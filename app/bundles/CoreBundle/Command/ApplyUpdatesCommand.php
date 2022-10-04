@@ -1,71 +1,39 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Update\StepProvider;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\SymfonyQuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to update the application.
  */
-class ApplyUpdatesCommand extends ContainerAwareCommand
+class ApplyUpdatesCommand extends Command
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
+    private StepProvider $stepProvider;
+    private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
-     * @var StepProvider
-     */
-    private $stepProvider;
-
-    /**
-     * @var InputInterface
-     */
-    private $input;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var ProgressBar
-     */
-    private $progressBar;
-
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, StepProvider $stepProvider)
-    {
+    public function __construct(
+        TranslatorInterface $translator,
+        StepProvider $stepProvider,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         parent::__construct();
 
         $this->translator           = $translator;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->stepProvider         = $stepProvider;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     protected function configure()
@@ -105,29 +73,26 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input  = $input;
-        $this->output = $output;
-
         $options = $input->getOptions();
 
-        // Set the locale for the translator
-        $this->translator->setLocale($this->coreParametersHelper->get('locale'));
-
         // Start a progress bar, don't give a max number of steps because it is conditional
-        $this->progressBar = ProgressBarHelper::init($this->output);
-        $this->progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
+        $progressBar = ProgressBarHelper::init($output);
+        $progressBar->setFormat('Step %current% [%bar%] <info>%message%</info>');
 
         // Define this just in case
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', (isset($options['env'])) ? $options['env'] : 'prod');
 
+        if (true === $this->coreParametersHelper->get('composer_updates', false)) {
+            $output->writeln('<error>'.$this->translator->trans('mautic.core.command.update.composer').'</error>');
+
+            return 1;
+        }
+
         try {
             if (empty($options['finish'])) {
-                $returnCode = $this->startUpgrade();
+                $returnCode = $this->startUpgrade($input, $output, $progressBar);
 
                 $output->writeln(
                     "\n\n<warning>".$this->translator->trans('mautic.core.command.update.finalize_instructions').'</warning>'
@@ -137,7 +102,7 @@ EOT
                 exit($returnCode);
             }
 
-            return $this->finishUpgrade();
+            return $this->finishUpgrade($input, $output, $progressBar);
         } catch (UpdateFailedException $exception) {
             $output->writeln(
                 "\n\n<error>".$exception->getMessage().'</error>'
@@ -150,20 +115,20 @@ EOT
     /**
      * @throws UpdateFailedException
      */
-    private function startUpgrade(): int
+    private function startUpgrade(InputInterface $input, OutputInterface $output, ProgressBar $progressBar): int
     {
-        if (!$this->input->getOption('force')) {
+        if (!$input->getOption('force')) {
             /** @var SymfonyQuestionHelper $helper */
             $helper   = $this->getHelperSet()->get('question');
             $question = new ConfirmationQuestion($this->translator->trans('mautic.core.update.confirm_application_update').' ', false);
 
-            if (!$helper->ask($this->input, $this->output, $question)) {
+            if (!$helper->ask($input, $output, $question)) {
                 throw new UpdateFailedException($this->translator->trans('mautic.core.update.aborted'));
             }
         }
 
         foreach ($this->stepProvider->getInitialSteps() as $step) {
-            $step->execute($this->progressBar, $this->input, $this->output);
+            $step->execute($progressBar, $input, $output);
         }
 
         return 0;
@@ -172,10 +137,10 @@ EOT
     /**
      * @throws UpdateFailedException
      */
-    private function finishUpgrade(): int
+    private function finishUpgrade(InputInterface $input, OutputInterface $output, ProgressBar $progressBar): int
     {
         foreach ($this->stepProvider->getFinalSteps() as $step) {
-            $step->execute($this->progressBar, $this->input, $this->output);
+            $step->execute($progressBar, $input, $output);
         }
 
         return 0;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Form;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
@@ -21,9 +12,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailStepType extends AbstractType
 {
@@ -153,6 +144,26 @@ class EmailStepType extends AbstractType
                     'class'        => 'form-control',
                     'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getAmazonService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.amazon_region.tooltip',
+                    'onchange'     => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'mailer_sparkpost_region',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.email.config.mailer.sparkpost_region.us'      => 'us',
+                    'mautic.email.config.mailer.sparkpost_region.eu'      => 'eu',
+                ],
+                'label'       => 'mautic.email.config.mailer.sparkpost_region',
+                'required'    => false,
+                'attr'        => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getSparkPostService().']}',
+                    'tooltip'      => 'mautic.email.config.mailer.sparkpost_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
                 'placeholder' => false,

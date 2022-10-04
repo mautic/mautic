@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -63,7 +54,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     private $output;
 
     /**
-     * @var GeneratedColumns
+     * @var GeneratedColumns<GeneratedColumn>
      */
     private $generatedColumns;
 
@@ -75,8 +66,6 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->versionProvider          = $this->createMock(VersionProviderInterface::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
@@ -98,7 +87,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 
-    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand()
+    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -110,7 +99,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenNotSupported()
+    public function testAddGeneratedColumnsWhenNotSupported(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -126,7 +115,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenExistsAlready()
+    public function testAddGeneratedColumnsWhenExistsAlready(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -150,7 +139,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenDoesNotExist()
+    public function testAddGeneratedColumnsWhenDoesNotExist(): void
     {
         $this->command->expects($this->once())
             ->method('getName')

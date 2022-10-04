@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'Social Media',
     'description' => 'Enables integrations with Mautic supported social media services.',
@@ -19,23 +10,23 @@ return [
         'main' => [
             'mautic_social_index' => [
                 'path'       => '/monitoring/{page}',
-                'controller' => 'MauticSocialBundle:Monitoring:index',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
             ],
             'mautic_social_action' => [
                 'path'       => '/monitoring/{objectAction}/{objectId}',
-                'controller' => 'MauticSocialBundle:Monitoring:execute',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::executeAction',
             ],
             'mautic_social_contacts' => [
                 'path'       => '/monitoring/view/{objectId}/contacts/{page}',
-                'controller' => 'MauticSocialBundle:Monitoring:contacts',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::contactsAction',
             ],
             'mautic_tweet_index' => [
                 'path'       => '/tweets/{page}',
-                'controller' => 'MauticSocialBundle:Tweet:index',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\TweetController::indexAction',
             ],
             'mautic_tweet_action' => [
                 'path'       => '/tweets/{objectAction}/{objectId}',
-                'controller' => 'MauticSocialBundle:Tweet:execute',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\TweetController::executeAction',
             ],
         ],
         'api' => [
@@ -43,13 +34,13 @@ return [
                 'standard_entity' => true,
                 'name'            => 'tweets',
                 'path'            => '/tweets',
-                'controller'      => 'MauticSocialBundle:Api\TweetApi',
+                'controller'      => 'MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController',
             ],
         ],
         'public' => [
             'mautic_social_js_generate' => [
                 'path'       => '/social/generate/{formName}.js',
-                'controller' => 'MauticSocialBundle:Js:generate',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\JsController::generateAction',
             ],
         ],
     ],
@@ -304,6 +295,12 @@ return [
                     'mautic.helper.integration',
                     'mautic.social.helper.twitter_command',
                     'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.social.command.social_monitoring' => [
+                'class'     => \MauticPlugin\MauticSocialBundle\Command\MauticSocialMonitoringCommand::class,
+                'arguments' => [
+                    'mautic.social.model.monitoring',
                 ],
             ],
         ],

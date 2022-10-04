@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -69,11 +60,13 @@ class PendingEvent extends AbstractLogCollectionEvent
     /**
      * @param string $reason
      */
-    public function fail(LeadEventLog $log, $reason)
+    public function fail(LeadEventLog $log, $reason, \DateInterval $rescheduleInterval = null)
     {
         if (!$failedLog = $log->getFailedLog()) {
             $failedLog = new FailedLeadEventLog();
         }
+
+        $log->setRescheduleInterval($rescheduleInterval);
 
         $failedLog->setLog($log)
             ->setDateAdded(new \DateTime())
@@ -155,6 +148,29 @@ class PendingEvent extends AbstractLogCollectionEvent
         );
 
         $this->passLog($log);
+    }
+
+    /**
+     * @param string $error
+     */
+    public function passAllWithError($error)
+    {
+        /** @var LeadEventLog $log */
+        foreach ($this->logs as $log) {
+            $this->passWithError($log, $error);
+        }
+    }
+
+    /**
+     * Pass all remainging logs that have not failed failed nor suceeded yet.
+     */
+    public function passRemainingWithError(string $error)
+    {
+        foreach ($this->logs as $log) {
+            if (!$this->failures->contains($log) && !$this->successful->contains($log)) {
+                $this->passWithError($log, $error);
+            }
+        }
     }
 
     /**

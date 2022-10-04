@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -88,9 +79,6 @@ class EventExecutioner
      */
     private $leadRepository;
 
-    /**
-     * EventExecutioner constructor.
-     */
     public function __construct(
         EventCollector $eventCollector,
         EventLogger $eventLogger,
@@ -151,7 +139,10 @@ class EventExecutioner
     }
 
     /**
-     * @param bool $isInactiveEvent
+     * @param ArrayCollection<int,Lead> $contacts
+     * @param bool                      $isInactiveEvent
+     *
+     * @return void
      *
      * @throws Dispatcher\Exception\LogNotProcessedException
      * @throws Dispatcher\Exception\LogPassedAndFailedException
@@ -302,7 +293,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+            ->clear();
     }
 
     /**
@@ -324,7 +315,7 @@ class EventExecutioner
 
         // Save updated log entries and clear from memory
         $this->eventLogger->persistCollection($logs)
-            ->clearCollection($logs);
+            ->clear();
     }
 
     /**
@@ -517,5 +508,14 @@ class EventExecutioner
         $counter->advanceEvaluated($children->count());
 
         $this->executeEventsForContacts($children, $contacts, $counter);
+    }
+
+    /**
+     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    public function persistSummaries(): void
+    {
+        $this->eventLogger->getSummaryModel()->persistSummaries();
     }
 }

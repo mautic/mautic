@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 use Mautic\EmailBundle\EmailEvents;
@@ -16,7 +7,7 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
@@ -107,10 +98,9 @@ class Fetcher
                         $this->dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
                     }
 
-                    $this->log[] = $this->translator->transChoice(
+                    $this->log[] = $this->translator->trans(
                         'mautic.email.fetch.processed',
-                        $processed,
-                        ['%processed%' => $processed, '%imapPath%' => $path, '%criteria%' => $criteria]
+                        ['%count%' => $processed, '%imapPath%' => $path, '%criteria%' => $criteria]
                     );
 
                     if ($limit && $this->processedMessageCounter >= $limit) {

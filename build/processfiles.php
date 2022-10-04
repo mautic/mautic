@@ -41,9 +41,6 @@ system('rm -f vendor/babdev/transifex/.scrutinizer.yml');
 // doctrine/common
 system('rm -f vendor/doctrine/common/UPGRADE_TO*');
 
-// doctrine/doctrine-cache-bundle
-system('rm -f vendor/doctrine/doctrine-cache-bundle/Doctrine/Bundle/DoctrineCacheBundle/ruleset.xml');
-
 // doctrine/migrations
 system('rm -f vendor/doctrine/migrations/build.properties.dev');
 
@@ -132,9 +129,6 @@ system('rm -f vendor/twig/twig/README.rst');
 
 // webfactory/exceptions-bundle
 system('rm -rf vendor/webfactory/exceptions-bundle/Resources/doc');
-
-// willdurand/oauth-server-bundle
-system('rm -rf vendor/willdurand/oauth-server-bundle/Resources/doc');
 
 // Delete random files
 system('find . -type f -name phpunit.xml -exec rm -f {} \\;');

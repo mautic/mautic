@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\QueueBundle\EventListener;
 
 use Mautic\QueueBundle\Event as Events;
 use Mautic\QueueBundle\Queue\QueueProtocol;
 use PhpAmqpLib\Message\AMQPMessage;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class RabbitMqSubscriber extends AbstractQueueSubscriber
 {
@@ -60,6 +48,12 @@ class RabbitMqSubscriber extends AbstractQueueSubscriber
             'durable'     => true,
         ]);
         $consumer->setRoutingKey($event->getQueueName());
+
+        // Check event for positive execution time and set on Consumer
+        if (0 < ($timeout = $event->getTimeout())) {
+            $consumer->setGracefulMaxExecutionDateTimeFromSecondsInTheFuture($timeout);
+        }
+
         $consumer->consume($event->getMessages());
     }
 }

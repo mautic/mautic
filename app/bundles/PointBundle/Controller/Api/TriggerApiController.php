@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -38,7 +29,7 @@ class TriggerApiController extends CommonApiController
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method            = $this->request->getMethod();
-        $triggerEventModel = $this->getModel('point.triggerEvent');
+        $triggerEventModel = $this->getModel('point.triggerevent');
         $isNew             = false;
 
         // Set timestamps
@@ -70,7 +61,7 @@ class TriggerApiController extends CommonApiController
                 $triggerEventForm = $this->createTriggerEventEntityForm($triggerEventEntity);
                 $triggerEventForm->submit($eventParams, 'PATCH' !== $method);
 
-                if (!$triggerEventForm->isValid()) {
+                if (!($triggerEventForm->isSubmitted() && $triggerEventForm->isValid())) {
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
@@ -100,7 +91,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm($entity)
     {
-        return $this->getModel('point.triggerEvent')->createForm(
+        return $this->getModel('point.triggerevent')->createForm(
             $entity,
             $this->get('form.factory'),
             null,

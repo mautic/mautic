@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Factory;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
@@ -43,9 +34,8 @@ class ModelFactory
 
         [$bundle, $name] = $parts;
 
-        $containerKey = strtolower(
-            sprintf('mautic.%s.model.%s', $bundle, $name)
-        );
+        // The container is now case sensitive
+        $containerKey = sprintf('mautic.%s.model.%s', $bundle, $name);
 
         if ($this->container->has($containerKey)) {
             return $this->container->get($containerKey);

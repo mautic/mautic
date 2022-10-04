@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -27,9 +18,37 @@ class ListApiController extends CommonApiController
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
-        $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress'];
+        $this->serializerGroups = ['leadListDetails', 'userList', 'publishDetails', 'ipAddress', 'categoryList'];
 
         parent::initialize($event);
+    }
+
+    /**
+     * @deprecated This conversion won't be needed in couple of years.
+     *
+     * The 'filter' and 'display' fields used to be part of each segment filter root array.
+     * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
+     * from filter root array so Symfony forms would not fail with unknown field error.
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
+            return $parameters;
+        }
+
+        foreach ($parameters['filters'] as $key => $filter) {
+            $bcFilterValue                                       = $filter['filter'] ?? null;
+            $filterValue                                         = $filter['properties']['filter'] ?? $bcFilterValue;
+            $parameters['filters'][$key]['properties']['filter'] = $filterValue;
+
+            if (!empty($filter['display']) && !isset($filter['properties']['display'])) {
+                $parameters['filters'][$key]['properties']['display'] = $filter['display'];
+            }
+
+            unset($parameters['filters'][$key]['filter'], $parameters['filters'][$key]['display']);
+        }
+
+        return $parameters;
     }
 
     /**

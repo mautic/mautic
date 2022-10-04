@@ -1,23 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Joomla\Http\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -256,7 +247,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
      */
     public function getFormLeadFields($settings = [])
     {
-        return  $this->getFormFieldsByObject('contacts', $settings);
+        return $this->getFormFieldsByObject('contacts', $settings);
     }
 
     /**
@@ -372,10 +363,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
 
                     return $integrationEntityId;
                 }
-                /** @var Response $response */
+                /** @var ResponseInterface $response */
                 $response = $this->getApiHelper()->createLead($mappedData, $lead);
                 // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
-                $header = $response->headers['OData-EntityId'];
+                $header = $response->getHeader('OData-EntityId');
                 if (preg_match('/contacts\((.+)\)/', $header, $out)) {
                     $id = $out[1];
                     if (empty($integrationId)) {
@@ -433,7 +424,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, -6));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {
@@ -505,7 +496,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 $oparams['request_settings']['headers']['Prefer'] = 'odata.maxpagesize='.$MAX_RECORDS;
                 $oparams['$select']                               = implode(',', $mappedData);
                 if (isset($params['fetchAll'], $params['start']) && !$params['fetchAll']) {
-                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, '-6'));
+                    $oparams['$filter'] = sprintf('modifiedon ge %sZ', substr($params['start'], 0, -6));
                 }
 
                 if (isset($params['output']) && $params['output']->getVerbosity() < OutputInterface::VERBOSITY_VERBOSE) {

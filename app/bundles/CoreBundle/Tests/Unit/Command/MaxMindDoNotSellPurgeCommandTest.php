@@ -14,14 +14,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        define('MAUTIC_TABLE_PREFIX', 'test');
-    }
-
-    public function testCommandDryRun()
+    public function testCommandDryRun(): void
     {
         $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
@@ -32,13 +25,13 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute(['--dry-run' => true]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Dry run; skipping purge', $output);
-        $this->assertNotContains('No matches found', $output);
-        $this->assertNotContains('Step 2: Purging data...', $output);
+        $this->assertStringContainsString('Dry run; skipping purge', $output);
+        $this->assertStringNotContainsString('No matches found', $output);
+        $this->assertStringNotContainsString('Step 2: Purging data...', $output);
         $this->assertEquals(0, $result);
     }
 
-    public function testNoContactsFound()
+    public function testNoContactsFound(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([]);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
@@ -49,12 +42,12 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute([]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('No matches found', $output);
-        $this->assertNotContains('contacts with IPs from Do Not Sell list', $output);
+        $this->assertStringContainsString('No matches found', $output);
+        $this->assertStringNotContainsString('contacts with IPs from Do Not Sell list', $output);
         $this->assertEquals(0, $result);
     }
 
-    public function testPurge()
+    public function testPurge(): void
     {
         $mockEntityManager = $this->buildMockEntityManager([['id' => 1, 'ip_address' => '123.123.123.123']]);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
@@ -65,13 +58,13 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $result = $commandTester->execute([]);
         $output = $commandTester->getDisplay();
 
-        $this->assertContains('Found 1 contacts with an IP from the Do Not Sell list', $output);
-        $this->assertContains('Step 2: Purging data...', $output);
-        $this->assertNotContains('No matches found', $output);
+        $this->assertStringContainsString('Found 1 contacts with an IP from the Do Not Sell list', $output);
+        $this->assertStringContainsString('Step 2: Purging data...', $output);
+        $this->assertStringNotContainsString('No matches found', $output);
         $this->assertEquals(0, $result);
     }
 
-    private function buildMockEntityManager(array $dataToReturn)
+    private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);
         $mockStatement->method('fetchAll')->withAnyParameters()->willReturn($dataToReturn);

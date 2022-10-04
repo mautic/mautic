@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -16,6 +7,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -27,7 +19,6 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
@@ -98,7 +89,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -110,7 +101,7 @@ class ReportSubscriber implements EventSubscriberInterface
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
         FieldsBuilder $fieldsBuilder,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;
@@ -156,6 +147,28 @@ class ReportSubscriber implements EventSubscriberInterface
                 $this->fieldsBuilder->getLeadFilter('l.', 's.'),
                 $companyColumns
             );
+
+            if ($event->checkContext([self::CONTEXT_LEADS])) {
+                $stageColumns = [
+                    'l.stage_id'           => [
+                        'label' => 'mautic.lead.report.attribution.stage_id',
+                        'type'  => 'int',
+                        'link'  => 'mautic_stage_action',
+                    ],
+                    's.name'               => [
+                        'alias' => 'stage_name',
+                        'label' => 'mautic.lead.report.attribution.stage_name',
+                        'type'  => 'string',
+                    ],
+                    's.date_added' => [
+                        'alias'   => 'stage_date_added',
+                        'label'   => 'mautic.lead.report.attribution.stage_date_added',
+                        'type'    => 'string',
+                        'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                    ],
+                ];
+                $columns      = array_merge($columns, $stageColumns);
+            }
 
             $data = [
                 'display_name' => 'mautic.lead.leads',
@@ -233,12 +246,16 @@ class ReportSubscriber implements EventSubscriberInterface
             case self::CONTEXT_LEADS:
                 $qb->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
+                }
+
+                if ($event->hasColumn(['s.name']) || $event->hasFilter(['s.name'])) {
+                    $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'stages', 's', 's.id = l.stage_id');
                 }
 
                 if ($event->hasFilter('s.leadlist_id')) {
@@ -247,6 +264,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 } else {
                     $event->applyDateFilters($qb, 'date_added', 'l');
                 }
+                $event->addCompanyLeftJoin($qb);
                 break;
 
             case self::CONTEXT_LEAD_POINT_LOG:
@@ -254,12 +272,16 @@ class ReportSubscriber implements EventSubscriberInterface
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
                     ->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lp.lead_id');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
+                }
+
+                if ($event->hasFilter('s.leadlist_id')) {
+                    $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
                 break;
@@ -268,11 +290,11 @@ class ReportSubscriber implements EventSubscriberInterface
                 $qb->from(MAUTIC_TABLE_PREFIX.'lead_frequencyrules', 'lf')
                     ->leftJoin('lf', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = lf.lead_id');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addLeadIpAddressLeftJoin($qb);
                 }
 
@@ -298,15 +320,15 @@ class ReportSubscriber implements EventSubscriberInterface
                         )
                     );
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
                 }
 
-                if ($event->hasColumn('i.ip_address') || $event->hasFilter('i.ip_address')) {
+                if ($event->usesColumn('i.ip_address')) {
                     $event->addIpAddressLeftJoin($qb, 'log');
                 }
 
-                if ($event->hasColumn(['cat.id', 'cat.title']) || $event->hasColumn(['cat.id', 'cat.title'])) {
+                if ($event->usesColumn(['cat.id', 'cat.title'])) {
                     $event->addCategoryLeftJoin($qb, 'c', 'cat');
                 }
 
@@ -366,7 +388,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->applyDateFilters($qb, 'date_added', 'comp');
                 $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
 
-                if ($event->hasColumn(['u.first_name', 'u.last_name']) || $event->hasFilter(['u.first_name', 'u.last_name'])) {
+                if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
                     $qb->leftJoin('comp', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = comp.owner_id');
                 }
 
@@ -480,8 +502,11 @@ class ReportSubscriber implements EventSubscriberInterface
                     break;
 
                 case 'mautic.lead.graph.line.leads':
-                    $chart = new LineChart(null, $options['dateFrom'], $options['dateTo']);
-                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', 'l');
+                    $chart          = new LineChart(null, $options['dateFrom'], $options['dateTo']);
+                    $parametersKeys = array_keys($queryBuilder->getParameters() ?? []);
+                    $leadListFilter = preg_grep('/leadlistid/', $parametersKeys);
+                    $tablePrefix    = $leadListFilter ? 's' : 'l';
+                    $chartQuery->modifyTimeDataQuery($queryBuilder, 'date_added', $tablePrefix);
                     $leads = $chartQuery->loadAndBuildTimeData($queryBuilder);
                     $chart->setDataset($options['translator']->trans('mautic.lead.all.leads'), $leads);
                     $queryBuilder->andwhere($qb->expr()->isNotNull('l.date_identified'));

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
@@ -23,6 +14,8 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\FormBundle\Form\Type\FormListType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
@@ -41,7 +34,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailType extends AbstractType
 {
@@ -62,14 +55,25 @@ class EmailType extends AbstractType
      */
     private $stageModel;
 
+    private CoreParametersHelper $coreParametersHelper;
+
+    /**
+     * @var ThemeHelperInterface
+     */
+    private $themeHelper;
+
     public function __construct(
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        StageModel $stageModel
+        StageModel $stageModel,
+        CoreParametersHelper $coreParametersHelper,
+        ThemeHelperInterface $themeHelper
     ) {
-        $this->translator = $translator;
-        $this->em         = $entityManager;
-        $this->stageModel = $stageModel;
+        $this->translator           = $translator;
+        $this->em                   = $entityManager;
+        $this->stageModel           = $stageModel;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->themeHelper          = $themeHelper;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -161,6 +165,21 @@ class EmailType extends AbstractType
         );
 
         $builder->add(
+            'useOwnerAsMailer',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.use.owner.as.mailer',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.use.owner.as.mailer.tooltip',
+                ],
+                'data'     => (bool) (is_null($options['data']->getUseOwnerAsMailer()) ? $this->coreParametersHelper->get('mailer_is_owner') : $options['data']->getUseOwnerAsMailer()),
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
             'utmTags',
             EmailUtmTagsType::class,
             [
@@ -189,6 +208,10 @@ class EmailType extends AbstractType
             ]
         );
 
+        $template = $options['data']->getTemplate() ?? 'blank';
+        // If theme does not exist, set empty
+        $template = $this->themeHelper->getCurrentTheme($template, 'email');
+
         $builder->add(
             'template',
             ThemeListType::class,
@@ -198,7 +221,7 @@ class EmailType extends AbstractType
                     'class'   => 'form-control not-chosen hidden',
                     'tooltip' => 'mautic.email.form.template.help',
                 ],
-                'data' => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data' => $template,
             ]
         );
 
@@ -264,9 +287,11 @@ class EmailType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'required'   => false,
                     'attr'       => [
+                        'tooltip'              => 'mautic.email.form.body.help',
                         'class'                => 'form-control editor-builder-tokens builder-html editor-email',
                         'data-token-callback'  => 'email:getBuilderTokens',
                         'data-token-activator' => '{',
+                        'rows'                 => '15',
                     ],
                 ]
             )->addModelTransformer($emojiTransformer)

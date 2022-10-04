@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'Integrations',
     'description' => 'Adds support for plugin integrations',
@@ -19,24 +10,24 @@ return [
         'main' => [
             'mautic_integration_config' => [
                 'path'       => '/integration/{integration}/config',
-                'controller' => 'IntegrationsBundle:Config:edit',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\ConfigController::editAction',
             ],
             'mautic_integration_config_field_pagination' => [
                 'path'       => '/integration/{integration}/config/{object}/{page}',
-                'controller' => 'IntegrationsBundle:FieldPagination:paginate',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\FieldPaginationController::paginateAction',
                 'defaults'   => [
                     'page' => 1,
                 ],
             ],
             'mautic_integration_config_field_update' => [
                 'path'       => '/integration/{integration}/config/{object}/field/{field}',
-                'controller' => 'IntegrationsBundle:UpdateField:update',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\UpdateFieldController::updateAction',
             ],
         ],
         'public' => [
             'mautic_integration_public_callback' => [
                 'path'       => '/integration/{integration}/callback',
-                'controller' => 'IntegrationsBundle:Auth:callback',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\AuthController::callbackAction',
             ],
         ],
     ],
@@ -173,6 +164,12 @@ return [
             ],
             'mautic.integrations.helper.config_integrations' => [
                 'class'     => \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
+            'mautic.integrations.helper.builder_integrations' => [
+                'class'     => \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],

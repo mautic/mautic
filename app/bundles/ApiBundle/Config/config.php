@@ -1,49 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'public' => [
-            // OAuth1.0a
-            'bazinga_oauth_server_requesttoken' => [
-                'path'       => '/oauth/v1/request_token',
-                'controller' => 'bazinga.oauth.controller.server:requestTokenAction',
-                'method'     => 'GET|POST',
-            ],
-            'bazinga_oauth_login_allow' => [
-                'path'       => '/oauth/v1/authorize',
-                'controller' => 'MauticApiBundle:oAuth1/Authorize:allow',
-                'method'     => 'GET',
-            ],
-            'bazinga_oauth_server_authorize' => [
-                'path'       => '/oauth/v1/authorize',
-                'controller' => 'bazinga.oauth.controller.server:authorizeAction',
-                'method'     => 'POST',
-            ],
-            'mautic_oauth1_server_auth_login' => [
-                'path'       => '/oauth/v1/authorize_login',
-                'controller' => 'MauticApiBundle:oAuth1/Security:login',
-                'method'     => 'GET|POST',
-            ],
-            'mautic_oauth1_server_auth_login_check' => [
-                'path'       => '/oauth/v1/authorize_login_check',
-                'controller' => 'MauticApiBundle:oAuth1/Security:loginCheck',
-                'method'     => 'GET|POST',
-            ],
-            'bazinga_oauth_server_accesstoken' => [
-                'path'       => '/oauth/v1/access_token',
-                'controller' => 'bazinga.oauth.controller.server:accessTokenAction',
-                'method'     => 'GET|POST',
-            ],
-
             // OAuth2
             'fos_oauth_server_token' => [
                 'path'       => '/oauth/v2/token',
@@ -52,17 +11,17 @@ return [
             ],
             'fos_oauth_server_authorize' => [
                 'path'       => '/oauth/v2/authorize',
-                'controller' => 'MauticApiBundle:oAuth2/Authorize:authorize',
+                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::authorizeAction',
                 'method'     => 'GET|POST',
             ],
             'mautic_oauth2_server_auth_login' => [
                 'path'       => '/oauth/v2/authorize_login',
-                'controller' => 'MauticApiBundle:oAuth2/Security:login',
+                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\SecurityController::loginAction',
                 'method'     => 'GET|POST',
             ],
             'mautic_oauth2_server_auth_login_check' => [
                 'path'       => '/oauth/v2/authorize_login_check',
-                'controller' => 'MauticApiBundle:oAuth2/Security:loginCheck',
+                'controller' => 'Mautic\ApiBundle\Controller\oAuth2\SecurityController::loginCheckAction',
                 'method'     => 'GET|POST',
             ],
         ],
@@ -70,11 +29,11 @@ return [
             // Clients
             'mautic_client_index' => [
                 'path'       => '/credentials/{page}',
-                'controller' => 'MauticApiBundle:Client:index',
+                'controller' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             ],
             'mautic_client_action' => [
                 'path'       => '/credentials/{objectAction}/{objectId}',
-                'controller' => 'MauticApiBundle:Client:execute',
+                'controller' => 'Mautic\ApiBundle\Controller\ClientController::executeAction',
             ],
         ],
     ],
@@ -98,7 +57,7 @@ return [
 
     'services' => [
         'controllers' => [
-            'mautic.api' => [
+            'mautic.api.oauth2.authorize_controller' => [
                 'class'     => \Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class,
                 'arguments' => [
                     'request_stack',
@@ -162,6 +121,11 @@ return [
                 'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
             ],
         ],
+        'helpers' => [
+            'mautic.api.helper.entity_result' => [
+                'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
+            ],
+        ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
                 'class'     => 'Mautic\ApiBundle\EventListener\OAuthEventListener',
@@ -185,13 +149,6 @@ return [
                     ],
                 ],
             ],
-            'mautic.api.oauth1.nonce_provider' => [
-                'class'     => 'Mautic\ApiBundle\Provider\NonceProvider',
-                'arguments' => 'doctrine.orm.entity_manager',
-            ],
-            'bazinga.oauth.security.authentication.provider.class'    => 'Mautic\ApiBundle\Security\OAuth1\Authentication\Provider\OAuthProvider',
-            'bazinga.oauth.security.authentication.listener.class'    => 'Mautic\ApiBundle\Security\OAuth1\Firewall\OAuthListener',
-            'bazinga.oauth.event_listener.request.class'              => 'Mautic\ApiBundle\EventListener\OAuth1\OAuthRequestListener',
             'fos_oauth_server.security.authentication.listener.class' => 'Mautic\ApiBundle\Security\OAuth2\Firewall\OAuthListener',
             'jms_serializer.metadata.annotation_driver'               => 'Mautic\ApiBundle\Serializer\Driver\AnnotationDriver',
             'jms_serializer.metadata.api_metadata_driver'             => [

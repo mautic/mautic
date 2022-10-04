@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'MauticConfigBundle:Config:execute',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
             ],
             'mautic_sysinfo_index' => [
                 'path'       => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index',
+                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
             ],
         ],
     ],
@@ -51,8 +42,6 @@ return [
             'mautic.config.subscriber' => [
                 'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
                 'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'service_container',
                     'mautic.config.config_change_logger',
                 ],
             ],
@@ -63,6 +52,7 @@ return [
                 'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
                 'arguments' => [
                     'mautic.config.form.restriction_helper',
+                    'mautic.config.form.escape_transformer',
                 ],
             ],
         ],
@@ -73,6 +63,9 @@ return [
                     'mautic.helper.paths',
                     'mautic.helper.core_parameters',
                     'translator',
+                    'doctrine.dbal.default_connection',
+                    'mautic.install.service',
+                    'mautic.install.configurator.step.check',
                 ],
             ],
         ],
@@ -98,6 +91,20 @@ return [
                     'mautic.core.model.auditlog',
                 ],
             ],
+            'mautic.config.form.escape_transformer' => [
+                'class'     => \Mautic\ConfigBundle\Form\Type\EscapeTransformer::class,
+                'arguments' => [
+                    '%mautic.config_allowed_parameters%',
+                ],
+            ],
+        ],
+    ],
+
+    'parameters' => [
+        'config_allowed_parameters' => [
+            'kernel.root_dir',
+            'kernel.project_dir',
+            'kernel.logs_dir',
         ],
     ],
 ];

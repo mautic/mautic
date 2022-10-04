@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\EventListener\CampaignSubscriber;
 use Mautic\FormBundle\EventListener\DashboardSubscriber;
@@ -47,37 +38,37 @@ return [
         'main' => [
             'mautic_formaction_action' => [
                 'path'       => '/forms/action/{objectAction}/{objectId}',
-                'controller' => 'MauticFormBundle:Action:execute',
+                'controller' => 'Mautic\FormBundle\Controller\ActionController::executeAction',
             ],
             'mautic_formfield_action' => [
                 'path'       => '/forms/field/{objectAction}/{objectId}',
-                'controller' => 'MauticFormBundle:Field:execute',
+                'controller' => 'Mautic\FormBundle\Controller\FieldController::executeAction',
             ],
             'mautic_form_index' => [
                 'path'       => '/forms/{page}',
-                'controller' => 'MauticFormBundle:Form:index',
+                'controller' => 'Mautic\FormBundle\Controller\FormController::indexAction',
             ],
             'mautic_form_results' => [
                 'path'       => '/forms/results/{objectId}/{page}',
-                'controller' => 'MauticFormBundle:Result:index',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
             ],
             'mautic_form_export' => [
                 'path'       => '/forms/results/{objectId}/export/{format}',
-                'controller' => 'MauticFormBundle:Result:export',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::exportAction',
                 'defaults'   => [
                     'format' => 'csv',
                 ],
             ],
             'mautic_form_results_action' => [
                 'path'       => '/forms/results/{formId}/{objectAction}/{objectId}',
-                'controller' => 'MauticFormBundle:Result:execute',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::executeAction',
                 'defaults'   => [
                     'objectId' => 0,
                 ],
             ],
             'mautic_form_action' => [
                 'path'       => '/forms/{objectAction}/{objectId}',
-                'controller' => 'MauticFormBundle:Form:execute',
+                'controller' => 'Mautic\FormBundle\Controller\FormController::executeAction',
             ],
         ],
         'api' => [
@@ -85,62 +76,62 @@ return [
                 'standard_entity' => true,
                 'name'            => 'forms',
                 'path'            => '/forms',
-                'controller'      => 'MauticFormBundle:Api\FormApi',
+                'controller'      => 'Mautic\FormBundle\Controller\Api\FormApiController',
             ],
             'mautic_api_formresults' => [
                 'path'       => '/forms/{formId}/submissions',
-                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntities',
+                'controller' => 'Mautic\FormBundle\Controller\Api\SubmissionApiController::getEntitiesAction',
             ],
             'mautic_api_formresult' => [
                 'path'       => '/forms/{formId}/submissions/{submissionId}',
-                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntity',
+                'controller' => 'Mautic\FormBundle\Controller\Api\SubmissionApiController::getEntityAction',
             ],
             'mautic_api_contactformresults' => [
                 'path'       => '/forms/{formId}/submissions/contact/{contactId}',
-                'controller' => 'MauticFormBundle:Api\SubmissionApi:getEntitiesForContact',
+                'controller' => 'Mautic\FormBundle\Controller\Api\SubmissionApiController::getEntitiesForContactAction',
             ],
             'mautic_api_formdeletefields' => [
                 'path'       => '/forms/{formId}/fields/delete',
-                'controller' => 'MauticFormBundle:Api\FormApi:deleteFields',
+                'controller' => 'Mautic\FormBundle\Controller\Api\FormApiController::deleteFieldsAction',
                 'method'     => 'DELETE',
             ],
             'mautic_api_formdeleteactions' => [
                 'path'       => '/forms/{formId}/actions/delete',
-                'controller' => 'MauticFormBundle:Api\FormApi:deleteActions',
+                'controller' => 'Mautic\FormBundle\Controller\Api\FormApiController::deleteActionsAction',
                 'method'     => 'DELETE',
             ],
         ],
         'public' => [
             'mautic_form_file_download' => [
                 'path'       => '/forms/results/file/{submissionId}/{field}',
-                'controller' => 'MauticFormBundle:Result:downloadFile',
+                'controller' => 'Mautic\FormBundle\Controller\ResultController::downloadFileAction',
             ],
             'mautic_form_postresults' => [
                 'path'       => '/form/submit',
-                'controller' => 'MauticFormBundle:Public:submit',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::submitAction',
             ],
             'mautic_form_generateform' => [
                 'path'       => '/form/generate.js',
-                'controller' => 'MauticFormBundle:Public:generate',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::generateAction',
             ],
             'mautic_form_postmessage' => [
                 'path'       => '/form/message',
-                'controller' => 'MauticFormBundle:Public:message',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::messageAction',
             ],
             'mautic_form_preview' => [
                 'path'       => '/form/{id}',
-                'controller' => 'MauticFormBundle:Public:preview',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::previewAction',
                 'defaults'   => [
                     'id' => '0',
                 ],
             ],
             'mautic_form_embed' => [
                 'path'       => '/form/embed/{id}',
-                'controller' => 'MauticFormBundle:Public:embed',
+                'controller' => 'Mautic\FormBundle\Controller\PublicController::embedAction',
             ],
             'mautic_form_postresults_ajax' => [
                 'path'       => '/form/submit/ajax',
-                'controller' => 'MauticFormBundle:Ajax:submit',
+                'controller' => 'Mautic\FormBundle\Controller\AjaxController::submitAction',
             ],
         ],
     ],
@@ -213,6 +204,7 @@ return [
                     'mautic.form.model.form',
                     'mautic.form.model.submission',
                     'mautic.campaign.executioner.realtime',
+                    'mautic.helper.form.field_helper',
                 ],
             ],
             'mautic.form.leadbundle.subscriber' => [
@@ -263,6 +255,13 @@ return [
                 'arguments' => [
                     'mautic.form.repository.submission',
                     'translator',
+                ],
+            ],
+            'mautic.form.conditional.subscriber' => [
+                'class'     => \Mautic\FormBundle\EventListener\FormConditionalSubscriber::class,
+                'arguments' => [
+                    'mautic.form.model.form',
+                    'mautic.form.model.field',
                 ],
             ],
         ],
@@ -342,6 +341,13 @@ return [
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
+                ],
+            ],
+            'mautic.form.type.field.conditional' => [
+                'class'       => \Mautic\FormBundle\Form\Type\FormFieldConditionType::class,
+                'arguments'   => [
+                    'mautic.form.model.field',
+                    'mautic.form.helper.properties.accessor',
                 ],
             ],
         ],
@@ -437,6 +443,12 @@ return [
                 'class'     => FieldValueTransformer::class,
                 'arguments' => [
                     'router',
+                ],
+            ],
+            'mautic.form.helper.properties.accessor' => [
+                'class'     => \Mautic\FormBundle\Helper\PropertiesAccessor::class,
+                'arguments' => [
+                    'mautic.form.model.form',
                 ],
             ],
         ],

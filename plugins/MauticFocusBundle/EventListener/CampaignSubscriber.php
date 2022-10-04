@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -18,6 +9,7 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -79,7 +71,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             return $event->setResult(false);
         }
         $values                 = [];
-        $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], true)];
+        $values['focus_item'][] = ['id' => $focusId, 'js' => $this->router->generate('mautic_focus_generate', ['id' => $focusId], UrlGeneratorInterface::ABSOLUTE_URL)];
         $this->trackingHelper->updateSession($values);
 
         return $event->setResult(true);

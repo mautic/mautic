@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\ContactFinder\Limiter;
 
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
@@ -246,7 +237,7 @@ class ContactLimiter
     {
         if (!$this->hasCampaignLimit()) {
             throw new \Exception('Campaign Limit was not set');
-        } elseif ($this->campaignLimit <= ($this->campaignLimitUsed + $reduction)) {
+        } elseif ($this->campaignLimit < ($this->campaignLimitUsed + $reduction)) {
             throw new \Exception('Campaign Limit exceeded');
         }
         $this->campaignLimitUsed += $reduction;

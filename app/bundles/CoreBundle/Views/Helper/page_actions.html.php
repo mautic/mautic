@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 
 if (!isset($item)) {
@@ -23,10 +14,6 @@ $view['buttons']->reset($app->getRequest(), ButtonHelper::LOCATION_PAGE_ACTIONS,
 include 'action_button_helper.php';
 
 foreach ($templateButtons as $action => $enabled) {
-    if (!$enabled) {
-        continue;
-    }
-
     if (!$enabled) {
         continue;
     }
@@ -53,7 +40,7 @@ foreach ($templateButtons as $action => $enabled) {
             $priority        = 200;
             break;
         case 'new':
-        case'edit':
+        case 'edit':
             $actionQuery = ('edit' == $action) ? ['objectId' => $item->getId()] : [];
             $icon        = ('edit' == $action) ? 'pencil-square-o' : 'plus';
             $path        = $view['router']->path($actionRoute, array_merge(['objectAction' => $action], $actionQuery, $query));

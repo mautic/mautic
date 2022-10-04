@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Helper;
 
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -155,9 +146,12 @@ class FormUploader
             return;
         }
         $exif = exif_read_data($filename);
+        if (empty($exif['Orientation'])) {
+            return;
+        }
         $ort  = $exif['Orientation']; /*STORES ORIENTATION FROM IMAGE */
         $ort1 = $ort;
-        $exif = exif_read_data($filename, 0, true);
+        $exif = exif_read_data($filename, '', true);
         if (!empty($ort1)) {
             $image = imagecreatefromjpeg($filename);
             $ort   = $ort1;

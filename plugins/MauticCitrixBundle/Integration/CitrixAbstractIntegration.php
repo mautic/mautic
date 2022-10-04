@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Integration;
 
 use Mautic\PluginBundle\Entity\Integration;
@@ -125,6 +116,20 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         $keys = $this->getKeys();
 
         return $keys[$this->getAuthTokenKey()];
+    }
+
+    /**
+     * @param bool $inAuthorization
+     *
+     * @return string|null
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
+            return $this->keys[$this->getAuthTokenKey()];
+        }
+
+        return null;
     }
 
     /**

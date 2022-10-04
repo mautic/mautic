@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -90,7 +81,7 @@ class PublicController extends FormController
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {
                         $resetToken = $this->request->getSession()->get('resetToken');
-                        $encoder    = $this->get('security.encoder_factory')->getEncoder($user);
+                        $encoder    = $this->get('security.password_encoder');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
                             $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -68,7 +59,7 @@ class RoleController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticUserBundle:Role:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_role_index',
                     'mauticContent' => 'role',
@@ -160,7 +151,7 @@ class RoleController extends FormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticUserBundle:Role:index',
+                    'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_role_index',
                         'mauticContent' => 'role',
@@ -213,7 +204,7 @@ class RoleController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'mauticContent' => 'role',
@@ -371,7 +362,7 @@ class RoleController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'success'       => $success,
@@ -433,7 +424,7 @@ class RoleController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'mauticContent' => 'role',

@@ -1,20 +1,16 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
-use Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Field\CustomFieldColumn;
+use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\ListModel;
 
@@ -24,7 +20,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleContactFieldIsCreatedAndDeleted()
     {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -40,7 +36,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testSingleCompanyFieldIsCreatedAndDeleted()
     {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
 
         $field = new LeadField();
         $field->setName('Test Field')
@@ -56,7 +52,7 @@ class FieldModelTest extends MauticMysqlTestCase
 
     public function testMultipleFieldsAreCreatedAndDeleted()
     {
-        $fieldModel = $this->container->get('mautic.lead.model.field');
+        $fieldModel = self::$container->get('mautic.lead.model.field');
 
         $leadField = new LeadField();
         $leadField->setName('Test Field')
@@ -101,15 +97,20 @@ class FieldModelTest extends MauticMysqlTestCase
     {
         $leadField = new LeadField();
 
-        $indexSchemaHelpe  = $this->createMock(IndexSchemaHelper::class);
-        $columnSchemaHelpe = $this->createMock(ColumnSchemaHelper::class);
-        $leadListModel     = $this->createMock(ListModel::class);
+        $columnSchemaHelper         = $this->createMock(ColumnSchemaHelper::class);
+        $leadListModel              = $this->createMock(ListModel::class);
+        $customFieldColumn          = $this->createMock(CustomFieldColumn::class);
+        $fieldSaveDispatcher        = $this->createMock(FieldSaveDispatcher::class);
+        $leadFieldRepository        = $this->createMock(LeadFieldRepository::class);
+        $fieldsWithUniqueIdentifier = $this->createMock(FieldsWithUniqueIdentifier::class);
+        $fieldList                  = $this->createMock(FieldList::class);
+        $leadFieldSaver             = $this->createMock(LeadFieldSaver::class);
         $leadListModel->expects($this->once())
             ->method('isFieldUsed')
             ->with($leadField)
             ->willReturn(true);
 
-        $model = new FieldModel($indexSchemaHelpe, $columnSchemaHelpe, $leadListModel);
+        $model = new FieldModel($columnSchemaHelper, $leadListModel, $customFieldColumn, $fieldSaveDispatcher, $leadFieldRepository, $fieldsWithUniqueIdentifier, $fieldList, $leadFieldSaver);
         $this->assertTrue($model->isUsedField($leadField));
     }
 
@@ -125,7 +126,6 @@ class FieldModelTest extends MauticMysqlTestCase
             "SELECT * FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND TABLE_NAME = '".MAUTIC_TABLE_PREFIX
             ."$table' AND COLUMN_NAME = '$column'"
         );
-        $stmt->execute();
 
         return $stmt->fetchAll();
     }

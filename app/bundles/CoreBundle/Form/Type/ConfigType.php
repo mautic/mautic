@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -30,8 +21,8 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
@@ -122,6 +113,22 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            '404_page',
+            PageListType::class,
+            [
+                'label'         => 'mautic.core.config.form.404_page',
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
+                ],
+                'multiple'       => false,
+                'placeholder'    => '',
+                'published_only' => true,
+            ]
+        );
+
+        $builder->add(
             'cache_path',
             TextType::class,
             [
@@ -177,6 +184,19 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'composer_updates',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.form.update.composer',
+                'data'  => (array_key_exists('composer_updates', $options['data']) && !empty($options['data']['composer_updates'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.update.composer.tooltip',
                 ],
             ]
         );
@@ -416,14 +436,14 @@ class ConfigType extends AbstractType
                 'choices' => [
                     'mautic.core.daterange.0days'                                                                 => 'midnight',
                     'mautic.core.daterange.1days'                                                                 => '-24 hours',
-                    $this->translator->transChoice('mautic.core.daterange.week', 1, ['%count%' => 1])  => '-1 week',
-                    $this->translator->transChoice('mautic.core.daterange.week', 2, ['%count%' => 2])  => '-2 weeks',
-                    $this->translator->transChoice('mautic.core.daterange.week', 3, ['%count%' => 3])  => '-3 weeks',
-                    $this->translator->transChoice('mautic.core.daterange.month', 1, ['%count%' => 1]) => '-1 month',
-                    $this->translator->transChoice('mautic.core.daterange.month', 2, ['%count%' => 2]) => '-2 months',
-                    $this->translator->transChoice('mautic.core.daterange.month', 3, ['%count%' => 3]) => '-3 months',
-                    $this->translator->transChoice('mautic.core.daterange.year', 1, ['%count%' => 1])  => '-1 year',
-                    $this->translator->transChoice('mautic.core.daterange.year', 2, ['%count%' => 2])  => '-2 years',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])  => '-1 week',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])  => '-2 weeks',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])  => '-3 weeks',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1]) => '-1 month',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2]) => '-2 months',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3]) => '-3 months',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])  => '-1 year',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])  => '-2 years',
                 ],
                 'expanded'          => false,
                 'multiple'          => false,

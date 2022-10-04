@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller;
 
+use Mautic\ApiBundle\Model\ClientModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
+use OAuth2\OAuth2;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,7 +33,7 @@ class ClientController extends FormController
         $orderBy           = $this->get('session')->get('mautic.client.orderby', 'c.name');
         $orderByDir        = $this->get('session')->get('mautic.client.orderbydir', 'ASC');
         $filter            = $this->request->get('search', $this->get('session')->get('mautic.client.filter', ''));
-        $apiMode           = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a'));
+        $apiMode           = $this->factory->getRequest()->get('api_mode', $this->get('session')->get('mautic.client.filter.api_mode', 'oauth2'));
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
         $this->get('session')->set('mautic.client.filter', $filter);
 
@@ -64,7 +57,7 @@ class ClientController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticApiBundle:Client:index',
+                    'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_client_index',
                         'mauticContent' => 'client',
@@ -80,7 +73,6 @@ class ClientController extends FormController
 
         // api options
         $apiOptions           = [];
-        $apiOptions['oauth1'] = 'OAuth 1';
         $apiOptions['oauth2'] = 'OAuth 2';
         $filters['api_mode']  = [
             'values'  => [$apiMode],
@@ -162,7 +154,7 @@ class ClientController extends FormController
         return $this->postActionRedirect(
             [
                 'returnUrl'       => $this->generateUrl('mautic_user_account'),
-                'contentTemplate' => 'MauticUserBundle:Profile:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                 'passthroughVars' => [
                     'success' => $success,
                 ],
@@ -182,7 +174,7 @@ class ClientController extends FormController
             return $this->accessDenied();
         }
 
-        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth1a') : $objectId;
+        $apiMode = (0 === $objectId) ? $this->get('session')->get('mautic.client.filter.api_mode', 'oauth2') : $objectId;
         $this->get('session')->set('mautic.client.filter.api_mode', $apiMode);
 
         /** @var \Mautic\ApiBundle\Model\ClientModel $model */
@@ -212,6 +204,11 @@ class ClientController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
+                    // If the admin is creating API credentials, enable 'Client Credential' grant type
+                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $this->getUser()->getRole()->isAdmin()) {
+                        $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
+                    }
+                    $client->setRole($this->getUser()->getRole());
                     $model->saveEntity($client);
                     $this->addFlash(
                         'mautic.api.client.notice.created',
@@ -235,7 +232,7 @@ class ClientController extends FormController
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'MauticApiBundle:Client:index',
+                        'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_client_index',
                             'mauticContent' => 'client',
@@ -284,7 +281,7 @@ class ClientController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'mauticContent' => 'client',
@@ -389,7 +386,7 @@ class ClientController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'success'       => $success,

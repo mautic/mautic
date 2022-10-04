@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'services' => [
         'events' => [
@@ -284,26 +275,26 @@ return [
         'main' => [
             'mautic_sms_index' => [
                 'path'       => '/sms/{page}',
-                'controller' => 'MauticSmsBundle:Sms:index',
+                'controller' => 'Mautic\SmsBundle\Controller\SmsController::indexAction',
             ],
             'mautic_sms_action' => [
                 'path'       => '/sms/{objectAction}/{objectId}',
-                'controller' => 'MauticSmsBundle:Sms:execute',
+                'controller' => 'Mautic\SmsBundle\Controller\SmsController::executeAction',
             ],
             'mautic_sms_contacts' => [
                 'path'       => '/sms/view/{objectId}/contact/{page}',
-                'controller' => 'MauticSmsBundle:Sms:contacts',
+                'controller' => 'Mautic\SmsBundle\Controller\SmsController::contactsAction',
             ],
         ],
         'public' => [
             'mautic_sms_callback' => [
                 'path'       => '/sms/{transport}/callback',
-                'controller' => 'MauticSmsBundle:Reply:callback',
+                'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
             ],
             /* @deprecated as this was Twilio specific */
             'mautic_receive_sms' => [
                 'path'       => '/sms/receive',
-                'controller' => 'MauticSmsBundle:Reply:callback',
+                'controller' => 'Mautic\SmsBundle\Controller\ReplyController::callbackAction',
                 'defaults'   => [
                     'transport' => 'twilio',
                 ],
@@ -314,11 +305,11 @@ return [
                 'standard_entity' => true,
                 'name'            => 'smses',
                 'path'            => '/smses',
-                'controller'      => 'MauticSmsBundle:Api\SmsApi',
+                'controller'      => 'Mautic\SmsBundle\Controller\Api\SmsApiController',
             ],
             'mautic_api_smses_send' => [
                 'path'       => '/smses/{id}/contact/{contactId}/send',
-                'controller' => 'MauticSmsBundle:Api\SmsApi:send',
+                'controller' => 'Mautic\SmsBundle\Controller\Api\SmsApiController::sendAction',
             ],
         ],
     ],

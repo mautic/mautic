@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller;
 
+use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
@@ -29,6 +21,7 @@ use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class PublicController extends CommonFormController
 {
@@ -306,7 +299,8 @@ class PublicController extends CommonFormController
             if (in_array('form', $config['features'])) {
                 $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
             } else {
-                $contentTemplate = 'MauticFormBundle::form.html.php';
+                $viewParams['content'] = '';
+                $viewParams['message'] = $message.$formContent;
             }
         }
 
@@ -333,9 +327,11 @@ class PublicController extends CommonFormController
 
             if ($lead) {
                 // Set the lead as current lead
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
                 $this->get('mautic.tracker.contact')->setTrackedContact($lead);
+
+                if (!$this->translator instanceof LocaleAwareInterface) {
+                    throw new LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+                }
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
@@ -416,7 +412,7 @@ class PublicController extends CommonFormController
     {
         ignore_user_abort(true);
 
-        $realTransport = $this->container->get('swiftmailer.transport.real');
+        $realTransport = $this->container->get('swiftmailer.mailer.default.transport.real');
 
         if (!$realTransport instanceof CallbackTransportInterface || $realTransport->getCallbackPath() !== $transport) {
             return $this->notFound();
@@ -446,7 +442,7 @@ class PublicController extends CommonFormController
         }
 
         if (
-            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->isPublished() || !$emailEntity->isPublicPreview()))
+            ($this->get('mautic.security')->isAnonymous() && (!$emailEntity->getIsPublished() || !$emailEntity->isPublicPreview()))
             || (!$this->get('mautic.security')->isAnonymous()
                 && !$this->get('mautic.security')->hasEntityAccess(
                     'email:emails:viewown',

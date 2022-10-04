@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -17,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonHelper extends Helper
 {
@@ -74,7 +65,7 @@ class ButtonHelper extends Helper
     private $templating;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -104,7 +95,7 @@ class ButtonHelper extends Helper
     private $menuLink;
 
     /**
-     * @var array
+     * @var array<array<string,mixed>>
      */
     private $buttons = [];
 
@@ -149,6 +140,8 @@ class ButtonHelper extends Helper
     }
 
     /**
+     * @param array<string,mixed> $button
+     *
      * @return $this
      */
     public function addButton(array $button)

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -32,7 +23,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
@@ -90,11 +81,13 @@ class BuilderSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_BUILD => ['onEmailBuild', 0],
             EmailEvents::EMAIL_ON_SEND  => [
+                ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
             ],
             EmailEvents::EMAIL_ON_DISPLAY => [
+                ['fixEmailAccessibility', 0],
                 ['onEmailGenerate', 0],
                 // Ensure this is done last in order to catch all tokenized URLs
                 ['convertUrlsToTokens', -9999],
@@ -247,6 +240,44 @@ class BuilderSubscriber implements EventSubscriberInterface
                 800
             );
         }
+    }
+
+    public function fixEmailAccessibility(EmailSendEvent $event): void
+    {
+        if ($event->isDynamicContentParsing() || !$event->getEmail() instanceof Email) {
+            // prevent a loop
+            return;
+        }
+
+        $content = $event->getContent();
+        $subject = $event->getEmail()->getSubject();
+
+        // Add the empty <head/> tag if it's missing.
+        if (empty(preg_match('#<\s*?head\b[^>]*>(.*?)</head\b[^>]*>#s', $content, $matches))) {
+            $content = str_replace('<body', '<head></head><body', $content);
+        }
+
+        // Add the <title/> tag with email subject value into the <head/> tag if it's missing.
+        $content = preg_replace_callback(
+            "/<title>(.*?)<\/title>/is",
+            fn ($matches) => empty(trim($matches[1])) ? "<title>{$subject}</title>" : $matches[0],
+            $content,
+            -1,
+            $fixed
+        );
+
+        if (!$fixed) {
+            $content = str_replace('</head>', "<title>{$subject}</title></head>", $content);
+        }
+
+        // Add the lang attribute to the <html/> tag if it's missing.
+        $locale = empty($event->getEmail()->getLanguage()) ? $this->coreParametersHelper->get('locale') : $event->getEmail()->getLanguage();
+        preg_match_all("~<html.*lang\s*=\s*[\"']([^\"']+)[\"'][^>]*>~i", $content, $matches);
+        if (empty($matches[1])) {
+            $content = str_replace('<html', '<html lang="'.$locale.'"', $content);
+        }
+
+        $event->setContent($content);
     }
 
     public function onEmailGenerate(EmailSendEvent $event)

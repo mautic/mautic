@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -63,6 +54,11 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      * @var string
      */
     private $subject;
+
+    /**
+     * @var bool
+     */
+    private $useOwnerAsMailer;
 
     /**
      * @var string
@@ -127,7 +123,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var bool
      */
-    private $publicPreview = 1;
+    private $publicPreview = 0;
 
     /**
      * @var int
@@ -240,6 +236,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->assetAttachments    = new ArrayCollection();
+        $this->setDateAdded(new \DateTime());
+        $this->setDateModified(new \DateTime());
     }
 
     /**
@@ -265,6 +263,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $builder->addNullableField('fromName', Type::STRING, 'from_name');
         $builder->addNullableField('replyToAddress', Type::STRING, 'reply_to_address');
         $builder->addNullableField('bccAddress', Type::STRING, 'bcc_address');
+        $builder->addNullableField('useOwnerAsMailer', Type::BOOLEAN, 'use_owner_as_mailer');
         $builder->addNullableField('template', Type::STRING);
         $builder->addNullableField('content', Type::TARRAY);
         $builder->addNullableField('utmTags', Type::TARRAY, 'utm_tags');
@@ -436,6 +435,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     'fromName',
                     'replyToAddress',
                     'bccAddress',
+                    'useOwnerAsMailer',
                     'utmTags',
                     'customHtml',
                     'plainText',
@@ -679,6 +679,26 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
+     * @return bool
+     */
+    public function getUseOwnerAsMailer()
+    {
+        return $this->useOwnerAsMailer;
+    }
+
+    /**
+     * @param bool $useOwnerAsMailer
+     *
+     * @return $this
+     */
+    public function setUseOwnerAsMailer($useOwnerAsMailer)
+    {
+        $this->useOwnerAsMailer = $useOwnerAsMailer;
+
+        return $this;
+    }
+
+    /**
      * @return mixed
      */
     public function getFromAddress()
@@ -693,6 +713,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setFromAddress($fromAddress)
     {
+        $this->isChanged('fromAddress', $fromAddress);
         $this->fromAddress = $fromAddress;
 
         return $this;
@@ -713,6 +734,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setFromName($fromName)
     {
+        $this->isChanged('fromName', $fromName);
         $this->fromName = $fromName;
 
         return $this;
@@ -733,6 +755,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setReplyToAddress($replyToAddress)
     {
+        $this->isChanged('replyToAddress', $replyToAddress);
         $this->replyToAddress = $replyToAddress;
 
         return $this;
@@ -753,6 +776,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setBccAddress($bccAddress)
     {
+        $this->isChanged('bccAddress', $bccAddress);
         $this->bccAddress = $bccAddress;
 
         return $this;
@@ -1195,5 +1219,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getClonedId(): ?int
     {
         return $this->clonedId;
+    }
+
+    public function isBackgroundSending(): bool
+    {
+        return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
     }
 }

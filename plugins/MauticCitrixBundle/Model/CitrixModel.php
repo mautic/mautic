@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Model;
 
 use Mautic\CampaignBundle\Model\EventModel;
@@ -23,9 +14,6 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class CitrixModel.
- */
 class CitrixModel extends FormModel
 {
     /**
@@ -38,9 +26,6 @@ class CitrixModel extends FormModel
      */
     protected $eventModel;
 
-    /**
-     * CitrixModel constructor.
-     */
     public function __construct(LeadModel $leadModel, EventModel $eventModel)
     {
         $this->leadModel  = $leadModel;
@@ -65,6 +50,7 @@ class CitrixModel extends FormModel
      * @param Lead      $lead
      * @param string    $eventType
      * @param \DateTime $eventDate
+     * @param string    $joinURL
      *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -72,7 +58,7 @@ class CitrixModel extends FormModel
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      */
-    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, $lead, \DateTime $eventDate = null)
+    public function addEvent($product, $email, $eventName, $eventDesc, $eventType, $lead, \DateTime $eventDate = null, $joinURL = null)
     {
         if (!CitrixProducts::isValidValue($product) || !CitrixEventTypes::isValidValue($eventType)) {
             CitrixHelper::log('addEvent: incorrect data');
@@ -89,6 +75,10 @@ class CitrixModel extends FormModel
 
         if (null !== $eventDate) {
             $citrixEvent->setEventDate($eventDate);
+        }
+
+        if (null !== $joinURL) {
+            $citrixEvent->setEventDesc($eventDesc.'_!'.$joinURL);
         }
 
         $this->em->persist($citrixEvent);
@@ -240,12 +230,12 @@ class CitrixModel extends FormModel
     }
 
     /**
-     * @param      $product
-     * @param      $productId
-     * @param      $eventName
-     * @param      $eventDesc
-     * @param int  $count
-     * @param null $output
+     * @param mixed                $product
+     * @param mixed                $productId
+     * @param mixed                $eventName
+     * @param mixed                $eventDesc
+     * @param int                  $count
+     * @param OutputInterface|null $output
      */
     public function syncEvent($product, $productId, $eventName, $eventDesc, &$count = 0, $output = null)
     {
@@ -322,7 +312,11 @@ class CitrixModel extends FormModel
         // Add events
         if (0 !== count($contactsToAdd)) {
             $searchEmails = array_keys($contactsToAdd);
-            $leads        = $this->leadModel->getRepository()->getLeadsByFieldValue('email', $searchEmails, null, true);
+            $leads        = array_change_key_case(
+                $this->leadModel->getRepository()->getLeadsByFieldValue('email', $searchEmails, null, true),
+                CASE_LOWER
+            );
+
             foreach ($contactsToAdd as $email => $info) {
                 if (!isset($leads[strtolower($email)])) {
                     $lead = (new Lead())

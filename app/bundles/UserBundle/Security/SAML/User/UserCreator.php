@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\User;
 
 use Doctrine\ORM\EntityManager;
@@ -19,7 +10,7 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -41,7 +32,7 @@ class UserCreator implements UserCreatorInterface
     private $userModel;
 
     /**
-     * @var EncoderFactoryInterface
+     * @var UserPasswordEncoder
      */
     private $encoder;
 
@@ -64,7 +55,7 @@ class UserCreator implements UserCreatorInterface
         EntityManagerInterface $entityManager,
         UserMapper $userMapper,
         UserModel $userModel,
-        EncoderFactoryInterface $encoder,
+        UserPasswordEncoder $encoder,
         $defaultRole
     ) {
         $this->entityManager = $entityManager;
@@ -87,7 +78,7 @@ class UserCreator implements UserCreatorInterface
         $defaultRole = $this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole);
 
         $user = $this->userMapper->getUser($response);
-        $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder->getEncoder($user), EncryptionHelper::generateKey()));
+        $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder, EncryptionHelper::generateKey()));
         $user->setRole($defaultRole);
 
         $this->validateUser($user);

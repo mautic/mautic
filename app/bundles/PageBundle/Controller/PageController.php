@@ -21,6 +21,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PageController extends FormController
 {
@@ -112,8 +113,8 @@ class PageController extends FormController
             $filter['force'][] = ['column' => 'p.translationParent', 'expr' => 'isNull'];
         }
 
-        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.title');
-        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', 'DESC');
+        $orderBy    = $this->get('session')->get('mautic.page.orderby', 'p.dateModified');
+        $orderByDir = $this->get('session')->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
         $pages      = $model->getEntities(
             [
                 'start'      => $start,
@@ -132,7 +133,7 @@ class PageController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -187,7 +188,7 @@ class PageController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -211,7 +212,7 @@ class PageController extends FormController
         }
 
         //get A/B test information
-        list($parent, $children) = $activePage->getVariants();
+        [$parent, $children]     = $activePage->getVariants();
         $properties              = [];
         $variantError            = false;
         $weight                  = 0;
@@ -285,7 +286,7 @@ class PageController extends FormController
         );
 
         //get related translations
-        list($translationParent, $translationChildren) = $activePage->getTranslations();
+        [$translationParent, $translationChildren] = $activePage->getTranslations();
 
         return $this->delegateView([
             'returnUrl' => $this->generateUrl('mautic_page_action', [
@@ -327,7 +328,7 @@ class PageController extends FormController
                 'abTestResults' => $abTestResults,
                 'security'      => $security,
                 'pageUrl'       => $model->generateUrl($activePage, true),
-                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], true),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'logs'          => $logs,
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
@@ -376,6 +377,7 @@ class PageController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
+                    $entity->setDateModified(new \DateTime());
 
                     //form is valid so process the data
                     $model->saveEntity($entity);
@@ -395,7 +397,7 @@ class PageController extends FormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
-                        $template  = 'MauticPageBundle:Page:view';
+                        $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -404,7 +406,7 @@ class PageController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_page_index', $viewParameters);
-                $template       = 'MauticPageBundle:Page:index';
+                $template       = 'Mautic\PageBundle\Controller\PageController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content');
             }
@@ -483,7 +485,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -556,7 +558,7 @@ class PageController extends FormController
                     array_merge($postActionVars, [
                         'returnUrl'       => $this->generateUrl('mautic_page_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'MauticPageBundle:Page:view',
+                        'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
             }
@@ -596,7 +598,7 @@ class PageController extends FormController
                 'sections'      => $this->buildSlotForms($sections),
                 'builderAssets' => trim(preg_replace('/\s+/', ' ', $this->getAssetsForBuilder())), // strip new lines
                 'sectionForm'   => $sectionForm->createView(),
-                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], true),
+                'previewUrl'    => $this->generateUrl('mautic_page_preview', ['id' => $objectId], UrlGeneratorInterface::ABSOLUTE_URL),
                 'permissions'   => $security->isGranted(
                     [
                         'page:preference_center:editown',
@@ -674,7 +676,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -735,7 +737,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -821,6 +823,9 @@ class PageController extends FormController
         }
 
         $template = InputHelper::clean($this->request->query->get('template'));
+        if (empty($template)) {
+            throw new \InvalidArgumentException('No template found');
+        }
         $slots    = $this->factory->getTheme($template)->getSlots('page');
 
         //merge any existing changes
@@ -859,28 +864,30 @@ class PageController extends FormController
         $model  = $this->getModel('page.page');
         $entity = $model->getEntity($objectId);
 
-        if (null != $entity) {
-            $parent = $entity->getVariantParent();
+        if (!$entity) {
+            return $this->notFound();
+        }
 
-            if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
+        $parent = $entity->getVariantParent();
+
+        if ($parent || !$this->get('mautic.security')->isGranted('page:pages:create') ||
                 !$this->get('mautic.security')->hasEntityAccess(
                     'page:pages:viewown', 'page:pages:viewother', $entity->getCreatedBy()
                 )
             ) {
-                return $this->accessDenied();
-            }
-
-            $clone = clone $entity;
-
-            //reset
-            $clone->setHits(0);
-            $clone->setRevision(0);
-            $clone->setVariantHits(0);
-            $clone->setUniqueHits(0);
-            $clone->setVariantStartDate(null);
-            $clone->setIsPublished(false);
-            $clone->setVariantParent($entity);
+            return $this->accessDenied();
         }
+
+        $clone = clone $entity;
+
+        //reset
+        $clone->setHits(0);
+        $clone->setRevision(0);
+        $clone->setVariantHits(0);
+        $clone->setUniqueHits(0);
+        $clone->setVariantStartDate(null);
+        $clone->setIsPublished(false);
+        $clone->setVariantParent($entity);
 
         return $this->newAction($clone);
     }
@@ -902,7 +909,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -946,7 +953,7 @@ class PageController extends FormController
                 'objectId'     => $objectId,
             ];
             $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
-            $postActionVars['contentTemplate'] = 'MauticPageBundle:Page:view';
+            $postActionVars['contentTemplate'] = 'Mautic\PageBundle\Controller\PageController::viewAction';
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -996,8 +1003,226 @@ class PageController extends FormController
         }
 
         $slotsHelper->start('builder'); ?>
-        <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
-        <?php
+<input type="hidden" id="builder_entity_id"
+    value="<?php echo $entity->getSessionId(); ?>" />
+<?php
         $slotsHelper->stop();
+    }
+
+    /**
+     * Show submissions inside page.
+     *
+     * @param int $objectId
+     * @param int $page
+     *
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function resultsAction($objectId, $page = 1)
+    {
+        /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
+        $pageModel    = $this->getModel('page.page');
+        $activePage   = $pageModel->getEntity($objectId);
+        $session      = $this->get('session');
+        $pageListPage = $session->get('mautic.page.page', 1);
+        $returnUrl    = $this->generateUrl('mautic_page_index', ['page' => $pageListPage]);
+
+        if (null === $activePage) {
+            //redirect back to page list
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $pageListPage],
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+                    'passthroughVars' => [
+                        'activeLink'    => 'mautic_page_index',
+                        'mauticContent' => 'page',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.page.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $activePage->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        if ('POST' == $this->request->getMethod()) {
+            $this->setListFilters($this->request->query->get('name'));
+        }
+
+        //set limits
+        $limit = $session->get('mautic.pageresult.'.$objectId.'.limit', $this->coreParametersHelper->get('default_pagelimit'));
+
+        $page  = $page ?: 0;
+        $start = ($page <= 1) ? 0 : (($page - 1) * $limit);
+
+        // Set order direction to desc if not set
+        if (!$session->get('mautic.pageresult.'.$objectId.'.orderbydir', null)) {
+            $session->set('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
+        }
+
+        $orderBy    = $session->get('mautic.pageresult.'.$objectId.'.orderby', 's.date_submitted');
+        $orderByDir = $session->get('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
+        $filters    = $session->get('mautic.pageresult.'.$objectId.'.filters', []);
+
+        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
+        $model = $this->getModel('form.submission');
+
+        if ($this->request->query->has('result')) {
+            // Force ID
+            $filters['s.id'] = ['column' => 's.id', 'expr' => 'like', 'value' => (int) $this->request->query->get('result'), 'strict' => false];
+            $session->set("mautic.pageresult.$objectId.filters", $filters);
+        }
+        //get the results
+        $entities = $model->getEntitiesByPage(
+            [
+                'start'          => $start,
+                'limit'          => $limit,
+                'filter'         => ['force' => $filters],
+                'orderBy'        => $orderBy,
+                'orderByDir'     => $orderByDir,
+                'withTotalCount' => true,
+                'simpleResults'  => true,
+                'activePage'     => $activePage,
+            ]
+        );
+
+        $count   = $entities['count'];
+        $results = $entities['results'];
+        unset($entities);
+
+        if ($count && $count < ($start + 1)) {
+            //the number of entities are now less then the current page so redirect to the last page
+            $lastPage = (1 === $count) ? 1 : (((ceil($count / $limit)) ?: 1) ?: 1);
+            $session->set('mautic.pageresult.page', $lastPage);
+            $returnUrl = $this->generateUrl('mautic_page_results', ['objectId' => $objectId, 'page' => $lastPage]);
+
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $lastPage],
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::resultsAction',
+                    'passthroughVars' => [
+                        'activeLink'    => 'mautic_page_index',
+                        'mauticContent' => 'pageresult',
+                    ],
+                ]
+            );
+        }
+
+        //set what page currently on so that we can return here if need be
+        $session->set('mautic.pageresult.page', $page);
+
+        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+
+        return $this->delegateView(
+            [
+                'viewParameters' => [
+                    'items'      => $results,
+                    'filters'    => $filters,
+                    'activePage' => $activePage,
+                    'page'       => $page,
+                    'totalCount' => $count,
+                    'limit'      => $limit,
+                    'tmpl'       => $tmpl,
+                ],
+                'contentTemplate' => 'MauticPageBundle:Result:list.html.php',
+                'passthroughVars' => [
+                    'activeLink'    => 'mautic_page_index',
+                    'mauticContent' => 'pageresult',
+                    'route'         => $this->generateUrl(
+                        'mautic_page_results',
+                        [
+                            'objectId' => $objectId,
+                            'page'     => $page,
+                        ]
+                    ),
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Export submissions from a page.
+     *
+     * @param int    $objectId
+     * @param string $format
+     *
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
+     */
+    public function exportAction($objectId, $format = 'csv')
+    {
+        $pageModel    = $this->getModel('page.page');
+        $activePage   = $pageModel->getEntity($objectId);
+        $session      = $this->get('session');
+        $pageListPage = $session->get('mautic.page.page', 1);
+        $returnUrl    = $this->generateUrl('mautic_page_index', ['page' => $pageListPage]);
+
+        if (null === $activePage) {
+            //redirect back to page list
+            return $this->postActionRedirect(
+                [
+                    'returnUrl'       => $returnUrl,
+                    'viewParameters'  => ['page' => $pageListPage],
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
+                    'passthroughVars' => [
+                        'activeLink'    => 'mautic_page_index',
+                        'mauticContent' => 'page',
+                    ],
+                    'flashes' => [
+                        [
+                            'type'    => 'error',
+                            'msg'     => 'mautic.page.error.notfound',
+                            'msgVars' => ['%id%' => $objectId],
+                        ],
+                    ],
+                ]
+            );
+        } elseif (!$this->get('mautic.security')->hasEntityAccess(
+            'page:pages:viewown',
+            'page:pages:viewother',
+            $activePage->getCreatedBy()
+        )
+        ) {
+            return $this->accessDenied();
+        }
+
+        $orderBy    = $session->get('mautic.pageresult.'.$objectId.'.orderby', 's.date_submitted');
+        $orderByDir = $session->get('mautic.pageresult.'.$objectId.'.orderbydir', 'DESC');
+        $filters    = $session->get('mautic.pageresult.'.$objectId.'.filters', []);
+
+        $args = [
+            'limit'      => false,
+            'filter'     => ['force' => $filters],
+            'orderBy'    => $orderBy,
+            'orderByDir' => $orderByDir,
+            'activePage' => $activePage,
+        ];
+
+        /** @var \Mautic\FormBundle\Model\SubmissionModel $model */
+        $model = $this->getModel('form.submission');
+
+        return $model->exportResultsForPage($format, $activePage, $args);
+    }
+
+    public function getModelName(): string
+    {
+        return 'page';
+    }
+
+    protected function getDefaultOrderDirection()
+    {
+        return 'DESC';
     }
 }

@@ -33,7 +33,7 @@
                     'names'      => implode(
                         ', ',
                         array_map(
-                            function (\Mautic\FormBundle\Entity\Form $f) {
+                            function (Mautic\FormBundle\Entity\Form $f) {
                                 return $f->getName();
                             },
                             $campaign->getForms()
@@ -51,7 +51,7 @@
                     'names'      => implode(
                         ', ',
                         array_map(
-                            function (\Mautic\LeadBundle\Entity\LeadList $f) {
+                            function (Mautic\LeadBundle\Entity\LeadList $f) {
                                 return $f->getName();
                             },
                             $campaign->getLists()

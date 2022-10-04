@@ -618,15 +618,20 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
             // ================================
             (function () {
                 // define variable
-                var minimizeHandler   = "[data-toggle~=minimize]";
+                var minimizeHandler = "[data-toggle~=minimize]";
 
                 // core minimize function
                 function toggleMinimize (e) {
+                    var backgroundImage = /^url\(.+$/.test($('.mautic-brand').css('background-image'));
+
                     // toggle class
                     if($(element).hasClass("sidebar-minimized")) {
                         isMinimize = false;
                         $(element).removeClass("sidebar-minimized");
                         $(this).removeClass("active");
+                        if (backgroundImage) {
+                            $('.mautic-brand, .sidebar-header').removeClass('minimized');
+                        }
 
                         // publish event
                         $(element).trigger(settings.eventPrefix+".sidebar.maximize", { "element": $(element) });
@@ -634,6 +639,9 @@ if (typeof jQuery === "undefined") { throw new Error("This application requires 
                         isMinimize = true;
                         $(element).addClass("sidebar-minimized");
                         $(this).addClass("active");
+                        if (backgroundImage) {
+                            $('.mautic-brand, .sidebar-header').addClass('minimized');
+                        }
 
                         // publish event
                         $(element).trigger(settings.eventPrefix+".sidebar.minimize", { "element": $(element) });

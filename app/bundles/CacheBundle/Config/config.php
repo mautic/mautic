@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes'   => [
         'main'   => [],
@@ -26,6 +17,15 @@ return [
                 'arguments' => [
                     'mautic.cache.provider',
                     'monolog.logger.mautic',
+                ],
+            ],
+        ],
+        'commands' => [
+            'mautic.cache.command.clear_cache' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CacheBundle\Command\ClearCacheCommand::class,
+                'arguments' => [
+                    'mautic.cache.provider',
                 ],
             ],
         ],

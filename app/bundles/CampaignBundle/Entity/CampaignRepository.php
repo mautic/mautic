@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
@@ -22,9 +14,6 @@ class CampaignRepository extends CommonRepository
     use ContactLimiterTrait;
     use SlaveConnectionTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntities(array $args = [])
     {
         $q = $this->getEntityManager()
@@ -47,8 +36,6 @@ class CampaignRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param object $entity
      * @param bool   $flush
      */
@@ -133,7 +120,7 @@ class CampaignRepository extends CommonRepository
      *
      * @return array
      */
-    public function getPublishedCampaignsByLeadLists($leadLists, $viewOther = false)
+    public function getPublishedCampaignsByLeadLists($leadLists)
     {
         if (!is_array($leadLists)) {
             $leadLists = [(int) $leadLists];
@@ -153,11 +140,6 @@ class CampaignRepository extends CommonRepository
         $q->andWhere(
             $q->expr()->in('ll.leadlist_id', $leadLists)
         );
-
-        if (!$viewOther) {
-            $q->andWhere($q->expr()->eq('c.created_by', ':id'))
-                ->setParameter('id', $this->currentUser->getId());
-        }
 
         $results = $q->execute()->fetchAll();
 
@@ -182,7 +164,7 @@ class CampaignRepository extends CommonRepository
     /**
      * Get array of list IDs assigned to this campaign.
      *
-     * @param null $id
+     * @param int|null $id
      *
      * @return array
      */
@@ -459,8 +441,10 @@ class CampaignRepository extends CommonRepository
      * @param array $pendingEvents List of specific events to rule out
      *
      * @return int
+     *
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [])
+    public function getCampaignLeadCount($campaignId, $leadId = null, $pendingEvents = [], \DateTimeInterface $dateFrom = null, \DateTimeInterface $dateTo = null)
     {
         $q = $this->getSlaveConnection()->createQueryBuilder();
 
@@ -472,12 +456,18 @@ class CampaignRepository extends CommonRepository
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
             )
-            ->setParameter('false', false, Type::BOOLEAN);
+            ->setParameter('false', false, Types::BOOLEAN);
 
         if ($leadId) {
             $q->andWhere(
                 $q->expr()->eq('cl.lead_id', (int) $leadId)
             );
+        }
+
+        if ($dateFrom && $dateTo) {
+            $q->andWhere('cl.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
 
         if (count($pendingEvents) > 0) {
@@ -491,12 +481,27 @@ class CampaignRepository extends CommonRepository
                     )
                 );
 
+            if ($dateFrom && $dateTo) {
+                $sq->andWhere('cl.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                    ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                    ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+            }
+
             $q->andWhere(
                 sprintf('NOT EXISTS (%s)', $sq->getSQL())
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         return (int) $results[0]['lead_count'];
     }
@@ -568,7 +573,7 @@ class CampaignRepository extends CommonRepository
         $q->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->leftJoin('c', MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl', 'cl.campaign_id = c.id AND cl.manually_removed = 0')
             ->leftJoin('cl',
-                '(SELECT lll.lead_id AS ll, lll.lead_id FROM lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
+                '(SELECT lll.lead_id AS ll, lll.lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_lists_leads lll WHERE lll.leadlist_id = '.$segmentId
                 .' AND lll.manually_removed = 0)',
                 't',
                 't.lead_id = cl.lead_id'

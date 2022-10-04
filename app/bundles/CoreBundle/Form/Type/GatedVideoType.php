@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\FormBundle\Entity\Form;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Mautic\FormBundle\Entity\FormRepository;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,6 +11,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GatedVideoType extends SlotType
 {
+    /**
+     * @var FormRepository
+     */
+    private $formRepository;
+
+    public function __construct(FormRepository $formRepository)
+    {
+        $this->formRepository = $formRepository;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -52,7 +53,7 @@ class GatedVideoType extends SlotType
 
         $builder->add(
             'formid',
-            EntityType::class,
+            ChoiceType::class,
             [
                 'label'      => 'Form',
                 'label_attr' => ['class' => 'control-label'],
@@ -61,11 +62,8 @@ class GatedVideoType extends SlotType
                     'class'           => 'form-control',
                     'data-slot-param' => 'gatedvideo-formid',
                 ],
-                'placeholder'  => 'Select your form',
-                'class'        => Form::class,
-                'choice_label' => function ($form) {
-                    return sprintf('%s (ID #%d)', $form->getName(), $form->getId());
-                },
+                'placeholder' => 'Select your form',
+                'choices'     => $this->getFormChoices(),
             ]
         );
 
@@ -108,5 +106,17 @@ class GatedVideoType extends SlotType
                 'height' => 320,
             ]
         );
+    }
+
+    private function getFormChoices(): array
+    {
+        $formList    = $this->formRepository->getSimpleList();
+        $formChoices = [];
+
+        foreach ($formList as $formItem) {
+            $formChoices["{$formItem['label']} (ID {$formItem['value']})"] = $formItem['value'];
+        }
+
+        return $formChoices;
     }
 }

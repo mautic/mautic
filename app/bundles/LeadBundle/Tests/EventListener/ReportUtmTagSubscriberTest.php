@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
@@ -19,11 +12,11 @@ use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    public function testNotRelevantContextBuilder()
+    public function testNotRelevantContextBuilder(): void
     {
         $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock  = $this->createMock(CompanyReportData::class);
@@ -41,7 +34,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $reportUtmTagSubscriber->onReportBuilder($reportBuilderEventMock);
     }
 
-    public function testNotRelevantContextGenerate()
+    public function testNotRelevantContextGenerate(): void
     {
         $fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock    = $this->createMock(CompanyReportData::class);
@@ -59,7 +52,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $reportUtmTagSubscriber->onReportGenerate($reportGeneratorEventMock);
     }
 
-    public function testReportBuilder()
+    public function testReportBuilder(): void
     {
         $translatorMock        = $this->createMock(TranslatorInterface::class);
         $channelListHelperMock = $this->createMock(ChannelListHelper::class);
@@ -142,12 +135,8 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $reportBuilderEvent->getTables());
     }
 
-    public function testReportGenerateNoJoinedTables()
+    public function testReportGenerateNoJoinedTables(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $reportGeneratorEventMock = $this->getReportGeneratorEventMock();
         $reportUtmTagSubscriber   = $this->getReportUtmTagSubscriber();
         $queryBuilderMock         = $this->getQueryBuilderMock();
@@ -159,32 +148,28 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $reportUtmTagSubscriber->onReportGenerate($reportGeneratorEventMock);
     }
 
-    public function testReportGenerateWithUsers()
+    public function testReportGenerateWithUsers(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $reportGeneratorEventMock = $this->getReportGeneratorEventMock();
         $reportUtmTagSubscriber   = $this->getReportUtmTagSubscriber();
         $queryBuilderMock         = $this->getQueryBuilderMock();
 
-        $reportGeneratorEventMock->expects($this->at(1))
+        $reportGeneratorEventMock->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($queryBuilderMock);
 
-        $reportGeneratorEventMock->expects($this->at(2))
-            ->method('hasColumn')
-            ->with(['u.first_name', 'u.last_name'])
+        $reportGeneratorEventMock->expects($this->exactly(2))
+            ->method('usesColumn')
+            ->withConsecutive(
+                [['u.first_name', 'u.last_name']],
+                ['i.ip_address']
+            )
             ->willReturn(true);
 
         $reportUtmTagSubscriber->onReportGenerate($reportGeneratorEventMock);
     }
 
-    /**
-     * @return ReportUtmTagSubscriber
-     */
-    private function getReportUtmTagSubscriber()
+    private function getReportUtmTagSubscriber(): ReportUtmTagSubscriber
     {
         $fieldsBuilderMock      = $this->createMock(FieldsBuilder::class);
         $companyReportDataMock  = $this->createMock(CompanyReportData::class);
@@ -200,7 +185,7 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $reportGeneratorEventMock = $this->createMock(ReportGeneratorEvent::class);
 
-        $reportGeneratorEventMock->expects($this->at(0))
+        $reportGeneratorEventMock->expects($this->once())
             ->method('checkContext')
             ->with(['lead.utmTag'])
             ->willReturn(true);
@@ -215,14 +200,13 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
 
-        $queryBuilderMock->expects($this->at(0))
+        $queryBuilderMock->expects($this->once())
             ->method('from')
             ->with(MAUTIC_TABLE_PREFIX.'lead_utmtags', 'utm')
             ->willReturn($queryBuilderMock);
 
-        $queryBuilderMock->expects($this->at(1))
-            ->method('leftJoin')
-            ->with('utm', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = utm.lead_id')
+        $queryBuilderMock->method('leftJoin')
+            ->withConsecutive(['utm', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.id = utm.lead_id'])
             ->willReturn($queryBuilderMock);
 
         return $queryBuilderMock;

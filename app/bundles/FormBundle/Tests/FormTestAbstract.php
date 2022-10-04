@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -19,7 +10,7 @@ use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -59,7 +50,7 @@ class FormTestAbstract extends TestCase
 
     protected function setUp(): void
     {
-        $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
+        $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
     }
 
     /**
@@ -69,7 +60,7 @@ class FormTestAbstract extends TestCase
     {
         $requestStack         = $this->createMock(RequestStack::class);
         $templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $themeHelper          = $this->createMock(ThemeHelper::class);
+        $themeHelper          = $this->createMock(ThemeHelperInterface::class);
         $formActionModel      = $this->createMock(ActionModel::class);
         $formFieldModel       = $this->createMock(FieldModel::class);
         $fieldHelper          = $this->createMock(FormFieldHelper::class);
@@ -155,6 +146,9 @@ class FormTestAbstract extends TestCase
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
+        $router                   = $this->createMock(RouterInterface::class);
+        $router->method('generate')->willReturn('absolute/path/somefile.jpg');
+
         $lead                     = new Lead();
         $lead->setId(123);
 
@@ -212,6 +206,9 @@ class FormTestAbstract extends TestCase
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
@@ -226,11 +223,10 @@ class FormTestAbstract extends TestCase
             $uploadFieldValidatorMock,
             $formUploaderMock,
             $deviceTrackingService,
-            new FieldValueTransformer($this->createMock(RouterInterface::class)),
+            new FieldValueTransformer($router),
             $dateHelper,
             $contactTracker
         );
-
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);
         $submissionModel->setEntityManager($entityManager);
@@ -240,33 +236,67 @@ class FormTestAbstract extends TestCase
         return $submissionModel;
     }
 
-    public function getTestFormFields()
+    /**
+     * @return array<string,array<string,mixed>>
+     */
+    public function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
-        $fields[$fieldSession] =
-            [
-                'label'        => 'Email',
-                'showLabel'    => 1,
-                'saveResult'   => 1,
-                'defaultValue' => false,
-                'alias'        => 'email',
-                'type'         => 'email',
-                'leadField'    => 'email',
-                'id'           => $fieldSession,
-            ];
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields[$fieldSession] = [
+            'label'        => 'Email',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'email',
+            'type'         => 'email',
+            'leadField'    => 'email',
+            'id'           => $fieldSession,
+        ];
 
-        $fields['file'] =
-            [
-                'label'                   => 'File',
-                'showLabel'               => 1,
-                'saveResult'              => 1,
-                'defaultValue'            => false,
-                'alias'                   => 'file',
-                'type'                    => 'file',
-                'id'                      => 'file',
-                'allowed_file_size'       => 1,
-                'allowed_file_extensions' => ['jpg', 'gif'],
-            ];
+        $fields['file'] = [
+            'label'                   => 'File',
+            'showLabel'               => 1,
+            'saveResult'              => 1,
+            'defaultValue'            => false,
+            'alias'                   => 'file',
+            'type'                    => 'file',
+            'id'                      => 'file',
+            'allowed_file_size'       => 1,
+            'allowed_file_extensions' => ['jpg', 'gif'],
+        ];
+
+        $fields['123'] = [
+            'label'        => 'Parent Field',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'parent',
+            'type'         => 'select',
+            'id'           => '123',
+        ];
+
+        $fields['456'] = [
+            'label'        => 'Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'child',
+            'type'         => 'text',
+            'id'           => '456',
+            'parent'       => '123',
+        ];
+
+        $fields[$fieldSession2] = [
+            'label'        => 'New Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'new_child',
+            'type'         => 'text',
+            'id'           => $fieldSession2,
+            'parent'       => '123',
+        ];
 
         return $fields;
     }

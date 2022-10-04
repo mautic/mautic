@@ -36,14 +36,14 @@ if (!isset($colSize)) {
             <div class="row">
                 <div class="col-md-<?php echo $colSize; ?>">
                     <?php if (!empty($availablePanelsLabel)): ?>
-                    <label class="control-label" for=<?php $containerId; ?>AvailablePanels">
+                    <label class="control-label" for=<?php echo $containerId; ?>AvailablePanels">
                         <?php echo $view['translator']->trans($availablePanelsLabel); ?>
                         <?php if (!empty($availablePanelsLabelTooltip)): ?>
                         <i class="fa fa-question-circle" data-toggle="tooltip" title="<?php echo $view['translator']->trans($availablePanelsLabelTooltip); ?>"></i>
                         <?php endif; ?>
                     </label>
                     <?php endif; ?>
-                    <select id="<?php $containerId; ?>AvailablePanels"
+                    <select id="<?php echo $containerId; ?>AvailablePanels"
                             class="available-panel-selector"
                             data-prototype-prefix="<?php echo $prototypeContainerPrefix; ?>"
                             data-prototype-id-prefix="<?php echo $prototypeIdPrefix; ?>"

@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 
@@ -79,7 +72,7 @@ class FieldController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticLeadBundle:Field:index',
+                'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contactfield_index',
                     'mauticContent' => 'leadfield',
@@ -158,6 +151,12 @@ class FieldController extends FormController
                             $model->saveEntity($field);
                         } catch (DBALException $ee) {
                             $flashMessage = $ee->getMessage();
+                        } catch (AbortColumnCreateException $e) {
+                            $flashMessage = $this->get('translator')->trans('mautic.lead.field.pushed_to_background');
+                        } catch (SchemaException $e) {
+                            $flashMessage = $e->getMessage();
+                            $form['alias']->addError(new FormError($e->getMessage()));
+                            $valid = false;
                         } catch (\Exception $e) {
                             $form['alias']->addError(
                                     new FormError(
@@ -188,7 +187,7 @@ class FieldController extends FormController
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'MauticLeadBundle:Field:index',
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_contactfield_index',
                             'mauticContent' => 'leadfield',
@@ -244,7 +243,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'leadfield',
@@ -311,7 +310,7 @@ class FieldController extends FormController
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                             'viewParameters'  => ['objectId' => $field->getId()],
-                            'contentTemplate' => 'MauticLeadBundle:Field:index',
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         ]
                     )
                 );
@@ -390,7 +389,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',
@@ -468,7 +467,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',

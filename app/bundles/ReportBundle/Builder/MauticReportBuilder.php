@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
@@ -346,10 +337,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
 
-                if ('AVG' === $aggregator['function']) {
-                    $selectText = sprintf('ROUND(%s)', $selectText);
-                }
-
                 $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
             }
 
@@ -403,16 +390,33 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $groupExpr->add(
                             $expr->isNotNull($filter['column'])
                         );
-                        $groupExpr->add(
-                            $expr->neq($filter['column'], $expr->literal(''))
-                        );
+                        if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
+                            $groupExpr->add(
+                                $expr->neq($filter['column'], $expr->literal(''))
+                            );
+                        }
                         break;
                     case 'empty':
                         $expression = $queryBuilder->expr()->orX(
-                            $queryBuilder->expr()->isNull($filter['column']),
-                            $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
+                            $queryBuilder->expr()->isNull($filter['column'])
                         );
+                        if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
+                            $expression->add(
+                                $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
+                            );
+                        }
 
+                        $groupExpr->add(
+                            $expression
+                        );
+                        break;
+                    case 'neq':
+                        $columnValue = ":$paramName";
+                        $expression  = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column']),
+                            $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
+                        );
+                        $queryBuilder->setParameter($paramName, $filter['value']);
                         $groupExpr->add(
                             $expression
                         );
@@ -473,7 +477,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-
                         $groupExpr->add(
                             $expr->{$exprFunction}($filter['column'], $columnValue)
                         );
@@ -519,5 +522,16 @@ final class MauticReportBuilder implements ReportBuilderInterface
         [$tableAlias, $columnName] = explode('.', $fullCollumnName);
 
         return "`{$tableAlias}`.`{$columnName}`";
+    }
+
+    /**
+     * @param mixed[] $filter
+     * @param mixed[] $filterDefinitions
+     */
+    private function doesColumnSupportEmptyValue(array $filter, array $filterDefinitions): bool
+    {
+        $type = $filterDefinitions[$filter['column']]['type'] ?? null;
+
+        return !in_array($type, ['date', 'datetime'], true);
     }
 }

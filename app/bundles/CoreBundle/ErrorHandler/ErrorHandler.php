@@ -1,25 +1,15 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\DatabaseConnectionException;
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
-    use Symfony\Component\Debug\Debug;
-    use Symfony\Component\Debug\Exception\ContextErrorException;
     use Symfony\Component\Debug\Exception\FatalErrorException;
     use Symfony\Component\Debug\Exception\FatalThrowableError;
     use Symfony\Component\Debug\Exception\FlattenException;
     use Symfony\Component\Debug\Exception\OutOfMemoryException;
+    use Symfony\Component\ErrorHandler\Debug;
 
     class ErrorHandler
     {
@@ -52,18 +42,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private static $root;
 
-        /**
-         * ErrorHandler constructor.
-         */
         public function __construct()
         {
             self::$root = realpath(__DIR__.'/../../../../');
         }
 
         /**
-         * @param        $log
-         * @param string $context
-         * @param bool   $backtrace
+         * @param mixed               $log
+         * @param string|array<mixed> $context
+         * @param bool                $backtrace
          */
         public static function logDebugEntry($log, $context = 'null', $backtrace = false)
         {
@@ -140,7 +127,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
          *
          * @return bool
          *
-         * @throws ContextErrorException
+         * @throws \ErrorException
          */
         public function handleError($level, $message, $file = 'unknown', $line = 0, $context = [])
         {
@@ -168,7 +155,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 if (LogLevel::DEBUG === $logLevel) {
                     $this->log($logLevel, "$message - in file $file - at line $line", $context);
                 } elseif ($this->displayErrors) {
-                    throw new ContextErrorException($message, 0, $level, $file, $line, $context);
+                    throw new \ErrorException($message, 0, $level, $file, $line);
                 } else {
                     $this->log($logLevel, "$message - in file $file - at line $line", $context);
                 }
@@ -186,23 +173,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function handleException($exception, $returnContent = false, $inTemplate = false)
         {
-            $inline = $inTemplate;
-            if (!$exception instanceof FatalThrowableError && defined('MAUTIC_DELEGATE_VIEW')) {
-                $inline = true;
-            }
-
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
             }
-            if (isset($error['inline'])) {
-                $inline = $error['inline'];
-            }
 
-            if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
-                $inline = true;
-            }
-
-            $content = $this->generateResponse($error, $inline, $inTemplate);
+            $content = $this->generateResponse($error, $inTemplate);
 
             $message = isset($error['logMessage']) ? $error['logMessage'] : $error['message'];
             $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
@@ -346,16 +321,23 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             self::$handler = new self();
             self::$handler->setEnvironment($environment);
-            // Log PHP fatal errors
-            register_shutdown_function([self::$handler, 'handleFatal']);
 
-            // Log general PHP errors
-            set_exception_handler([self::$handler, 'handleException']);
-            set_error_handler([self::$handler, 'handleError']);
+            /**
+             * We need PHPUnit to convert notices/warnings/etc. to exceptions, so
+             * we can't use our own ErrorHandler in that case.
+             */
+            if (!defined('IS_PHPUNIT')) {
+                // Log PHP fatal errors
+                register_shutdown_function([self::$handler, 'handleFatal']);
 
-            // Hide errors by default so we can format them
-            self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-            ini_set('display_errors', 0);
+                // Log general PHP errors
+                set_exception_handler([self::$handler, 'handleException']);
+                set_error_handler([self::$handler, 'handleError']);
+
+                // Hide errors by default so we can format them
+                self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
+                ini_set('display_errors', '0');
+            }
 
             return self::$handler;
         }
@@ -437,13 +419,12 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param      $error
-         * @param bool $inline
-         * @param bool $inTemplate
+         * @param mixed[] $error
+         * @param bool    $inTemplate
          *
          * @return mixed|string
          */
-        private function generateResponse($error, $inline = true, $inTemplate = false)
+        private function generateResponse($error, $inTemplate = false)
         {
             // Get a trace
             if ('dev' == self::$environment) {

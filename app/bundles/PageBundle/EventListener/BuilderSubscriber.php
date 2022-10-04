@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -43,7 +34,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
@@ -502,6 +493,16 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (count($tokens)) {
             $content = str_ireplace(array_keys($tokens), $tokens, $content);
+        }
+
+        $headCloseScripts = $page->getHeadScript();
+        if ($headCloseScripts) {
+            $content = str_ireplace('</head>', $headCloseScripts."\n</head>", $content);
+        }
+
+        $bodyCloseScripts = $page->getFooterScript();
+        if ($bodyCloseScripts) {
+            $content = str_ireplace('</body>', $bodyCloseScripts."\n</body>", $content);
         }
 
         $event->setContent($content);

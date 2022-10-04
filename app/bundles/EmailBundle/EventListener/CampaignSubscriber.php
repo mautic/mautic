@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\ORMException;
@@ -37,7 +28,7 @@ use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PageBundle\Entity\Hit;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -261,7 +252,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $email   = $this->emailModel->getEntity($emailId);
 
         if (!$email || !$email->isPublished()) {
-            $event->failAll('Email not found or published');
+            $event->passAllWithError($this->translator->trans('mautic.email.campaign.event.failure_missing_email'));
 
             return;
         }

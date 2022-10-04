@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatterHelper extends Helper
 {
@@ -74,7 +65,7 @@ class FormatterHelper extends Helper
                 }
                 break;
             case 'datetime':
-                $string = $this->dateHelper->toFull($val, 'utc');
+                $string = $this->dateHelper->toFullConcat($val, 'utc');
                 break;
             case 'time':
                 $string = $this->dateHelper->toTime($val, 'utc');
@@ -172,6 +163,24 @@ class FormatterHelper extends Helper
             },
             explode(',', $csv)
         );
+    }
+
+    /**
+     * Takes a string and returns a normalized representation of it.
+     *
+     * @param $string string
+     *
+     * @return string
+     */
+    public function normalizeStringValue($string)
+    {
+        $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
+
+        if ($stringIsDate && ($string === $stringIsDate->format('Y-m-d H:i:s'))) {
+            return $this->_($stringIsDate, 'datetime');
+        }
+
+        return $string;
     }
 
     /**

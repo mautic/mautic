@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
@@ -59,7 +50,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -139,7 +130,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticFormBundle:Result:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'formresult',
@@ -258,7 +249,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -349,7 +340,7 @@ class ResultController extends CommonFormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticFormBundle:Result:index',
+                'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                 'passthroughVars' => [
                     'mauticContent' => 'formresult',
                 ],
@@ -392,12 +383,8 @@ class ResultController extends CommonFormController
 
     /**
      * Set the main form ID as the objectId.
-     *
-     * @param string $route
-     * @param array  $parameters
-     * @param int    $referenceType
      */
-    public function generateUrl($route, $parameters = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         $formId = $this->getFormIdFromRequest($parameters);
         switch ($route) {

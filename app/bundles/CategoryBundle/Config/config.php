@@ -1,35 +1,26 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_category_batch_contact_set' => [
                 'path'       => '/categories/batch/contact/set',
-                'controller' => 'MauticCategoryBundle:BatchContact:exec',
+                'controller' => 'Mautic\CategoryBundle\Controller\BatchContactController::execAction',
             ],
             'mautic_category_batch_contact_view' => [
                 'path'       => '/categories/batch/contact/view',
-                'controller' => 'MauticCategoryBundle:BatchContact:index',
+                'controller' => 'Mautic\CategoryBundle\Controller\BatchContactController::indexAction',
             ],
             'mautic_category_index' => [
                 'path'       => '/categories/{bundle}/{page}',
-                'controller' => 'MauticCategoryBundle:Category:index',
+                'controller' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                 'defaults'   => [
                     'bundle' => 'category',
                 ],
             ],
             'mautic_category_action' => [
                 'path'       => '/categories/{bundle}/{objectAction}/{objectId}',
-                'controller' => 'MauticCategoryBundle:Category:executeCategory',
+                'controller' => 'Mautic\CategoryBundle\Controller\CategoryController::executeCategoryAction',
                 'defaults'   => [
                     'bundle' => 'category',
                 ],
@@ -40,7 +31,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'categories',
                 'path'            => '/categories',
-                'controller'      => 'MauticCategoryBundle:Api\CategoryApi',
+                'controller'      => 'Mautic\CategoryBundle\Controller\Api\CategoryApiController',
             ],
         ],
     ],

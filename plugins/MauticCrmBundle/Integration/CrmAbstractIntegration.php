@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Mautic\LeadBundle\DataObject\LeadManipulator;
@@ -296,7 +287,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -364,7 +355,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -388,9 +379,9 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
             if (array_key_exists($leadField, $uniqueLeadFields) && !empty($value)) {
                 $uniqueLeadFieldData[$leadField] = $value;
             }
-            if (isset($leadFieldTypes[$leadField]['type']) && 'text' == $leadFieldTypes[$leadField]['type']) {
-                $matchedFields[$leadField] = substr($value, 0, 255);
-            }
+
+            $fieldType                 = isset($leadFieldTypes[$leadField]['type']) ? $leadFieldTypes[$leadField]['type'] : '';
+            $matchedFields[$leadField] = $this->limitString($value, $fieldType);
         }
 
         if (count(array_diff_key($uniqueLeadFields, $matchedFields)) == count($uniqueLeadFields)) {
@@ -657,5 +648,24 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         }
 
         return $matchedFields;
+    }
+
+    /**
+     * Limits the string.
+     *
+     * @param mixed  $value
+     * @param string $fieldType
+     *
+     * @return mixed
+     */
+    protected function limitString($value, $fieldType = '')
+    {
+        // We must not convert boolean values to string, otherwise "false" will be converted to an empty string.
+        // "False" has to be converted to 0 instead.
+        if (('text' == $fieldType) && !is_bool($value)) {
+            return substr($value, 0, 255);
+        }
+
+        return $value;
     }
 }

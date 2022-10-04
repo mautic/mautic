@@ -1,24 +1,19 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\EmailType;
 use Mautic\StageBundle\Model\StageModel;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,49 +42,60 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
      */
     private $form;
 
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var ThemeHelperInterface|MockObject
+     */
+    private $themeHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator    = $this->createMock(TranslatorInterface::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->stageModel    = $this->createMock(StageModel::class);
-        $this->formBuilder   = $this->createMock(FormBuilderInterface::class);
-        $this->form          = new EmailType(
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->entityManager        = $this->createMock(EntityManager::class);
+        $this->stageModel           = $this->createMock(StageModel::class);
+        $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->themeHelper          = $this->createMock(ThemeHelperInterface::class);
+        $this->form                 = new EmailType(
             $this->translator,
             $this->entityManager,
-            $this->stageModel
+            $this->stageModel,
+            $this->coreParametersHelper,
+            $this->themeHelper
         );
 
         $this->formBuilder->method('create')->willReturnSelf();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
-        $options = [
-            'data' => new Email(),
-        ];
+        $options = ['data' => new Email()];
+        $names   = [];
+        $this->themeHelper
+            ->expects($this->once())
+            ->method('getCurrentTheme')
+            ->with('blank', 'email')
+            ->willReturn('blank');
 
-        $this->formBuilder->expects($this->at(46))
-            ->method('add')
+        $this->formBuilder->method('add')
             ->with(
-                'buttons',
-                FormButtonsType::class,
-                [
-                    'pre_extra_buttons' => [
-                        [
-                            'name'  => 'builder',
-                            'label' => 'mautic.core.builder',
-                            'attr'  => [
-                                'class'   => 'btn btn-default btn-dnd btn-nospin text-primary btn-builder',
-                                'icon'    => 'fa fa-cube',
-                                'onclick' => "Mautic.launchBuilder('emailform', 'email');",
-                            ],
-                        ],
-                    ],
-                ]
+                $this->callback(
+                    function ($name) use (&$names) {
+                        $names[] = $name;
+
+                        return true;
+                    }
+                )
             );
 
         $this->form->buildForm($this->formBuilder, $options);
+
+        Assert::assertContains('buttons', $names);
     }
 }

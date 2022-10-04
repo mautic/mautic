@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -42,29 +33,28 @@ trait CitrixRegistrationTrait
             foreach ($productsToRegister as $productToRegister) {
                 $productId = $productToRegister['productId'];
 
-                $isRegistered = CitrixHelper::registerToProduct(
+                $joinURL = CitrixHelper::registerToProduct(
                     $product,
                     $productId,
                     $email,
                     $firstname,
                     $lastname
                 );
-                if ($isRegistered) {
-                    $eventName = CitrixHelper::getCleanString(
-                            $productToRegister['productTitle']
-                        ).'_#'.$productToRegister['productId'];
 
-                    $this->citrixModel->addEvent(
-                        $product,
-                        $email,
-                        $eventName,
-                        $productToRegister['productTitle'],
-                        CitrixEventTypes::REGISTERED,
-                        $currentLead
-                    );
-                } else {
-                    throw new BadRequestHttpException('Unable to register!');
-                }
+                $eventName = CitrixHelper::getCleanString(
+                        $productToRegister['productTitle']
+                    ).'_#'.$productToRegister['productId'];
+
+                $this->citrixModel->addEvent(
+                    $product,
+                    $email,
+                    $eventName,
+                    $productToRegister['productTitle'],
+                    CitrixEventTypes::REGISTERED,
+                    $currentLead,
+                    null,
+                    $joinURL
+                );
             }
         } else {
             throw new BadRequestHttpException('Mandatory lead fields not found!');

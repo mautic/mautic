@@ -584,79 +584,32 @@ Mautic.onPageLoad = function (container, response, inModal) {
             }
         }
     });
-
     Mautic.activateGlobalFroalaOptions();
-    if (mQuery(container + ' textarea.editor').length) {
-        mQuery(container + ' textarea.editor').each(function () {
-            var textarea = mQuery(this);
+    Mautic.getBuilderContainer = function() {
+        return container;
+    }
 
-            // init AtWho in a froala editor
-            if (textarea.hasClass('editor-builder-tokens')) {
-                textarea.on('froalaEditor.initialized', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                });
+    // This turns all textarea elements with class "editor" into CKEditor ones, except for Dynamic Content elements, which can be initialized with Mautic.setDynamicContentEditors().
+    if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length && Mautic.getActiveBuilderName() === 'legacy') {
+        mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
+            mQuery(this).froalaEditor();
+        });
+    } else if (mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').length) {
+        mQuery(container + ' textarea.editor:not(".editor-dynamic-content")').each(function () {
+            const textarea = mQuery(this);
+            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
+            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
 
-                textarea.on('froalaEditor.focus', function (e, editor) {
-                    Mautic.initAtWho(editor.$el, textarea.attr('data-token-callback'), editor);
-                });
+            if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
+                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
             }
 
-            textarea.on('froalaEditor.blur', function (e, editor) {
-                editor.popups.hideAll();
-            });
-
-            var maxButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'token', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
-            var minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline'];
-
-            if (textarea.hasClass('editor-email')) {
-                maxButtons = mQuery.grep(maxButtons, function(value) {
-                    return value != 'insertGatedVideo';
-                });
-
-                maxButtons.push('dynamicContent');
-            }
-
-            if (textarea.hasClass('editor-dynamic-content')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertGatedVideo', 'insertTable', 'html', 'fullscreen'];
-            }
-
-            if (textarea.hasClass('editor-basic')) {
-                minButtons = ['undo', 'redo', '|', 'bold', 'italic', 'underline', 'paragraphFormat', 'fontFamily', 'fontSize', 'color', 'align', 'formatOL', 'formatUL', 'quote', 'clearFormatting', 'insertLink', 'insertImage', 'insertTable', 'html', 'fullscreen'];
-            }
-
+            let ckEditorToolbar = minButtons;
             if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
-                var options = {
-                    // Set custom buttons with separator between them.
-                    toolbarButtons: maxButtons,
-                    toolbarButtonsMD: maxButtons,
-                    heightMin: 300,
-                    useClasses: false
-                };
-
-                if (textarea.hasClass('editor-basic-fullpage')) {
-                    options.fullPage = true;
-                    options.htmlAllowedTags = ['.*'];
-                    options.htmlAllowedAttrs = ['.*'];
-                    options.htmlRemoveTags = [];
-                    options.lineBreakerTags = [];
-                }
-
-                textarea.on('froalaEditor.focus', function (e, editor) {
-                    Mautic.showChangeThemeWarning = true;
-                });
-
-                textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, options));
-            } else {
-                textarea.froalaEditor(mQuery.extend({}, Mautic.basicFroalaOptions, {
-                    // Set custom buttons with separator between them.
-                    toolbarButtons: minButtons,
-                    toolbarButtonsMD: minButtons,
-                    toolbarButtonsSM: minButtons,
-                    toolbarButtonsXS: minButtons,
-                    heightMin: 100,
-                    useClasses: false
-                }));
+                ckEditorToolbar = maxButtons;
             }
+            
+            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
         });
     }
 
@@ -770,6 +723,34 @@ Mautic.onPageLoad = function (container, response, inModal) {
     }
 };
 
+Mautic.setDynamicContentEditors = function(container) {
+    // The editor for dynamic content should only be initialized when the modal is opened due to conflicts and not being able to edit content otherwise
+    if (mQuery(container + ' textarea.editor-dynamic-content').length && Mautic.getActiveBuilderName() === 'legacy') {
+        console.log('[Builder] Using Froala for the Dynamic Content editor (legacy)');
+        mQuery(container + ' textarea.editor-dynamic-content').each(function () {
+            mQuery(this).froalaEditor();
+        });
+    } else if (mQuery(container + ' textarea.editor-dynamic-content').length) {
+        console.log('[Builder] Using CKEditor for the Dynamic Content editor');
+        mQuery(container + ' textarea.editor-dynamic-content').each(function () {
+            const textarea = mQuery(this);
+            const maxButtons = [[ 'Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'InsertToken', 'Sourcedialog', 'Maximize']]
+            let minButtons = [['Undo', 'Redo', '|', 'Bold', 'Italic', 'Underline']];
+
+            if (textarea.hasClass('editor-dynamic-content') || textarea.hasClass('editor-basic')) {
+                minButtons = [['Undo', 'Redo', '-', 'Bold', 'Italic', 'Underline', 'Format', 'Font', 'FontSize', 'TextColor', 'BGColor', 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', 'NumberedList', 'BulletedList', 'Blockquote', 'RemoveFormat', 'Link', 'Image', 'Table', 'Sourcedialog', 'Maximize']];
+            }
+
+            let ckEditorToolbar = minButtons;
+            if (textarea.hasClass('editor-advanced') || textarea.hasClass('editor-basic-fullpage')) {
+                ckEditorToolbar = maxButtons;
+            }
+
+            Mautic.ConvertFieldToCkeditor(textarea, ckEditorToolbar);
+        });
+    }
+}
+
 /**
  * @param jQueryObject
  */
@@ -838,9 +819,14 @@ Mautic.onPageUnload = function (container, response) {
             MauticVars.modalsReset = {};
         }
 
-        mQuery(container + ' textarea.editor').each(function () {
-            mQuery('textarea.editor').froalaEditor('destroy');
-        });
+        if (Mautic.getActiveBuilderName() === 'legacy') {
+            mQuery('textarea').froalaEditor('destroy');
+        } else {
+            for(name in CKEDITOR.instances)
+            {
+                CKEDITOR.instances[name].destroy(false);
+            }
+        }
 
         //turn off shuffle events
         mQuery('html')
@@ -1057,12 +1043,15 @@ Mautic.destroyChosen = function(el) {
 
 /**
  * Activate a typeahead lookup
- *
- * @param field
- * @param target
- * @param options
  */
 Mautic.activateFieldTypeahead = function (field, target, options, action) {
+    var fieldId = '#' + field;
+    var fieldEl = mQuery('#' + field);
+
+    if (fieldEl.length && fieldEl.parent('.twitter-typeahead').length) {
+        return; // If the parent exist then the typeahead was already initialized. Abort.
+    }
+
     if (options && typeof options === 'String') {
         var keys = values = [];
 
@@ -1074,7 +1063,7 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             values = options[0].split('|');
         }
 
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, {
+        var fieldTypeahead = Mautic.activateTypeahead(fieldId, {
             dataOptions: values,
             dataOptionKeys: keys,
             minLength: 0
@@ -1090,14 +1079,18 @@ Mautic.activateFieldTypeahead = function (field, target, options, action) {
             typeAheadOptions.limit = options.limit;
         }
 
-        var fieldTypeahead = Mautic.activateTypeahead('#' + field, typeAheadOptions);
+        if (('undefined' !== typeof options) && ('undefined' !== typeof options.noRrecordMessage)) {
+            typeAheadOptions.noRrecordMessage = options.noRrecordMessage;
+        }
+
+        var fieldTypeahead = Mautic.activateTypeahead(fieldId, typeAheadOptions);
     }
 
     var callback = function (event, datum) {
-        if (mQuery("#" + field).length && datum["value"]) {
-            mQuery("#" + field).val(datum["value"]);
+        if (fieldEl.length && datum["value"]) {
+            fieldEl.val(datum["value"]);
 
-            var lookupCallback = mQuery('#' + field).data("lookup-callback");
+            var lookupCallback = mQuery(fieldId).data('lookup-callback');
             if (lookupCallback && typeof Mautic[lookupCallback] == 'function') {
                 Mautic[lookupCallback](field, datum);
             }
@@ -1681,7 +1674,19 @@ Mautic.activateTypeahead = function (el, options) {
         }
     }
 
+    var noRrecordMessage = (options.noRrecordMessage) ? options.noRrecordMessage : mQuery(el).data('no-record-message');
     var theName = el.replace(/[^a-z0-9\s]/gi, '').replace(/[-\s]/g, '_');
+    var dataset = {
+        name: theName,
+        displayKey: options.displayKey,
+        source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
+    };
+
+    if (noRrecordMessage) {
+        dataset.templates = {
+            empty: "<p>" + noRrecordMessage + "<p>"
+        }
+    }
 
     var theTypeahead = mQuery(el).typeahead(
         {
@@ -1690,11 +1695,7 @@ Mautic.activateTypeahead = function (el, options) {
             minLength: options.minLength,
             multiple: options.multiple
         },
-        {
-            name: theName,
-            displayKey: options.displayKey,
-            source: (typeof theBloodhound != 'undefined') ? theBloodhound.ttAdapter() : substringMatcher(lookupOptions, lookupKeys)
-        }
+        dataset
     ).on('keypress', function (event) {
         if ((event.keyCode || event.which) == 13) {
             mQuery(el).typeahead('close');

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Entity\DownloadRepository;
@@ -66,10 +57,12 @@ class ReportSubscriber implements EventSubscriberInterface
         $prefix  = 'a.';
         $columns = [
             $prefix.'download_count' => [
+                'alias' => 'download_count',
                 'label' => 'mautic.asset.report.download_count',
                 'type'  => 'int',
             ],
             $prefix.'unique_download_count' => [
+                'alias' => 'unique_download_count',
                 'label' => 'mautic.asset.report.unique_download_count',
                 'type'  => 'int',
             ],
@@ -102,6 +95,10 @@ class ReportSubscriber implements EventSubscriberInterface
         );
 
         if ($event->checkContext([self::CONTEXT_ASSET_DOWNLOAD])) {
+            // asset downloads calculate this columns
+            $columns[$prefix.'download_count']['formula']        = 'COUNT(ad.id)';
+            $columns[$prefix.'unique_download_count']['formula'] = 'COUNT(DISTINCT ad.lead_id)';
+
             // Downloads
             $downloadPrefix  = 'ad.';
             $downloadColumns = [
@@ -181,6 +178,10 @@ class ReportSubscriber implements EventSubscriberInterface
 
             if ($this->companyReportData->eventHasCompanyColumns($event)) {
                 $event->addCompanyLeftJoin($queryBuilder);
+            }
+
+            if (!$event->hasGroupBy()) {
+                $queryBuilder->groupBy('ad.id');
             }
         }
 

@@ -32,7 +32,7 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
         $tablePrefix = new TablePrefix('prefix_');
         $this->em->getEventManager()->addEventListener(Events::loadClassMetadata, $tablePrefix);
 
-        $dbParams = array_merge($this->container->get('doctrine')->getConnection()->getParams(), [
+        $dbParams = array_merge(self::$container->get('doctrine')->getConnection()->getParams(), [
             'table_prefix'  => null,
             'backup_tables' => 0,
         ]);
@@ -64,6 +64,6 @@ abstract class MauticSqliteTestCase extends AbstractMauticTestCase
 
     private function getDatabasePath()
     {
-        return $this->container->get('doctrine')->getConnection()->getParams()['path'];
+        return self::$container->get('doctrine')->getConnection()->getParams()['path'];
     }
 }

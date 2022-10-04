@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'sysinfo');
-$view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
+$view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.header.index'));
 ?>
 
 <!-- start: box layout -->
@@ -26,6 +18,11 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
+                    <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.recommendations'); ?>
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
                     <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.sysinfo.tab.folders'); ?>
                     </a>
@@ -33,6 +30,11 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
                 <li role="presentation" class="list-group-item">
                     <a href="#log" aria-controls="log" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.sysinfo.tab.log'); ?>
+                    </a>
+                </li>
+                <li role="presentation" class="list-group-item">
+                    <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.dbinfo'); ?>
                     </a>
                 </li>
             </ul>
@@ -48,6 +50,25 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
             <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
                     <?php echo $phpInfo; ?>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <?php if (empty($recommendations) && empty($requirement)) : ?>
+                        <div class="alert alert-info">
+                            <?php echo $view['translator']->trans('mautic.sysinfo.no.recommendations'); ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php foreach ($requirements as $requirement): ?>
+                        <div class="alert alert-danger">
+                            <?php echo $requirement; ?>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php foreach ($recommendations as $recommendation): ?>
+                        <div class="alert alert-warning">
+                            <?php echo $recommendation; ?>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
@@ -79,6 +100,33 @@ $view['slots']->set('headerTitle', $view['translator']->trans('System Info'));
                             <?php echo $view['translator']->trans('mautic.sysinfo.log.missing'); ?>
                         </div>
                     <?php endif; ?>
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
+                <div class="pt-md pr-md pl-md pb-md">
+                    <h2 class="pb-md"><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.title'); ?></h2>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.property'); ?></th>
+                                <th><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.value'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.version'); ?></td>
+                                <td id="dbinfo-version"><?php echo $dbInfo['version']; ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.driver'); ?></td>
+                                <td id="dbinfo-driver"><?php echo $dbInfo['driver']; ?></td>
+                            </tr>
+                            <tr>
+                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.platform'); ?></td>
+                                <td id="dbinfo-platform"><?php echo $dbInfo['platform']; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

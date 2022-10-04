@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -56,14 +47,14 @@ class SecurityController extends CommonController
                 // Run migrations
                 $this->request->query->set('finalize', 1);
 
-                return $this->forward('MauticCoreBundle:Ajax:updateDatabaseMigration',
+                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateDatabaseMigrationAction',
                     [
                         'request' => $this->request,
                     ]
                 );
             } elseif ('schemaMigration' == $step) {
                 // Done so finalize
-                return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
+                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
                     [
                         'request' => $this->request,
                     ]

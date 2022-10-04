@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -36,7 +27,7 @@ class TrackingHelper
     /**
      * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * @var ContactTracker
@@ -49,12 +40,12 @@ class TrackingHelper
     public function __construct(
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        RequestStack $request,
+        RequestStack $requestStack,
         ContactTracker $contactTracker
     ) {
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->request              = $request;
+        $this->requestStack         = $requestStack;
         $this->contactTracker       = $contactTracker;
     }
 
@@ -146,7 +137,7 @@ class TrackingHelper
      */
     protected function isLandingPage()
     {
-        $server = $this->request->getCurrentRequest()->server;
+        $server = $this->requestStack->getCurrentRequest()->server;
         if (false === strpos($server->get('HTTP_REFERER'), $this->coreParametersHelper->get('site_url'))) {
             return false;
         }

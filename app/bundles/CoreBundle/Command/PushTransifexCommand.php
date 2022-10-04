@@ -1,40 +1,35 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Factory\TransifexFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\Transifex\Connector\Resources;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to push language resources to Transifex.
  */
-class PushTransifexCommand extends ContainerAwareCommand
+class PushTransifexCommand extends Command
 {
-    private $transifexFactory;
-    private $translator;
+    private TransifexFactory $transifexFactory;
+    private TranslatorInterface $translator;
+    private CoreParametersHelper $coreParametersHelper;
 
     public function __construct(
         TransifexFactory $transifexFactory,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        $this->transifexFactory = $transifexFactory;
-        $this->translator       = $translator;
+        $this->transifexFactory     = $transifexFactory;
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct();
     }
@@ -63,8 +58,6 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
-
         $options = $input->getOptions();
         $create  = $options['create'];
         $files   = $this->getLanguageFiles();
@@ -106,13 +99,13 @@ EOT
     /**
      * Returns Mautic translation files.
      *
-     * @return array
+     * @return array<string,string[]>
      */
     private function getLanguageFiles()
     {
         $files         = [];
-        $mauticBundles = $this->getContainer()->getParameter('mautic.bundles');
-        $pluginBundles = $this->getContainer()->getParameter('mautic.plugin.bundles');
+        $mauticBundles = $this->coreParametersHelper->get('bundles');
+        $pluginBundles = $this->coreParametersHelper->get('plugin.bundles');
 
         foreach ($mauticBundles as $bundle) {
             // Parse the namespace into a filepath

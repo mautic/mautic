@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Doctrine\Bundle\MigrationsBundle\Command\MigrationsMigrateDoctrineCommand;
@@ -22,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateSchemaStepTest extends AbstractStepTest
 {
@@ -90,26 +81,16 @@ class UpdateSchemaStepTest extends AbstractStepTest
         /** @var ContainerInterface|MockObject $container */
         $container = $this->createMock(ContainerInterface::class);
         $container->method('get')
-            ->withConsecutive(
-                ['kernel'],
-                ['event_dispatcher'],
-                ['doctrine:migrations:migrate']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->kernel,
-                $this->eventDispatcher,
-                $this->migrateCommand
-            );
-
+            ->will($this->returnValueMap([
+                ['kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->kernel],
+                ['event_dispatcher', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->eventDispatcher],
+                ['doctrine:migrations:migrate', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->migrateCommand],
+            ]));
         $container->method('hasParameter')
-            ->withConsecutive(
-                ['console.command.ids'],
-                ['console.lazy_command.ids']
-            )
-            ->willReturnOnConsecutiveCalls(
-                true,
-                false
-            );
+            ->will($this->returnValueMap([
+                ['console.command.ids', true],
+                ['console.laze_command.ids', false],
+            ]));
 
         $container->method('getParameter')
             ->with('console.command.ids')
@@ -127,38 +108,46 @@ class UpdateSchemaStepTest extends AbstractStepTest
     {
         $this->expectException(UpdateFailedException::class);
 
+        $this->migrateCommand->method('run')
+            ->willReturn(1);
+
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (string $eventName, Event $event) {
+                function (Event $event, string $eventName) {
                     switch ($eventName) {
                         case ConsoleEvents::COMMAND:
                             $event->enableCommand();
                             break;
-                        case ConsoleEvents::TERMINATE:
-                            $event->setExitCode(1);
-                            break;
                     }
                 }
             );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
     public function testExceptionNotThrownIfMigrationsWereSuccessful()
     {
+        $this->migrateCommand->method('run')
+            ->willReturn(0);
+
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (string $eventName, Event $event) {
+                function (Event $event, string $eventName) {
                     switch ($eventName) {
                         case ConsoleEvents::COMMAND:
                             $event->enableCommand();
                             break;
-                        case ConsoleEvents::TERMINATE:
-                            $event->setExitCode(0);
-                            break;
                     }
                 }
             );
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         try {
             $this->step->execute($this->progressBar, $this->input, $this->output);

@@ -57,12 +57,51 @@ switch (true) {
         break;
 }
 
+if (isset($aditionalLabel)) {
+    $text .= $aditionalLabel;
+}
+
 if (!empty($disableToggle)) {
     $icon = str_replace(['success', 'danger', 'warning'], 'muted', $icon);
 }
 
 $clickAction = (isset($disableToggle) && true === $disableToggle) ? ' disabled' : ' has-click-event';
 $idClass     = str_replace('.', '-', $model).'-publish-icon'.$item->getId().md5($query);
+
+$backdropFlag = (isset($backdrop)) ? 'true' : 'false';
+
+$onclick = $onclick ?? "Mautic.togglePublishStatus(event, '.{$idClass}', '{$model}', '{$item->getId()}', '{$query}', {$backdropFlag})";
+
+$defaultAttributes = [
+    'data-container' => 'body',
+    'data-placement' => 'right',
+    'data-toggle'    => 'tooltip',
+    'data-status'    => $status,
+];
+
+$attributes = $attributes ?? [];
+
+if (!empty($attributes)) {
+    $attributes['data-id-class']    = '.'.$idClass;
+    $attributes['data-model']       = $model;
+    $attributes['data-item-id']     = $item->getId();
+    $attributes['data-query']       = $query;
+    $attributes['data-backdrop']    = $backdropFlag;
+}
+
+if (!empty($transKeys)) {
+    foreach ($transKeys as $k => $v) {
+        $attributes[$k] = $view['translator']->trans($v);
+    }
+}
+
+$allDataAttrs = array_merge($attributes + $defaultAttributes);
+
+$dataAttributes = implode(' ', array_map(
+    function ($v, $k) { return sprintf("%s='%s'", $k, $v); },
+    $allDataAttrs,
+    array_keys($allDataAttrs)
+));
 ?>
 
-<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?>" data-toggle="tooltip" data-container="body" data-placement="right" data-status="<?php echo $status; ?>" title="<?php echo $text; ?>"<?php if (empty($disableToggle)): ?> onclick="Mautic.togglePublishStatus(event, '.<?php echo $idClass; ?>', '<?php echo $model; ?>', '<?php echo $item->getId(); ?>', '<?php echo $query; ?>', <?php echo (isset($backdrop)) ? 'true' : 'false'; ?>);"<?php endif; ?>></i>
+<i class="fa fa-fw <?php echo $size.' '.$icon.$clickAction.' '.$idClass; ?> toggle-publish-status"  title="<?php echo $text; ?>" <?php echo $dataAttributes; ?> <?php if (empty($disableToggle)): ?> onclick="<?php echo $onclick; ?>"<?php endif; ?>></i>

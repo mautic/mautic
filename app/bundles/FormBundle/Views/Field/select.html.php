@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $defaultInputFormClass = ' not-chosen';
 $defaultInputClass     = 'selectbox';
 $containerType         = 'select';
@@ -30,9 +22,9 @@ HTML;
 
 $emptyOption = '';
 if ((!empty($properties['placeholder']) || empty($field['defaultValue']) && empty($properties['multiple']))):
+    $placeholder = $properties['placeholder'] ?? '';
     $emptyOption = <<<HTML
-
-                    <option value="">{$properties['placeholder']}</option>
+                    <option value="">{$placeholder}</option>
 HTML;
 endif;
 

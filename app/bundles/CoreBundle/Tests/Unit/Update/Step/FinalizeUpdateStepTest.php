@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -16,7 +7,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Update\Step\FinalizeUpdateStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FinalizeUpdateStepTest extends AbstractStepTest
 {
@@ -90,8 +81,8 @@ class FinalizeUpdateStepTest extends AbstractStepTest
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
-        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
 
         $this->assertEquals($updateSuccessfulKey, trim($this->progressBar->getMessage()));
     }
@@ -121,9 +112,13 @@ class FinalizeUpdateStepTest extends AbstractStepTest
             ->method('writeln')
             ->with("\n\n<info>This is an example message</info>");
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $this->step->execute($this->progressBar, $this->input, $this->output);
 
-        $this->assertFileNotExists(__DIR__.'/resources/upgrade.php');
-        $this->assertFileNotExists(__DIR__.'/resources/lastUpdateCheck.txt');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/upgrade.php');
+        $this->assertFileDoesNotExist(__DIR__.'/resources/lastUpdateCheck.txt');
     }
 }

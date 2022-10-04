@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -93,7 +84,7 @@ class ReportController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticReportBundle:Report:index',
+                    'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
                         'mauticContent' => 'report',
@@ -175,7 +166,7 @@ class ReportController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticReportBundle:Report:index',
+            'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_report_index',
                 'mauticContent' => 'report',
@@ -236,7 +227,7 @@ class ReportController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticReportBundle:Report:index',
+            'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_report_index',
                 'mauticContent' => 'report',
@@ -318,7 +309,7 @@ class ReportController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticReportBundle:Report:index',
+            'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_report_index',
                 'mauticContent' => 'report',
@@ -378,7 +369,7 @@ class ReportController extends FormController
                         ]
                     );
                     $viewParams = ['objectId' => $entity->getId()];
-                    $template   = 'MauticReportBundle:Report:view';
+                    $template   = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
                 } else {
                     //reset old columns
                     $entity->setColumns($oldColumns);
@@ -390,7 +381,7 @@ class ReportController extends FormController
 
                 $returnUrl  = $this->generateUrl('mautic_report_index', ['page' => $page]);
                 $viewParams = ['report' => $page];
-                $template   = 'MauticReportBundle:Report:index';
+                $template   = 'Mautic\ReportBundle\Controller\ReportController::indexAction';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -498,12 +489,12 @@ class ReportController extends FormController
                         'objectId' => $entity->getId(),
                     ];
                     $returnUrl = $this->generateUrl('mautic_report_view', $viewParameters);
-                    $template  = 'MauticReportBundle:Report:view';
+                    $template  = 'Mautic\ReportBundle\Controller\ReportController::viewAction';
                 }
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_report_index', $viewParameters);
-                $template       = 'MauticReportBundle:Report:index';
+                $template       = 'Mautic\ReportBundle\Controller\ReportController::indexAction';
             }
 
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
@@ -564,7 +555,7 @@ class ReportController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_report_index', ['page' => $page]),
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticReportBundle:Report:index',
+                    'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
                         'mauticContent' => 'report',
@@ -765,7 +756,7 @@ class ReportController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_report_index', ['page' => $page]),
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticReportBundle:Report:index',
+                    'contentTemplate' => 'Mautic\ReportBundle\Controller\ReportController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_report_index',
                         'mauticContent' => 'report',

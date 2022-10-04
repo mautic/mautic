@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Guzzle;
 
 use GuzzleHttp\ClientInterface;
-use Http\Adapter\Guzzle6\Client;
+use Http\Adapter\Guzzle7\Client;
 
 /**
  * Class ClientFactory.

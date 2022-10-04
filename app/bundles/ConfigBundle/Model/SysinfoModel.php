@@ -1,51 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SysinfoModel.
- */
 class SysinfoModel
 {
+    /**
+     * @var string|null
+     */
     protected $phpInfo;
+
+    /**
+     * @var array<string,bool>|null
+     */
     protected $folders;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected PathsHelper $pathsHelper;
+    protected CoreParametersHelper $coreParametersHelper;
+    protected Connection $connection;
+    private TranslatorInterface $translator;
+    private InstallService $installService;
+    private CheckStep $checkStep;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * SysinfoModel constructor.
-     */
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator,
+        Connection $connection,
+        InstallService $installService,
+        CheckStep $checkStep
+    ) {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
+        $this->connection           = $connection;
+        $this->installService       = $installService;
+        $this->checkStep            = $checkStep;
     }
 
     /**
@@ -59,7 +55,7 @@ class SysinfoModel
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo')) {
+        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -84,6 +80,22 @@ class SysinfoModel
         }
 
         return $this->phpInfo;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->installService->checkOptionalSettings($this->checkStep);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
     }
 
     /**
@@ -138,6 +150,15 @@ class SysinfoModel
         }
 
         return $this->tail($log, $lines);
+    }
+
+    public function getDbInfo(): array
+    {
+        return [
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
+            'driver'   => $this->connection->getDriver()->getName(),
+            'platform' => get_class($this->connection->getDatabasePlatform()),
+        ];
     }
 
     /**

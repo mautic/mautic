@@ -1,28 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_asset_index' => [
                 'path'       => '/assets/{page}',
-                'controller' => 'MauticAssetBundle:Asset:index',
+                'controller' => 'Mautic\AssetBundle\Controller\AssetController::indexAction',
             ],
             'mautic_asset_remote' => [
                 'path'       => '/assets/remote',
-                'controller' => 'MauticAssetBundle:Asset:remote',
+                'controller' => 'Mautic\AssetBundle\Controller\AssetController::remoteAction',
             ],
             'mautic_asset_action' => [
                 'path'       => '/assets/{objectAction}/{objectId}',
-                'controller' => 'MauticAssetBundle:Asset:execute',
+                'controller' => 'Mautic\AssetBundle\Controller\AssetController::executeAction',
             ],
         ],
         'api' => [
@@ -30,13 +21,13 @@ return [
                 'standard_entity' => true,
                 'name'            => 'assets',
                 'path'            => '/assets',
-                'controller'      => 'MauticAssetBundle:Api\AssetApi',
+                'controller'      => 'Mautic\AssetBundle\Controller\Api\AssetApiController',
             ],
         ],
         'public' => [
             'mautic_asset_download' => [
                 'path'       => '/asset/{slug}',
-                'controller' => 'MauticAssetBundle:Public:download',
+                'controller' => 'Mautic\AssetBundle\Controller\PublicController::downloadAction',
                 'defaults'   => [
                     'slug' => '',
                 ],
@@ -62,6 +53,14 @@ return [
     ],
 
     'services' => [
+        'permissions' => [
+            'mautic.asset.permissions' => [
+                'class'     => \Mautic\AssetBundle\Security\Permissions\AssetPermissions::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+        ],
         'events' => [
             'mautic.asset.subscriber' => [
                 'class'     => \Mautic\AssetBundle\EventListener\AssetSubscriber::class,
@@ -228,7 +227,6 @@ return [
             'mautic.asset.fixture.asset' => [
                 'class'     => \Mautic\AssetBundle\DataFixtures\ORM\LoadAssetData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.asset.model.asset'],
             ],
         ],
         'repositories' => [

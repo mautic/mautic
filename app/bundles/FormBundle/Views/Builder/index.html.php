@@ -27,6 +27,12 @@ if (!isset($inBuilder)) {
     $inBuilder = false;
 }
 
+$fieldsTabError = false;
+if ($view['form']->errors(
+    $form['progressiveProfilingLimit']
+)) {
+    $fieldsTabError = true;
+}
 ?>
 <?php echo $view['form']->start($form); ?>
 <div class="box-layout">
@@ -38,9 +44,16 @@ if (!isset($inBuilder)) {
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
                                 'mautic.core.details'
                             ); ?></a></li>
-                    <li id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
+                    <li id="fields-tab" class="text-danger"><a class="<?php if ($fieldsTabError) {
+                                echo 'text-danger';
+                            } ?>" href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
                                 'mautic.form.tab.fields'
-                            ); ?></a></li>
+                            ); ?>
+                            <?php if ($fieldsTabError): ?>
+                                <i class="fa fa-warning"></i>
+                            <?php endif; ?>
+                        </a>
+                    </li>
                     <li id="actions-tab"><a href="#actions-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
                                 'mautic.form.tab.actions'
                             ); ?></a></li>
@@ -92,8 +105,29 @@ if (!isset($inBuilder)) {
                                     </select>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-sm-12 mb-10">
+                                    <?php echo $view['form']->label(
+                                        $form['progressiveProfilingLimit']
+                                    ); ?>
+                                    <div class="ml-5 mr-5" style="display:inline-block;">
+                                        <?php echo $view['form']->widget(
+                                            $form['progressiveProfilingLimit']
+                                        ); ?>
+                                    </div>
+                                    <div class="has-error" style="display:inline-block;">
+                                        <?php echo $view['form']->errors(
+                                            $form['progressiveProfilingLimit']
+                                        ); ?>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="drop-here">
                             <?php foreach ($formFields as $field): ?>
+                            <?php if (!is_null($field['parent'])) {
+                                            continue;
+                                        }
+                                ?>
                                 <?php if (!in_array($field['id'], $deletedFields)) : ?>
                                     <?php if (!empty($field['isCustom'])):
                                         $params   = $field['customParameters'];
@@ -101,18 +135,23 @@ if (!isset($inBuilder)) {
                                     else:
                                         $template = 'MauticFormBundle:Field:'.$field['type'].'.html.php';
                                     endif; ?>
-                                    <?php echo $view->render(
+                                    <?php
+
+                                    echo $view->render(
                                         'MauticFormBundle:Builder:fieldwrapper.html.php',
                                         [
-                                            'template'      => $template,
-                                            'field'         => $field,
-                                            'inForm'        => true,
-                                            'id'            => $field['id'],
-                                            'formId'        => $formId,
-                                            'formName'      => $activeForm->generateFormName(),
-                                            'contactFields' => $contactFields,
-                                            'companyFields' => $companyFields,
-                                            'inBuilder'     => $inBuilder,
+                                            'template'       => $template,
+                                            'field'          => $field,
+                                            'viewOnlyFields' => $viewOnlyFields,
+                                            'inForm'         => true,
+                                            'id'             => $field['id'],
+                                            'formId'         => $formId,
+                                            'formName'       => $activeForm->generateFormName(),
+                                            'contactFields'  => $contactFields,
+                                            'companyFields'  => $companyFields,
+                                            'inBuilder'      => $inBuilder,
+                                            'fields'         => $fields,
+                                            'formFields'     => $formFields,
                                         ]
                                     ); ?>
                                 <?php endif; ?>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker\Service\ContactTrackingService;
 
 use Mautic\CoreBundle\Helper\CookieHelper;
@@ -16,7 +7,6 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Entity\MergeRecordRepository;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -47,9 +37,9 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
     private $mergeRecordRepository;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * ContactTrackingService constructor.
@@ -65,7 +55,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
         $this->leadDeviceRepository  = $leadDeviceRepository;
         $this->leadRepository        = $leadRepository;
         $this->mergeRecordRepository = $mergeRecordRepository;
-        $this->request               = $requestStack->getCurrentRequest();
+        $this->requestStack          = $requestStack;
     }
 
     /**
@@ -73,7 +63,9 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
      */
     public function getTrackedLead()
     {
-        if (null === $this->request) {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
             return null;
         }
 
@@ -84,7 +76,7 @@ final class ContactTrackingService implements ContactTrackingServiceInterface
 
         $leadId = $this->cookieHelper->getCookie($trackingId, null);
         if (null === $leadId) {
-            $leadId = $this->request->get('mtc_id', null);
+            $leadId = $request->get('mtc_id', null);
             if (null === $leadId) {
                 return null;
             }

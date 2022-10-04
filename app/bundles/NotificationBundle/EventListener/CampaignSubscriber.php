@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -29,30 +20,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var NotificationModel
-     */
-    private $notificationModel;
-
-    /**
-     * @var AbstractNotificationApi
-     */
-    private $notificationApi;
-
-    /**
-     * @var IntegrationHelper
-     */
-    private $integrationHelper;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
-     * @var DoNotContactModel
-     */
-    private $doNotContact;
+    private NotificationModel $notificationModel;
+    private AbstractNotificationApi $notificationApi;
+    private IntegrationHelper $integrationHelper;
+    private EventDispatcherInterface $dispatcher;
+    private DoNotContactModel $doNotContact;
 
     public function __construct(
         IntegrationHelper $integrationHelper,

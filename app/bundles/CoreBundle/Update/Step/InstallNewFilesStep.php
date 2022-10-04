@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Update\Step;
 
 use Mautic\CoreBundle\Exception\UpdateFailedException;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class InstallNewFilesStep implements StepInterface
 {
@@ -58,7 +49,7 @@ final class InstallNewFilesStep implements StepInterface
 
     public function getOrder(): int
     {
-        return 0;
+        return 10;
     }
 
     public function shouldExecuteInFinalStage(): bool
@@ -127,7 +118,7 @@ final class InstallNewFilesStep implements StepInterface
         // Fetch the update package
         $package = $this->updateHelper->fetchPackage($update['package']);
 
-        if (isset($package['error'])) {
+        if (isset($package['error']) && true === $package['error']) {
             throw new UpdateFailedException($this->translator->trans($package['message']));
         }
 

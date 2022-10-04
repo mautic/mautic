@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle;
 
 /**
@@ -168,6 +159,16 @@ final class LeadEvents
     const LEAD_BUILD_SEARCH_COMMANDS = 'mautic.lead_build_search_commands';
 
     /**
+     * The mautic.company_build_search_commands event is dispatched when the search commands are built.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyBuildSearchEvent instance.
+     *
+     * @var string
+     */
+    const COMPANY_BUILD_SEARCH_COMMANDS = 'mautic.company_build_search_commands';
+
+    /**
      * The mautic.current_lead_changed event is dispatched when the current lead is changed to another such as when
      * a new lead is created from a form submit.  This gives opportunity to update session data if applicable.
      *
@@ -197,6 +198,16 @@ final class LeadEvents
      * @var string
      */
     const LIST_POST_SAVE = 'mautic.lead_list_post_save';
+
+    /**
+     * The mautic.lead_list_pre_unpublish event is dispatched before a lead_list is unpublished.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListEvent instance.
+     *
+     * @var string
+     */
+    const LIST_PRE_UNPUBLISH = 'mautic.lead_list_pre_unpublish';
 
     /**
      * The mautic.lead_list_pre_delete event is dispatched before a lead_list is deleted.
@@ -347,6 +358,44 @@ final class LeadEvents
      * @var string
      */
     const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
+
+    /**
+     * The mautic.lead_import_on_initialize event is dispatched when the import is being initialized.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportInitEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_INITIALIZE = 'mautic.lead_import_on_initialize';
+
+    /**
+     * The mautic.lead_import_on_field_mapping event is dispatched when the import needs the list of fields for mapping.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportMappingEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_FIELD_MAPPING = 'mautic.lead_import_on_field_mapping';
+
+    /**
+     * The mautic.lead_import_on_process event is dispatched when the import batch is processing.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance.
+     *
+     * @var string
+     */
+    const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
+
+    /**
+     * The mautic.lead_import_on_validate event is dispatched when the import form is being validated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance
+     */
+    const IMPORT_ON_VALIDATE = 'mautic.lead_import_on_validate';
 
     /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.
@@ -542,6 +591,13 @@ final class LeadEvents
     const LIST_FILTERS_CHOICES_ON_GENERATE = 'mautic.list_filters_choices_on_generate';
 
     /**
+     * The event is dispatched to allow inserting segment filters translations.
+     *
+     * The listener receives SegmentDictionaryGenerationEvent
+     */
+    const SEGMENT_DICTIONARY_ON_GENERATE = 'mautic.list_dictionary_on_generate';
+
+    /**
      * The mautic.list_filters_operators_on_generate event is dispatched when the operators for list filters are generated.
      *
      * The event listener receives a
@@ -550,6 +606,54 @@ final class LeadEvents
      * @var string
      */
     const LIST_FILTERS_OPERATORS_ON_GENERATE = 'mautic.list_filters_operators_on_generate';
+
+    /**
+     * The mautic.collect_filter_choices_for_list_field_type event is dispatched when some filter based on a list type needs to load its choices.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ListFieldChoicesEvent
+     *
+     * @var string
+     */
+    const COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE = 'mautic.collect_filter_choices_for_list_field_type';
+
+    /**
+     * The mautic.collect_operators_for_field_type event is dispatched when some filter needs operators for a field type.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TypeOperatorsEvent
+     *
+     * @var string
+     */
+    const COLLECT_OPERATORS_FOR_FIELD_TYPE = 'mautic.collect_operators_for_field_type';
+
+    /**
+     * The mautic.collect_operators_for_field event is dispatched when some filter needs operators for a specific field.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TypeOperatorsEvent
+     *
+     * @var string
+     */
+    const COLLECT_OPERATORS_FOR_FIELD = 'mautic.collect_operators_for_field';
+
+    /**
+     * The mautic.adjust_filter_form_type_for_field event is dispatched when the segment filter form is built so events can add new or modify existing fields.
+     *
+     * The event listener receives a
+     * Symfony\Component\Form\FormEvent
+     *
+     * @var string
+     */
+    const ADJUST_FILTER_FORM_TYPE_FOR_FIELD = 'mautic.adjust_filter_form_type_for_field';
+
+    /**
+     * The mautic.list_filters_delegate_decorator event id dispatched when decorator is delegated for segment filter.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent instance.
+     */
+    const SEGMENT_ON_DECORATOR_DELEGATE = 'mautic.list_filters_delegate_decorator';
 
     /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
@@ -572,6 +676,16 @@ final class LeadEvents
     const LIST_FILTERS_QUERYBUILDER_GENERATED = 'mautic.list_filters_querybuilder_generated';
 
     /**
+     * The mautic.list_filters_operator_querybuilder_on_generate event is dispatched when the queryBuilder for segment filter operators is being generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent instance.
+     *
+     * @var string
+     */
+    const LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE = 'mautic.list_filters_operator_querybuilder_on_generate';
+
+    /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
      *
      * The event listener receives a
@@ -590,4 +704,25 @@ final class LeadEvents
      * @var string
      */
     const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
+
+    /**
+     * The mautic.lead_field_pre_add_column event is dispatched before adding a new column to lead_fields table.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Field\Event\AddColumnEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_FIELD_PRE_ADD_COLUMN = 'mautic.lead_field_pre_add_column';
+
+    /**
+     * The mautic.lead_field_pre_add_column_background_job event is dispatched before adding a new column to lead_fields table
+     * in background job.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Field\Event\AddColumnBackgroundEvent instance.
+     *
+     * @var string
+     */
+    const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
 }

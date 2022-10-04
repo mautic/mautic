@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -129,6 +120,21 @@ class FormType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'progressiveProfilingLimit',
+            TextType::class,
+            [
+                'label' => 'mautic.form.form.progressive_profiling_limit.max_fields',
+                'attr'  => [
+                    'style'       => 'width:75px;',
+                    'class'       => 'form-control',
+                    'tooltip'     => 'mautic.form.form.progressive_profiling_limit.max_fields.tooltip',
+                    'placeholder' => 'mautic.form.form.progressive_profiling_limit_unlimited',
+                ],
+                'data'  => $options['data']->getProgressiveProfilingLimit() ? $options['data']->getProgressiveProfilingLimit() : '',
+            ]
+        );
+
         // Render style for new form by default
         if (null === $options['data']->getId()) {
             $options['data']->setRenderStyle(true);
@@ -137,7 +143,6 @@ class FormType extends AbstractType
         $builder->add('renderStyle', YesNoButtonGroupType::class, [
             'label'      => 'mautic.form.form.renderstyle',
             'data'       => (null === $options['data']->getRenderStyle()) ? true : $options['data']->getRenderStyle(),
-            'empty_data' => true,
             'attr'       => [
                 'tooltip' => 'mautic.form.form.renderstyle.tooltip',
             ],

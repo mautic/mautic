@@ -1,54 +1,45 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_integration_auth_callback_secure' => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback',
+                'controller' => 'Mautic\PluginBundle\Controller\AuthController::authCallbackAction',
             ],
             'mautic_integration_auth_postauth_secure' => [
                 'path'       => '/plugins/integrations/authstatus/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authStatus',
+                'controller' => 'Mautic\PluginBundle\Controller\AuthController::authStatusAction',
             ],
             'mautic_plugin_index' => [
                 'path'       => '/plugins',
-                'controller' => 'MauticPluginBundle:Plugin:index',
+                'controller' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
             ],
             'mautic_plugin_config' => [
                 'path'       => '/plugins/config/{name}/{page}',
-                'controller' => 'MauticPluginBundle:Plugin:config',
+                'controller' => 'Mautic\PluginBundle\Controller\PluginController::configAction',
             ],
             'mautic_plugin_info' => [
                 'path'       => '/plugins/info/{name}',
-                'controller' => 'MauticPluginBundle:Plugin:info',
+                'controller' => 'Mautic\PluginBundle\Controller\PluginController::infoAction',
             ],
             'mautic_plugin_reload' => [
                 'path'       => '/plugins/reload',
-                'controller' => 'MauticPluginBundle:Plugin:reload',
+                'controller' => 'Mautic\PluginBundle\Controller\PluginController::reloadAction',
             ],
         ],
         'public' => [
             'mautic_integration_auth_user' => [
                 'path'       => '/plugins/integrations/authuser/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authUser',
+                'controller' => 'Mautic\PluginBundle\Controller\AuthController::authUserAction',
             ],
             'mautic_integration_auth_callback' => [
                 'path'       => '/plugins/integrations/authcallback/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authCallback',
+                'controller' => 'Mautic\PluginBundle\Controller\AuthController::authCallbackAction',
             ],
             'mautic_integration_auth_postauth' => [
                 'path'       => '/plugins/integrations/authstatus/{integration}',
-                'controller' => 'MauticPluginBundle:Auth:authStatus',
+                'controller' => 'Mautic\PluginBundle\Controller\AuthController::authStatusAction',
             ],
         ],
     ],
@@ -150,6 +141,7 @@ return [
             'mautic.plugin.helper.reload' => [
                 'class'     => \Mautic\PluginBundle\Helper\ReloadHelper::class,
                 'arguments' => [
+                    'event_dispatcher',
                     'mautic.factory',
                 ],
             ],
@@ -176,6 +168,31 @@ return [
 
             'mautic.plugin.model.integration_entity' => [
                 'class' => Mautic\PluginBundle\Model\IntegrationEntityModel::class,
+            ],
+        ],
+        'commands' => [
+            'mautic.plugin.command.fetch_leads' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\FetchLeadsCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.integration',
+                ],
+            ],
+            'mautic.plugin.command.push_activity' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\PushLeadActivityCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.integration',
+                ],
+            ],
+            'mautic.plugin.command.reload' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\PluginBundle\Command\ReloadCommand::class,
+                'arguments' => [
+                    'mautic.plugin.facade.reload',
+                ],
             ],
         ],
     ],

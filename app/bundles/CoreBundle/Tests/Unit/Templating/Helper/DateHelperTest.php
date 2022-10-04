@@ -1,19 +1,10 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -109,5 +100,13 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
         $this->assertSame('00:00:00', $this->helper->toText($dateTime));
+    }
+
+    public function testFullConcat()
+    {
+        date_default_timezone_set('Europe/Paris');
+        $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
+        $result   = $this->helper->toFullConcat($dateTime, 'UTC');
+        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
     }
 }

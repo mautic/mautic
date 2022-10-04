@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -46,7 +37,7 @@ class LeadApiController extends CommonApiController
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
         $this->serializerGroups = ['leadDetails', 'frequencyRulesList', 'doNotContactList', 'userList', 'stageList', 'publishDetails', 'ipAddress', 'tagList', 'utmtagsList'];
-
+        $this->setCleaningRules();
         parent::initialize($event);
     }
 
@@ -699,6 +690,6 @@ class LeadApiController extends CommonApiController
     {
         $form->submit($data, 'PATCH' !== $this->request->getMethod());
 
-        return $form->isValid();
+        return $form->isSubmitted() && $form->isValid();
     }
 }

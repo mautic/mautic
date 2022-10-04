@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder\Metadata;
 
+use Mautic\AssetBundle\Security\Permissions\AssetPermissions;
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadata;
 use Mautic\CoreBundle\DependencyInjection\Builder\Metadata\PermissionClassMetadata;
+use Mautic\CoreBundle\Security\Permissions\SystemPermissions;
 use PHPUnit\Framework\TestCase;
 
 class PermissionClassMetadataTest extends TestCase
@@ -34,7 +27,7 @@ class PermissionClassMetadataTest extends TestCase
         $permissionClassMetadata = new PermissionClassMetadata($metadata);
         $permissionClassMetadata->build();
 
-        $this->assertTrue(isset($metadata->toArray()['permissionClasses']['core']));
+        $this->assertTrue(isset($metadata->toArray()['permissionClasses'][SystemPermissions::class]));
         $this->assertCount(1, $metadata->toArray()['permissionClasses']);
     }
 
@@ -55,6 +48,6 @@ class PermissionClassMetadataTest extends TestCase
         $permissionClassMetadata = new PermissionClassMetadata($metadata);
         $permissionClassMetadata->build();
 
-        $this->assertTrue(isset($metadata->toArray()['permissionClasses']['asset']));
+        $this->assertTrue(isset($metadata->toArray()['permissionClasses'][AssetPermissions::class]));
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -262,9 +253,9 @@ class PluginController extends FormController
 
                     if ($valid || $authorize) {
                         $dispatcher = $this->get('event_dispatcher');
-                        $this->get('logger')->info('Dispatching integration config save event.');
+                        $this->get('monolog.logger.mautic')->info('Dispatching integration config save event.');
                         if ($dispatcher->hasListeners(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE)) {
-                            $this->get('logger')->info('Event dispatcher has integration config save listeners.');
+                            $this->get('monolog.logger.mautic')->info('Event dispatcher has integration config save listeners.');
                             $event = new PluginIntegrationEvent($integrationObject);
 
                             $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
@@ -434,7 +425,7 @@ class PluginController extends FormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_plugin_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticPluginBundle:Plugin:index',
+                'contentTemplate' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'plugin',

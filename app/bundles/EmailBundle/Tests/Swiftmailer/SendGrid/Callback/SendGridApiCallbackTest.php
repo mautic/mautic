@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Swiftmailer\SendGrid\Callback;
 
@@ -18,15 +11,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SendGridApiCallbackTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSupportedEvents()
+    public function testSupportedEvents(): void
     {
-        $transportCallback = $this->getMockBuilder(TransportCallback::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $transportCallback   = $this->createMock(TransportCallback::class);
         $sendGridApiCallback = new SendGridApiCallback($transportCallback);
-
-        $payload = [
+        $payload             = [
             [
                 'email'         => 'example5@test.com',
                 'timestamp'     => '1512130989',
@@ -67,13 +56,12 @@ class SendGridApiCallbackTest extends \PHPUnit\Framework\TestCase
 
         $request = new Request(['query'], $payload);
 
-        $transportCallback->expects($this->at(0))
+        $transportCallback->expects($this->exactly(2))
             ->method('addFailureByAddress')
-            ->with('example6@test.com', '500 unknown recipient', DoNotContact::BOUNCED);
-
-        $transportCallback->expects($this->at(1))
-            ->method('addFailureByAddress')
-            ->with('example7@test.com', 'Bounced Address', DoNotContact::BOUNCED);
+            ->withConsecutive(
+                ['example6@test.com', '500 unknown recipient', DoNotContact::BOUNCED],
+                ['example7@test.com', 'Bounced Address', DoNotContact::BOUNCED]
+            );
 
         $sendGridApiCallback->processCallbackRequest($request);
     }

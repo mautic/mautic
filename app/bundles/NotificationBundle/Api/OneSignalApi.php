@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Api;
 
-use Joomla\Http\Response;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Exception\MissingApiKeyException;
 use Mautic\NotificationBundle\Exception\MissingAppIDException;
+use Psr\Http\Message\ResponseInterface;
 
 class OneSignalApi extends AbstractNotificationApi
 {
@@ -24,15 +15,10 @@ class OneSignalApi extends AbstractNotificationApi
     protected $apiUrlBase = 'https://onesignal.com/api/v1';
 
     /**
-     * @param string $endpoint One of "apps", "players", or "notifications"
-     * @param string $data     JSON encoded array of data to send
-     *
-     * @return Response
-     *
      * @throws MissingAppIDException
      * @throws MissingApiKeyException
      */
-    public function send($endpoint, $data)
+    public function send(string $endpoint, array $data): ResponseInterface
     {
         $apiKeys    = $this->integrationHelper->getIntegrationObject('OneSignal')->getKeys();
         $appId      = $apiKeys['app_id'];
@@ -52,10 +38,12 @@ class OneSignalApi extends AbstractNotificationApi
 
         return $this->http->post(
             $this->apiUrlBase.$endpoint,
-            json_encode($data),
             [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Basic '.$restApiKey,
+                \GuzzleHttp\RequestOptions::HEADERS => [
+                    'Authorization' => 'Basic '.$restApiKey,
+                    'Content-Type'  => 'application/json',
+                ],
+                \GuzzleHttp\RequestOptions::JSON => $data,
             ]
         );
     }
@@ -63,11 +51,9 @@ class OneSignalApi extends AbstractNotificationApi
     /**
      * @param string|array $playerId Player ID as string, or an array of player ID's
      *
-     * @return Response
-     *
      * @throws \Exception
      */
-    public function sendNotification($playerId, Notification $notification)
+    public function sendNotification($playerId, Notification $notification): ResponseInterface
     {
         $data = [];
 
@@ -166,7 +152,14 @@ class OneSignalApi extends AbstractNotificationApi
                     $data['android_visibility'] = (int) $value;
                     break;
                 case 'additional_data':
-                    $data['data'] = $value['list'];
+                    // Transforms values received from SortableListType into values acceptable by OneSignal.
+                    if (count($value['list']) > 0) {
+                        $result = [];
+                        foreach ($value['list'] as $item) {
+                            $result[$item['label']] = $item['value'];
+                        }
+                        $data['data'] = $result;
+                    }
                     break;
             }
         }

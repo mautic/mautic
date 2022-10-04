@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -26,6 +17,7 @@ use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType;
+use Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
@@ -81,6 +73,11 @@ class CampaignSubscriber implements EventSubscriberInterface
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
+
+    /**
+     * @var array
+     */
+    private $fields;
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
@@ -227,6 +224,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.segments', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.stages',
+            'description' => 'mautic.lead.lead.events.stages_descr',
+            'formType'    => CampaignEventLeadStagesType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.stages', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.owner',
@@ -466,6 +472,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.segments')) {
             $listRepo = $this->listModel->getRepository();
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+        } elseif ($event->checkContext('lead.stages')) {
+            $result   = $this->leadModel->getRepository()->isContactInOneOfStages($lead, $event->getConfig()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
             $result = $this->leadModel->getRepository()->checkLeadOwner($lead, $event->getConfig()['owner']);
         } elseif ($event->checkContext('lead.campaigns')) {
@@ -494,12 +502,13 @@ class CampaignSubscriber implements EventSubscriberInterface
                 $operators = $this->leadModel->getFilterExpressionFunctions();
                 $field     = $event->getConfig()['field'];
                 $value     = $event->getConfig()['value'];
-                $fields    = $lead->getFields(true);
+                $fields    = $this->getFields($lead);
 
-                $result = $this->leadFieldModel->getRepository()->compareValue(
+                $fieldValue = isset($fields[$field]) ? CustomFieldHelper::fieldValueTransfomer($fields[$field], $value) : $value;
+                $result     = $this->leadFieldModel->getRepository()->compareValue(
                     $lead->getId(),
                     $field,
-                    CustomFieldHelper::fieldValueTransfomer($fields[$field], $value),
+                    $fieldValue,
                     $operators[$event->getConfig()['operator']]['expr']
                 );
             }
@@ -520,5 +529,16 @@ class CampaignSubscriber implements EventSubscriberInterface
             $event->getConfig()['field'],
             $triggerDate->format('Y-m-d')
         );
+    }
+
+    protected function getFields(Lead $lead): array
+    {
+        if (!$this->fields) {
+            $contactFields = $lead->getFields(true);
+            $companyFields = $this->leadFieldModel->getFieldListWithProperties('company');
+            $this->fields  = array_merge($contactFields, $companyFields);
+        }
+
+        return $this->fields;
     }
 }

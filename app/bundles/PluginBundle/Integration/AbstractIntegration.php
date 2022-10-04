@@ -1,18 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
-use Joomla\Http\HttpFactory;
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\CurlHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\RequestOptions;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -39,6 +34,7 @@ use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
 use Monolog\Logger;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
@@ -48,13 +44,15 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method pushLead(Lead $lead, array $config = [])
  * @method pushLeadToCampaign(Lead $lead, mixed $integrationCampaign, mixed $integrationMemberStatus)
  * @method getLeads(array $params, string $query, &$executed, array $result = [], $object = 'Lead')
  * @method getCompanies(array $params)
+ *
+ * @deprecated To be removed in Mautic 6.0. Please use the IntegrationsBundle instead, which is meant to be a drop-in replacement for AbstractIntegration.
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
@@ -64,142 +62,40 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     const FIELD_TYPE_DATETIME = 'datetime';
     const FIELD_TYPE_DATE     = 'date';
 
-    /**
-     * @var bool
-     */
-    protected $coreIntegration = false;
-
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var Integration
-     */
-    protected $settings;
-
-    /**
-     * @var array Decrypted keys
-     */
-    protected $keys = [];
-
-    /**
-     * @var CacheStorageHelper
-     */
-    protected $cache;
-
-    /**
-     * @var \Doctrine\ORM\EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var SessionInterface|null
-     */
-    protected $session;
-
-    /**
-     * @var Request|null
-     */
-    protected $request;
-
-    /**
-     * @var Router
-     */
-    protected $router;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var EncryptionHelper
-     */
-    protected $encryptionHelper;
-
-    /**
-     * @var LeadModel
-     */
-    protected $leadModel;
-
-    /**
-     * @var CompanyModel
-     */
-    protected $companyModel;
-
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var NotificationModel
-     */
-    protected $notificationModel;
-
-    /**
-     * @var FieldModel
-     */
-    protected $fieldModel;
+    protected bool $coreIntegration = false;
+    protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
+    protected Integration $settings;
+    protected array $keys = [];
+    protected ?CacheStorageHelper $cache;
+    protected \Doctrine\ORM\EntityManager $em;
+    protected ?SessionInterface $session;
+    protected ?Request $request;
+    protected Router $router;
+    protected LoggerInterface $logger;
+    protected TranslatorInterface $translator;
+    protected EncryptionHelper $encryptionHelper;
+    protected LeadModel $leadModel;
+    protected CompanyModel $companyModel;
+    protected PathsHelper $pathsHelper;
+    protected NotificationModel $notificationModel;
+    protected FieldModel $fieldModel;
 
     /**
      * Used for notifications.
      *
-     * @var array|null
+     * @var \Doctrine\ORM\Tools\Pagination\Paginator<\Mautic\UserBundle\Entity\User>
      */
-    protected $adminUsers;
+    protected ?\Doctrine\ORM\Tools\Pagination\Paginator $adminUsers = null;
 
-    /**
-     * @var array
-     */
-    protected $notifications = [];
-
-    /**
-     * @var string|null
-     */
-    protected $lastIntegrationError;
-
-    /**
-     * @var array
-     */
-    protected $mauticDuplicates = [];
-
-    /**
-     * @var array
-     */
-    protected $salesforceIdMapping = [];
-
-    /**
-     * @var array
-     */
-    protected $deleteIntegrationEntities = [];
-
-    /**
-     * @var array
-     */
-    protected $persistIntegrationEntities = [];
-
-    /**
-     * @var IntegrationEntityModel
-     */
-    protected $integrationEntityModel;
-
-    /**
-     * @var DoNotContactModel
-     */
-    protected $doNotContact;
-
-    /**
-     * @var array
-     */
-    protected $commandParameters = [];
+    protected array $notifications = [];
+    protected ?string $lastIntegrationError;
+    protected array $mauticDuplicates           = [];
+    protected array $salesforceIdMapping        = [];
+    protected array $deleteIntegrationEntities  = [];
+    protected array $persistIntegrationEntities = [];
+    protected IntegrationEntityModel $integrationEntityModel;
+    protected DoNotContactModel $doNotContact;
+    protected array  $commandParameters = [];
 
     public function __construct(
         EventDispatcherInterface $eventDispatcher,
@@ -251,7 +147,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Mautic\CoreBundle\Translation\Translator
+     * @return TranslatorInterface
      */
     public function getTranslator()
     {
@@ -581,7 +477,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         foreach ($keys as $name => $key) {
             $key = $this->encryptionHelper->decrypt($key, $mainDecryptOnly);
             if (false === $key) {
-                return [];
+                continue;
             }
             $decrypted[$name] = $key;
         }
@@ -706,6 +602,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
+        // remove control characters that will break json_decode from parsing
+        $data = preg_replace('/[[:cntrl:]]/', '', $data);
         if (!$parsed = json_decode($data, true)) {
             parse_str($data, $parsed);
         }
@@ -774,12 +672,12 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Make a basic call using cURL to get the data.
      *
-     * @param        $url
+     * @param string $url
      * @param array  $parameters
      * @param string $method
-     * @param array  $settings
+     * @param array  $settings   Set $settings['return_raw'] to receive a ResponseInterface
      *
-     * @return mixed|string
+     * @return mixed|string|ResponseInterface
      */
     public function makeRequest($url, $parameters = [], $method = 'GET', $settings = [])
     {
@@ -869,8 +767,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
+        /**
+         * Set some cURL settings for backward compatibility
+         * https://docs.guzzlephp.org/en/latest/faq.html?highlight=curl#how-can-i-add-custom-curl-options.
+         */
         $options = [
-            CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_HEADER         => 1,
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_FOLLOWLOCATION => 0,
@@ -886,11 +787,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $options[CURLOPT_SSL_VERIFYPEER] = $settings['ssl_verifypeer'];
         }
 
-        $connector = HttpFactory::getHttp(
-            [
-                'transport.curl' => $options,
-            ]
-        );
+        $client = $this->makeHttpClient($options);
 
         $parseHeaders = (isset($settings['headers'])) ? array_merge($headers, $settings['headers']) : $headers;
         // HTTP library requires that headers are in key => value pairs
@@ -912,16 +809,26 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $timeout = (isset($settings['request_timeout'])) ? (int) $settings['request_timeout'] : 10;
             switch ($method) {
                 case 'GET':
-                    $result = $connector->get($url, $headers, $timeout);
+                    $result = $client->get($url, [
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
+                    ]);
                     break;
                 case 'POST':
                 case 'PUT':
                 case 'PATCH':
-                    $connectorMethod = strtolower($method);
-                    $result          = $connector->$connectorMethod($url, $parameters, $headers, $timeout);
+                    $payloadKey = is_string($parameters) ? RequestOptions::BODY : RequestOptions::FORM_PARAMS;
+                    $result     = $client->request($method, $url, [
+                        $payloadKey             => $parameters,
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
+                    ]);
                     break;
                 case 'DELETE':
-                    $result = $connector->delete($url, $headers, $timeout);
+                    $result = $client->delete($url, [
+                        RequestOptions::HEADERS => $headers,
+                        RequestOptions::TIMEOUT => $timeout,
+                    ]);
                     break;
             }
         } catch (\Exception $exception) {
@@ -937,7 +844,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (!empty($settings['return_raw'])) {
             return $result;
         } else {
-            return $this->parseCallbackResponse($result->body, !empty($settings['authorize_session']));
+            return $this->parseCallbackResponse($result->getBody(), !empty($settings['authorize_session']));
         }
     }
 
@@ -1837,7 +1744,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -2373,7 +2280,6 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param                 $leadsToSync
      * @param bool|\Exception $error
      *
      * @return int Number ignored due to being duplicates
@@ -2476,15 +2382,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null  $entity
-     * @param array $params
-     * @param bool  $ignoreEntityChanges
+     * @param CommonEntity|null $entity
+     * @param array             $params
+     * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */
@@ -2622,5 +2528,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function getLeadDoNotContactByDate($channel, $records, $object, $lead, $integrationData, $params = [])
     {
         return $records;
+    }
+
+    /**
+     * Because so many integrations extend this class and mautic.http.client is not in the
+     * constructor at the time of writing, let's just create a new client here. In addition,
+     * we add some custom cURL options.
+     *
+     * @param mixed[] $options
+     */
+    protected function makeHttpClient(array $options): Client
+    {
+        return new Client(['handler' => HandlerStack::create(new CurlHandler([
+            'options' => $options,
+        ]))]);
     }
 }

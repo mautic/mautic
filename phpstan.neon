@@ -1,6 +1,18 @@
+includes:
+	- phpstan-baseline.neon
+	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
 parameters:
-	level: 1
-	excludes_analyse:
+	level: 6
+	reportUnmatchedIgnoredErrors: false
+	parallel:
+		maximumNumberOfProcesses: 4
+		processTimeout: 1000.0
+	paths:
+		- app/bundles
+		- app/migrations
+		- plugins
+	excludePaths:
 		- *.html.php
 		- *.js.php
 		- *.less.php
@@ -16,14 +28,20 @@ parameters:
 		- app/bundles/CoreBundle/Loader/ParameterLoader.php
 		- app/bundles/CoreBundle/Helper/PathsHelper.php
 		- app/bundles/CoreBundle/Configurator/Configurator.php
+	dynamicConstantNames:
+		- MAUTIC_ENV
+		- MAUTIC_TABLE_PREFIX
+		- MAUTIC_VERSION
 	ignoreErrors:
 		- '#Cannot unset offset#'
-		- '#Undefined variable: \$container#'
 		- '#Undefined variable: \$parameters#'
-		- '#Access to an undefined property Mautic\\AssetBundle\\Controller\\UploadController::\$errorHandler.#' # issue of the oneup/uploader-bundle package
-		- '#Call to an undefined static method Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle::installAllTablesIfMissing\(\).#'
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
 		- '#Constant MAUTIC_ENV not found.#'
 		- '#Constant MAUTIC_VERSION not found.#'
 		- '/Variable \$\w+ might not be defined\./'
 		- '/Variable \$paths in isset\(\) is never defined\./'
+		- '#Property Mautic\\LeadBundle\\EventListener\\SegmentFiltersSubscriber::\$translator \(Symfony\\Component\\Translation\\TranslatorInterface\) in isset\(\) is not nullable\.#' # this is antipatern, should be refactored.
+		- '#Call to an undefined static method static\(Mautic\\IntegrationsBundle\\Bundle\\AbstractPluginBundle\)::installAllTablesIfMissing\(\).#'
+		# Following 2 ignores are there due to https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
+		- '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
+		- '#Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) expects object, string given\.#'

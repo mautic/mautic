@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-sunday",
+            "directory": "themes/sunday",
+            "target": "git@github.com:mautic/theme-sunday.git"
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+name: Build JS files for dist folder
+
+on:
+  # Allow manually triggering this workflow
+  workflow_dispatch:
+  schedule:
+    # Run every day at 10 AM UTC
+    - cron: '0 10 * * *'
+
+defaults:
+  run:
+    working-directory: plugins/GrapesJsBuilderBundle
+
+permissions:
+  contents: read
+
+jobs:
+  build-js:
+    permissions:
+      contents: write  # for peter-evans/create-pull-request to create branch
+      pull-requests: write  # for peter-evans/create-pull-request to create a PR
+    runs-on: ubuntu-latest
+    if: github.repository == 'mautic/mautic'
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - name: Install dependencies
+      run: npm install
+    - name: Build JS dist files
+      run: npm run build
+
+    # Checks if the JS files have been updated as a result of the NPM build,
+    # and creates a PR if necessary.
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        commit-message: 'Auto-update GrapesJS generated JS dist files'
+        title: 'Update GrapesJS generated JS dist files'
+        delete-branch: true

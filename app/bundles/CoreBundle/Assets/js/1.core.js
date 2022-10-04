@@ -47,9 +47,9 @@ mQuery.ajaxSetup({
 
 mQuery( document ).ajaxComplete(function(event, xhr, settings) {
     Mautic.stopPageLoadingBar();
-    xhr.always(function(response) {
-        if (response.flashes) Mautic.setFlashes(response.flashes);
-    });
+    if (xhr.responseJSON && xhr.responseJSON.flashes) {
+        Mautic.setFlashes(xhr.responseJSON.flashes);
+    }
 });
 
 // Force stop the page loading bar when no more requests are being in progress

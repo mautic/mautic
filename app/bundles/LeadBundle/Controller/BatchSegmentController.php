@@ -1,20 +1,9 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Form\Type\BatchType;
-use Mautic\LeadBundle\Model\ListModel;
-use Mautic\LeadBundle\Model\SegmentActionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
@@ -41,20 +30,23 @@ class BatchSegmentController extends AbstractFormController
      */
     public function setAction()
     {
-        $params = $this->request->get('lead_batch', []);
-        $ids    = empty($params['ids']) ? [] : json_decode($params['ids']);
+        $params     = $this->request->get('lead_batch', []);
+        $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
 
-        if ($ids && is_array($ids)) {
-            $segmentsToAdd    = isset($params['add']) ? $params['add'] : [];
-            $segmentsToRemove = isset($params['remove']) ? $params['remove'] : [];
-            $contactIds       = json_decode($params['ids']);
+        if ($contactIds && is_array($contactIds)) {
+            $segmentsToAdd    = $params['add'] ?? [];
+            $segmentsToRemove = $params['remove'] ?? [];
 
-            $this->actionModel->addContacts($contactIds, $segmentsToAdd);
-            $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
+            if ($segmentsToAdd) {
+                $this->actionModel->addContacts($contactIds, $segmentsToAdd);
+            }
+
+            if ($segmentsToRemove) {
+                $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
+            }
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($ids),
-                '%count%'     => count($ids),
+                '%count%' => count($contactIds),
             ]);
         } else {
             $this->addFlash('mautic.core.error.ids.missing');

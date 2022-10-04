@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PhpVersionHelper;
+use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\DashboardBundle\Dashboard\Widget as WidgetService;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\UploadType;
@@ -75,11 +68,18 @@ class DashboardController extends AbstractFormController
         $dateRangeFilter['date_to']   = $filter['dateTo']->format(WidgetService::FORMAT_HUMAN);
         $dateRangeForm                = $this->get('form.factory')->create(DateRangeType::class, $dateRangeFilter, ['action' => $action]);
 
+        $model->populateWidgetsContent($widgets, $filter);
+        $releaseMetadata = ThisRelease::getMetadata();
+
         return $this->delegateView([
             'viewParameters' => [
                 'security'      => $this->get('mautic.security'),
                 'widgets'       => $widgets,
                 'dateRangeForm' => $dateRangeForm->createView(),
+                'phpVersion'    => [
+                    'isOutdated' => version_compare(PHP_VERSION, $releaseMetadata->getShowPHPVersionWarningIfUnder(), 'lt'),
+                    'version'    => PhpVersionHelper::getCurrentSemver(),
+                ],
             ],
             'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
             'passthroughVars' => [
@@ -311,8 +311,11 @@ class DashboardController extends AbstractFormController
         }
 
         $name = $this->getNameFromRequest();
+
+        /** @var DashboardModel $dashboardModel */
+        $dashboardModel = $this->getModel('dashboard');
         try {
-            $this->getModel('dashboard')->saveSnapshot($name);
+            $dashboardModel->saveSnapshot($name);
             $type = 'notice';
             $msg  = $this->translator->trans('mautic.dashboard.notice.save', [
                 '%name%'    => $name,
@@ -355,7 +358,7 @@ class DashboardController extends AbstractFormController
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $response->headers->set('Expires', 0);
+        $response->headers->set('Expires', '0');
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Pragma', 'public');
 

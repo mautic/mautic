@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -44,7 +35,7 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
+            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
     }
 
@@ -64,7 +55,7 @@ class DefaultController extends CommonController
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
+        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -84,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

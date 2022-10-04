@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\SmsBundle\Tests\Sms;
 
@@ -57,7 +49,7 @@ class TransportChainTest extends MauticMysqlTestCase
 
         $this->transportChain = new TransportChain(
             'mautic.test.twilio.mock',
-            $this->container->get('mautic.helper.integration')
+            self::$container->get('mautic.helper.integration')
         );
 
         $this->twilioTransport = $this->createMock(TwilioTransport::class);
@@ -71,7 +63,7 @@ class TransportChainTest extends MauticMysqlTestCase
     {
         $count = count($this->transportChain->getTransports());
 
-        $this->transportChain->addTransport('mautic.transport.test', $this->container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
+        $this->transportChain->addTransport('mautic.transport.test', self::$container->get('mautic.sms.twilio.transport'), 'mautic.transport.test', 'Twilio');
 
         $this->assertCount($count + 1, $this->transportChain->getTransports());
     }

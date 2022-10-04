@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'menu' => [
         'main' => [
@@ -26,21 +17,21 @@ return [
         'main' => [
             'mautic_dynamicContent_index' => [
                 'path'       => '/dwc/{page}',
-                'controller' => 'MauticDynamicContentBundle:DynamicContent:index',
+                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
             ],
             'mautic_dynamicContent_action' => [
                 'path'       => '/dwc/{objectAction}/{objectId}',
-                'controller' => 'MauticDynamicContentBundle:DynamicContent:execute',
+                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::executeAction',
             ],
         ],
         'public' => [
             'mautic_api_dynamicContent_index' => [
                 'path'       => '/dwc',
-                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:getEntities',
+                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentApiController::getEntitiesAction',
             ],
             'mautic_api_dynamicContent_action' => [
                 'path'       => '/dwc/{objectAlias}',
-                'controller' => 'MauticDynamicContentBundle:DynamicContentApi:process',
+                'controller' => 'Mautic\DynamicContentBundle\Controller\DynamicContentApiController::processAction',
             ],
         ],
         'api' => [
@@ -48,7 +39,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'dynamicContents',
                 'path'            => '/dynamiccontents',
-                'controller'      => 'MauticDynamicContentBundle:Api\DynamicContentApi',
+                'controller'      => 'Mautic\DynamicContentBundle\Controller\Api\DynamicContentApiController',
             ],
         ],
     ],
@@ -163,6 +154,7 @@ return [
                     'mautic.dynamicContent.model.dynamicContent',
                     'mautic.campaign.executioner.realtime',
                     'event_dispatcher',
+                    'mautic.lead.model.lead',
                 ],
             ],
         ],

@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Model;
 
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
-use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Exception\FailedToSendToContactException;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Stat\Exception\StatNotFoundException;
@@ -22,7 +12,7 @@ use Mautic\EmailBundle\Stat\StatHelper;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Model\DoNotContact;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SendEmailToContact
 {
@@ -428,7 +418,7 @@ class SendEmailToContact
         // Dispatch the event to generate the tokens
         $this->mailer->dispatchSendEvent();
 
-        // Create the stat to ensure it is availble for emails sent
+        // Create the stat to ensure it is available for emails sent
         $this->createContactStatEntry($this->contact['email']);
 
         // Now send but don't redispatch the event

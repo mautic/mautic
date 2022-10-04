@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
@@ -24,7 +15,7 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class UserModel extends FormModel
 {
@@ -99,17 +90,17 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, PasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordEncoder $encoder, $submittedPassword, $validate = false)
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
-                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', 'validators'));
+                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', [], 'validators'));
             }
         }
 
         if (!empty($submittedPassword)) {
             //hash the clear password submitted via the form
-            return $encoder->encodePassword($submittedPassword, $entity->getSalt());
+            return $encoder->encodePassword($entity, $submittedPassword);
         }
 
         return $entity->getPassword();
@@ -154,7 +145,7 @@ class UserModel extends FormModel
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getSystemAdministrator()
     {
@@ -241,7 +232,7 @@ class UserModel extends FormModel
      *
      * @param string $newPassword
      */
-    public function resetPassword(User $user, PasswordEncoderInterface $encoder, $newPassword)
+    public function resetPassword(User $user, UserPasswordEncoder $encoder, $newPassword)
     {
         $encodedPassword = $this->checkNewPassword($user, $encoder, $newPassword);
 
@@ -304,10 +295,40 @@ class UserModel extends FormModel
         $text = str_replace('\\n', "\n", $text);
         $html = nl2br($text);
 
-        $mailer->setBody($html);
-        $mailer->setPlainText(strip_tags($text));
+        $this->emailUser(
+            $user,
+            $this->translator->trans('mautic.user.user.passwordreset.subject'),
+            $html
+        );
+    }
 
+    public function emailUser(User $user, string $subject, string $content): void
+    {
+        $mailer  = $this->prepareEMail($subject, $content);
+        $mailer->setTo([$user->getEmail() => $user->getName()]);
         $mailer->send();
+    }
+
+    /**
+     * @param string[] $emailAddresses
+     */
+    public function sendMailToEmailAddresses(array $emailAddresses, string $subject, string $content): void
+    {
+        $mailer  = $this->prepareEMail($subject, $content);
+        $mailer->setTo($emailAddresses);
+        $mailer->send();
+    }
+
+    private function prepareEMail(string $subject, string $content): MailHelper
+    {
+        $mailer  = $this->mailHelper->getMailer();
+        $content = str_replace('\\n', "\n", $content);
+        $html    = nl2br($content);
+        $mailer->setSubject($subject);
+        $mailer->setBody($html);
+        $mailer->setPlainText(strip_tags($content));
+
+        return $mailer;
     }
 
     /**

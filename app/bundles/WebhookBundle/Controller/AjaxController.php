@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\WebhookBundle\Http\Client;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
@@ -45,7 +35,7 @@ class AjaxController extends CommonAjaxController
 
         // set the response
         /** @var Psr\Http\Message\ResponseInterface $response */
-        $response = $this->get('mautic.webhook.http.client')->post($url, $payloads, null, InputHelper::string($request->request->get('secret')));
+        $response = $this->get('mautic.webhook.http.client')->post($url, $payloads, InputHelper::string($request->request->get('secret')));
 
         // default to an error message
         $dataArray = [

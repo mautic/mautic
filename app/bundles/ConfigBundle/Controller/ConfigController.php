@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Controller;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -20,37 +11,11 @@ use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConfigController extends FormController
 {
-    /**
-     * Recursively filters the specified array and replaces any UploadedFile instances with their contents
-     * (or NULL if the file cannot be read).
-     *
-     * @see https://github.com/mautic/mautic/issues/7294
-     *
-     * @return array
-     */
-    protected function filterNormDataForLogging(array $data)
-    {
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $value = $this->filterNormDataForLogging($value);
-            }
-
-            if ($value instanceof UploadedFile) {
-                $value = @file_get_contents($value->getFilename());
-            }
-
-            $data[$key] = $value;
-        }
-
-        return $data;
-    }
-
     /**
      * Controller action for editing the application configuration.
      *
@@ -65,7 +30,7 @@ class ConfigController extends FormController
 
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
         $fileFields  = $event->getFileFields();
         $formThemes  = $event->getFormThemes();
         $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
@@ -103,8 +68,8 @@ class ConfigController extends FormController
                     $configEvent = new ConfigEvent($formData, $post);
                     $configEvent
                         ->setOriginalNormData($originalNormData)
-                        ->setNormData($this->filterNormDataForLogging($form->getNormData()));
-                    $dispatcher->dispatch(ConfigEvents::CONFIG_PRE_SAVE, $configEvent);
+                        ->setNormData($form->getNormData());
+                    $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_PRE_SAVE);
                     $formValues = $configEvent->getConfig();
 
                     $errors      = $configEvent->getErrors();
@@ -150,7 +115,7 @@ class ConfigController extends FormController
                             }
 
                             $configurator->write();
-                            $dispatcher->dispatch(ConfigEvents::CONFIG_POST_SAVE, $configEvent);
+                            $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
                             $this->addFlash('mautic.config.config.notice.updated');
 
@@ -164,6 +129,8 @@ class ConfigController extends FormController
                         } catch (\RuntimeException $exception) {
                             $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
+
+                        $this->setLocale($params);
                     }
                 } elseif (!$isWritabale) {
                     $form->addError(
@@ -224,7 +191,7 @@ class ConfigController extends FormController
 
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -241,7 +208,7 @@ class ConfigController extends FormController
             $response->headers->set('Content-Type', 'application/force-download');
             $response->headers->set('Content-Type', 'application/octet-stream');
             $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename);
-            $response->headers->set('Expires', 0);
+            $response->headers->set('Expires', '0');
             $response->headers->set('Cache-Control', 'must-revalidate');
             $response->headers->set('Pragma', 'public');
 
@@ -266,7 +233,7 @@ class ConfigController extends FormController
         $success    = 0;
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(ConfigEvents::CONFIG_ON_GENERATE, $event);
+        $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
 
         // Extract and base64 encode file contents
         $fileFields = $event->getFileFields();
@@ -290,22 +257,17 @@ class ConfigController extends FormController
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
-     *
-     * @param array $forms
-     * @param array $doNotChange
-     *
-     * @return array
      */
-    private function mergeParamsWithLocal(&$forms)
+    private function mergeParamsWithLocal(array &$forms): void
     {
-        $doNotChange = $this->getParameter('mautic.security.restrictedConfigFields');
+        $doNotChange = $this->get('mautic.helper.core_parameters')->get('mautic.security.restrictedConfigFields');
         /** @var PathsHelper $pathsHelper */
         $pathsHelper     = $this->get('mautic.helper.paths');
         $localConfigFile = $pathsHelper->getLocalConfigurationFile();
 
         // Import the current local configuration, $parameters is defined in this file
 
-        /** @var $parameters */
+        /** @var array $parameters */
         include $localConfigFile;
 
         $localParams = $parameters;
@@ -316,9 +278,25 @@ class ConfigController extends FormController
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
                 } elseif (array_key_exists($key, $localParams)) {
-                    $form['parameters'][$key] = (is_string($localParams[$key])) ? str_replace('%%', '%', $localParams[$key]) : $localParams[$key];
+                    $paramValue               = $localParams[$key];
+                    $form['parameters'][$key] = $paramValue;
                 }
             }
         }
+    }
+
+    /**
+     * @param array<string, string> $params
+     */
+    private function setLocale(array $params): void
+    {
+        $me     = $this->get('security.token_storage')->getToken()->getUser();
+        $locale = $me->getLocale();
+
+        if (empty($locale)) {
+            $locale = $params['locale'] ?? $this->get('mautic.helper.core_parameters')->get('locale');
+        }
+
+        $this->get('session')->set('_locale', $locale);
     }
 }

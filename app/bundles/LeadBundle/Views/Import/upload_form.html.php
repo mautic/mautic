@@ -15,10 +15,14 @@ $view['slots']->set(
         'MauticCoreBundle:Helper:page_actions.html.php',
         [
             'routeBase'       => 'import',
-            'routeVars'       => ['close' => ['object' => $view['request']->getParameter('object')]],
             'langVar'         => 'lead.import',
             'templateButtons' => [
                 'close' => true,
+            ],
+            'routeVars' => [
+                'close' => [
+                    'object' => $app->getRequest()->get('object', 'contacts'),
+                ],
             ],
         ]
     )

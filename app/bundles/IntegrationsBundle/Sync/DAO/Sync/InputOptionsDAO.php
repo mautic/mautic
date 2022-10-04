@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync;
 
 use DateTimeImmutable;
@@ -42,6 +33,11 @@ class InputOptionsDAO
     private $disablePull;
 
     /**
+     * @var bool
+     */
+    private $disableActivityPush;
+
+    /**
      * @var ObjectIdsDAO|null
      */
     private $mauticObjectIds;
@@ -61,6 +57,8 @@ class InputOptionsDAO
      */
     private $endDateTime;
 
+    private array $options;
+
     /**
      * Example $input:
      * [
@@ -68,6 +66,7 @@ class InputOptionsDAO
      *      'first-time-sync' => true,
      *      'disable-push' => false,
      *      'disable-pull' => false,
+     *      'disable-activity-push' => false,
      *      'mautic-object-id' => ['contact:12', 'contact:13'] or a ObjectIdsDAO object,
      *      'integration-object-id' => ['Lead:hfskjdhf', 'Lead:hfskjdhr'] or a ObjectIdsDAO object,
      *      'start-datetime' => '2019-09-12T12:01:20' or a DateTimeInterface object, Expecting UTC timezone
@@ -86,10 +85,12 @@ class InputOptionsDAO
         $this->firstTimeSync        = (bool) ($input['first-time-sync'] ?? false);
         $this->disablePush          = (bool) ($input['disable-push'] ?? false);
         $this->disablePull          = (bool) ($input['disable-pull'] ?? false);
+        $this->disableActivityPush  = (bool) ($input['disable-activity-push'] ?? false);
         $this->startDateTime        = $this->validateDateTime($input, 'start-datetime');
         $this->endDateTime          = $this->validateDateTime($input, 'end-datetime');
         $this->mauticObjectIds      = $this->validateObjectIds($input, 'mautic-object-id');
         $this->integrationObjectIds = $this->validateObjectIds($input, 'integration-object-id');
+        $this->options              = $this->validateOptions($input);
     }
 
     public function getIntegration(): string
@@ -107,6 +108,11 @@ class InputOptionsDAO
         return !$this->disablePull;
     }
 
+    public function activityPushIsEnabled(): bool
+    {
+        return !$this->disableActivityPush;
+    }
+
     public function pushIsEnabled(): bool
     {
         return !$this->disablePush;
@@ -122,14 +128,19 @@ class InputOptionsDAO
         return $this->integrationObjectIds;
     }
 
-    public function getStartDateTime(): ?\DateTimeInterface
+    public function getStartDateTime(): ?DateTimeInterface
     {
         return $this->startDateTime;
     }
 
-    public function getEndDateTime(): ?\DateTimeInterface
+    public function getEndDateTime(): ?DateTimeInterface
     {
         return $this->endDateTime;
+    }
+
+    public function getOptions(): array
+    {
+        return $this->options;
     }
 
     /**
@@ -188,10 +199,30 @@ class InputOptionsDAO
             $input['mautic-object-id'][$key] = preg_replace(
                 '/^contact:/',
                 Contact::NAME.':',
-                $mauticObjectId
+                "$mauticObjectId"
             );
         }
 
         return $input;
+    }
+
+    private function validateOptions(array $input): array
+    {
+        if (is_array($input['options'] ?? null)) {
+            return $input['options'];
+        }
+
+        $options = [];
+
+        if (is_array($input['option'] ?? null)) {
+            foreach ($input['option'] as $option) {
+                $parsedOption = explode(':', $option);
+                if (2 === count($parsedOption)) {
+                    $options[$parsedOption[0]] = $parsedOption[1];
+                }
+            }
+        }
+
+        return $options;
     }
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -73,7 +64,7 @@ class TriggerController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPointBundle:Trigger:index',
+                'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_pointtrigger_index',
                     'mauticContent' => 'pointTrigger',
@@ -130,7 +121,7 @@ class TriggerController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticPointBundle:Trigger:index',
+                'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_pointtrigger_index',
                     'mauticContent' => 'pointTrigger',
@@ -184,7 +175,7 @@ class TriggerController extends FormController
 
         $session      = $this->get('session');
         $pointTrigger = $this->request->request->get('pointtrigger', []);
-        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(mt_rand(), true));
+        $sessionId    = $pointTrigger['sessionId'] ?? 'mautic_'.sha1(uniqid(random_int(1, PHP_INT_MAX), true));
 
         if (!$this->get('mautic.security')->isGranted('point:triggers:create')) {
             return $this->accessDenied();
@@ -241,7 +232,7 @@ class TriggerController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'MauticPointBundle:Trigger:index';
+                $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
 
                 //clear temporary fields
                 $this->clearSessionComponents($sessionId);
@@ -309,7 +300,7 @@ class TriggerController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Trigger:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -365,7 +356,7 @@ class TriggerController extends FormController
 
                         //delete entities
                         if (count($deletedEvents)) {
-                            $this->getModel('point.triggerEvent')->deleteEntities($deletedEvents);
+                            $this->getModel('point.triggerevent')->deleteEntities($deletedEvents);
                         }
 
                         $this->addFlash('mautic.core.notice.updated', [
@@ -386,7 +377,7 @@ class TriggerController extends FormController
             if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
-                $template       = 'MauticPointBundle:Trigger:index';
+                $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
 
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
@@ -488,7 +479,7 @@ class TriggerController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Trigger:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -545,7 +536,7 @@ class TriggerController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Trigger:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',

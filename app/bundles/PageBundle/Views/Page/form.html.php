@@ -57,6 +57,11 @@ if (!isset($previewUrl)) {
                             <?php echo $view['translator']->trans('mautic.core.form.theme'); ?>
                         </a>
                     </li>
+                    <li id="advanced-tab" class="hidden">
+                        <a href="#advanced-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.advanced'); ?>
+                        </a>
+                    </li>
                 </ul>
 
                 <!--/ tabs controls -->
@@ -73,6 +78,16 @@ if (!isset($previewUrl)) {
                             'themes' => $themes,
                             'active' => $form['template']->vars['value'],
                         ]); ?>
+                    </div>
+
+                    <div class="tab-pane fade bdr-w-0" id="advanced-container">
+                        <br>
+                        <div class="row hidden" id="custom-html-row">
+                            <div class="col-md-12">
+                                <?php echo $view['form']->label($form['customHtml']); ?>
+                                <?php echo $view['form']->widget($form['customHtml']); ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -114,14 +129,18 @@ if (!isset($previewUrl)) {
             <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
                 <?php echo $view['form']->row($form['metaDescription']); ?>
             </div>
-
+            <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
+                <?php echo $view['form']->row($form['headScript']); ?>
+            </div>
+            <div class="template-fields<?php echo (!$template) ? ' hide"' : ''; ?>">
+                <?php echo $view['form']->row($form['footerScript']); ?>
+            </div>
             <div class="hide">
                 <?php echo $view['form']->rest($form); ?>
             </div>
         </div>
     </div>
 </div>
-<?php echo $view['form']->row($form['customHtml']); ?>
 <?php echo $view['form']->end($form); ?>
 
 <?php echo $view->render('MauticCoreBundle:Helper:builder.html.php', [

@@ -1,24 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CommandListEvent;
 use Mautic\CoreBundle\Event\GlobalSearchEvent;
 use Mautic\CoreBundle\Event\UpgradeEvent;
+use Mautic\CoreBundle\Exception\RecordCanNotUnpublishException;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Helper\Update\PreUpdateChecks\PreUpdateCheckError;
 use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
@@ -29,6 +23,7 @@ use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -83,29 +78,26 @@ class AjaxController extends CommonController
                 //call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
-                $isPlugin  = false;
 
                 if (3 == count($parts) && 'plugin' == $parts['0']) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
-                    $isPlugin = true;
                 }
 
                 if (2 == count($parts)) {
                     $bundleName = $parts[0];
                     $bundle     = ucfirst($bundleName);
                     $action     = $parts[1];
+
                     if (!$classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController')) {
                         // Check if a plugin is prefixed with Mautic
                         $bundle      = 'Mautic'.$bundle;
                         $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
-                    } elseif (!$isPlugin) {
-                        $bundle = 'Mautic'.$bundle;
                     }
 
                     if ($classExists) {
                         return $this->forward(
-                            "{$bundle}Bundle:Ajax:executeAjax",
+                            $namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController::executeAjaxAction',
                             [
                                 'action' => $action,
                                 //forward the request as well as Symfony creates a subrequest without GET/POST
@@ -243,6 +235,7 @@ class AjaxController extends CommonController
         $id             = InputHelper::clean($request->request->get('id'));
         $customToggle   = InputHelper::clean($request->request->get('customToggle'));
         $model          = $this->getModel($name);
+        $status         = Response::HTTP_OK;
 
         $post = $request->request->all();
         unset($post['model'], $post['id'], $post['action']);
@@ -277,36 +270,51 @@ class AjaxController extends CommonController
             }
 
             if ($hasPermission) {
-                $dataArray['success'] = 1;
-                //toggle permission state
-                if ($customToggle) {
-                    $accessor = PropertyAccess::createPropertyAccessor();
-                    $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
-                    $model->getRepository()->saveEntity($entity);
-                } else {
-                    $refresh = $model->togglePublishStatus($entity);
+                try {
+                    $dataArray['success'] = 1;
+                    //toggle permission state
+                    if ($customToggle) {
+                        $accessor = PropertyAccess::createPropertyAccessor();
+                        $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
+                        $model->getRepository()->saveEntity($entity);
+                    } else {
+                        $refresh = $model->togglePublishStatus($entity);
+                    }
+                    if (!empty($refresh)) {
+                        $dataArray['reload'] = 1;
+                    } else {
+                        $onclickMethod  = (method_exists($entity, 'getOnclickMethod')) ? $entity->getOnclickMethod() : '';
+                        $dataAttr       = (method_exists($entity, 'getDataAttributes')) ? $entity->getDataAttributes() : [];
+                        $attrTransKeys  = (method_exists($entity, 'getTranslationKeysDataAttributes')) ? $entity->getTranslationKeysDataAttributes() : [];
+
+                        //get updated icon HTML
+                        $html = $this->renderView(
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            [
+                                'item'          => $entity,
+                                'model'         => $name,
+                                'query'         => $extra,
+                                'size'          => (isset($post['size'])) ? $post['size'] : '',
+                                'onclick'       => $onclickMethod,
+                                'attributes'    => $dataAttr,
+                                'transKeys'     => $attrTransKeys,
+                            ]
+                        );
+                        $dataArray['statusHtml'] = $html;
+                    }
+                } catch (RecordCanNotUnpublishException $e) {
+                    $this->addFlash($e->getMessage());
+                    $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
-                if (!empty($refresh)) {
-                    $dataArray['reload'] = 1;
-                } else {
-                    //get updated icon HTML
-                    $html = $this->renderView(
-                        'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                        [
-                            'item'  => $entity,
-                            'model' => $name,
-                            'query' => $extra,
-                            'size'  => (isset($post['size'])) ? $post['size'] : '',
-                        ]
-                    );
-                    $dataArray['statusHtml'] = $html;
-                }
+            } else {
+                $this->addFlash('mautic.core.error.access.denied');
+                $status = Response::HTTP_FORBIDDEN;
             }
         }
 
         $dataArray['flashes'] = $this->getFlashContent();
 
-        return $this->sendJsonResponse($dataArray);
+        return $this->sendJsonResponse($dataArray, $status);
     }
 
     /**
@@ -353,6 +361,56 @@ class AjaxController extends CommonController
         /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
         $cookieHelper = $this->container->get('mautic.helper.cookie');
         $cookieHelper->setCookie('mautic_update', 'setupUpdate', 300);
+
+        return $this->sendJsonResponse($dataArray);
+    }
+
+    /**
+     * Run pre-update checks, like if the user has the correct PHP version, database version, etc.
+     */
+    protected function updateRunChecksAction(): JsonResponse
+    {
+        $dataArray  = [];
+        $translator = $this->translator;
+        /** @var \Mautic\CoreBundle\Helper\CookieHelper $cookieHelper */
+        $cookieHelper = $this->container->get('mautic.helper.cookie');
+        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
+        $updateHelper = $this->container->get('mautic.helper.update');
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
+        $errors               = [];
+
+        if (true === $coreParametersHelper->get('composer_updates', false)) {
+            $errors = [$translator->trans('mautic.core.update.composer')];
+        } else {
+            $results = $updateHelper->runPreUpdateChecks();
+
+            foreach ($results as $result) {
+                if (!$result->success) {
+                    $errors = array_merge($errors, array_map(fn (PreUpdateCheckError $error) => $translator->trans($error->key, $error->parameters), $result->errors));
+                }
+            }
+        }
+
+        if (!empty($errors)) {
+            $dataArray['success']    = 0;
+            $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
+            $dataArray['message']    = $translator->trans('mautic.core.update.check.error');
+            $dataArray['errors']     = $errors;
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            $cookieHelper->deleteCookie('mautic_update');
+        } else {
+            $dataArray['success']        = 1;
+            $dataArray['stepStatus']     = $translator->trans('mautic.core.update.step.success');
+            $dataArray['nextStep']       = $translator->trans('mautic.core.update.step.downloading.package');
+            $dataArray['nextStepStatus'] = $translator->trans('mautic.core.update.step.in.progress');
+
+            // A way to keep the upgrade from failing if the session is lost after
+            // the cache is cleared by upgrade.php
+            $cookieHelper->setCookie('mautic_update', 'runChecks', 300);
+        }
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -565,7 +623,7 @@ class AjaxController extends CommonController
             $minExecutionTime = 300;
             $maxExecutionTime = (int) ini_get('max_execution_time');
             if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-                ini_set('max_execution_time', $minExecutionTime);
+                ini_set('max_execution_time', "$minExecutionTime");
             }
 
             $result = $application->run($input, $output);

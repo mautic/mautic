@@ -29,14 +29,14 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
 {
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -128,7 +128,7 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
 
                     $newFilters[$clmn][] = $fltr;
                 }
@@ -186,8 +186,8 @@ class EmailController extends FormController
             }
         }
 
-        $orderBy    = $session->get('mautic.email.orderby', 'e.subject');
-        $orderByDir = $session->get('mautic.email.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
+        $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
 
         $emails = $model->getEntities(
             [
@@ -216,7 +216,7 @@ class EmailController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticEmailBundle:Email:index',
+                    'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_email_index',
                         'mauticContent' => 'email',
@@ -280,7 +280,7 @@ class EmailController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticEmailBundle:Email:index',
+                    'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_email_index',
                         'mauticContent' => 'email',
@@ -304,7 +304,7 @@ class EmailController extends FormController
         }
 
         //get A/B test information
-        list($parent, $children) = $email->getVariants();
+        [$parent, $children]     = $email->getVariants();
         $properties              = [];
         $variantError            = false;
         $weight                  = 0;
@@ -361,7 +361,7 @@ class EmailController extends FormController
         }
 
         //get related translations
-        list($translationParent, $translationChildren) = $email->getTranslations();
+        [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Audit Log
         $logs = $this->getModel('core.auditlog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
@@ -381,7 +381,6 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
@@ -413,10 +412,10 @@ class EmailController extends FormController
                     'previewUrl'    => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $email->getId()],
-                        true
+                        UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                     'contacts' => $this->forward(
-                        'MauticEmailBundle:Email:contacts',
+                        'Mautic\EmailBundle\Controller\EmailController::contactsAction',
                         [
                             'objectId'   => $email->getId(),
                             'page'       => $this->get('session')->get('mautic.email.contact.page', 1),
@@ -508,7 +507,7 @@ class EmailController extends FormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_email_action', $viewParameters);
-                        $template  = 'MauticEmailBundle:Email:view';
+                        $template  = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -517,7 +516,7 @@ class EmailController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_email_index', $viewParameters);
-                $template       = 'MauticEmailBundle:Email:index';
+                $template       = 'Mautic\EmailBundle\Controller\EmailController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.emailbuilder.'.$entity->getSessionId().'.content');
             }
@@ -622,7 +621,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -695,8 +694,7 @@ class EmailController extends FormController
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
-                        ],
-                        'warning'
+                        ]
                     );
                 }
             } else {
@@ -706,7 +704,7 @@ class EmailController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            $template    = 'MauticEmailBundle:Email:view';
+            $template    = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
             $passthrough = [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -803,7 +801,7 @@ class EmailController extends FormController
                     'previewUrl'         => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $entity->getId()],
-                        true
+                        UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
@@ -868,7 +866,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -1043,7 +1041,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Page:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'page',
@@ -1087,7 +1085,7 @@ class EmailController extends FormController
                 'objectId'     => $objectId,
             ];
             $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
-            $postActionVars['contentTemplate'] = 'MauticEmailBundle:Email:view';
+            $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -1121,7 +1119,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
@@ -1209,16 +1207,15 @@ class EmailController extends FormController
                 $session->set('mautic.email.send.stats', $stats);
 
                 $status     = 'inprogress';
-                $batchlimit = $form['batchlimit']->getData();
 
                 $session->set('mautic.email.send.active', false);
             } else {
                 $stats      = $session->get('mautic.email.send.stats');
                 $progress   = $session->get('mautic.email.send.progress');
-                $batchlimit = 100;
                 $status     = (!empty($stats['failed'])) ? 'with_errors' : 'success';
             }
 
+            $batchlimit      = $this->coreParametersHelper->get('mailer_memory_msg_limit');
             $contentTemplate = 'MauticEmailBundle:Send:progress.html.php';
             $viewParameters  = [
                 'progress'   => $progress,
@@ -1263,7 +1260,7 @@ class EmailController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'contentTemplate' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_email_index',
                 'mauticContent' => 'email',
@@ -1532,5 +1529,15 @@ class EmailController extends FormController
             'email',
             'email_id'
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'email';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

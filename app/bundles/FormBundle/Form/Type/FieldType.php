@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -22,8 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class FieldType.
@@ -56,6 +47,7 @@ class FieldType extends AbstractType
             'inputAttributes'     => 'string',
             'containerAttributes' => 'string',
             'label'               => 'strict_html',
+            'helpMessage'         => 'strict_html',
         ];
 
         $addHelpMessage         =
@@ -151,6 +143,29 @@ class FieldType extends AbstractType
                     break;
             }
         }
+
+        // disable progressing profiling  for conditional fields
+        if (!empty($options['data']['parent'])) {
+            $addBehaviorFields = false;
+            $builder->add(
+                'conditions',
+                FormFieldConditionType::class,
+                [
+                    'label'      => false,
+                    'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
+                    'formId'     => $options['data']['formId'],
+                    'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
+                ]
+            );
+        }
+
+        $builder->add(
+            'parent',
+            HiddenType::class,
+            [
+                'label'=> false,
+            ]
+        );
 
         // Build form fields
         $builder->add(
@@ -292,7 +307,7 @@ class FieldType extends AbstractType
                 'containerAttributes',
                 TextType::class,
                 [
-                    'label'      => (!empty($containerAttributesText)) ? $containerAttributesText : 'mautic.form.field.form.container_attr',
+                    'label'      => 'mautic.form.field.form.container_attr',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'     => 'form-control',
@@ -321,6 +336,19 @@ class FieldType extends AbstractType
         }
 
         if ($addBehaviorFields) {
+            $alwaysDisplay = isset($options['data']['alwaysDisplay']) ? $options['data']['alwaysDisplay'] : false;
+            $builder->add(
+                'alwaysDisplay',
+                YesNoButtonGroupType::class,
+                [
+                    'label' => 'mautic.form.field.form.always_display',
+                    'attr'  => [
+                        'tooltip' => 'mautic.form.field.form.always_display.tooltip',
+                    ],
+                    'data'  => $alwaysDisplay,
+                ]
+            );
+
             $default = (!isset($options['data']['showWhenValueExists']) || null === $options['data']['showWhenValueExists']) ? true
                 : (bool) $options['data']['showWhenValueExists'];
             $builder->add(
@@ -330,7 +358,8 @@ class FieldType extends AbstractType
                     'label' => 'mautic.form.field.form.show.when.value.exists',
                     'data'  => $default,
                     'attr'  => [
-                        'tooltip' => 'mautic.form.field.help.show.when.value.exists',
+                        'tooltip'      => 'mautic.form.field.help.show.when.value.exists',
+                        'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
                     ],
                 ]
             );
@@ -342,8 +371,9 @@ class FieldType extends AbstractType
                     'label'      => 'mautic.form.field.form.show.after.x.submissions',
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
-                        'class'   => 'form-control',
-                        'tooltip' => 'mautic.form.field.help.show.after.x.submissions',
+                        'class'        => 'form-control',
+                        'tooltip'      => 'mautic.form.field.help.show.after.x.submissions',
+                        'data-show-on' => '{"formfield_alwaysDisplay_0": "checked"}',
                     ],
                     'required' => false,
                 ]

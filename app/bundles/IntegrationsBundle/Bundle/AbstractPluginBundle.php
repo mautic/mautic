@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Bundle;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -52,19 +43,5 @@ abstract class AbstractPluginBundle extends PluginBundleBase
         }
 
         $migrationEngine->up();
-    }
-
-    /**
-     * Returns the bundle name that this bundle overrides.
-     *
-     * Despite its name, this method does not imply any parent/child relationship
-     * between the bundles, just a way to extend and override an existing
-     * bundle.
-     *
-     * @return string The Bundle name it overrides or null if no parent
-     */
-    public function getParent()
-    {
-        return null;
     }
 }

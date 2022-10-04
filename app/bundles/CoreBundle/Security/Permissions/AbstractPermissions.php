@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\UserBundle\Form\Type\PermissionListType;
@@ -32,6 +23,15 @@ abstract class AbstractPermissions
     public function __construct(array $params)
     {
         $this->params = $params;
+    }
+
+    /**
+     * This method is called before the permissions object is used.
+     * Define permissions with `addExtendedPermissions` here instead of constructor.
+     */
+    public function definePermissions()
+    {
+        // Override this method in the final class
     }
 
     /**
@@ -380,6 +380,17 @@ abstract class AbstractPermissions
     }
 
     /**
+     * @param string $bundle
+     * @param string $level
+     *
+     * @return string
+     */
+    protected function getLabel($bundle, $level)
+    {
+        return ('categories' === $level) ? 'mautic.category.permissions.categories' : "mautic.{$bundle}.permissions.{$level}";
+    }
+
+    /**
      * Add a single full permission.
      *
      * @param array $permissionNames
@@ -488,7 +499,8 @@ abstract class AbstractPermissions
             PermissionListType::class,
             [
                 'choices'           => $choices,
-                'label'             => "mautic.$bundle.permissions.$level",
+                'choices_as_values' => true,
+                'label'             => $this->getLabel($bundle, $level),
                 'data'              => (!empty($data[$level]) ? $data[$level] : []),
                 'bundle'            => $bundle,
                 'level'             => $level,

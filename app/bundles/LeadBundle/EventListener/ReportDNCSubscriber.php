@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -20,7 +11,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportDNCSubscriber implements EventSubscriberInterface
 {
@@ -163,7 +154,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
                     $row['reason'] = $this->getDncReasonLabel($row['reason']);
                 }
 
-                if (isset($row['channel']) && $row['channel_id']) {
+                if (isset($row['channel']) && isset($row['channel_id'])) {
                     $href              = $this->router->generate('mautic_'.$row['channel'].'_action', ['objectAction' => 'view', 'objectId' => $row['channel_id']]);
                     $row['channel']    = '<a href="'.$href.'" data-toggle="ajax">'.$this->channelListHelper->getChannelLabel($row['channel']).'</a>';
                     $row['channel_id'] = '<a href="'.$href.'" data-toggle="ajax">'.$row['channel_id'].'</a>';

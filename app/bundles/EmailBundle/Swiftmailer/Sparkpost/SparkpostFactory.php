@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Swiftmailer\Sparkpost;
 
-use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
+use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use SparkPost\SparkPost;
 
 final class SparkpostFactory implements SparkpostFactoryInterface

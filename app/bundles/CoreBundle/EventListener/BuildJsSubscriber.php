@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -84,7 +75,7 @@ MauticJS.log = function() {
 };
 
 MauticJS.setCookie = function(name, value) {
-    document.cookie = name+"="+value+"; path=/";
+    document.cookie = name+"="+value+"; path=/; secure";
 };
 
 MauticJS.createCORSRequest = function(method, url) {

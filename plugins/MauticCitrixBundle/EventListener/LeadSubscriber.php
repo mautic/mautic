@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Mautic\LeadBundle\Event\LeadListFilteringEvent;
@@ -21,7 +12,7 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -133,6 +124,10 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onListChoicesGenerate(LeadListFiltersChoicesEvent $event)
     {
+        if (false === strpos($event->getRoute(), 'mautic_segment_action')) {
+            return;
+        }
+
         $activeProducts = [];
         foreach (CitrixProducts::toArray() as $p) {
             if (CitrixHelper::isAuthorized('Goto'.$p)) {
@@ -224,6 +219,8 @@ class LeadSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $leadsTableAlias = $event->getLeadsTableAlias();
+
         $details           = $event->getDetails();
         $leadId            = $event->getLeadId();
         $em                = $event->getEntityManager();
@@ -259,7 +256,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                 $q->expr()->eq($alias.$k.'.product', $q->expr()->literal($product)),
                                 $q->expr()->eq($alias.$k.'.event_type', $q->expr()->literal($eventType)),
                                 $q->expr()->in($alias.$k.'.event_name', $eventNames),
-                                $q->expr()->eq($alias.$k.'.lead_id', 'l.id')
+                                $q->expr()->eq($alias.$k.'.lead_id', $leadsTableAlias.'.id')
                             )
                         );
                     } else {
@@ -267,7 +264,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             $q->expr()->andX(
                                 $q->expr()->eq($alias.$k.'.product', $q->expr()->literal($product)),
                                 $q->expr()->eq($alias.$k.'.event_type', $q->expr()->literal($eventType)),
-                                $q->expr()->eq($alias.$k.'.lead_id', 'l.id')
+                                $q->expr()->eq($alias.$k.'.lead_id', $leadsTableAlias.'.id')
                             )
                         );
                     }

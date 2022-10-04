@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'services' => [
         'events' => [
@@ -70,6 +61,9 @@ return [
                     'mautic.notification.repository.stat',
                 ],
             ],
+            'mautic.notification.configbundle.subscriber' => [
+                'class' => Mautic\NotificationBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [
@@ -86,6 +80,9 @@ return [
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
+            ],
+            'mautic.notification.config' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\NotificationConfigType::class,
             ],
             'mautic.form.type.notificationsend_list' => [
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
@@ -119,9 +116,9 @@ return [
         ],
         'other' => [
             'mautic.notification.api' => [
-                'class'     => 'Mautic\NotificationBundle\Api\OneSignalApi',
+                'class'     => \Mautic\NotificationBundle\Api\OneSignalApi::class,
                 'arguments' => [
-                    'mautic.http.connector',
+                    'mautic.http.client',
                     'mautic.page.model.trackable',
                     'mautic.helper.integration',
                 ],
@@ -173,59 +170,59 @@ return [
         'main' => [
             'mautic_notification_index' => [
                 'path'       => '/notifications/{page}',
-                'controller' => 'MauticNotificationBundle:Notification:index',
+                'controller' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
             ],
             'mautic_notification_action' => [
                 'path'       => '/notifications/{objectAction}/{objectId}',
-                'controller' => 'MauticNotificationBundle:Notification:execute',
+                'controller' => 'Mautic\NotificationBundle\Controller\NotificationController::executeAction',
             ],
             'mautic_notification_contacts' => [
                 'path'       => '/notifications/view/{objectId}/contact/{page}',
-                'controller' => 'MauticNotificationBundle:Notification:contacts',
+                'controller' => 'Mautic\NotificationBundle\Controller\NotificationController::contactsAction',
             ],
             'mautic_mobile_notification_index' => [
                 'path'       => '/mobile_notifications/{page}',
-                'controller' => 'MauticNotificationBundle:MobileNotification:index',
+                'controller' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
             ],
             'mautic_mobile_notification_action' => [
                 'path'       => '/mobile_notifications/{objectAction}/{objectId}',
-                'controller' => 'MauticNotificationBundle:MobileNotification:execute',
+                'controller' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::executeAction',
             ],
             'mautic_mobile_notification_contacts' => [
                 'path'       => '/mobile_notifications/view/{objectId}/contact/{page}',
-                'controller' => 'MauticNotificationBundle:MobileNotification:contacts',
+                'controller' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
             ],
         ],
         'public' => [
             'mautic_receive_notification' => [
                 'path'       => '/notification/receive',
-                'controller' => 'MauticNotificationBundle:Api\NotificationApi:receive',
+                'controller' => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController::receiveAction',
             ],
             'mautic_subscribe_notification' => [
                 'path'       => '/notification/subscribe',
-                'controller' => 'MauticNotificationBundle:Api\NotificationApi:subscribe',
+                'controller' => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController::subscribeAction',
             ],
             'mautic_notification_popup' => [
                 'path'       => '/notification',
-                'controller' => 'MauticNotificationBundle:Popup:index',
+                'controller' => 'Mautic\NotificationBundle\Controller\PopupController::indexAction',
             ],
 
             // JS / Manifest URL's
             'mautic_onesignal_worker' => [
                 'path'       => '/OneSignalSDKWorker.js',
-                'controller' => 'MauticNotificationBundle:Js:worker',
+                'controller' => 'Mautic\NotificationBundle\Controller\JsController::workerAction',
             ],
             'mautic_onesignal_updater' => [
                 'path'       => '/OneSignalSDKUpdaterWorker.js',
-                'controller' => 'MauticNotificationBundle:Js:updater',
+                'controller' => 'Mautic\NotificationBundle\Controller\JsController::updaterAction',
             ],
             'mautic_onesignal_manifest' => [
                 'path'       => '/manifest.json',
-                'controller' => 'MauticNotificationBundle:Js:manifest',
+                'controller' => 'Mautic\NotificationBundle\Controller\JsController::manifestAction',
             ],
             'mautic_app_notification' => [
                 'path'       => '/notification/appcallback',
-                'controller' => 'MauticNotificationBundle:AppCallback:index',
+                'controller' => 'Mautic\NotificationBundle\Controller\AppCallbackController::indexAction',
             ],
         ],
         'api' => [
@@ -233,7 +230,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'notifications',
                 'path'            => '/notifications',
-                'controller'      => 'MauticNotificationBundle:Api\NotificationApi',
+                'controller'      => 'Mautic\NotificationBundle\Controller\Api\NotificationApiController',
             ],
         ],
     ],
@@ -276,14 +273,18 @@ return [
     //    'notification' => null
     //],
     'parameters' => [
-        'notification_enabled'               => false,
-        'notification_landing_page_enabled'  => true,
-        'notification_tracking_page_enabled' => false,
-        'notification_app_id'                => null,
-        'notification_rest_api_key'          => null,
-        'notification_safari_web_id'         => null,
-        'gcm_sender_id'                      => '482941778795',
-        'notification_subdomain_name'        => null,
-        'welcomenotification_enabled'        => true,
+        'notification_enabled'                        => false,
+        'notification_landing_page_enabled'           => true,
+        'notification_tracking_page_enabled'          => false,
+        'notification_app_id'                         => null,
+        'notification_rest_api_key'                   => null,
+        'notification_safari_web_id'                  => null,
+        'gcm_sender_id'                               => '482941778795',
+        'notification_subdomain_name'                 => null,
+        'welcomenotification_enabled'                 => true,
+        'campaign_send_notification_to_author'        => true,
+        'campaign_notification_email_addresses'       => null,
+        'webhook_send_notification_to_author'         => true,
+        'webhook_notification_email_addresses'        => null,
     ],
 ];

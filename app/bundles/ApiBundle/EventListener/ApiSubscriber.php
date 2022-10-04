@@ -1,25 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
@@ -29,13 +20,13 @@ class ApiSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
@@ -149,7 +140,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            // Catch useless oauth1a errors
+            // Catch useless oauth errors
             $error = $error['message'];
         }
 

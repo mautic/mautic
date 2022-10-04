@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Update\Step\UpdateTranslationsStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateTranslationsStepTest extends AbstractStepTest
 {
@@ -72,6 +72,10 @@ class UpdateTranslationsStepTest extends AbstractStepTest
             ->method('error')
             ->with('UPDATE ERROR: there was an error');
 
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
+
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }
 
@@ -94,6 +98,10 @@ class UpdateTranslationsStepTest extends AbstractStepTest
             ->method('extractLanguagePackage')
             ->with('es_MX')
             ->willReturn(['error' => false]);
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('');
 
         $this->step->execute($this->progressBar, $this->input, $this->output);
     }

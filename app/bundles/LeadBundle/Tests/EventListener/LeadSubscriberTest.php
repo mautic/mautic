@@ -1,13 +1,6 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
@@ -28,7 +21,7 @@ use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriberTest extends CommonMocks
 {
@@ -132,9 +125,7 @@ class LeadSubscriberTest extends CommonMocks
             $this->router
         );
 
-        $leadEvent = $this->getMockBuilder(LeadEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadEvent = $this->createMock(LeadEvent::class);
 
         $leadEvent->expects($this->exactly(2))
             ->method('getLead')
@@ -194,23 +185,16 @@ class LeadSubscriberTest extends CommonMocks
             'contactId'  => $leadEventLog['lead_id'],
         ];
 
-        $leadEvent = new LeadTimelineEvent(
-            $lead
-        );
+        $leadEvent = new LeadTimelineEvent($lead);
+        $repo      = $this->createMock(LeadEventLogRepository::class);
 
-        $repo = $this->getMockBuilder(LeadEventLogRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repo->expects($this->at(0))
+        $repo->expects($this->exactly(2))
             ->method('getEvents')
-            ->with($lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions())
-            ->will($this->returnValue($logs));
-
-        $repo->expects($this->at(1))
-            ->method('getEvents')
-            ->with($lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions())
-            ->will($this->returnValue(['total' => 0, 'results' => []]));
+            ->withConsecutive(
+                [$lead, 'lead', 'api-single', null, $leadEvent->getQueryOptions()],
+                [$lead, 'lead', 'api-batch', null, $leadEvent->getQueryOptions()]
+            )
+            ->willReturnOnConsecutiveCalls($logs, ['total' => 0, 'results' => []]);
 
         $this->entityManager->method('getRepository')
             ->with(LeadEventLog::class)

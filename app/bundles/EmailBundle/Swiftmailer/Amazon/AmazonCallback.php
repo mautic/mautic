@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Amazon;
 
-use Joomla\Http\Exception\UnexpectedResponseException;
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\TransferException;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\EmailBundle\MonitoredEmail\Exception\BounceNotFound;
 use Mautic\EmailBundle\MonitoredEmail\Exception\UnsubscriptionNotFound;
@@ -25,7 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AmazonCallback
 {
@@ -34,27 +25,12 @@ class AmazonCallback
      */
     const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
+    private LoggerInterface $logger;
+    private Client $httpClient;
+    private TransportCallback $transportCallback;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Http
-     */
-    private $httpClient;
-
-    /**
-     * @var TransportCallback
-     */
-    private $transportCallback;
-
-    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Http $httpClient, TransportCallback $transportCallback)
+    public function __construct(TranslatorInterface $translator, LoggerInterface $logger, Client $httpClient, TransportCallback $transportCallback)
     {
         $this->translator        = $translator;
         $this->logger            = $logger;
@@ -69,8 +45,6 @@ class AmazonCallback
      */
     public function processCallbackRequest(Request $request)
     {
-        $this->logger->debug('Receiving webhook from Amazon');
-
         $payload = json_decode($request->getContent(), true);
 
         if (0 !== json_last_error()) {
@@ -83,6 +57,8 @@ class AmazonCallback
 
         // determine correct key for message type (global or via ConfigurationSet)
         $type = (array_key_exists('Type', $payload) ? $payload['Type'] : $payload['eventType']);
+
+        $this->logger->debug('Receiving webhook from Amazon', ['Type'=>$type]);
 
         return $this->processJsonPayload($payload, $type);
     }
@@ -98,17 +74,16 @@ class AmazonCallback
     {
         switch ($type) {
             case 'SubscriptionConfirmation':
-
                     // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
                     try {
                         $response = $this->httpClient->get($payload['SubscribeURL']);
-                        if (200 == $response->code) {
+                        if (200 == $response->getStatusCode()) {
                             $this->logger->info('Callback to SubscribeURL from Amazon SNS successfully');
                             break;
                         }
 
-                        $reason = 'HTTP Code '.$response->code.', '.$response->body;
-                    } catch (UnexpectedResponseException $e) {
+                        $reason = 'HTTP Code '.$response->getStatusCode().', '.$response->getBody();
+                    } catch (TransferException $e) {
                         $reason = $e->getMessage();
                     }
 
@@ -148,7 +123,6 @@ class AmazonCallback
 
             break;
             case 'Bounce':
-
                 if ('Permanent' == $payload['bounce']['bounceType']) {
                     $emailId = null;
 
@@ -170,7 +144,7 @@ class AmazonCallback
                 }
             break;
             default:
-                $this->logger->warn("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
+                $this->logger->warning("Received SES webhook of type '$payload[Type]' but couldn't understand payload");
                 $this->logger->debug('SES webhook payload: '.json_encode($payload));
             break;
         }

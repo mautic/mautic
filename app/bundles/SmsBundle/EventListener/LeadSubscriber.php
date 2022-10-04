@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -16,7 +7,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -110,8 +101,8 @@ class LeadSubscriber implements EventSubscriberInterface
                         'eventType'  => $eventTypeName,
                         'timestamp'  => $stat['date'.ucfirst($dateSent)],
                         'extra'      => [
-                            'stat' => $stat,
-                            'type' => $state,
+                            'stat'   => $stat,
+                            'type'   => $state,
                         ],
                         'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',

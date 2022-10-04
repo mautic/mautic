@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -110,7 +101,7 @@ class MobileNotificationController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticNotificationBundle:MobileNotification:index',
+                    'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_mobile_notification_index',
                         'mauticContent' => 'mobile_notification',
@@ -169,7 +160,7 @@ class MobileNotificationController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticNotificationBundle:MobileNotification:index',
+                    'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_mobile_notification_index',
                         'mauticContent' => 'mobile_notification',
@@ -230,7 +221,7 @@ class MobileNotificationController extends FormController
                 'security'    => $security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'MauticNotificationBundle:MobileNotification:contacts',
+                    'Mautic\NotificationBundle\Controller\MobileNotificationController::contactsAction',
                     [
                         'objectId'   => $notification->getId(),
                         'page'       => $this->get('session')->get('mautic.mobile_notification.contact.page', 1),
@@ -315,7 +306,7 @@ class MobileNotificationController extends FormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_mobile_notification_action', $viewParameters);
-                        $template  = 'MauticNotificationBundle:MobileNotification:view';
+                        $template  = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -324,7 +315,7 @@ class MobileNotificationController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_mobile_notification_index', $viewParameters);
-                $template       = 'MauticNotificationBundle:MobileNotification:index';
+                $template       = 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.mobile_notification.'.$entity->getId().'.content');
             }
@@ -407,7 +398,7 @@ class MobileNotificationController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticNotificationBundle:MobileNotification:index',
+            'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -482,7 +473,7 @@ class MobileNotificationController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            $template    = 'MauticNotificationBundle:MobileNotification:view';
+            $template    = 'Mautic\NotificationBundle\Controller\MobileNotificationController::viewAction';
             $passthrough = [
                 'activeLink'    => 'mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -601,7 +592,7 @@ class MobileNotificationController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticNotificationBundle:MobileNotification:index',
+            'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -665,7 +656,7 @@ class MobileNotificationController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticNotificationBundle:MobileNotification:index',
+            'contentTemplate' => 'Mautic\NotificationBundle\Controller\MobileNotificationController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',

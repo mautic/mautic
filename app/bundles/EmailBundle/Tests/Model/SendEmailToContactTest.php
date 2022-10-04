@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -257,7 +248,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->method('createEmailStat')
@@ -416,7 +407,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         // Enable queueing
@@ -519,7 +510,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->expects($this->exactly(21))
@@ -656,7 +647,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
 
         $mailHelper = $this->getMockBuilder(MailHelper::class)
             ->setConstructorArgs([$factoryMock, $mailer])
-            ->setMethods(['createEmailStat'])
+            ->onlyMethods(['createEmailStat'])
             ->getMock();
 
         $mailHelper->method('createEmailStat')

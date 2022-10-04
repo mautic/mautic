@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Connection;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Entity\RegexTrait;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -20,10 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 trait FilterTrait
 {
@@ -44,20 +36,28 @@ trait FilterTrait
      */
     public function buildFiltersForm($eventName, FormEvent $event, TranslatorInterface $translator, $currentListId = null)
     {
-        $data        = $event->getData();
-        $form        = $event->getForm();
-        $options     = $form->getConfig()->getOptions();
-        $fieldType   = isset($data['type']) ? $data['type'] : '';
-        $fieldName   = isset($data['field']) ? $data['field'] : '';
+        $data    = $event->getData();
+        $form    = $event->getForm();
+        $options = $form->getConfig()->getOptions();
+
+        if (!isset($data['type'])) {
+            $data['type']     = TextType::class;
+            $data['field']    = '';
+            $data['operator'] = null;
+        }
+
+        $fieldType   = $data['type'];
+        $fieldName   = $data['field'];
         $type        = TextType::class;
-        $attr        = ['class' => 'form-control'];
+        $attr        = ['class' => 'form-control filter-value'];
         $displayType = HiddenType::class;
         $displayAttr = [];
         $operator    = isset($data['operator']) ? $data['operator'] : '';
+        $field       = [];
 
-        $field = [];
-
-        if (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
+        if (isset($options['fields']['behaviors'][$fieldName])) {
+            $field = $options['fields']['behaviors'][$fieldName];
+        } elseif (isset($data['object']) && isset($options['fields'][$data['object']][$fieldName])) {
             $field = $options['fields'][$data['object']][$fieldName];
         }
 
@@ -267,13 +267,14 @@ trait FilterTrait
                 $choices = [];
                 if (!empty($field['properties']['list'])) {
                     $list    = $field['properties']['list'];
-                    $choices = array_flip(
-                        ('boolean' === $fieldType)
-                            ?
-                            FormFieldHelper::parseBooleanList($list)
-                            :
-                            FormFieldHelper::parseList($list)
-                    );
+                    $choices =
+                        ArrayHelper::flipArray(
+                            ('boolean' === $fieldType)
+                                ?
+                                FormFieldHelper::parseBooleanList($list)
+                                :
+                                FormFieldHelper::parseList($list)
+                        );
                 }
 
                 if ('select' === $fieldType) {
@@ -288,21 +289,18 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
             break;
             case 'lookup':
-            default:
-                if ('number' !== $fieldType) {
-                    $attr = array_merge(
-                        $attr,
-                        [
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => isset($data['field']) ? $data['field'] : '',
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
-                        ]
-                    );
+                $attr = array_merge(
+                    $attr,
+                    [
+                        'data-toggle' => 'field-lookup',
+                        'data-target' => isset($data['field']) ? $data['field'] : '',
+                        'data-action' => 'lead:fieldList',
+                        'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
+                    ]
+                );
 
-                    if (isset($field['properties']['list'])) {
-                        $attr['data-options'] = $field['properties']['list'];
-                    }
+                if (isset($field['properties']['list'])) {
+                    $attr['data-options'] = $field['properties']['list'];
                 }
 
                 break;
@@ -369,7 +367,7 @@ trait FilterTrait
                     [
                         'label'          => false,
                         'attr'           => $attr,
-                        'data'           => isset($data['filter']) ? $data['filter'] : '',
+                        'data'           => $data['filter'] ?? '',
                         'error_bubbling' => false,
                     ],
                     $customOptions
@@ -383,7 +381,7 @@ trait FilterTrait
             [
                 'label'          => false,
                 'attr'           => $displayAttr,
-                'data'           => (isset($data['display'])) ? $data['display'] : '',
+                'data'           => $data['display'] ?? '',
                 'error_bubbling' => false,
             ]
         );
@@ -392,11 +390,11 @@ trait FilterTrait
             'operator',
             ChoiceType::class,
             [
-                'label'             => false,
-                'choices'           => isset($field['operators']) ? $field['operators'] : [],
-                'attr'              => [
-                    'class'    => 'form-control not-chosen',
-                    'onchange' => 'Mautic.convertLeadFilterInput(this)',
+                'label'   => false,
+                'choices' => $field['operators'] ?? [],
+                'attr'    => [
+                    'class'    => 'form-control not-chosen filter-operator',
+                    'onchange' => 'Mautic.convertDwcFilterInput(this)',
                 ],
             ]
         );

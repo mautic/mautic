@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Form\Type;
 
 use Doctrine\Common\Collections\Criteria;
@@ -134,7 +125,6 @@ class WebhookType extends AbstractType
             ChoiceType::class,
             [
                 'choices' => [
-                    'mautic.core.form.default'                                  => '',
                     'mautic.webhook.config.event.orderby.chronological'         => Criteria::ASC,
                     'mautic.webhook.config.event.orderby.reverse.chronological' => Criteria::DESC,
                 ],
@@ -143,7 +133,7 @@ class WebhookType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.webhook.config.event.orderby.tooltip',
                 ],
-                'placeholder' => '',
+                'placeholder' => 'mautic.core.form.default',
                 'required'    => false,
             ]
         );

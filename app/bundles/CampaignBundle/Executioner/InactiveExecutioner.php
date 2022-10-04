@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,7 +17,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InactiveExecutioner implements ExecutionerInterface
 {
@@ -261,7 +252,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     $this->counter->advanceEvaluated($contacts->count());
 
                     $inactiveEvents = $decisionEvent->getNegativeChildren();
-                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
+                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents, $decisionEvent);
                     $earliestLastActiveDateTime = $this->helper->getEarliestInactiveDateTime();
 
                     $this->logger->debug(

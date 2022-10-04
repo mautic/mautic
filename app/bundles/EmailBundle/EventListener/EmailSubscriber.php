@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -20,7 +11,7 @@ use Mautic\EmailBundle\Event as Events;
 use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailSubscriber implements EventSubscriberInterface
 {
@@ -145,7 +136,7 @@ class EmailSubscriber implements EventSubscriberInterface
                 $stat->upRetryCount();
 
                 $retries = $stat->getRetryCount();
-                if (true || $retries > 3) {
+                if ($retries > 3) {
                     //tried too many times so just fail
                     $reason = $this->translator->trans('mautic.email.dnc.retries', [
                         '%subject%' => EmojiHelper::toShort($message->getSubject()),
