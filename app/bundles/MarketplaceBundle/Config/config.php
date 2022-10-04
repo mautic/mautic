@@ -31,7 +31,7 @@ return [
             ],
             RouteProvider::ROUTE_CLEAR_CACHE => [
                 'path'       => '/marketplace/clear/cache',
-                'controller' => 'MarketplaceBundle:Cache:clear',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
                 'method'     => 'GET',
             ],
         ],

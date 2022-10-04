@@ -196,7 +196,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build WHERE clause
         if (!empty($standardFilters)) {
             if (!$filterExpr = $event->getFilterExpression()) {
-                $this->applyFilters($standardFilters, $queryBuilder, $options['filters']);
+                $this->applyFilters($standardFilters, $queryBuilder, $options['filters'], $event);
             } else {
                 $queryBuilder->andWhere($filterExpr);
             }
@@ -367,7 +367,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * @return bool
      */
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
+    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions, ReportGeneratorEvent $event)
     {
         $expr      = $queryBuilder->expr();
         $groups    = [];
@@ -383,6 +383,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         $groups[]  = $groupExpr;
                         $groupExpr = $queryBuilder->expr()->andX();
                     }
+                }
+
+                if ('tag' === $filter['column']) {
+                    $event->applyTagFilter($groupExpr, $filter);
+                    continue;
                 }
 
                 switch ($exprFunction) {
@@ -517,9 +522,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
      * Aliases like "8e296a06" makes MySql to think it is a number.
      * Expects param in format "table_alias.column_name".
      */
-    private function sanitizeColumnName(string $fullCollumnName): string
+    private function sanitizeColumnName(string $fullColumnName): string
     {
-        [$tableAlias, $columnName] = explode('.', $fullCollumnName);
+        [$tableAlias, $columnName] = explode('.', $fullColumnName);
 
         return "`{$tableAlias}`.`{$columnName}`";
     }

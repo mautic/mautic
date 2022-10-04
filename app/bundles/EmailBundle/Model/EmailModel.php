@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -170,7 +171,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
+        Connection $connection
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -189,6 +191,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
+        $this->connection               = $connection;
     }
 
     /**
