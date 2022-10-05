@@ -954,7 +954,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
-        $id = (int) InputHelper::clean($request->request->get('id'));
+        $id = (int) InputHelper::clean($request->get('id'));
 
         /** @var ListModel $model */
         $model          = $this->getModel('lead.list');
