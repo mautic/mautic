@@ -80,6 +80,7 @@ class RouteLoader extends Loader
 
         if ($forceSSL) {
             $apiCollection->setSchemes('https');
+        }
 
         $collection->addCollection($apiCollection);
 

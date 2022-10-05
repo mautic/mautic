@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -113,9 +114,9 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleCommandEvent $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }
@@ -136,9 +137,9 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (ConsoleCommandEvent $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }

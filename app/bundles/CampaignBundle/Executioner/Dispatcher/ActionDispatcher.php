@@ -77,7 +77,7 @@ class ActionDispatcher
 
         // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($customEvent, $pendingEvent);
+            $this->dispatcher->dispatch($pendingEvent, $customEvent);
 
             $success = $pendingEvent->getSuccessful();
             $failed  = $pendingEvent->getFailures();

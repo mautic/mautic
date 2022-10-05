@@ -350,7 +350,7 @@ class TriggerModel extends CommonFormModel
 
             $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
 
-            $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
+            $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
 
             return $triggerExecutedEvent->getResult();
         }
