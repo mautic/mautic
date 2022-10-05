@@ -195,7 +195,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'There should be 4 contacts in the has-email-and-visited-url segment after rebuilding from the command line.'
         );
 
-        // Remove the title from all contacts, rebuild the list, and check that list is updated
+        // Change the url from page_hits with the right tracking_id, rebuild the list, and check that list is updated
         $this->em->getConnection()->query(sprintf(
             "UPDATE %spage_hits SET url = '%s' WHERE tracking_id = '%s';",
             MAUTIC_TABLE_PREFIX,
