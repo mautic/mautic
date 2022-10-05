@@ -30,7 +30,8 @@
                     <div class="box-layout">
 
                         <div class="col-xs-10">
-                            <div class="text-white dark-sm mb-0">{{ tag.getDescription()|raw }}{#TODO: Replace 'raw' #}</div>
+                            <div class="text-white dark-sm mb-0">{{ tag.getDescription()|purify }}</div>
+
                         </div>
 
                     </div>

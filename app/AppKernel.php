@@ -127,6 +127,9 @@ class AppKernel extends Kernel
             new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
 
+            // Custom Bundles
+            new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
+
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
