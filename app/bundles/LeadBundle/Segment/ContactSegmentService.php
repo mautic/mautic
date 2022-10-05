@@ -6,7 +6,6 @@ use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Symfony\Bridge\Monolog\Logger;
 
 class ContactSegmentService
 {
@@ -21,14 +20,14 @@ class ContactSegmentService
     private $contactSegmentQueryBuilder;
 
     /**
-     * @var Logger
+     * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
-        Logger $logger
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
         $this->contactSegmentQueryBuilder  = $queryBuilder;

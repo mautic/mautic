@@ -43,7 +43,7 @@ class InstallController extends CommonController
         // We're going to assume a bit here; if the config file exists already and DB info is provided, assume the app
         // is installed and redirect
         if ($this->installer->checkIfInstalled()) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            return $this->redirectToRoute('mautic_dashboard_index');
         }
 
         if ($index - floor($index) > 0) {
@@ -61,7 +61,7 @@ class InstallController extends CommonController
         if ((empty($params) || empty($params['db_driver'])) && $index > 1) {
             $session->set('mautic.installer.completedsteps', [0]);
 
-            return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
+            return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
         }
 
         /** @var \Mautic\CoreBundle\Configurator\Step\StepInterface $step */
@@ -109,7 +109,7 @@ class InstallController extends CommonController
                         $entityManager->getConfiguration()->getMetadataCache()->clear();
 
                         // Refresh to install schema with new connection information in the container
-                        return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.1]));
+                        return $this->redirectToRoute('mautic_installer_step', ['index' => 1.1]);
                     case InstallService::USER_STEP:
                         $adminParam = (array) $formData;
                         $messages   = $this->installer->createAdminUserStep($adminParam);
@@ -150,16 +150,16 @@ class InstallController extends CommonController
                             if (!empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
 
-                                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
+                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
                             }
 
-                            return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1.2]));
+                            return $this->redirectToRoute('mautic_installer_step', ['index' => 1.2]);
                         case 2:
                             $messages = $this->installer->createFixturesStep();
                             if (!empty($messages)) {
                                 $this->handleInstallerErrors($form, $messages);
 
-                                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => 1]));
+                                return $this->redirectToRoute('mautic_installer_step', ['index' => 1]);
                             }
 
                             $complete = true;
@@ -177,7 +177,7 @@ class InstallController extends CommonController
             if ($index < $this->configurator->getStepCount()) {
                 // On to the next step
 
-                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => (int) $index]));
+                return $this->redirectToRoute('mautic_installer_step', ['index' => (int) $index]);
             } else {
                 $siteUrl  = $this->request->getSchemeAndHttpHost().$this->request->getBaseUrl();
                 $messages = $this->installer->createFinalConfigStep($siteUrl);
@@ -204,7 +204,7 @@ class InstallController extends CommonController
             // Redirect back to last step if the user advanced ahead via the URL
             $last = (int) end($completedSteps) + 1;
             if ($index && $index > $last) {
-                return $this->redirect($this->generateUrl('mautic_installer_step', ['index' => $last]));
+                return $this->redirectToRoute('mautic_installer_step', ['index' => $last]);
             }
         }
 
@@ -248,11 +248,11 @@ class InstallController extends CommonController
             if (!$session->has('mautic.installer.completedsteps')) {
                 // Arrived here by directly browsing to URL so redirect to the dashboard
 
-                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                return $this->redirectToRoute('mautic_dashboard_index');
             }
         } else {
             // Shouldn't have made it to this step without having a successful install
-            return $this->redirect($this->generateUrl('mautic_installer_home'));
+            return $this->redirectToRoute('mautic_installer_home');
         }
 
         // Remove installer session variables

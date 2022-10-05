@@ -385,7 +385,7 @@ class DashboardController extends AbstractFormController
             unlink($path);
         }
 
-        return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+        return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
     }
 
     /**
@@ -411,7 +411,7 @@ class DashboardController extends AbstractFormController
         if (!file_exists($path) || !is_readable($path)) {
             $this->addFlash('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
 
-            return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+            return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
         }
 
         $widgets = json_decode(file_get_contents($path), true);

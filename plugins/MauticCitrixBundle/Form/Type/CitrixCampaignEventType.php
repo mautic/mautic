@@ -86,12 +86,4 @@ class CitrixCampaignEventType extends AbstractType
             ]
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'citrix_campaign_event';
-    }
 }

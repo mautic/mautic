@@ -169,12 +169,4 @@ class WidgetType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, $func);
         $builder->addEventListener(FormEvents::PRE_SUBMIT, $func);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'widget';
-    }
 }
