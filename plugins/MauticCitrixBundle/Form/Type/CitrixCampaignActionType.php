@@ -109,12 +109,4 @@ class CitrixCampaignActionType extends AbstractType
             $builder->add('template', EmailListType::class, $defaultOptions);
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'citrix_campaign_action';
-    }
 }

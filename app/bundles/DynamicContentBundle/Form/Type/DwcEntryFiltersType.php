@@ -100,14 +100,6 @@ class DwcEntryFiltersType extends AbstractType
     }
 
     /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'dwc_entry_filters';
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
