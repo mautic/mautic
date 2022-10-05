@@ -13,10 +13,12 @@ class TemplatingHelper
      * @var Container
      */
     protected $container;
+    private \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine $delegatingEngine;
 
-    public function __construct(Kernel $kernel)
+    public function __construct(Kernel $kernel, \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine $delegatingEngine)
     {
         $this->container = $kernel->getContainer();
+        $this->delegatingEngine = $delegatingEngine;
     }
 
     /**
@@ -28,7 +30,7 @@ class TemplatingHelper
      */
     public function getTemplating()
     {
-        return $this->container->get('templating');
+        return $this->delegatingEngine;
     }
 
     /**

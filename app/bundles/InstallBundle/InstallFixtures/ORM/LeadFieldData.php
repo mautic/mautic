@@ -17,6 +17,11 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
      * @var ContainerInterface
      */
     private $container;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
+    public function __construct(\Mautic\CoreBundle\Translation\Translator $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -42,7 +47,7 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 
-        $translator   = $this->container->get('translator');
+        $translator   = $this->translator;
         foreach ($fieldGroups as $fields) {
             $order = 1;
             foreach ($fields as $alias => $field) {

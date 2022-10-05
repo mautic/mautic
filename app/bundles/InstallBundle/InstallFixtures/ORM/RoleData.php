@@ -16,6 +16,11 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Conta
      * @var ContainerInterface
      */
     private $container;
+    private \Mautic\CoreBundle\Translation\Translator $translator;
+    public function __construct(\Mautic\CoreBundle\Translation\Translator $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * {@inheritdoc}
@@ -39,7 +44,7 @@ class RoleData extends AbstractFixture implements OrderedFixtureInterface, Conta
             return;
         }
 
-        $translator = $this->container->get('translator');
+        $translator = $this->translator;
         $role       = new Role();
         $role->setName($translator->trans('mautic.user.role.admin.name', [], 'fixtures'));
         $role->setDescription($translator->trans('mautic.user.role.admin.description', [], 'fixtures'));

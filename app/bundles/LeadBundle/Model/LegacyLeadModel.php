@@ -18,13 +18,15 @@ class LegacyLeadModel
      * @var Container
      */
     private $container;
+    private \Mautic\LeadBundle\Deduplicate\ContactMerger $contactMerger;
 
     /**
      * LegacyContactMerger constructor.
      */
-    public function __construct(Container $container)
+    public function __construct(Container $container, \Mautic\LeadBundle\Deduplicate\ContactMerger $contactMerger)
     {
         $this->container = $container;
+        $this->contactMerger = $contactMerger;
     }
 
     /**
@@ -47,7 +49,7 @@ class LegacyLeadModel
 
         try {
             /** @var ContactMerger $contactMerger */
-            $contactMerger = $this->container->get('mautic.lead.merger');
+            $contactMerger = $this->contactMerger;
 
             return $contactMerger->merge($winner, $loser);
         } catch (SameContactException $exception) {
