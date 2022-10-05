@@ -176,7 +176,7 @@ class OrderExecutionerTest extends TestCase
 
                         return true;
                     }),
-                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                 ],
                 [
                     $this->callback(function (InternalObjectCreateEvent $event) {

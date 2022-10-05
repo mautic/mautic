@@ -156,7 +156,7 @@ class DynamicContentHelperTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
-                    DynamicContentEvents::TOKEN_REPLACEMENT
+                    DynamicContentEvents::TOKEN_REPLACEMENT,
                 ]
             );
 

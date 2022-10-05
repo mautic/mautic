@@ -57,8 +57,8 @@ use Mautic\UserBundle\Security\Provider\UserProvider;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Component\Intl\Countries;
+use Symfony\Contracts\EventDispatcher\Event;
 use Tightenco\Collect\Support\Collection;
 
 class LeadModel extends FormModel
