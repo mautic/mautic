@@ -7,6 +7,7 @@ namespace Mautic\FormBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\FormBundle\Entity\Form;
@@ -37,6 +38,7 @@ class DeleteFormTest extends FormTestAbstract
         $contactTracker       = $this->createMock(ContactTracker::class);
         $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
         $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $entityManager        = $this->createMock(EntityManager::class);
         $dispatcher           = $this->createMock(EventDispatcher::class);
         $formRepository       = $this->createMock(FormRepository::class);
@@ -52,7 +54,8 @@ class DeleteFormTest extends FormTestAbstract
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
-            $tableSchemaHelper
+            $tableSchemaHelper,
+            $coreParametersHelper
         );
 
         $dispatcher->expects($this->exactly(2))

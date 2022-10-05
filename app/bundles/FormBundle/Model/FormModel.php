@@ -527,7 +527,7 @@ class FormModel extends CommonFormModel
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'fieldSettings'           => $this->getCustomComponents()['fields'],
+                'fieldSettings'          => $this->getCustomComponents()['fields'],
                 'viewOnlyFields'         => $this->getCustomComponents()['viewOnlyFields'],
                 'fields'                 => $fields,
                 'contactFields'          => $this->leadFieldModel->getFieldListWithProperties(),

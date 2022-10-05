@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
@@ -73,6 +74,7 @@ class FormTestAbstract extends TestCase
         $this->formRepository = $this->createMock(FormRepository::class);
         $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
         $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
 
         $contactTracker->expects($this
             ->any())
@@ -108,7 +110,8 @@ class FormTestAbstract extends TestCase
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
-            $tableSchemaHelper
+            $tableSchemaHelper,
+            $coreParametersHelper
         );
 
         $formModel->setDispatcher($dispatcher);
