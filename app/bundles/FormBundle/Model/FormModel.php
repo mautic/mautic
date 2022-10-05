@@ -6,6 +6,7 @@ use DOMDocument;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
@@ -100,7 +101,8 @@ class FormModel extends CommonFormModel
         FormUploader $formUploader,
         ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
-        TableSchemaHelper $tableSchemaHelper
+        TableSchemaHelper $tableSchemaHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->requestStack           = $requestStack;
         $this->templatingHelper       = $templatingHelper;
@@ -113,6 +115,7 @@ class FormModel extends CommonFormModel
         $this->contactTracker         = $contactTracker;
         $this->columnSchemaHelper     = $columnSchemaHelper;
         $this->tableSchemaHelper      = $tableSchemaHelper;
+        $this->coreParametersHelper   = $coreParametersHelper;
     }
 
     /**
@@ -524,19 +527,20 @@ class FormModel extends CommonFormModel
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.php',
             [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
-                'fields'         => $fields,
-                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'form'           => $entity,
-                'theme'          => $theme,
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
+                'fieldSettings'           => $this->getCustomComponents()['fields'],
+                'viewOnlyFields'         => $this->getCustomComponents()['viewOnlyFields'],
+                'fields'                 => $fields,
+                'contactFields'          => $this->leadFieldModel->getFieldListWithProperties(),
+                'companyFields'          => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'form'                   => $entity,
+                'theme'                  => $theme,
+                'submissions'            => $submissions,
+                'lead'                   => $lead,
+                'formPages'              => $pages,
+                'lastFormPage'           => $lastPage,
+                'style'                  => $style,
+                'inBuilder'              => false,
+                'successfulSubmitAction' => $this->coreParametersHelper->get('successful_submit_action'),
             ]
         );
 

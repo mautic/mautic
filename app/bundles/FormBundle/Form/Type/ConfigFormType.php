@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -27,6 +28,23 @@ class ConfigFormType extends AbstractType
                     'required' => false,
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
+            'successful_submit_action',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.form.config.form.successful_submit_action_at_the_top'    => 'top',
+                    'mautic.form.config.form.successful_submit_action_at_the_bottom' => 'bottom',
+                ],
+                'label'             => 'mautic.form.config.form.successful_submit_action',
+                'required'          => true,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.config.form.successful_submit_action.tooltip',
+                ],
+            ]
         );
     }
 

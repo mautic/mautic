@@ -375,6 +375,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.model.submission' => [
@@ -485,8 +486,9 @@ return [
     ],
 
     'parameters' => [
-        'form_upload_dir'        => '%kernel.root_dir%/../media/files/form',
-        'blacklisted_extensions' => ['php', 'sh'],
-        'do_not_submit_emails'   => [],
+        'form_upload_dir'          => '%kernel.root_dir%/../media/files/form',
+        'blacklisted_extensions'   => ['php', 'sh'],
+        'do_not_submit_emails'     => [],
+        'successful_submit_action' => 'top',
     ],
 ];
