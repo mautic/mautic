@@ -32,3 +32,4 @@ if ($messageChannels) {
     <span class="label label-default"><?php echo $channel; ?></span>
     <?php endforeach; ?>
 </td>
+<?php echo $view->render('MauticCoreBundle:Helper:list_actions_quick_icons.html.php'); ?>
