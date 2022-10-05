@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 class FieldSaveDispatcher
 {
@@ -47,8 +46,6 @@ class FieldSaveDispatcher
     }
 
     /**
-     * @param LeadFieldEvent|null $event
-     *
      * @throws NoListenerException
      */
     public function dispatchEvent(string $action, LeadField $entity, bool $isNew, ?LeadFieldEvent $event = null): LeadFieldEvent
