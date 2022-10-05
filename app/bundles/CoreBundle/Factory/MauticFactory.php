@@ -27,60 +27,10 @@ class MauticFactory
     private $database;
 
     private $entityManager;
-    private \Mautic\CoreBundle\Factory\ModelFactory $modelFactory;
-    private \Mautic\CoreBundle\Security\Permissions\CorePermissions $corePermissions;
-    private \Mautic\CoreBundle\Helper\UserHelper $userHelper;
-    private \Symfony\Component\HttpFoundation\Session\Session $session;
-    private \Doctrine\Bundle\DoctrineBundle\Registry $registry;
-    private \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper $connectionWrapper;
-    private \Mautic\CoreBundle\Translation\Translator $translator;
-    private \JMS\Serializer\Serializer $serializer;
-    private \Mautic\CoreBundle\Helper\TemplatingHelper $templatingHelper;
-    private \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher $traceableEventDispatcher;
-    private \Symfony\Component\HttpFoundation\RequestStack $requestStack;
-    private \Symfony\Component\Validator\Validator\TraceableValidator $traceableValidator;
-    private \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper;
-    private \Symfony\Bundle\FrameworkBundle\Routing\Router $router;
-    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
-    private \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper;
-    private \Mautic\EmailBundle\Helper\MailHelper $mailHelper;
-    private \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper;
-    private \Psr\Log\LoggerInterface $logger;
-    private \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper;
-    private \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper;
-    private \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper;
-    private \Mautic\CoreBundle\Templating\Helper\TranslatorHelper $translatorHelper;
-    private \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper;
-    private \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper;
 
-    public function __construct(ContainerInterface $container, \Mautic\CoreBundle\Factory\ModelFactory $modelFactory, \Mautic\CoreBundle\Security\Permissions\CorePermissions $corePermissions, \Mautic\CoreBundle\Helper\UserHelper $userHelper, \Symfony\Component\HttpFoundation\Session\Session $session, \Doctrine\Bundle\DoctrineBundle\Registry $registry, \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper $connectionWrapper, \Mautic\CoreBundle\Translation\Translator $translator, \JMS\Serializer\Serializer $serializer, \Mautic\CoreBundle\Helper\TemplatingHelper $templatingHelper, \Symfony\Component\HttpKernel\Debug\TraceableEventDispatcher $traceableEventDispatcher, \Symfony\Component\HttpFoundation\RequestStack $requestStack, \Symfony\Component\Validator\Validator\TraceableValidator $traceableValidator, \Mautic\CoreBundle\Helper\CoreParametersHelper $coreParametersHelper, \Symfony\Bundle\FrameworkBundle\Routing\Router $router, \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper, \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper, \Mautic\EmailBundle\Helper\MailHelper $mailHelper, \Mautic\CoreBundle\Helper\IpLookupHelper $ipLookupHelper, \Psr\Log\LoggerInterface $logger, \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper, \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper, \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper, \Mautic\CoreBundle\Templating\Helper\TranslatorHelper $translatorHelper, \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper, \Mautic\CoreBundle\Helper\BundleHelper $bundleHelper)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->modelFactory = $modelFactory;
-        $this->corePermissions = $corePermissions;
-        $this->userHelper = $userHelper;
-        $this->session = $session;
-        $this->registry = $registry;
-        $this->connectionWrapper = $connectionWrapper;
-        $this->translator = $translator;
-        $this->serializer = $serializer;
-        $this->templatingHelper = $templatingHelper;
-        $this->traceableEventDispatcher = $traceableEventDispatcher;
-        $this->requestStack = $requestStack;
-        $this->traceableValidator = $traceableValidator;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->router = $router;
-        $this->pathsHelper = $pathsHelper;
-        $this->themeHelper = $themeHelper;
-        $this->mailHelper = $mailHelper;
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->logger = $logger;
-        $this->assetsHelper = $assetsHelper;
-        $this->slotsHelper = $slotsHelper;
-        $this->formHelper = $formHelper;
-        $this->translatorHelper = $translatorHelper;
-        $this->routerHelper = $routerHelper;
-        $this->bundleHelper = $bundleHelper;
     }
 
     /**
@@ -94,7 +44,7 @@ class MauticFactory
      */
     public function getModel($modelNameKey)
     {
-        return $this->modelFactory->getModel($modelNameKey);
+        return $this->container->get('mautic.model.factory')->getModel($modelNameKey);
     }
 
     /**
@@ -104,7 +54,7 @@ class MauticFactory
      */
     public function getSecurity()
     {
-        return $this->corePermissions;
+        return $this->container->get('mautic.security');
     }
 
     /**
@@ -126,7 +76,7 @@ class MauticFactory
      */
     public function getUser($nullIfGuest = false)
     {
-        return $this->userHelper->getUser($nullIfGuest);
+        return $this->container->get('mautic.helper.user')->getUser($nullIfGuest);
     }
 
     /**
@@ -136,7 +86,7 @@ class MauticFactory
      */
     public function getSession()
     {
-        return $this->session;
+        return $this->container->get('session');
     }
 
     /**
@@ -146,7 +96,7 @@ class MauticFactory
      */
     public function getEntityManager()
     {
-        return ($this->entityManager) ? $this->entityManager : $this->registry->getManager();
+        return ($this->entityManager) ? $this->entityManager : $this->container->get('doctrine')->getManager();
     }
 
     public function setEntityManager(EntityManager $em)
@@ -161,7 +111,7 @@ class MauticFactory
      */
     public function getDatabase()
     {
-        return ($this->database) ? $this->database : $this->connectionWrapper;
+        return ($this->database) ? $this->database : $this->container->get('database_connection');
     }
 
     /**
@@ -181,7 +131,7 @@ class MauticFactory
     {
         if (defined('IN_MAUTIC_CONSOLE')) {
             /** @var \Mautic\CoreBundle\Translation\Translator $translator */
-            $translator = $this->translator;
+            $translator = $this->container->get('translator');
 
             $translator->setLocale(
                 $this->getParameter('locale')
@@ -190,7 +140,7 @@ class MauticFactory
             return $translator;
         }
 
-        return $this->translator;
+        return $this->container->get('translator');
     }
 
     /**
@@ -200,7 +150,7 @@ class MauticFactory
      */
     public function getSerializer()
     {
-        return $this->serializer;
+        return $this->container->get('jms_serializer');
     }
 
     /**
@@ -210,7 +160,7 @@ class MauticFactory
      */
     public function getTemplating()
     {
-        return $this->templatingHelper->getTemplating();
+        return $this->container->get('mautic.helper.templating')->getTemplating();
     }
 
     /**
@@ -220,7 +170,7 @@ class MauticFactory
      */
     public function getDispatcher()
     {
-        return $this->traceableEventDispatcher;
+        return $this->container->get('event_dispatcher');
     }
 
     /**
@@ -230,7 +180,7 @@ class MauticFactory
      */
     public function getRequest()
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $request = $this->container->get('request_stack')->getCurrentRequest();
         if (empty($request)) {
             //likely in a test as the request is not populated for outside the container
             $request      = Request::createFromGlobals();
@@ -248,7 +198,7 @@ class MauticFactory
      */
     public function getValidator()
     {
-        return $this->traceableValidator;
+        return $this->container->get('validator');
     }
 
     /**
@@ -271,7 +221,7 @@ class MauticFactory
      */
     public function getParameter($id, $default = false)
     {
-        return $this->coreParametersHelper->get($id, $default);
+        return $this->container->get('mautic.helper.core_parameters')->get($id, $default);
     }
 
     /**
@@ -295,7 +245,7 @@ class MauticFactory
      */
     public function getRouter()
     {
-        return $this->router;
+        return $this->container->get('router');
     }
 
     /**
@@ -311,7 +261,7 @@ class MauticFactory
      */
     public function getSystemPath($name, $fullPath = false)
     {
-        return $this->pathsHelper->getSystemPath($name, $fullPath);
+        return $this->container->get('mautic.helper.paths')->getSystemPath($name, $fullPath);
     }
 
     /**
@@ -362,7 +312,7 @@ class MauticFactory
      */
     public function getTheme($theme = 'current', $throwException = false)
     {
-        return $this->themeHelper->getTheme($theme, $throwException);
+        return $this->container->get('mautic.helper.theme')->getTheme($theme, $throwException);
     }
 
     /**
@@ -375,7 +325,7 @@ class MauticFactory
      */
     public function getInstalledThemes($specificFeature = 'all', $extended = false)
     {
-        return $this->themeHelper->getInstalledThemes($specificFeature, $extended);
+        return $this->container->get('mautic.helper.theme')->getInstalledThemes($specificFeature, $extended);
     }
 
     /**
@@ -387,7 +337,7 @@ class MauticFactory
      */
     public function getMailer($cleanSlate = true)
     {
-        return $this->mailHelper->getMailer($cleanSlate);
+        return $this->container->get('mautic.helper.mailer')->getMailer($cleanSlate);
     }
 
     /**
@@ -397,7 +347,7 @@ class MauticFactory
      */
     public function getIpAddressFromRequest()
     {
-        return $this->ipLookupHelper->getIpAddressFromRequest();
+        return $this->container->get('mautic.helper.ip_lookup')->getIpAddressFromRequest();
     }
 
     /**
@@ -409,7 +359,7 @@ class MauticFactory
      */
     public function getIpAddress($ip = null)
     {
-        return $this->ipLookupHelper->getIpAddress($ip);
+        return $this->container->get('mautic.helper.ip_lookup')->getIpAddress($ip);
     }
 
     /**
@@ -432,9 +382,9 @@ class MauticFactory
     public function getLogger($system = false)
     {
         if ($system) {
-            return $this->logger;
+            return $this->container->get('logger');
         } else {
-            return $this->logger;
+            return $this->container->get('monolog.logger.mautic');
         }
     }
 
@@ -449,15 +399,15 @@ class MauticFactory
     {
         switch ($helper) {
             case 'template.assets':
-                return $this->assetsHelper;
+                return $this->container->get('templating.helper.assets');
             case 'template.slots':
-                return $this->slotsHelper;
+                return $this->container->get('templating.helper.slots');
             case 'template.form':
-                return $this->formHelper;
+                return $this->container->get('templating.helper.form');
             case 'template.translator':
-                return $this->translatorHelper;
+                return $this->container->get('templating.helper.translator');
             case 'template.router':
-                return $this->routerHelper;
+                return $this->container->get('templating.helper.router');
             default:
                 return $this->container->get('mautic.helper.'.$helper);
         }
@@ -482,7 +432,7 @@ class MauticFactory
      */
     public function getMauticBundles($includePlugins = false)
     {
-        return $this->bundleHelper->getMauticBundles($includePlugins);
+        return $this->container->get('mautic.helper.bundle')->getMauticBundles($includePlugins);
     }
 
     /**
@@ -492,7 +442,7 @@ class MauticFactory
      */
     public function getPluginBundles()
     {
-        return $this->bundleHelper->getPluginBundles();
+        return $this->container->get('mautic.helper.bundle')->getPluginBundles();
     }
 
     /**
@@ -508,7 +458,7 @@ class MauticFactory
      */
     public function getBundleConfig($bundleName, $configKey = '', $includePlugins = false)
     {
-        return $this->bundleHelper->getBundleConfig($bundleName, $configKey, $includePlugins);
+        return $this->container->get('mautic.helper.bundle')->getBundleConfig($bundleName, $configKey, $includePlugins);
     }
 
     /**

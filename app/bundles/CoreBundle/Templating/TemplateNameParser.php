@@ -15,19 +15,15 @@ class TemplateNameParser extends BaseTemplateNameParser
      * @var \Symfony\Component\DependencyInjection\ContainerInterface
      */
     protected $container;
-    private \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper;
-    private \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(KernelInterface $kernel, \Mautic\CoreBundle\Helper\ThemeHelper $themeHelper, \Mautic\CoreBundle\Helper\PathsHelper $pathsHelper)
+    public function __construct(KernelInterface $kernel)
     {
         parent::__construct($kernel);
 
         $this->container = $kernel->getContainer();
-        $this->themeHelper = $themeHelper;
-        $this->pathsHelper = $pathsHelper;
     }
 
     /**
@@ -75,8 +71,8 @@ class TemplateNameParser extends BaseTemplateNameParser
             $template->setThemeOverride($themeOverride);
         }
 
-        $template->setThemeHelper($this->themeHelper);
-        $template->setPathsHelper($this->pathsHelper);
+        $template->setThemeHelper($this->container->get('mautic.helper.theme'));
+        $template->setPathsHelper($this->container->get('mautic.helper.paths'));
 
         if ($template->get('bundle')) {
             try {
