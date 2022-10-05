@@ -896,6 +896,19 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.helper.contact_request_helper' => [
+                'class'     => \Mautic\LeadBundle\Helper\ContactRequestHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.ip_lookup',
+                    'request_stack',
+                    'monolog.logger.mautic',
+                    'event_dispatcher',
+                    'mautic.lead.merger'
+                ],
+            ],
             'mautic.lead.validator.length' => [
                 'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
                 'tag'       => 'validator.constraint_validator',
@@ -1137,16 +1150,7 @@ return [
                     'mautic.user.provider',
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
-                    'mautic.lead.model.legacy_lead',
                     'mautic.lead.model.ipaddress',
-                ],
-            ],
-
-            // Deprecated support for circular dependency
-            'mautic.lead.model.legacy_lead' => [
-                'class'     => \Mautic\LeadBundle\Model\LegacyLeadModel::class,
-                'arguments' => [
-                    'service_container',
                 ],
             ],
             'mautic.lead.model.field' => [

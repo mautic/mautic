@@ -45,7 +45,6 @@ use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Form\Type\LeadType;
-use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -162,11 +161,6 @@ class LeadModel extends FormModel
     private $deviceTracker;
 
     /**
-     * @var LegacyLeadModel
-     */
-    private $legacyLeadModel;
-
-    /**
      * @var IpAddressModel
      */
     private $ipAddressModel;
@@ -202,7 +196,6 @@ class LeadModel extends FormModel
         UserProvider $userProvider,
         ContactTracker $contactTracker,
         DeviceTracker $deviceTracker,
-        LegacyLeadModel $legacyLeadModel,
         IpAddressModel $ipAddressModel
     ) {
         $this->requestStack         = $requestStack;
@@ -220,7 +213,6 @@ class LeadModel extends FormModel
         $this->userProvider         = $userProvider;
         $this->contactTracker       = $contactTracker;
         $this->deviceTracker        = $deviceTracker;
-        $this->legacyLeadModel      = $legacyLeadModel;
         $this->ipAddressModel       = $ipAddressModel;
     }
 
@@ -891,36 +883,11 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get the contat from request (ct/clickthrough) and handles auto merging of contact data from request parameters.
-     *
-     * @param array $queryFields
-     *
-     * @return array|Lead|null
-     */
-    public function getContactFromRequest($queryFields = [])
-    {
-        // @todo Instantiate here until we can remove circular dependency on LeadModel in order to make it a service
-        $requestStack = new RequestStack();
-        $requestStack->push($this->requestStack->getCurrentRequest());
-        $contactRequestHelper = new ContactRequestHelper(
-            $this,
-            $this->contactTracker,
-            $this->coreParametersHelper,
-            $this->ipLookupHelper,
-            $requestStack,
-            $this->logger,
-            $this->dispatcher
-        );
-
-        return $contactRequestHelper->getContactFromQuery($queryFields);
-    }
-
-    /**
      * @param bool $returnWithQueryFields
      *
      * @return array|Lead
      */
-    public function checkForDuplicateContact(array $queryFields, Lead $lead = null, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
+    public function checkForDuplicateContact(array $queryFields, $returnWithQueryFields = false, $onlyPubliclyUpdateable = false)
     {
         // Search for lead by request and/or update lead fields if some data were sent in the URL query
         if (empty($this->availableLeadFields)) {
@@ -937,10 +904,7 @@ class LeadModel extends FormModel
             );
         }
 
-        if (is_null($lead)) {
-            $lead = new Lead();
-        }
-
+        $lead            = new Lead();
         $uniqueFields    = $this->leadFieldModel->getUniqueIdentifierFields();
         $uniqueFieldData = [];
         $inQuery         = array_intersect_key($queryFields, $this->availableLeadFields);
@@ -966,12 +930,11 @@ class LeadModel extends FormModel
 
         // Check for leads using unique identifier
         if (count($uniqueFieldData)) {
-            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData, ($lead) ? $lead->getId() : null);
+            $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData);
 
             if (!empty($existingLeads)) {
                 $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
-                // Merge with existing lead or use the one found
-                $lead = ($lead->getId()) ? $this->mergeLeads($lead, $existingLeads[0]) : $existingLeads[0];
+                $lead = $existingLeads[0];
             }
         }
 
@@ -2434,20 +2397,6 @@ class LeadModel extends FormModel
         }
 
         return DNC::IS_CONTACTABLE;
-    }
-
-    /**
-     * Merge two leads; if a conflict of data occurs, the newest lead will get precedence.
-     *
-     * @deprecated 2.13.0; to be removed in 3.0. Use \Mautic\LeadBundle\Deduplicate\ContactMerger instead
-     *
-     * @param bool $autoMode If true, the newest lead will be merged into the oldes then deleted; otherwise, $lead will be merged into $lead2 then deleted
-     *
-     * @return Lead
-     */
-    public function mergeLeads(Lead $lead, Lead $lead2, $autoMode = true)
-    {
-        return $this->legacyLeadModel->mergeLeads($lead, $lead2, $autoMode);
     }
 
     public function getAvailableLeadFields(): array

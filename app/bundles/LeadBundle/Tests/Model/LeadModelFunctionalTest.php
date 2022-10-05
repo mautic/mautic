@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -17,6 +18,9 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactFound()
     {
         $model = self::$container->get('mautic.lead.model.lead');
+
+        $merger = self::$container->get('mautic.lead.merger');
+        \assert($merger instanceof ContactMerger);
 
         $bob = new Lead();
         $bob->setFirstname('Bob')
@@ -32,7 +36,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($jane);
         $janeId = $jane->getId();
 
-        $model->mergeLeads($bob, $jane, false);
+        $merger->merge($bob, $jane);
 
         // Bob should have been merged into Jane
         $jane = $model->getEntity($janeId);
@@ -50,7 +54,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $model->saveEntity($joey);
         $joeyId = $joey->getId();
 
-        $model->mergeLeads($jane, $joey, false);
+        $merger->merge($jane, $joey);
 
         // Query for Bob which should now return Joey
         $joey = $model->getEntity($bobId);
@@ -70,6 +74,9 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $model = self::$container->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
         $em   = self::$container->get('doctrine.orm.entity_manager');
+
+        $merger = self::$container->get('mautic.lead.merger');
+        \assert($merger instanceof ContactMerger);
 
         // Startout Jane with 50 points
         $jane = new Lead();
@@ -98,7 +105,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         // Jane should start out with 50 points
         $this->assertEquals(50, $jane->getPoints());
         // Jane should come out of the merge as Jane
-        $jane = $model->mergeLeads($visitor, $jane, false);
+        $jane = $merger->merge($visitor, $jane);
         $this->assertEquals($janeId, $jane->getId());
         // Jane should now have 53 points
         $this->assertEquals(53, $jane->getPoints());
@@ -117,7 +124,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
         // Jane again identifies herself, gets merged into the new visitor and so should now have a total of 56 points
         $jane = $model->getEntity($janeId);
-        $jane = $model->mergeLeads($visitor2, $jane, false);
+        $jane = $merger->merge($visitor2, $jane);
         $this->assertEquals($janeId, $jane->getId());
         $em->clear(Lead::class);
         $jane = $model->getEntity($jane->getId());
