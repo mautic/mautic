@@ -126,8 +126,6 @@ class AppKernel extends Kernel
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
-
-            // Custom Bundles
             new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
 
             // Mautic Bundles
