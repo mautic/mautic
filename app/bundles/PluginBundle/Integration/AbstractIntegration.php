@@ -1738,9 +1738,9 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
+     * @param mixed      $data        Profile data from integration
+     * @param bool|true  $persist     Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
      * @param mixed|null $identifiers
      *
      * @return Lead

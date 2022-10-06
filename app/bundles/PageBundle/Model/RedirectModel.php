@@ -105,7 +105,7 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param  $url
+     * @param $url
      *
      * @return Redirect|null
      */
