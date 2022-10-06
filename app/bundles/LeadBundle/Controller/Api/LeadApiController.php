@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -18,8 +19,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 
 /**
- * Class LeadApiController.
- *
  * @property LeadModel $model
  */
 class LeadApiController extends CommonApiController
@@ -603,6 +602,7 @@ class LeadApiController extends CommonApiController
         //Since the request can be from 3rd party, check for an IP address if included
         if (isset($this->entityRequestParameters['ipAddress'])) {
             $ipAddress = $this->get('mautic.helper.ip_lookup')->getIpAddress($this->entityRequestParameters['ipAddress']);
+            \assert($ipAddress instanceof IpAddress);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
