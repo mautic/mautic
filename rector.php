@@ -28,8 +28,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     $rectorConfig->parallel();
 
-    // $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/test/appAppKernelTestDebugContainer.xml');
-    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/dev/appAppKernelDevDebugContainer.xml');
+    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/test/appAppKernelTestDebugContainer.xml');
 
     $rectorConfig->cacheClass(FileCacheStorage::class);
     $rectorConfig->cacheDirectory(__DIR__.'/var/cache/rector');
