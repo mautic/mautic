@@ -128,7 +128,7 @@ class TagController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => $parameters,
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:list.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $this->generateUrl('mautic_tagmanager_index', ['page' => $page]),
@@ -212,7 +212,7 @@ class TagController extends FormController
                 'form'   => $form->createView(),
                 'entity' => $tag,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'new']),
@@ -313,7 +313,7 @@ class TagController extends FormController
                     }
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticTagManagerBundle:Tag:form.html.php';
+                        $contentTemplate                     = 'MauticTagManagerBundle:Tag:form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_tagmanager_action', [
@@ -330,7 +330,7 @@ class TagController extends FormController
                             'objectAction' => 'edit',
                             'entity'       => $tag,
                             'objectId'     => $tag->getId(),
-                            'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticTagManagerBundle:FormTheme\Filter'),
+                            'form'         => $this->getFormView($form, 'edit'),
                         ];
 
                         return $this->postActionRedirect($postActionVars);
@@ -351,7 +351,7 @@ class TagController extends FormController
                 'entity'     => $tag,
                 'currentTag' => $tag->getId(),
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $action,
@@ -461,9 +461,10 @@ class TagController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
-                'tag' => $tag,
+                'tag'      => $tag,
+                'security' => $security,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',
