@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadFieldEvent;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -833,6 +835,10 @@ class FieldModel extends FormModel
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
+        }
+
+        if (null !== $event && !$event instanceof LeadFieldEvent) {
+            throw new RuntimeException('Event should be LeadFieldEvent|null.');
         }
 
         return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);

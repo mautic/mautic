@@ -316,25 +316,23 @@ class FocusModel extends FormModel
      * @param mixed                                         $type
      * @param null                                          $data
      * @param array<int|string|array<int|string>>|Lead|null $lead
-     *
-     * @return Stat
      */
-    public function addStat(Focus $focus, $type, $data = null, $lead = null)
+    public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
     {
         if (empty($lead)) {
-            return;
+            return null;
         }
 
         if ($lead instanceof Lead && !$lead->getId()) {
-            return;
+            return null;
         }
 
         if (is_array($lead)) {
             if (empty($lead['id'])) {
-                return;
+                return null;
             }
 
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+            $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
         switch ($type) {
