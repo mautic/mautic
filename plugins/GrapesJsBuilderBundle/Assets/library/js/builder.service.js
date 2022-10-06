@@ -137,6 +137,7 @@ export default class BuilderService {
           { name: 'document', items: ['Source'] },
           { name: 'insert', items: ['SpecialChar'] },
         ],
+        autoParagraph: false,
         extraPlugins: ['sharedspace', 'colorbutton'],
       },
     };
