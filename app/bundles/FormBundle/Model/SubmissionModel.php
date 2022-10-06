@@ -34,6 +34,7 @@ use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -1055,7 +1056,10 @@ class SubmissionModel extends CommonFormModel
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
                 // Merge the found lead with currently tracked lead
-                $lead = $this->contactMerger->merge($lead, $foundLead);
+                try {
+                    $lead = $this->contactMerger->merge($lead, $foundLead);
+                } catch (SameContactException $exception) {
+                }
             }
 
             // Update unique fields data for comparison with submitted data

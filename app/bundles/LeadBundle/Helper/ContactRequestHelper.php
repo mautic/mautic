@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactIdentificationEvent;
 use Mautic\LeadBundle\Exception\ContactNotFoundException;
@@ -151,7 +152,12 @@ class ContactRequestHelper
                 true,
                 true
             );
-            $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
+
+            try {
+                $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
+            } catch (SameContactException $exception) {
+            }
+
             if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {
                 // A contact was found by a publicly updatable field
                 if (!$foundContact->isNew()) {
@@ -244,7 +250,10 @@ class ContactRequestHelper
     private function mergeWithTrackedContact(Lead $foundContact)
     {
         if ($this->trackedContact && $this->trackedContact->getId() && $this->trackedContact->isAnonymous()) {
-            return $this->contactMerger->merge($this->trackedContact, $foundContact);
+            try {
+                return $this->contactMerger->merge($this->trackedContact, $foundContact);
+            } catch (SameContactException $exception) {
+            }
         }
 
         return $foundContact;
