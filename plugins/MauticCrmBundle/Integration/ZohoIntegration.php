@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -763,7 +762,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                     'multiple'    => true,
                     'label'       => 'mautic.zoho.form.blanks.label',
                     'label_attr'  => ['class' => 'control-label'],
-                    'empty_value' => false,
+                    'placeholder' => false,
                     'required'    => false,
                 ]
             );
