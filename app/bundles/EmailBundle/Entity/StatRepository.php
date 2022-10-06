@@ -8,9 +8,6 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
-/**
- * Class StatRepository.
- */
 class StatRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -167,7 +164,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $listId
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
      *
      * @return array
      */
@@ -203,9 +201,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -215,9 +213,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int|string>|int|null $emailIds
+     * @param array<int,int|string>|int|null $listId
+     * @param bool                           $combined
      *
      * @return array|int
      */
@@ -227,9 +225,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -239,10 +237,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $column
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param string                              $column
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -269,8 +267,9 @@ class StatRepository extends CommonRepository
                         ->groupBy('s.list_id');
                 } elseif (is_array($listId)) {
                     $q->andWhere(
-                        $q->expr()->in('s.list_id', array_map('intval', $listId))
+                        $q->expr()->in('s.list_id', ':segmentIds')
                     );
+                    $q->setParameter('segmentIds', $listId, Connection::PARAM_INT_ARRAY);
 
                     $q->addSelect('s.list_id')
                         ->groupBy('s.list_id');
@@ -321,8 +320,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param           $emailIds
-     * @param \DateTime $fromDate
+     * @param array<int,int|string>|int $emailIds
      *
      * @return array
      */
@@ -383,7 +381,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array|int $emailIds
+     * @param array<int,int|string>|int $emailIds
      *
      * @return int
      */
