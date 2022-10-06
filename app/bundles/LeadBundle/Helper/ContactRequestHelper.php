@@ -56,7 +56,7 @@ class ContactRequestHelper
     private $logger;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     private $trackedContact;
 
@@ -153,9 +153,11 @@ class ContactRequestHelper
                 true
             );
 
-            try {
-                $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
-            } catch (SameContactException $exception) {
+            if ($this->trackedContact && $this->trackedContact->getId() && $foundContact->getId()) {
+                try {
+                    $foundContact = $this->contactMerger->merge($this->trackedContact, $foundContact);
+                } catch (SameContactException $exception) {
+                }
             }
 
             if (is_null($this->trackedContact) or $foundContact->getId() !== $this->trackedContact->getId()) {

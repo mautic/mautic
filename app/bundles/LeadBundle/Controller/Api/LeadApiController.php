@@ -572,12 +572,12 @@ class LeadApiController extends CommonApiController
             $contactMerger  = $this->get('mautic.lead.merger');
             \assert($contactMerger instanceof ContactMerger);
 
-            if ($entity->getId()) {
-                try{
+            if ($entity->getId() && $existingEntity->getId()) {
+                try {
                     $entity = $contactMerger->merge($entity, $existingEntity);
                 } catch (SameContactException $exception) {
                 }
-            } else {
+            } elseif ($existingEntity->getId()) {
                 $entity = $existingEntity;
             }
         }

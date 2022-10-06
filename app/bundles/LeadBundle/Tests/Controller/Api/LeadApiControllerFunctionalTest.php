@@ -249,7 +249,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response= json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals(Response::HTTP_OK, $response['statusCodes'][0]);
         $this->assertEquals($contact->getId(), $response['contacts'][0]['id']);
@@ -264,7 +267,10 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request('PUT', '/api/contacts/batch/edit', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
+
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals(Response::HTTP_CREATED, $response['statusCodes'][0]);
         $this->assertGreaterThanOrEqual(1, $response['contacts'][0]['id']);

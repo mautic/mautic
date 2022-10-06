@@ -471,8 +471,8 @@ class PublicController extends CommonFormController
         if (isset($ct)) {
             if ($ipAddress->isTrackable()) {
                 // Search replace lead fields in the URL
+                /** @var ContactRequestHelper $contactRequestHelper */
                 $contactRequestHelper = $this->get('mautic.lead.helper.contact_request_helper');
-                \assert($contactRequestHelper instanceof ContactRequestHelper);
 
                 /** @var PageModel $pageModel */
                 $pageModel = $this->getModel('page');
