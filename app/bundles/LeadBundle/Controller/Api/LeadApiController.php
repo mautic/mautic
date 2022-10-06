@@ -464,7 +464,7 @@ class LeadApiController extends CommonApiController
      *
      * @param int       $id
      * @param string    $method
-     * @param array/int $data
+     * @param array|int $data
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
