@@ -205,9 +205,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
-        $this->leadRepositoryMock->expects($this->once())
-            ->method('getFieldValues');
-
         $this->contactTrackingServiceMock->expects($this->once())
             ->method('getTrackedLead')
             ->willReturn(null);
