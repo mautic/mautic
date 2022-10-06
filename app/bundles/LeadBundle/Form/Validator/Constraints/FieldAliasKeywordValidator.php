@@ -17,7 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FieldAliasKeywordValidator extends ConstraintValidator
 {
-    const RESTRICTED_ALIASES = [
+    public const RESTRICTED_ALIASES = [
         'contact_id',
         'company_id',
     ];

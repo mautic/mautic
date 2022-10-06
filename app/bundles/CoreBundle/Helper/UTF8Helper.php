@@ -4,9 +4,9 @@ namespace Mautic\CoreBundle\Helper;
 
 class UTF8Helper
 {
-    const ICONV_TRANSLIT = 'TRANSLIT';
-    const ICONV_IGNORE   = 'IGNORE';
-    const WITHOUT_ICONV  = '';
+    public const ICONV_TRANSLIT = 'TRANSLIT';
+    public const ICONV_IGNORE   = 'IGNORE';
+    public const WITHOUT_ICONV  = '';
 
     protected static $win1252ToUtf8 = [
         128 => "\xe2\x82\xac",

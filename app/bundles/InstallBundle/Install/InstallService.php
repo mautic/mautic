@@ -32,11 +32,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallService
 {
-    const CHECK_STEP    = 0;
-    const DOCTRINE_STEP = 1;
-    const USER_STEP     = 2;
-    const EMAIL_STEP    = 3;
-    const FINAL_STEP    = 4;
+    public const CHECK_STEP    = 0;
+    public const DOCTRINE_STEP = 1;
+    public const USER_STEP     = 2;
+    public const EMAIL_STEP    = 3;
+    public const FINAL_STEP    = 4;
 
     private Configurator $configurator;
     private CacheHelper $cacheHelper;

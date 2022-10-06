@@ -22,16 +22,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_LEADS                     = 'leads';
-    const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
-    const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
-    const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
-    const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
-    const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
-    const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
-    const CONTEXT_COMPANIES                 = 'companies';
+    public const CONTEXT_LEADS                     = 'leads';
+    public const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+    public const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
+    public const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
+    public const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+    public const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+    public const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
+    public const CONTEXT_COMPANIES                 = 'companies';
 
-    const GROUP_CONTACTS = 'contacts';
+    public const GROUP_CONTACTS = 'contacts';
 
     private $leadContexts = [
         self::CONTEXT_LEADS,

@@ -84,13 +84,13 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $titleRegex          = '{pagetitle}';
     private $descriptionRegex    = '{pagemetadescription}';
 
-    const segmentListRegex  = '{segmentlist}';
-    const categoryListRegex = '{categorylist}';
-    const channelfrequency  = '{channelfrequency}';
-    const preferredchannel  = '{preferredchannel}';
-    const saveprefsRegex    = '{saveprefsbutton}';
-    const successmessage    = '{successmessage}';
-    const identifierToken   = '{leadidentifier}';
+    public const segmentListRegex  = '{segmentlist}';
+    public const categoryListRegex = '{categorylist}';
+    public const channelfrequency  = '{channelfrequency}';
+    public const preferredchannel  = '{preferredchannel}';
+    public const saveprefsRegex    = '{saveprefsbutton}';
+    public const successmessage    = '{successmessage}';
+    public const identifierToken   = '{leadidentifier}';
 
     /**
      * BuilderSubscriber constructor.

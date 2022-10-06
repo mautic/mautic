@@ -29,7 +29,7 @@ class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
-    const MODEL_ID = 'lead.lead';
+    public const MODEL_ID = 'lead.lead';
 
     public function initialize(ControllerEvent $event)
     {

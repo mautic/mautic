@@ -17,8 +17,8 @@ use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 
 abstract class PipedriveTest extends MauticMysqlTestCase
 {
-    const WEBHOOK_USER     = 'user';
-    const WEBHOOK_PASSWORD = 'pa$$word';
+    public const WEBHOOK_USER     = 'user';
+    public const WEBHOOK_PASSWORD = 'pa$$word';
 
     protected function setUp(): void
     {

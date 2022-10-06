@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_FORMS           = 'forms';
-    const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+    public const CONTEXT_FORMS           = 'forms';
+    public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
 
     /**
      * @var CompanyReportData
