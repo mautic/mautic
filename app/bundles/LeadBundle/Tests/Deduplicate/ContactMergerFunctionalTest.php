@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use PHPUnit\Framework\MockObject\MockObject;
 
 final class ContactMergerFunctionalTest extends MauticMysqlTestCase
 {
