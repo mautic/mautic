@@ -568,7 +568,7 @@ class LeadApiController extends CommonApiController
             // Merge existing duplicate contact based on unique fields if exist
             // new endpoints will leverage getNewEntity in order to return the correct status codes
             $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
-            $contactMerger = $this->get('mautic.lead.merger');
+            $contactMerger  = $this->get('mautic.lead.merger');
             \assert($contactMerger instanceof ContactMerger);
             $entity = $entity->getId() ? $contactMerger->merge($entity, $existingEntity) : $existingEntity;
         }

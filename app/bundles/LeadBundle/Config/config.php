@@ -906,7 +906,7 @@ return [
                     'request_stack',
                     'monolog.logger.mautic',
                     'event_dispatcher',
-                    'mautic.lead.merger'
+                    'mautic.lead.merger',
                 ],
             ],
             'mautic.lead.validator.length' => [

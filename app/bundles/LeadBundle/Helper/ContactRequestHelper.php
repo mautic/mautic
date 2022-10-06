@@ -92,7 +92,7 @@ class ContactRequestHelper
     }
 
     /**
-     * @return Lead
+     * @return Lead|null
      */
     public function getContactFromQuery(array $queryFields = [])
     {
@@ -148,7 +148,6 @@ class ContactRequestHelper
         if (!empty($this->queryFields)) {
             [$foundContact, $this->publiclyUpdatableFieldValues] = $this->leadModel->checkForDuplicateContact(
                 $this->queryFields,
-                $this->trackedContact,
                 true,
                 true
             );
