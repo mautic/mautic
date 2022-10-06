@@ -1585,7 +1585,7 @@ return [
             'mautic.lead.fixture.contact_field' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'arguments' => ['translator'],
             ],
             'mautic.lead.fixture.segment' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,

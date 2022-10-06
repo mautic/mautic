@@ -8,17 +8,13 @@ use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface, FixtureGroupInterface
+class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-    private \Mautic\CoreBundle\Translation\Translator $translator;
-    public function __construct(\Mautic\CoreBundle\Translation\Translator $translator)
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -32,14 +28,6 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function load(ObjectManager $manager)
@@ -47,14 +35,13 @@ class LeadFieldData extends AbstractFixture implements OrderedFixtureInterface, 
         $fieldGroups['lead']    = FieldModel::$coreFields;
         $fieldGroups['company'] = FieldModel::$coreCompanyFields;
 
-        $translator   = $this->translator;
         foreach ($fieldGroups as $fields) {
             $order = 1;
             foreach ($fields as $alias => $field) {
                 $type = isset($field['type']) ? $field['type'] : 'text';
 
                 $entity = new LeadField();
-                $entity->setLabel($translator->trans('mautic.lead.field.'.$alias, [], 'fixtures'));
+                $entity->setLabel($this->translator->trans('mautic.lead.field.'.$alias, [], 'fixtures'));
                 $entity->setGroup(isset($field['group']) ? $field['group'] : 'core');
                 $entity->setOrder($order);
                 $entity->setAlias($alias);
