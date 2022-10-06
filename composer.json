@@ -22,7 +22,6 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "exercise/htmlpurifier-bundle": "^4.1",
     "mautic/core-lib": "^4.0"
   },
   "require-dev": {

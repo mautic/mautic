@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2cd42d1f4e98eb7e6e3629714426ccbd",
+    "content-hash": "5d8c5004a72500c3a074f7667932cac8",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5714,7 +5714,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "6ab1aa7a1ea6bcb0bc27b342a56a613ef0364f04"
+                "reference": "c62461ff5c39edf571b1fa867a9a774e2c2e8c57"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5729,6 +5729,7 @@
                 "doctrine/doctrine-fixtures-bundle": "^3.3.2",
                 "doctrine/doctrine-migrations-bundle": "~2.1",
                 "doctrine/orm": "^2.8.0",
+                "exercise/htmlpurifier-bundle": "^4.1",
                 "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
