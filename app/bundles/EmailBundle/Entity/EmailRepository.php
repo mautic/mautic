@@ -158,7 +158,9 @@ class EmailRepository extends CommonRepository
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false
+        $countWithMaxMin = false,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -265,6 +267,14 @@ class EmailRepository extends CommonRepository
             )
         );
 
+        if ($threadId && $maxThreads) {
+            if ($threadId <= $maxThreads) {
+                $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
+                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+            }
+        }
+
         if (!empty($limit)) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
@@ -293,7 +303,9 @@ class EmailRepository extends CommonRepository
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false
+        $countWithMaxMin = false,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -303,7 +315,9 @@ class EmailRepository extends CommonRepository
             $limit,
             $minContactId,
             $maxContactId,
-            $countWithMaxMin
+            $countWithMaxMin,
+            $maxThreads,
+            $threadId
         );
 
         if (!($q instanceof QueryBuilder)) {

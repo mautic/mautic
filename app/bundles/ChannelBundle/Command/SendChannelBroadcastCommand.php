@@ -88,12 +88,6 @@ EOT
         $key           = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
 
         if ($threadId && $maxThreads) {
-            if ('sms' !== $channel) {
-                $output->writeln('Threads are supported just for sms channel at the moment.');
-
-                return 1;
-            }
-
             if ((int) $threadId > (int) $maxThreads) {
                 $output->writeln('--thread-id cannot be larger than --max-thread');
 
