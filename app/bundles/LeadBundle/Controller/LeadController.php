@@ -1989,11 +1989,12 @@ class LeadController extends FormController
             'withTotalCount' => true,
         ];
 
-        $resultsCallback = function ($contact) {
-            return $contact->getProfileFields();
-        };
+        /** @var \Mautic\CoreBundle\Helper\ExportHelper */
+        $exportHelper = $this->get('mautic.helper.export');
 
-        $iterator = new IteratorExportDataModel($model, $args, $resultsCallback);
+        $iterator = new IteratorExportDataModel($model, $args, function ($contact) use ($exportHelper) {
+            return $exportHelper->parseLeadToExport($contact);
+        });
 
         return $this->exportResultsAs($iterator, $dataType, 'contacts');
     }
