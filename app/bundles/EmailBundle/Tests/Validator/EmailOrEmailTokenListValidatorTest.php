@@ -15,7 +15,6 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Context\ExecutionContext;
-use Symfony\Contracts\EventDispatcher\Event;
 
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
@@ -68,7 +67,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             {
             }
 
-            public function dispatch($eventName, ?Event $event = null)
+            public function dispatch($event)
             {
                 return $event;
             }

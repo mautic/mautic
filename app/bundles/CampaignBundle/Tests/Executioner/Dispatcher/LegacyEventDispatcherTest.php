@@ -321,12 +321,10 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         // Legacy custom event should dispatch
         $this->dispatcher->method('dispatch')
-            ->withConsecutive(['something', $this->isInstanceOf(CampaignExecutionEvent::class)])
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
-                        $event->setResult(['failed' => 1, 'reason' => 'because']);
-                    }
+                    fn (CampaignExecutionEvent $event) => $event->setResult(['failed' => 1, 'reason' => 'because'])
                 )
             );
 
@@ -361,12 +359,10 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
 
         // Should pass
         $this->dispatcher->method('dispatch')
-            ->withConsecutive(['something', $this->isInstanceOf(CampaignExecutionEvent::class)])
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
-                        $event->setResult(true);
-                    }
+                    fn (CampaignExecutionEvent $event) => $event->setResult(true)
                 )
             );
 
@@ -400,12 +396,10 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
             ->method('setSystemContact');
 
         $this->dispatcher->method('dispatch')
-            ->withConsecutive(['something', $this->isInstanceOf(CampaignExecutionEvent::class)])
+            ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($eventName, CampaignExecutionEvent $event) {
-                        $event->setResult(true);
-                    }
+                    fn (CampaignExecutionEvent $event) => $event->setResult(true)
                 )
             );
 
