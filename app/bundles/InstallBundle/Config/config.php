@@ -86,7 +86,7 @@ return [
                 'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
-                    '%kernel.root_dir%',
+                    '%kernel.project_dir%',
                     'request_stack',
                     'mautic.cipher.openssl',
                 ],

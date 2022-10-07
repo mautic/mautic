@@ -465,9 +465,9 @@ class PublicControllerTest extends MauticMysqlTestCase
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(PageEvents::ON_CONTACT_TRACKED, $event)
+            ->with($event, PageEvents::ON_CONTACT_TRACKED)
             ->willReturnCallback(
-                function (string $eventName, TrackingEvent $event) {
+                function (TrackingEvent $event) {
                     $contact  = $event->getContact()->getEmail();
                     $request  = $event->getRequest();
                     $response = $event->getResponse();

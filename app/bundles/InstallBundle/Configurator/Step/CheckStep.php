@@ -36,7 +36,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $cache_path = '%kernel.root_dir%/../var/cache';
+    public $cache_path = '%kernel.project_dir%/var/cache';
 
     /**
      * Absolute path to log directory.
@@ -44,7 +44,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $log_path = '%kernel.root_dir%/../var/logs';
+    public $log_path = '%kernel.project_dir%/var/logs';
 
     /**
      * Set the domain URL for use in getting the absolute URL for cli/cronjob generated URLs.
@@ -62,19 +62,19 @@ class CheckStep implements StepInterface
 
     /**
      * @param Configurator $configurator Configurator service
-     * @param string       $kernelRoot   Kernel root path
+     * @param string       $projectDir   Kernel root path
      * @param RequestStack $requestStack Request stack
      */
     public function __construct(
         Configurator $configurator,
-        $kernelRoot,
+        string $projectDir,
         RequestStack $requestStack,
         OpenSSLCipher $openSSLCipher
     ) {
         $request = $requestStack->getCurrentRequest();
 
         $this->configIsWritable = $configurator->isFileWritable();
-        $this->kernelRoot       = $kernelRoot;
+        $this->kernelRoot       = $projectDir.'/app';
         if (!empty($request)) {
             $this->site_url     = $request->getSchemeAndHttpHost().$request->getBasePath();
         }
@@ -110,11 +110,11 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.config.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->cache_path))) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->cache_path))) {
             $messages[] = 'mautic.install.cache.unwritable';
         }
 
-        if (!is_writable(str_replace('%kernel.root_dir%', $this->kernelRoot, $this->log_path))) {
+        if (!is_writable(str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $this->log_path))) {
             $messages[] = 'mautic.install.logs.unwritable';
         }
 

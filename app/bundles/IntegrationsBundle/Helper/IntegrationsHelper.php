@@ -83,7 +83,7 @@ class IntegrationsHelper
 
         // Dispatch event before encryption
         $encryptionEvent = new KeysEncryptionEvent($configuration, $decryptedApiKeys);
-        $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION, $encryptionEvent);
+        $this->eventDispatcher->dispatch($encryptionEvent, IntegrationEvents::INTEGRATION_KEYS_BEFORE_ENCRYPTION);
 
         // Encrypt and store the keys
         $encryptedApiKeys = $this->encryptionService->encrypt($encryptionEvent->getKeys());
@@ -122,7 +122,7 @@ class IntegrationsHelper
 
             // Dispatch event after decryption
             $decryptionEvent = new KeysDecryptionEvent($configuration, $decryptedApiKeys);
-            $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION, $decryptionEvent);
+            $this->eventDispatcher->dispatch($decryptionEvent, IntegrationEvents::INTEGRATION_KEYS_AFTER_DECRYPTION);
 
             $configuration->setApiKeys($decryptionEvent->getKeys());
 

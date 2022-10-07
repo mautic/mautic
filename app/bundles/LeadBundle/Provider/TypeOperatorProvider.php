@@ -69,7 +69,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
         if (empty($this->cachedTypeOperators)) {
             $event = new TypeOperatorsEvent();
 
-            $this->dispatcher->dispatch(LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE);
 
             $this->cachedTypeOperators = $event->getOperatorsForAllFieldTypes();
         }
@@ -92,7 +92,7 @@ final class TypeOperatorProvider implements TypeOperatorProviderInterface
             $this->getOperatorsForFieldType($type)
         );
 
-        $this->dispatcher->dispatch(LeadEvents::COLLECT_OPERATORS_FOR_FIELD, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::COLLECT_OPERATORS_FOR_FIELD);
 
         return $event->getOperators();
     }
