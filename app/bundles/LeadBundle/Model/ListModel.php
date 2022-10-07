@@ -354,38 +354,6 @@ class ListModel extends FormModel
     }
 
     /**
-     * @return array
-     *
-     * @throws Exception
-     */
-    public function getVersionNew(LeadList $entity)
-    {
-        $dtHelper      = new DateTimeHelper();
-        $batchLimiters = [
-            'dateTime' => $dtHelper->toUtcString(),
-        ];
-
-        return $this->leadSegmentService->getNewLeadListLeadsCount($entity, $batchLimiters);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getVersionOld(LeadList $entity)
-    {
-        $batchLimiters = [
-            'dateTime' => (new DateTimeHelper())->toUtcString(),
-        ];
-
-        $newLeadsCount = $this->leadSegmentService->getNewLeadListLeadsCount(
-            $entity,
-            $batchLimiters
-        );
-
-        return array_shift($newLeadsCount);
-    }
-
-    /**
      * @param int  $limit
      * @param bool $maxLeads
      *

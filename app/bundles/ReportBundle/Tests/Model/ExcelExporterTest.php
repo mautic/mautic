@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelExporterTest extends TestCase
 {

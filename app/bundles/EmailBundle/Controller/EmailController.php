@@ -1176,21 +1176,17 @@ class EmailController extends FormController
 
         // Check that the parent is getting sent
         if ($variantParent = $entity->getVariantParent()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'send',
-                    'objectId'     => $variantParent->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'send',
+                'objectId'     => $variantParent->getId(),
+            ]);
         }
 
         if ($translationParent = $entity->getTranslationParent()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'send',
-                    'objectId'     => $translationParent->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'send',
+                'objectId'     => $translationParent->getId(),
+            ]);
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);

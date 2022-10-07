@@ -954,7 +954,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
-        $id = (int) InputHelper::clean($request->request->get('id'));
+        $id = (int) InputHelper::clean($request->get('id'));
 
         /** @var ListModel $model */
         $model          = $this->getModel('lead.list');
@@ -996,9 +996,8 @@ class AjaxController extends CommonAjaxController
     private function prepareJsonResponse(int $leadCount): array
     {
         return [
-            'html' => $this->translator->transChoice(
+            'html' => $this->translator->trans(
                 'mautic.lead.list.viewleads_count',
-                $leadCount,
                 ['%count%' => $leadCount]
             ),
             'leadCount' => $leadCount,

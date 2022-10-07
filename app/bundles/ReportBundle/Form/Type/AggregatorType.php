@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AggregatorType extends AbstractType
 {
@@ -77,14 +77,6 @@ class AggregatorType extends AbstractType
         $view->vars = array_replace($view->vars, [
             'columnList' => $options['columnList'],
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'aggregator';
     }
 
     /**

@@ -94,7 +94,7 @@ class UserModel extends FormModel
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
-                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', 'validators'));
+                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', [], 'validators'));
             }
         }
 

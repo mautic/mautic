@@ -18,8 +18,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadType extends AbstractType
 {
@@ -209,13 +209,5 @@ class LeadType extends AbstractType
         );
 
         $resolver->setRequired(['fields', 'isShortForm']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'lead';
     }
 }

@@ -7,6 +7,7 @@ namespace Mautic\PointBundle\Tests\Unit\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,7 +21,7 @@ use Mautic\PointBundle\Model\TriggerModel;
 use Mautic\PointBundle\PointEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -83,7 +84,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
         $this->mauticFactory          = $this->createMock(MauticFactory::class);
         $this->contactTracker         = $this->createMock(ContactTracker::class);
         $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
         $this->triggerEventRepository = $this->createMock(TriggerEventRepository::class);
         $this->triggerModel           = new TriggerModel(

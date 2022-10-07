@@ -59,14 +59,6 @@ class EmailListType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
-    {
-        return 'email_list';
-    }
-
-    /**
-     * @return string
-     */
     public function getParent()
     {
         return EntityLookupType::class;

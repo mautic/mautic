@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Swift_Transport;
@@ -23,18 +24,19 @@ class ProcessEmailQueueCommand extends ModeratedCommand
     private EventDispatcherInterface $eventDispatcher;
     private CoreParametersHelper $parametersHelper;
 
-    public function __construct(Swift_Transport $swiftTransport, EventDispatcherInterface $eventDispatcher, CoreParametersHelper $parametersHelper)
-    {
-        parent::__construct();
+    public function __construct(
+        Swift_Transport $swiftTransport,
+        EventDispatcherInterface $eventDispatcher,
+        CoreParametersHelper $parametersHelper,
+        PathsHelper $pathsHelper
+    ) {
+        parent::__construct($pathsHelper);
 
         $this->swiftTransport   = $swiftTransport;
         $this->eventDispatcher  = $eventDispatcher;
         $this->parametersHelper = $parametersHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -56,9 +58,6 @@ EOT
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $options     = $input->getOptions();

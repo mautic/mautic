@@ -105,12 +105,4 @@ class EmailToUserType extends AbstractType
 
         $resolver->setDefined(['update_select']);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'email_to_user';
-    }
 }

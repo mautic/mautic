@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportContactSubscriber implements EventSubscriberInterface
 {

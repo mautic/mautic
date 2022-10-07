@@ -3,8 +3,8 @@
 namespace Mautic\PointBundle\Event;
 
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PointBuilderEvent extends Event
 {

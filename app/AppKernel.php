@@ -126,11 +126,11 @@ class AppKernel extends Kernel
             new LightSaml\SpBundle\LightSamlSpBundle(),
             new Noxlogic\RateLimitBundle\NoxlogicRateLimitBundle(),
             new FM\ElfinderBundle\FMElfinderBundle(),
+            new Exercise\HTMLPurifierBundle\ExerciseHTMLPurifierBundle(),
 
             // Mautic Bundles
             new Mautic\ApiBundle\MauticApiBundle(),
             new Mautic\AssetBundle\MauticAssetBundle(),
-            new Mautic\CalendarBundle\MauticCalendarBundle(),
             new Mautic\CampaignBundle\MauticCampaignBundle(),
             new Mautic\CategoryBundle\MauticCategoryBundle(),
             new Mautic\ChannelBundle\MauticChannelBundle(),

@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Report;
 
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Model\UserModel;
 
@@ -24,11 +25,17 @@ class FieldsBuilder
      */
     private $userModel;
 
-    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel)
+    /**
+     * @var LeadModel
+     */
+    private $leadModel;
+
+    public function __construct(FieldModel $fieldModel, ListModel $listModel, UserModel $userModel, LeadModel $leadModel)
     {
         $this->fieldModel = $fieldModel;
         $this->listModel  = $listModel;
         $this->userModel  = $userModel;
+        $this->leadModel  = $leadModel;
     }
 
     /**
@@ -74,6 +81,24 @@ class FieldsBuilder
             'list'      => $list,
             'operators' => [
                 'eq' => 'mautic.core.operator.equals',
+            ],
+        ];
+
+        $aTags     = [];
+        $aTagsList = $this->leadModel->getTagList();
+        foreach ($aTagsList as $aTemp) {
+            $aTags[$aTemp['value']] = $aTemp['label'];
+        }
+
+        $filters['tag'] = [
+            'label'     => 'mautic.core.filter.tags',
+            'type'      => 'multiselect',
+            'list'      => $aTags,
+            'operators' => [
+                'in'       => 'mautic.core.operator.in',
+                'notIn'    => 'mautic.core.operator.notin',
+                'empty'    => 'mautic.core.operator.isempty',
+                'notEmpty' => 'mautic.core.operator.isnotempty',
             ],
         ];
 

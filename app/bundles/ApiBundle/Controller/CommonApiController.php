@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CommonApiController.
@@ -1099,7 +1099,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->setCategory($entity, $categoryId);
             $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
 
