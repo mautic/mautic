@@ -256,8 +256,8 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */
             $event = $this->dispatcher->dispatch(
-                CampaignEvents::CAMPAIGN_ON_TRIGGER,
-                new CampaignTriggerEvent($campaign)
+                new CampaignTriggerEvent($campaign),
+                CampaignEvents::CAMPAIGN_ON_TRIGGER
             );
 
             return $event->shouldTrigger();

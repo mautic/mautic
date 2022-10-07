@@ -102,7 +102,6 @@ return [
 
     'parameters' => [
         'config_allowed_parameters' => [
-            'kernel.root_dir',
             'kernel.project_dir',
             'kernel.logs_dir',
         ],
