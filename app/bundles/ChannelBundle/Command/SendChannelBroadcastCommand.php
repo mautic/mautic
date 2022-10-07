@@ -106,7 +106,7 @@ EOT
             }
         }
 
-        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
+        if (!$this->checkRunStatus($input, $output, $key)) {
             return 0;
         }
 

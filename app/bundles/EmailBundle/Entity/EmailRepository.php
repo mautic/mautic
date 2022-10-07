@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 class EmailRepository extends CommonRepository
 {
     /**
-     * Get an array of do not email emails.
+     * Get an array of do not email.
      *
      * @param array $leadIds
      *
@@ -47,7 +47,7 @@ class EmailRepository extends CommonRepository
     /**
      * Check to see if an email is set as do not contact.
      *
-     * @param $email
+     * @param string $email
      *
      * @return bool
      */
@@ -313,6 +313,7 @@ class EmailRepository extends CommonRepository
             $minContactId,
             $maxContactId,
             $countWithMaxMin,
+            null,
             $maxThreads,
             $threadId
         );
@@ -339,13 +340,13 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param string      $search
-     * @param int         $limit
-     * @param int         $start
-     * @param bool        $viewOther
-     * @param bool        $topLevel
-     * @param string|null $emailType
-     * @param int|null    $variantParentId
+     * @param string|array<int|string> $search
+     * @param int                      $limit
+     * @param int                      $start
+     * @param bool                     $viewOther
+     * @param bool                     $topLevel
+     * @param string|null              $emailType
+     * @param int|null                 $variantParentId
      *
      * @return array
      */
