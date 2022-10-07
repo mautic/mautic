@@ -192,6 +192,10 @@ class PublicController extends CommonFormController
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
                 ];
 
+                if ($session->get($successSessionName)) {
+                    $viewParameters['successMessage'] = $this->translator->trans('mautic.email.preferences_center_success_message.text');
+                }
+
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
                 if (true === $form) {
                     $session->set($successSessionName, 1);
@@ -203,6 +207,9 @@ class PublicController extends CommonFormController
                             'contentTemplate' => $contentTemplate,
                         ]
                     );
+                } else {
+                    // success message should not persist on page refresh
+                    $session->set($successSessionName, 0);
                 }
 
                 $formView = $form->createView();
