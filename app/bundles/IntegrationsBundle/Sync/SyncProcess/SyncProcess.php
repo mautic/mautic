@@ -142,8 +142,8 @@ class SyncProcess
 
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_POST_EXECUTE,
-            new SyncEvent($this->inputOptionsDAO)
+            new SyncEvent($this->inputOptionsDAO),
+            IntegrationEvents::INTEGRATION_POST_EXECUTE
         );
     }
 

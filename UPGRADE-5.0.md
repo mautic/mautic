@@ -1,6 +1,8 @@
 # Backwards compatibility breaking changes
 *   Platform Requirements
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
+*   Configuration
+    * Replace all occurances of `%kernel.root_dir%` to `%kernel.project_dir%/app` as the "root_dir" was deprecated in Symfony 4 and removed in Symfony 5. The "project_dir" variable is path to the Mautic root directory. The "root_dir" variable was path to the app directory.
 *   Commands
     * The command `bin/console mautic:segments:update` will no longer update the campaign members but only the segment members. Use also command `bin/console mautic:campaigns:update` to update the campaign members if you haven't already. Both commands are recommended from Mautic 1.
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:

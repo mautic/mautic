@@ -168,7 +168,7 @@ class ContactRequestHelper
     private function getContactFromClickthrough(array $clickthrough)
     {
         $event = new ContactIdentificationEvent($clickthrough);
-        $this->eventDispatcher->dispatch(LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION, $event);
+        $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
 
         if ($contact = $event->getIdentifiedContact()) {
             $this->logger->addDebug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');

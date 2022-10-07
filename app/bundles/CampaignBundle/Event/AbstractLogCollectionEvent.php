@@ -9,7 +9,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
 use Mautic\LeadBundle\Entity\Lead;
 
-abstract class AbstractLogCollectionEvent extends \Symfony\Component\EventDispatcher\Event
+abstract class AbstractLogCollectionEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var AbstractEventAccessor

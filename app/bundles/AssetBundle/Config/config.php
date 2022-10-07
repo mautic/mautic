@@ -239,7 +239,7 @@ return [
     ],
 
     'parameters' => [
-        'upload_dir'         => '%kernel.root_dir%/../media/files',
+        'upload_dir'         => '%kernel.project_dir%/media/files',
         'max_size'           => '6',
         'allowed_extensions' => ['csv', 'doc', 'docx', 'epub', 'gif', 'jpg', 'jpeg', 'mpg', 'mpeg', 'mp3', 'odt', 'odp', 'ods', 'pdf', 'png', 'ppt', 'pptx', 'tif', 'tiff', 'txt', 'xls', 'xlsx', 'wav'],
     ],

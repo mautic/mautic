@@ -56,7 +56,7 @@ class AjaxController extends CommonAjaxController
 
         $event = new RemoteAssetBrowseEvent($integration);
 
-        $dispatcher->dispatch($name, $event);
+        $dispatcher->dispatch($event, $name);
 
         if (!$adapter = $event->getAdapter()) {
             return $this->sendJsonResponse(['success' => 0]);
