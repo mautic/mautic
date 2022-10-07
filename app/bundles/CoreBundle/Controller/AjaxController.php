@@ -515,7 +515,7 @@ class AjaxController extends CommonController
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
-            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade')) {
                 $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
                 $dataArray['message']    = $translator->trans(
                     'mautic.core.update.error',
@@ -550,9 +550,9 @@ class AjaxController extends CommonController
         $result     = 0;
 
         // Also do the last bit of filesystem cleanup from the upgrade here
-        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+        if (is_dir(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade')) {
             $iterator = new \FilesystemIterator(
-                dirname($this->container->getParameter('kernel.root_dir')).'/upgrade', \FilesystemIterator::SKIP_DOTS
+                dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade', \FilesystemIterator::SKIP_DOTS
             );
 
             /** @var \FilesystemIterator $file */
@@ -564,7 +564,7 @@ class AjaxController extends CommonController
             }
 
             // Should be empty now, nuke the folder
-            @rmdir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade');
+            @rmdir(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade');
         }
 
         $cacheDir = $this->container->get('mautic.helper.paths')->getSystemPath('cache');
@@ -606,7 +606,7 @@ class AjaxController extends CommonController
             }
         }
 
-        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];

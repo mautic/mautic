@@ -21,7 +21,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [
-            'kernel.root_dir',
             'kernel.project_dir',
         ];
 

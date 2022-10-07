@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
