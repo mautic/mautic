@@ -279,7 +279,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                     elem.html(response.html);
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         });
     }
@@ -1119,7 +1120,7 @@ Mautic.reloadLeadImportProgress = function() {
                     mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
                 }
             }
-        });
+        }, false, false, "GET");
 
         // Initiate import
         mQuery.ajax({
@@ -1271,7 +1272,7 @@ Mautic.getLeadEmailContent = function (el) {
         mQuery('#'+idPrefix+'subject').val(response.subject);
 
         Mautic.removeLabelLoadingIndicator();
-    });
+    }, false, false, "GET");
 };
 
 Mautic.updateLeadTags = function () {
@@ -1468,7 +1469,7 @@ Mautic.initUniqueIdentifierFields = function() {
                 } else {
                     input.parent().find('div.exists-warning').remove();
                 }
-            });
+            }, false, false, "GET");
         });
     }
 };

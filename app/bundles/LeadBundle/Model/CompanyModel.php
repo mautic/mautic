@@ -784,7 +784,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $company = $this->importCompany($fields, $data, $owner, false, $skipIfExists);
 
         if (null === $company) {
-            throw new \Exception($this->translator->trans('mautic.company.error.notfound', [], 'flashes'));
+            throw new \Exception($this->translator->trans('mautic.lead.import.unique_field_not_exist', [], 'flashes'));
         }
 
         $merged = !$company->isNew();

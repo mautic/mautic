@@ -160,7 +160,7 @@ class FormSubscriber implements EventSubscriberInterface
             'message'       => $message,
             'messengerMode' => $messengerMode,
         ]    = $event->getPostSubmitCallback('asset.download_file');
-        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]);
+        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]).'&stream=0';
 
         if ($messengerMode) {
             $event->setPostSubmitResponse(['download' => $url]);
