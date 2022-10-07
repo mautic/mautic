@@ -72,6 +72,13 @@ if ('index' === $tmpl) {
             </div>
         </div>
     </div>
+    <div id="SparkpostRegion">
+        <div class="row">
+            <div class="col-sm-12">
+                <?php echo $view['form']->row($form['mailer_sparkpost_region']); ?>
+            </div>
+        </div>
+    </div>
     <div id="authDetails">
         <div class="row">
             <div class="col-sm-6">
