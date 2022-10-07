@@ -29,7 +29,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CommonApiController extends AbstractFOSRestController implements MauticController
@@ -527,7 +527,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Initialize some variables.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->security = $this->get('mautic.security');
 
