@@ -1050,7 +1050,7 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                         'object'     => 'behaviors',
                         'field'      => 'hit_url',
                         'operator'   => 'regexp',
-                        'properties' => ['filter' => 'segment-\d+'],
+                        'properties' => ['filter' => 'segment-[[:digit:]]+'],
                     ],
                 ],
                 'populate' => true,
