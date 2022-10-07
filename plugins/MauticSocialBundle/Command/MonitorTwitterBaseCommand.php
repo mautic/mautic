@@ -189,8 +189,8 @@ abstract class MonitorTwitterBaseCommand extends Command
         $this->processMonitor($monitor);
 
         $this->dispatcher->dispatch(
-            SocialEvents::MONITOR_POST_PROCESS,
-            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount())
+            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount()),
+            SocialEvents::MONITOR_POST_PROCESS
         );
 
         return 0;

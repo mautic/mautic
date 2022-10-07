@@ -60,7 +60,7 @@ class MessageApiController extends CommonApiController
      */
     protected function preSerializeEntity(&$entity, $action = 'view')
     {
-        $event = $this->dispatcher->dispatch(ChannelEvents::ADD_CHANNEL, new ChannelEvent());
+        $event = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
 
         if ($channels = $entity->getChannels()) {
             foreach ($channels as $channel) {

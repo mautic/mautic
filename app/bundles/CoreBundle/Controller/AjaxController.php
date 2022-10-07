@@ -692,7 +692,7 @@ class AjaxController extends CommonController
         }
 
         // Execute the mautic.post_upgrade event
-        $this->dispatcher->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
+        $this->dispatcher->dispatch(new UpgradeEvent($dataArray), CoreEvents::POST_UPGRADE);
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
