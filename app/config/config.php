@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
@@ -55,7 +55,7 @@ if (defined('MAUTIC_INSTALLER')) {
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
     'router' => [
-        'resource'            => '%kernel.root_dir%/config/routing.php',
+        'resource'            => '%kernel.project_dir%/app/config/routing.php',
         'strict_requirements' => null,
     ],
     'form'            => null,
@@ -136,11 +136,11 @@ $container->loadFromExtension('doctrine', [
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'        => '%kernel.root_dir%/migrations',
+    'dir_name'        => '%kernel.project_dir%/app/migrations',
     'namespace'       => 'Mautic\\Migrations',
     'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
     'name'            => 'Mautic Migrations',
-    'custom_template' => '%kernel.root_dir%/migrations/Migration.template',
+    'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
 // Swiftmailer Configuration
