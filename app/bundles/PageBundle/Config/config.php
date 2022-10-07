@@ -155,16 +155,6 @@ return [
                     'setModelFactory' => ['mautic.model.factory'],
                 ],
             ],
-            'mautic.page.calendarbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'mautic.page.model.page',
-                    'doctrine.dbal.default_connection',
-                    'mautic.security',
-                    'translator',
-                    'router',
-                ],
-            ],
             'mautic.page.configbundle.subscriber' => [
                 'class' => \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             ],

@@ -32,8 +32,8 @@ class CustomFormExtension extends AbstractTypeExtension
         // Fetch plugin subscribers/listeners
         if ($this->dispatcher->hasListeners(CoreEvents::ON_FORM_TYPE_BUILD)) {
             $event = $this->dispatcher->dispatch(
-                CoreEvents::ON_FORM_TYPE_BUILD,
-                new CustomFormEvent($builder->getName(), $builder->getType()->getBlockPrefix(), $builder)
+                new CustomFormEvent($builder->getName(), $builder->getType()->getBlockPrefix(), $builder),
+                CoreEvents::ON_FORM_TYPE_BUILD
             );
 
             if ($listeners = $event->getListeners()) {

@@ -437,14 +437,6 @@ return [
                     'mautic.lead.model.company_report_data',
                 ],
             ],
-            'mautic.lead.calendarbundle.subscriber' => [
-                'class'     => \Mautic\LeadBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'translator',
-                    'router',
-                ],
-            ],
             'mautic.lead.pointbundle.subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\PointSubscriber::class,
                 'arguments' => [
@@ -1365,6 +1357,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
                     'mautic.user.model.user',
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.model.dnc' => [

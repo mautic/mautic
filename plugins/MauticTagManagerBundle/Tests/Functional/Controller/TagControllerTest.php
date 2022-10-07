@@ -157,7 +157,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $form['tag_entity[tag]']->setValue($TagName);
         $crawler = $this->client->submit($form);
 
-        $this->assertStringContainsString($TagName.' has been updated!', $crawler->text(), 'Must contain already exist.');
+        $this->assertStringContainsString($TagName.' has been updated!', strip_tags($crawler->text()), 'Must contain already exist.');
     }
 
     public function testBatchDeleteAction(): void

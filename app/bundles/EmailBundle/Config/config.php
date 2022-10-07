@@ -196,6 +196,7 @@ return [
                     'mautic.lead.model.company_report_data',
                     'mautic.email.repository.stat',
                     'mautic.generated.columns.provider',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
@@ -829,6 +830,7 @@ return [
                     'mautic.lead.model.dnc',
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -949,7 +951,7 @@ return [
         'mailer_amazon_other_region'     => null,
         'mailer_custom_headers'          => [],
         'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'              => '%kernel.root_dir%/../var/spool',
+        'mailer_spool_path'              => '%kernel.project_dir%/var/spool',
         'mailer_spool_msg_limit'         => null,
         'mailer_spool_time_limit'        => null,
         'mailer_spool_recover_timeout'   => 900,

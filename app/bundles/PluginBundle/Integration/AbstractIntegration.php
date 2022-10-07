@@ -693,8 +693,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         if (empty($settings['ignore_event_dispatch'])) {
             $event = $this->dispatcher->dispatch(
-                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST,
-                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType)
+                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType),
+                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST
             );
 
             $headers    = $event->getHeaders();
@@ -831,14 +831,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (\Exception $exception) {
-            return ['error' => ['message' => $exception->getMessage(), 'code' => $exception->getCode()]];
+        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+            return [
+                'error' => [
+                    'message' => $exception->getResponse()->getBody()->getContents(),
+                    'code'    => $exception->getCode(),
+                ],
+            ];
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
             $this->dispatcher->dispatch(
-                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE,
-                $event
+                $event,
+                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE
             );
         }
         if (!empty($settings['return_raw'])) {
@@ -1083,8 +1088,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         /** @var PluginIntegrationAuthCallbackUrlEvent $event */
         $event = $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL,
-            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl)
+            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl),
+            PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL
         );
 
         return $event->getCallbackUrl();
@@ -2121,8 +2126,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function modifyForm($builder, $options)
     {
         $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD,
-            new PluginIntegrationFormBuildEvent($this, $builder, $options)
+            new PluginIntegrationFormBuildEvent($this, $builder, $options),
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD
         );
     }
 
@@ -2162,8 +2167,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         /** @var PluginIntegrationFormDisplayEvent $event */
         $event = $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY,
-            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings())
+            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings()),
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY
         );
 
         return $event->getSettings();
@@ -2233,8 +2238,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
-            $eventName,
-            new PluginIntegrationKeyEvent($this, $keys)
+            new PluginIntegrationKeyEvent($this, $keys),
+            $eventName
         );
 
         return $event->getKeys();
