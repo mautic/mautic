@@ -19,7 +19,7 @@ class MauticApiBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new SerializerPass());
+        $container->addCompilerPass(new SerializerPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
 
         $extension = $container->getExtension('security');
         $extension->addSecurityListenerFactory(new ApiFactory());

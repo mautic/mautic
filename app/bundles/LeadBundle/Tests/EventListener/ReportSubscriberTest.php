@@ -420,24 +420,24 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 'display_name' => 'mautic.lead.leads',
                 'columns'      => [
                     'xx.yy' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'bool',
                         'alias' => 'first',
                     ],
                     'comp.name' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'text',
                         'alias' => 'name',
                     ],
                 ],
                 'filters' => [
                     'filter' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'text',
                         'alias' => 'filter',
                     ],
                     'comp.name' => [
-                        'label' => null,
+                        'label' => '',
                         'type'  => 'text',
                         'alias' => 'name',
                     ],
@@ -448,19 +448,19 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         switch ($event) {
             case 'leads':
                 $expected['leads']['columns']['l.stage_id'] = [
-                    'label' => null,
+                    'label' => '',
                     'type'  => 'int',
                     'link'  => 'mautic_stage_action',
                     'alias' => 'stage_id',
                 ];
                 $expected['leads']['columns']['s.name'] = [
                     'alias' => 'stage_name',
-                    'label' => null,
+                    'label' => '',
                     'type'  => 'string',
                 ];
                 $expected['leads']['columns']['s.date_added'] = [
                     'alias'   => 'stage_date_added',
-                    'label'   => null,
+                    'label'   => '',
                     'type'    => 'string',
                     'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
                 ];
@@ -470,47 +470,47 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'display_name' => 'mautic.lead.report.frequency.messages',
                     'columns'      => [
                         'xx.yy' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'bool',
                             'alias' => 'first',
                         ],
                         'comp.name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'text',
                             'alias' => 'name',
                         ],
                         'lf.frequency_number' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'int',
                             'alias' => 'frequency_number',
                         ],
                         'lf.frequency_time' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'frequency_time',
                         ],
                         'lf.channel' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'channel',
                         ],
                         'lf.preferred_channel' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'boolean',
                             'alias' => 'preferred_channel',
                         ],
                         'lf.pause_from_date' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'datetime',
                             'alias' => 'pause_from_date',
                         ],
                         'lf.pause_to_date' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'datetime',
                             'alias' => 'pause_to_date',
                         ],
                         'lf.date_added' => [
-                            'label'          => null,
+                            'label'          => '',
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lf.date_added)',
                             'alias'          => 'date_added',
@@ -518,47 +518,47 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     ],
                     'filters' => [
                         'filter' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'text',
                             'alias' => 'filter',
                         ],
                         'comp.name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'text',
                             'alias' => 'name',
                         ],
                         'lf.frequency_number' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'int',
                             'alias' => 'frequency_number',
                         ],
                         'lf.frequency_time' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'frequency_time',
                         ],
                         'lf.channel' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'channel',
                         ],
                         'lf.preferred_channel' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'boolean',
                             'alias' => 'preferred_channel',
                         ],
                         'lf.pause_from_date' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'datetime',
                             'alias' => 'pause_from_date',
                         ],
                         'lf.pause_to_date' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'datetime',
                             'alias' => 'pause_to_date',
                         ],
                         'lf.date_added' => [
-                            'label'          => null,
+                            'label'          => '',
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lf.date_added)',
                             'alias'          => 'date_added',
@@ -572,90 +572,90 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     'display_name' => 'mautic.lead.report.points.table',
                     'columns'      => [
                         'xx.yy' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'bool',
                             'alias' => 'first',
                         ],
                         'comp.name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'text',
                             'alias' => 'name',
                         ],
                         'lp.id' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'int',
                             'alias' => 'id',
                         ],
                         'lp.type' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'type',
                         ],
                         'lp.event_name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'event_name',
                         ],
                         'lp.action_name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'action_name',
                         ],
                         'lp.delta' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'int',
                             'alias' => 'delta',
                         ],
                         'lp.date_added' => [
-                            'label'          => null,
+                            'label'          => '',
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
                         ],
                         'i.ip_address' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'ip_address',
                         ],
                     ],
                     'filters' => [
                         'filter' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'text',
                             'alias' => 'filter',
                         ],
                         'comp.name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'text',
                             'alias' => 'name',
                         ],
                         'lp.id' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'int',
                             'alias' => 'id',
                         ],
                         'lp.type' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'type',
                         ],
                         'lp.event_name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'event_name',
                         ],
                         'lp.action_name' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'string',
                             'alias' => 'action_name',
                         ],
                         'lp.delta' => [
-                            'label' => null,
+                            'label' => '',
                             'type'  => 'int',
                             'alias' => 'delta',
                         ],
                         'lp.date_added' => [
-                            'label'          => null,
+                            'label'          => '',
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
@@ -672,111 +672,111 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'display_name' => $displayName,
                         'columns'      => [
                             'xx.yy' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'bool',
                                 'alias' => 'first',
                             ],
                             'comp.name' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'text',
                                 'alias' => 'name',
                             ],
                             'cat.id' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'int',
                                 'alias' => 'category_id',
                             ],
                             'cat.title' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                                 'alias' => 'category_title',
                             ],
                             'log.campaign_id' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'int',
                                 'link'  => 'mautic_campaign_action',
                                 'alias' => 'campaign_id',
                             ],
                             'log.date_triggered' => [
-                                'label'          => null,
+                                'label'          => '',
                                 'type'           => 'datetime',
                                 'groupByFormula' => 'DATE(log.date_triggered)',
                                 'alias'          => 'date_triggered',
                             ],
                             'c.name' => [
                                 'alias' => 'campaign_name',
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                             ],
                             'l.stage_id' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'int',
                                 'link'  => 'mautic_stage_action',
                                 'alias' => 'stage_id',
                             ],
                             's.name' => [
                                 'alias' => 'stage_name',
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                             ],
                             'channel' => [
                                 'alias'   => 'channel',
                                 'formula' => 'SUBSTRING_INDEX(e.type, \'.\', 1)',
-                                'label'   => null,
+                                'label'   => '',
                                 'type'    => 'string',
                             ],
                             'channel_action' => [
                                 'alias'   => 'channel_action',
                                 'formula' => 'SUBSTRING_INDEX(e.type, \'.\', -1)',
-                                'label'   => null,
+                                'label'   => '',
                                 'type'    => 'string',
                             ],
                             'e.name' => [
                                 'alias' => 'action_name',
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                             ],
                         ],
                         'filters' => [
                             'filter' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'text',
                                 'alias' => 'filter',
                             ],
                             'comp.name' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'text',
                                 'alias' => 'name',
                             ],
                             'cat.id' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'int',
                                 'alias' => 'category_id',
                             ],
                             'cat.title' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                                 'alias' => 'category_title',
                             ],
                             'log.campaign_id' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'select',
                                 'list'  => null,
                                 'alias' => 'campaign_id',
                             ],
                             'log.date_triggered' => [
-                                'label'          => null,
+                                'label'          => '',
                                 'type'           => 'datetime',
                                 'groupByFormula' => 'DATE(log.date_triggered)',
                                 'alias'          => 'date_triggered',
                             ],
                             'c.name' => [
                                 'alias' => 'campaign_name',
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                             ],
                             'l.stage_id' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'select',
                                 'list'  => [
                                     1 => 'Stage One',
@@ -785,11 +785,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             ],
                             's.name' => [
                                 'alias' => 'stage_name',
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                             ],
                             'channel' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'select',
                                 'list'  => [
                                     'email' => 'Email',
@@ -797,7 +797,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                                 'alias' => 'channel',
                             ],
                             'channel_action' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'select',
                                 'list'  => [
                                     'click' => 'email: click',
@@ -806,7 +806,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             ],
                             'e.name' => [
                                 'alias' => 'action_name',
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'string',
                             ],
                         ],
@@ -820,14 +820,14 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'display_name' => 'mautic.lead.lead.companies',
                         'columns'      => [
                             'comp.name' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'text',
                                 'alias' => 'name',
                             ],
                         ],
                         'filters' => [
                             'comp.name' => [
-                                'label' => null,
+                                'label' => '',
                                 'type'  => 'text',
                                 'alias' => 'name',
                             ],

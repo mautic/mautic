@@ -44,7 +44,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method pushLead(Lead $lead, array $config = [])
@@ -147,7 +147,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Mautic\CoreBundle\Translation\Translator
+     * @return TranslatorInterface
      */
     public function getTranslator()
     {
@@ -831,8 +831,13 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (\Exception $exception) {
-            return ['error' => ['message' => $exception->getMessage(), 'code' => $exception->getCode()]];
+        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+            return [
+                'error' => [
+                    'message' => $exception->getResponse()->getBody()->getContents(),
+                    'code'    => $exception->getCode(),
+                ],
+            ];
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);

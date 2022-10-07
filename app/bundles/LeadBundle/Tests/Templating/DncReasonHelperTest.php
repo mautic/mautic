@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Tests\Templating;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {

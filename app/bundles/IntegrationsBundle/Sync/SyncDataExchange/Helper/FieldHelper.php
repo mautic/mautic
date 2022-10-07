@@ -19,7 +19,7 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelper
 {

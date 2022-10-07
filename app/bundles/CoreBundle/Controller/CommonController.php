@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CommonController.
@@ -245,7 +245,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function redirectSecureRootAction()
     {
-        return $this->redirect($this->generateUrl('mautic_dashboard_index'), 301);
+        return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
 
     /**

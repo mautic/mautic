@@ -34,7 +34,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {

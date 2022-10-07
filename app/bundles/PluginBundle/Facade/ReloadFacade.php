@@ -4,7 +4,7 @@ namespace Mautic\PluginBundle\Facade;
 
 use Mautic\PluginBundle\Helper\ReloadHelper;
 use Mautic\PluginBundle\Model\PluginModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReloadFacade
 {

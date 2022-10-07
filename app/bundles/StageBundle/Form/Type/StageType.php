@@ -135,12 +135,4 @@ class StageType extends AbstractType
 
         $resolver->setDefined(['stageActions', 'actionType']);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'stage';
-    }
 }

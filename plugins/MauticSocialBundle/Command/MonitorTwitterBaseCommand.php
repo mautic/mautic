@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
@@ -14,7 +15,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class MonitorTwitterBaseCommand extends Command
 {
@@ -24,7 +24,7 @@ abstract class MonitorTwitterBaseCommand extends Command
     protected $twitter;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -70,7 +70,7 @@ abstract class MonitorTwitterBaseCommand extends Command
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
+        Translator $translator,
         IntegrationHelper $integrationHelper,
         TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper
