@@ -348,7 +348,7 @@ class AjaxController extends CommonAjaxController
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
                 $dispatcher = $this->dispatcher;
                 $event      = new LeadTimelineEvent($lead, $filter);
-                $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+                $dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
 
                 $events     = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
@@ -954,7 +954,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
-        $id = (int) InputHelper::clean($request->request->get('id'));
+        $id = (int) InputHelper::clean($request->get('id'));
 
         /** @var ListModel $model */
         $model          = $this->getModel('lead.list');

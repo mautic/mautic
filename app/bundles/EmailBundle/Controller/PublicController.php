@@ -426,7 +426,7 @@ class PublicController extends CommonFormController
         }
 
         $event = new TransportWebhookEvent($realTransport, $this->request);
-        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::ON_TRANSPORT_WEBHOOK);
 
         return new Response('success');
     }
@@ -523,7 +523,7 @@ class PublicController extends CommonFormController
                 'lead'         => $fields,
             ]
         );
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
         $content = $event->getContent(true);
 

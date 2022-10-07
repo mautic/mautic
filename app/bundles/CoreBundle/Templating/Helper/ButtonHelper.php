@@ -348,8 +348,8 @@ class ButtonHelper extends Helper
     {
         if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
             $event = $this->dispatcher->dispatch(
-                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS,
-                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item)
+                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item),
+                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS
             );
             $this->buttonsFetched = true;
             $this->buttons        = $event->getButtons();

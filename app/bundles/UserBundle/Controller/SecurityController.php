@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Security\Core\Exception as Exception;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
  * Class DefaultController.
@@ -37,7 +37,7 @@ class SecurityController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction()
+    public function loginAction(AuthenticationUtils $authenticationUtils)
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -66,25 +66,15 @@ class SecurityController extends CommonController
             $cookieHelper->deleteCookie('mautic_update');
         }
 
-        $session = $this->request->getSession();
+        $error = $authenticationUtils->getLastAuthenticationError();
 
-        // get the login error if there is one
-        if ($this->request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-            $error = $this->request->attributes->get(Security::AUTHENTICATION_ERROR);
-        } else {
-            $error = $session->get(Security::AUTHENTICATION_ERROR);
-            $session->remove(Security::AUTHENTICATION_ERROR);
-        }
-
-        if (!empty($error)) {
+        if (null !== $error) {
             if (($error instanceof Exception\BadCredentialsException)) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
-            } elseif ($error instanceof \Exception) {
-                $msg = $error->getMessage();
             } else {
-                $msg = $error;
+                $msg = $error->getMessage();
             }
 
             $this->addFlash($msg, [], 'error', null, false);
@@ -97,7 +87,7 @@ class SecurityController extends CommonController
 
         return $this->delegateView([
             'viewParameters' => [
-                'last_username' => $session->get(Security::LAST_USERNAME),
+                'last_username' => $authenticationUtils->getLastUsername(),
                 'integrations'  => $integrations,
             ],
             'contentTemplate' => 'MauticUserBundle:Security:login.html.php',

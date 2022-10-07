@@ -455,7 +455,7 @@ class SubmissionModel extends CommonFormModel
             $submissionEvent->setAction(null);
 
             // Dispatch to on submit listeners
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $submissionEvent);
+            $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
         }
 
         //get callback commands from the submit action

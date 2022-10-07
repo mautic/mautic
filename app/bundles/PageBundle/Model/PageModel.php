@@ -35,9 +35,9 @@ use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class PageModel extends FormModel
 {
@@ -326,7 +326,7 @@ class PageModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -717,7 +717,7 @@ class PageModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
     }
 
@@ -761,7 +761,7 @@ class PageModel extends FormModel
     public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }

@@ -150,12 +150,4 @@ class CompanyType extends AbstractType
 
         $resolver->setRequired(['fields']);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'company';
-    }
 }

@@ -125,12 +125,4 @@ class LeadImportType extends AbstractType
             $builder->setAction($options['action']);
         }
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'lead_import';
-    }
 }

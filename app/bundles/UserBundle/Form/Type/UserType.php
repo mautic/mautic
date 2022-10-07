@@ -274,14 +274,6 @@ class UserType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'user';
-    }
-
-    /**
      * @return array
      */
     private function getSupportedLanguageChoices()
