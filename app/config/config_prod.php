@@ -60,7 +60,7 @@ $container->loadFromExtension('twig', [
     'auto_reload'      => true,
     'strict_variables' => true,
     'paths'            => [
-        '%kernel.root_dir%/bundles' => 'bundles',
+        '%kernel.project_dir%/app/bundles' => 'bundles',
     ],
     'form_themes' => [
         // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig

@@ -29,7 +29,7 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
                 'mailer_auth_mode'             => null,
                 'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
                 'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
+                'mailer_spool_path'            => '%kernel.project_dir%/var/spool',
                 'mailer_spool_msg_limit'       => null,
                 'mailer_spool_time_limit'      => null,
                 'mailer_spool_recover_timeout' => 900,
