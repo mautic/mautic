@@ -91,10 +91,7 @@ class ContactSegmentFilterCrate
         return self::COMPANY_OBJECT === $this->object;
     }
 
-    /**
-     * @return bool
-     */
-    public function isBehaviorsType()
+    public function isBehaviorsType(): bool
     {
         return self::BEHAVIORS_OBJECT === $this->object;
     }
