@@ -23,9 +23,6 @@ class ControllerSubscriber implements EventSubscriberInterface
      */
     private $resolver;
 
-    /**
-     * ControllerSubscriber constructor.
-     */
     public function __construct(IntegrationsHelper $integrationsHelper, ControllerResolverInterface $resolver)
     {
         $this->integrationsHelper = $integrationsHelper;

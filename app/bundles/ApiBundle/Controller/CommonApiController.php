@@ -32,9 +32,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CommonApiController.
- */
 class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
