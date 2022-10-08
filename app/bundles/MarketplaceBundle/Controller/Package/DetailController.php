@@ -55,6 +55,7 @@ class DetailController extends CommonController
         }
 
         $security = $this->get('mautic.security');
+
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),

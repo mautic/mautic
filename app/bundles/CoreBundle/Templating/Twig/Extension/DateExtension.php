@@ -25,8 +25,8 @@ class DateExtension extends AbstractExtension
         return [
             new TwigFunction('dateToText', [$this, 'toText'], ['is_safe' => ['all']]),
             new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
-            new TwigFunction('dateToFullConcat', [$this, 'toFullConcat', ['is_safe' => ['all']]]),
-            new TwigFunction('dateToDate', [$this, 'toDate', ['is_safe' => ['all']]])
+            new TwigFunction('dateToFullConcat', [$this, 'toFullConcat'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToDate', [$this, 'toDate'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -60,7 +60,8 @@ class DateExtension extends AbstractExtension
      *
      * @return string
      */
-    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s'){
+    public function toFullConcat($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    {
         return $this->dateHelper->toFullConcat($datetime, $timezone, $fromFormat);
     }
 
@@ -73,7 +74,8 @@ class DateExtension extends AbstractExtension
      *
      * @return string
      */
-    public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s'){
+    public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
     }
 }
