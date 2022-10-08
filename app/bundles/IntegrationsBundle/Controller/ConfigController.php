@@ -75,7 +75,7 @@ class ConfigController extends AbstractFormController
 
         $dispatcher = $this->get('event_dispatcher');
         $event      = new FormLoadEvent($this->integrationConfiguration);
-        $dispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD, $event);
+        $dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
         // Set the request for private methods
         $this->request = $request;

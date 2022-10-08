@@ -140,7 +140,7 @@ class AjaxController extends CommonController
         $this->get('session')->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-        $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+        $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
 
         $dataArray['newContent'] = $this->renderView(
             'MauticCoreBundle:GlobalSearch:results.html.php',
@@ -186,7 +186,7 @@ class AjaxController extends CommonController
     {
         $dispatcher = $this->get('event_dispatcher');
         $event      = new CommandListEvent();
-        $dispatcher->dispatch(CoreEvents::BUILD_COMMAND_LIST, $event);
+        $dispatcher->dispatch($event, CoreEvents::BUILD_COMMAND_LIST);
         $allCommands = $event->getCommands();
         $translator  = $this->get('translator');
         $dataArray   = [];
