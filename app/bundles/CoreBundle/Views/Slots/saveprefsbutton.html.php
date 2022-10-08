@@ -16,13 +16,13 @@ if (isset($form)) {
     echo '<script src="'.$view['assets']->getUrl('app/bundles/PageBundle/Assets/js/prefcenter.js').'"></script>';
 }
 ?>
-    <a href="javascript:void(null)"
+    <button href="javascript:void(null)"
         class="button btn btn-default btn-save"
         <?php if (isset($form)) : ?>onclick="saveUnsubscribePreferences('<?php echo $form->vars['id']; ?>')"<?php endif; ?>
         style="<?php echo $style; ?>"
         background="<?php echo $background; ?>">
         <?php echo $view['translator']->trans('mautic.page.form.saveprefs'); ?>
-    </a>
+    </button>
     <div style="clear:both"></div>
 <?php
 if (isset($form)) {
@@ -48,9 +48,9 @@ if (isset($form)) {
     // that's why we can't use the bodyclose customdeclaration
     if (isset($custom_tag)) {
         echo $custom_tag;
-        $view['assets']->addCustomDeclaration($view['form']->end($form), 'customTag');
+        $view['assets']->addCustomDeclaration($view['form']->rest($form), 'customTag');
     } else {
-        $view['assets']->addCustomDeclaration($view['form']->end($form), 'bodyClose');
+        $view['assets']->addCustomDeclaration($view['form']->rest($form), 'bodyClose');
     }
 }
 ?>

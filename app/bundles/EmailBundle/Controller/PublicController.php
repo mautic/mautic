@@ -20,6 +20,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -220,27 +221,23 @@ class PublicController extends CommonFormController
                     $savePrefsPresent = false !== strpos($html, 'data-slot="saveprefsbutton"') ||
                         false !== strpos($html, BuilderSubscriber::saveprefsRegex);
                     if ($savePrefsPresent) {
-                        // set custom tag to inject end form
-                        // update show pref center slots by looking for their presence in the html
-                        /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
-                        $formHelper =$this->get('templating.helper.form');
-                        $params     = array_merge(
+                        $showParameters  = $this->buildSlotShowParametersBasedOnContent($html, $viewParameters);
+                        $eventParameters = array_merge(
                             $viewParameters,
+                            $showParameters,
                             [
-                                'form'                         => $formView,
-                                'startform'                    => $formHelper->start($formView),
-                                'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
-                                'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
-                                'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
-                                'showContactCategories'        => false !== strpos($html, 'data-slot="categorylist"') || false !== strpos($html, BuilderSubscriber::categoryListRegex),
-                                'showContactPreferredChannels' => false !== strpos($html, 'data-slot="preferredchannel"') || false !== strpos($html, BuilderSubscriber::preferredchannel),
+                                'form'       => $formView,
+                                'startform'  => $this->get('templating.helper.form')->start($formView),
+                                'custom_tag' => '<a name="end-'.$formView->vars['id'].'"></a>',
                             ]
                         );
-                        // Replace tokens in preference center page
-                        $event = new PageDisplayEvent($html, $prefCenter, $params);
-                        $this->get('event_dispatcher')
-                            ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+
+                        $event = new PageDisplayEvent($html, $prefCenter, $eventParameters);
+
+                        $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+
                         $html = $event->getContent();
+
                         if (!$session->has($successSessionName)) {
                             $successMessageDataSlots       = [
                                 'data-slot="successmessage"',
@@ -767,5 +764,39 @@ class PublicController extends CommonFormController
             ],
             $message
         );
+    }
+
+    /**
+     * The $viewParameters here have already been used to build the $form.
+     * Fields that are set to show based on the app configuration are part
+     * of the form. If the field is not configured to show, but a slot exists
+     * for that field in the content, then we need to keep the configuration
+     * value instead of letting the content determine if it should show. This
+     * is because of what was stated above - fields that are not configured to
+     * to show are not part of the form. Attempting to render them will result
+     * in an error.
+     *
+     * @param FormView $formView
+     */
+    private function buildSlotShowParametersBasedOnContent(string $content, array $viewParameters): array
+    {
+        /*
+         * Since we're going to be merging this with the $viewParameters, filter out `true` values. We do not
+         * want to change a configured value from `false` to `true` because a value of `false` in the $viewParameters
+         * means that the field is not configured to show and therefore is not part of the form. Attempting to
+         * render that field just because a slot for it exists will result in an error.
+         */
+        $showParamsBasedOnContent = array_filter([
+            'showContactFrequency'         => false !== strpos($content, 'data-slot="channelfrequency"') || false !== strpos($content, BuilderSubscriber::channelfrequency),
+            'showContactSegments'          => false !== strpos($content, 'data-slot="segmentlist"') || false !== strpos($content, BuilderSubscriber::segmentListRegex),
+            'showContactCategories'        => false !== strpos($content, 'data-slot="categorylist"') || false !== strpos($content, BuilderSubscriber::categoryListRegex),
+            'showContactPreferredChannels' => false !== strpos($content, 'data-slot="preferredchannel"') || false !== strpos($content, BuilderSubscriber::preferredchannel),
+        ], function (bool $value) { return !$value; });
+
+        $showParamsBasedOnConfiguration = array_filter($viewParameters, function ($key) {
+            return 0 === strpos($key, 'show');
+        }, ARRAY_FILTER_USE_KEY);
+
+        return array_merge($showParamsBasedOnConfiguration, $showParamsBasedOnContent);
     }
 }
