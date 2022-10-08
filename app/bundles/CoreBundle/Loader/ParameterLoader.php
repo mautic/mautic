@@ -187,6 +187,6 @@ class ParameterLoader
 
     private function getLocalParametersFile(): string
     {
-        return $this->rootPath.'/config/parameters_local.php';
+        return $this->rootPath.'../local_config/parameters_local.php';
     }
 }

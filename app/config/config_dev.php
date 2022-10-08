@@ -1,9 +1,11 @@
 <?php
 
+$root = $container->getParameter('kernel.project_dir').'/app';
+
 $loader->import('config.php');
 
-if (file_exists(__DIR__.'/security_local.php')) {
-    $loader->import('security_local.php');
+if (file_exists($root.'/../local_config/security_local.php')) {
+    $loader->import($root.'/../local_config/security_local.php');
 } else {
     $loader->import('security.php');
 }
@@ -84,11 +86,11 @@ $container->loadFromExtension('maker', [
 ]);
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists(__DIR__.'/config_override.php')) {
-    $loader->import('config_override.php');
+if (file_exists($root.'/../local_config/config_override.php')) {
+    $loader->import($root.'/../local_config/config_override.php');
 }
 
 // Allow local settings without committing to git such as swift mailer delivery address overrides
-if (file_exists(__DIR__.'/config_local.php')) {
-    $loader->import('config_local.php');
+if (file_exists($root.'/../local_config/config_local.php')) {
+    $loader->import($root.'/../local_config/config_local.php');
 }

@@ -8,12 +8,12 @@ $paths = [
     'asset_prefix' => '',
     'plugins'      => 'plugins',
     'translations' => 'translations',
-    'local_config' => '%kernel.project_dir%/app/config/local.php',
+    'local_config' => '%kernel.project_dir%/local_config/config_local.php',
 ];
 
 // allow easy overrides of the above
-if (file_exists(__DIR__.'/paths_local.php')) {
-    include __DIR__.'/paths_local.php';
+if (file_exists($root.'../local_config/paths_local.php')) {
+    include $root.'../local_config/paths_local.php';
 }
 
 // fixed

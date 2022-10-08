@@ -5,6 +5,10 @@ use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+
+// Include path settings
+$root = $container->getParameter('kernel.project_dir').'/app';
+
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -114,8 +118,8 @@ $container->loadFromExtension('liip_test_fixtures', [
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
-if (file_exists(__DIR__.'/config_override.php')) {
-    $loader->import('config_override.php');
+if (file_exists($root.'/../local_config/config_override.php')) {
+    $loader->import($root.'/../local_config/config_override.php');
 }
 
 // Add required parameters
