@@ -425,7 +425,7 @@ class FieldController extends CommonFormController
         $form->get('formId')->setData($formId);
 
         $event      = new FormBuilderEvent($this->get('translator'));
-        $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
         $event->addValidatorsToBuilder($form);
 
         return $form;
