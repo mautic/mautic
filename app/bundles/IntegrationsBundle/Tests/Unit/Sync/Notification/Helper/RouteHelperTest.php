@@ -153,7 +153,7 @@ class RouteHelperTest extends TestCase
 
                         return true;
                     }),
-                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
+                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 ],
                 [
                     $this->callback(function (InternalObjectRouteEvent $event) use ($internalObject) {
@@ -165,7 +165,7 @@ class RouteHelperTest extends TestCase
 
                         return true;
                     }),
-                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE
+                    IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE,
                 ]
             );
 
