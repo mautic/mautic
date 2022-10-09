@@ -49,7 +49,7 @@
 /var/tmp/*
 !/var/tmp/.gitkeep
 
-/app/config/local*.php
+/local_config/config_local.php
 /app/config/config_local.php
 /app/config/paths_local.php
 /app/config/parameters_defaults.php
