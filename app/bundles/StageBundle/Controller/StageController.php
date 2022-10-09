@@ -92,7 +92,7 @@ class StageController extends AbstractFormController
                     'permissions' => $permissions,
                     'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:list.html.php',
+                'contentTemplate' => 'MauticStageBundle:Stage:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -202,10 +202,10 @@ class StageController extends AbstractFormController
                 'viewParameters' => [
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticStageBundle:Stage:form.html.php', $themes),
+                    'form'    => $form->createView(), //Check if this is the correct way to do this: $this->setFormTheme($form, 'MauticStageBundle:Stage:form.html.twig', $themes),
                     'actions' => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.php',
+                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -352,10 +352,10 @@ class StageController extends AbstractFormController
                 'viewParameters' => [
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticStageBundle:Stage:form.html.php', $themes),
+                    'form'    => $form->createView(),
                     'actions' => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.php',
+                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
