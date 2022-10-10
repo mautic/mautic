@@ -6,8 +6,8 @@ namespace Mautic\CoreBundle\Entity;
 
 trait UpsertTrait
 {
-    private bool $wasInserted = false;
-    private bool $wasUpdated  = false;
+    private $wasInserted = false;
+    private $wasUpdated  = false;
 
     public function wasInserted(): bool
     {
