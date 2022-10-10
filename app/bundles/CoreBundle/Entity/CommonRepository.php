@@ -782,6 +782,85 @@ class CommonRepository extends EntityRepository
     }
 
     /**
+     * Insert entity if it does not exist, update if it does.
+     * ID is set to the enity after upsert.
+     * Main reason to use this over fetch/save is to avoid race conditions.
+     *
+     * Warning: This method use DBAL, not ORM. It will save only the entity you send it.
+     * It will NOT save the entity's associations. Entity manager won't know that the entity was flushed.
+     */
+    public function upsert(object $entity): void
+    {
+        $connection = $this->getEntityManager()->getConnection();
+        $metadata   = $this->getClassMetadata();
+        $identifier = $metadata->getSingleIdentifierFieldName();
+        $makeUpdate = fn (string $column) => "{$column} = VALUES({$column})";
+        $columns    = [];
+        $values     = [];
+        $types      = [];
+        $set        = [];
+        $update     = [];
+        $hasId      = $metadata->containsForeignIdentifier;
+
+        foreach ($metadata->getFieldNames() as $fieldName) {
+            $value = $metadata->getFieldValue($entity, $fieldName);
+            if ($metadata->isIdentifier($fieldName)) {
+                if ($value) {
+                    $hasId = true;
+                } else {
+                    continue;
+                }
+            }
+            $column    = $metadata->getColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $value;
+            $types[]   = $metadata->getTypeOfField($fieldName);
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        foreach ($metadata->getAssociationNames() as $fieldName) {
+            $assocEntity = $metadata->getFieldValue($entity, $fieldName);
+            if (!$metadata->isAssociationWithSingleJoinColumn($fieldName) || !is_object($assocEntity)) {
+                continue;
+            }
+            $idCol     = ucfirst($metadata->getSingleAssociationReferencedJoinColumnName($fieldName));
+            $idGetter  = "get{$idCol}";
+            $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $assocEntity->$idGetter();
+            $types[]   = Types::STRING;
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        $numberOfRowsAffected = $connection->executeStatement(
+            'INSERT INTO '.$this->getTableName().' ('.implode(', ', $columns).')'.
+            ' VALUES ('.implode(', ', $set).')'.
+            ' ON DUPLICATE KEY UPDATE '.implode(', ', $update),
+            $values,
+            $types
+        );
+
+        if (is_subclass_of($entity, UpsertInterface::class)) {
+            /*number of rows affected With ON DUPLICATE KEY UPDATE:
+            the affected-rows value per row is 1 if the row is inserted as a new row and 2 if an existing row is updated.*/
+            switch ($numberOfRowsAffected) {
+                case 1: $entity->setWasInserted(true);
+                break;
+                case 2: $entity->setWasUpdated(true);
+            }
+        }
+        if ($hasId) {
+            return;
+        }
+
+        $id = (int) $connection->lastInsertId();
+
+        $metadata->setFieldValue($entity, $identifier, $id);
+    }
+
+    /**
      * Set the current user (i.e. from security context) for use within repositories.
      *
      * @param User $user
