@@ -75,6 +75,13 @@ class EmailStep implements StepInterface
     public $mailer_amazon_other_region;
 
     /**
+     * Sparkpost Region.
+     *
+     * @var string
+     */
+    public $mailer_sparkpost_region;
+
+    /**
      * Mailer API key if applicable.
      *
      * @var string

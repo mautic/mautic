@@ -162,7 +162,7 @@ class EmailStepType extends AbstractType
                 'required'    => false,
                 'attr'        => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getSparkPostService().']}',
+                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getSparkPostService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.sparkpost_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
