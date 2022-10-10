@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Install;
 
-use Doctrine\Bundle\FixturesBundle\Loader\SymfonyFixturesLoader;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -46,7 +46,7 @@ class InstallService
     private KernelInterface $kernel;
     private ValidatorInterface $validator;
     private UserPasswordEncoder $encoder;
-    private SymfonyFixturesLoader $fixturesLoader;
+    private FixturesLoaderInterface $fixturesLoader;
 
     public function __construct(
         Configurator $configurator,
@@ -57,7 +57,7 @@ class InstallService
         KernelInterface $kernel,
         ValidatorInterface $validator,
         UserPasswordEncoder $encoder,
-        SymfonyFixturesLoader $fixturesLoader,
+        FixturesLoaderInterface $fixturesLoader
     ) {
         $this->configurator   = $configurator;
         $this->cacheHelper    = $cacheHelper;
