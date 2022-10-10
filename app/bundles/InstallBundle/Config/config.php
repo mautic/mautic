@@ -133,7 +133,7 @@ return [
                     'kernel',
                     'validator',
                     'security.password_encoder',
-                    'service_container',
+                    'doctrine.fixtures.loader',
                 ],
             ],
             'mautic.install.leadcolumns' => [
