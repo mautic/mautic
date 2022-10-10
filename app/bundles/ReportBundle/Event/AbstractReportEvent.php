@@ -42,7 +42,7 @@ class AbstractReportEvent extends Event
      *
      * @return bool
      */
-    public function checkContext($context): bool
+    public function checkContext($context)
     {
         if (empty($this->context)) {
             return true;
