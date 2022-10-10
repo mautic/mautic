@@ -150,6 +150,13 @@ JS;
                     unset($form['global_categories']);
                 endif;
                 ?>
+
+                <?php if (!empty($successMessage)):?>
+                    <hr />
+                    <div id="success-message-text">
+                        <?php echo $successMessage; ?>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="panel-footer text-left">
                 <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?></div>

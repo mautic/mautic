@@ -134,9 +134,7 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, ContactIdentificationEvent $event) use ($contact) {
-                    $event->setIdentifiedContact($contact, 'email');
-                }
+                fn (ContactIdentificationEvent $event) => $event->setIdentifiedContact($contact, 'email')
             );
 
         $this->leadModel->expects($this->never())

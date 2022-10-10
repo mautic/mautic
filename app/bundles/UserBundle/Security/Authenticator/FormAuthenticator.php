@@ -126,7 +126,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
                 $this->authenticatingService,
                 $integrations
             );
-            $this->dispatcher->dispatch($authEvent);
+            $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_AUTHENTICATION);
 
             if ($authEvent->isAuthenticated()) {
                 $user                        = $authEvent->getUser();

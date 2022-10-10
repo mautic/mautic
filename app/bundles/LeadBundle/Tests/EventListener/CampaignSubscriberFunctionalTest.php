@@ -192,8 +192,8 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             /** @var EventDispatcherInterface $dispatcher */
             $dispatcher = self::$container->get('event_dispatcher');
             $result     = $dispatcher->dispatch(
-                LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
-                $event
+                $event,
+                LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
             );
 
             Assert::assertSame(true, $event->getResult());

@@ -1411,7 +1411,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * Get stage.
      *
-     * @return \Mautic\StageBundle\Entity\Stage
+     * @return \Mautic\StageBundle\Entity\Stage|null
      */
     public function getStage()
     {

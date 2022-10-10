@@ -275,7 +275,7 @@ class PublicController extends CommonFormController
             );
 
             $event = new PageDisplayEvent($content, $entity);
-            $this->get('event_dispatcher')->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+            $this->get('event_dispatcher')->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
 
             $model->hitPage($entity, $this->request, 200, $lead, $query);
@@ -347,7 +347,7 @@ class PublicController extends CommonFormController
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
             $event = new PageDisplayEvent($content, $entity);
-            $dispatcher->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+            $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
             $content = $event->getContent();
         }
 
@@ -409,7 +409,7 @@ class PublicController extends CommonFormController
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->get('event_dispatcher');
         $event           = new TrackingEvent($lead, $request, $sessionValue);
-        $eventDispatcher->dispatch(PageEvents::ON_CONTACT_TRACKED, $event);
+        $eventDispatcher->dispatch($event, PageEvents::ON_CONTACT_TRACKED);
 
         return new JsonResponse(
             [

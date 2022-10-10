@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d8c5004a72500c3a074f7667932cac8",
+    "content-hash": "70fc0a8afdbd53da154ed3e8d738010d",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2739,6 +2739,68 @@
                 }
             ],
             "time": "2022-06-18T20:57:19+00:00"
+        },
+        {
+            "name": "exercise/htmlpurifier-bundle",
+            "version": "4.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Exercise/HTMLPurifierBundle.git",
+                "reference": "153e71b36d90060b5ba52efdec75d6b4bf0fe9bd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Exercise/HTMLPurifierBundle/zipball/153e71b36d90060b5ba52efdec75d6b4bf0fe9bd",
+                "reference": "153e71b36d90060b5ba52efdec75d6b4bf0fe9bd",
+                "shasum": ""
+            },
+            "require": {
+                "ezyang/htmlpurifier": "~4.14",
+                "php": "^7.1.3 || ^8.0.0",
+                "symfony/config": "~4.4 || ^5.0 || ^6.0",
+                "symfony/dependency-injection": "^4.4 || ^5.0 || ^6.0",
+                "symfony/http-kernel": "^4.4 || ^5.0 || ^6.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "symfony/form": "^4.4 || ^5.0 || ^6.0",
+                "symfony/phpunit-bridge": "^6.0",
+                "twig/twig": "^1.35.0 || ^2.4.4 || ^3.0"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Exercise\\HTMLPurifierBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "contributors",
+                    "homepage": "https://github.com/Exercise/HTMLPurifierBundle/contributors"
+                }
+            ],
+            "description": "HTMLPurifier integration for your Symfony project",
+            "homepage": "https://github.com/Exercise/HTMLPurifierBundle",
+            "keywords": [
+                "Purifier",
+                "html",
+                "htmlpurifier",
+                "symfony"
+            ],
+            "support": {
+                "issues": "https://github.com/Exercise/HTMLPurifierBundle/issues",
+                "source": "https://github.com/Exercise/HTMLPurifierBundle/tree/4.1.1"
+            },
+            "time": "2022-08-29T10:31:19+00:00"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -5639,7 +5701,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "6ab1aa7a1ea6bcb0bc27b342a56a613ef0364f04"
+                "reference": "c62461ff5c39edf571b1fa867a9a774e2c2e8c57"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5654,6 +5716,7 @@
                 "doctrine/doctrine-fixtures-bundle": "^3.3.2",
                 "doctrine/doctrine-migrations-bundle": "~2.1",
                 "doctrine/orm": "^2.8.0",
+                "exercise/htmlpurifier-bundle": "^4.1",
                 "ext-imap": "*",
                 "ext-zip": "*",
                 "ext-zlib": "*",
@@ -14602,37 +14665,45 @@
         },
         {
             "name": "liip/test-fixtures-bundle",
-            "version": "1.12.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/liip/LiipTestFixturesBundle.git",
-                "reference": "252ab82556e2468780255b5c1893d8c9401624ea"
+                "reference": "12cd7cb27ffea6aec45da7f66923f6f5df565752"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/liip/LiipTestFixturesBundle/zipball/252ab82556e2468780255b5c1893d8c9401624ea",
-                "reference": "252ab82556e2468780255b5c1893d8c9401624ea",
+                "url": "https://api.github.com/repos/liip/LiipTestFixturesBundle/zipball/12cd7cb27ffea6aec45da7f66923f6f5df565752",
+                "reference": "12cd7cb27ffea6aec45da7f66923f6f5df565752",
                 "shasum": ""
             },
             "require": {
+                "doctrine/annotations": "^1.2.7",
                 "doctrine/common": "^2.13 || ^3.0",
+                "doctrine/persistence": "^1.3.3 || ^2.0 || ^3.0",
                 "php": "^7.2 || ^8.0",
-                "symfony/framework-bundle": "^3.4 || ^4.4 || ^5.0",
-                "symfony/yaml": "^3.4 || ^4.4 || ^5.0"
+                "symfony/event-dispatcher": "^4.4 || ^5.4 || ^6.0",
+                "symfony/event-dispatcher-contracts": "^1 || ^2 || ^3",
+                "symfony/framework-bundle": "^4.4 || ^5.4 || ^6.0",
+                "symfony/yaml": "^4.4 || ^5.4 || ^6.0"
+            },
+            "conflict": {
+                "doctrine/dbal": "<2.11"
             },
             "require-dev": {
                 "doctrine/data-fixtures": "^1.3",
-                "doctrine/doctrine-bundle": "^1.8 || ^2.0",
+                "doctrine/doctrine-bundle": "^2.1",
                 "doctrine/doctrine-fixtures-bundle": "^3.0.2",
-                "doctrine/orm": "^2.6",
-                "doctrine/phpcr-bundle": "^2.0",
+                "doctrine/orm": "^2.7",
+                "doctrine/phpcr-bundle": "^2.0.2",
                 "doctrine/phpcr-odm": "^1.3",
                 "jackalope/jackalope-doctrine-dbal": "^1.5",
-                "monolog/monolog": "^1.11 || ^2.0",
-                "phpunit/phpunit": "^7.5 || ^8.0",
-                "symfony/monolog-bridge": ">=3",
+                "monolog/monolog": "^1.25.1 || ^2.0",
+                "phpunit/phpunit": "^8.0 || ^9.0",
+                "symfony/doctrine-bridge": "^4.4 || ^5.4 || ^6.0",
+                "symfony/monolog-bridge": "^4.4 || ^5.4 || ^6.0",
                 "symfony/monolog-bundle": "^3.2",
-                "symfony/phpunit-bridge": "^3.4 || ^4.4 || ^5.0",
+                "symfony/phpunit-bridge": "^4.4 || ^5.4 || ^6.0",
                 "theofidry/alice-data-fixtures": "^1.0.1"
             },
             "suggest": {
@@ -14645,7 +14716,7 @@
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.x-dev"
+                    "dev-master": "2.x-dev"
                 }
             },
             "autoload": {
@@ -14675,9 +14746,9 @@
             ],
             "support": {
                 "issues": "https://github.com/liip/LiipTestFixturesBundle/issues",
-                "source": "https://github.com/liip/LiipTestFixturesBundle/tree/1.12.0"
+                "source": "https://github.com/liip/LiipTestFixturesBundle/tree/2.4.1"
             },
-            "time": "2021-07-17T16:52:27+00:00"
+            "time": "2022-10-04T22:17:03+00:00"
         },
         {
             "name": "mautic/transifex",
@@ -17468,5 +17539,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }

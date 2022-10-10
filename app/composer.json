@@ -107,7 +107,8 @@
     "phpoffice/phpspreadsheet": "^1.15",
     "predis/predis": "^1.1",
     "composer/composer": "^2.2",
-    "beberlei/doctrineextensions": "^1.3"
+    "beberlei/doctrineextensions": "^1.3",
+    "exercise/htmlpurifier-bundle": "^4.1"
   },
   "repositories": [
     {
