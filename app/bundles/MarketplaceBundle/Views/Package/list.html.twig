@@ -3,7 +3,7 @@
 
 {% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
 {% block mauticContent %}Package{% endblock %}
-{% block headerTitle %}{{ 'marketplace.title'|trans|raw }}{% endblock %}
+{% block headerTitle %}{{ 'marketplace.title'|trans|purify }}{% endblock %}
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
     'customButtons' : {
