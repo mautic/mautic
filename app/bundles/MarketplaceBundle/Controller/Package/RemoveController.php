@@ -50,7 +50,7 @@ class RemoveController extends CommonController
                 'viewParameters' => [
                     'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:remove.html.php',
+                'contentTemplate' => 'MarketplaceBundle:Package:remove.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',
