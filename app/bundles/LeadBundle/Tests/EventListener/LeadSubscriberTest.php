@@ -214,7 +214,7 @@ class LeadSubscriberTest extends CommonMocks
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $leadEvent);
+        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }

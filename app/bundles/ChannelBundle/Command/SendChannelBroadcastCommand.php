@@ -95,7 +95,7 @@ EOT
         $event->setMinContactIdFilter($minContactId);
         $event->setMaxContactIdFilter($maxContactId);
 
-        $this->dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
+        $this->dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
 
         $results = $event->getResults();
 
