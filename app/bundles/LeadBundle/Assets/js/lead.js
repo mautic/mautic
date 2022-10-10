@@ -484,24 +484,27 @@ Mautic.reorderSegmentFilters = function() {
             }
 
             if (name) {
-                if (isProperties){
-                    var newName    = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
-                    var properties = 'properties_';
-                }
-                else {
+                if (isProperties) {
+                    var newName = prefix + '[filters][' + counter + '][properties][' + suffix + ']';
+                    if (name.slice(-2) === '[]') {
+                        newName += '[]';
+                    }
+
+                    mQuery(this).attr('name', newName);
+                    mQuery(this).attr('id', prefix + '_filters_' + counter + '_properties_' + suffix);
+                } else {
                     var newName = prefix + '[filters][' + counter + '][' + suffix + ']';
-                    var properties = '';
-                }
-                if (name.slice(-2) === '[]') {
-                    newName += '[]';
-                }
+                    if (name.slice(-2) === '[]') {
+                        newName += '[]';
+                    }
 
+                    mQuery(this).attr('name', newName);
+                    mQuery(this).attr('id', prefix + '_filters_' + counter + '_' + suffix);
+                }
+            } else {
                 mQuery(this).attr('name', newName);
-                mQuery(this).attr('id', prefix + '_filters_' + counter + '_' + properties + suffix);
+                mQuery(this).attr('id', prefix + '_filters_'+counter+'_'+suffix);
             }
-
-            mQuery(this).attr('name', newName);
-            mQuery(this).attr('id', prefix + '_filters_'+counter+'_'+suffix);
 
             // Destroy the chosen and recreate
             if (mQuery(this).is('select') && suffix == "filter") {
