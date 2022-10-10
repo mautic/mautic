@@ -115,7 +115,7 @@ class PublicController extends CommonFormController
                                 $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
                                 $submissionEvent->setContext($key);
 
-                                $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
+                                $this->get('event_dispatcher')->dispatch($submissionEvent, $callbackRequested['eventName']);
                             }
 
                             if ($submissionEvent->isPropagationStopped() && $submissionEvent->hasPostSubmitResponse()) {

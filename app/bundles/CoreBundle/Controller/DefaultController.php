@@ -49,7 +49,7 @@ class DefaultController extends CommonController
 
         if (!empty($searchStr)) {
             $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-            $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+            $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
             $results = $event->getResults();
         } else {
             $results = [];

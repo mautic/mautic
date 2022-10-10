@@ -129,13 +129,13 @@ class MappingHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -177,7 +177,6 @@ class MappingHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
@@ -190,7 +189,8 @@ class MappingHelperTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -232,7 +232,6 @@ class MappingHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame(['email' => 'test@test.com'], $event->getFieldValues());
@@ -245,7 +244,8 @@ class MappingHelperTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject(

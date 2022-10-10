@@ -91,7 +91,7 @@ class SecurityHelper extends Helper
         $content = '';
         if ($this->dispatcher->hasListeners(UserEvents::USER_AUTHENTICATION_CONTENT)) {
             $event = new AuthenticationContentEvent($request);
-            $this->dispatcher->dispatch(UserEvents::USER_AUTHENTICATION_CONTENT, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_AUTHENTICATION_CONTENT);
             $content = $event->getContent();
 
             // Remove post_logout session after content has been generated
