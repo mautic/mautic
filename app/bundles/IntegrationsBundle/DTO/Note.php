@@ -6,8 +6,8 @@ namespace Mautic\IntegrationsBundle\DTO;
 
 final class Note
 {
-    public const TYPE_ALERT = 'alert';
-    public const TYPE_INFO  = 'info';
+    public const TYPE_WARNING = 'warning';
+    public const TYPE_INFO    = 'info';
 
     private string $note;
     private string $type;
@@ -16,8 +16,8 @@ final class Note
     {
         $this->note = $note;
 
-        if (!in_array($type, [self::TYPE_INFO, self::TYPE_ALERT])) {
-            throw new \InvalidArgumentException(sprintf('Type value can be either "%s" or "%s".', self::TYPE_INFO, self::TYPE_ALERT));
+        if (!in_array($type, [self::TYPE_INFO, self::TYPE_WARNING])) {
+            throw new \InvalidArgumentException(sprintf('Type value can be either "%s" or "%s".', self::TYPE_INFO, self::TYPE_WARNING));
         }
 
         $this->type = $type;
