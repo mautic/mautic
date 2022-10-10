@@ -916,7 +916,7 @@ class SubmissionModel extends CommonFormModel
             return array_key_exists($action->getType(), $availableActions);
         })->map(function (Action $action) use ($event, $availableActions) {
             $event->setAction($action);
-            $this->dispatcher->dispatch($availableActions[$action->getType()]['eventName'], $event);
+            $this->dispatcher->dispatch($event, $availableActions[$action->getType()]['eventName']);
         });
     }
 
@@ -1167,7 +1167,7 @@ class SubmissionModel extends CommonFormModel
                     if (!is_array($validator)) {
                         $validator = ['eventName' => $validator];
                     }
-                    $event = $this->dispatcher->dispatch($validator['eventName'], new ValidationEvent($field, $value));
+                    $event = $this->dispatcher->dispatch(new ValidationEvent($field, $value), $validator['eventName']);
                     if (!$event->isValid()) {
                         return $event->getInvalidReason();
                     }

@@ -92,7 +92,7 @@ EOT
         }
 
         $event = new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr));
-        $this->dispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, $event);
+        $this->dispatcher->dispatch($event, CoreEvents::MAINTENANCE_CLEANUP_DATA);
         $stats = $event->getStats();
 
         $rows = [];

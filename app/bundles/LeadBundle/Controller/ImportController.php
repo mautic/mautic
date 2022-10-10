@@ -235,8 +235,8 @@ class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
                 $mappingEvent = $dispatcher->dispatch(
-                    LeadEvents::IMPORT_ON_FIELD_MAPPING,
-                    new ImportMappingEvent($this->request->get('object'))
+                    new ImportMappingEvent($this->request->get('object')),
+                    LeadEvents::IMPORT_ON_FIELD_MAPPING
                 );
 
                 try {
@@ -395,7 +395,7 @@ class ImportController extends FormController
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($this->request->get('object'), $form);
 
-                    $dispatcher->dispatch(LeadEvents::IMPORT_ON_VALIDATE, $validateEvent);
+                    $dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
 
                     if ($validateEvent->hasErrors()) {
                         break;
@@ -757,7 +757,7 @@ class ImportController extends FormController
     {
         $event = new ImportInitEvent($this->request->get('object'));
 
-        $this->container->get('event_dispatcher')->dispatch(LeadEvents::IMPORT_ON_INITIALIZE, $event);
+        $this->container->get('event_dispatcher')->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
 
         return $event;
     }
