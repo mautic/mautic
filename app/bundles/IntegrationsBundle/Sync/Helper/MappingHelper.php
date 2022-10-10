@@ -114,8 +114,8 @@ class MappingHelper
         $event->setFieldValues($identifiers);
 
         $this->dispatcher->dispatch(
+            $event,
             IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-            $event
         );
 
         $foundObjects = $event->getFoundObjects();
