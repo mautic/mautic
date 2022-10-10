@@ -42,15 +42,22 @@ class AbstractReportEvent extends Event
      *
      * @return bool
      */
-    public function checkContext($context)
+    public function checkContext($context): bool
     {
         if (empty($this->context)) {
             return true;
         }
 
         if (is_array($context)) {
-            return in_array($this->context, $context);
+            $res = array_filter(
+                $context,
+                fn ($elem) => 0 === stripos($this->context, $elem)
+            );
+
+            return count($res) > 0;
         } elseif ($this->context == $context) {
+            return true;
+        } elseif (0 === stripos($this->context, $context)) {
             return true;
         } else {
             return false;

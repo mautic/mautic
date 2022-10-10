@@ -4,7 +4,9 @@ namespace Mautic\FormBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -16,14 +18,24 @@ use PHPUnit\Framework\TestCase;
 class ReportSubscriberTest extends TestCase
 {
     /**
+     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $companyReportData;
+
+    /**
      * @var SubmissionRepository|\PHPUnit\Framework\MockObject\MockObject
      */
     private $submissionRepository;
 
     /**
-     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     * @var FormRepository|\PHPUnit\Framework\MockObject\MockObject
      */
-    private $companyReportData;
+    private $formRepository;
+
+    /**
+     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $coreParametersHelper;
 
     /**
      * @var ReportSubscriber
@@ -36,7 +48,14 @@ class ReportSubscriberTest extends TestCase
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
-        $this->subscriber           = new ReportSubscriber($this->companyReportData, $this->submissionRepository);
+        $this->formRepository       = $this->createMock(FormRepository::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->subscriber           = new ReportSubscriber(
+            $this->companyReportData,
+            $this->submissionRepository,
+            $this->formRepository,
+            $this->coreParametersHelper
+        );
     }
 
     public function testOnReportBuilderAddsFormAndFormSubmissionReports(): void

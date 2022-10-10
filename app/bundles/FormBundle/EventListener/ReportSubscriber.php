@@ -3,6 +3,8 @@
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
@@ -15,21 +17,26 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     const CONTEXT_FORMS           = 'forms';
     const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+    const CONTEXT_FORM_RESULT     = 'form.results';
 
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
+    private CompanyReportData $companyReportData;
 
-    /**
-     * @var SubmissionRepository
-     */
-    private $submissionRepository;
+    private SubmissionRepository $submissionRepository;
 
-    public function __construct(CompanyReportData $companyReportData, SubmissionRepository $submissionRepository)
-    {
+    private FormRepository $formRepository;
+
+    private CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(
+        CompanyReportData $companyReportData,
+        SubmissionRepository $submissionRepository,
+        FormRepository $formRepository,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->companyReportData    = $companyReportData;
         $this->submissionRepository = $submissionRepository;
+        $this->formRepository       = $formRepository;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -49,7 +56,7 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     public function onReportBuilder(ReportBuilderEvent $event)
     {
-        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION])) {
+        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
         }
 
@@ -120,6 +127,26 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addGraph($context, 'table', 'mautic.form.table.top.referrers');
             $event->addGraph($context, 'table', 'mautic.form.table.most.submitted');
         }
+
+        if ($this->coreParametersHelper->get('form_results_data_sources') && $event->checkContext(self::CONTEXT_FORM_RESULT)) {
+            $forms = $this->formRepository->getEntities();
+            foreach ($forms as $form) {
+                $formEntity         = $form[0];
+
+                $formColumn         = $event->getFormColumns($formEntity);
+                $leadColumns        = $event->getLeadColumns();
+                $companyColumns     = $this->companyReportData->getCompanyData();
+                $formResultsColumns = array_merge($formColumn, $leadColumns, $companyColumns);
+
+                $data = [
+                    'display_name' => $formEntity->getId().' '.$formEntity->getName(),
+                    'columns'      => $formResultsColumns,
+                ];
+
+                $resultsTableName = $this->formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
+            }
+        }
     }
 
     /**
@@ -127,7 +154,7 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     public function onReportGenerate(ReportGeneratorEvent $event)
     {
-        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION])) {
+        if (!$event->checkContext([self::CONTEXT_FORMS, self::CONTEXT_FORM_SUBMISSION, self::CONTEXT_FORM_RESULT])) {
             return;
         }
 
@@ -150,6 +177,17 @@ class ReportSubscriber implements EventSubscriberInterface
                 $event->addIpAddressLeftJoin($qb, 'fs');
                 $event->addCampaignByChannelJoin($qb, 'f', 'form');
 
+                if ($this->companyReportData->eventHasCompanyColumns($event)) {
+                    $event->addCompanyLeftJoin($qb);
+                }
+
+                break;
+            case self::CONTEXT_FORM_RESULT.str_replace(self::CONTEXT_FORM_RESULT, '', $context):
+                $resultsTableName = str_replace(self::CONTEXT_FORM_RESULT.'.', '', $context);
+
+                $qb->from(MAUTIC_TABLE_PREFIX.$resultsTableName, 'fr')
+                    ->leftJoin('fr', MAUTIC_TABLE_PREFIX.'form_submissions', 'fs', 'fs.id = fr.submission_id');
+                $event->addLeadLeftJoin($qb, 'fs');
                 if ($this->companyReportData->eventHasCompanyColumns($event)) {
                     $event->addCompanyLeftJoin($qb);
                 }

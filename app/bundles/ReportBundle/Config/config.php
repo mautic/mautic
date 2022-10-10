@@ -311,5 +311,6 @@ return [
         'report_export_batch_size'            => 1000,
         'report_export_max_filesize_in_bytes' => 5000000,
         'csv_always_enclose'                  => false,
+        'form_results_data_sources'           => false,
     ],
 ];

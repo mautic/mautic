@@ -23,6 +23,20 @@ class ConfigType extends AbstractType
                 'data'       => isset($options['data']['csv_always_enclose']) ? (bool) $options['data']['csv_always_enclose'] : false,
             ]
         );
+
+        $builder->add(
+            'form_results_data_sources',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.config.tab.form.form_results_data_sources',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.config.tab.form.form_results_data_sources.tooltip',
+                ],
+                'data'       => isset($options['data']['form_results_data_sources']) && (bool) $options['data']['form_results_data_sources'],
+            ]
+        );
     }
 
     /**

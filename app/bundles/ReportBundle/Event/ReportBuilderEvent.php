@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Event;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
@@ -305,6 +306,39 @@ class ReportBuilderEvent extends AbstractReportEvent
         }
 
         return $channelColumns;
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    public function getFormColumns(Form $form, string $prefix = 'fr.'): array
+    {
+        $fields      = $form->getFields();
+        $formColumns = [];
+        foreach ($fields as $field) {
+            if ('button' !== $field->getType()) {
+                $index               = $prefix.$field->getAlias();
+                $formColumns[$index] = [
+                    'label' => $field->getLabel(),
+                    'type'  => $this->reportHelper->getReportBuilderFieldType($field->getType()),
+                    'alias' => $field->getAlias(),
+                ];
+            }
+        }
+
+        $formColumns[$prefix.'submission_id'] = [
+            'label' => 'mautic.report.field.results.submission_id',
+            'type'  => 'int',
+            'alias' => 'submissionId',
+        ];
+        $formColumns[$prefix.'form_id'] = [
+            'label' => 'mautic.report.field.results.form_id',
+            'type'  => 'int',
+            'link'  => 'mautic_form_action',
+            'alias' => 'submissionId',
+        ];
+
+        return $formColumns;
     }
 
     /**
