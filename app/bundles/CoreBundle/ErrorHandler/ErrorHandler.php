@@ -7,9 +7,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Psr\Log\LogLevel;
     use Symfony\Component\Debug\Exception\FatalErrorException;
     use Symfony\Component\Debug\Exception\FatalThrowableError;
-    use Symfony\Component\Debug\Exception\FlattenException;
     use Symfony\Component\Debug\Exception\OutOfMemoryException;
     use Symfony\Component\ErrorHandler\Debug;
+    use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
     class ErrorHandler
     {
@@ -285,7 +285,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $type = ($exception instanceof \ErrorException) ? $exception->getSeverity() : E_ERROR;
 
             if (!$exception instanceof FlattenException) {
-                $exception = FlattenException::create($exception);
+                $exception = FlattenException::createFromThrowable($exception);
             }
 
             if (empty($message)) {
