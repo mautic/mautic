@@ -424,6 +424,13 @@ return [
                     'mautic.channel.helper.channel_list',
                 ],
             ],
+            'mautic.lead.reportbundle.report_devices_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ReportDevicesSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.reportbundle.fields_builder',
+                    'mautic.lead.model.company_report_data',
+                ],
+            ],
             'mautic.lead.reportbundle.segment_log_subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber::class,
                 'arguments' => [
