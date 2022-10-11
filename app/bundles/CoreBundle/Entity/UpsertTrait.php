@@ -6,26 +6,26 @@ namespace Mautic\CoreBundle\Entity;
 
 trait UpsertTrait
 {
-    private bool $wasInserted = false;
-    private bool $wasUpdated  = false;
+    private bool $hasBeenInserted = false;
+    private bool $hasBeenUpdated  = false;
 
-    public function wasInserted(): bool
+    public function hasBeenInserted(): bool
     {
-        return $this->wasInserted;
+        return $this->hasBeenInserted;
     }
 
-    public function wasUpdated(): bool
+    public function hasBeenUpdated(): bool
     {
-        return $this->wasUpdated;
+        return $this->hasBeenUpdated;
     }
 
-    public function setWasInserted(bool $wasInserted): void
+    public function setHasBeenInserted(bool $hasBeenInserted): void
     {
-        $this->wasInserted = $wasInserted;
+        $this->hasBeenInserted = $hasBeenInserted;
     }
 
-    public function setWasUpdated(bool $wasUpdated): void
+    public function setHasBeenUpdated(bool $hasBeenUpdated): void
     {
-        $this->wasUpdated = $wasUpdated;
+        $this->hasBeenUpdated = $hasBeenUpdated;
     }
 }

@@ -843,11 +843,9 @@ class CommonRepository extends EntityRepository
             $types
         );
 
-        if (is_subclass_of($entity, UpsertInterface::class)) {
-            /*number of rows affected With ON DUPLICATE KEY UPDATE:
-            the affected-rows value per row is 1 if the row is inserted as a new row and 2 if an existing row is updated.*/
-            $entity->setWasInserted(1 === $numberOfRowsAffected);
-            $entity->setWasUpdated(2 === $numberOfRowsAffected);
+        if ($entity instanceof UpsertInterface) {
+            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT == $numberOfRowsAffected);
+            $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
         }
         if ($hasId) {
             return;
