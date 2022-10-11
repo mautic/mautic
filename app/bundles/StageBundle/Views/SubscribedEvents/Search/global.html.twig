@@ -1,7 +1,6 @@
-
-{% if showMore is not empty %}
+{% if showMore is defined and showMore is not empty %}
     <a href="{{ url('mautic_stage_index', {'search' : searchString}) }}" data-toggle="ajax">
-        <span>{{ trans('mautic.core.search.more', {'%count%' : $remaining}) }}</span>
+        <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
     </a>
 </div>
 {% else %}
