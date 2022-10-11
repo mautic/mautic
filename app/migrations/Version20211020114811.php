@@ -40,14 +40,23 @@ final class Version20211020114811 extends AbstractMauticMigration
             $this->addSql(sprintf('ALTER TABLE %s CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', $tableName));
         }
 
-        $columns = $this->getColumns();
+        $columns          = $this->getColumns();
+        $columnsWithTable = [];
         foreach ($columns as $column) {
-            $columnName = $column['COLUMN_NAME'];
-            $columnType = $column['COLUMN_TYPE'];
-            $tableName  = $column['TABLE_NAME'];
-            $isNullable = 'NO' == $column['IS_NULLABLE'] ? ' NOT NULL' : '';
-            $default    = !is_null($column['COLUMN_DEFAULT']) ? sprintf(' DEFAULT "%s"', $column['COLUMN_DEFAULT']) : '';
-            $this->addSql(sprintf('ALTER TABLE %s MODIFY %s %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci %s %s;', $tableName, $columnName, $columnType, $isNullable, $default));
+            $columnsWithTable[$column['TABLE_NAME']][] = $column;
+        }
+
+        foreach ($columnsWithTable as $table => $columns) {
+            $allColumnsQueries = [];
+            foreach ($columns as $column) {
+                $columnName          = $column['COLUMN_NAME'];
+                $columnType          = $column['COLUMN_TYPE'];
+                $isNullable          = 'NO' == $column['IS_NULLABLE'] ? ' NOT NULL' : '';
+                $default             = !is_null($column['COLUMN_DEFAULT']) ? sprintf(' DEFAULT "%s"', $column['COLUMN_DEFAULT']) : '';
+                $allColumnsQueries[] = sprintf('MODIFY %s %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci %s %s', $columnName, $columnType, $isNullable, $default);
+            }
+            $query = implode(',', $allColumnsQueries);
+            $this->addSql(sprintf("ALTER TABLE %s $query;", $table));
         }
         $this->addSql('SET FOREIGN_KEY_CHECKS=1;');
     }
