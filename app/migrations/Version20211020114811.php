@@ -56,7 +56,7 @@ final class Version20211020114811 extends AbstractMauticMigration
                 $allColumnsQueries[] = sprintf('MODIFY %s %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci %s %s', $columnName, $columnType, $isNullable, $default);
             }
             $query = implode(',', $allColumnsQueries);
-            $this->addSql(sprintf("ALTER TABLE %s $query;", $table));
+            $this->addSql(sprintf('ALTER TABLE %s %s;', $table, $query));
         }
         $this->addSql('SET FOREIGN_KEY_CHECKS=1;');
     }
