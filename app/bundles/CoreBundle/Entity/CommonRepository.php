@@ -844,7 +844,7 @@ class CommonRepository extends EntityRepository
         );
 
         if ($entity instanceof UpsertInterface) {
-            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT == $numberOfRowsAffected);
+            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT === $numberOfRowsAffected);
             $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
         }
         if ($hasId) {
