@@ -149,7 +149,7 @@ EOT
         }
 
         //now process new emails
-        if (!$quiet) {
+        if ($quiet) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
 
