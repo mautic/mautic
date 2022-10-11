@@ -14,11 +14,12 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,6 +48,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $report;
 
+    /**
+     * @var ChannelListHelper|MockObject
+     */
     private $channelListHelper;
 
     /**
@@ -59,21 +63,27 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
+    /**
+     * @var MockObject|FieldsBuilder
+     */
+    private $fieldsBuilderMock;
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->connectionMock           = $this->createMock(Connection::class);
         $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
         $this->statRepository           = $this->createMock(StatRepository::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
+
         $this->subscriber               = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
             $this->statRepository,
-            $this->generatedColumnsProvider
+            $this->generatedColumnsProvider,
+            $this->fieldsBuilderMock
         );
 
         $this->report            = $this->createMock(Report::class);
@@ -105,7 +115,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGenerate($event);
 
         $this->assertSame(
-            "SELECT  FROM email_stats es LEFT JOIN lead_donotcontact dnc ON es.email_id = dnc.channel_id AND dnc.channel='email' AND es.lead_id = dnc.lead_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id",
+            'SELECT  FROM '.MAUTIC_TABLE_PREFIX.'email_stats es LEFT JOIN '.MAUTIC_TABLE_PREFIX."lead_donotcontact dnc ON es.email_id = dnc.channel_id AND dnc.channel='email' AND es.lead_id = dnc.lead_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id",
             $this->queryBuilder->getSQL()
         );
     }
@@ -130,7 +140,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGenerate($event);
 
         $this->assertSame(
-            'SELECT  FROM email_stats es LEFT JOIN emails e ON e.id = es.email_id LEFT JOIN emails vp ON vp.id = e.variant_parent_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id',
+            'SELECT  FROM '.MAUTIC_TABLE_PREFIX.'email_stats es LEFT JOIN '.MAUTIC_TABLE_PREFIX.'emails e ON e.id = es.email_id LEFT JOIN '.MAUTIC_TABLE_PREFIX.'emails vp ON vp.id = e.variant_parent_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id',
             $this->queryBuilder->getSQL()
         );
     }
@@ -163,7 +173,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGenerate($event);
 
         $this->assertSame(
-            "SELECT  FROM email_stats es LEFT JOIN (SELECT COUNT(ph.id) AS hits, COUNT(DISTINCT(ph.redirect_id)) AS unique_hits, cut2.channel_id, ph.lead_id FROM channel_url_trackables cut2 INNER JOIN page_hits ph ON cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id WHERE cut2.channel = 'email' AND ph.source = 'email' GROUP BY cut2.channel_id, ph.lead_id) cut ON es.email_id = cut.channel_id AND es.lead_id = cut.lead_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id",
+            'SELECT  FROM '.MAUTIC_TABLE_PREFIX.'email_stats es LEFT JOIN (SELECT COUNT(ph.id) AS hits, COUNT(DISTINCT(ph.redirect_id)) AS unique_hits, cut2.channel_id, ph.lead_id FROM '.MAUTIC_TABLE_PREFIX.'channel_url_trackables cut2 INNER JOIN '.MAUTIC_TABLE_PREFIX."page_hits ph ON cut2.redirect_id = ph.redirect_id AND cut2.channel_id = ph.source_id WHERE cut2.channel = 'email' AND ph.source = 'email' GROUP BY cut2.channel_id, ph.lead_id) cut ON es.email_id = cut.channel_id AND es.lead_id = cut.lead_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id",
             $this->queryBuilder->getSQL()
         );
     }
@@ -196,7 +206,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->onReportGenerate($event);
 
         $this->assertSame(
-            "SELECT  FROM email_stats es LEFT JOIN leads l ON l.id = es.lead_id LEFT JOIN campaign_lead_event_log clel ON clel.channel='email' AND es.email_id = clel.channel_id AND clel.lead_id = l.id LEFT JOIN campaigns cmp ON cmp.id = clel.campaign_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id",
+            'SELECT  FROM '.MAUTIC_TABLE_PREFIX.'email_stats es LEFT JOIN '.MAUTIC_TABLE_PREFIX.'leads l ON l.id = es.lead_id LEFT JOIN '.MAUTIC_TABLE_PREFIX."campaign_lead_event_log clel ON clel.channel='email' AND es.email_id = clel.channel_id AND clel.lead_id = l.id LEFT JOIN ".MAUTIC_TABLE_PREFIX.'campaigns cmp ON cmp.id = clel.campaign_id WHERE es.date_sent IS NULL OR (es.date_sent BETWEEN :dateFrom AND :dateTo) GROUP BY es.id',
             $this->queryBuilder->getSQL()
         );
     }
@@ -247,7 +257,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('leftJoin')
             ->with(
                 ReportSubscriber::EMAILS_PREFIX,
-                'lead_donotcontact',
+                MAUTIC_TABLE_PREFIX.'lead_donotcontact',
                 ReportSubscriber::DNC_PREFIX,
                 'e.id = dnc.channel_id AND dnc.channel=\'email\''
             );

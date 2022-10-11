@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\StageBundle\Entity\Stage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +38,7 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test if exportDataAs() correctly generates a CSV file when we input some array data.
      */
-    public function testCsvExport()
+    public function testCsvExport(): void
     {
         $helper = $this->getExportHelper();
         $stream = $helper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo-file.csv');
@@ -60,7 +62,7 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test if exportDataAs() correctly generates an Excel file when we input some array data.
      */
-    public function testExcelExport()
+    public function testExcelExport(): void
     {
         $helper = $this->getExportHelper();
         $stream = $helper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo-file.xlsx');
@@ -83,6 +85,27 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
         $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
+    }
+
+    public function testParseLeadResults(): void
+    {
+        $leadFieldsData = [
+            'id'        => 43,
+            'email'     => 'tomasz.amg@example.com',
+            'firstname' => 'Tomasz',
+            'lastname'  => 'Amg',
+        ];
+
+        $lead = new Lead();
+        $lead->setFields($leadFieldsData);
+
+        $stage = new Stage();
+        $stage->setName('Stage 3');
+        $lead->setStage($stage);
+
+        $result   = $this->getExportHelper()->parseLeadToExport($lead);
+        $expected = $leadFieldsData + ['stage' => 'Stage 3'];
+        $this->assertEquals($expected, $result);
     }
 
     private function getExportHelper(): ExportHelper

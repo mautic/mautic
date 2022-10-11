@@ -8,11 +8,11 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -39,7 +39,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,11 +46,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|RequestStack
      */
     private $requestStackMock;
-
-    /**
-     * @var MockObject|CookieHelper
-     */
-    private $cookieHelperMock;
 
     /**
      * @var MockObject|IpLookupHelper
@@ -168,7 +162,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->requestStackMock          = $this->createMock(RequestStack::class);
-        $this->cookieHelperMock          = $this->createMock(CookieHelper::class);
         $this->ipLookupHelperMock        = $this->createMock(IpLookupHelper::class);
         $this->pathsHelperMock           = $this->createMock(PathsHelper::class);
         $this->integrationHelperkMock    = $this->createMock(IntegrationHelper::class);
@@ -192,7 +185,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerMock         = $this->createMock(EntityManager::class);
         $this->leadModel                 = new LeadModel(
             $this->requestStackMock,
-            $this->cookieHelperMock,
             $this->ipLookupHelperMock,
             $this->pathsHelperMock,
             $this->integrationHelperkMock,
@@ -546,7 +538,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 $stageRepositoryMock
             );
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->once())
             ->method('trans')
             ->with('mautic.stage.event.changed');
@@ -584,7 +576,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 $stageRepositoryMock
             );
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->once())
             ->method('trans')
             ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']])

@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Tests\Controller;
 
+use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\PageBundle\Tests\Controller\PageControllerTest;
@@ -16,14 +17,16 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
      */
     public function testIndexAction(): void
     {
-        $assetData = [
-            'title'     => 'Asset controller test. Index action',
-            'alias'     => 'Test',
-            'createdAt' => new \DateTime('2020-02-07 20:29:02'),
-            'updatedAt' => new \DateTime('2020-03-21 20:29:02'),
-            'createdBy' => 'Test User',
-        ];
-        $this->createAsset($assetData);
+        $asset = new Asset();
+        $asset->setTitle('test');
+        $asset->setAlias('test');
+        $asset->setDateAdded(new \DateTime('2020-02-07 20:29:02'));
+        $asset->setDateModified(new \DateTime('2020-03-21 20:29:02'));
+        $asset->setCreatedByUser('Test User');
+
+        $this->em->persist($asset);
+        $this->em->flush();
+        $this->em->clear();
 
         $urlAlias   = 'assets';
         $routeAlias = 'asset';

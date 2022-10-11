@@ -6,7 +6,7 @@ use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\Model\ReportModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ReportBuilderEvent.
@@ -89,7 +89,7 @@ class ReportBuilderEvent extends AbstractReportEvent
         $data['group'] = (null == $group) ? $context : $group;
 
         foreach ($data['columns'] as $column => &$d) {
-            $d['label'] = $this->translator->trans($d['label']);
+            $d['label'] = null !== $d['label'] ? $this->translator->trans($d['label']) : '';
             if (!isset($d['alias'])) {
                 $d['alias'] = substr(
                     $column,

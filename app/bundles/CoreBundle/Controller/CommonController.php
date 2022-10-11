@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,12 +23,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CommonController.
  */
-class CommonController extends Controller implements MauticController
+class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
@@ -245,7 +245,7 @@ class CommonController extends Controller implements MauticController
      */
     public function redirectSecureRootAction()
     {
-        return $this->redirect($this->generateUrl('mautic_dashboard_index'), 301);
+        return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
 
     /**
@@ -428,7 +428,7 @@ class CommonController extends Controller implements MauticController
         $parameters = ['request' => $this->request, 'exception' => $exception];
         $query      = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
 
-        return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
+        return $this->forward('Mautic\CoreBundle\Controller\ExceptionController::showAction', $parameters, $query);
     }
 
     /**

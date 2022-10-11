@@ -12,13 +12,14 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
@@ -53,11 +54,11 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Countries;
+use Symfony\Contracts\EventDispatcher\Event;
 use Tightenco\Collect\Support\Collection;
 
 class LeadModel extends FormModel
@@ -72,11 +73,6 @@ class LeadModel extends FormModel
      * @var RequestStack
      */
     protected $requestStack;
-
-    /**
-     * @var CookieHelper
-     */
-    protected $cookieHelper;
 
     /**
      * @var IpLookupHelper
@@ -192,7 +188,6 @@ class LeadModel extends FormModel
 
     public function __construct(
         RequestStack $requestStack,
-        CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
         PathsHelper $pathsHelper,
         IntegrationHelper $integrationHelper,
@@ -211,7 +206,6 @@ class LeadModel extends FormModel
         IpAddressModel $ipAddressModel
     ) {
         $this->requestStack         = $requestStack;
-        $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
         $this->pathsHelper          = $pathsHelper;
         $this->integrationHelper    = $integrationHelper;
@@ -461,7 +455,7 @@ class LeadModel extends FormModel
                 $event = new LeadEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -1107,12 +1101,12 @@ class LeadModel extends FormModel
     /**
      * Set frequency rules for lead per channel.
      *
-     * @param null $data
-     * @param null $leadLists
+     * @param array<mixed>    $data
+     * @param array<LeadList> $leadLists
      *
      * @return bool Returns true
      */
-    public function setFrequencyRules(Lead $lead, $data = null, $leadLists = null, $persist = true)
+    public function setFrequencyRules(Lead $lead, $data, $leadLists, $persist = true)
     {
         // One query to get all the lead's current frequency rules and go ahead and create entities for them
         $frequencyRules = $lead->getFrequencyRules()->toArray();
@@ -1209,7 +1203,7 @@ class LeadModel extends FormModel
                 $results[$category->getId()] = $newLeadCategory;
 
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($lead, $category));
+                    $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
                 }
             }
         }
@@ -1233,14 +1227,14 @@ class LeadModel extends FormModel
                 $deleteCats[] = $category;
 
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                    $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($category->getLead(), $category->getCategory(), false));
+                    $this->dispatcher->dispatch(new CategoryChangeEvent($category->getLead(), $category->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
                 }
             }
         } elseif ($categories instanceof LeadCategory) {
             $deleteCats[] = $categories;
 
             if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
-                $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($categories->getLead(), $categories->getCategory(), false));
+                $this->dispatcher->dispatch(new CategoryChangeEvent($categories->getLead(), $categories->getCategory(), false), LeadEvents::LEAD_CATEGORY_CHANGE);
             }
         }
 
@@ -1427,10 +1421,10 @@ class LeadModel extends FormModel
                 $lead->addUpdatedField('email', $data[$fields['email']]);
                 if ($doNotEmail) {
                     $event = new DoNotContactAddEvent($lead, 'email', $reason, DNC::MANUAL);
-                    $this->dispatcher->dispatch(DoNotContactAddEvent::ADD_DONOT_CONTACT, $event);
+                    $this->dispatcher->dispatch($event, DoNotContactAddEvent::ADD_DONOT_CONTACT);
                 } else {
                     $event = new DoNotContactRemoveEvent($lead, 'email');
-                    $this->dispatcher->dispatch(DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT, $event);
+                    $this->dispatcher->dispatch($event, DoNotContactRemoveEvent::REMOVE_DONOT_CONTACT);
                 }
             }
         }
@@ -2122,8 +2116,8 @@ class LeadModel extends FormModel
     public function getEngagements(Lead $lead = null, $filters = null, array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true)
     {
         $event = $this->dispatcher->dispatch(
-            LeadEvents::TIMELINE_ON_GENERATE,
-            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url'))
+            new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url')),
+            LeadEvents::TIMELINE_ON_GENERATE
         );
 
         $payload = [
@@ -2148,7 +2142,7 @@ class LeadModel extends FormModel
         $event = new LeadTimelineEvent();
         $event->fetchTypesOnly();
 
-        $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
 
         return $event->getEventTypes();
     }
@@ -2165,7 +2159,7 @@ class LeadModel extends FormModel
         $event = new LeadTimelineEvent($lead);
         $event->setCountOnly($dateFrom, $dateTo, $unit, $chartQuery);
 
-        $this->dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
 
         return $event->getEventCounter();
     }
@@ -2459,5 +2453,16 @@ class LeadModel extends FormModel
     public function getAvailableLeadFields(): array
     {
         return $this->availableLeadFields;
+    }
+
+    /**
+     * @return array<string, int|float>
+     */
+    public function getLeadEmailStats(Lead $lead): array
+    {
+        /** @var StatRepository $statRepository */
+        $statRepository = $this->em->getRepository(Stat::class);
+
+        return $statRepository->getStatsSummaryForContacts([$lead->getId()])[$lead->getId()];
     }
 }

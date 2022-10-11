@@ -42,7 +42,7 @@ class SidebarCanvasHelper extends Helper
     {
         if ($this->dispatcher->hasListeners(CoreEvents::BUILD_CANVAS_CONTENT)) {
             $event = new SidebarCanvasEvent($templating);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_CANVAS_CONTENT, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_CANVAS_CONTENT);
             $this->content = $event->getCanvasContent();
         }
 

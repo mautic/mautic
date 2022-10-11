@@ -29,7 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
@@ -199,7 +199,7 @@ class CoreSubscriber implements EventSubscriberInterface
             //dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $loginEvent);
+                $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
             }
         } else {
             $session->remove('mautic.user');
@@ -347,7 +347,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'],
+                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );

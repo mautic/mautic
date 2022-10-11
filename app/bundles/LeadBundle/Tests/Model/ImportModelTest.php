@@ -50,13 +50,13 @@ class ImportModelTest extends StandardImportTestHelper
         $dispatcher->expects($this->exactly(4))
             ->method('dispatch')
             ->with(
-                LeadEvents::IMPORT_ON_PROCESS,
                 $this->callback(function (ImportProcessEvent $event) {
                     // Emulate a subscriber.
                     $event->setWasMerged(false);
 
                     return true;
-                })
+                }),
+                LeadEvents::IMPORT_ON_PROCESS
             );
 
         $model = $this->initImportModel();
