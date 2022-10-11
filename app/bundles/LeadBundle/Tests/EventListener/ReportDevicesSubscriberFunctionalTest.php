@@ -90,9 +90,11 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
     public function testOnReportGenerate(): void
     {
         $countDevices = 0;
+        $leadIds      = [];
 
         foreach ($this->contactData as $el) {
-            $contact = $this->createContact($el['email']);
+            $contact   = $this->createContact($el['email']);
+            $leadIds[] = $contact->getId();
 
             foreach ($el['devices'] as $device) {
                 $this->createDevice(
@@ -117,7 +119,7 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($countDevices, $result['totalResults']);
         $this->assertEquals([
             [
-                'id'                 => '1',
+                'id'                 => $leadIds[0],
                 'date_added1'        => '2020-02-07 20:29:02',
                 'device'             => 'desktop',
                 'device_os_name'     => 'Windows',
@@ -128,7 +130,7 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
                 'device_model'       => '',
             ],
             [
-                'id'                 => '2',
+                'id'                 => $leadIds[1],
                 'date_added1'        => '2020-02-26 22:29:02',
                 'device'             => 'desktop',
                 'device_os_name'     => 'Ubuntu',
@@ -139,7 +141,7 @@ class ReportDevicesSubscriberFunctionalTest extends MauticMysqlTestCase
                 'device_model'       => '',
             ],
             [
-                'id'                 => '2',
+                'id'                 => $leadIds[1],
                 'date_added1'        => '2022-09-21 07:36:48',
                 'device'             => 'smartphone',
                 'device_os_name'     => 'Android',
