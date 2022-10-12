@@ -3,22 +3,20 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-/**
- * Class ExceptionController.
- */
 class ExceptionController extends CommonController
 {
     /**
      * {@inheritdoc}
      */
-    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, \Throwable $exception, DebugLoggerInterface $logger = null)
     {
+        $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $this->request->headers->all());
         $class          = $exception->getClass();
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';

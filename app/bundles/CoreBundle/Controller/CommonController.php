@@ -11,23 +11,19 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CommonController.
- */
 class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
@@ -102,7 +98,7 @@ class CommonController extends AbstractController implements MauticController
         $this->flashBag = $flashBag;
     }
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
     }
 
@@ -424,8 +420,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function renderException(\Exception $e)
     {
-        $exception  = FlattenException::create($e, $e->getCode(), $this->request->headers->all());
-        $parameters = ['request' => $this->request, 'exception' => $exception];
+        $parameters = ['request' => $this->request, 'exception' => $e];
         $query      = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
 
         return $this->forward('Mautic\CoreBundle\Controller\ExceptionController::showAction', $parameters, $query);

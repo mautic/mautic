@@ -9,14 +9,11 @@ use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class WidgetApiController.
- */
 class WidgetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel('dashboard');
         $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';

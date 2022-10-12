@@ -8,7 +8,6 @@ use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\IntegrationsHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class ControllerSubscriber implements EventSubscriberInterface
@@ -39,7 +38,7 @@ class ControllerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onKernelController(FilterControllerEvent $event): void
+    public function onKernelController(\Symfony\Component\HttpKernel\Event\ControllerEvent $event): void
     {
         $request = $event->getRequest();
 
