@@ -16,17 +16,17 @@
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- container -->
-    {{ form_start(form) }}
+	{{ form_start(form) }}
     <div class="col-md-9 bg-auto height-auto bdr-r">
 		<div class="pa-md">
 			<div class="form-group mb-0">
 			    <div class="row">
-                    <div class="col-sm-6<?php echo (count($form['firstName']->vars['errors'])) ? ' has-error' : ''; ?>">
+                    <div class="col-sm-6{{ form.firstName.vars.errors|length ? ' has-error' : '' }}">
                     	<label class="control-label mb-xs">{{ form_label(form.firstName) }}</label>
                         {{ form_widget(form.firstName, {'attr' : {'placeholder' : form.firstName.vars.label }}) }}
                         {{ form_errors(form.firstName) }}
 			        </div>
-                    <div class="col-sm-6<?php echo (count($form['lastName']->vars['errors'])) ? ' has-error' : ''; ?>">
+                    <div class="col-sm-6{{ form.lastName.vars.errors|length ? ' has-error' : '' }}">
                         <label class="control-label mb-xs">{{ form_label(form.lastName) }}</label>
                         {{ form_widget(form.lastName, {'attr' : {'placeholder' : form.lastName.vars.label }}) }}
                         {{ form_errors(form.lastName) }}
@@ -37,12 +37,12 @@
 
 			<div class="form-group mb-0">
 			    <div class="row">
-			        <div class="col-sm-6<?php echo (count($form['role']->vars['errors'])) ? ' has-error' : ''; ?>">
+			        <div class="col-sm-6{{ form.role.vars.errors|length ? ' has-error' : '' }}">
 			        	<label class="control-label mb-xs">{{ form_label(form.role) }}</label>
                         {{ form_widget(form.role, {'attr' : {'placeholder' : form.role.vars.label }}) }}
                         {{ form_errors(form.role) }}
 			        </div>
-			        <div class="col-sm-6<?php echo (count($form['position']->vars['errors'])) ? ' has-error' : ''; ?>">
+			        <div class="col-sm-6{{ form.position.vars.errors|length ? ' has-error' : '' }}">
 				    	<label class="control-label mb-xs">{{ form_label(form.position) }}</label>
                         {{ form_widget(form.position, {'attr' : {'placeholder' : form.position.vars.label }}) }}
                         {{ form_errors(form.position) }}
@@ -53,7 +53,7 @@
 
             <div class="form-group mb-0">
                 <div class="row">
-                    <div class="col-sm-6<?php echo (count($form['signature']->vars['errors'])) ? ' has-error' : ''; ?>">
+                    <div class="col-sm-6{{ form.signature.vars.errors|length ? ' has-error' : '' }}">
                         <label class="control-label mb-xs">{{ form_label(form.signature) }}</label>
                         {{ form_widget(form.signature, {'attr' : {'placeholder' : form.signature.vars.label }}) }}
                         {{ form_errors(form.signature) }}
@@ -66,12 +66,12 @@
 				<div class="panel-body">
 				    <div class="row">
 				        <div class="col-sm-6">
-				        	<div class="form-group col-xs-12<?php echo (count($form['username']->vars['errors'])) ? ' has-error' : ''; ?>">
+				        	<div class="form-group col-xs-12{{ form.username.vars.errors|length ? ' has-error' : '' }}">
 				        		<label class="control-label mb-xs">{{ form_label(form.username) }}</label>
                         {{ form_widget(form.username, {'attr' : {'placeholder' : form.username.vars.label }}) }}
                         {{ form_errors(form.username) }}
 				            </div>
-							<div class="form-group col-xs-12<?php echo (count($form['email']->vars['errors'])) ? ' has-error' : ''; ?>">
+							<div class="form-group col-xs-12{{ form.email.vars.errors|length ? ' has-error' : '' }}">
 					    		<label class="control-label mb-xs">{{ form_label(form.email) }}</label>
                         {{ form_widget(form.email, {'attr' : {'placeholder' : form.email.vars.label }}) }}
                         {{ form_errors(form.email) }}
