@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\ApiBundle\Helper;
+namespace Mautic\ApiBundle\DTO;
 
 class BatchIdToEntityHelper
 {
