@@ -180,11 +180,9 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @return int|null
-     *
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $quiet              = $input->getOption('quiet');
         $this->output       = $quiet ? new NullOutput() : $output;

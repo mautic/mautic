@@ -35,7 +35,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     $rectorConfig->sets([
-        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_43,
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
