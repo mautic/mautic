@@ -68,7 +68,7 @@ EOT
         $queueMode   = $this->parametersHelper->get('mailer_spool_type');
         $lockName    = $input->getOption('lock-name') ?? '';
 
-        if ('file' != $queueMode) {
+        if ('file' !== $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
             return 0;

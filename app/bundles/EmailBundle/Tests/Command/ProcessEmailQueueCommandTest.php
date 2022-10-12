@@ -123,7 +123,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
                 ['mautic.mailer_spool_msg_limit']
             )
             ->willReturnOnConsecutiveCalls(
-                true,
+                'file',
                 $tmpSpoolDir,
                 10
             );
