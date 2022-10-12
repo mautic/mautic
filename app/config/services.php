@@ -15,6 +15,7 @@ return function (ContainerConfigurator $configurator) {
     ;
 
     // Auto-register Commands as it worked in M3
-    $services->load('Mautic\\', '../bundles/*/Command/*');
+    // $services->load('Mautic\\', '../bundles/*/Command/*');
+    $services->load('Mautic\\', '../bundles/')->exclude('../bundles/*/{DependencyInjection,Entity,Config,Tests,Views,Event,DTO}');
     $services->load('MauticPlugin\\', '../../plugins/*/Command/*');
 };
