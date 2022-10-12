@@ -29,7 +29,7 @@ class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
-    const MODEL_ID = 'lead.lead';
+    public const MODEL_ID = 'lead.lead';
 
     public function initialize(ControllerEvent $event)
     {
@@ -462,9 +462,9 @@ class LeadApiController extends CommonApiController
     /**
      * Add/Remove a UTM Tagset to/from the contact.
      *
-     * @param int       $id
-     * @param string    $method
-     * @param array/int $data
+     * @param int              $id
+     * @param string           $method
+     * @param array<mixed>|int $data
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

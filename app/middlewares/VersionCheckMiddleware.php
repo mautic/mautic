@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class VersionCheckMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 10;
+    public const PRIORITY = 10;
 
     /**
      * @var HttpKernelInterface

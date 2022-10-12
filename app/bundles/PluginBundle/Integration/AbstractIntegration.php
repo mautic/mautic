@@ -56,11 +56,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
-    const FIELD_TYPE_STRING   = 'string';
-    const FIELD_TYPE_BOOL     = 'boolean';
-    const FIELD_TYPE_NUMBER   = 'number';
-    const FIELD_TYPE_DATETIME = 'datetime';
-    const FIELD_TYPE_DATE     = 'date';
+    public const FIELD_TYPE_STRING   = 'string';
+    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const FIELD_TYPE_NUMBER   = 'number';
+    public const FIELD_TYPE_DATETIME = 'datetime';
+    public const FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
     protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
@@ -1738,10 +1738,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed      $data        Profile data from integration
+     * @param bool|true  $persist     Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
+     * @param mixed|null $identifiers
      *
      * @return Lead
      */

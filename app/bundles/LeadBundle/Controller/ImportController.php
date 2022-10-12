@@ -32,10 +32,10 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ImportController extends FormController
 {
     // Steps of the import
-    const STEP_UPLOAD_CSV      = 1;
-    const STEP_MATCH_FIELDS    = 2;
-    const STEP_PROGRESS_BAR    = 3;
-    const STEP_IMPORT_FROM_CSV = 4;
+    public const STEP_UPLOAD_CSV      = 1;
+    public const STEP_MATCH_FIELDS    = 2;
+    public const STEP_PROGRESS_BAR    = 3;
+    public const STEP_IMPORT_FROM_CSV = 4;
 
     /**
      * @var LoggerInterface

@@ -25,7 +25,7 @@
     "mautic/core-lib": "^4.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.19.2",
+    "friendsofphp/php-cs-fixer": "^3.0",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.2",
     "liip/test-fixtures-bundle": "^2.0",

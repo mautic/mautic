@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportDNCSubscriber implements EventSubscriberInterface
 {
-    const DNC = 'contact.dnc';
+    public const DNC = 'contact.dnc';
 
     /**
      * @var FieldsBuilder

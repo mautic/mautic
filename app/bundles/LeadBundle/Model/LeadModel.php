@@ -66,7 +66,7 @@ class LeadModel extends FormModel
     use OperatorListTrait;
     use RequestTrait;
 
-    const CHANNEL_FEATURE = 'contact_preference';
+    public const CHANNEL_FEATURE = 'contact_preference';
 
     /**
      * @var RequestStack

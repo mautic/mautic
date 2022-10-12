@@ -14,11 +14,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
-    const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
-    const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
-    const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
+    public const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
+    public const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
+    public const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
 
-    const BITWISE_BY_PERM = [
+    public const BITWISE_BY_PERM = [
         self::PERMISSION_CREATE       => 52,
         self::PERMISSION_DELETE_OWN   => 66,
         self::PERMISSION_DELETE_OTHER => 150,

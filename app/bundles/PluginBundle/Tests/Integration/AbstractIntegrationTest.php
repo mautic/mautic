@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\PluginBundle\Tests\Integration;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\RequestOptions;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
