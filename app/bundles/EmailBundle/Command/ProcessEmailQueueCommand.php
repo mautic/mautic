@@ -63,7 +63,7 @@ EOT
         $options     = $input->getOptions();
         $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
         $skipClear   = $input->getOption('do-not-clear');
-        $quiet       = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $quiet       = (bool) $input->getOption('quiet');
         $timeout     = $input->getOption('clear-timeout');
         $queueMode   = $this->parametersHelper->get('mailer_spool_type');
         $lockName    = $input->getOption('lock-name') ?? '';
