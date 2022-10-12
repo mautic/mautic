@@ -3320,133 +3320,6 @@
             "time": "2022-08-05T20:32:58+00:00"
         },
         {
-            "name": "giggsey/libphonenumber-for-php",
-            "version": "8.12.54",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/giggsey/libphonenumber-for-php.git",
-                "reference": "d0bad134ca7206d36784c2c5ec531ba4513efde7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/libphonenumber-for-php/zipball/d0bad134ca7206d36784c2c5ec531ba4513efde7",
-                "reference": "d0bad134ca7206d36784c2c5ec531ba4513efde7",
-                "shasum": ""
-            },
-            "require": {
-                "giggsey/locale": "^1.7|^2.0",
-                "php": ">=5.3.2",
-                "symfony/polyfill-mbstring": "^1.17"
-            },
-            "require-dev": {
-                "pear/pear-core-minimal": "^1.9",
-                "pear/pear_exception": "^1.0",
-                "pear/versioncontrol_git": "^0.5",
-                "phing/phing": "^2.7",
-                "php-coveralls/php-coveralls": "^1.0|^2.0",
-                "symfony/console": "^2.8|^3.0|^v4.4|^v5.2",
-                "symfony/phpunit-bridge": "^4.2 || ^5"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "8.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "libphonenumber\\": "src/"
-                },
-                "exclude-from-classmap": [
-                    "/src/data/",
-                    "/src/carrier/data/",
-                    "/src/geocoding/data/",
-                    "/src/timezone/data/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Joshua Gigg",
-                    "email": "giggsey@gmail.com",
-                    "homepage": "https://giggsey.com/"
-                }
-            ],
-            "description": "PHP Port of Google's libphonenumber",
-            "homepage": "https://github.com/giggsey/libphonenumber-for-php",
-            "keywords": [
-                "geocoding",
-                "geolocation",
-                "libphonenumber",
-                "mobile",
-                "phonenumber",
-                "validation"
-            ],
-            "support": {
-                "irc": "irc://irc.appliedirc.com/lobby",
-                "issues": "https://github.com/giggsey/libphonenumber-for-php/issues",
-                "source": "https://github.com/giggsey/libphonenumber-for-php"
-            },
-            "time": "2022-08-22T06:43:42+00:00"
-        },
-        {
-            "name": "giggsey/locale",
-            "version": "2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/giggsey/Locale.git",
-                "reference": "9c1dca769253f6a3e81f9a5c167f53b6a54ab635"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/giggsey/Locale/zipball/9c1dca769253f6a3e81f9a5c167f53b6a54ab635",
-                "reference": "9c1dca769253f6a3e81f9a5c167f53b6a54ab635",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2"
-            },
-            "require-dev": {
-                "ext-json": "*",
-                "pear/pear-core-minimal": "^1.9",
-                "pear/pear_exception": "^1.0",
-                "pear/versioncontrol_git": "^0.5",
-                "phing/phing": "^2.7",
-                "php-coveralls/php-coveralls": "^2.0",
-                "phpunit/phpunit": "^8.5|^9.5",
-                "symfony/console": "^5.0",
-                "symfony/filesystem": "^5.0",
-                "symfony/finder": "^5.0",
-                "symfony/process": "^5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Giggsey\\Locale\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Joshua Gigg",
-                    "email": "giggsey@gmail.com",
-                    "homepage": "https://giggsey.com/"
-                }
-            ],
-            "description": "Locale functions required by libphonenumber-for-php",
-            "support": {
-                "issues": "https://github.com/giggsey/Locale/issues",
-                "source": "https://github.com/giggsey/Locale/tree/2.2"
-            },
-            "time": "2022-04-06T07:33:59+00:00"
-        },
-        {
             "name": "guzzlehttp/guzzle",
             "version": "7.5.0",
             "source": {
@@ -5701,7 +5574,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "c62461ff5c39edf571b1fa867a9a774e2c2e8c57"
+                "reference": "176e84abea327a2fd42208e12ad7758415f73c2d"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5738,7 +5611,6 @@
                 "leezy/pheanstalk-bundle": "^4.0",
                 "lightsaml/sp-bundle": "~1.2.1",
                 "matomo/device-detector": "^4.0",
-                "misd/phone-number-bundle": "^1.1",
                 "mrclay/minify": "2.2.0",
                 "noxlogic/ratelimit-bundle": "^1.11",
                 "oneup/uploader-bundle": "^3.1.0",
@@ -5975,81 +5847,6 @@
                 "source": "https://github.com/maxmind/web-service-common-php/tree/v0.9.0"
             },
             "time": "2022-03-28T17:43:20+00:00"
-        },
-        {
-            "name": "misd/phone-number-bundle",
-            "version": "v1.3.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/misd-service-development/phone-number-bundle.git",
-                "reference": "32e569b8aa4378e89345668e0cc526d1e0e5837a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/misd-service-development/phone-number-bundle/zipball/32e569b8aa4378e89345668e0cc526d1e0e5837a",
-                "reference": "32e569b8aa4378e89345668e0cc526d1e0e5837a",
-                "shasum": ""
-            },
-            "require": {
-                "giggsey/libphonenumber-for-php": "~5.7|~6.0|~7.0|~8.0",
-                "php": ">=5.3.3",
-                "symfony/framework-bundle": "~2.1|~3.0|^4.0"
-            },
-            "conflict": {
-                "twig/twig": "<1.12.0"
-            },
-            "require-dev": {
-                "doctrine/doctrine-bundle": "~1.0",
-                "jms/serializer-bundle": "~0.11|~1.0|~2.0",
-                "phpunit/phpunit": "~4.0|^5.7",
-                "symfony/form": "~2.3|~3.0|^4.0",
-                "symfony/serializer": "~2.7|~3.1|^4.0",
-                "symfony/templating": "~2.1|~3.0|^4.0",
-                "symfony/twig-bundle": "~2.1|~3.0|^4.0",
-                "symfony/validator": "~2.1|~3.0|^4.0"
-            },
-            "suggest": {
-                "doctrine/doctrine-bundle": "Add a DBAL mapping type",
-                "jms/serializer-bundle": "Serialize/deserialize phone numbers using JSM library",
-                "symfony/form": "Add a data transformer",
-                "symfony/serializer": "Serialize/deserialize phone numbers using Symfony library",
-                "symfony/templating": "Format phone numbers in templates",
-                "symfony/twig-bundle": "Format phone numbers in Twig templates",
-                "symfony/validator": "Add a validation constraint"
-            },
-            "type": "symfony-bundle",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.3.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Misd\\PhoneNumberBundle\\": ""
-                },
-                "exclude-from-classmap": [
-                    "/Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Integrates libphonenumber into your Symfony2 application",
-            "homepage": "https://github.com/misd-service-development/phone-number-bundle",
-            "keywords": [
-                "bundle",
-                "libphonenumber",
-                "phone-number",
-                "phonenumber",
-                "telephone number"
-            ],
-            "support": {
-                "issues": "https://github.com/misd-service-development/phone-number-bundle/issues",
-                "source": "https://github.com/misd-service-development/phone-number-bundle/tree/1.3"
-            },
-            "abandoned": "odolbeau/phone-number-bundle",
-            "time": "2018-01-18T09:06:41+00:00"
         },
         {
             "name": "monolog/monolog",
