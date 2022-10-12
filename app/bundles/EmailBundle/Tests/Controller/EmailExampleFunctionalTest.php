@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use DateTime;
-use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
@@ -18,9 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var Swift_Transport
-     */
+    /** @phpstan-ignore-next-line */
     private $transport;
 
     protected function setUp(): void
@@ -33,8 +31,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
 
     /**
      * @throws ORMException
-     * @throws OptimisticLockException
-     * @throws MappingException
+     * @throws OptimisticLockException|MappingException
      */
     public function testSendExampleEmailWithContact(): void
     {
@@ -66,9 +63,8 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws MappingException
      * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws OptimisticLockException|MappingException
      */
     public function testSendExampleEmailWithOutContact(): void
     {
@@ -95,9 +91,8 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws MappingException
      * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws OptimisticLockException|MappingException
      */
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoContact(): void
     {
@@ -174,9 +169,8 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws MappingException
      * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws OptimisticLockException|MappingException
      */
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithMatchFilterContact(): void
     {
@@ -277,9 +271,8 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @throws MappingException
      * @throws ORMException
-     * @throws OptimisticLockException
+     * @throws OptimisticLockException|MappingException
      */
     public function testSendExampleEmailForDynamicContentVariantsWithCustomFieldWithNoMatchFilterContact(): void
     {
