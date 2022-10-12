@@ -156,7 +156,7 @@ class FieldHelper
 
         // Dispatch event to add possibility to add field from some listener
         $event                                     = new MauticSyncFieldsLoadEvent($objectName, $this->syncFields[$objectName]);
-        $event                                     = $this->eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD, $event);
+        $event                                     = $this->eventDispatcher->dispatch($event, IntegrationEvents::INTEGRATION_MAUTIC_SYNC_FIELDS_LOAD);
         $this->syncFields[$event->getObjectName()] = $event->getFields();
 
         // Add ID as a read only field

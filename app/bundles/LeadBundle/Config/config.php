@@ -424,6 +424,13 @@ return [
                     'mautic.channel.helper.channel_list',
                 ],
             ],
+            'mautic.lead.reportbundle.report_devices_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ReportDevicesSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.reportbundle.fields_builder',
+                    'mautic.lead.model.company_report_data',
+                ],
+            ],
             'mautic.lead.reportbundle.segment_log_subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber::class,
                 'arguments' => [
@@ -896,6 +903,19 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.helper.contact_request_helper' => [
+                'class'     => \Mautic\LeadBundle\Helper\ContactRequestHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.ip_lookup',
+                    'request_stack',
+                    'monolog.logger.mautic',
+                    'event_dispatcher',
+                    'mautic.lead.merger',
+                ],
+            ],
             'mautic.lead.validator.length' => [
                 'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
                 'tag'       => 'validator.constraint_validator',
@@ -1137,16 +1157,7 @@ return [
                     'mautic.user.provider',
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
-                    'mautic.lead.model.legacy_lead',
                     'mautic.lead.model.ipaddress',
-                ],
-            ],
-
-            // Deprecated support for circular dependency
-            'mautic.lead.model.legacy_lead' => [
-                'class'     => \Mautic\LeadBundle\Model\LegacyLeadModel::class,
-                'arguments' => [
-                    'service_container',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -1581,7 +1592,7 @@ return [
             'mautic.lead.fixture.contact_field' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'arguments' => ['translator'],
             ],
             'mautic.lead.fixture.segment' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,

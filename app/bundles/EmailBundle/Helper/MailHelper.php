@@ -23,11 +23,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class MailHelper
 {
-    const QUEUE_RESET_TO          = 'RESET_TO';
-    const QUEUE_FULL_RESET        = 'FULL_RESET';
-    const QUEUE_DO_NOTHING        = 'DO_NOTHING';
-    const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
-    const QUEUE_RETURN_ERRORS     = 'RETURN_ERRORS';
+    public const QUEUE_RESET_TO          = 'RESET_TO';
+    public const QUEUE_FULL_RESET        = 'FULL_RESET';
+    public const QUEUE_DO_NOTHING        = 'DO_NOTHING';
+    public const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
+    public const QUEUE_RETURN_ERRORS     = 'RETURN_ERRORS';
     /**
      * @var MauticFactory
      */
@@ -1633,7 +1633,7 @@ class MailHelper
 
         $event = new EmailSendEvent($this);
 
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
 

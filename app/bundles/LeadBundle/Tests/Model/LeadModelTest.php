@@ -15,7 +15,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
-use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -26,7 +25,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\LegacyLeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -118,11 +116,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private $deviceTrackerMock;
 
     /**
-     * @var MockObject|LegacyLeadModel
-     */
-    private $legacyLeadModelMock;
-
-    /**
      * @var MockObject|IpAddressModel
      */
     private $ipAddressModelMock;
@@ -176,7 +169,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->userProviderMock          = $this->createMock(UserProvider::class);
         $this->contactTrackerMock        = $this->createMock(ContactTracker::class);
         $this->deviceTrackerMock         = $this->createMock(DeviceTracker::class);
-        $this->legacyLeadModelMock       = $this->createMock(LegacyLeadModel::class);
         $this->ipAddressModelMock        = $this->createMock(IpAddressModel::class);
         $this->leadRepositoryMock        = $this->createMock(LeadRepository::class);
         $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
@@ -199,7 +191,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->userProviderMock,
             $this->contactTrackerMock,
             $this->deviceTrackerMock,
-            $this->legacyLeadModelMock,
             $this->ipAddressModelMock
         );
 
@@ -359,6 +350,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
             ]);
 
+        /** @var LeadModel&MockObject $mockLeadModel */
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRepository'])
@@ -378,7 +370,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         // The availableLeadFields property should start empty.
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
-        [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
+        [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], true, true);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());

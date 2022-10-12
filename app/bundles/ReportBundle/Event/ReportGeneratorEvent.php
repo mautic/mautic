@@ -11,10 +11,10 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportGeneratorEvent extends AbstractReportEvent
 {
-    const CATEGORY_PREFIX    = 'c';
-    const CONTACT_PREFIX     = 'l';
-    const COMPANY_PREFIX     = 'comp';
-    const IP_ADDRESS_PREFIX  = 'i';
+    public const CATEGORY_PREFIX    = 'c';
+    public const CONTACT_PREFIX     = 'l';
+    public const COMPANY_PREFIX     = 'comp';
+    public const IP_ADDRESS_PREFIX  = 'i';
 
     /**
      * @var array

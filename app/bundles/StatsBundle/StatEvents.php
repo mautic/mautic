@@ -11,5 +11,5 @@ final class StatEvents
      *
      * @var string
      */
-    const AGGREGATE_STAT_REQUEST = 'mautic.aggregate_stat_request';
+    public const AGGREGATE_STAT_REQUEST = 'mautic.aggregate_stat_request';
 }

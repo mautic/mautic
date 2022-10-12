@@ -150,7 +150,7 @@ class SyncProcess
     private function executeIntegrationSync(): void
     {
         $this->syncIteration = 1;
-        do {
+        while (true) {
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf('Integration to Mautic; syncing iteration %s', $this->syncIteration),
@@ -204,13 +204,13 @@ class SyncProcess
 
             // Fetch the next iteration/batch
             ++$this->syncIteration;
-        } while (true);
+        }
     }
 
     private function executeInternalSync(): void
     {
         $this->syncIteration = 1;
-        do {
+        while (true) {
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf('Mautic to integration; syncing iteration %s', $this->syncIteration),
@@ -262,7 +262,7 @@ class SyncProcess
 
             // Fetch the next iteration/batch
             ++$this->syncIteration;
-        } while (true);
+        }
     }
 
     private function manageRelations(ReportDAO $syncReport): void

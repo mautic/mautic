@@ -57,7 +57,7 @@ class PushDataToPipedriveCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var PipeDriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper
@@ -69,7 +69,7 @@ class PushDataToPipedriveCommand extends Command
         if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
             $this->io->note('Pipedrive integration is disabled.');
 
-            return;
+            return 0;
         }
 
         if ($input->getOption('restart')) {
@@ -107,5 +107,7 @@ class PushDataToPipedriveCommand extends Command
         $this->io->text('Pushed '.$pushed);
 
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+
+        return 0;
     }
 }
