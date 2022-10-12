@@ -346,7 +346,6 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $builder->createManyToOne('stage', 'Mautic\StageBundle\Entity\Stage')
             ->cascadePersist()
             ->cascadeMerge()
-            ->cascadeDetach()
             ->addJoinColumn('stage_id', 'id', true, false, 'SET NULL')
             ->build();
 
