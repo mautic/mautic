@@ -128,7 +128,10 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function urlDecodeTokens(string $content): string
+    /**
+     * @param array<mixed>|string $content
+     */
+    private function urlDecodeTokens($content): string
     {
         return preg_replace('/(%7B)(.*?)(%3D|=)(.*?)(%7D)/i', '{$2=$4}', $content);
     }
