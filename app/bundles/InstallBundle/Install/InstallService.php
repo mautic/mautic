@@ -9,6 +9,7 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -20,8 +21,6 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Psr\Container\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -47,7 +46,7 @@ class InstallService
     private KernelInterface $kernel;
     private ValidatorInterface $validator;
     private UserPasswordEncoder $encoder;
-    private ContainerInterface $container;
+    private FixturesLoaderInterface $fixturesLoader;
 
     public function __construct(
         Configurator $configurator,
@@ -58,17 +57,17 @@ class InstallService
         KernelInterface $kernel,
         ValidatorInterface $validator,
         UserPasswordEncoder $encoder,
-        ContainerInterface $container
+        FixturesLoaderInterface $fixturesLoader
     ) {
-        $this->configurator  = $configurator;
-        $this->cacheHelper   = $cacheHelper;
-        $this->pathsHelper   = $pathsHelper;
-        $this->entityManager = $entityManager;
-        $this->translator    = $translator;
-        $this->kernel        = $kernel;
-        $this->validator     = $validator;
-        $this->encoder       = $encoder;
-        $this->container     = $container;
+        $this->configurator   = $configurator;
+        $this->cacheHelper    = $cacheHelper;
+        $this->pathsHelper    = $pathsHelper;
+        $this->entityManager  = $entityManager;
+        $this->translator     = $translator;
+        $this->kernel         = $kernel;
+        $this->validator      = $validator;
+        $this->encoder        = $encoder;
+        $this->fixturesLoader = $fixturesLoader;
     }
 
     /**
@@ -365,20 +364,10 @@ class InstallService
      */
     public function installDatabaseFixtures(): void
     {
-        $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
-        /** @phpstan-ignore-next-line */
-        $loader = new ContainerAwareLoader($this->container);
-
-        foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
-            }
-        }
-
-        $fixtures = $loader->getFixtures();
+        $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
         if (!$fixtures) {
-            throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
+            throw new \InvalidArgumentException('Could not find any fixtures to load with the "group_install" group.');
         }
 
         $purger = new ORMPurger($this->entityManager);

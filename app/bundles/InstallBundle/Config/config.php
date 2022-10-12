@@ -34,12 +34,12 @@ return [
             'mautic.install.fixture.lead_field' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'arguments' => ['translator'],
             ],
             'mautic.install.fixture.role' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'arguments' => ['translator'],
             ],
             'mautic.install.fixture.report_data' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
@@ -133,7 +133,7 @@ return [
                     'kernel',
                     'validator',
                     'security.password_encoder',
-                    'service_container',
+                    'mautic.doctrine.loader.mautic_fixtures_loader',
                 ],
             ],
             'mautic.install.leadcolumns' => [

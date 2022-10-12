@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
@@ -566,7 +568,18 @@ class LeadApiController extends CommonApiController
         if ('edit' === $action) {
             // Merge existing duplicate contact based on unique fields if exist
             // new endpoints will leverage getNewEntity in order to return the correct status codes
-            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
+            $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
+            $contactMerger  = $this->get('mautic.lead.merger');
+            \assert($contactMerger instanceof ContactMerger);
+
+            if ($entity->getId() && $existingEntity->getId()) {
+                try {
+                    $entity = $contactMerger->merge($entity, $existingEntity);
+                } catch (SameContactException $exception) {
+                }
+            } elseif ($existingEntity->getId()) {
+                $entity = $existingEntity;
+            }
         }
 
         $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';

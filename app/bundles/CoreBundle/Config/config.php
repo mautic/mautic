@@ -1174,6 +1174,12 @@ return [
                 ],
                 'tag'       => 'twig.extension',
             ],
+            'mautic.doctrine.loader.mautic_fixtures_loader' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
+                'arguments' => [
+                    'doctrine.fixtures.loader',
+                ],
+            ],
             // Schema
             'mautic.schema.helper.column' => [
                 'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',

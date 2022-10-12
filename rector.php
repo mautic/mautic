@@ -16,6 +16,13 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/*.less.php',
             __DIR__.'/*.inc.php',
             __DIR__.'/*.js.php',
+            \Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
+                __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
+                __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+                __DIR__.'/plugins/MauticCitrixBundle/MauticCitrixBundle.php', // Requires quite a refactoring.
+                __DIR__.'/app/bundles/CoreBundle/Helper/TemplatingHelper.php', // Will be removed once Twig refactoring is done.
+                __DIR__.'/app/bundles/CoreBundle/Templating/TemplateNameParser.php', // Will be removed once Twig refactoring is done.
+            ],
         ]
     );
 
@@ -28,7 +35,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     $rectorConfig->sets([
-        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_41,
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_42,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
