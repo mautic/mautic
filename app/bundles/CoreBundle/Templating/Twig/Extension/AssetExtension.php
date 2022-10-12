@@ -37,7 +37,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
             new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
-            new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration'] ),
+            new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
         ];
     }
 
@@ -109,7 +109,8 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->getAssetPrefix($includeEndingslash);
     }
 
-    public function addScriptDeclaration($script, $location = 'head'){
+    public function addScriptDeclaration(string $script, string $location = 'head'): AssetsHelper
+    {
         return $this->assetsHelper->addScriptDeclaration($script, $location);
     }
 }
