@@ -47,7 +47,7 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processed  = 0;
         $channel    = $input->getOption('channel');
