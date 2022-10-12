@@ -4,8 +4,8 @@ namespace Mautic\LeadBundle\Segment;
 
 class ContactSegmentFilterCrate
 {
-    const CONTACT_OBJECT = 'lead';
-    const COMPANY_OBJECT = 'company';
+    public const CONTACT_OBJECT = 'lead';
+    public const COMPANY_OBJECT = 'company';
 
     /**
      * @var string|null

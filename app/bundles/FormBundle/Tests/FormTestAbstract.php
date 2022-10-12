@@ -23,6 +23,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -147,6 +148,7 @@ class FormTestAbstract extends TestCase
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
         $router                   = $this->createMock(RouterInterface::class);
+        $contactMerger            = $this->createMock(ContactMerger::class);
         $router->method('generate')->willReturn('absolute/path/somefile.jpg');
 
         $lead                     = new Lead();
@@ -225,7 +227,8 @@ class FormTestAbstract extends TestCase
             $deviceTrackingService,
             new FieldValueTransformer($router),
             $dateHelper,
-            $contactTracker
+            $contactTracker,
+            $contactMerger
         );
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);

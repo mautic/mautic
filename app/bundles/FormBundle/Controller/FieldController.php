@@ -11,7 +11,7 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class FieldController extends CommonFormController
 {
@@ -30,7 +30,7 @@ class FieldController extends CommonFormController
      */
     private $fieldHelper;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->formModel      = $this->getModel('form');
         $this->formFieldModel = $this->getModel('form.field');

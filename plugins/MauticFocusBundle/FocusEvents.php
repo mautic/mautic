@@ -16,7 +16,7 @@ final class FocusEvents
      *
      * @var string
      */
-    const PRE_SAVE = 'mautic.focus_pre_save';
+    public const PRE_SAVE = 'mautic.focus_pre_save';
 
     /**
      * The mautic.focus_post_save event is dispatched right after a focus is persisted.
@@ -25,7 +25,7 @@ final class FocusEvents
      *
      * @var string
      */
-    const POST_SAVE = 'mautic.focus_post_save';
+    public const POST_SAVE = 'mautic.focus_post_save';
 
     /**
      * The mautic.focus_pre_delete event is dispatched before a focus is deleted.
@@ -34,7 +34,7 @@ final class FocusEvents
      *
      * @var string
      */
-    const PRE_DELETE = 'mautic.focus_pre_delete';
+    public const PRE_DELETE = 'mautic.focus_pre_delete';
 
     /**
      * The mautic.focus_post_delete event is dispatched after a focus is deleted.
@@ -43,7 +43,7 @@ final class FocusEvents
      *
      * @var string
      */
-    const POST_DELETE = 'mautic.focus_post_delete';
+    public const POST_DELETE = 'mautic.focus_post_delete';
 
     /**
      * The mautic.focus_token_replacent event is dispatched after a load content.
@@ -52,7 +52,7 @@ final class FocusEvents
      *
      * @var string
      */
-    const TOKEN_REPLACEMENT = 'mautic.focus_token_replacement';
+    public const TOKEN_REPLACEMENT = 'mautic.focus_token_replacement';
 
     /**
      * The mautic.focus.on_campaign_trigger_action event is fired when the campaign action triggers.
@@ -62,7 +62,7 @@ final class FocusEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.focus.on_campaign_trigger_action';
 
     /**
      * The mautic.focus.on_open event is dispatched when an focus is opened.
@@ -72,5 +72,5 @@ final class FocusEvents
      *
      * @var string
      */
-    const FOCUS_ON_VIEW = 'mautic.focus.on_view';
+    public const FOCUS_ON_VIEW = 'mautic.focus.on_view';
 }

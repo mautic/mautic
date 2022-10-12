@@ -36,7 +36,7 @@ class EmailController extends FormController
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+    public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -352,8 +352,8 @@ class EmailController extends FormController
 
                 $event = new DetermineWinnerEvent($args);
                 $this->dispatcher->dispatch(
-                        $testSettings['event'],
-                        $event
+                        $event,
+                        $testSettings['event']
                     );
 
                 $abTestResults = $event->getAbTestResults();

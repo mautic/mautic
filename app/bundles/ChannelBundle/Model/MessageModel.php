@@ -19,7 +19,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class MessageModel extends FormModel implements AjaxLookupModelInterface
 {
-    const CHANNEL_FEATURE = 'marketing_messages';
+    public const CHANNEL_FEATURE = 'marketing_messages';
 
     /**
      * @var ChannelListHelper

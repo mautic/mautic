@@ -36,7 +36,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ReportModel extends FormModel
 {
-    const CHANNEL_FEATURE = 'reporting';
+    public const CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array

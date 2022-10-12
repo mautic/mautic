@@ -239,7 +239,7 @@ class PublicController extends CommonFormController
                         // Replace tokens in preference center page
                         $event = new PageDisplayEvent($html, $prefCenter, $params);
                         $this->get('event_dispatcher')
-                            ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                            ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
                         $html = $event->getContent();
                         if (!$session->has($successSessionName)) {
                             $successMessageDataSlots       = [
