@@ -315,6 +315,9 @@ return [
     'categories' => [
         'segment' => null,
     ],
+    'serviceAliases' => [
+        'mautic.lead.model.lead_segment_service' => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
+    ],
     'services' => [
         'events' => [
             'mautic.lead.subscriber' => [
@@ -1205,14 +1208,6 @@ return [
                     'event_dispatcher',
                 ],
             ],
-            'mautic.lead.model.lead_segment_service' => [
-                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
-                'arguments' => [
-                    'mautic.lead.model.lead_segment_filter_factory',
-                    'mautic.lead.repository.lead_segment_query_builder',
-                    'monolog.logger.mautic',
-                ],
-            ],
             'mautic.lead.model.lead_segment_filter_factory' => [
                 'class'     => \Mautic\LeadBundle\Segment\ContactSegmentFilterFactory::class,
                 'arguments' => [
@@ -1556,16 +1551,6 @@ return [
                     'mautic.lead.field.settings.background_service',
                     'translator',
                     'mautic.lead.repository.field',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.lead.command.update_lead_lists' => [
-                'class'     => \Mautic\LeadBundle\Command\UpdateLeadListsCommand::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'translator',
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
                 ],
                 'tag' => 'console.command',
             ],
