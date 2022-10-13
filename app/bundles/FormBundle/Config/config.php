@@ -398,6 +398,7 @@ return [
                     'mautic.form.service.field.value.transformer',
                     'mautic.helper.template.date',
                     'mautic.tracker.contact',
+                    'mautic.lead.merger',
                 ],
             ],
             'mautic.form.model.submission_result_loader' => [

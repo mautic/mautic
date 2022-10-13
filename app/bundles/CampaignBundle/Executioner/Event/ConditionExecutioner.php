@@ -14,7 +14,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
 class ConditionExecutioner implements EventInterface
 {
-    const TYPE = 'condition';
+    public const TYPE = 'condition';
 
     /**
      * @var ConditionDispatcher

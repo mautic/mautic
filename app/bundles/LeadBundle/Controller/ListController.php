@@ -22,9 +22,9 @@ class ListController extends FormController
 {
     use EntityContactsTrait;
 
-    const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
-    const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+    public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
     /**
      * @var array

@@ -14,11 +14,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 {
-    const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
-    const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
-    const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
+    public const PERMISSION_CREATE       = 'dynamiccontent:dynamiccontents:create';
+    public const PERMISSION_DELETE_OTHER = 'dynamiccontent:dynamiccontents:deleteother';
+    public const PERMISSION_DELETE_OWN   = 'dynamiccontent:dynamiccontents:deleteown';
 
-    const BITWISE_BY_PERM = [
+    public const BITWISE_BY_PERM = [
         self::PERMISSION_CREATE       => 52,
         self::PERMISSION_DELETE_OWN   => 66,
         self::PERMISSION_DELETE_OTHER => 150,
@@ -29,7 +29,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser(self::PERMISSION_CREATE);
         $this->client->request(Request::METHOD_GET, '/s/dwc/new');
 
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
     public function testForbiddenNewAction(): void
@@ -37,7 +37,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request(Request::METHOD_GET, '/s/dwc/new');
 
-        Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
     public function testAccessDeleteAction(): void
@@ -45,7 +45,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser(self::PERMISSION_DELETE_OWN);
         $this->client->request(Request::METHOD_POST, '/s/dwc/delete');
 
-        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame(Response::HTTP_OK, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
     public function testForbiddenDeleteAction(): void
@@ -53,7 +53,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->createAndLoginUser();
         $this->client->request('GET', '/s/dwc/delete');
 
-        Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode());
+        Assert::assertSame(Response::HTTP_FORBIDDEN, $this->client->getResponse()->getStatusCode(), $this->client->getResponse()->getContent());
     }
 
     private function createAndLoginUser(string $permission = null): User

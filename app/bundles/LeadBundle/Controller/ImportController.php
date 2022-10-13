@@ -25,17 +25,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ImportController extends FormController
 {
     // Steps of the import
-    const STEP_UPLOAD_CSV      = 1;
-    const STEP_MATCH_FIELDS    = 2;
-    const STEP_PROGRESS_BAR    = 3;
-    const STEP_IMPORT_FROM_CSV = 4;
+    public const STEP_UPLOAD_CSV      = 1;
+    public const STEP_MATCH_FIELDS    = 2;
+    public const STEP_PROGRESS_BAR    = 3;
+    public const STEP_IMPORT_FROM_CSV = 4;
 
     /**
      * @var LoggerInterface
@@ -52,7 +52,7 @@ class ImportController extends FormController
      */
     private $importModel;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         /** @var ImportModel $model */
         $model = $this->getModel($this->getModelName());

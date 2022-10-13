@@ -90,8 +90,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */

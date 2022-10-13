@@ -1,36 +1,17 @@
-<?php
-
-declare(strict_types=1);
-
-use Mautic\MarketplaceBundle\DTO\PackageDetail;
-use Mautic\MarketplaceBundle\Service\RouteProvider;
-
-/** @var PackageDetail $packageDetail */
-$packageDetail = $packageDetail;
-?>
 <div class="text-center" id="marketplace-removal-in-progress">
-    <p><?php echo $view['translator']->trans(
-        'marketplace.package.remove.html.in.progress',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
-        ); ?></p>
+    <p>{{ 'marketplace.package.remove.html.in.progress'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) }}</p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
     </div>
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-failed">
-    <p><?php echo $view['translator']->trans(
-        'marketplace.package.remove.html.failed',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
-        ); ?></p>
+    <p>{{ 'marketplace.package.remove.html.failed'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) }}</p>
     <textarea class="form-control" readonly id="marketplace-removal-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-removal-success">
-    <p><?php echo $view['translator']->trans(
-        'marketplace.package.remove.html.success',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
-        ); ?></p>
-    <p><a class="btn btn-primary" href="<?php echo $view['router']->path(RouteProvider::ROUTE_LIST); ?>"><?php echo $view['translator']->trans(
-        'marketplace.package.remove.html.success.continue'); ?></a></p>
+    <p>{{ 'marketplace.package.remove.html.success'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) }}</p>
+    <p><a class="btn btn-primary" href="{{ path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_LIST')) }}">
+    {% trans %}marketplace.package.remove.html.success.continue{% endtrans %}</a></p>
 </div>
 
 <script>
@@ -43,8 +24,8 @@ $packageDetail = $packageDetail;
     removePackageResetView();
 
     Mautic.Marketplace.removePackage(
-        '<?php echo htmlspecialchars($packageDetail->packageBase->getVendorName(), ENT_QUOTES); ?>',
-        '<?php echo htmlspecialchars($packageDetail->packageBase->getPackageName(), ENT_QUOTES); ?>',
+        '{{ packageDetail.packageBase.getVendorName()|escape }}',
+        '{{ packageDetail.packageBase.getPackageName()|escape }}',
         (response) => {
             if (response.success) {
                 mQuery('#marketplace-removal-in-progress').hide();
