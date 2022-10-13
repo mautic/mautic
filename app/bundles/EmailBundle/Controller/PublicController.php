@@ -430,7 +430,7 @@ class PublicController extends CommonFormController
         $callbackTransport = $realTransport->getTransportExtension($transport);
 
         $event = new TransportWebhookEvent($callbackTransport, $this->request);
-        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::ON_TRANSPORT_WEBHOOK);
 
         return new Response('success');
     }

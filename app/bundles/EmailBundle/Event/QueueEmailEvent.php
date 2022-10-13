@@ -3,12 +3,11 @@
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Mailer\Message\MauticMessage;
-use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class QueueEmailEvent.
  */
-class QueueEmailEvent extends Event
+class QueueEmailEvent extends \Symfony\Contracts\EventDispatcher\Event
 {
     /**
      * @var MauticMessage

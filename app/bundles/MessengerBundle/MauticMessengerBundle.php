@@ -17,6 +17,6 @@ class MauticMessengerBundle extends Bundle
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
-        $container->addCompilerPass(new MessengerTransportPass());
+        $container->addCompilerPass(new MessengerTransportPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }
