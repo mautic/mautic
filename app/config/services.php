@@ -48,6 +48,7 @@ return function (ContainerConfigurator $configurator) {
         'PreferenceBuilder/ChannelPreferences.php',
         'PreferenceBuilder/PreferenceBuilder.php',
         'Helper/Chart',
+        'Helper/BatchIdToEntityHelper.php',
         'Helper/CommandResponse.php',
         'Helper/Language/Installer.php',
         'Helper/PageHelper.php',
