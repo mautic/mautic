@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Mautic\InstallBundle\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\DBAL\Exception;
-use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;

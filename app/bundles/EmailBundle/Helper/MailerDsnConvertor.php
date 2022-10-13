@@ -23,7 +23,7 @@ class MailerDsnConvertor
      *
      * @param string $dsnString The DSN string
      *
-     * @return array<string, mixed>              the array of DSN options
+     * @return array<string, mixed> the array of DSN options
      */
     public static function convertDsnToArray(string $dsnString): array
     {

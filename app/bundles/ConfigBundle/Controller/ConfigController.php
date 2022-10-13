@@ -262,6 +262,8 @@ class ConfigController extends FormController
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
+     *
+     * @param array<string> $temporaryFields
      */
     private function mergeParamsWithLocal(array &$forms, array $temporaryFields): void
     {

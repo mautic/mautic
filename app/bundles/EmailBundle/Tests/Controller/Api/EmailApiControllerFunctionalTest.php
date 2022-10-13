@@ -35,7 +35,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
         $this->setPrivateProperty($mailHelper, 'transport', $transport);
 
-        $this->transport  = $transport;
+        $this->transport = $transport;
     }
 
     protected function tearDown(): void
@@ -331,7 +331,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmail();
@@ -369,7 +369,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmailOwnerAsMailer();

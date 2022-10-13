@@ -116,7 +116,7 @@ class ConfigSubscriber implements EventSubscriberInterface
      *
      * @param ConfigBuilderEvent $event config builder event
      *
-     * @return array<string, string>  the parsed parameters
+     * @return array<string, string> the parsed parameters
      */
     private function getParameters(ConfigBuilderEvent $event): array
     {

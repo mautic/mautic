@@ -6,7 +6,6 @@ use Mautic\EmailBundle\Mailer\Transport\CallbackTransportInterface;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
-
 /**
  * Event triggered when a transport service send Mautic a webhook request.
  */

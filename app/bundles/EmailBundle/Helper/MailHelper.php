@@ -892,7 +892,7 @@ class MailHelper
 
     private function convertEmbedImages(): void
     {
-        $content = $this->message->getBody();
+        $content = $this->message->getHtmlBody();
         $matches = [];
         $content = strtr($content, $this->embedImagesReplaces);
         $tokens  = $this->getTokens();
@@ -908,12 +908,12 @@ class MailHelper
                     continue;
                 }
 
-                $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                $this->embedImagesReplaces[$match] = $this->message->embedFromPath($match);
             }
             $content = strtr($content, $this->embedImagesReplaces);
         }
 
-        $this->message->setBody($content);
+        $this->message->html($content);
     }
 
     /**
