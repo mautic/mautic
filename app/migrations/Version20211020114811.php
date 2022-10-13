@@ -39,45 +39,7 @@ final class Version20211020114811 extends AbstractMauticMigration
             $tableName = $table['TABLE_NAME'];
             $this->addSql(sprintf('ALTER TABLE %s CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;', $tableName));
         }
-
-        $columns          = $this->getColumns();
-        $columnsWithTable = [];
-        foreach ($columns as $column) {
-            $columnsWithTable[$column['TABLE_NAME']][] = $column;
-        }
-
-        foreach ($columnsWithTable as $table => $columns) {
-            $allColumnsQueries = [];
-            foreach ($columns as $column) {
-                $columnName          = $column['COLUMN_NAME'];
-                $columnType          = $column['COLUMN_TYPE'];
-                $isNullable          = 'NO' == $column['IS_NULLABLE'] ? ' NOT NULL' : '';
-                $default             = !is_null($column['COLUMN_DEFAULT']) ? sprintf(' DEFAULT "%s"', $column['COLUMN_DEFAULT']) : '';
-                $allColumnsQueries[] = sprintf('MODIFY %s %s CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci %s %s', $columnName, $columnType, $isNullable, $default);
-            }
-            $query = implode(',', $allColumnsQueries);
-            $this->addSql(sprintf('ALTER TABLE %s %s;', $table, $query));
-        }
         $this->addSql('SET FOREIGN_KEY_CHECKS=1;');
-    }
-
-    /**
-     * @return array<string, mixed>
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    private function getColumns(): array
-    {
-        $dataTypes = "'".implode("','", self::DATA_TYPES_FOR_CHANGE_CHARSET)."'";
-        $stmt      = $this->connection->executeQuery(
-            "SELECT COLUMN_NAME, COLUMN_TYPE, TABLE_NAME, IS_NULLABLE, COLUMN_DEFAULT  FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '{$this->connection->getDatabase()}' AND 
-                                               DATA_TYPE IN ({$dataTypes}) AND
-                                               EXTRA != 'VIRTUAL GENERATED' AND
-                                               (CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci')"
-        );
-        $stmt->execute();
-
-        return $stmt->fetchAll();
     }
 
     /**
