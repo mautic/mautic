@@ -200,10 +200,10 @@ class StageController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'entity'  => $entity,
-                    'form'    => $form->createView(), //Check if this is the correct way to do this: $this->setFormTheme($form, 'MauticStageBundle:Stage:form.html.twig', $themes),
-                    'actions' => $actions['actions'],
+                    'tmpl'      => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'entity'    => $entity,
+                    'form'      => $form->createView(),
+                    'actions'   => $actions['actions'],
                 ],
                 'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
                 'passthroughVars' => [
