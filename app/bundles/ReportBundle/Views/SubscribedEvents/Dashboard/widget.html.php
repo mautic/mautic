@@ -8,8 +8,8 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if (isset($chartData['data']) and isset($chartType)) :
-    $chartData = $chartData['data'];
+if (isset($chartData) and isset($chartType)) :
+    $chartData = $chartData['data'] ?? $chartData;
 
 if ('table' === $chartType) {
     echo $view->render(
