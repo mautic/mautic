@@ -19,8 +19,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:
      *     1. A query that alters a DB schema causes an open transaction being committed immediately.
      *     2. Full-text search does not see uncommitted changes.
+     *
+     * @var bool
      */
-    protected bool $useCleanupRollback = true;
+    protected $useCleanupRollback = true;
 
     /**
      * @param array<mixed> $data
