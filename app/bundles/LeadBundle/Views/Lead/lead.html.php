@@ -590,7 +590,12 @@ $view['slots']->set(
         <div class="pa-sm">
             <?php $tags = $lead->getTags(); ?>
             <?php foreach ($tags as $tag): ?>
-                <h5 class="pull-left mt-xs mr-xs"><span class="label label-success label-tag"><?php echo $view->escape($tag->getTag()); ?></span>
+                <h5 class="pull-left mt-xs mr-xs">
+                    <span class="label label-success label-tag">
+                        <a href="<?php echo $view['router']->path('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]); ?>" data-toggle="ajax" style="color: white;">
+                             <?php echo $view->escape($tag->getTag()); ?>
+                        </a>
+                    </span>
                 </h5>
             <?php endforeach; ?>
             <div class="clearfix"></div>
