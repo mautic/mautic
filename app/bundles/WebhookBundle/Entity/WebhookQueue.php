@@ -28,7 +28,7 @@ class WebhookQueue
     /**
      * @var string|null
      */
-    private $payload;
+    private $payload; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
 
     /**
      * @var string|resource|null
@@ -156,7 +156,7 @@ class WebhookQueue
     }
 
     /**
-     * @param Event|null
+     * @param Event|null $event
      *
      * @return WebhookQueue
      */
