@@ -55,15 +55,13 @@
 
 								<!-- Nav tabs -->
 								<ul class="list-group list-group-tabs" role="tablist">
-                                    {% set i = 0 %}
                                     {% for bundle, config in permissionsConfig['config'] %}
-										<li role="presentation" class="list-group-item {{ i is same as(0) ? 'in active' : '' }}">
+										<li role="presentation" class="list-group-item {{ loop.index0 is same as(0) ? 'in active' : '' }}">
 											<a href="#{{ bundle }}PermissionTab" aria-controls="{{ bundle }}PermissionTab" role="tab" data-toggle="tab" class="steps">
 												<span>{{ config['label'] }}</span>
 												<span class="permission-ratio"> (<span class="{{ bundle }}_granted">{{ config['ratio'][0] }}</span> / <span class="{{ bundle }}_total">{{ config['ratio'][1] }}</span>)</span>
 											</a>
 										</li>
-                                        {% do ++i %}
 									{% endfor %}
 								</ul>
 							</div>
@@ -72,28 +70,23 @@
 						<!-- container -->
 						<div class="col-md-7 bg-auto height-auto bdr-l">
 							<div class="tab-content">
-                                {% set permissions = form.permissions.children %}
-                                {% set i = 0 %}
-                                {% for child in permissions %}
-                                    {% if child.vars['value'] == 'newbundle' %}
-                                        {% if i > 0 %} {# Close tab panel #}
-                                            </div>
-                                            </div>
-                                        {% endif %}
-                                        <div role="tabpanel" class="tab-pane fade{{ 0 is same as(i) ? ' in active' : '' }} bdr-w-0" id="{{ child.vars['name'] }}PermissionTab">
-                                        <div class="pt-md pr-md pl-md pb-md">
-                                        {% do child.setRendered() %}
-                                    {% else %}
-                                        {{ form_row(child) }}
-                                    {% endif %}
-                                    {% do ++i %}
-                                {% endfor %}
-                                {# close last tab #}
-                                </div>
-                                </div>
-                                </div>
-                                </div>
-                                {% do form.permissions.setRendered() %}
+								{% set permissions = form.permissions.children %}
+								{% for child in permissions %}
+									{% if 'newbundle' == child.vars.value %}
+										{% if loop.index0 > 0 %}
+											{# // Close tab panel #}
+											</div>{{ "\n" }}</div>{{ "\n" }}
+										{% endif %}
+										<div role="tabpanel" class="tab-pane fade{{ 0 is same as(loop.index0) ? ' in active' : '' }} bdr-w-0" id="{{ child.vars.name }}PermissionTab">{{ "\n" }}
+										<div class="pt-md pr-md pl-md pb-md"> {{ "\n" }}
+										{% do child.setRendered() %}
+									{% else %}
+										{{ form_row(child) }}
+									{% endif %}
+								{% endfor %}
+									{# //close last tab  #}
+									</div>{{ "\n" }}
+								{% do form.permissions.setRendered() %}
 							</div>
 						</div>
 					</div>
@@ -101,7 +94,7 @@
 				<div id="isAdminMessage"{% if not hidePerms %} class="hide"{% endif %}>
 					<div class="alert alert-warning">
 						<h4>{% trans %}mautic.user.role.permission.isadmin.header{% endtrans %}</h4>
-						<p><{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
+						<p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
 					</div>
 				</div>
 			</div>
