@@ -11,7 +11,10 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class MauticCloudStorageExtension extends Extension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    /**
+     * @param mixed[] $configs
+     */
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Config'));
         $loader->load('services.php');

@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class MauticLeadExtension extends MauticCoreExtension
 {
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Config'));
         $loader->load('services.php');

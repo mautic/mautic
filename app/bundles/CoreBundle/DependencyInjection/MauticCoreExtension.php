@@ -36,9 +36,9 @@ class MauticCoreExtension extends Extension
     ];
 
     /**
-     * {@inheritdoc}
+     * @param mixed[] $configs
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         // Auto-wire commands to keep support for the M3 way although best practice is to register each command
         // as a service and tag with console.command or include in a Mautic config.php services[command] array.
@@ -50,6 +50,9 @@ class MauticCoreExtension extends Extension
         $this->configureBundles($container, $bundles, true);
     }
 
+    /**
+     * @param mixed[] $bundles
+     */
     protected function configureBundles(ContainerBuilder $container, array $bundles, bool $excludeServicesConfig = false): void
     {
         // Store menu renderer options to create unique renderering classes per menu
