@@ -2,11 +2,13 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 // This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire Commands
 // as they were done in M3 which must be done when the bundle config.php's services are processed to prevent
 // Symfony attempting to auto-wire commands manually registered by bundle
-
-return function (ContainerConfigurator $configurator) {
+return function (ContainerConfigurator $configurator, ContainerInterface $container) {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
@@ -14,29 +16,14 @@ return function (ContainerConfigurator $configurator) {
         ->public() // Set as public as was the default in M3
     ;
 
-    $excludeBundleDirectories = [
-        'DependencyInjection',
-        'Entity',
-        'Config',
-        'Test',
-        'Tests',
-        'Views',
+    $excludes = [
         'EventCollector',
-        'Event',
-        'Exception',
-        'Crate',
-        'DataObject',
-        'DTO',
         'OptionsAccessor',
-        'Migrations',
-        'Migration',
         'Generator',
         'Doctrine',
         'Model/IteratorExportDataModel.php',
         'Model/ConsoleOutputModel.php',
         'Form/EventListener/FormExitSubscriber.php',
-        'Form/DataTransformer',
-        'Security',
         'Release',
         'Serializer/Driver',
         'Serializer/Exclusion',
@@ -76,16 +63,6 @@ return function (ContainerConfigurator $configurator) {
         'Sync/DAO',
         'Sync/Exception',
         'Sync/SyncProcess/SyncProcess.php',
-        'Deduplicate/Exception',
-        'Field/DTO',
-        'Field/Event',
-        'Segment/ContactSegmentFilter.php',
-        'Segment/ContactSegmentFilterCrate.php',
-        'Segment/Decorator',
-        'Segment/DoNotContact',
-        'Segment/IntegrationCampaign',
-        'Segment/Query',
-        'Segment/Stat',
         'Integration/IntegrationObject.php',
         'MauticQueueBundle.php',
         'Builder/MauticReportBuilder.php',
@@ -93,9 +70,20 @@ return function (ContainerConfigurator $configurator) {
         'Scheduler/Option',
         'Aggregate/Collection',
         'Aggregate/Calculator.php',
+        'Services',
+        'Api',
+        'Integration/Salesforce',
     ];
 
-    // Auto-register Commands as it worked in M3
-    $services->load('Mautic\\', '../bundles/')->exclude('../bundles/*/{'.implode(',', $excludeBundleDirectories).'}');
-    $services->load('MauticPlugin\\', '../../plugins/*/Command/*');
+    $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
+
+    // Autoconfigure services for bundles that do not have its own Config/services.php
+    foreach ($bundles as $bundle) {
+        if (file_exists($bundle['directory'].'/Config/services.php')) {
+            continue;
+        }
+
+        $services->load($bundle['namespace'].'\\', $bundle['directory'])
+            ->exclude($bundle['directory'].'/{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+    }
 };

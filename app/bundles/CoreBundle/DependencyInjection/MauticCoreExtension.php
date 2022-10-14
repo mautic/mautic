@@ -13,13 +13,28 @@ use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 /**
- * Class MauticCoreExtension.
- *
- * This is the class that loads and manages your bundle configuration
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
+ * @see http://symfony.com/doc/current/cookbook/bundles/extension.html
  */
 class MauticCoreExtension extends Extension
 {
+    public const DEFAULT_EXCLUDES = [
+        'DependencyInjection',
+        'Entity',
+        'Config',
+        'Test',
+        'Tests',
+        'Views',
+        'Event',
+        'Exception',
+        'Crate',
+        'DataObject',
+        'DTO',
+        'Migrations',
+        'Migration',
+        'Form/DataTransformer',
+        'Security',
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -32,6 +47,11 @@ class MauticCoreExtension extends Extension
 
         $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
 
+        $this->configureBundles($container, $bundles, true);
+    }
+
+    protected function configureBundles(ContainerBuilder $container, array $bundles, bool $excludeServicesConfig = false): void
+    {
         // Store menu renderer options to create unique renderering classes per menu
         // since KNP menus doesn't seem to support a Renderer factory
         $menus = [];
@@ -40,6 +60,10 @@ class MauticCoreExtension extends Extension
         $serviceNames = [];
 
         foreach ($bundles as $bundle) {
+            // Exclude bundles that configure themselves.
+            if ($excludeServicesConfig && file_exists($bundle['directory'].'/Config/services.php')) {
+                continue;
+            }
             if (!empty($bundle['config']['serviceAliases'])) {
                 foreach ($bundle['config']['serviceAliases'] as $alias => $serviceFQCN) {
                     $container->setAlias($alias, $serviceFQCN);
