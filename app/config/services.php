@@ -27,7 +27,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Release',
         'Serializer/Driver',
         'Serializer/Exclusion',
-        'Controller',
         'Executioner/ContactFinder/Limiter/ContactLimiter.php',
         'Executioner/Dispatcher/Exception',
         'Executioner/Scheduler/Mode/DAO',

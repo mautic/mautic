@@ -33,6 +33,7 @@ class MauticCoreExtension extends Extension
         'Migration',
         'Form/DataTransformer',
         'Security',
+        'Controller',
     ];
 
     /**
