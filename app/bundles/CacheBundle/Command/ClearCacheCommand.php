@@ -29,7 +29,7 @@ class ClearCacheCommand extends Command
             ->setDescription('Clears Mautic\'s cache');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): ?int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         return (int) !$this->cacheProvider->clear();
     }

@@ -240,7 +240,7 @@ class InstallCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Check Mautic is not already installed
         if ($this->installer->checkIfInstalled()) {
@@ -343,7 +343,7 @@ class InstallCommand extends Command
                         $this->handleInstallerErrors($output, $messages['requirements']);
                         $output->writeln('Install canceled');
 
-                        return -$step;
+                        return (int) -$step;
                     } elseif (isset($messages['optional']) && !empty($messages['optional'])) {
                         $output->writeln('Missing optional settings:');
                         $this->handleInstallerErrors($output, $messages['optional']);
@@ -354,7 +354,7 @@ class InstallCommand extends Command
                             $question = new ConfirmationQuestion('Continue with install anyway? [yes/no]', false);
 
                             if (!$helper->ask($input, $output, $question)) {
-                                return -$step;
+                                return (int) -$step;
                             }
                         }
                     }
@@ -380,7 +380,7 @@ class InstallCommand extends Command
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
 
                 $step = InstallService::DOCTRINE_STEP + .1;
@@ -420,7 +420,7 @@ class InstallCommand extends Command
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
                 // Keep on with next step
                 $step = InstallService::EMAIL_STEP;
@@ -435,7 +435,7 @@ class InstallCommand extends Command
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
                 // Keep on with next step
                 $step = InstallService::FINAL_STEP;
@@ -450,7 +450,7 @@ class InstallCommand extends Command
 
                     $output->writeln('Install canceled');
 
-                    return -$step;
+                    return (int) -$step;
                 }
         }
 

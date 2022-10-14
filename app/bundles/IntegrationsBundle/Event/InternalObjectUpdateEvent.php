@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Event;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\ObjectInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class InternalObjectUpdateEvent extends Event
 {

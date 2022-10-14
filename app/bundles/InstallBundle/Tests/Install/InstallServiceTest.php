@@ -8,11 +8,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Install\InstallService;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -26,7 +26,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private $cacheHelper;
     private $pathsHelper;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager&MockObject */
     private $entityManager;
 
     private $translator;
@@ -35,9 +35,9 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
     private $encoder;
 
     /**
-     * @var MockObject&ContainerInterface
+     * @var MockObject&FixturesLoaderInterface
      */
-    private $container;
+    private $fixtureLoader;
 
     private InstallService $installer;
 
@@ -53,7 +53,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
         $this->kernel               = $this->createMock(KernelInterface::class);
         $this->validator            = $this->createMock(ValidatorInterface::class);
         $this->encoder              = $this->createMock(UserPasswordEncoder::class);
-        $this->container            = $this->createMock(ContainerInterface::class);
+        $this->fixtureLoader        = $this->createMock(FixturesLoaderInterface::class);
 
         $this->installer = new InstallService(
             $this->configurator,
@@ -64,7 +64,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             $this->kernel,
             $this->validator,
             $this->encoder,
-            $this->container
+            $this->fixtureLoader
         );
     }
 

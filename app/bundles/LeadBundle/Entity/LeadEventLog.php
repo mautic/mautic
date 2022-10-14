@@ -17,7 +17,7 @@ class LeadEventLog
     /**
      * @var string
      */
-    const INDEX_SEARCH = 'IDX_SEARCH';
+    public const INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
      * @var int

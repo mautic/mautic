@@ -3,8 +3,8 @@
 namespace Mautic\EmailBundle\Event;
 
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event triggered when a transport service send Mautic a webhook request.

@@ -51,7 +51,7 @@ class InstallController extends CommonController
                 'viewParameters' => [
                     'packageDetail'  => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:install.html.php',
+                'contentTemplate' => 'MarketplaceBundle:Package:install.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',

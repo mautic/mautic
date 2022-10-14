@@ -59,7 +59,7 @@ class RedirectModel extends FormModel
     {
         if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);
-            $this->dispatcher->dispatch(PageEvents::ON_REDIRECT_GENERATE, $event);
+            $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
 
             $clickthrough = $event->getClickthrough();
         }
@@ -105,7 +105,7 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param  $url
+     * @param $url
      *
      * @return Redirect|null
      */

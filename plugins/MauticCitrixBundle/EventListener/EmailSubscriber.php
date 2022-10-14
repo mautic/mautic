@@ -178,7 +178,7 @@ class EmailSubscriber implements EventSubscriberInterface
                 if ($triggerEvent && $this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_TOKEN_GENERATE)) {
                     $params['lead'] = $event->getLead();
                     $tokenEvent     = new TokenGenerateEvent($params);
-                    $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_TOKEN_GENERATE, $tokenEvent);
+                    $this->dispatcher->dispatch($tokenEvent, CitrixEvents::ON_CITRIX_TOKEN_GENERATE);
                     $params = $tokenEvent->getParams();
                     unset($tokenEvent);
                 }

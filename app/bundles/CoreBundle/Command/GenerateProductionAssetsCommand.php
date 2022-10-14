@@ -43,7 +43,7 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);

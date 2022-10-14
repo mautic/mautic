@@ -108,7 +108,7 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $id             = $input->getOption('campaign-id');
         $batchLimit     = $input->getOption('batch-limit');

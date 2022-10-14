@@ -4,7 +4,7 @@ namespace Mautic\PointBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PointBundle\Entity\TriggerEvent as TriggerEventEntity;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class TriggerExecutedEvent extends Event
 {

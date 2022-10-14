@@ -10,11 +10,11 @@ use Mautic\CoreBundle\Helper\Serializer;
  */
 class CustomFieldValueHelper
 {
-    const TYPE_BOOLEAN     = 'boolean';
+    public const TYPE_BOOLEAN     = 'boolean';
 
-    const TYPE_SELECT      = 'select';
+    public const TYPE_SELECT      = 'select';
 
-    const TYPE_MULTISELECT = 'multiselect';
+    public const TYPE_MULTISELECT = 'multiselect';
 
     /**
      * @return array

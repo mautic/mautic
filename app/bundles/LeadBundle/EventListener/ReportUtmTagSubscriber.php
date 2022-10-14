@@ -11,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
-    const UTM_TAG = 'lead.utmTag';
+    public const UTM_TAG = 'lead.utmTag';
 
     /**
      * @var FieldsBuilder
