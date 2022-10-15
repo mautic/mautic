@@ -1,4 +1,5 @@
 <?php
+
 $parameters = [
     'api_enabled'                           => true,
     'api_enable_basic_auth'                 => true,
