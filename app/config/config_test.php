@@ -5,7 +5,7 @@ use Mautic\CoreBundle\Test\EnvLoader;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -27,6 +27,9 @@ $container->loadFromExtension('framework', [
     ],
     'csrf_protection' => [
         'enabled' => true,
+    ],
+    'mailer' => [
+        'dsn' => 'null://null',
     ],
 ]);
 

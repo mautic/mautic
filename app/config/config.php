@@ -83,6 +83,29 @@ $container->loadFromExtension('framework', [
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'messenger'            => [
+        'default_bus' => 'email.bus',
+        'buses'       => [
+            'email.bus' => null,
+        ],
+        'transports'  => [
+            'email_transport' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
+                    'consumer'    => '%env(MAUTIC_MESSENGER_CONSUMER_NAME)%',
+                ],
+                'retry_strategy' => [
+                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
+                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
+                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
+                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                ],
+            ],
+        ],
+        'routing' => [
+             'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+        ],
+    ],
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')

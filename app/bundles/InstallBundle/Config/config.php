@@ -64,6 +64,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.email.transport_type',
+                    'mautic.messenger.transport_type',
                 ],
             ],
             \Mautic\InstallBundle\Configurator\Form\UserStepType::class => [
