@@ -93,6 +93,11 @@ if ('index' === $tmpl) {
                 <?php echo $view['form']->row($form['mailer_api_key']); ?>
             </div>
         </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <?php echo $view['form']->row($form['messenger_transport']); ?>
+            </div>
+        </div>
     </div>
     <div class="row mt-20">
         <div class="col-sm-9">

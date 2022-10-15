@@ -5,6 +5,7 @@ namespace Mautic\InstallBundle\Configurator\Form;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\EmailBundle\Model\TransportType;
+use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -28,10 +29,16 @@ class EmailStepType extends AbstractType
      */
     private $transportType;
 
-    public function __construct(TranslatorInterface $translator, TransportType $transportType)
+    /**
+     * @var MessengerTransportType
+     */
+    private $messengerTransportType;
+
+    public function __construct(TranslatorInterface $translator, TransportType $transportType, MessengerTransportType $messengerTransportType)
     {
-        $this->translator    = $translator;
-        $this->transportType = $transportType;
+        $this->translator             = $translator;
+        $this->transportType          = $transportType;
+        $this->messengerTransportType = $messengerTransportType;
     }
 
     /**
@@ -327,6 +334,21 @@ class EmailStepType extends AbstractType
         $builder->add('mailer_spool_path', HiddenType::class);
 
         $builder->add(
+            'messenger_transport',
+            ChoiceType::class,
+            [
+                'choices'           => $this->getMessengerTransportChoices(),
+                'label'             => 'mautic.install.form.email.messenger',
+                'required'          => false,
+                'attr'              => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.config.mailer.messenger.tooltip',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
             'buttons',
             FormButtonsType::class,
             [
@@ -368,6 +390,23 @@ class EmailStepType extends AbstractType
     {
         $choices    = [];
         $transports = $this->transportType->getTransportTypes();
+
+        foreach ($transports as $value => $label) {
+            $choices[$this->translator->trans($label)] = $value;
+        }
+
+        ksort($choices, SORT_NATURAL);
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getMessengerTransportChoices()
+    {
+        $choices    = [];
+        $transports = $this->messengerTransportType->getTransportTypes();
 
         foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;
