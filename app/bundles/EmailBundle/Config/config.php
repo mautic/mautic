@@ -340,7 +340,10 @@ return [
                 'class' => \Mautic\EmailBundle\Form\Type\AbTestPropertiesType::class,
             ],
             'mautic.email.type.batch_send' => [
-                'class' => \Mautic\EmailBundle\Form\Type\BatchSendType::class,
+                'class'     => \Mautic\EmailBundle\Form\Type\BatchSendType::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'mautic.form.type.emailconfig' => [
                 'class'     => \Mautic\EmailBundle\Form\Type\ConfigType::class,
@@ -952,6 +955,7 @@ return [
         'mailer_spool_time_limit'        => null,
         'mailer_spool_recover_timeout'   => 900,
         'mailer_spool_clear_timeout'     => 1800,
+        'mailer_memory_msg_limit'        => 100,
         'unsubscribe_text'               => null,
         'webview_text'                   => null,
         'unsubscribe_message'            => null,
