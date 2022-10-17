@@ -28,7 +28,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Helper/Tree/IntNode.php',
         'Helper/Update/Github/Release.php',
         'Helper/Update/PreUpdateChecks',
-        'Helper/oAuthHelper.php',
         'Helper/RabbitMqProducer.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
         'Templating/Engine/PhpEngine.php', // Will be removed in M5
