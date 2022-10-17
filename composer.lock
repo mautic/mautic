@@ -5701,7 +5701,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "9b2eafe9a78413a007a3b5a0951b65c377b56a43"
+                "reference": "a6a5774ce1e2747d6486a6b73f40c06952f756ad"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5774,9 +5774,7 @@
                 "symfony/http-kernel": "~4.4.0",
                 "symfony/intl": "~4.4.0",
                 "symfony/lock": "^5.1",
-                "symfony/mailer": "^5.4",
                 "symfony/messenger": "^5.4",
-                "symfony/mime": "^5.4",
                 "symfony/monolog-bridge": "~4.4.0",
                 "symfony/monolog-bundle": "~3.5.0",
                 "symfony/options-resolver": "~4.4.0",
