@@ -15,8 +15,8 @@ class DsnDoctrineConvertor
     {
         $parameters = [];
 
-        $dsn                          = Dsn::fromString($dsnString);
-        $parameters['messenger_dsn']  = $dsnString;
+        $dsn = Dsn::fromString($dsnString);
+        $parameters['messenger_dsn'] = $dsnString;
         $parameters['messenger_type'] = $dsn->getScheme();
 
         return $parameters;
@@ -33,6 +33,6 @@ class DsnDoctrineConvertor
          * We will use a static Dsn string, that matches the default Dsn string
          * https://symfony.com/doc/current/messenger.html#doctrine-transport
          */
-        return 'doctrine://default?table_name=table_name&queue_name=default&redeliver_timeout=3600&auto_setup=true';
+        return 'doctrine://default?auto_setup=true';
     }
 }

@@ -22,7 +22,7 @@ $container->loadFromExtension('sensio_framework_extra', [
 ]);
 
 // Build and store Mautic bundle metadata
-$symfonyBundles        = $container->getParameter('kernel.bundles');
+$symfonyBundles = $container->getParameter('kernel.bundles');
 $bundleMetadataBuilder = new \Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder($symfonyBundles, $paths, $root);
 
 $container->setParameter('mautic.bundles', $bundleMetadataBuilder->getCoreBundleMetadata());
@@ -34,8 +34,8 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
-$configParameterBag      = $parameterLoader->getParameterBag();
+$parameterLoader = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag = $parameterLoader->getParameterBag();
 $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
 // Set template engines
@@ -45,10 +45,10 @@ $engines = ['php', 'twig'];
 // This cannot be set dynamically
 
 if (defined('MAUTIC_INSTALLER')) {
-    $request      = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
     $secureCookie = $request->isSecure();
 } else {
-    $siteUrl      = $configParameterBag->get('site_url');
+    $siteUrl = $configParameterBag->get('site_url');
     $secureCookie = ($siteUrl && 0 === strpos($siteUrl, 'https'));
 }
 
@@ -93,7 +93,7 @@ $container->loadFromExtension('framework', [
             'email_transport' => [
                 'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
                 'options'        => [
-                    'consumer'    => '%env(MAUTIC_MESSENGER_CONSUMER_NAME)%',
+                    'auto_setup'    => true,
                 ],
                 'retry_strategy' => [
                     'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
@@ -104,7 +104,8 @@ $container->loadFromExtension('framework', [
             ],
         ],
         'routing' => [
-             'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+            // TODO: Enable this line when you want to merge symfony/mailer
+            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
         ],
     ],
 
