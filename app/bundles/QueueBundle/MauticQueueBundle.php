@@ -58,6 +58,6 @@ class MauticQueueBundle extends Bundle
             return new LeezyPheanstalkExtension();
         }
 
-        return null;
+        return parent::createContainerExtension();
     }
 }

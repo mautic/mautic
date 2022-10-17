@@ -28,13 +28,11 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Helper/Tree/IntNode.php',
         'Helper/Update/Github/Release.php',
         'Helper/Update/PreUpdateChecks',
-        'Helper/RabbitMqProducer.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
         'Templating/Engine/PhpEngine.php', // Will be removed in M5
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
-        'MauticQueueBundle.php',
         'Aggregate/Collection',
         'Aggregate/Calculator.php',
         'Services',
