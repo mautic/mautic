@@ -5,9 +5,8 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-// This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire Commands
-// as they were done in M3 which must be done when the bundle config.php's services are processed to prevent
-// Symfony attempting to auto-wire commands manually registered by bundle
+// This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire services
+// if the bundle do not cover it itself by their own *Extension and services.php which is prefered.
 return function (ContainerConfigurator $configurator, ContainerInterface $container) {
     $services = $configurator->services()
         ->defaults()
@@ -16,6 +15,8 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         ->public() // Set as public as was the default in M3
     ;
 
+    // These are excludes only for the CoreBundle. Do not add exclues from other bundles here.
+    // Each bundle can exclude their own folders or files.
     $excludes = [
         'Doctrine',
         'Model/IteratorExportDataModel.php',
