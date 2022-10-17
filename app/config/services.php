@@ -28,7 +28,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Helper/Tree/IntNode.php',
         'Helper/Update/Github/Release.php',
         'Helper/Update/PreUpdateChecks',
-        'Helper/SchemaHelper.php',
         'Helper/FieldFilterHelper.php',
         'Helper/FieldMergerHelper.php',
         'Helper/oAuthHelper.php',
