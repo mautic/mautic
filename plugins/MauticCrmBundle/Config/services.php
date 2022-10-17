@@ -14,6 +14,7 @@ return function (ContainerConfigurator $configurator) {
 
     $excludes = [
         'Api',
+        'Integration/Salesforce',
     ];
 
     $services->load('MauticPlugin\\MauticCrmBundle\\', '../')
