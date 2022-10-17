@@ -17,7 +17,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
     ;
 
     $excludes = [
-        'OptionsAccessor',
         'Generator',
         'Doctrine',
         'Model/IteratorExportDataModel.php',
@@ -46,11 +45,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
-        'MonitoredEmail/Accessor',
-        'MonitoredEmail/Organizer',
-        'MonitoredEmail/Processor',
-        'Stat/Reference.php',
-        'Swiftmailer', // Will be removed in M5
         'ProgressiveProfiling/DisplayCounter.php',
         'ProgressiveProfiling/DisplayManager.php',
         'Auth/Support/Oauth2/Token',
