@@ -33,9 +33,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
-        'Services',
-        'Api',
-        'Integration/Salesforce',
     ];
 
     $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
