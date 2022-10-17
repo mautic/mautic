@@ -16,7 +16,7 @@
     ]
   },
   "require": {
-    "php": ">=7.4.0 <8.1",
+    "php": "~8.0",
     "ext-zlib": "*",
     "ext-zip": "*",
     "ext-imap": "*",
@@ -56,8 +56,6 @@
     "symfony/swiftmailer-bundle": "~3.3",
     "symfony/polyfill-mbstring": "~1.0",
     "symfony/security-acl": "~3.0.0",
-    "symfony/polyfill-php73": "^1.13",
-    "symfony/polyfill-php74": "^1.13",
     "symfony/css-selector": "~4.4.0",
     "symfony/http-client": "~4.4.0",
     "doctrine/doctrine-bundle": ">= 2.1.1 < 2.6",
