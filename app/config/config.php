@@ -140,7 +140,7 @@ $dbalSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
-    'schema_filter'  => '~^(?!messenger_messages)~',
+    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
 
 $container->loadFromExtension('doctrine', [
