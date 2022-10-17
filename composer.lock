@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4a0288b09fc441b94c4a9710a6b7d312",
+    "content-hash": "264f77d178984cfa68a6cbfae8eed5e3",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5701,7 +5701,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "ec2359706acea866485c247e1f08e0fb1fe57c92"
+                "reference": "04d980c8618173daf6506be50213027971bfb71a"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5742,7 +5742,7 @@
                 "mrclay/minify": "2.2.0",
                 "noxlogic/ratelimit-bundle": "^1.11",
                 "oneup/uploader-bundle": "^3.1.0",
-                "php": ">=7.4.0 <8.1",
+                "php": "~8.0",
                 "php-amqplib/rabbitmq-bundle": "^2.5.1",
                 "php-http/guzzle7-adapter": "^1.0",
                 "phpoffice/phpspreadsheet": "^1.15",
@@ -5777,8 +5777,6 @@
                 "symfony/monolog-bundle": "~3.5.0",
                 "symfony/options-resolver": "~4.4.0",
                 "symfony/polyfill-mbstring": "~1.0",
-                "symfony/polyfill-php73": "^1.13",
-                "symfony/polyfill-php74": "^1.13",
                 "symfony/process": "~4.4.0",
                 "symfony/property-access": "~4.4.0",
                 "symfony/routing": "~4.4.0",
@@ -12042,86 +12040,6 @@
             "time": "2022-05-24T11:49:31+00:00"
         },
         {
-            "name": "symfony/polyfill-php74",
-            "version": "v1.26.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-php74.git",
-                "reference": "ad4f7d62a17b1187d9f381f0a662aab19ff3c033"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php74/zipball/ad4f7d62a17b1187d9f381f0a662aab19ff3c033",
-                "reference": "ad4f7d62a17b1187d9f381f0a662aab19ff3c033",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-main": "1.26-dev"
-                },
-                "thanks": {
-                    "name": "symfony/polyfill",
-                    "url": "https://github.com/symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php74\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ion Bazan",
-                    "email": "ion.bazan@gmail.com"
-                },
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill backporting some PHP 7.4+ features to lower PHP versions",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-php74/tree/v1.26.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2022-05-24T11:49:31+00:00"
-        },
-        {
             "name": "symfony/polyfill-php80",
             "version": "v1.26.0",
             "source": {
@@ -17371,7 +17289,7 @@
     "platform": [],
     "platform-dev": [],
     "platform-overrides": {
-        "php": "7.4"
+        "php": "8.0"
     },
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.2.0"
 }
