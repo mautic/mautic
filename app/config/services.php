@@ -33,8 +33,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
-        'Aggregate/Collection',
-        'Aggregate/Calculator.php',
         'Services',
         'Api',
         'Integration/Salesforce',
