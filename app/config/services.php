@@ -17,7 +17,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
     ;
 
     $excludes = [
-        'Generator',
         'Doctrine',
         'Model/IteratorExportDataModel.php',
         'Model/ConsoleOutputModel.php',
@@ -53,9 +52,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Sync/SyncProcess/SyncProcess.php',
         'Integration/IntegrationObject.php',
         'MauticQueueBundle.php',
-        'Builder/MauticReportBuilder.php',
-        'Scheduler/Entity',
-        'Scheduler/Option',
         'Aggregate/Collection',
         'Aggregate/Calculator.php',
         'Services',
