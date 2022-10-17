@@ -44,8 +44,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
-        'ProgressiveProfiling/DisplayCounter.php',
-        'ProgressiveProfiling/DisplayManager.php',
         'Auth/Support/Oauth2/Token',
         'Sync/DAO',
         'Sync/Exception',
