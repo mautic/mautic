@@ -24,8 +24,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Release',
         'Serializer/Driver',
         'Serializer/Exclusion',
-        'PreferenceBuilder/ChannelPreferences.php',
-        'PreferenceBuilder/PreferenceBuilder.php',
         'Helper/Chart',
         'Helper/BatchIdToEntityHelper.php',
         'Helper/CommandResponse.php',
