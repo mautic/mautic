@@ -17,7 +17,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
     ;
 
     $excludes = [
-        'EventCollector',
         'OptionsAccessor',
         'Generator',
         'Doctrine',
@@ -27,10 +26,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         'Release',
         'Serializer/Driver',
         'Serializer/Exclusion',
-        'Executioner/ContactFinder/Limiter/ContactLimiter.php',
-        'Executioner/Dispatcher/Exception',
-        'Executioner/Scheduler/Mode/DAO',
-        'Membership/Exception',
         'PreferenceBuilder/ChannelPreferences.php',
         'PreferenceBuilder/PreferenceBuilder.php',
         'Helper/Chart',
