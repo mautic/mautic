@@ -45,7 +45,7 @@ EOT
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $options = $input->getOptions();
         $force   = $options['force'];
@@ -77,7 +77,7 @@ EOT
         $returnCode = $command->run($input, $output);
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         //recreate the database
@@ -89,7 +89,7 @@ EOT
         ]);
         $returnCode = $command->run($input, $output);
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         //now populate the tables with fixture
@@ -106,7 +106,7 @@ EOT
         $returnCode = $command->run($input, $output);
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         $output->setVerbosity($verbosity);

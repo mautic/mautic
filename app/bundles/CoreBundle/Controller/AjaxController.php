@@ -140,7 +140,7 @@ class AjaxController extends CommonController
         $this->get('session')->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-        $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+        $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
 
         $dataArray['newContent'] = $this->renderView(
             'MauticCoreBundle:GlobalSearch:results.html.php',
@@ -186,7 +186,7 @@ class AjaxController extends CommonController
     {
         $dispatcher = $this->get('event_dispatcher');
         $event      = new CommandListEvent();
-        $dispatcher->dispatch(CoreEvents::BUILD_COMMAND_LIST, $event);
+        $dispatcher->dispatch($event, CoreEvents::BUILD_COMMAND_LIST);
         $allCommands = $event->getCommands();
         $translator  = $this->get('translator');
         $dataArray   = [];
@@ -515,7 +515,7 @@ class AjaxController extends CommonController
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
-            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade')) {
                 $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
                 $dataArray['message']    = $translator->trans(
                     'mautic.core.update.error',
@@ -550,9 +550,9 @@ class AjaxController extends CommonController
         $result     = 0;
 
         // Also do the last bit of filesystem cleanup from the upgrade here
-        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+        if (is_dir(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade')) {
             $iterator = new \FilesystemIterator(
-                dirname($this->container->getParameter('kernel.root_dir')).'/upgrade', \FilesystemIterator::SKIP_DOTS
+                dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade', \FilesystemIterator::SKIP_DOTS
             );
 
             /** @var \FilesystemIterator $file */
@@ -564,7 +564,7 @@ class AjaxController extends CommonController
             }
 
             // Should be empty now, nuke the folder
-            @rmdir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade');
+            @rmdir(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade');
         }
 
         $cacheDir = $this->container->get('mautic.helper.paths')->getSystemPath('cache');
@@ -606,7 +606,7 @@ class AjaxController extends CommonController
             }
         }
 
-        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
@@ -692,7 +692,7 @@ class AjaxController extends CommonController
         }
 
         // Execute the mautic.post_upgrade event
-        $this->dispatcher->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
+        $this->dispatcher->dispatch(new UpgradeEvent($dataArray), CoreEvents::POST_UPGRADE);
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php

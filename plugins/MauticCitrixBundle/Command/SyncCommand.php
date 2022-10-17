@@ -43,7 +43,7 @@ class SyncCommand extends ModeratedCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $options = $input->getOptions();
         $product = $options['product'];
@@ -64,14 +64,14 @@ class SyncCommand extends ModeratedCommand
             if (0 === count($activeProducts)) {
                 $this->completeRun();
 
-                return;
+                return 0;
             }
         } else {
             if (!CitrixProducts::isValidValue($product)) {
                 $output->writeln('<error>Invalid product: '.$product.'. Aborted</error>');
                 $this->completeRun();
 
-                return;
+                return 0;
             }
             $activeProducts[] = $product;
         }
@@ -115,5 +115,7 @@ class SyncCommand extends ModeratedCommand
         $output->writeln('<info>Done.</info>');
 
         $this->completeRun();
+
+        return 0;
     }
 }

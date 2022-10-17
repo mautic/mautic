@@ -22,8 +22,8 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -90,8 +90,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */
@@ -306,10 +306,9 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
                     $smsEvent = new SmsSendEvent($sms->getMessage(), $lead);
                     $smsEvent->setSmsId($sms->getId());
-                    $this->dispatcher->dispatch(SmsEvents::SMS_ON_SEND, $smsEvent);
+                    $this->dispatcher->dispatch($smsEvent, SmsEvents::SMS_ON_SEND);
 
                     $tokenEvent = $this->dispatcher->dispatch(
-                        SmsEvents::TOKEN_REPLACEMENT,
                         new TokenReplacementEvent(
                             $smsEvent->getContent(),
                             $lead,
@@ -321,7 +320,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                                 ],
                                 'stat'    => $stat->getTrackingHash(),
                             ]
-                        )
+                        ),
+                        SmsEvents::TOKEN_REPLACEMENT
                     );
 
                     $sendResult = [
@@ -433,7 +433,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $name = SmsEvents::SMS_POST_DELETE;
                 break;
             default:
-                return;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -442,11 +442,11 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
-            return;
+            return null;
         }
     }
 

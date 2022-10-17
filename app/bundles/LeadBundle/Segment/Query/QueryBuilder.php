@@ -28,16 +28,16 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /*
      * The query types.
      */
-    const SELECT = 0;
-    const DELETE = 1;
-    const UPDATE = 2;
-    const INSERT = 3;
+    public const SELECT = 0;
+    public const DELETE = 1;
+    public const UPDATE = 2;
+    public const INSERT = 3;
 
     /*
      * The builder states.
      */
-    const STATE_DIRTY = 0;
-    const STATE_CLEAN = 1;
+    public const STATE_DIRTY = 0;
+    public const STATE_CLEAN = 1;
 
     /**
      * The DBAL Connection.
@@ -1516,14 +1516,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function guessPrimaryLeadContactIdColumn()
     {
         $parts     = $this->getQueryParts();
-
         $leadTable = $parts['from'][0]['alias'];
-        if (!isset($parts['join'][$leadTable])) {
-            return $leadTable.'.id';
+
+        if ('orp' === $leadTable) {
+            return 'orp.lead_id';
         }
 
-        if ('orp' == $leadTable) {
-            return 'orp.lead_id';
+        if (!isset($parts['join'][$leadTable])) {
+            return $leadTable.'.id';
         }
 
         $joins     = $parts['join'][$leadTable];

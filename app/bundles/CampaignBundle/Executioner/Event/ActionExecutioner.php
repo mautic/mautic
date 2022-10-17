@@ -13,7 +13,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
 class ActionExecutioner implements EventInterface
 {
-    const TYPE = 'action';
+    public const TYPE = 'action';
 
     /**
      * @var ActionDispatcher

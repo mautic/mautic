@@ -87,7 +87,7 @@ class OrderExecutioner
             );
         }
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS);
         $this->mappingHelper->updateObjectMappings($event->getUpdatedObjectMappings());
     }
 
@@ -122,7 +122,7 @@ class OrderExecutioner
             );
         }
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS);
         $this->mappingHelper->saveObjectMappings($event->getObjectMappings());
     }
 }

@@ -36,7 +36,7 @@ class EmailController extends FormController
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+    public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -352,8 +352,8 @@ class EmailController extends FormController
 
                 $event = new DetermineWinnerEvent($args);
                 $this->dispatcher->dispatch(
-                        $testSettings['event'],
-                        $event
+                        $event,
+                        $testSettings['event']
                     );
 
                 $abTestResults = $event->getAbTestResults();
@@ -1176,21 +1176,17 @@ class EmailController extends FormController
 
         // Check that the parent is getting sent
         if ($variantParent = $entity->getVariantParent()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'send',
-                    'objectId'     => $variantParent->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'send',
+                'objectId'     => $variantParent->getId(),
+            ]);
         }
 
         if ($translationParent = $entity->getTranslationParent()) {
-            return $this->redirect($this->generateUrl('mautic_email_action',
-                [
-                    'objectAction' => 'send',
-                    'objectId'     => $translationParent->getId(),
-                ]
-            ));
+            return $this->redirectToRoute('mautic_email_action', [
+                'objectAction' => 'send',
+                'objectId'     => $translationParent->getId(),
+            ]);
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);

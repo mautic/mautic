@@ -46,7 +46,7 @@ class RouteLoader extends Loader
     {
         // Public
         $event = new RouteEvent($this, 'public');
-        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
         $collection = $event->getCollection();
 
         // Force all links to be SSL if the site_url parameter is SSL
@@ -63,7 +63,7 @@ class RouteLoader extends Loader
 
         // Secured area - Default
         $event = new RouteEvent($this);
-        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
         $secureCollection = $event->getCollection();
 
         // OneupUploader (added behind our secure /s)
@@ -74,7 +74,7 @@ class RouteLoader extends Loader
 
         //API
         $event = new RouteEvent($this, 'api');
-        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
         $apiCollection = $event->getCollection();
         $apiCollection->addPrefix('/api');
 
@@ -92,7 +92,7 @@ class RouteLoader extends Loader
 
         // Catch all
         $event = new RouteEvent($this, 'catchall');
-        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $this->dispatcher->dispatch($event, CoreEvents::BUILD_ROUTE);
         $lastCollection = $event->getCollection();
 
         if ($forceSSL) {

@@ -42,7 +42,7 @@ class DecisionDispatcher
     public function dispatchRealTimeEvent(DecisionAccessor $config, LeadEventLog $log, $passthrough)
     {
         $event = new DecisionEvent($config, $log, $passthrough);
-        $this->dispatcher->dispatch($config->getEventName(), $event);
+        $this->dispatcher->dispatch($event, $config->getEventName());
 
         return $event;
     }
@@ -54,7 +54,7 @@ class DecisionDispatcher
     {
         $event = new DecisionEvent($config, $log);
 
-        $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_DECISION_EVALUATION, $event);
+        $this->dispatcher->dispatch($event, CampaignEvents::ON_EVENT_DECISION_EVALUATION);
         $this->legacyDispatcher->dispatchDecisionEvent($event);
 
         return $event;
@@ -67,8 +67,8 @@ class DecisionDispatcher
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS,
-            new DecisionResultsEvent($config, $logs, $evaluatedContacts)
+            new DecisionResultsEvent($config, $logs, $evaluatedContacts),
+            CampaignEvents::ON_EVENT_DECISION_EVALUATION_RESULTS
         );
     }
 }

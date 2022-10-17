@@ -2581,141 +2581,6 @@ parameters:
 			path: app/bundles/CacheBundle/EventListener/CacheClearSubscriber.php
 
 		-
-			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:editCalendarEvent\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:getCalendarEvents\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Controller\\\\AjaxController\\:\\:checkEventPermissions\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Controller\\\\AjaxController\\:\\:checkEventPermissions\\(\\) has parameter \\$events with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Controller\\\\AjaxController\\:\\:generateDataAction\\(\\) should return Symfony\\\\Component\\\\HttpFoundation\\\\JsonResponse but returns Symfony\\\\Component\\\\HttpFoundation\\\\Response\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Parameter \\#2 \\$messageVars of method Mautic\\\\CoreBundle\\\\Controller\\\\CommonController\\:\\:addFlash\\(\\) expects array\\|null, string given\\.$#"
-			count: 2
-			path: app/bundles/CalendarBundle/Controller/AjaxController.php
-
-		-
-			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Model\\\\AbstractCommonModel\\:\\:editCalendarEvent\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Controller/DefaultController.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:__construct\\(\\) has parameter \\$dates with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:addEvents\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:addEvents\\(\\) has parameter \\$events with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:getDates\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:getEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:\\$dates type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CalendarBundle\\\\Event\\\\CalendarGeneratorEvent\\:\\:\\$events type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/CalendarGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:__construct\\(\\) has parameter \\$entityId with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setAccess\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setAccess\\(\\) has parameter \\$access with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setContentTemplate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setEntity\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setFormName\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setFormName\\(\\) has parameter \\$formName with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\:\\:setModel\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$id$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Event/EventGeneratorEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Model\\\\CalendarModel\\:\\:editCalendarEvent\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Model/CalendarModel.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Model\\\\CalendarModel\\:\\:editCalendarEvent\\(\\) should return array but returns Mautic\\\\CalendarBundle\\\\Event\\\\EventGeneratorEvent\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Model/CalendarModel.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Model\\\\CalendarModel\\:\\:getCalendarEvents\\(\\) has parameter \\$dates with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Model/CalendarModel.php
-
-		-
-			message: "#^Method Mautic\\\\CalendarBundle\\\\Model\\\\CalendarModel\\:\\:getCalendarEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CalendarBundle/Model/CalendarModel.php
-
-		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Command\\\\ExecuteEventCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Command/ExecuteEventCommand.php
@@ -5559,21 +5424,6 @@ parameters:
 			message: "#^Property Mautic\\\\CampaignBundle\\\\EventCollector\\\\EventCollector\\:\\:\\$eventsArray type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/EventCollector/EventCollector.php
-
-		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:onCalendarGenerate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Parameter \\#3 \\$referenceType of method Symfony\\\\Component\\\\Routing\\\\Generator\\\\UrlGeneratorInterface\\:\\:generate\\(\\) expects int, true given\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/EventListener/CalendarSubscriber.php
 
 		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\EventListener\\\\CampaignActionChangeMembershipSubscriber\\:\\:addAction\\(\\) has no return type specified\\.$#"
@@ -35716,11 +35566,6 @@ parameters:
 			path: app/bundles/InstallBundle/Tests/Install/InstallServiceTest.php
 
 		-
-			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) has invalid return type UnitEnum\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
 			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:getParameter\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
@@ -35737,11 +35582,6 @@ parameters:
 
 		-
 			message: "#^Method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
-
-		-
-			message: "#^Parameter \\$value of method class@anonymous/app/bundles/InstallBundle/Tests/InstallFixtures/ORM/FakeContainerTrait\\.php\\:13\\:\\:setParameter\\(\\) has invalid type UnitEnum\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Tests/InstallFixtures/ORM/GrapeJsDataTest.php
 
@@ -44034,21 +43874,6 @@ parameters:
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\ButtonSubscriber\\:\\:injectViewButtons\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/EventListener/ButtonSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:onCalendarGenerate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Parameter \\#3 \\$referenceType of method Symfony\\\\Component\\\\Routing\\\\Generator\\\\UrlGeneratorInterface\\:\\:generate\\(\\) expects int, true given\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/EventListener/CalendarSubscriber.php
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\EventListener\\\\CampaignActionDNCSubscriber\\:\\:addDoNotContact\\(\\) has no return type specified\\.$#"
@@ -54701,26 +54526,6 @@ parameters:
 			path: app/bundles/PageBundle/EventListener/BuilderSubscriber.php
 
 		-
-			message: "#^Method Mautic\\\\PageBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\PageBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:onCalendarEventGenerate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\PageBundle\\\\EventListener\\\\CalendarSubscriber\\:\\:onCalendarGenerate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/EventListener/CalendarSubscriber.php
-
-		-
-			message: "#^Parameter \\#3 \\$referenceType of method Symfony\\\\Component\\\\Routing\\\\Generator\\\\UrlGeneratorInterface\\:\\:generate\\(\\) expects int, true given\\.$#"
-			count: 2
-			path: app/bundles/PageBundle/EventListener/CalendarSubscriber.php
-
-		-
 			message: "#^Cannot call method getDeviceStat\\(\\) on array\\.$#"
 			count: 2
 			path: app/bundles/PageBundle/EventListener/CampaignSubscriber.php
@@ -55881,16 +55686,6 @@ parameters:
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 
 		-
-			message: "#^Method Mautic\\\\PageBundle\\\\Model\\\\TrackableModel\\:\\:prepareUrlForTracking\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: "#^Method Mautic\\\\PageBundle\\\\Model\\\\TrackableModel\\:\\:prepareUrlForTracking\\(\\) has parameter \\$url with no type specified\\.$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
 			message: "#^Method Mautic\\\\PageBundle\\\\Model\\\\TrackableModel\\:\\:validateTokenIsTrackable\\(\\) has parameter \\$token with no type specified\\.$#"
 			count: 1
 			path: app/bundles/PageBundle/Model/TrackableModel.php
@@ -55912,11 +55707,6 @@ parameters:
 
 		-
 			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$tokenizedParams\\[\\], \\$untokenizedParams\\[\\]\\]\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 140$#"
-			count: 1
-			path: app/bundles/PageBundle/Model/TrackableModel.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(array\\[\\$trackingKey, \\$trackingUrl\\]\\|false\\)\\: Unexpected token \"\\[\", expected TOKEN_HORIZONTAL_WS at offset 102$#"
 			count: 1
 			path: app/bundles/PageBundle/Model/TrackableModel.php
 

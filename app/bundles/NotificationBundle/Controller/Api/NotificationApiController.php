@@ -5,11 +5,8 @@ namespace Mautic\NotificationBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class NotificationApiController.
- */
 class NotificationApiController extends CommonApiController
 {
     /**
@@ -20,7 +17,7 @@ class NotificationApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->contactTracker  = $this->container->get('mautic.tracker.contact');
         $this->model           = $this->getModel('notification');

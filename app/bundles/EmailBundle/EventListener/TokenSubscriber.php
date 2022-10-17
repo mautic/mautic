@@ -75,7 +75,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 ],
                 $email
             );
-            $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch($tokenEvent, EmailEvents::TOKEN_REPLACEMENT);
             $event->addTokens($tokenEvent->getTokens());
         }
     }
@@ -122,7 +122,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 true
             );
 
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
+            $this->dispatcher->dispatch($emailSendEvent, EmailEvents::EMAIL_ON_DISPLAY);
             $untokenizedContent = $emailSendEvent->getContent(true);
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
