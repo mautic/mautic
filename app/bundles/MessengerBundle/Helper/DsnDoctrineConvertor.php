@@ -33,6 +33,6 @@ class DsnDoctrineConvertor
          * We will use a static Dsn string, that matches the default Dsn string
          * https://symfony.com/doc/current/messenger.html#doctrine-transport
          */
-        return 'doctrine://default?auto_setup=true';
+        return 'doctrine://default';
     }
 }
