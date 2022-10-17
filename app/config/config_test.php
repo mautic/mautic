@@ -27,9 +27,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
-    'mailer' => [
-        'dsn' => 'null://null',
-    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
