@@ -19,7 +19,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
     $excludes = [
         'Doctrine',
         'Model/IteratorExportDataModel.php',
-        'Model/ConsoleOutputModel.php',
         'Form/EventListener/FormExitSubscriber.php',
         'Release',
         'Serializer/Driver',
