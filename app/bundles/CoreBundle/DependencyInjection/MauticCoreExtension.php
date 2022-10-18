@@ -165,11 +165,20 @@ class MauticCoreExtension extends Extension
                             $this->processArgument($argument, $container, $definitionArguments);
                         }
 
-                        // Add the service
-                        $definition = $container->setDefinition($name, new Definition(
-                            $details['class'],
-                            $definitionArguments
-                        ));
+                        if ($container->hasDefinition($details['class'])) {
+                            $definition = $container->getDefinition($details['class']);
+
+                            if ($definitionArguments) {
+                                $definition->setArguments($definitionArguments);
+                            }
+                        } else {
+                            $definition = new Definition($details['class'], $definitionArguments);
+                            $container->setDefinition($name, $definition);
+                        }
+
+                        if (!$container->hasDefinition($name) && !$container->hasAlias($name)) {
+                            $container->setAlias($name, new Alias($details['class'], true));
+                        }
 
                         // Generate tag and tag arguments
                         if (isset($details['tags'])) {
