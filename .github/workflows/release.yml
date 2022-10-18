@@ -28,7 +28,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Get tag name
@@ -140,7 +140,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Download full installation package from previous step
@@ -240,7 +240,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
