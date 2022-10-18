@@ -842,6 +842,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "T0mTom",
+      "name": "Tomazz Jurich",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9713824?v=4",
+      "profile": "https://github.com/T0mTom",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -849,5 +858,6 @@
   "projectOwner": "mautic",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
