@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -46,7 +46,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadCompanyData::class,
                 LoadLeadListData::class,
                 LoadLeadData::class,
-                LoadLeadFieldData::class,
+                LeadFieldData::class,
                 LoadPageHitData::class,
                 LoadSegmentsData::class,
                 LoadPageCategoryData::class,

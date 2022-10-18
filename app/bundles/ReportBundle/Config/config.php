@@ -298,12 +298,6 @@ return [
                 'tag' => 'console.command',
             ],
         ],
-        'fixtures' => [
-            'mautic.report.fixture.report' => [
-                'class' => \Mautic\ReportBundle\DataFixtures\ORM\LoadReportData::class,
-                'tag'   => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-            ],
-        ],
     ],
 
     'parameters' => [
