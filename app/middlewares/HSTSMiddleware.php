@@ -12,7 +12,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 {
     use ConfigAwareTrait;
 
-    const PRIORITY = 900;
+    public const PRIORITY = 900;
 
     protected bool $enableHSTS;
     protected bool $includeDubDomains;

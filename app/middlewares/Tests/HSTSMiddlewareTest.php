@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HSTSMiddlewareTest extends AbstractMauticTestCase
 {
-    const HSTS_KEY = 'strict-transport-security';
+    public const HSTS_KEY = 'strict-transport-security';
 
     protected ReflectionProperty $addHSTS;
     protected ReflectionProperty $includeDubDomains;
