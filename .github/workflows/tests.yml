@@ -9,6 +9,9 @@ on:
     # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
     - cron: '45 10 * * *'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   phpunit:
     # We don't want the scheduled jobs to run on forks of Mautic
@@ -17,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0']
+        php-versions: ['8.0']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -116,7 +119,7 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
-        php-versions: ['7.4', '8.0']
+        php-versions: ['8.0']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 

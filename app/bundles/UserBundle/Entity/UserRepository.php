@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -286,10 +287,18 @@ class UserRepository extends CommonRepository
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->like('u.firstName', ':'.$unique),
-                    $q->expr()->like('u.lastName', ':'.$unique)
-                );
+                // This if/else can be removed once we upgrade to Dotrine 2.11 as both builders have the or() method there.
+                if ($q instanceof QueryBuilder) {
+                    $expr = $q->expr()->or(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                } else {
+                    $expr = $q->expr()->orX(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                }
                 $returnParameter = true;
                 break;
         }

@@ -127,10 +127,6 @@ $container->register('mautic.install.fixture.lead_field', \Mautic\InstallBundle\
     ->addArgument(new Reference('translator'))
     ->addTag(FixturesCompilerPass::FIXTURE_TAG)
     ->setPublic(true);
-$container->register('mautic.lead.fixture.contact_field', \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class)
-    ->addArgument(new Reference('translator'))
-    ->addTag(FixturesCompilerPass::FIXTURE_TAG)
-    ->setPublic(true);
 
 // Use static namespace for token manager
 $container->register('security.csrf.token_manager', \Symfony\Component\Security\Csrf\CsrfTokenManager::class)
