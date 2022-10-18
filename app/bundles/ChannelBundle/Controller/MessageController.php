@@ -52,7 +52,7 @@ class MessageController extends AbstractStandardFormController
      */
     public function indexAction($page = 1)
     {
-        return $this->indexStandard($page);
+        return $this->indexStandard($page, 'twig');
     }
 
     /**
@@ -94,7 +94,7 @@ class MessageController extends AbstractStandardFormController
                             'class' => 'visible-md visible-lg',
                         ],
                     ],
-                    'listItemTemplate'  => 'MauticChannelBundle:Message:list_item.html.php',
+                    'listItemTemplate'  => 'MauticChannelBundle:Message:list_item.html.twig',
                     'enableCloneButton' => true,
                 ];
 

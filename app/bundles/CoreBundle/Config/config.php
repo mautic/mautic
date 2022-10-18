@@ -1166,6 +1166,10 @@ return [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\StorageExtension::class,
                 'tag'       => 'twig.extension',
             ],
+            'templating.twig.extension.app' => [
+                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\AppExtension::class,
+                'tag'       => 'twig.extension',
+            ],
             'templating.twig.extension.publish_status' => [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\CoreHelpersExtension::class,
                 'arguments' => [
