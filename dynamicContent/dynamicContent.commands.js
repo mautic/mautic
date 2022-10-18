@@ -77,7 +77,7 @@ export default class DynamicContentCommands {
         dynamicContent,
         dynConToken,
       });
-      dynamicContent.components('')
+      dynamicContent.components('');
       dynamicContent.set('content', dynConToken);
     });
 
