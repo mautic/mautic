@@ -6,7 +6,7 @@ use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class MandrillTransport.
@@ -272,6 +272,10 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
      */
     public function start()
     {
+        if ($this->started) {
+            return;
+        }
+
         $key = $this->getApiKey();
         if (empty($key)) {
             // BC support @deprecated - remove in 3.0
@@ -291,6 +295,20 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
         );
 
         $this->started = true;
+    }
+
+    /**
+     * @param string[]|null $failedRecipients An array of failures by-reference
+     *
+     * @return int
+     *
+     * @throws \Swift_TransportException
+     */
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    {
+        $this->start();
+
+        return parent::send($message, $failedRecipients);
     }
 
     /**
