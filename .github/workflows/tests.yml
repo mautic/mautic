@@ -9,6 +9,9 @@ on:
     # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
     - cron: '45 10 * * *'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   phpunit:
     # We don't want the scheduled jobs to run on forks of Mautic
