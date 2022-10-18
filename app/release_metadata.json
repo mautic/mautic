@@ -1,5 +1,5 @@
 {
-  "version": "5.x",
+  "version": "5.0.0",
   "stability": "stable",
   "minimum_php_version": "8.0.0",
   "maximum_php_version": "8.0.99",
