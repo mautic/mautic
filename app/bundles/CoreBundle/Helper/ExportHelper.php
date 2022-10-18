@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use ZipArchive;
@@ -66,6 +67,8 @@ class ExportHelper
 
         if (self::EXPORT_TYPE_EXCEL === $type) {
             return $this->exportAsExcel($data, $filename);
+        } elseif (self::EXPORT_TYPE_CSV === $type) {
+            return $this->exportAsCsv($data, $filename);
         }
 
         throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
@@ -142,6 +145,29 @@ class ExportHelper
         }
 
         return $spreadsheet;
+    }
+
+    private function exportAsCsv(Iterator $data, string $filename): StreamedResponse
+    {
+        $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
+        $objWriter   = new Csv($spreadsheet);
+        $objWriter->setPreCalculateFormulas(false);
+        // For UTF-8 support
+        $objWriter->setUseBOM(true);
+
+        $response = new StreamedResponse(
+            function () use ($objWriter) {
+                $objWriter->save('php://output');
+            }
+        );
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Expires', 0);
+        $response->headers->set('Cache-Control', 'must-revalidate');
+        $response->headers->set('Pragma', 'public');
+
+        return $response;
     }
 
     /**
