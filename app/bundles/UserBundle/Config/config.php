@@ -201,25 +201,10 @@ return [
                 'arguments' => 'Mautic\UserBundle\Entity\User',
                 'factory'   => ['@doctrine', 'getManagerForClass'],
             ],
-            'mautic.user.repository' => [
-                'class'     => 'Mautic\UserBundle\Entity\UserRepository',
-                'arguments' => 'Mautic\UserBundle\Entity\User',
-                'factory'   => ['@mautic.user.manager', 'getRepository'],
-            ],
-            'mautic.user.token.repository' => [
-                'class'     => 'Mautic\UserBundle\Entity\UserTokenRepository',
-                'arguments' => 'Mautic\UserBundle\Entity\UserToken',
-                'factory'   => ['@doctrine', 'getRepository'],
-            ],
             'mautic.permission.manager' => [
                 'class'     => 'Doctrine\ORM\EntityManager',
                 'arguments' => 'Mautic\UserBundle\Entity\Permission',
                 'factory'   => ['@doctrine', 'getManagerForClass'],
-            ],
-            'mautic.permission.repository' => [
-                'class'     => 'Mautic\UserBundle\Entity\PermissionRepository',
-                'arguments' => 'Mautic\UserBundle\Entity\Permission',
-                'factory'   => ['@mautic.permission.manager', 'getRepository'],
             ],
             'mautic.user.form_guard_authenticator' => [
                 'class'     => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
@@ -362,10 +347,18 @@ return [
         'repositories' => [
             'mautic.user.repository.user_token' => [
                 'class'     => \Doctrine\ORM\EntityRepository::class,
+                'arguments' => [\Mautic\UserBundle\Entity\UserToken::class],
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \Mautic\UserBundle\Entity\UserToken::class,
-                ],
+            ],
+            'mautic.user.repository' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'arguments' => \Mautic\UserBundle\Entity\User::class,
+                'factory'   => ['@mautic.user.manager', 'getRepository'],
+            ],
+            'mautic.permission.repository' => [
+                'class'     => \Doctrine\ORM\EntityRepository::class,
+                'arguments' => \Mautic\UserBundle\Entity\Permission::class,
+                'factory'   => ['@mautic.permission.manager', 'getRepository'],
             ],
         ],
         'fixtures' => [

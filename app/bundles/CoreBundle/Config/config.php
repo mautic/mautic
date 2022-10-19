@@ -223,12 +223,11 @@ return [
                     'mautic.model.factory',
                 ],
             ],
-
             'mautic.core.maintenance.subscriber' => [
                 'class'     => Mautic\CoreBundle\EventListener\MaintenanceSubscriber::class,
                 'arguments' => [
                     'doctrine.dbal.default_connection',
-                    'mautic.user.token.repository',
+                    'mautic.user.repository.user_token',
                     'translator',
                 ],
             ],
