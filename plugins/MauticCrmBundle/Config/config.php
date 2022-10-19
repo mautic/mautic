@@ -278,29 +278,5 @@ return [
                 'arguments' => ['mautic.integration.connectwise'],
             ],
         ],
-        'commands' => [
-            'mautic_integration.pipedrive.data_fetch' => [
-                'tag'       => 'console.command',
-                'class'     => MauticPlugin\MauticCrmBundle\Command\FetchPipedriveDataCommand::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'templating.helper.translator',
-                    'mautic_integration.pipedrive.import.owner',
-                    'mautic_integration.pipedrive.import.company',
-                    'mautic_integration.pipedrive.import.lead',
-                ],
-            ],
-            'mautic_integration.pipedrive.data_push' => [
-                'tag'       => 'console.command',
-                'class'     => MauticPlugin\MauticCrmBundle\Command\PushDataToPipedriveCommand::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'templating.helper.translator',
-                    'doctrine.orm.entity_manager',
-                    'mautic_integration.pipedrive.export.company',
-                    'mautic_integration.pipedrive.export.lead',
-                ],
-            ],
-        ],
     ],
 ];

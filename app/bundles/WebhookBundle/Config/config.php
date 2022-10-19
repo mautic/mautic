@@ -119,24 +119,6 @@ return [
                 ],
             ],
         ],
-        'commands' => [
-            'mautic.webhook.command.process.queues' => [
-                'class'     => \Mautic\WebhookBundle\Command\ProcessWebhookQueuesCommand::class,
-                'tag'       => 'console.command',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.webhook.model.webhook',
-                ],
-            ],
-            'mautic.webhook.command.delete.logs' => [
-                'class'     => \Mautic\WebhookBundle\Command\DeleteWebhookLogsCommand::class,
-                'arguments' => [
-                    'mautic.webhook.model.webhook',
-                    'mautic.helper.core_parameters',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'repositories' => [
             'mautic.webhook.repository.queue' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,

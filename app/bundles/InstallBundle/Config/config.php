@@ -71,16 +71,6 @@ return [
                 'arguments' => ['session'],
             ],
         ],
-        'commands' => [
-            'mautic.install.command.install' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\InstallBundle\Command\InstallCommand::class,
-                'arguments' => [
-                    'mautic.install.service',
-                    'doctrine',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
                 'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,

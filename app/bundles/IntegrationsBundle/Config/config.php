@@ -32,16 +32,6 @@ return [
         ],
     ],
     'services' => [
-        'commands' => [
-            'mautic.integrations.command.sync' => [
-                'class'     => \Mautic\IntegrationsBundle\Command\SyncCommand::class,
-                'arguments' => [
-                    'mautic.integrations.sync.service',
-                    'mautic.helper.core_parameters',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'events' => [
             'mautic.integrations.subscriber.lead' => [
                 'class'     => \Mautic\IntegrationsBundle\EventListener\LeadSubscriber::class,

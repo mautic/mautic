@@ -864,26 +864,6 @@ return [
                 'arguments' => [],
             ],
         ],
-        'commands' => [
-            'mautic.email.command.fetch' => [
-                'class'     => \Mautic\EmailBundle\Command\ProcessFetchEmailCommand::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.email.fetcher',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.email.command.queue' => [
-                'class'     => \Mautic\EmailBundle\Command\ProcessEmailQueueCommand::class,
-                'arguments' => [
-                    'swiftmailer.mailer.default.transport.real',
-                    'event_dispatcher',
-                    'mautic.helper.core_parameters',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'validator' => [
             'mautic.email.validator.multiple_emails_valid_validator' => [
                 'class'     => \Mautic\EmailBundle\Validator\MultipleEmailsValidValidator::class,

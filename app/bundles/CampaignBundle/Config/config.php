@@ -552,64 +552,6 @@ return [
                 ],
             ],
         ],
-        'commands' => [
-            'mautic.campaign.command.trigger' => [
-                'class'     => \Mautic\CampaignBundle\Command\TriggerCampaignCommand::class,
-                'arguments' => [
-                    'mautic.campaign.repository.campaign',
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.campaign.executioner.kickoff',
-                    'mautic.campaign.executioner.scheduled',
-                    'mautic.campaign.executioner.inactive',
-                    'monolog.logger.mautic',
-                    'mautic.helper.template.formatter',
-                    'mautic.lead.model.list',
-                    'mautic.helper.segment.count.cache',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.campaign.command.execute' => [
-                'class'     => \Mautic\CampaignBundle\Command\ExecuteEventCommand::class,
-                'arguments' => [
-                    'mautic.campaign.executioner.scheduled',
-                    'translator',
-                    'mautic.helper.template.formatter',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.campaign.command.validate' => [
-                'class'     => \Mautic\CampaignBundle\Command\ValidateEventCommand::class,
-                'arguments' => [
-                    'mautic.campaign.executioner.inactive',
-                    'translator',
-                    'mautic.helper.template.formatter',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.campaign.command.update' => [
-                'class'     => \Mautic\CampaignBundle\Command\UpdateLeadCampaignsCommand::class,
-                'arguments' => [
-                    'mautic.campaign.repository.campaign',
-                    'translator',
-                    'mautic.campaign.membership.builder',
-                    'monolog.logger.mautic',
-                    'mautic.helper.template.formatter',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.campaign.command.summarize' => [
-                'class'     => \Mautic\CampaignBundle\Command\SummarizeCommand::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.campaign.model.summary',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'services' => [
             'mautic.campaign.service.campaign'=> [
                 'class'     => \Mautic\CampaignBundle\Service\Campaign::class,

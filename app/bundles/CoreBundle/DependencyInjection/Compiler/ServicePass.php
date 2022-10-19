@@ -60,10 +60,6 @@ final class ServicePass implements CompilerPassInterface
                         case 'integrations':
                             $defaultTag = 'mautic.integration';
                             break;
-                        case 'command':
-                        case 'commands':
-                            $defaultTag = 'console.command';
-                            break;
                         case 'controllers':
                             $defaultTag = 'controller.service_arguments';
                             break;
