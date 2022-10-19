@@ -57,6 +57,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     const SEGMENT_B = 'segment B';
 
     /**
+     * @var Connection|MockObject
+     */
+    private $connection;
+
+    /**
      * @var MockObject|IpLookupHelper
      */
     private $ipLookupHelper;
@@ -227,6 +232,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
+        $this->connection               = $this->createMock(Connection::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -245,7 +251,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -629,7 +636,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection
         );
 
         $emailModel->setTranslator($this->translator);

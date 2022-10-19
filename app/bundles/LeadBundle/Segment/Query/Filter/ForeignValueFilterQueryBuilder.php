@@ -99,7 +99,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'regexp':
             case 'notRegexp':
-                $subQueryBuilder->select('NULL')
+                $subQueryBuilder->select($tableAlias.'.lead_id')
                     ->from($filter->getTable(), $tableAlias);
 
                 $not        = ('notRegexp' === $filterOperator) ? ' NOT' : '';
@@ -107,7 +107,10 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
                 break;
             default:
                 $subQueryBuilder->select($tableAlias.'.lead_id')
