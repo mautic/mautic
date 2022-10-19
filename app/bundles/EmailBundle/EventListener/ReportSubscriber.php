@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -149,7 +149,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
-     * @var GeneratedColumnsProviderInterface
+     * @var GeneratedColumnsProvider
      */
     private $generatedColumnsProvider;
 
@@ -167,7 +167,7 @@ class ReportSubscriber implements EventSubscriberInterface
         Connection $db,
         CompanyReportData $companyReportData,
         StatRepository $statRepository,
-        GeneratedColumnsProviderInterface $generatedColumnsProvider,
+        GeneratedColumnsProvider $generatedColumnsProvider,
         FieldsBuilder $fieldsBuilder
     ) {
         $this->db                       = $db;

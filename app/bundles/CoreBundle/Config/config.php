@@ -168,89 +168,12 @@ return [
             ],
         ],
         'events' => [
-            'mautic.core.subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.bundle',
-                    'mautic.helper.menu',
-                    'mautic.helper.user',
-                    'templating.helper.assets',
-                    'mautic.helper.core_parameters',
-                    'security.authorization_checker',
-                    'mautic.user.model.user',
-                    'event_dispatcher',
-                    'translator',
-                    'request_stack',
-                    'mautic.form.repository.form',
-                    'mautic.factory',
-                    'mautic.core.service.flashbag',
-                ],
-            ],
-            'mautic.core.environment.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
             'mautic.core.migration.command.subscriber' => [
                 'class'     => \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber::class,
                 'arguments' => [
                     'mautic.database.version.provider',
                     'mautic.generated.columns.provider',
                     'database_connection',
-                ],
-            ],
-            'mautic.core.configbundle.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.language',
-                ],
-            ],
-            'mautic.core.configbundle.subscriber.theme' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ConfigThemeSubscriber::class,
-            ],
-            'mautic.webpush.js.subscriber' => [
-                'class' => \Mautic\CoreBundle\EventListener\BuildJsSubscriber::class,
-            ],
-            'mautic.core.dashboard.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.auditlog',
-                    'translator',
-                    'router',
-                    'mautic.security',
-                    'event_dispatcher',
-                    'mautic.model.factory',
-                ],
-            ],
-            'mautic.core.maintenance.subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\MaintenanceSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'mautic.user.repository.user_token',
-                    'translator',
-                ],
-            ],
-            'mautic.core.request.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
-                'arguments' => [
-                    'security.csrf.token_manager',
-                    'translator',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.core.stats.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.core.assets.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\AssetsSubscriber::class,
-                'arguments' => [
-                    'templating.helper.assets',
-                    'event_dispatcher',
                 ],
             ],
             'mautic.core.subscriber.router' => [
@@ -262,12 +185,6 @@ return [
                     '%request_listener.https_port%',
                     '%request_listener.http_port%',
                     '%router.request_context.base_url%',
-                ],
-            ],
-            'mautic.core.subscriber.editor_assets' => [
-                'class'       => \Mautic\CoreBundle\EventListener\EditorFontsSubscriber::class,
-                'arguments'   => [
-                    'mautic.helper.core_parameters',
                 ],
             ],
         ],

@@ -38,15 +38,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.config.subscriber' => [
-                'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
-                'arguments' => [
-                    'mautic.config.config_change_logger',
-                ],
-            ],
-        ],
-
         'forms' => [
             'mautic.form.type.config' => [
                 'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,

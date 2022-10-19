@@ -44,58 +44,6 @@ return [
         ],
     ],
     'services' => [
-        'events' => [
-            'mautic.dynamicContent.campaignbundle.subscriber' => [
-                'class'     => \Mautic\DynamicContentBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.dynamicContent.model.dynamicContent',
-                    'session',
-                    'event_dispatcher',
-                ],
-            ],
-            'mautic.dynamicContent.js.subscriber' => [
-                'class'     => \Mautic\DynamicContentBundle\EventListener\BuildJsSubscriber::class,
-                'arguments' => [
-                    'templating.helper.assets',
-                    'translator',
-                    'request_stack',
-                    'router',
-                ],
-            ],
-            'mautic.dynamicContent.subscriber' => [
-                'class'     => \Mautic\DynamicContentBundle\EventListener\DynamicContentSubscriber::class,
-                'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.page.helper.token',
-                    'mautic.asset.helper.token',
-                    'mautic.form.helper.token',
-                    'mautic.focus.helper.token',
-                    'mautic.core.model.auditlog',
-                    'mautic.helper.dynamicContent',
-                    'mautic.dynamicContent.model.dynamicContent',
-                    'mautic.security',
-                    'mautic.tracker.contact',
-                ],
-            ],
-            'mautic.dynamicContent.subscriber.channel' => [
-                'class' => \Mautic\DynamicContentBundle\EventListener\ChannelSubscriber::class,
-            ],
-            'mautic.dynamicContent.stats.subscriber' => [
-                'class'     => \Mautic\DynamicContentBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.dynamicContent.lead.subscriber' => [
-                'class'     => \Mautic\DynamicContentBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'translator',
-                    'router',
-                    'mautic.dynamicContent.repository.stat',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.form.type.dwc' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
