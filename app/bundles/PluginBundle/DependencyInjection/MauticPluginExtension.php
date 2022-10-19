@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\PluginBundle\DependencyInjection;
 
-use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class MauticPluginExtension extends MauticCoreExtension
+class MauticPluginExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Config'));
         $loader->load('services.php');
-
-        $this->configureBundles($container, [$container->getParameter('mautic.bundles')['MauticPluginBundle']]);
     }
 }

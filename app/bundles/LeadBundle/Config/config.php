@@ -315,9 +315,6 @@ return [
     'categories' => [
         'segment' => null,
     ],
-    'serviceAliases' => [
-        'mautic.lead.model.lead_segment_service' => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
-    ],
     'services' => [
         'events' => [
             'mautic.lead.subscriber' => [
@@ -1206,6 +1203,14 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.model.lead_segment_service' => [
+                'class'     => \Mautic\LeadBundle\Segment\ContactSegmentService::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'mautic.lead.repository.lead_segment_query_builder',
+                    'monolog.logger.mautic',
                 ],
             ],
             'mautic.lead.model.lead_segment_filter_factory' => [

@@ -22,4 +22,6 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\CampaignBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php');
 };

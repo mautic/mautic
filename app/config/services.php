@@ -46,5 +46,9 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
 
         $services->load($bundle['namespace'].'\\', $bundle['directory'])
             ->exclude($bundle['directory'].'/{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+        if (is_dir($bundle['directory'].'/Entity')) {
+            $services->load($bundle['namespace'].'\\Entity\\', $bundle['directory'].'/Entity/*Repository.php');
+        }
     }
 };
