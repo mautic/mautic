@@ -210,8 +210,6 @@ class MatchFilterForLeadTraitTest extends TestCase
 
     public function testMatchFilterForLeadTraitEmptyCompany(): void
     {
-        error_reporting(E_ALL);
-
         $lead = [
             'id'        => 1,
             'firstname' => 'Test',
