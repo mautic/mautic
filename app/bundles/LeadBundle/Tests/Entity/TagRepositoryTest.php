@@ -2,12 +2,14 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
 class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 {
+    use RepositoryConfiguratorTrait;
+
     public function testGetTagByNameOrCreateNewOneWithSomeExistingTag(): void
     {
         $fetchedEntity = new Tag('sometag');
@@ -62,8 +64,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 
     public function testRemoveMinusFromTags(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $repository      = new TagRepository($managerRegistry);
+        $repository = $this->configureRepository(Tag::class);
 
         $tags = [
             'sometag1',

@@ -13,9 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
 {
-    use RepositoryConfiguratorTrait {
-        configureMocks as configureMocksInTrait;
-    }
+    use RepositoryConfiguratorTrait;
 
     /**
      * @var MockObject|QueryBuilder
@@ -30,16 +28,7 @@ class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->repo             = $this->configureRepository(Email::class);
-    }
-
-    /**
-     * A bit of a hacky way to configure mock builder instead of the real object which the trait does.
-     */
-    private function configureMocks(string $entityClass): void
-    {
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilderMock);
-
-        $this->configureMocksInTrait($entityClass);
     }
 
     public function testUpCountWithNoIncrease(): void

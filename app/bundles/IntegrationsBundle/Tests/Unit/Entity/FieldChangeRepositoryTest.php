@@ -2,6 +2,7 @@
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\IntegrationsBundle\Entity\FieldChange;
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
@@ -18,6 +19,7 @@ class FieldChangeRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repository = $this->configureRepository(FieldChange::class);
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
     }
 
     public function testWhereQueryPartForFindingChangesForSingleObject(): void

@@ -132,8 +132,7 @@ class LeadListRepositoryTest extends TestCase
      */
     private function mockGetLeadCount(array $queryResult): void
     {
-        $this->connection
-            ->method('createQueryBuilder')
+        $this->connection->method('createQueryBuilder')
             ->willReturn($this->queryBuilderMock);
 
         $this->queryBuilderMock->expects(self::once())

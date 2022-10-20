@@ -15,9 +15,6 @@ use PHPUnit\Framework\TestCase;
 
 class CampaignRepositoryTest extends TestCase
 {
-    use RepositoryConfiguratorTrait {
-        configureMocks as configureMocksInTrait;
-    }
     use RepositoryConfiguratorTrait;
 
     /**
@@ -38,6 +35,8 @@ class CampaignRepositoryTest extends TestCase
             ->getMock();
 
         $this->repository = $this->configureRepository(Campaign::class);
+
+        $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
     public function testFetchEmailIdsById(): void
@@ -101,15 +100,5 @@ class CampaignRepositoryTest extends TestCase
         $result = $this->repository->fetchEmailIdsById($id);
 
         $this->assertEquals($expectedResult, $result);
-    }
-
-    /**
-     * A bit of a hacky way to configure mock builder instead of the real object which the trait does.
-     */
-    private function configureMocks(string $entityClass): void
-    {
-        $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
-
-        $this->configureMocksInTrait($entityClass);
     }
 }

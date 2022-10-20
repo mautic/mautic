@@ -7,10 +7,8 @@ namespace Mautic\CoreBundle\Test\Doctrine;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Query\QueryBuilder as QueryBuilderDBAL;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder as QueryBuilderORM;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -68,8 +66,6 @@ trait RepositoryConfiguratorTrait
         $this->managerRegistry->method('getManagerForClass')->with($entityClass)->willReturn($this->entityManager);
         $this->entityManager->method('getClassMetadata')->with($entityClass)->willReturn($this->classMetadata);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
-        $this->entityManager->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilderORM($this->entityManager));
-        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilderDBAL($this->connection));
         $this->connection->method('getExpressionBuilder')->willReturnCallback(fn () => new ExpressionBuilder($this->connection));
         $this->connection->method('executeQuery')->willReturn($this->resultStatement);
         $this->connection->method('quote')->willReturnCallback(fn ($value) => "'$value'");

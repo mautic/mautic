@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
@@ -19,6 +20,7 @@ final class StatRepositoryTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->statRepository = $this->configureRepository(Stat::class);
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
     }
 
     public function testGetStatsSummaryForContacts(): void

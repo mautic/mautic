@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Entity;
 
 use Doctrine\DBAL\Cache\ArrayStatement;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -21,6 +22,7 @@ class EmailRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = $this->configureRepository(Email::class);
+        $this->connection->method('createQueryBuilder')->willReturnCallback(fn () => new QueryBuilder($this->connection));
     }
 
     /**
