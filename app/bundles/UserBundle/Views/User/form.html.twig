@@ -66,12 +66,12 @@
 				<div class="panel-body">
 				<div class="row">
 					<div class="col-sm-6">
-						<div class="form-group col-xs-12{{ form.username.vars.errors|length ? ' has-error' : '' }}">
+						<div class="form-group{{ form.username.vars.errors|length ? ' has-error' : '' }}">
 							{{ form_label(form.username) }}
 						{{ form_widget(form.username, {'attr' : {'placeholder' : form.username.vars.label }}) }}
 						{{ form_errors(form.username) }}
 						</div>
-							<div class="form-group col-xs-12{{ form.email.vars.errors|length ? ' has-error' : '' }}">
+							<div class="form-group{{ form.email.vars.errors|length ? ' has-error' : '' }}">
 							{{ form_label(form.email) }}
                         {{ form_widget(form.email, {'attr' : {'placeholder' : form.email.vars.label }}) }}
                         {{ form_errors(form.email) }}
