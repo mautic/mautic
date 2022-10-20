@@ -731,7 +731,7 @@ return [
                 ],
             ],
             'mautic.lead.repository.frequency_rule' => [
-                'class'     => \Mautic\LeadBundle\Entity\FrequencyRuleRepository::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\LeadBundle\Entity\FrequencyRule::class,
