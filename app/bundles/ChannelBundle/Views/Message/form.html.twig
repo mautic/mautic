@@ -1,0 +1,48 @@
+{% extends "MauticCoreBundle:FormTheme:form_tabbed.html.twig" %}
+
+{# active, id, name, content #}
+{% set tabs, active = [], true %}
+
+{% for channel, config in channels %}
+    {# {% if form.channels[channel] is defined %}
+        {% set tab = {
+            'active'        : active,
+            'id'            : 'channel_' ~ channel,
+            'name'          : config.label,
+            'content'       : form_row(form.channels[channel]),
+            'containerAttr' : {
+                'style' : 'min-height: 200px;',
+            },
+        } %}
+        {% if formContainsErrors(form.channels[channel]) %}
+            {% set tab = tab|merge({'class': 'text-danger', 'icon': 'fa-warning'}) %}
+        {% elseif form.channels[channel].isEnabled.vars.data %}
+            {% set tab = tab|merge({'published': true}) %}
+        {% endif %}
+
+
+        {% set tabs, active = tabs|merge(tab), false %}
+    {% endif %} #}
+    
+{% endfor %}
+
+
+{% block formTabs %}{{ tabs }}{% endblock %}
+
+
+
+{% block aboveTabsContent %}
+<div class="pa-md row">
+    <div class="col-md-12">
+        {{ form_row(form.name) }}
+        {{ form_row(form.description) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block rightFormContent %}
+{{ form_row(form.category) }}
+{{ form_row(form.isPublished) }}
+{{ form_row(form.publishUp) }}
+{{ form_row(form.publishDown) }}
+{% endblock %}
