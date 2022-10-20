@@ -216,8 +216,8 @@ class TrackableModel extends AbstractCommonModel
     public function getDoNotTrackList($content = null)
     {
         $event = $this->dispatcher->dispatch(
-            PageEvents::REDIRECT_DO_NOT_TRACK,
-            new UntrackableUrlsEvent($content)
+            new UntrackableUrlsEvent($content),
+            PageEvents::REDIRECT_DO_NOT_TRACK
         );
 
         return $event->getDoNotTrackList();
@@ -414,11 +414,9 @@ class TrackableModel extends AbstractCommonModel
     /**
      * Validate and parse link for tracking.
      *
-     * @param $url
-     *
-     * @return array[$trackingKey, $trackingUrl]|false
+     * @return bool|non-empty-array<mixed, mixed>
      */
-    protected function prepareUrlForTracking($url)
+    protected function prepareUrlForTracking(string $url)
     {
         // Ensure it's clean
         $url = trim($url);
@@ -439,7 +437,8 @@ class TrackableModel extends AbstractCommonModel
         // Convert URL
         $urlParts = parse_url($url);
 
-        if (!$this->isValidUrl($urlParts, false)) {
+        // We need to ignore not parsable and invalid urls
+        if (false === $urlParts || !$this->isValidUrl($urlParts, false)) {
             return false;
         }
 
@@ -563,7 +562,7 @@ class TrackableModel extends AbstractCommonModel
             || (isset($urlParts['scheme'])
                 && !in_array(
                     $urlParts['scheme'],
-                    ['http', 'https', 'ftp', 'ftps']
+                    ['http', 'https', 'ftp', 'ftps', 'mailto']
                 ))) {
             return false;
         }
@@ -790,7 +789,7 @@ class TrackableModel extends AbstractCommonModel
 
             // Combine the new elements into a string and return it
             return
-                ((isset($url['scheme'])) ? $url['scheme'].'://' : '')
+                ((isset($url['scheme'])) ? 'mailto' == $url['scheme'] ? $url['scheme'].':' : $url['scheme'].'://' : '')
                 .((isset($url['user'])) ? $url['user'].((isset($url['pass'])) ? ':'.$url['pass'] : '').'@' : '')
                 .((isset($url['host'])) ? $url['host'] : '')
                 .((isset($url['port'])) ? ':'.$url['port'] : '')

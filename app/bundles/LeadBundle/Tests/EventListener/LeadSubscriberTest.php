@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriberTest extends CommonMocks
 {
@@ -214,7 +214,7 @@ class LeadSubscriberTest extends CommonMocks
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $leadEvent);
+        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }

@@ -55,7 +55,7 @@ class UpdateController extends CommonController
         $result       = 0;
         $failed       = false;
         $noMigrations = true;
-        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];

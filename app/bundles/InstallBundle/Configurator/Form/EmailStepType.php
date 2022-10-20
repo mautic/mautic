@@ -12,9 +12,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailStepType extends AbstractType
 {
@@ -162,7 +162,7 @@ class EmailStepType extends AbstractType
                 'required'    => false,
                 'attr'        => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getSparkPostService().']}',
+                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getSparkPostService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.sparkpost_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],

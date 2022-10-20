@@ -115,8 +115,8 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         $event = new OAuthEvent($user, $this->getClient());
 
         $this->eventDispatcher->dispatch(
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS,
-            $event
+            $event,
+            OAuthEvent::PRE_AUTHORIZATION_PROCESS
         );
 
         if ($event->isAuthorizedClient()) {

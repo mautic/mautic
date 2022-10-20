@@ -122,14 +122,6 @@ return [
                     'router',
                 ],
             ],
-            'mautic.campaign.calendarbundle.subscriber' => [
-                'class'     => \Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'translator',
-                    'router',
-                ],
-            ],
             'mautic.campaign.pointbundle.subscriber'    => [
                 'class' => \Mautic\CampaignBundle\EventListener\PointSubscriber::class,
             ],
@@ -574,6 +566,7 @@ return [
                     'mautic.helper.template.formatter',
                     'mautic.lead.model.list',
                     'mautic.helper.segment.count.cache',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -603,6 +596,7 @@ return [
                     'mautic.campaign.membership.builder',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -611,6 +605,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.campaign.model.summary',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],

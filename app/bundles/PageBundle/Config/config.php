@@ -155,16 +155,6 @@ return [
                     'setModelFactory' => ['mautic.model.factory'],
                 ],
             ],
-            'mautic.page.calendarbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'mautic.page.model.page',
-                    'doctrine.dbal.default_connection',
-                    'mautic.security',
-                    'translator',
-                    'router',
-                ],
-            ],
             'mautic.page.configbundle.subscriber' => [
                 'class' => \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             ],
@@ -299,6 +289,7 @@ return [
                     'mautic.tracker.device',
                     'mautic.tracker.contact',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.helper.contact_request_helper',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [

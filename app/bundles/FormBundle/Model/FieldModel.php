@@ -8,9 +8,9 @@ use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FieldModel extends CommonFormModel
 {
@@ -201,7 +201,7 @@ class FieldModel extends CommonFormModel
                 $event = new FormFieldEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

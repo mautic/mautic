@@ -409,11 +409,6 @@ return [
                 ],
                 'alias' => 'date',
             ],
-            'mautic.helper.template.exception' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
-                'arguments' => '%kernel.root_dir%',
-                'alias'     => 'exception',
-            ],
             'mautic.helper.template.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
                 'arguments' => [
@@ -498,13 +493,13 @@ return [
                 'alias' => 'translator',
             ],
             'mautic.helper.paths' => [
-                'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
+                'class'     => \Mautic\CoreBundle\Helper\PathsHelper::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
                     '%kernel.cache_dir%',
                     '%kernel.logs_dir%',
-                    '%kernel.root_dir%',
+                    '%kernel.project_dir%',
                 ],
             ],
             'mautic.helper.ip_lookup' => [
@@ -625,6 +620,7 @@ return [
                 'arguments' => [
                     'transifex.factory',
                     'translator',
+                    'mautic.helper.paths',
                     'mautic.helper.core_parameters',
                 ],
             ],
@@ -634,6 +630,7 @@ return [
                 'arguments' => [
                     'transifex.factory',
                     'translator',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.command.do_not_sell' => [
@@ -649,8 +646,8 @@ return [
                 'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
                 'arguments' => [
                     'translator',
-                    'mautic.helper.core_parameters',
                     'mautic.update.step_provider',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.core.command.maxmind.purge' => [
@@ -659,6 +656,60 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.maxmind.doNotSellList',
+                ],
+            ],
+            'mautic.core.command.cleanup_maintenance' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\CleanupMaintenanceCommand::class,
+                'arguments' => [
+                    'translator',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.core.command.convert_config' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\ConvertConfigCommand::class,
+                'arguments' => [
+                    'mautic.helper.paths',
+                ],
+            ],
+            'mautic.core.command.find_updates' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\FindUpdatesCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.helper.update',
+                ],
+            ],
+            'mautic.core.command.generate_assets' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\GenerateProductionAssetsCommand::class,
+                'arguments' => [
+                    'mautic.helper.assetgeneration',
+                    'mautic.helper.paths',
+                    'translator',
+                ],
+            ],
+            'mautic.core.command.install_data' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\InstallDataCommand::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
+            'mautic.core.command.unused_ip_delete' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\UnusedIpDeleteCommand::class,
+                'arguments' => [
+                    'mautic.lead.model.ipaddress',
+                ],
+            ],
+            'mautic.core.command.update_ip_data_store' => [
+                'tag'       => 'console.command',
+                'class'     => \Mautic\CoreBundle\Command\UpdateIpDataStoreCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.ip_lookup',
                 ],
             ],
         ],
@@ -1123,6 +1174,16 @@ return [
                 ],
                 'tag'       => 'twig.extension',
             ],
+            'templating.twig.extension.object' => [
+                'class' => \Mautic\CoreBundle\Templating\Twig\Extension\ObjectExtension::class,
+                'tag'   => 'twig.extension',
+            ],
+            'mautic.doctrine.loader.mautic_fixtures_loader' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
+                'arguments' => [
+                    'doctrine.fixtures.loader',
+                ],
+            ],
             // Schema
             'mautic.schema.helper.column' => [
                 'class'     => 'Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper',
@@ -1332,12 +1393,12 @@ return [
         'site_url'                        => '',
         'webroot'                         => '',
         '404_page'                        => '',
-        'cache_path'                      => '%kernel.root_dir%/../var/cache',
-        'log_path'                        => '%kernel.root_dir%/../var/logs',
+        'cache_path'                      => '%kernel.project_dir%/var/cache',
+        'log_path'                        => '%kernel.project_dir%/var/logs',
         'max_log_files'                   => 7,
         'log_file_name'                   => 'mautic_%kernel.environment%.php',
         'image_path'                      => 'media/images',
-        'tmp_path'                        => '%kernel.root_dir%/../var/tmp',
+        'tmp_path'                        => '%kernel.project_dir%/var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',

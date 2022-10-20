@@ -124,11 +124,7 @@ $container->setParameter('mautic.batch_sleep_time', 0);
 
 // Turn off creating of indexes in lead field fixtures
 $container->register('mautic.install.fixture.lead_field', \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class)
-    ->addArgument(false)
-    ->addTag(FixturesCompilerPass::FIXTURE_TAG)
-    ->setPublic(true);
-$container->register('mautic.lead.fixture.contact_field', \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class)
-    ->addArgument(false)
+    ->addArgument(new Reference('translator'))
     ->addTag(FixturesCompilerPass::FIXTURE_TAG)
     ->setPublic(true);
 

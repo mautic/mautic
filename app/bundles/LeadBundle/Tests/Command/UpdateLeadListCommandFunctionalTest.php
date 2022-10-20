@@ -50,11 +50,11 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertEquals($longTimeAgo, $segment->getLastBuiltDate());
 
-        $this->runCommand(UpdateLeadListsCommand::NAME, $getCommandParams($segment));
+        $output = $this->runCommand(UpdateLeadListsCommand::NAME, $getCommandParams($segment));
 
         /** @var LeadList $segment */
         $segment = $this->em->find(LeadList::class, $segment->getId());
-        $assert($segment);
+        $assert($segment, $output);
 
         /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
@@ -84,28 +84,33 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
         ];
 
         // Test that it will work when we select a specific segment too.
+        // Also testing the timing option = 0.
         yield [
             function (LeadList $segment): array {
                 return ['--list-id' => $segment->getId()];
             },
-            function (LeadList $segment): void {
+            function (LeadList $segment, string $output): void {
                 Assert::assertGreaterThan(
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
+                Assert::assertStringNotContainsString('Total time:', $output);
             },
         ];
 
         // But the last built date will not update if we limit how many contacts to process.
+        // Also testing the timing option = 1.
         yield [
             function (): array {
-                return ['--max-contacts' => 1];
+                return ['--max-contacts' => 1, '--timing' => 1];
             },
-            function (LeadList $segment): void {
+            function (LeadList $segment, string $output): void {
                 Assert::assertEquals(
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
+                Assert::assertStringContainsString('Total time:', $output);
+                Assert::assertStringContainsString('seconds', $output);
             },
         ];
     }

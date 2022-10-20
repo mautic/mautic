@@ -26,7 +26,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper
@@ -473,7 +473,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead

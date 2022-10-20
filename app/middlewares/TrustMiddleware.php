@@ -10,7 +10,7 @@ class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInter
 {
     use ConfigAwareTrait;
 
-    const PRIORITY = 0;
+    public const PRIORITY = 0;
 
     /**
      * @var HttpKernelInterface

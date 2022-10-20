@@ -43,7 +43,6 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD,
                 $this->callback(function (FormAdjustmentEvent $event) {
                     $this->assertSame($this->form, $event->getForm());
                     $this->assertSame('email', $event->getFieldAlias());
@@ -52,7 +51,8 @@ final class FormAdjustmentsProviderTest extends \PHPUnit\Framework\TestCase
                     $this->assertSame('text', $event->getFieldType());
 
                     return true;
-                })
+                }),
+                LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD
             );
 
         $this->provider->adjustForm(

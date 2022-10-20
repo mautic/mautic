@@ -112,6 +112,16 @@ return [
                 'optional'  => true,
             ],
         ],
+        'commands' => [
+            'mautic.citrix.command.sync' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\Command\SyncCommand::class,
+                'arguments' => [
+                    'mautic.citrix.model.citrix',
+                    'mautic.helper.paths',
+                ],
+                'tag' => 'console.command',
+            ],
+        ],
         'integrations' => [
             'mautic.integration.gotoassist' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Integration\GotoassistIntegration::class,

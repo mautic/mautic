@@ -175,13 +175,13 @@ class UserProvider implements UserProviderInterface
         $event = new UserEvent($user, $isNew);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
-            $event = $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+            $event = $this->dispatcher->dispatch($event, UserEvents::USER_PRE_SAVE);
         }
 
         $this->userRepository->saveEntity($user);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
-            $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
         }
 
         return $user;

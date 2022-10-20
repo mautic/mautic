@@ -157,7 +157,7 @@ class VideoModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::VIDEO_ON_HIT)) {
             $event = new VideoHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch(PageEvents::VIDEO_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::VIDEO_ON_HIT);
         }
     }
 }

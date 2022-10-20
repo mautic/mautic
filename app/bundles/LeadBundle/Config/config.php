@@ -424,6 +424,13 @@ return [
                     'mautic.channel.helper.channel_list',
                 ],
             ],
+            'mautic.lead.reportbundle.report_devices_subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ReportDevicesSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.reportbundle.fields_builder',
+                    'mautic.lead.model.company_report_data',
+                ],
+            ],
             'mautic.lead.reportbundle.segment_log_subscriber' => [
                 'class'     => \Mautic\LeadBundle\EventListener\SegmentLogReportSubscriber::class,
                 'arguments' => [
@@ -435,14 +442,6 @@ return [
                 'arguments' => [
                     'mautic.lead.reportbundle.fields_builder',
                     'mautic.lead.model.company_report_data',
-                ],
-            ],
-            'mautic.lead.calendarbundle.subscriber' => [
-                'class'     => \Mautic\LeadBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'translator',
-                    'router',
                 ],
             ],
             'mautic.lead.pointbundle.subscriber' => [
@@ -904,6 +903,19 @@ return [
                     'mautic.lead.repository.company_lead',
                 ],
             ],
+            'mautic.lead.helper.contact_request_helper' => [
+                'class'     => \Mautic\LeadBundle\Helper\ContactRequestHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.tracker.contact',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.ip_lookup',
+                    'request_stack',
+                    'monolog.logger.mautic',
+                    'event_dispatcher',
+                    'mautic.lead.merger',
+                ],
+            ],
             'mautic.lead.validator.length' => [
                 'class'     => Mautic\LeadBundle\Validator\Constraints\LengthValidator::class,
                 'tag'       => 'validator.constraint_validator',
@@ -1145,16 +1157,7 @@ return [
                     'mautic.user.provider',
                     'mautic.tracker.contact',
                     'mautic.tracker.device',
-                    'mautic.lead.model.legacy_lead',
                     'mautic.lead.model.ipaddress',
-                ],
-            ],
-
-            // Deprecated support for circular dependency
-            'mautic.lead.model.legacy_lead' => [
-                'class'     => \Mautic\LeadBundle\Model\LegacyLeadModel::class,
-                'arguments' => [
-                    'service_container',
                 ],
             ],
             'mautic.lead.model.field' => [
@@ -1365,6 +1368,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.lead.model.list',
                     'mautic.user.model.user',
+                    'mautic.lead.model.lead',
                 ],
             ],
             'mautic.lead.model.dnc' => [
@@ -1542,6 +1546,7 @@ return [
                 'arguments' => [
                     'mautic.lead.deduper',
                     'translator',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -1551,6 +1556,24 @@ return [
                     'mautic.lead.field.settings.background_service',
                     'translator',
                     'mautic.lead.repository.field',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.lead.command.update_lead_lists' => [
+                'class'     => \Mautic\LeadBundle\Command\UpdateLeadListsCommand::class,
+                'arguments' => [
+                    'mautic.lead.model.list',
+                    'translator',
+                    'mautic.helper.paths',
+                    'monolog.logger.mautic',
+                ],
+                'tag' => 'console.command',
+            ],
+            'mautic.lead.command.import' => [
+                'class'     => \Mautic\LeadBundle\Command\ImportCommand::class,
+                'arguments' => [
+                    'translator',
+                    'mautic.lead.model.import',
                 ],
                 'tag' => 'console.command',
             ],
@@ -1565,11 +1588,6 @@ return [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['doctrine.orm.entity_manager', 'mautic.helper.core_parameters'],
-            ],
-            'mautic.lead.fixture.contact_field' => [
-                'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
             ],
             'mautic.lead.fixture.segment' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,

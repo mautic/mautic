@@ -8,7 +8,7 @@ use Mautic\EmailBundle\Swiftmailer\Sparkpost\SparkpostFactoryInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SparkpostTransportTest extends TestCase
 {
