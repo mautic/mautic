@@ -149,6 +149,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'headers_sts_subdomains', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_preload', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'headers_sts_expire_time', $template); ?>
             </div>
         </div>

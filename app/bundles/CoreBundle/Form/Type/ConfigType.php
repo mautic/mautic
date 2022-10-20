@@ -671,6 +671,20 @@ class ConfigType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+            'headers_sts_preload',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.preload',
+                'data'  => (array_key_exists('headers_sts_preload', $options['data']) && !empty($options['data']['headers_sts_preload'])),
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.response.headers.sts.preload.tooltip',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
+        );
     }
 
     /**

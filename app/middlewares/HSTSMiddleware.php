@@ -16,6 +16,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
 
     protected bool $enableHSTS;
     protected bool $includeDubDomains;
+    protected bool $preload;
     protected int $expireTime;
     protected HttpKernelInterface $app;
 
@@ -25,6 +26,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         $this->config            = $this->getConfig();
         $this->enableHSTS        = array_key_exists('headers_sts', $this->config) && (bool) $this->config['headers_sts'];
         $this->includeDubDomains = array_key_exists('headers_sts_subdomains', $this->config) && (bool) $this->config['headers_sts_subdomains'];
+        $this->preload           = array_key_exists('headers_sts_preload', $this->config) && (bool) $this->config['headers_sts_preload'];
         $this->expireTime        = $this->config['headers_sts_expire_time'] ?? 60;
     }
 
@@ -38,7 +40,7 @@ class HSTSMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterf
         }
 
         if ($this->enableHSTS && $this->expireTime) {
-            $value = 'max-age='.$this->expireTime.($this->includeDubDomains ? '; includeSubDomains' : '');
+            $value = 'max-age='.$this->expireTime.($this->includeDubDomains ? '; includeSubDomains' : '').($this->preload ? '; preload' : '');
             $response->headers->set('Strict-Transport-Security', $value);
         }
 
