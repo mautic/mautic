@@ -119,41 +119,6 @@ return [
                 'class' => \Mautic\UserBundle\Controller\SecurityController::class,
             ],
         ],
-        'events' => [
-            'mautic.user.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\UserSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.user.search.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.user.model.user',
-                    'mautic.user.model.role',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.user.config.subscriber' => [
-                'class' => \Mautic\UserBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.user.route.subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\SAMLSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'router',
-                ],
-            ],
-            'mautic.user.security_subscriber' => [
-                'class'     => \Mautic\UserBundle\EventListener\SecuritySubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.form.type.user' => [
                 'class'     => \Mautic\UserBundle\Form\Type\UserType::class,

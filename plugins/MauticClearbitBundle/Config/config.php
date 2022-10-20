@@ -22,22 +22,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.plugin.clearbit.button.subscriber' => [
-                'class'     => \MauticPlugin\MauticClearbitBundle\EventListener\ButtonSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'translator',
-                    'router',
-                ],
-            ],
-            'mautic.plugin.clearbit.lead.subscriber' => [
-                'class'     => \MauticPlugin\MauticClearbitBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.plugin.clearbit.lookup_helper',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.form.type.clearbit_lookup' => [
                 'class' => 'MauticPlugin\MauticClearbitBundle\Form\Type\LookupType',

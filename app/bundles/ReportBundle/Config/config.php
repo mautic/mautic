@@ -77,46 +77,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.report.configbundle.subscriber' => [
-                'class' => \Mautic\ReportBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.report.search.subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.report.model.report',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.report.report.subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.report.dashboard.subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.report.model.report',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.report.scheduler.report_scheduler_subscriber' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\EventListener\ReportSchedulerSubscriber::class,
-                'arguments' => [
-                    'mautic.report.model.scheduler_planner',
-                ],
-            ],
-            'mautic.report.report.schedule_subscriber' => [
-                'class'     => \Mautic\ReportBundle\EventListener\SchedulerSubscriber::class,
-                'arguments' => [
-                    'mautic.report.model.send_schedule',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.form.type.reportconfig' => [
                 'class'     => \Mautic\ReportBundle\Form\Type\ConfigType::class,

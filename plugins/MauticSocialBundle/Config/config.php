@@ -46,35 +46,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.social.formbundle.subscriber' => [
-                'class' => \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
-            ],
-            'mautic.social.campaignbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.social.helper.campaign',
-                    'mautic.helper.integration',
-                    'translator',
-                ],
-            ],
-            'mautic.social.configbundle.subscriber' => [
-                'class' => \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.social.subscriber.channel' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\ChannelSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.social.stats.subscriber' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.form.type.social.sociallogin' => [
                 'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType',

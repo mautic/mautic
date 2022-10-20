@@ -1,18 +1,6 @@
 <?php
 
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
-use Mautic\FormBundle\EventListener\CampaignSubscriber;
-use Mautic\FormBundle\EventListener\DashboardSubscriber;
-use Mautic\FormBundle\EventListener\EmailSubscriber;
-use Mautic\FormBundle\EventListener\FormSubscriber;
-use Mautic\FormBundle\EventListener\FormValidationSubscriber;
-use Mautic\FormBundle\EventListener\LeadSubscriber;
-use Mautic\FormBundle\EventListener\PageSubscriber;
-use Mautic\FormBundle\EventListener\PointSubscriber;
-use Mautic\FormBundle\EventListener\ReportSubscriber;
-use Mautic\FormBundle\EventListener\SearchSubscriber;
-use Mautic\FormBundle\EventListener\StatsSubscriber;
-use Mautic\FormBundle\EventListener\WebhookSubscriber;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\Form\Type\FormFieldFileType;
@@ -154,117 +142,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.core.configbundle.subscriber.form' => [
-                'class'     => \Mautic\FormBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.form.subscriber' => [
-                'class'     => FormSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                    'mautic.helper.mailer',
-                    'mautic.helper.core_parameters',
-                    'translator',
-                    'router',
-                ],
-            ],
-            'mautic.form.validation.subscriber' => [
-                'class'     => FormValidationSubscriber::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.form.pagebundle.subscriber' => [
-                'class'     => PageSubscriber::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.helper.token_builder.factory',
-                    'translator',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.form.pointbundle.subscriber' => [
-                'class'     => PointSubscriber::class,
-                'arguments' => [
-                    'mautic.point.model.point',
-                ],
-            ],
-            'mautic.form.reportbundle.subscriber' => [
-                'class'     => ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.company_report_data',
-                    'mautic.form.repository.submission',
-                ],
-            ],
-            'mautic.form.campaignbundle.subscriber' => [
-                'class'     => CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.form.model.submission',
-                    'mautic.campaign.executioner.realtime',
-                    'mautic.helper.form.field_helper',
-                ],
-            ],
-            'mautic.form.leadbundle.subscriber' => [
-                'class'     => LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.page.model.page',
-                    'mautic.form.repository.submission',
-                    'translator',
-                    'router',
-                ],
-            ],
-            'mautic.form.emailbundle.subscriber' => [
-                'class' => EmailSubscriber::class,
-            ],
-            'mautic.form.search.subscriber' => [
-                'class'     => SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.form.model.form',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.form.webhook.subscriber' => [
-                'class'     => WebhookSubscriber::class,
-                'arguments' => [
-                    'mautic.webhook.model.webhook',
-                ],
-            ],
-            'mautic.form.dashboard.subscriber' => [
-                'class'     => DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.form.model.submission',
-                    'mautic.form.model.form',
-                    'router',
-                ],
-            ],
-            'mautic.form.stats.subscriber' => [
-                'class'     => StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.form.subscriber.determine_winner' => [
-                'class'     => \Mautic\FormBundle\EventListener\DetermineWinnerSubscriber::class,
-                'arguments' => [
-                    'mautic.form.repository.submission',
-                    'translator',
-                ],
-            ],
-            'mautic.form.conditional.subscriber' => [
-                'class'     => \Mautic\FormBundle\EventListener\FormConditionalSubscriber::class,
-                'arguments' => [
-                    'mautic.form.model.form',
-                    'mautic.form.model.field',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.form.type.formconfig' => [
                 'class'     => \Mautic\FormBundle\Form\Type\ConfigFormType::class,

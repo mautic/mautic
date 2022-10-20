@@ -140,7 +140,8 @@ return [
         ],
     ],
     'serviceAliases' => [
-        \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class => \Mautic\UserBundle\Entity\UserTokenRepository::class,
+        \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class        => \Mautic\UserBundle\Entity\UserTokenRepository::class,
+        \Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class => \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
     ],
     'services' => [
         'main' => [
@@ -171,14 +172,6 @@ return [
             ],
         ],
         'events' => [
-            'mautic.core.migration.command.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber::class,
-                'arguments' => [
-                    'mautic.database.version.provider',
-                    'mautic.generated.columns.provider',
-                    'database_connection',
-                ],
-            ],
             'mautic.core.subscriber.router' => [
                 'class'     => \Mautic\CoreBundle\EventListener\RouterSubscriber::class,
                 'arguments' => [

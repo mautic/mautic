@@ -15,7 +15,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
@@ -41,7 +41,7 @@ class PageSubscriber implements EventSubscriberInterface
     private $pageModel;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -70,7 +70,7 @@ class PageSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         PageModel $pageModel,
-        Logger $logger,
+        LoggerInterface $logger,
         HitRepository $hitRepository,
         PageRepository $pageRepository,
         RedirectRepository $redirectRepository,

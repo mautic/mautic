@@ -65,32 +65,6 @@ return [
                 ],
             ],
         ],
-        'events' => [
-            'mautic.webhook.config.subscriber' => [
-                'class' => \Mautic\WebhookBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.webhook.audit.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\WebhookSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                    'mautic.webhook.notificator.webhookkillnotificator',
-                ],
-            ],
-            'mautic.webhook.stats.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.webhook.campaign.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.webhook.campaign.helper',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.webhook.model.webhook' => [
                 'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,

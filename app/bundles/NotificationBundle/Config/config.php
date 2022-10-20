@@ -13,57 +13,6 @@ return [
                     'mautic.lead.model.dnc',
                 ],
             ],
-            'mautic.notification.campaignbundle.condition_subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\CampaignConditionSubscriber::class,
-            ],
-            'mautic.notification.pagebundle.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\PageSubscriber::class,
-                'arguments' => [
-                    'templating.helper.assets',
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.core.js.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\BuildJsSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.notification',
-                    'mautic.helper.integration',
-                    'router',
-                ],
-            ],
-            'mautic.notification.notificationbundle.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\NotificationSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.auditlog',
-                    'mautic.page.model.trackable',
-                    'mautic.page.helper.token',
-                    'mautic.asset.helper.token',
-                ],
-            ],
-            'mautic.notification.subscriber.channel' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\ChannelSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.notification.stats.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.notification.mobile_notification.report.subscriber' => [
-                'class'     => \Mautic\NotificationBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'mautic.lead.model.company_report_data',
-                    'mautic.notification.repository.stat',
-                ],
-            ],
-            'mautic.notification.configbundle.subscriber' => [
-                'class' => Mautic\NotificationBundle\EventListener\ConfigSubscriber::class,
-            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [

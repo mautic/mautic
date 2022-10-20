@@ -33,13 +33,6 @@ return [
                     'setEmailModel' => ['mautic.email.model.email'],
                 ],
             ],
-            'mautic.citrix.leadbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                ],
-            ],
             'mautic.citrix.campaignbundle.subscriber' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
@@ -50,25 +43,6 @@ return [
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
                 ],
-            ],
-            'mautic.citrix.emailbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.citrix.stats.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.citrix.integration.request' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber::class,
             ],
         ],
         'forms' => [

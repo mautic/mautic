@@ -91,58 +91,6 @@ return [
 
     'services' => [
         'events' => [
-            'mautic.page.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\PageSubscriber::class,
-                'arguments' => [
-                    'templating.helper.assets',
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                    'mautic.page.model.page',
-                    'monolog.logger.mautic',
-                    'mautic.page.repository.hit',
-                    'mautic.page.repository.page',
-                    'mautic.page.repository.redirect',
-                    'mautic.lead.repository.lead',
-                ],
-            ],
-            'mautic.pagebuilder.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\BuilderSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.page.helper.token',
-                    'mautic.helper.integration',
-                    'mautic.page.model.page',
-                    'mautic.helper.token_builder.factory',
-                    'translator',
-                    'doctrine.dbal.default_connection',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.pagetoken.subscriber' => [
-                'class' => \Mautic\PageBundle\EventListener\TokenSubscriber::class,
-            ],
-            'mautic.page.pointbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\PointSubscriber::class,
-                'arguments' => [
-                    'mautic.point.model.point',
-                ],
-            ],
-            'mautic.page.reportbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.company_report_data',
-                    'mautic.page.repository.hit',
-                    'translator',
-                ],
-            ],
-            'mautic.page.campaignbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                    'mautic.page.helper.tracking',
-                    'mautic.campaign.executioner.realtime',
-                ],
-            ],
             'mautic.page.leadbundle.subscriber' => [
                 'class'     => \Mautic\PageBundle\EventListener\LeadSubscriber::class,
                 'arguments' => [
@@ -153,60 +101,6 @@ return [
                 ],
                 'methodCalls' => [
                     'setModelFactory' => ['mautic.model.factory'],
-                ],
-            ],
-            'mautic.page.configbundle.subscriber' => [
-                'class' => \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.page.search.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.page.model.page',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.page.webhook.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\WebhookSubscriber::class,
-                'arguments' => [
-                    'mautic.webhook.model.webhook',
-                ],
-            ],
-            'mautic.page.dashboard.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.page.model.page',
-                    'router',
-                ],
-            ],
-            'mautic.page.js.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\BuildJsSubscriber::class,
-                'arguments' => [
-                    'templating.helper.assets',
-                    'mautic.page.helper.tracking',
-                    'router',
-                ],
-            ],
-            'mautic.page.maintenance.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\MaintenanceSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'translator',
-                ],
-            ],
-            'mautic.page.stats.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.page.subscriber.determine_winner' => [
-                'class'     => \Mautic\PageBundle\EventListener\DetermineWinnerSubscriber::class,
-                'arguments' => [
-                    'mautic.page.repository.hit',
-                    'translator',
                 ],
             ],
         ],

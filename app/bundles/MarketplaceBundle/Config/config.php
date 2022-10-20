@@ -118,14 +118,6 @@ return [
                 ],
             ],
         ],
-        'events' => [
-            'marketplace.menu.subscriber' => [
-                'class'     => \Mautic\MarketplaceBundle\EventListener\MenuSubscriber::class,
-                'arguments' => [
-                    'marketplace.service.config',
-                ],
-            ],
-        ],
         'permissions' => [
             'marketplace.permissions' => [
                 'class'     => \Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions::class,

@@ -84,47 +84,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.point.subscriber' => [
-                'class'     => \Mautic\PointBundle\EventListener\PointSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.point.leadbundle.subscriber' => [
-                'class'     => \Mautic\PointBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.point.model.trigger',
-                    'translator',
-                    'mautic.lead.repository.points_change_log',
-                    'mautic.point.repository.lead_point_log',
-                    'mautic.point.repository.lead_trigger_log',
-                ],
-            ],
-            'mautic.point.search.subscriber' => [
-                'class'     => \Mautic\PointBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.point.model.point',
-                    'mautic.point.model.trigger',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.point.dashboard.subscriber' => [
-                'class'     => \Mautic\PointBundle\EventListener\DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.point.model.point',
-                ],
-            ],
-            'mautic.point.stats.subscriber' => [
-                'class'     => \Mautic\PointBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-        ],
         'forms' => [
             'mautic.point.type.form' => [
                 'class'     => \Mautic\PointBundle\Form\Type\PointType::class,

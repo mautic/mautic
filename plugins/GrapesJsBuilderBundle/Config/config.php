@@ -80,33 +80,6 @@ return [
                 ],
             ],
         ],
-        'events'  => [
-            'grapesjsbuilder.event.assets.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'mautic.install.service',
-                ],
-            ],
-            'grapesjsbuilder.event.email.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                ],
-            ],
-            'grapesjsbuilder.event.content.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\InjectCustomContentSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                    'grapesjsbuilder.helper.filemanager',
-                    'mautic.helper.templating',
-                    'request_stack',
-                    'router',
-                ],
-            ],
-        ],
     ],
     'parameters' => [
         'image_path_exclude'     => ['flags', 'mejs'], // exclude certain folders from showing in the image browser
