@@ -21,4 +21,6 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\ReportBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\ReportBundle\\Entity\\', '../Entity/*Repository.php');
 };
