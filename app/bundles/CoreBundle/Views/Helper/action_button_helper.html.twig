@@ -18,7 +18,7 @@
 {% set langVar = langVar is defined ? langVar : (routeBase is defined ? routeBase : '') %}
 {% set translationBase = translationBase is defined ? translationBase : 'mautic.' ~ langVar %}
 {# Set index and action routes #}
-{% set actionRoute = (route is defined and actionRoute is not defined) ? route : (routeBase is defined ? ('mautic_' ~ routeBase|replace({'mautic_': ''}) ~ '_action') : '') %}
+{% set actionRoute = (route is defined and actionRoute is not defined) ? route : (routeBase is defined ? ('mautic_' ~ routeBase|replace({'mautic_': ''}) ~ '_action') : actionRoute) %}
 {% set indexRoute = routeBase is defined ? ('mautic_' ~ routeBase|replace({'mautic_': ''}) ~ '_index') : '' %}
 {% set routeVars = routeVars is defined ? routeVars : [] %}
 {# Extra HTML to be inserted after the buttons #}

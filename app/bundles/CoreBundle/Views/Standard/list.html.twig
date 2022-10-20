@@ -1,22 +1,36 @@
+{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
+{% set ignoreStandardColumns = ignoreStandardColumns is defined ? ignoreStandardColumns : [] %}
+
+
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
 {% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
-{% if not slot('mauticContent') %}
-    {% if mauticContent is defined %}
-        {% block mauticContent %}{{ muaticContent }}{% endblock %}
+
+{% block mauticContent %}
+    {% if not slot('mauticContent') %}
+        {% if mauticContent is defined %}
+            {{ muaticContent }}
+        {% endif %}
+    {% else %}
+        {{ slot('mauticContent') }}
     {% endif %}
-{% endif %}
+    
+{% endblock %}
+{% block headerTitle %}
 {% if not slot('headerTitle') %}
     {% if headerTitle is not defined %}
         {% set headerTitle = 'Mautic' %}
     {% endif %}
-    {% block headerTitle %}{{ headerTitle|trans }}{% endblock %}
+    {{ headerTitle|trans }}
+    {% else %}
+     {{ slot('headerTitle') }}
 {% endif %}
+{% endblock %}
 
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig',
-        {
+    {
             'templateButtons' : {
                 'new' : permissions[permissionBase ~ ':create'],
             },

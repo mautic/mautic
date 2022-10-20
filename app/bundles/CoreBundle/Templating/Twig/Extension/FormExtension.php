@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
+use Mautic\CoreBundle\Templating\Helper\FormHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
@@ -18,7 +19,7 @@ class FormExtension extends AbstractExtension
     {
         return [
             new TwigFunction('formFieldFormatList', [$this, 'formatList'], ['is_safe' => ['all']]),
-            new TwigFunction('formContainsErrors', [$this, 'containsErrors']),
+            new TwigFunction('formContainsErrors', [$this, 'containsErrors'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -30,18 +31,12 @@ class FormExtension extends AbstractExtension
         return FormFieldHelper::formatList($format, $v);
     }
 
-    /**
-     * Checks to see if the form and its children has an error.
-     *
-     * @param array<string> $excluding
-     */
-    public function containsErrors(FormView $form, array $excluding = []): bool
-    {
+    public function containsErrors(FormView $form, array $exluding = []){
         if (count($form->vars['errors'])) {
             return true;
         }
         foreach ($form->children as $key => $child) {
-            if (in_array($key, $excluding)) {
+            if (in_array($key, $exluding)) {
                 continue;
             }
 
@@ -59,4 +54,5 @@ class FormExtension extends AbstractExtension
 
         return false;
     }
+
 }
