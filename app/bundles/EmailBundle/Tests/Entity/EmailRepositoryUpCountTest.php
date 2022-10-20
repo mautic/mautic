@@ -4,53 +4,42 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Entity;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class EmailRepositoryUpCountTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|Connection
-     */
-    private $mockConnection;
+    use RepositoryConfiguratorTrait {
+        configureMocks as configureMocksInTrait;
+    }
 
     /**
      * @var MockObject|QueryBuilder
      */
     private $queryBuilderMock;
 
-    /**
-     * @var MockObject|EntityManager
-     */
-    private $em;
-
-    /**
-     * @var MockObject|ClassMetadata
-     */
-    private $cm;
-
-    /**
-     * @var EmailRepository
-     */
-    private $repo;
+    private EmailRepository $repo;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
-        $this->mockConnection   = $this->createMock(Connection::class);
-        $this->em               = $this->createMock(EntityManager::class);
-        $this->cm               = $this->createMock(ClassMetadata::class);
-        $this->repo             = new EmailRepository($this->em, $this->cm);
+        $this->repo             = $this->configureRepository(Email::class);
+    }
 
-        $this->mockConnection->method('createQueryBuilder')->willReturn($this->queryBuilderMock);
-        $this->em->method('getConnection')->willReturn($this->mockConnection);
+    /**
+     * A bit of a hacky way to configure mock builder instead of the real object which the trait does.
+     */
+    private function configureMocks(string $entityClass): void
+    {
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilderMock);
+
+        $this->configureMocksInTrait($entityClass);
     }
 
     public function testUpCountWithNoIncrease(): void

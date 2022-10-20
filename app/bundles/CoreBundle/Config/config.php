@@ -139,6 +139,9 @@ return [
             ],
         ],
     ],
+    'serviceAliases' => [
+        \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class => \Mautic\UserBundle\Entity\UserTokenRepository::class,
+    ],
     'services' => [
         'main' => [
             'mautic.core.service.flashbag' => [
