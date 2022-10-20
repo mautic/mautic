@@ -14,14 +14,10 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 final class ServicePass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
-        $this->configureBundles($container, $bundles);
-    }
 
-    private function configureBundles(ContainerBuilder $container, array $bundles, bool $excludeServicesConfig = false): void
-    {
         // Store menu renderer options to create unique renderering classes per menu
         // since KNP menus doesn't seem to support a Renderer factory
         $menus = [];
@@ -285,11 +281,10 @@ final class ServicePass implements CompilerPassInterface
     }
 
     /**
-     * @param $argument
-     * @param $container
-     * @param $definitionArguments
+     * @param mixed   $argument
+     * @param mixed[] $definitionArguments
      */
-    private function processArgument($argument, $container, &$definitionArguments)
+    private function processArgument($argument, ContainerBuilder $container, &$definitionArguments): void
     {
         if ('' === $argument) {
             // To be added during compilation
