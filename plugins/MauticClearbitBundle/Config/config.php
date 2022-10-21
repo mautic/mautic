@@ -22,14 +22,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.clearbit_lookup' => [
-                'class' => 'MauticPlugin\MauticClearbitBundle\Form\Type\LookupType',
-            ],
-            'mautic.form.type.clearbit_batch_lookup' => [
-                'class' => 'MauticPlugin\MauticClearbitBundle\Form\Type\BatchLookupType',
-            ],
-        ],
         'others' => [
             'mautic.plugin.clearbit.lookup_helper' => [
                 'class'     => 'MauticPlugin\MauticClearbitBundle\Helper\LookupHelper',

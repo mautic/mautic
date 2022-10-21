@@ -58,40 +58,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.integration.details' => [
-                'class' => \Mautic\PluginBundle\Form\Type\DetailsType::class,
-            ],
-            'mautic.form.type.integration.settings' => [
-                'class'     => \Mautic\PluginBundle\Form\Type\FeatureSettingsType::class,
-                'arguments' => [
-                    'session',
-                    'mautic.helper.core_parameters',
-                    'monolog.logger.mautic',
-                ],
-            ],
-            'mautic.form.type.integration.fields' => [
-                'class'     => \Mautic\PluginBundle\Form\Type\FieldsType::class,
-            ],
-            'mautic.form.type.integration.company.fields' => [
-                'class'     => \Mautic\PluginBundle\Form\Type\CompanyFieldsType::class,
-            ],
-            'mautic.form.type.integration.keys' => [
-                'class' => \Mautic\PluginBundle\Form\Type\KeysType::class,
-            ],
-            'mautic.form.type.integration.list' => [
-                'class'     => \Mautic\PluginBundle\Form\Type\IntegrationsListType::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.form.type.integration.config' => [
-                'class' => \Mautic\PluginBundle\Form\Type\IntegrationConfigType::class,
-            ],
-            'mautic.form.type.integration.campaign' => [
-                'class' => \Mautic\PluginBundle\Form\Type\IntegrationCampaignsType::class,
-            ],
-        ],
         'other' => [
             'mautic.helper.integration' => [
                 'class'     => \Mautic\PluginBundle\Helper\IntegrationHelper::class,

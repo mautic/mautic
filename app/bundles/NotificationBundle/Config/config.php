@@ -14,40 +14,6 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.form.type.notification' => [
-                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationType',
-            ],
-            'mautic.form.type.mobile.notification' => [
-                'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationType::class,
-            ],
-            'mautic.form.type.mobile.notification_details' => [
-                'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationDetailsType::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.form.type.notificationconfig' => [
-                'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
-            ],
-            'mautic.notification.config' => [
-                'class' => \Mautic\NotificationBundle\Form\Type\NotificationConfigType::class,
-            ],
-            'mautic.form.type.notificationsend_list' => [
-                'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
-                'arguments' => 'router',
-            ],
-            'mautic.form.type.notification_list' => [
-                'class' => 'Mautic\NotificationBundle\Form\Type\NotificationListType',
-            ],
-            'mautic.form.type.mobilenotificationsend_list' => [
-                'class'     => \Mautic\NotificationBundle\Form\Type\MobileNotificationSendType::class,
-                'arguments' => 'router',
-            ],
-            'mautic.form.type.mobilenotification_list' => [
-                'class' => \Mautic\NotificationBundle\Form\Type\MobileNotificationListType::class,
-            ],
-        ],
         'helpers' => [
             'mautic.helper.notification' => [
                 'class'     => 'Mautic\NotificationBundle\Helper\NotificationHelper',

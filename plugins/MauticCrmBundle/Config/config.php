@@ -248,11 +248,5 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.form.type.connectwise.campaignaction' => [
-                'class'     => MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType::class,
-                'arguments' => ['mautic.integration.connectwise'],
-            ],
-        ],
     ],
 ];

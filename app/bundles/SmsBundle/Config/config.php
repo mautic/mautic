@@ -2,31 +2,6 @@
 
 return [
     'services' => [
-        'forms' => [
-            'mautic.form.type.sms' => [
-                'class'     => \Mautic\SmsBundle\Form\Type\SmsType::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.form.type.smsconfig' => [
-                'class' => \Mautic\SmsBundle\Form\Type\ConfigType::class,
-            ],
-            'mautic.form.type.smssend_list' => [
-                'class'     => \Mautic\SmsBundle\Form\Type\SmsSendType::class,
-                'arguments' => 'router',
-            ],
-            'mautic.form.type.sms_list' => [
-                'class' => \Mautic\SmsBundle\Form\Type\SmsListType::class,
-            ],
-            'mautic.form.type.sms.config.form' => [
-                'class'     => \Mautic\SmsBundle\Form\Type\ConfigType::class,
-                'arguments' => ['mautic.sms.transport_chain', 'translator'],
-            ],
-            'mautic.form.type.sms.campaign_reply_type' => [
-                'class' => \Mautic\SmsBundle\Form\Type\CampaignReplyType::class,
-            ],
-        ],
         'helpers' => [
             'mautic.helper.sms' => [
                 'class'     => \Mautic\SmsBundle\Helper\SmsHelper::class,

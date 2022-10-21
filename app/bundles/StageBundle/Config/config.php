@@ -48,35 +48,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.stage.type.form' => [
-                'class'     => \Mautic\StageBundle\Form\Type\StageType::class,
-                'arguments' => [
-                    'mautic.security',
-                ],
-            ],
-            'mautic.stage.type.action' => [
-                'class' => 'Mautic\StageBundle\Form\Type\StageActionType',
-            ],
-            'mautic.stage.type.action_list' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageActionListType',
-                'arguments' => [
-                    'mautic.stage.model.stage',
-                ],
-            ],
-            'mautic.stage.type.action_change' => [
-                'class' => 'Mautic\StageBundle\Form\Type\StageActionChangeType',
-            ],
-            'mautic.stage.type.stage_list' => [
-                'class'     => 'Mautic\StageBundle\Form\Type\StageListType',
-                'arguments' => [
-                    'mautic.stage.model.stage',
-                ],
-            ],
-            'mautic.point.type.genericstage_settings' => [
-                'class' => 'Mautic\StageBundle\Form\Type\GenericStageSettingsType',
-            ],
-        ],
         'models' => [
             'mautic.stage.model.stage' => [
                 'class'     => 'Mautic\StageBundle\Model\StageModel',

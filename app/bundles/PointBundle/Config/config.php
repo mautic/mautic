@@ -84,27 +84,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.point.type.form' => [
-                'class'     => \Mautic\PointBundle\Form\Type\PointType::class,
-                'arguments' => ['mautic.security'],
-            ],
-            'mautic.point.type.action' => [
-                'class' => \Mautic\PointBundle\Form\Type\PointActionType::class,
-            ],
-            'mautic.pointtrigger.type.form' => [
-                'class'     => \Mautic\PointBundle\Form\Type\TriggerType::class,
-                'arguments' => [
-                  'mautic.security',
-                ],
-            ],
-            'mautic.pointtrigger.type.action' => [
-                'class' => \Mautic\PointBundle\Form\Type\TriggerEventType::class,
-            ],
-            'mautic.point.type.genericpoint_settings' => [
-                'class' => \Mautic\PointBundle\Form\Type\GenericPointSettingsType::class,
-            ],
-        ],
         'models' => [
             'mautic.point.model.point' => [
                 'class'     => \Mautic\PointBundle\Model\PointModel::class,

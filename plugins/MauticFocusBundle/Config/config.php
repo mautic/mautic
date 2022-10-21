@@ -43,20 +43,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.focus.form.type.focus' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusType::class,
-                'arguments' => 'mautic.security',
-            ],
-            'mautic.focus.form.type.focusshow_list' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType::class,
-                'arguments' => 'router',
-            ],
-            'mautic.focus.form.type.focus_list' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusListType::class,
-                'arguments' => 'mautic.focus.model.focus',
-            ],
-        ],
         'models' => [
             'mautic.focus.model.focus' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Model\FocusModel::class,

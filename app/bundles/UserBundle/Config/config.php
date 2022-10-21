@@ -119,46 +119,6 @@ return [
                 'class' => \Mautic\UserBundle\Controller\SecurityController::class,
             ],
         ],
-        'forms' => [
-            'mautic.form.type.user' => [
-                'class'     => \Mautic\UserBundle\Form\Type\UserType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.user.model.user',
-                    'mautic.helper.language',
-                ],
-            ],
-            'mautic.form.type.role' => [
-                'class' => \Mautic\UserBundle\Form\Type\RoleType::class,
-            ],
-            'mautic.form.type.permissions' => [
-                'class' => \Mautic\UserBundle\Form\Type\PermissionsType::class,
-            ],
-            'mautic.form.type.permissionlist' => [
-                'class' => \Mautic\UserBundle\Form\Type\PermissionListType::class,
-            ],
-            'mautic.form.type.passwordreset' => [
-                'class' => \Mautic\UserBundle\Form\Type\PasswordResetType::class,
-            ],
-            'mautic.form.type.passwordresetconfirm' => [
-                'class' => \Mautic\UserBundle\Form\Type\PasswordResetConfirmType::class,
-            ],
-            'mautic.form.type.user_list' => [
-                'class'     => \Mautic\UserBundle\Form\Type\UserListType::class,
-                'arguments' => 'mautic.user.model.user',
-            ],
-            'mautic.form.type.role_list' => [
-                'class'     => \Mautic\UserBundle\Form\Type\RoleListType::class,
-                'arguments' => 'mautic.user.model.role',
-            ],
-            'mautic.form.type.userconfig' => [
-                'class'     => \Mautic\UserBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'translator',
-                ],
-            ],
-        ],
         'other' => [
             // Authentication
             'mautic.user.manager' => [

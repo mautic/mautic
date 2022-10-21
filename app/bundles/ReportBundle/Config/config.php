@@ -77,44 +77,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.reportconfig' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\ConfigType::class,
-            ],
-            'mautic.form.type.report' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\ReportType::class,
-                'arguments' => [
-                    'mautic.report.model.report',
-                ],
-            ],
-            'mautic.form.type.filter_selector' => [
-                'class' => \Mautic\ReportBundle\Form\Type\FilterSelectorType::class,
-            ],
-            'mautic.form.type.table_order' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\TableOrderType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.report_filters' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportFiltersType',
-                'arguments' => 'mautic.factory',
-            ],
-            'mautic.form.type.report_dynamic_filters' => [
-                'class' => 'Mautic\ReportBundle\Form\Type\DynamicFiltersType',
-            ],
-            'mautic.form.type.report_widget' => [
-                'class'     => 'Mautic\ReportBundle\Form\Type\ReportWidgetType',
-                'arguments' => 'mautic.report.model.report',
-            ],
-            'mautic.form.type.aggregator' => [
-                'class'     => \Mautic\ReportBundle\Form\Type\AggregatorType::class,
-                'arguments' => 'translator',
-            ],
-            'mautic.form.type.report.settings' => [
-                'class' => \Mautic\ReportBundle\Form\Type\ReportSettingsType::class,
-            ],
-        ],
         'helpers' => [
             'mautic.report.helper.report' => [
                 'class' => \Mautic\ReportBundle\Helper\ReportHelper::class,

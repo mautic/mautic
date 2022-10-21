@@ -45,30 +45,6 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.form.type.fieldslist.citrixlist' => [
-                'class' => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType::class,
-            ],
-            'mautic.form.type.citrix.submitaction' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType::class,
-                'arguments' => [
-                    'mautic.form.model.field',
-                ],
-            ],
-            'mautic.form.type.citrix.campaignevent' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.citrix.campaignaction' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.citrix.model.citrix' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\Model\CitrixModel::class,

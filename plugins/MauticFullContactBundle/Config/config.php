@@ -22,14 +22,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.fullcontact_lookup' => [
-                'class' => \MauticPlugin\MauticFullContactBundle\Form\Type\LookupType::class,
-            ],
-            'mautic.form.type.fullcontact_batch_lookup' => [
-                'class' => \MauticPlugin\MauticFullContactBundle\Form\Type\BatchLookupType::class,
-            ],
-        ],
         'others' => [
             'mautic.plugin.fullcontact.lookup_helper' => [
                 'class'     => 'MauticPlugin\MauticFullContactBundle\Helper\LookupHelper',

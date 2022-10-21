@@ -40,31 +40,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.webhook' => [
-                'class'     => \Mautic\WebhookBundle\Form\Type\WebhookType::class,
-            ],
-            'mautic.form.type.webhookconfig' => [
-                'class' => \Mautic\WebhookBundle\Form\Type\ConfigType::class,
-            ],
-            'mautic.campaign.type.action.sendwebhook' => [
-                'class'     => \Mautic\WebhookBundle\Form\Type\CampaignEventSendWebhookType::class,
-                'arguments' => [
-                    'arguments' => 'translator',
-                ],
-            ],
-            'mautic.webhook.notificator.webhookkillnotificator' => [
-                'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
-                'arguments' => [
-                    'translator',
-                    'router',
-                    'mautic.core.model.notification',
-                    'doctrine.orm.entity_manager',
-                    'mautic.helper.mailer',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.webhook.model.webhook' => [
                 'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,
@@ -77,6 +52,17 @@ return [
             ],
         ],
         'others' => [
+            'mautic.webhook.notificator.webhookkillnotificator' => [
+                'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.core.model.notification',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'mautic.webhook.campaign.helper' => [
                 'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
                 'arguments' => [
