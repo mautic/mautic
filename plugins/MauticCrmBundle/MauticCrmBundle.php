@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MauticCrmBundle extends PluginBundleBase
 {
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(new TestPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
