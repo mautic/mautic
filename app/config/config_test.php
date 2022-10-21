@@ -2,7 +2,6 @@
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Mautic\CoreBundle\Test\EnvLoader;
-use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
 use Symfony\Component\DependencyInjection\Reference;
 
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
@@ -31,10 +30,6 @@ $container->loadFromExtension('framework', [
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
-
-$container
-    ->register('mautic_integration.pipedrive.guzzle.client', Client::class)
-    ->setPublic(true);
 
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
