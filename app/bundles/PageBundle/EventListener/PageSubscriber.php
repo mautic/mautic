@@ -211,7 +211,7 @@ class PageSubscriber implements EventSubscriberInterface
 
             // Log the rejection with event payload as context.
             if ($this->logger) {
-                $this->logger->addNotice(
+                $this->logger->notice(
                     'QUEUE MESSAGE REJECTED: Lead or Hit not found',
                     $payload
                 );
@@ -235,7 +235,7 @@ class PageSubscriber implements EventSubscriberInterface
 
             // Log the exception with event payload as context.
             if ($this->logger) {
-                $this->logger->addError(
+                $this->logger->error(
                     'QUEUE CONSUMER ERROR ('.QueueEvents::PAGE_HIT.'): '.$e->getMessage(),
                     $payload
                 );
