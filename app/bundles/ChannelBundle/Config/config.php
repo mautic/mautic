@@ -58,24 +58,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            \Mautic\ChannelBundle\Form\Type\MessageType::class => [
-                'class'       => \Mautic\ChannelBundle\Form\Type\MessageType::class,
-                'methodCalls' => [
-                    'setSecurity' => ['mautic.security'],
-                ],
-                'arguments' => [
-                    'mautic.channel.model.message',
-                ],
-            ],
-            'mautic.form.type.message_list' => [
-                'class' => \Mautic\ChannelBundle\Form\Type\MessageListType::class,
-            ],
-            'mautic.form.type.message_send' => [
-                'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
-                'arguments' => ['router', 'mautic.channel.model.message'],
-            ],
-        ],
         'helpers' => [
             'mautic.channel.helper.channel_list' => [
                 'class'     => \Mautic\ChannelBundle\Helper\ChannelListHelper::class,

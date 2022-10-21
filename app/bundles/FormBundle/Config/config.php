@@ -1,13 +1,7 @@
 <?php
 
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
-use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 use Mautic\FormBundle\Form\Type\FieldType;
-use Mautic\FormBundle\Form\Type\FormFieldFileType;
-use Mautic\FormBundle\Form\Type\FormFieldPageBreakType;
-use Mautic\FormBundle\Form\Type\FormFieldTelType;
-use Mautic\FormBundle\Form\Type\FormListType;
-use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\Form\Type\SubmitActionEmailType;
 use Mautic\FormBundle\Form\Type\SubmitActionRepostType;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -143,16 +137,6 @@ return [
 
     'services' => [
         'forms' => [
-            'mautic.form.type.formconfig' => [
-                'class'     => \Mautic\FormBundle\Form\Type\ConfigFormType::class,
-                    'alias' => 'formconfig',
-            ],
-            'mautic.form.type.form' => [
-                'class'     => FormType::class,
-                'arguments' => [
-                    'mautic.security',
-                ],
-            ],
             'mautic.form.type.field' => [
                 'class'       => FieldType::class,
                 'arguments'   => [
@@ -161,45 +145,6 @@ return [
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-            'mautic.form.type.field_propertypagebreak' => [
-                'class'     => FormFieldPageBreakType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.field_propertytel' => [
-                'class'     => FormFieldTelType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.field_propertyemail' => [
-                'class'     => \Mautic\FormBundle\Form\Type\FormFieldEmailType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.field_propertyfile' => [
-                'class'     => FormFieldFileType::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.form_list' => [
-                'class'     => FormListType::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.form.model.form',
-                    'mautic.helper.user',
-                ],
-            ],
-            'mautic.form.type.campaignevent_form_field_value' => [
-                'class'     => CampaignEventFormFieldValueType::class,
-                'arguments' => [
-                    'mautic.form.model.form',
                 ],
             ],
             'mautic.form.type.form_submitaction_sendemail' => [
@@ -218,13 +163,6 @@ return [
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
                     'setFormModel'  => ['mautic.form.model.form'],
-                ],
-            ],
-            'mautic.form.type.field.conditional' => [
-                'class'       => \Mautic\FormBundle\Form\Type\FormFieldConditionType::class,
-                'arguments'   => [
-                    'mautic.form.model.field',
-                    'mautic.form.helper.properties.accessor',
                 ],
             ],
         ],

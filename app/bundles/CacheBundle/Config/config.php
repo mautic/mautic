@@ -20,9 +20,6 @@ return [
                 ],
             ],
         ],
-        'forms'     => [],
-        'helpers'   => [],
-        'menus'     => [],
         'other'     => [
             'mautic.cache.provider'           => [
                 'class'     => \Mautic\CacheBundle\Cache\CacheProvider::class,

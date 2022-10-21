@@ -45,15 +45,6 @@ return [
     ],
     'services' => [
         'forms' => [
-            'mautic.form.type.dwc' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentType',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.list',
-                    'translator',
-                    'mautic.lead.model.lead',
-                ],
-            ],
             'mautic.form.type.dwc_entry_filters' => [
                 'class'     => 'Mautic\DynamicContentBundle\Form\Type\DwcEntryFiltersType',
                 'arguments' => [
@@ -64,21 +55,6 @@ return [
                         'database_connection',
                     ],
                 ],
-            ],
-            'mautic.form.type.dwcsend_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType',
-                'arguments' => [
-                    'router',
-                ],
-            ],
-            'mautic.form.type.dwcdecision_list' => [
-                'class'     => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentDecisionType',
-                'arguments' => [
-                    'router',
-                ],
-            ],
-            'mautic.form.type.dwc_list' => [
-                'class' => 'Mautic\DynamicContentBundle\Form\Type\DynamicContentListType',
             ],
         ],
         'models' => [

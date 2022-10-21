@@ -103,46 +103,6 @@ return [
     ],
 
     'services' => [
-        'forms'        => [
-            'mautic.campaign.type.form'                 => [
-                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignType',
-                'arguments' => [
-                    'mautic.security',
-                    'translator',
-                ],
-            ],
-            'mautic.campaignrange.type.action'          => [
-                'class' => 'Mautic\CampaignBundle\Form\Type\EventType',
-            ],
-            'mautic.campaign.type.campaignlist'         => [
-                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignListType',
-                'arguments' => [
-                    'mautic.campaign.model.campaign',
-                    'translator',
-                    'mautic.security',
-                ],
-            ],
-            'mautic.campaign.type.trigger.leadchange'   => [
-                'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventLeadChangeType',
-            ],
-            'mautic.campaign.type.action.addremovelead' => [
-                'class' => 'Mautic\CampaignBundle\Form\Type\CampaignEventAddRemoveLeadType',
-            ],
-            'mautic.campaign.type.action.jump_to_event' => [
-                'class' => \Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType::class,
-            ],
-            'mautic.campaign.type.canvassettings'       => [
-                'class' => 'Mautic\CampaignBundle\Form\Type\EventCanvasSettingsType',
-            ],
-            'mautic.campaign.type.leadsource'           => [
-                'class'     => 'Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType',
-                'arguments' => 'mautic.factory',
-            ],
-            'mautic.form.type.campaignconfig'           => [
-                'class'     => 'Mautic\CampaignBundle\Form\Type\ConfigType',
-                'arguments' => 'translator',
-            ],
-        ],
         'models' => [
             'mautic.campaign.model.campaign' => [
                 'class'     => \Mautic\CampaignBundle\Model\CampaignModel::class,

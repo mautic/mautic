@@ -48,29 +48,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.category' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryListType',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'translator',
-                    'mautic.category.model.category',
-                    'router',
-                ],
-            ],
-            'mautic.form.type.category_form' => [
-                'class'     => \Mautic\CategoryBundle\Form\Type\CategoryType::class,
-                'arguments' => [
-                    'session',
-                ],
-            ],
-            'mautic.form.type.category_bundles_form' => [
-                'class'     => 'Mautic\CategoryBundle\Form\Type\CategoryBundlesType',
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.category.model.category' => [
                 'class'     => 'Mautic\CategoryBundle\Model\CategoryModel',

@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -44,7 +44,7 @@ class ClientType extends AbstractType
     private $requestStack;
 
     /**
-     * @var Session
+     * @var SessionInterface
      */
     private $session;
 
@@ -52,7 +52,7 @@ class ClientType extends AbstractType
         RequestStack $requestStack,
         TranslatorInterface $translator,
         ValidatorInterface $validator,
-        Session $session,
+        SessionInterface $session,
         RouterInterface $router
     ) {
         $this->translator   = $translator;

@@ -61,35 +61,6 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.form.type.asset' => [
-                'class'     => \Mautic\AssetBundle\Form\Type\AssetType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.asset.model.asset',
-                ],
-            ],
-            'mautic.form.type.pointaction_assetdownload' => [
-                'class' => \Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType::class,
-            ],
-            'mautic.form.type.campaignevent_assetdownload' => [
-                'class' => \Mautic\AssetBundle\Form\Type\CampaignEventAssetDownloadType::class,
-            ],
-            'mautic.form.type.formsubmit_assetdownload' => [
-                'class' => \Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType::class,
-            ],
-            'mautic.form.type.assetlist' => [
-                'class'     => \Mautic\AssetBundle\Form\Type\AssetListType::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.asset.model.asset',
-                    'mautic.helper.user',
-                ],
-            ],
-            'mautic.form.type.assetconfig' => [
-                'class' => \Mautic\AssetBundle\Form\Type\ConfigType::class,
-            ],
-        ],
         'others' => [
             'mautic.asset.upload.error.handler' => [
                 'class'     => \Mautic\AssetBundle\ErrorHandler\DropzoneErrorHandler::class,

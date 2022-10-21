@@ -185,18 +185,6 @@ return [
             ],
         ],
         'forms' => [
-            'mautic.form.type.button_group' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\ButtonGroupType',
-            ],
-            'mautic.form.type.standalone_button' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\StandAloneButtonType',
-            ],
-            'mautic.form.type.form_buttons' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\FormButtonsType',
-            ],
-            'mautic.form.type.sortablelist' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
-            ],
             'mautic.form.type.coreconfig' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
                 'arguments' => [
@@ -205,78 +193,6 @@ return [
                     'mautic.ip_lookup.factory',
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
-                ],
-            ],
-            'mautic.form.type.coreconfig.iplookup_download_data_store_button' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType::class,
-                'arguments' => [
-                    'mautic.helper.template.date',
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.theme_list' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\ThemeListType::class,
-                'arguments' => ['mautic.helper.theme'],
-            ],
-            'mautic.form.type.daterange' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DateRangeType::class,
-                'arguments' => [
-                    'session',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.form.type.timeformat' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\TimeFormatType::class,
-                'arguments' => ['translator'],
-            ],
-            'mautic.form.type.slot.saveprefsbutton' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.successmessage' => [
-                'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.gatedvideo' => [
-                'class'     => Mautic\CoreBundle\Form\Type\GatedVideoType::class,
-                'arguments' => [
-                    'mautic.form.repository.form',
-                ],
-            ],
-            'mautic.form.type.slot.segmentlist' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.categorylist' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\SlotCategoryListType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.preferredchannel' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\SlotPreferredChannelType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.channelfrequency' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.dynamic_content_filter_entry' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.stage.model.stage',
-                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
@@ -288,21 +204,6 @@ return [
                     'setConnection' => [
                         'database_connection',
                     ],
-                ],
-            ],
-            'mautic.form.type.entity_lookup' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
-                'arguments' => [
-                    'mautic.model.factory',
-                    'translator',
-                    'database_connection',
-                    'router',
-                ],
-            ],
-            'mautic.form.type.dynamic_content_filter' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
-                'arguments' => [
-                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
         ],

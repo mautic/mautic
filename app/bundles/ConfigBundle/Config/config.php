@@ -38,15 +38,6 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.config' => [
-                'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'mautic.config.form.restriction_helper',
-                    'mautic.config.form.escape_transformer',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.config.model.sysinfo' => [
                 'class'     => \Mautic\ConfigBundle\Model\SysinfoModel::class,

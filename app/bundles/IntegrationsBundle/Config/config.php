@@ -41,46 +41,6 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.integrations.form.config.integration' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationConfigType::class,
-                'arguments' => [
-                    'mautic.integrations.helper.config_integrations',
-                ],
-            ],
-            'mautic.integrations.form.config.feature_settings' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationFeatureSettingsType::class,
-            ],
-            'mautic.integrations.form.config.sync_settings' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsType::class,
-            ],
-            'mautic.integrations.form.config.sync_settings_field_mappings' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsFieldMappingsType::class,
-                'arguments' => [
-                    'monolog.logger.mautic',
-                    'translator',
-                ],
-            ],
-            'mautic.integrations.form.config.sync_settings_object_field_directions' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
-            ],
-            'mautic.integrations.form.config.sync_settings_object_field_mapping' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldMappingType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.integrations.sync.data_exchange.mautic.field_helper',
-                ],
-            ],
-            'mautic.integrations.form.config.sync_settings_object_field' => [
-                'class' => \Mautic\IntegrationsBundle\Form\Type\IntegrationSyncSettingsObjectFieldType::class,
-            ],
-            'mautic.integrations.form.config.feature_settings.activity_list' => [
-                'class'     => \Mautic\IntegrationsBundle\Form\Type\ActivityListType::class,
-                'arguments' => [
-                    'mautic.lead.model.lead',
-                ],
-            ],
-        ],
         'helpers' => [
             'mautic.integrations.helper.variable_expresser' => [
                 'class' => \Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelper::class,

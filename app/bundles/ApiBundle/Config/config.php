@@ -73,21 +73,6 @@ return [
                 ],
             ],
         ],
-        'forms' => [
-            'mautic.form.type.apiclients' => [
-                'class'     => \Mautic\ApiBundle\Form\Type\ClientType::class,
-                'arguments' => [
-                    'request_stack',
-                    'translator',
-                    'validator',
-                    'session',
-                    'router',
-                ],
-            ],
-            'mautic.form.type.apiconfig' => [
-                'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
-            ],
-        ],
         'helpers' => [
             'mautic.api.helper.entity_result' => [
                 'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
