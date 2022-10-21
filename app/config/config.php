@@ -77,9 +77,10 @@ $container->loadFromExtension('framework', [
         'fallback' => 'en_US',
     ],
     'session'         => [ //handler_id set to null will use default session handler from php.ini
-        'handler_id'    => null,
-        'name'          => '%env(MAUTIC_SESSION_NAME)%',
-        'cookie_secure' => $secureCookie,
+        'handler_id'           => null,
+        'name'                 => '%env(MAUTIC_SESSION_NAME)%',
+        'cookie_secure'        => $secureCookie,
+        'cookie_samesite'      => 'lax',
     ],
     'fragments'            => null,
     'http_method_override' => true,
