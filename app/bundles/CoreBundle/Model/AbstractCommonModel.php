@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-abstract class AbstractCommonModel
+abstract class AbstractCommonModel implements MauticModelInterface
 {
     /**
      * @var \Doctrine\ORM\EntityManager
