@@ -136,11 +136,10 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
     ->setPublic(true);
 
 // HTTP client mock handler providing response queue
-$container->register('mautic.http.client.mock_handler', \GuzzleHttp\Handler\MockHandler::class)
-    ->setClass('\GuzzleHttp\Handler\MockHandler');
+$container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
 
 // Stub Guzzle HTTP client to prevent accidental request to third parties
 $container->register('mautic.http.client', \GuzzleHttp\Client::class)
     ->setPublic(true)
     ->setFactory('\Mautic\CoreBundle\Test\Guzzle\ClientFactory::stub')
-    ->addArgument(new Reference('mautic.http.client.mock_handler'));
+    ->addArgument(new Reference(\GuzzleHttp\Handler\MockHandler::class));
