@@ -21,6 +21,7 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 
     protected ReflectionProperty $addHSTS;
     protected ReflectionProperty $includeDubDomains;
+    protected ReflectionProperty $preload;
     protected HSTSMiddleware $middleware;
     protected ReflectionClass $middlewareReflection;
 
@@ -38,6 +39,9 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
 
         $this->includeDubDomains = $this->middlewareReflection->getProperty('includeDubDomains');
         $this->includeDubDomains->setAccessible(true);
+
+        $this->preload = $this->middlewareReflection->getProperty('preload');
+        $this->preload->setAccessible(true);
     }
 
     protected function testResponseHeaders(): void
@@ -98,6 +102,36 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
         );
     }
 
+    public function testPreloadEnabled(): void
+    {
+        $needle = 'preload';
+        $this->setHSTS(true);
+        $this->setPreloadValue(true);
+
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertStringContainsString(
+            $needle,
+            $response->headers->get(self::HSTS_KEY),
+            'Option preload is enabled but is missing from the HSTS value'
+        );
+    }
+
+    public function testPreloadDisabled(): void
+    {
+        $needle = 'preload';
+        $this->setHSTS(true);
+        $this->setPreloadValue(false);
+
+        $response = $this->getMiddlewareResponse();
+
+        Assert::assertStringNotContainsStringIgnoringCase(
+            $needle,
+            $this->getHSTSValue($response),
+            'Option preload is disabled but is present in HSTS value'
+        );
+    }
+
     /**
      * @throws ReflectionException
      */
@@ -126,6 +160,11 @@ class HSTSMiddlewareTest extends AbstractMauticTestCase
     private function setIncludeDubDomainsValue(bool $value): void
     {
         $this->includeDubDomains->setValue($this->middleware, $value);
+    }
+
+    private function setPreloadValue(bool $value): void
+    {
+        $this->preload->setValue($this->middleware, $value);
     }
 
     private function getHSTSValue(Response $response): string

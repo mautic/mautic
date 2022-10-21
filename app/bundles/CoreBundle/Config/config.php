@@ -1838,6 +1838,7 @@ return [
         'headers_sts'               => false,
         'headers_sts_expire_time'   => 31536000,
         'headers_sts_subdomains'    => false,
+        'headers_sts_preload'       => false,
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
         'debug'                     => false,
