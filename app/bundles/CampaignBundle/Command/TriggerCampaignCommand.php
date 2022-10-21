@@ -180,11 +180,9 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @return int|null
-     *
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $quiet              = $input->getOption('quiet');
         $this->output       = $quiet ? new NullOutput() : $output;
@@ -256,8 +254,8 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */
             $event = $this->dispatcher->dispatch(
-                CampaignEvents::CAMPAIGN_ON_TRIGGER,
-                new CampaignTriggerEvent($campaign)
+                new CampaignTriggerEvent($campaign),
+                CampaignEvents::CAMPAIGN_ON_TRIGGER
             );
 
             return $event->shouldTrigger();

@@ -184,7 +184,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         if ($this->dispatcher) {
             $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
-            $this->dispatcher->dispatch(LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();
                 $filter->strict  = $event->getStrict();
@@ -450,9 +450,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->select($prefix.$valueColumn.' as value,
         case
-        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, " <small>", companycity,", ", companycountry, "</small>")
-        when (comp.companycountry is not null) then concat(comp.companyname, " <small>", comp.companycountry, "</small>")
-        when (comp.companycity is not null) then concat(comp.companyname, " <small>", comp.companycity, "</small>")
+        when (comp.companycountry is not null and comp.companycity is not null) then concat(comp.companyname, \' <small>\', companycity,\', \', companycountry, \'</small>\')
+        when (comp.companycountry is not null) then concat(comp.companyname, \' <small>\', comp.companycountry, \'</small>\')
+        when (comp.companycity is not null) then concat(comp.companyname, \' <small>\', comp.companycity, \'</small>\')
         else comp.companyname
         end
         as label')

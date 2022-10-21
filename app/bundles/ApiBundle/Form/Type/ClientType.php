@@ -203,12 +203,4 @@ class ClientType extends AbstractType
             ]
         );
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'client';
-    }
 }

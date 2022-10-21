@@ -744,15 +744,6 @@
       ]
     },
     {
-      "login": "automatyzuj",
-      "name": "automatyzuj",
-      "avatar_url": "https://avatars.githubusercontent.com/u/104569506?v=4",
-      "profile": "https://github.com/automatyzuj",
-      "contributions": [
-        "userTesting"
-      ]
-    },
-    {
       "login": "KN4CK3R",
       "name": "KN4CK3R",
       "avatar_url": "https://avatars.githubusercontent.com/u/1666336?v=4",
@@ -851,6 +842,24 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "T0mTom",
+      "name": "Tomazz Jurich",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9713824?v=4",
+      "profile": "https://github.com/T0mTom",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "putzwasser",
+      "name": "putzwasser",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26040044?v=4",
+      "profile": "https://github.com/putzwasser",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -858,5 +867,6 @@
   "projectOwner": "mautic",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }

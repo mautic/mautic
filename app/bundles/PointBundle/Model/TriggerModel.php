@@ -15,8 +15,8 @@ use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\TriggerType;
 use Mautic\PointBundle\PointEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class TriggerModel extends CommonFormModel
 {
@@ -225,7 +225,7 @@ class TriggerModel extends CommonFormModel
                 $event = new Events\TriggerEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -280,7 +280,7 @@ class TriggerModel extends CommonFormModel
             //build them
             $events = [];
             $event  = new Events\TriggerBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(PointEvents::TRIGGER_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
             $events = $event->getEvents();
         }
 
@@ -350,7 +350,7 @@ class TriggerModel extends CommonFormModel
 
             $triggerExecutedEvent = new Events\TriggerExecutedEvent($triggerEvent, $lead);
 
-            $this->dispatcher->dispatch($settings['eventName'], $triggerExecutedEvent);
+            $this->dispatcher->dispatch($triggerExecutedEvent, $settings['eventName']);
 
             return $triggerExecutedEvent->getResult();
         }

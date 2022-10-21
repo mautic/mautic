@@ -23,7 +23,7 @@ class AmazonCallback
     /**
      * From address for SNS email.
      */
-    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
+    public const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
     private TranslatorInterface $translator;
     private LoggerInterface $logger;

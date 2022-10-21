@@ -49,7 +49,7 @@ return [
     ],
 
     'parameters' => [
-        'log_path'      => '%kernel.root_dir%/../var/logs',
+        'log_path'      => '%kernel.project_dir%/var/logs',
         'max_log_files' => 7,
         'image_path'    => 'media/images',
         'bool_value'    => false,

@@ -119,7 +119,6 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    PointEvents::TRIGGER_ON_BUILD,
                     $this->callback(
                         // Emulate a subscriber:
                         function (TriggerBuilderEvent $event) {
@@ -143,10 +142,10 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    PointEvents::TRIGGER_ON_BUILD,
                 ],
                 // Ensure the event is triggered if the point trigger event has 'eventName' defined instead of 'callback'.
                 [
-                    EmailEvents::ON_SENT_EMAIL_TO_USER,
                     $this->callback(
                         function (TriggerExecutedEvent $event) use ($contact, $triggerEvent) {
                             $this->assertSame($contact, $event->getLead());
@@ -155,6 +154,7 @@ class TriggerModelTest extends \PHPUnit\Framework\TestCase
                             return true;
                         }
                     ),
+                    EmailEvents::ON_SENT_EMAIL_TO_USER,
                 ]
             );
 

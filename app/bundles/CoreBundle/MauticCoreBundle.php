@@ -14,14 +14,14 @@ class MauticCoreBundle extends Bundle
      */
     public function build(ContainerBuilder $container)
     {
-        $container->addCompilerPass(new Compiler\ConfiguratorPass());
-        $container->addCompilerPass(new Compiler\DbalPass());
-        $container->addCompilerPass(new Compiler\TemplatingPass());
+        $container->addCompilerPass(new Compiler\ConfiguratorPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\DbalPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\TemplatingPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\TranslationsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         $container->addCompilerPass(new Compiler\TranslationLoaderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
-        $container->addCompilerPass(new Compiler\ModelPass());
-        $container->addCompilerPass(new Compiler\UpdateStepPass());
-        $container->addCompilerPass(new Compiler\PermissionsPass());
-        $container->addCompilerPass(new Compiler\PreUpdateCheckPass());
+        $container->addCompilerPass(new Compiler\ModelPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\UpdateStepPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\PermissionsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\PreUpdateCheckPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

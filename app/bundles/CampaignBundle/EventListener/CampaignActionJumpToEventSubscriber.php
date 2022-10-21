@@ -16,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
-    const EVENT_NAME = 'campaign.jump_to_event';
+    public const EVENT_NAME = 'campaign.jump_to_event';
 
     /**
      * @var EventRepository

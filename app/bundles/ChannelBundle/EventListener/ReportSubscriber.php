@@ -12,7 +12,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
+    public const CONTEXT_MESSAGE_CHANNEL = 'message.channel';
 
     /**
      * @var CompanyReportData

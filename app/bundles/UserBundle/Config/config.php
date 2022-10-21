@@ -114,6 +114,11 @@ return [
     ],
 
     'services' => [
+        'controllers' => [
+            \Mautic\UserBundle\Controller\SecurityController::class => [
+                'class' => \Mautic\UserBundle\Controller\SecurityController::class,
+            ],
+        ],
         'events' => [
             'mautic.user.subscriber' => [
                 'class'     => \Mautic\UserBundle\EventListener\UserSubscriber::class,
@@ -216,13 +221,15 @@ return [
                 'arguments' => 'Mautic\UserBundle\Entity\Permission',
                 'factory'   => ['@mautic.permission.manager', 'getRepository'],
             ],
-            'mautic.user.form_authenticator' => [
+            'mautic.user.form_guard_authenticator' => [
                 'class'     => 'Mautic\UserBundle\Security\Authenticator\FormAuthenticator',
                 'arguments' => [
                     'mautic.helper.integration',
                     'security.password_encoder',
                     'event_dispatcher',
                     'request_stack',
+                    'security.csrf.token_manager',
+                    'router',
                 ],
             ],
             'mautic.user.preauth_authenticator' => [

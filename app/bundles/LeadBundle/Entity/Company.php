@@ -13,7 +13,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS = 'company';
+    public const FIELD_ALIAS = 'company';
 
     /**
      * @var int

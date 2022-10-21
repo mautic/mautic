@@ -44,7 +44,7 @@ class RouteHelper
             throw new ObjectNotSupportedException(MauticSyncDataExchange::NAME, $object);
         }
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE, $event);
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_BUILD_INTERNAL_OBJECT_ROUTE);
 
         return $event->getRoute();
     }

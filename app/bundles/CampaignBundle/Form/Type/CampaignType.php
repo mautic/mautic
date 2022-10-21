@@ -153,9 +153,4 @@ class CampaignType extends AbstractType
             'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
         ]);
     }
-
-    public function getBlockPrefix()
-    {
-        return 'campaign';
-    }
 }

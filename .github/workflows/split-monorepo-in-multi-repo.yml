@@ -28,6 +28,9 @@ on:
             - '[0-9].*'
             - 'gitsplit-action-debug'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
     sync:
         if: github.repository == 'mautic/mautic'

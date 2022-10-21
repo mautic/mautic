@@ -143,10 +143,8 @@ abstract class MonitorTwitterBaseCommand extends Command
 
     /**
      * Main execution method. Gets the integration settings, processes the search criteria.
-     *
-     * @return int|null
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input      = $input;
         $this->output     = $output;
@@ -189,8 +187,8 @@ abstract class MonitorTwitterBaseCommand extends Command
         $this->processMonitor($monitor);
 
         $this->dispatcher->dispatch(
-            SocialEvents::MONITOR_POST_PROCESS,
-            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount())
+            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount()),
+            SocialEvents::MONITOR_POST_PROCESS
         );
 
         return 0;

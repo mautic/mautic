@@ -48,12 +48,4 @@ class IntegrationConfigType extends AbstractType
             'campaigns' => [],
         ]);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'integration_config';
-    }
 }

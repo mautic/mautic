@@ -4,7 +4,7 @@ namespace Mautic\UserBundle\Hash;
 
 class UserHash
 {
-    const FAKE_USER_HASH = 'xxxxxxxxxxxxxx';
+    public const FAKE_USER_HASH = 'xxxxxxxxxxxxxx';
 
     /**
      * Return fake user hash for emails etc. Users does not have hash, only Contacts.
