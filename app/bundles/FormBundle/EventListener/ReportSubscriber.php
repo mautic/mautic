@@ -129,14 +129,40 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($this->coreParametersHelper->get('form_results_data_sources') && $event->checkContext(self::CONTEXT_FORM_RESULT)) {
+            $formResultPrefix  = 'fr.';
             $forms = $this->formRepository->getEntities();
             foreach ($forms as $form) {
-                $formEntity         = $form[0];
+                $formEntity  = $form[0];
+                $fields      = $formEntity->getFields();
+                $formColumns = [];
+                foreach ($fields as $field) {
+                    if ('button' !== $field->getType()) {
+                        $index               = $formResultPrefix.$field->getAlias();
+                        $formColumns[$index] = [
+                            'label' => $field->getLabel(),
+                            'type'  => $field->getType() === 'number' ? 'int' : 'string', // check  type
+//                            'type'  => $this->reportHelper->getReportBuilderFieldType($field->getType()),
+                            'alias' => $field->getAlias(),
+                        ];
+                    }
+                }
 
-                $formColumn         = $event->getFormColumns($formEntity);
+                $formColumns[$formResultPrefix.'submission_id'] = [
+                    'label' => 'mautic.form.report.submission.id',
+                    'type'  => 'int',
+                    'alias' => 'submissionId',
+                ];
+                $formColumns[$formResultPrefix.'form_id'] = [
+                    'label' => 'mautic.form.report.form_id',
+                    'type'  => 'int',
+                    'link'  => 'mautic_form_action',
+                    'alias' => 'submissionId',
+                ];
+
                 $leadColumns        = $event->getLeadColumns();
                 $companyColumns     = $this->companyReportData->getCompanyData();
-                $formResultsColumns = array_merge($formColumn, $leadColumns, $companyColumns);
+
+                $formResultsColumns = array_merge($formColumns, $leadColumns, $companyColumns);
 
                 $data = [
                     'display_name' => $formEntity->getId().' '.$formEntity->getName(),

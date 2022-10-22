@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\FormBundle\EventListener\ReportSubscriber;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
@@ -61,10 +60,6 @@ class ReportController extends FormController
 
         if (!$permissions['report:reports:viewother']) {
             $filter['force'][] = ['column' => 'r.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
-        }
-
-        if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
-            $filter['force'][] = ['column' => 'r.source', 'expr' => 'notlike', 'value' => ReportSubscriber::CONTEXT_FORM_RESULT.'%'];
         }
 
         $orderBy    = $this->container->get('session')->get('mautic.report.orderby', 'r.name');
