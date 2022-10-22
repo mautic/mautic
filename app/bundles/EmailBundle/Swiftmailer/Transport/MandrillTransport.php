@@ -308,7 +308,7 @@ class MandrillTransport extends AbstractTokenHttpTransport implements CallbackTr
     {
         $this->start();
 
-        return parent::start($message, $failedRecipients);
+        return parent::send($message, $failedRecipients);
     }
 
     /**
