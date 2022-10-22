@@ -16,7 +16,7 @@
     </div>
     <div class="panel-body">
         <?php foreach ($form->children as $name => $f): ?>
-            <?php if ($name !== 'form_results_data_sources') : ?>
+            <?php if ('form_results_data_sources' !== $name) : ?>
                 <div class="row">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($f); ?>
