@@ -142,7 +142,7 @@ class ReportSubscriber implements EventSubscriberInterface
                         $index               = $formResultPrefix.$field->getAlias();
                         $formColumns[$index] = [
                             'label' => $field->getLabel(),
-                            'type'  => 'number' === $field->getType() ? 'int' : 'string',,
+                            'type'  => 'number' === $field->getType() ? 'int' : 'string',
                             'alias' => $field->getAlias(),
                         ];
                     }
