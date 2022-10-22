@@ -207,10 +207,6 @@ class ReportDevicesSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testReportGenerate(): void
     {
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
-
         $reportGeneratorEventMock  = $this->getReportGeneratorEventMock();
         $reportDevicesSubscriber   = $this->getReportDevicesSubscriber();
         $queryBuilderMock          = $this->getQueryBuilderMock();
