@@ -143,10 +143,8 @@ abstract class MonitorTwitterBaseCommand extends Command
 
     /**
      * Main execution method. Gets the integration settings, processes the search criteria.
-     *
-     * @return int|null
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input      = $input;
         $this->output     = $output;

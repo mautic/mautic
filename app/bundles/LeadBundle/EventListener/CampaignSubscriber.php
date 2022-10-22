@@ -37,7 +37,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
+    public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     /**
      * @var IpLookupHelper

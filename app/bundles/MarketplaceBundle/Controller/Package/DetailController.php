@@ -54,6 +54,8 @@ class DetailController extends CommonController
             return $this->notFound($e->getMessage());
         }
 
+        $security = $this->get('mautic.security');
+
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
@@ -61,8 +63,9 @@ class DetailController extends CommonController
                     'packageDetail'     => $packageDetail,
                     'isInstalled'       => $isInstalled,
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
+                    'security'          => $security,
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:detail.html.php',
+                'contentTemplate' => 'MarketplaceBundle:Package:detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',

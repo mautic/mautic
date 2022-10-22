@@ -13,13 +13,13 @@ use Symfony\Component\Lock\Store\FlockStore;
 
 abstract class ModeratedCommand extends Command
 {
-    const MODE_PID   = 'pid';
-    const MODE_FLOCK = 'flock';
+    public const MODE_PID   = 'pid';
+    public const MODE_FLOCK = 'flock';
 
     /**
      * @deprecated Symfony 4 Removed LockHandler and the replacement is the lock from the Lock component so there is no need for something custom
      */
-    const MODE_LOCK = 'file_lock';
+    public const MODE_LOCK = 'file_lock';
 
     protected $checkFile;
     protected $moderationKey;

@@ -9,7 +9,7 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Form\Form;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class MessageApiController extends CommonApiController
 {
@@ -18,7 +18,7 @@ class MessageApiController extends CommonApiController
      */
     protected $model;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel('channel.message');
         $this->entityClass      = Message::class;

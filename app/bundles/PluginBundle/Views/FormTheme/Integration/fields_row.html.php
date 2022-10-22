@@ -41,7 +41,7 @@ $indexCount = 1;
             ?>
             <?php $isRequired = !empty($child->vars['attr']['data-required']); ?>
             <?php if (0 == $rowCount % $numberOfFields):  ?>
-            <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row<?php if (5 !== $numberOfFields): echo ' pb-md'; endif; ?>">
+            <div id="<?php echo $object; ?> - <?php echo $rowCount; ?>" class="field-container row<?php if (5 !== $numberOfFields): echo ' pb-md'; endif; ?>">
             <?php endif; ?>
             <?php ++$rowCount; ?>
             <?php

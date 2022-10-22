@@ -6,6 +6,8 @@ namespace Mautic\InstallBundle\Tests\Functional;
 
 use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -57,7 +59,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form         = $submitButton->form();
         $crawler      = $this->client->submit($form);
 
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         // Step 1: DB.
         $submitButton = $crawler->selectButton('install_doctrine_step[buttons][next]');
@@ -71,7 +73,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form['install_doctrine_step[backup_tables]']->setValue('0');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         // Step 2: Admin user.
         $submitButton = $crawler->selectButton('install_user_step[buttons][next]');
@@ -84,7 +86,7 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form['install_user_step[email]']->setValue('mautic@example.com');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $submitButton = $crawler->selectButton('install_email_step[buttons][next]');
         $form         = $submitButton->form();
@@ -95,9 +97,17 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form['install_email_step[mailer_transport]']->setValue('smtp');
 
         $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $successText = $crawler->filter('.panel-body.text-center h5')->text();
         Assert::assertStringContainsString('Mautic is installed', $successText);
+
+        // Assert that the fixtures were loaded
+        $fieldRepository = $this->em->getRepository(LeadField::class);
+        \assert($fieldRepository instanceof LeadFieldRepository);
+
+        $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
+        \assert($emailField instanceof LeadField);
+        Assert::assertSame('Email', $emailField->getLabel());
     }
 }

@@ -1,36 +1,16 @@
-<?php
-
-declare(strict_types=1);
-
-use Mautic\MarketplaceBundle\DTO\PackageDetail;
-
-/** @var PackageDetail $packageDetail */
-$packageDetail = $packageDetail;
-
-?>
 <div class="text-center" id="marketplace-installation-in-progress">
-    <p><?php echo $view['translator']->trans(
-        'marketplace.package.install.html.in.progress',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
-        ); ?></p>
+    <p><?php echo 'marketplace.package.install.html.in.progress'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) ?></p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
     </div>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-failed">
-    <p><?php echo $view['translator']->trans(
-        'marketplace.package.install.html.failed',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
-        ); ?></p>
+    <p><?php echo 'marketplace.package.install.html.failed'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) ?></p>
     <textarea class="form-control" readonly id="marketplace-installation-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
-    <p><?php echo $view['translator']->trans(
-        'marketplace.package.install.html.success',
-        ['%packagename%' => $view->escape($packageDetail->packageBase->getHumanPackageName())]
-        ); ?></p>
-    <p><a class="btn btn-primary" href="<?php echo $view['router']->path('mautic_plugin_reload'); ?>"><?php echo $view['translator']->trans(
-        'marketplace.package.install.html.success.continue'); ?></a></p>
+    <p><?php echo 'marketplace.package.install.html.success'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) ?></p>
+    <p><a class="btn btn-primary" href="{{ path('mautic_plugin_reload') }}">{% trans %}marketplace.package.install.html.success.continue{% endtrans %}</a></p>
 </div>
 
 <script>
@@ -43,8 +23,8 @@ $packageDetail = $packageDetail;
     installPackageResetView();
 
     Mautic.Marketplace.installPackage(
-        '<?php echo htmlspecialchars($packageDetail->packageBase->getVendorName(), ENT_QUOTES); ?>',
-        '<?php echo htmlspecialchars($packageDetail->packageBase->getPackageName(), ENT_QUOTES); ?>',
+        '{{ packageDetail.packageBase.getVendorName()|escape }}',
+        '{{ packageDetail.packageBase.getPackageName()|escape }}',
         (response) => {
             if (response.success) {
                 mQuery('#marketplace-installation-in-progress').hide();

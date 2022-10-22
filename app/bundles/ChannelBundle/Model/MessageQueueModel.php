@@ -17,7 +17,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class MessageQueueModel extends FormModel
 {
     /** @var string A default message reschedule interval */
-    const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
+    public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
     /**
      * @var LeadModel

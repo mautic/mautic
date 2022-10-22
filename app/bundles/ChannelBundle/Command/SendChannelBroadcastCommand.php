@@ -72,10 +72,7 @@ EOT
         parent::configure();
     }
 
-    /**
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $channel      = $input->getOption('channel');
         $channelId    = $input->getOption('id');

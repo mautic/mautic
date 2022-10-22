@@ -15,9 +15,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_FORMS           = 'forms';
-    const CONTEXT_FORM_SUBMISSION = 'form.submissions';
-    const CONTEXT_FORM_RESULT     = 'form.results';
+    public const CONTEXT_FORMS           = 'forms';
+    public const CONTEXT_FORM_SUBMISSION = 'form.submissions';
+    public const CONTEXT_FORM_RESULT     = 'form.results';
 
     private CompanyReportData $companyReportData;
 
@@ -130,18 +130,19 @@ class ReportSubscriber implements EventSubscriberInterface
 
         if ($this->coreParametersHelper->get('form_results_data_sources') && $event->checkContext(self::CONTEXT_FORM_RESULT)) {
             $formResultPrefix  = 'fr.';
+
             $forms = $this->formRepository->getEntities();
             foreach ($forms as $form) {
                 $formEntity  = $form[0];
                 $fields      = $formEntity->getFields();
                 $formColumns = [];
+
                 foreach ($fields as $field) {
                     if ('button' !== $field->getType()) {
                         $index               = $formResultPrefix.$field->getAlias();
                         $formColumns[$index] = [
                             'label' => $field->getLabel(),
-                            'type'  => $field->getType() === 'number' ? 'int' : 'string', // check  type
-//                            'type'  => $this->reportHelper->getReportBuilderFieldType($field->getType()),
+                            'type'  => $field->getType() === 'number' ? 'int' : 'string',
                             'alias' => $field->getAlias(),
                         ];
                     }
@@ -152,7 +153,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     'type'  => 'int',
                     'alias' => 'submissionId',
                 ];
-                $formColumns[$formResultPrefix.'form_id'] = [
+                $formColumns[$formResultPrefix.'form_id']       = [
                     'label' => 'mautic.form.report.form_id',
                     'type'  => 'int',
                     'link'  => 'mautic_form_action',

@@ -19,6 +19,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -110,9 +111,8 @@ class PageModel extends FormModel
      */
     private $contactTracker;
 
-    /**
-     * PageModel constructor.
-     */
+    private ContactRequestHelper $contactRequestHelper;
+
     public function __construct(
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
@@ -124,7 +124,8 @@ class PageModel extends FormModel
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        ContactRequestHelper $contactRequestHelper
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -138,6 +139,7 @@ class PageModel extends FormModel
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->contactRequestHelper = $contactRequestHelper;
     }
 
     /**
@@ -459,7 +461,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->contactRequestHelper->getContactFromQuery($query);
 
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
