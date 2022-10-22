@@ -46,9 +46,9 @@ if (empty($inline)): ?>
     <div class="row">
         <?php if (!empty($error)): ?>
 
-        <div class="<?php echo (!empty($error['isPrevious']) || $inline) ? 'col-sm-12' : 'col-sm-offset-2 col-sm-8'; ?>">
-            <div class="bg-white pa-sm" style=" word-wrap: break-word;<?php if (empty($error['isPrevious']) && !$inline): ?> margin-top:100px;<?php endif; ?>">
-                <?php if ($inline): ?>
+        <div class="<?php echo (!empty($error['isPrevious']) || (!empty($inline) && $inline)) ? 'col-sm-12' : 'col-sm-offset-2 col-sm-8'; ?>">
+            <div class="bg-white pa-sm" style=" word-wrap: break-word;<?php if (empty($error['isPrevious']) && !(!empty($inline) && $inline)): ?> margin-top:100px;<?php endif; ?>">
+                <?php if ((!empty($inline) && $inline)): ?>
                 <h3><i class="fa fa-warning fa-fw text-danger pull-left"></i><?php echo $error['message']; ?></h3>
                 <h6 class="text-muted"><?php echo $error['file'].':'.$error['line']; ?></h6>
                 <?php else: ?>
@@ -74,7 +74,7 @@ if (empty($inline)): ?>
                 <div id="previous"></div>
             </div>
         </div>
-        <?php elseif ($inline): ?>
+        <?php elseif ((!empty($inline) && $inline)): ?>
         <div class="col-xs-12">
             <h3><i class="fa fa-warning fa-fw text-danger"></i><?php echo $message; ?></h3>
             <?php if (!empty($submessage)): ?>
