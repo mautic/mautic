@@ -6,7 +6,8 @@
             DWC: 'dwc',
             CONTACTFIELD: 'contactfield',
             COMPANYFIELD: 'companyfield',
-            CUSTOM: 'custom'
+            CUSTOM: 'custom',
+            FORM: 'form'
         }
 
         constructor(name, tokenCode) {
@@ -39,26 +40,29 @@
                             delete tokens[key];
                             tempValue = value.replace('a:', '');
                             tempKey = Token.makeLink('Asset Link', key, tempValue);
-                            this.storage[Token.TYPE.ASSETLINK].push(new Token(tempValue, tempKey));
+                            this.pushTokenToStorage(Token.TYPE.ASSETLINK, tempKey, tempValue);
                             break;
                         case Token.TYPE.PAGELINK:
                             delete tokens[key];
                             tempValue = value.replace('a:', '');
                             tempKey = Token.makeLink('Page Link', key, tempValue);
-                            this.storage[Token.TYPE.PAGELINK].push(new Token(tempValue, tempKey));
+                            this.pushTokenToStorage(Token.TYPE.PAGELINK, tempKey, tempValue);
                             break;
                         case Token.TYPE.DWC:
                             const token = key.substr(5, key.length - 6);
-                            this.storage[Token.TYPE.DWC].push(new Token(value + ' (' + token + ')', key));
+                            this.pushTokenToStorage(Token.TYPE.DWC, key, value + ' (' + token + ')', key);
+                            break;
+                        case Token.TYPE.FORM:
+                            this.pushTokenToStorage(Token.TYPE.FORM, key, value);
                             break;
                         case Token.TYPE.CONTACTFIELD:
                             if (typeOfToken[1] && typeOfToken[1].match(/company/i))
-                                this.storage[Token.TYPE.COMPANYFIELD].push(new Token(value, key));
+                                this.pushTokenToStorage(Token.TYPE.COMPANYFIELD, key, value);
                             else
-                                this.storage[Token.TYPE.CONTACTFIELD].push(new Token(value, key));
+                                this.pushTokenToStorage(Token.TYPE.CONTACTFIELD, key, value);
                             break;
                         default:
-                            this.storage[Token.TYPE.CUSTOM].push(new Token(value, key));
+                            this.pushTokenToStorage(Token.TYPE.CUSTOM, key, value);
                     }
                 }
             }
@@ -83,6 +87,10 @@
                     Mautic.processAjaxError(request, textStatus, errorThrown);
                 },
             });
+        }
+
+        pushTokenToStorage(type, key, value) {
+            this.storage[type].push(new Token(value, key));
         }
 
         static sort(tokens) {
@@ -124,6 +132,9 @@
                                         break;
                                     case Token.TYPE.PAGELINK:
                                         groupName = 'Page links';
+                                        break;
+                                    case Token.TYPE.FORM:
+                                        groupName = 'Forms';
                                         break;
                                     default:
                                         groupName = 'Custom tokens';
