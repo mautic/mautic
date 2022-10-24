@@ -54,7 +54,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     private $output;
 
     /**
-     * @var GeneratedColumns
+     * @var GeneratedColumns<GeneratedColumn>
      */
     private $generatedColumns;
 
@@ -66,8 +66,6 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->versionProvider          = $this->createMock(VersionProviderInterface::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
@@ -89,7 +87,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 
-    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand()
+    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -101,7 +99,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenNotSupported()
+    public function testAddGeneratedColumnsWhenNotSupported(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -117,7 +115,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenExistsAlready()
+    public function testAddGeneratedColumnsWhenExistsAlready(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -141,7 +139,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenDoesNotExist()
+    public function testAddGeneratedColumnsWhenDoesNotExist(): void
     {
         $this->command->expects($this->once())
             ->method('getName')

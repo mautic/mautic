@@ -46,6 +46,7 @@ class Log
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
             ->setCustomRepositoryClass(LogRepository::class)
+            ->addIndex(['webhook_id', 'date_added'], 'webhook_id_date_added')
             ->addId();
 
         $builder->createManyToOne('webhook', 'Webhook')

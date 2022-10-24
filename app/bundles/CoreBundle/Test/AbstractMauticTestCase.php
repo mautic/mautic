@@ -6,12 +6,11 @@ use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
-use Mautic\CoreBundle\Helper\CookieHelper;
+use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
+use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -28,11 +27,6 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
-    use FixturesTrait {
-        loadFixtures as private traitLoadFixtures;
-        loadFixtureFiles as private traitLoadFixtureFiles;
-    }
-
     protected EntityManager $em;
     protected Connection $connection;
     protected KernelBrowser $client;
@@ -49,9 +43,17 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'mailer_from_name'                  => 'Mautic',
     ];
 
+    /**
+     * Flag to turn off the mockServices() method.
+     */
+    protected bool $useMockServices = true;
+
+    protected AbstractDatabaseTool $databaseTool;
+
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
+        $this->databaseTool = $this->getContainer()->get(DatabaseToolCollection::class)->get();
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
@@ -72,7 +74,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $this->client->setServerParameter('HTTPS', $secure);
 
-        $this->mockServices();
+        if ($this->useMockServices) {
+            $this->mockServices();
+        }
     }
 
     /**
@@ -86,35 +90,25 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * Make `$append = true` default so we can avoid unnecessary purges.
      */
-    protected function loadFixtures(array $classNames = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): ?AbstractExecutor
+    protected function loadFixtures(array $classNames = [], bool $append = true): ?AbstractExecutor
     {
-        return $this->traitLoadFixtures($classNames, $append, $omName, $registryName, $purgeMode);
+        return $this->databaseTool->loadFixtures($classNames, $append);
     }
 
     /**
      * Make `$append = true` default so we can avoid unnecessary purges.
      */
-    protected function loadFixtureFiles(array $paths = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): array
+    protected function loadFixtureFiles(array $paths = [], bool $append = true): array
     {
-        return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
+        return $this->databaseTool->loadAliceFixture($paths, $append);
     }
 
-    private function mockServices()
+    private function mockServices(): void
     {
-        $cookieHelper = $this->getMockBuilder(CookieHelper::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['setCookie', 'setCharset'])
-            ->getMock();
-
-        $cookieHelper->expects($this->any())
-            ->method('setCookie');
-
-        self::$container->set('mautic.helper.cookie', $cookieHelper);
-
         self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
-    protected function applyMigrations()
+    protected function applyMigrations(): void
     {
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
@@ -124,7 +118,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    protected function installDatabaseFixtures(array $classNames = [])
+    protected function installDatabaseFixtures(array $classNames = []): void
     {
         $this->loadFixtures($classNames);
     }
@@ -169,10 +163,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->setCatchExceptions(false);
 
         if ($command) {
-            if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer(self::$container);
-            }
-
             // Register the command
             $application->add($command);
         }

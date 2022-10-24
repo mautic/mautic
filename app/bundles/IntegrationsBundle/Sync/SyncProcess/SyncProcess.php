@@ -142,15 +142,15 @@ class SyncProcess
 
         // Tell listeners sync is done
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_POST_EXECUTE,
-            new SyncEvent($this->mappingManualDAO->getIntegration(), $this->inputOptionsDAO->getStartDateTime(), $this->inputOptionsDAO->getEndDateTime())
+            new SyncEvent($this->inputOptionsDAO),
+            IntegrationEvents::INTEGRATION_POST_EXECUTE
         );
     }
 
     private function executeIntegrationSync(): void
     {
         $this->syncIteration = 1;
-        do {
+        while (true) {
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf('Integration to Mautic; syncing iteration %s', $this->syncIteration),
@@ -204,13 +204,13 @@ class SyncProcess
 
             // Fetch the next iteration/batch
             ++$this->syncIteration;
-        } while (true);
+        }
     }
 
     private function executeInternalSync(): void
     {
         $this->syncIteration = 1;
-        do {
+        while (true) {
             DebugLogger::log(
                 $this->mappingManualDAO->getIntegration(),
                 sprintf('Mautic to integration; syncing iteration %s', $this->syncIteration),
@@ -262,7 +262,7 @@ class SyncProcess
 
             // Fetch the next iteration/batch
             ++$this->syncIteration;
-        } while (true);
+        }
     }
 
     private function manageRelations(ReportDAO $syncReport): void

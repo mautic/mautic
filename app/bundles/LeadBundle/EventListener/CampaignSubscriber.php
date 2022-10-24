@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType;
+use Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
@@ -36,7 +37,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
+    public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     /**
      * @var IpLookupHelper
@@ -223,6 +224,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.segments', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.stages',
+            'description' => 'mautic.lead.lead.events.stages_descr',
+            'formType'    => CampaignEventLeadStagesType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.stages', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.owner',
@@ -462,6 +472,8 @@ class CampaignSubscriber implements EventSubscriberInterface
         } elseif ($event->checkContext('lead.segments')) {
             $listRepo = $this->listModel->getRepository();
             $result   = $listRepo->checkLeadSegmentsByIds($lead, $event->getConfig()['segments']);
+        } elseif ($event->checkContext('lead.stages')) {
+            $result   = $this->leadModel->getRepository()->isContactInOneOfStages($lead, $event->getConfig()['stages']);
         } elseif ($event->checkContext('lead.owner')) {
             $result = $this->leadModel->getRepository()->checkLeadOwner($lead, $event->getConfig()['owner']);
         } elseif ($event->checkContext('lead.campaigns')) {

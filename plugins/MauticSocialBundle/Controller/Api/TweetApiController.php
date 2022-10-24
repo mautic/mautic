@@ -3,17 +3,14 @@
 namespace MauticPlugin\MauticSocialBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class TweetApiController.
- */
 class TweetApiController extends CommonApiController
 {
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model           = $this->getModel('social.tweet');
         $this->entityClass     = 'MauticPlugin\MauticSocialBundle\Entity\Tweet';

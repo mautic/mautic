@@ -7,9 +7,9 @@ namespace Mautic\CoreBundle\Helper;
  */
 class SearchStringHelper
 {
-    const COMMAND_NEGATE  = 0;
-    const COMMAND_POSIT   = 1;
-    const COMMAND_NEUTRAL = 2;
+    public const COMMAND_NEGATE  = 0;
+    public const COMMAND_POSIT   = 1;
+    public const COMMAND_NEUTRAL = 2;
 
     /**
      * @var array

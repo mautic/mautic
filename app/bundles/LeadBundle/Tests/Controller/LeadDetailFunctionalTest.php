@@ -13,13 +13,6 @@ use PHPUnit\Framework\Assert;
 
 class LeadDetailFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testCustomFieldOrderIsRespected(): void
     {
         $lead = new Lead();
@@ -84,6 +77,8 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
             )
             ->execute()
             ->fetchAll(FetchMode::COLUMN);
+
+        $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);
 
         $crawler = $this->client->request('GET', sprintf('/s/contacts/view/%d', $lead->getId()));
 

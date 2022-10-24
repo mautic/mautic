@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InactiveExecutioner implements ExecutionerInterface
 {
@@ -252,7 +252,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     $this->counter->advanceEvaluated($contacts->count());
 
                     $inactiveEvents = $decisionEvent->getNegativeChildren();
-                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents);
+                    $this->helper->removeContactsThatAreNotApplicable($now, $contacts, $parentEventId, $inactiveEvents, $decisionEvent);
                     $earliestLastActiveDateTime = $this->helper->getEarliestInactiveDateTime();
 
                     $this->logger->debug(

@@ -24,19 +24,19 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ReportModel.
  */
 class ReportModel extends FormModel
 {
-    const CHANNEL_FEATURE = 'reporting';
+    public const CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array
@@ -201,7 +201,7 @@ class ReportModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -228,7 +228,7 @@ class ReportModel extends FormModel
                 $eventContext = ('all' == $context) ? '' : $context;
 
                 $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
-                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
+                $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_BUILD);
 
                 $tables = $event->getTables();
                 $graphs = $event->getGraphs();
@@ -598,7 +598,7 @@ class ReportModel extends FormModel
                 }
 
                 $event = new ReportGraphEvent($entity, $eventGraphs, $query);
-                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+                $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_GRAPH_GENERATE);
                 $graphs = $event->getGraphs();
 
                 unset($defaultGraphOptions);
@@ -609,7 +609,7 @@ class ReportModel extends FormModel
 
         // Allow plugin to manipulate the query
         $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $this->dispatcher->dispatch($event, ReportEvents::REPORT_QUERY_PRE_EXECUTE);
         $query = $event->getQuery();
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
@@ -655,11 +655,11 @@ class ReportModel extends FormModel
 
             // Allow plugin to manipulate the data
             $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_ON_DISPLAY, $event);
+            $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_DISPLAY);
             $data = $event->getData();
         }
 
-        if (MAUTIC_ENV == 'dev') {
+        if ($this->isDebugMode()) {
             $debugData['query'] = $query->getSQL();
             $params             = $query->getParameters();
 
@@ -743,7 +743,7 @@ class ReportModel extends FormModel
         $countQb->select('count(*)')
             ->from('('.$qb->getSQL().')', 'c');
 
-        if (MAUTIC_ENV == 'dev') {
+        if ($this->isDebugMode()) {
             $debugData['count_query'] = $countQb->getSQL();
         }
 
@@ -791,5 +791,10 @@ class ReportModel extends FormModel
         }
 
         return $this->em->getConnection();
+    }
+
+    protected function isDebugMode(): bool
+    {
+        return MAUTIC_ENV == 'dev' || $this->coreParametersHelper->get('debug');
     }
 }

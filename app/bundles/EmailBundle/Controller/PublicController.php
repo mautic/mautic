@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
@@ -20,6 +21,7 @@ use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class PublicController extends CommonFormController
 {
@@ -190,6 +192,10 @@ class PublicController extends CommonFormController
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
                 ];
 
+                if ($session->get($successSessionName)) {
+                    $viewParameters['successMessage'] = $this->translator->trans('mautic.email.preferences_center_success_message.text');
+                }
+
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
                 if (true === $form) {
                     $session->set($successSessionName, 1);
@@ -201,6 +207,9 @@ class PublicController extends CommonFormController
                             'contentTemplate' => $contentTemplate,
                         ]
                     );
+                } else {
+                    // success message should not persist on page refresh
+                    $session->set($successSessionName, 0);
                 }
 
                 $formView = $form->createView();
@@ -230,7 +239,7 @@ class PublicController extends CommonFormController
                         // Replace tokens in preference center page
                         $event = new PageDisplayEvent($html, $prefCenter, $params);
                         $this->get('event_dispatcher')
-                            ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                            ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
                         $html = $event->getContent();
                         if (!$session->has($successSessionName)) {
                             $successMessageDataSlots       = [
@@ -325,9 +334,11 @@ class PublicController extends CommonFormController
 
             if ($lead) {
                 // Set the lead as current lead
-                /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
-                $leadModel = $this->getModel('lead');
                 $this->get('mautic.tracker.contact')->setTrackedContact($lead);
+
+                if (!$this->translator instanceof LocaleAwareInterface) {
+                    throw new LogicException(sprintf('$this->translator must be an instance of "%s"', LocaleAwareInterface::class));
+                }
 
                 // Set lead lang
                 if ($lead->getPreferredLocale()) {
@@ -415,7 +426,7 @@ class PublicController extends CommonFormController
         }
 
         $event = new TransportWebhookEvent($realTransport, $this->request);
-        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::ON_TRANSPORT_WEBHOOK);
 
         return new Response('success');
     }
@@ -512,7 +523,7 @@ class PublicController extends CommonFormController
                 'lead'         => $fields,
             ]
         );
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
         $content = $event->getContent(true);
 

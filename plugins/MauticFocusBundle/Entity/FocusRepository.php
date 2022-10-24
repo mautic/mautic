@@ -20,11 +20,6 @@ class FocusRepository extends CommonRepository
         );
     }
 
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
     public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();

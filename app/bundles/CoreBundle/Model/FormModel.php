@@ -4,8 +4,8 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class FormModel extends AbstractCommonModel
 {

@@ -168,7 +168,7 @@ trait OperatorListTrait
             $choices = array_diff_key($choices, array_flip($definition['exclude']));
         }
 
-        if (isset($this->translator)) {
+        if (property_exists($this, 'translator')) {
             foreach ($choices as $value => $label) {
                 $choices[$value] = $this->translator->trans($label);
             }

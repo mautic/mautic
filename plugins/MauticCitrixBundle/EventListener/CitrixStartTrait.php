@@ -23,8 +23,8 @@ trait CitrixStartTrait
     /**
      * @param string $product
      * @param Lead   $lead
-     * @param  $emailId
-     * @param  $actionId
+     * @param        $emailId
+     * @param        $actionId
      *
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException

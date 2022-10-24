@@ -6,16 +6,13 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldExclusionStrategy;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class EventApiController.
- */
 class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model                    = $this->getModel('campaign.event');
         $this->entityClass              = 'Mautic\CampaignBundle\Entity\Event';
