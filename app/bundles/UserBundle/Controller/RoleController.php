@@ -89,7 +89,7 @@ class RoleController extends FormController
                     'delete' => $this->get('mautic.security')->isGranted('user:roles:delete'),
                 ],
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:list.html.php',
+            'contentTemplate' => 'MauticUserBundle:Role:list.html.twig',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_role_index', ['page' => $page]),
                 'mauticContent' => 'role',
@@ -164,10 +164,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_new',
                 'route'          => $this->generateUrl('mautic_role_action', ['objectAction' => 'new']),
@@ -275,10 +275,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_index',
                 'route'          => $action,
