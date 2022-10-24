@@ -1836,7 +1836,7 @@ return [
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
         'headers_sts'               => false,
-        'headers_sts_expire_time'   => 31536000,
+        'headers_sts_expire_time'   => 60,
         'headers_sts_subdomains'    => false,
         'headers_sts_preload'       => false,
         'max_entity_lock_time'      => 0,
