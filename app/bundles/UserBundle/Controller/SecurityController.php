@@ -82,12 +82,14 @@ class SecurityController extends CommonController
         $integrationHelper = $this->get('mautic.helper.integration');
         $integrations      = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
+        $templ = $this->request->get('templ') ?? 'twig';
+
         return $this->delegateView([
             'viewParameters' => [
                 'last_username' => $authenticationUtils->getLastUsername(),
                 'integrations'  => $integrations,
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
+            'contentTemplate' => 'MauticUserBundle:Security:login.html.'.$templ,
             'passthroughVars' => [
                 'route'          => $this->generateUrl('login'),
                 'mauticContent'  => 'user',
