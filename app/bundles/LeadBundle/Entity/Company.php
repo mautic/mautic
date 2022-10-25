@@ -178,10 +178,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
         ];
     }
 
-    /**
-     * @param string $prop
-     * @param mixed  $val
-     */
     protected function isChanged($prop, $val)
     {
         $prefix = 'company';
@@ -192,14 +188,13 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             if ($current !== $val) {
                 $this->addChange($prop, [$current, $val]);
             }
-        } elseif ('owner' == $prop) {
-            $getter  = 'get'.ucfirst($prop);
-            $current = $this->$getter();
+        } elseif ('owner' === $prop) {
+            $current = $this->getOwner();
             if ($current && !$val) {
                 $this->changes['owner'] = [$current->getName().' ('.$current->getId().')', $val];
             } elseif (!$current && $val) {
                 $this->changes['owner'] = [$current, $val->getName().' ('.$val->getId().')'];
-            } elseif ($current && $val && $current->getId() != $val->getId()) {
+            } elseif ($current && $current->getId() != $val->getId()) {
                 $this->changes['owner'] = [
                     $current->getName().'('.$current->getId().')',
                     $val->getName().'('.$val->getId().')',
@@ -259,7 +254,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
     }
 
     /**
-     * @param User $score
+     * @param int $score
      *
      * @return Company
      */

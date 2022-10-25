@@ -37,6 +37,6 @@ class CompanySubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertInstanceOf(AuditLog::class, $auditLogs);
         $auditLogDetail = $auditLogs->getDetails();
         $this->assertArrayHasKey('owner', $auditLogDetail);
-        $this->assertSame([null, $user->getId()], $auditLogDetail['owner']);
+        $this->assertSame([null, "Admin User ({$user->getId()})"], $auditLogDetail['owner']);
     }
 }

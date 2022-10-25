@@ -21,7 +21,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     public const CACHE_NAMESPACE = 'User';
 
     /**
-     * @var int
+     * @var ?int
      */
     protected $id;
 
@@ -412,9 +412,7 @@ class User extends FormEntity implements UserInterface, EquatableInterface, Pass
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return ?int
      */
     public function getId()
     {
