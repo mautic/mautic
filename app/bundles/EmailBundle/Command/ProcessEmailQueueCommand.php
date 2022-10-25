@@ -64,6 +64,7 @@ EOT
         $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
         $skipClear   = $input->getOption('do-not-clear');
         $quiet       = $input->hasOption('quiet') ? $input->getOption('quiet') : false;
+        $verbose     = $input->hasOption('verbose') ? $input->getOption('verbose') : false;
         $timeout     = $input->getOption('clear-timeout');
         $queueMode   = $this->parametersHelper->get('mailer_spool_type');
         $lockName    = $input->getOption('lock-name') ?? '';
@@ -148,7 +149,7 @@ EOT
         }
 
         //now process new emails
-        if (!$quiet) {
+        if (!$quiet && !$verbose) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
         }
 
