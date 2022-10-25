@@ -16,7 +16,6 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
-use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
@@ -546,9 +545,7 @@ class InstallService
             return $messages;
         }
 
-        if ($step instanceof EmailStep && !empty($data['mailer_transport'])) {
-            $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
-        }
+        $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
 
         return $this->saveConfiguration($data, $step, true);
     }

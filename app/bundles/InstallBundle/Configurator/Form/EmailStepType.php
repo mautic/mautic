@@ -348,6 +348,10 @@ class EmailStepType extends AbstractType
             ]
         );
 
+        $builder->add('messenger_type', HiddenType::class, [
+            'data'   => 'async',
+        ]);
+
         $builder->add(
             'buttons',
             FormButtonsType::class,
