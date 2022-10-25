@@ -544,8 +544,9 @@ class InstallService
 
             return $messages;
         }
-
-        $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
+        if ($step instanceof EmailStep) {
+            $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
+        }
 
         return $this->saveConfiguration($data, $step, true);
     }
