@@ -198,6 +198,7 @@ return [
                     'mautic.form.repository.submission',
                     'mautic.form.repository.form',
                     'mautic.helper.core_parameters',
+                    'translator',
                 ],
             ],
             'mautic.form.campaignbundle.subscriber' => [

@@ -12,6 +12,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
@@ -27,16 +28,20 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private CoreParametersHelper $coreParametersHelper;
 
+    private TranslatorInterface $translator;
+
     public function __construct(
         CompanyReportData $companyReportData,
         SubmissionRepository $submissionRepository,
         FormRepository $formRepository,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator
     ) {
         $this->companyReportData    = $companyReportData;
         $this->submissionRepository = $submissionRepository;
         $this->formRepository       = $formRepository;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -128,10 +133,28 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addGraph($context, 'table', 'mautic.form.table.most.submitted');
         }
 
-        if ($this->coreParametersHelper->get('form_results_data_sources') && $event->checkContext(self::CONTEXT_FORM_RESULT)) {
+        if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
             $formResultPrefix  = 'fr.';
 
-            $forms = $this->formRepository->getEntities();
+            // select only the table for an existing report, if the setting is disabled
+            if ($this->coreParametersHelper->get('form_results_data_sources') === false) {
+                $reportSource = !empty($event->getContext()) ? $event->getContext() : $event->getReportSource() ?? '';
+
+                $alias = $this->formRepository->getFormTableNameViaResults($reportSource);
+                $args  = [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'f.alias',
+                                'expr'   => 'eq',
+                                'value'  => $alias,
+                            ],
+                        ],
+                    ],
+                ];
+            }
+
+            $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
                 $formEntity  = $form[0];
                 $fields      = $formEntity->getFields();
@@ -141,7 +164,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     if ('button' !== $field->getType()) {
                         $index               = $formResultPrefix.$field->getAlias();
                         $formColumns[$index] = [
-                            'label' => $field->getLabel(),
+                            'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),
                             'type'  => 'number' === $field->getType() ? 'int' : 'string',
                             'alias' => $field->getAlias(),
                         ];
@@ -149,12 +172,12 @@ class ReportSubscriber implements EventSubscriberInterface
                 }
 
                 $formColumns[$formResultPrefix.'submission_id'] = [
-                    'label' => 'mautic.form.report.submission.id',
+                    'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.submission.id')]),
                     'type'  => 'int',
                     'alias' => 'submissionId',
                 ];
                 $formColumns[$formResultPrefix.'form_id']       = [
-                    'label' => 'mautic.form.report.form_id',
+                    'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.form_id')]),
                     'type'  => 'int',
                     'link'  => 'mautic_form_action',
                     'alias' => 'submissionId',

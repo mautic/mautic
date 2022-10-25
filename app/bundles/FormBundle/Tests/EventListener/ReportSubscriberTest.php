@@ -13,29 +13,36 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends TestCase
 {
     /**
-     * @var CompanyReportData|\PHPUnit\Framework\MockObject\MockObject
+     * @var CompanyReportData|MockObject
      */
     private $companyReportData;
 
     /**
-     * @var SubmissionRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var SubmissionRepository|MockObject
      */
     private $submissionRepository;
 
     /**
-     * @var FormRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var FormRepository|MockObject
      */
     private $formRepository;
 
     /**
-     * @var CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var CoreParametersHelper|MockObject
      */
     private $coreParametersHelper;
+
+    /**
+     * @var TranslatorInterface|MockObject
+     */
+    private $translator;
 
     /**
      * @var ReportSubscriber
@@ -50,11 +57,13 @@ class ReportSubscriberTest extends TestCase
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formRepository,
-            $this->coreParametersHelper
+            $this->coreParametersHelper,
+            $this->translator
         );
     }
 
