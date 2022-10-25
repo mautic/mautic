@@ -5701,7 +5701,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "04d980c8618173daf6506be50213027971bfb71a"
+                "reference": "0a510d87580bfe2be78d01f1667ea4934a96da7c"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5838,7 +5838,8 @@
                     "Mautic\\": "bundles/",
                     "MauticPlugin\\": "plugins/",
                     "Mautic\\Middleware\\": "middlewares/",
-                    "Mautic\\Migrations\\": "migrations/"
+                    "Mautic\\Migrations\\": "migrations/",
+                    "Mautic\\CodingStandards\\": "codingstandards/"
                 },
                 "files": [
                     "AppKernel.php",

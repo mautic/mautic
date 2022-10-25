@@ -47,10 +47,6 @@ final class MauticReportBuilderTest extends TestCase
         );
         $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
         $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
-
-        if (!defined('MAUTIC_TABLE_PREFIX')) {
-            define('MAUTIC_TABLE_PREFIX', '');
-        }
     }
 
     public function testColumnSanitization(): void
