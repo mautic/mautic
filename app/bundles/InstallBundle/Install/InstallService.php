@@ -509,6 +509,7 @@ class InstallService
         $required = [
             'mailer_from_name',
             'mailer_from_email',
+            'messneger_transport',
         ];
 
         $messages = [];
