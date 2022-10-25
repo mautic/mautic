@@ -21,8 +21,6 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->generateCsv();
 
         $assetData = [
