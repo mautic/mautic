@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FormModel;
@@ -11,10 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PublicController.
- */
-class PublicController extends CommonFormController
+class PublicController extends AbstractFormController
 {
     /**
      * @var array
@@ -405,6 +402,11 @@ class PublicController extends CommonFormController
         }
 
         return new Response('', Response::HTTP_NOT_FOUND);
+    }
+
+    public function getModelName(): string
+    {
+        return 'form';
     }
 
     /**

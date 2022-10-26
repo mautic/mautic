@@ -9,6 +9,7 @@
         * `Mautic\LeadBundle\Model\ListModel::getVersionNew()`
         * `Mautic\LeadBundle\Model\ListModel::getVersionOld()`
 *   Other
+    * `Mautic\CoreBundle\Controller\FormController` that was deprecated in Mautic 2.3 was removed. Use `AbstractFormController` instead.
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
     * `Mautic\CoreBundle\Templating\Helper\ExceptionHelper` removed - we don't use it

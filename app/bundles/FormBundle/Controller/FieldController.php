@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
@@ -13,7 +13,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-class FieldController extends CommonFormController
+class FieldController extends AbstractFormController
 {
     /**
      * @var FormModel|AbstractCommonModel

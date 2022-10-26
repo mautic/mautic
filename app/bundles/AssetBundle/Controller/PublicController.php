@@ -2,11 +2,11 @@
 
 namespace Mautic\AssetBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
-class PublicController extends CommonFormController
+class PublicController extends AbstractFormController
 {
     /**
      * @param string $slug

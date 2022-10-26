@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PublicController extends CommonFormController
+class PublicController extends AbstractFormController
 {
     /**
      * @param $slug

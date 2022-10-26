@@ -3,10 +3,10 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class SourceController extends CommonFormController
+class SourceController extends AbstractFormController
 {
     private $supportedSourceTypes = ['lists', 'forms'];
 

@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Controller;
 
 use LogicException;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\EmailBundle\EmailEvents;
@@ -23,7 +23,7 @@ use Mautic\QueueBundle\Queue\QueueName;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
-class PublicController extends CommonFormController
+class PublicController extends AbstractFormController
 {
     use FrequencyRuleTrait;
 

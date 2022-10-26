@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\FormBundle\Entity\Field;
@@ -13,7 +13,7 @@ use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 
-class FormController extends CommonFormController
+class FormController extends AbstractFormController
 {
     /**
      * @param int $page

@@ -2,15 +2,12 @@
 
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-/**
- * Class TriggerEventController.
- */
-class TriggerEventController extends CommonFormController
+class TriggerEventController extends AbstractFormController
 {
     /**
      * Generates new form and processes post data.

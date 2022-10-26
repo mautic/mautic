@@ -2,27 +2,10 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 
-/**
- * Class WebhookController.
- */
-class WebhookController extends FormController
+class WebhookController extends AbstractStandardFormController
 {
-    public function __construct()
-    {
-        $this->setStandardParameters(
-            'webhook.webhook', // model name
-            'webhook:webhooks', // permission base
-            'mautic_webhook', // route base
-            'mautic_webhook', // session base
-            'mautic.webhook', // lang string base
-            'MauticWebhookBundle:Webhook', // template base
-            'mautic_webhook', // activeLink
-            'mauticWebhook' // mauticContent
-        );
-    }
-
     /**
      * @param int $page
      *
@@ -100,5 +83,10 @@ class WebhookController extends FormController
     public function batchDeleteAction()
     {
         return parent::batchDeleteStandard();
+    }
+
+    protected function getModelName(): string
+    {
+        return 'webhook';
     }
 }

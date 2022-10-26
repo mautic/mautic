@@ -2,7 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
@@ -12,22 +12,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ResultController extends CommonFormController
+class ResultController extends AbstractStandardFormController
 {
-    public function __construct()
-    {
-        $this->setStandardParameters(
-            'form.submission', // model name
-            'form:forms', // permission base
-            'mautic_form', // route base
-            'mautic.formresult', // session base
-            'mautic.form.result', // lang string base
-            'MauticFormBundle:Result', // template base
-            'mautic_form', // activeLink
-            'formresult' // mauticContent
-        );
-    }
-
     /**
      * @param int $objectId
      * @param int $page

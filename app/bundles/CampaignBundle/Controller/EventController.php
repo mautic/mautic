@@ -5,10 +5,10 @@ namespace Mautic\CampaignBundle\Controller;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Form\Type\EventType;
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class EventController extends CommonFormController
+class EventController extends AbstractFormController
 {
     private $supportedEventTypes = [
         Event::TYPE_DECISION,

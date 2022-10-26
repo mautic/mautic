@@ -2,15 +2,12 @@
 
 namespace Mautic\FormBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController as CommonFormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-/**
- * Class ActionController.
- */
-class ActionController extends CommonFormController
+class ActionController extends AbstractFormController
 {
     /**
      * Generates new form and processes post data.
