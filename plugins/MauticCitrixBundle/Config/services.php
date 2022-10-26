@@ -18,4 +18,6 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('MauticPlugin\\MauticCitrixBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('MauticPlugin\\MauticCitrixBundle\\Entity\\', '../Entity/*Repository.php');
 };
