@@ -33,7 +33,12 @@ class MauticCoreExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
+        // For the project:
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../../../config'));
+        $loader->load('services.php');
+
+        // For the CoreBundle
+        $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/../Config'));
         $loader->load('services.php');
     }
 }

@@ -139,10 +139,6 @@ return [
             ],
         ],
     ],
-    'serviceAliases' => [
-        \Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class        => \Mautic\UserBundle\Entity\UserTokenRepository::class,
-        \Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class => \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class,
-    ],
     'services' => [
         'main' => [
             'mautic.core.service.flashbag' => [

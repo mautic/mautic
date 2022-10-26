@@ -26,11 +26,6 @@ final class ServicePass implements CompilerPassInterface
         $serviceNames = [];
 
         foreach ($bundles as $bundle) {
-            if (!empty($bundle['config']['serviceAliases'])) {
-                foreach ($bundle['config']['serviceAliases'] as $alias => $serviceFQCN) {
-                    $container->setAlias($alias, $serviceFQCN);
-                }
-            }
             if (!empty($bundle['config']['services'])) {
                 $config = $bundle['config']['services'];
                 foreach ($config as $type => $services) {
