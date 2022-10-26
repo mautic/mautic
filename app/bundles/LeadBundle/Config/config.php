@@ -656,27 +656,6 @@ return [
             ],
         ],
         'models' => [
-            'mautic.lead.model.lead' => [
-                'class'     => \Mautic\LeadBundle\Model\LeadModel::class,
-                'arguments' => [
-                    'request_stack',
-                    'mautic.helper.ip_lookup',
-                    'mautic.helper.paths',
-                    'mautic.helper.integration',
-                    'mautic.lead.model.field',
-                    'mautic.lead.model.list',
-                    'form.factory',
-                    'mautic.lead.model.company',
-                    'mautic.category.model.category',
-                    'mautic.channel.helper.channel_list',
-                    'mautic.helper.core_parameters',
-                    'mautic.validator.email',
-                    'mautic.user.provider',
-                    'mautic.tracker.contact',
-                    'mautic.tracker.device',
-                    'mautic.lead.model.ipaddress',
-                ],
-            ],
             'mautic.lead.model.field' => [
                 'class'     => \Mautic\LeadBundle\Model\FieldModel::class,
                 'arguments' => [

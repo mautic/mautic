@@ -29,4 +29,5 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php');
+    $services->alias('mautic.lead.model.lead', \Mautic\LeadBundle\Model\LeadModel::class);
 };
