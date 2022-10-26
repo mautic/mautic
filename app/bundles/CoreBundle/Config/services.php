@@ -37,4 +37,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
+    $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);
 };

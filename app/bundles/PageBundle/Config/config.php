@@ -90,20 +90,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.page.leadbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.page.model.page',
-                    'mautic.page.model.video',
-                    'translator',
-                    'router',
-                ],
-                'methodCalls' => [
-                    'setModelFactory' => ['mautic.model.factory'],
-                ],
-            ],
-        ],
         'models' => [
             'mautic.page.model.page' => [
                 'class'     => \Mautic\PageBundle\Model\PageModel::class,

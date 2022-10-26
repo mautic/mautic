@@ -11,7 +11,7 @@ trait ChannelTrait
      */
     protected $modelFactory;
 
-    public function setModelFactory(ModelFactory $modelFactory)
+    public function setModelFactory(ModelFactory $modelFactory): void
     {
         $this->modelFactory = $modelFactory;
     }

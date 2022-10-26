@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -42,12 +43,15 @@ class LeadSubscriber implements EventSubscriberInterface
         PageModel $pageModel,
         VideoModel $pageVideoModel,
         TranslatorInterface $translator,
-        RouterInterface $router
+        RouterInterface $router,
+        ModelFactory $modelFactory
     ) {
         $this->pageModel      = $pageModel;
         $this->pageVideoModel = $pageVideoModel;
         $this->translator     = $translator;
         $this->router         = $router;
+
+        $this->setModelFactory($modelFactory);
     }
 
     /**
