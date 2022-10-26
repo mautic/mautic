@@ -138,7 +138,7 @@ return [
             ],
             'mautic_contact_stats' => [
                 'path'       => '/contacts/view/{objectId}/stats',
-                'controller' => 'MauticLeadBundle:Lead:contactStats',
+                'controller' => 'Mautic\LeadBundle\Controller\LeadController::contactStatsAction',
             ],
         ],
         'api' => [
