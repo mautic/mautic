@@ -116,6 +116,7 @@ export default class BuilderService {
     codeModeButton.addCommand();
     codeModeButton.addButton();
 
+    this.overrideCustomRteDisable();
     this.setListeners();
   }
 
@@ -275,6 +276,27 @@ export default class BuilderService {
   getEditor() {
     return this.editor;
   }
+
+  // https://github.com/artf/grapesjs-mjml/issues/193
+  overrideCustomRteDisable() {
+    const richTextEditor = this.editor.RichTextEditor;
+
+    if (!richTextEditor) {
+      throw new Error('No RichTextEditor found');
+    }
+
+    if (richTextEditor.customRte) {
+      richTextEditor.customRte.disable = (el, rte) => {
+        el.contentEditable = false;
+        if(rte && rte.focusManager) {
+          rte.focusManager.blur(true);
+        }
+
+        rte.destroy(true);
+      }
+    }
+  }
+
   /**
    * Generate assets list from GrapesJs
    */
