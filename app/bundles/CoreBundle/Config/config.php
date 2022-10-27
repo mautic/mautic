@@ -1043,18 +1043,6 @@ return [
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
-            // Form extensions
-            'mautic.form.extension.custom' => [
-                'class'        => \Mautic\CoreBundle\Form\Extension\CustomFormExtension::class,
-                'arguments'    => [
-                    'event_dispatcher',
-                ],
-                'tag'          => 'form.type_extension',
-                'tagArguments' => [
-                    'extended_type' => Symfony\Component\Form\Extension\Core\Type\FormType::class,
-                ],
-            ],
-
             // Twig
             'templating.twig.extension.slot' => [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension::class,
