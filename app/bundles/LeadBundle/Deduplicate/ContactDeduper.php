@@ -26,16 +26,25 @@ class ContactDeduper
         $this->leadRepository = $leadRepository;
     }
 
+    /**
+     * @return array<string,string>
+     */
     public function getUniqueFields(string $object): array
     {
         return $this->fieldModel->getUniqueIdentifierFields(['object' => $object]);
     }
 
+    /**
+     * @param string[] $uniqueFieldAliases
+     */
     public function countDuplicatedContacts(array $uniqueFieldAliases): int
     {
         return $this->leadRepository->getContactCountWithDuplicateValues($uniqueFieldAliases);
     }
 
+    /**
+     * @param string[] $uniqueFieldAliases
+     */
     public function getOneDuplicateContact(array $uniqueFieldAliases): ?Lead
     {
         if (!$contactId = $this->leadRepository->getOneDuplicatedContactId($uniqueFieldAliases)) {
@@ -47,6 +56,8 @@ class ContactDeduper
 
     /**
      * To save RAM.
+     *
+     * @param Lead[] $contacts
      */
     public function detachContacts(array $contacts): void
     {
@@ -75,7 +86,7 @@ class ContactDeduper
 
     /**
      * @deprecated Use the other methods in this service to compose what you need. See DeduplicateCommand for an example.
-     * 
+     *
      * @param bool $mergeNewerIntoOlder
      *
      * @return int

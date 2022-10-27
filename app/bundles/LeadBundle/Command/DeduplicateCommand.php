@@ -53,7 +53,7 @@ EOT
         $duplicateCount = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
         $progressBar    = new ProgressBar($output, $duplicateCount);
 
-        $output->writeln("Deduplicating contacts based on unique identifiers: ".implode(', ', $uniqueFields));
+        $output->writeln('Deduplicating contacts based on unique identifiers: '.implode(', ', $uniqueFields));
         $output->writeln("{$duplicateCount} contacts found to deduplicate");
 
         $progressBar->setFormat('debug');
@@ -61,7 +61,7 @@ EOT
 
         while ($contact = $this->contactDeduper->getOneDuplicateContact($uniqueFields)) {
             $duplicates = $this->contactDeduper->checkForDuplicateContacts($contact->getProfileFields(), $newerIntoOlder);
-            
+
             $this->contactDeduper->mergeContacts($duplicates);
             $this->contactDeduper->detachContacts($duplicates);
 

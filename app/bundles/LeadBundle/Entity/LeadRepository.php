@@ -1232,9 +1232,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getContactCountWithDuplicateValues(array $uniqueFields): int
     {
         $subQueryBuilder = $this->getDuplicateValuesQuery($uniqueFields);
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb              = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $qb->select('count(*)')->from(sprintf('(%s)', $subQueryBuilder->getSQL()), 'sub');
-        return (int) $qb->execute()->fetchColumn();
+
+        return (int) $qb->execute()->fetchOne();
     }
 
     /**
@@ -1244,7 +1245,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $qb = $this->getDuplicateValuesQuery($uniqueFields);
         $qb->setMaxResults(1);
-        return (int) $qb->execute()->fetchColumn();
+
+        return (int) $qb->execute()->fetchOne();
     }
 
     /**
@@ -1253,7 +1255,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function getDuplicateValuesQuery(array $uniqueFields): QueryBuilder
     {
         $fieldsWithAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $qb                = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select([$this->getTableAlias().'.id', 'count(*) as duplicates'])
             ->from($this->getTableName(), $this->getTableAlias());
 
