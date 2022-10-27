@@ -289,6 +289,7 @@ class LeadController extends FormController
                 'lead:leads:editother',
                 'lead:leads:deleteown',
                 'lead:leads:deleteother',
+                'lead:exports:create',
             ],
             'RETURN_ARRAY'
         );
