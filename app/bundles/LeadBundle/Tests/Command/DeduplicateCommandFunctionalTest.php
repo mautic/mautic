@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\Command;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
+use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -18,6 +19,9 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     {
         $contactRepository = $this->em->getRepository(Lead::class);
         \assert($contactRepository instanceof LeadRepository);
+
+        $contactDeduper = self::$container->get('mautic.lead.deduper');
+        \assert($contactDeduper instanceof ContactDeduper);
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
@@ -32,6 +36,12 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         Assert::assertSame(7, $contactRepository->count([]));
+
+        Assert::assertSame(
+            2,
+            $contactDeduper->countDuplicatedContacts(array_keys($contactDeduper->getUniqueFields('lead'))),
+            'The deduper should see and process only 2 duplicated contacts. The third is unique.'
+        );
 
         $this->runCommand(DeduplicateCommand::NAME);
 
