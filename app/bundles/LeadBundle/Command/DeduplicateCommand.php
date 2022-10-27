@@ -1,40 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DeduplicateCommand extends ModeratedCommand
 {
-    /**
-     * @var ContactDeduper
-     */
-    private $contactDeduper;
+    public const NAME = 'mautic:contacts:deduplicate';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private ContactDeduper $contactDeduper;
 
-    public function __construct(ContactDeduper $contactDeduper, TranslatorInterface $translator, PathsHelper $pathsHelper)
+    public function __construct(ContactDeduper $contactDeduper, PathsHelper $pathsHelper)
     {
         parent::__construct($pathsHelper);
 
         $this->contactDeduper = $contactDeduper;
-        $this->translator     = $translator;
     }
 
     public function configure()
     {
         parent::configure();
 
-        $this->setName('mautic:contacts:deduplicate')
+        $this->setName(self::NAME)
             ->setDescription('Merge contacts based on same unique identifiers')
             ->addOption(
                 '--newer-into-older',
@@ -54,18 +49,25 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $newerIntoOlder = (bool) $input->getOption('newer-into-older');
-        $count          = $this->contactDeduper->deduplicate($newerIntoOlder, $output);
+        $uniqueFields   = $this->contactDeduper->getUniqueFields('lead');
+        $duplicateCount = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
+        $progressBar    = new ProgressBar($output, $duplicateCount);
 
-        $output->writeln('');
-        $output->writeln(
-            $this->translator->trans(
-                'mautic.lead.merge.count',
-                [
-                    '%count%' => $count,
-                ]
-            )
-        );
+        $output->writeln("Deduplicating contacts based on unique identifiers: ".implode(', ', $uniqueFields));
+        $output->writeln("{$duplicateCount} contacts found to deduplicate");
 
-        return 0;
+        $progressBar->setFormat('debug');
+        $progressBar->start();
+
+        while ($contact = $this->contactDeduper->getOneDuplicateContact($uniqueFields)) {
+            $duplicates = $this->contactDeduper->checkForDuplicateContacts($contact->getProfileFields(), $newerIntoOlder);
+            
+            $this->contactDeduper->mergeContacts($duplicates);
+            $this->contactDeduper->detachContacts($duplicates);
+
+            $progressBar->advance();
+        }
+
+        $progressBar->finish();
     }
 }

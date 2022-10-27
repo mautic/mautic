@@ -1041,8 +1041,6 @@ return [
                 'class'     => \Mautic\LeadBundle\Command\DeduplicateCommand::class,
                 'arguments' => [
                     'mautic.lead.deduper',
-                    'translator',
-                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],

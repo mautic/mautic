@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -13,24 +15,10 @@ class ContactDeduper
 {
     use DeduperTrait;
 
-    /**
-     * @var ContactMerger
-     */
-    private $contactMerger;
+    private ContactMerger $contactMerger;
 
-    /**
-     * @var LeadRepository
-     */
-    private $leadRepository;
+    private LeadRepository $leadRepository;
 
-    /**
-     * @var bool
-     */
-    private $mergeNewerIntoOlder = false;
-
-    /**
-     * DedupModel constructor.
-     */
     public function __construct(FieldModel $fieldModel, ContactMerger $contactMerger, LeadRepository $leadRepository)
     {
         $this->fieldModel     = $fieldModel;
@@ -38,14 +26,62 @@ class ContactDeduper
         $this->leadRepository = $leadRepository;
     }
 
+    public function getUniqueFields(string $object): array
+    {
+        return $this->fieldModel->getUniqueIdentifierFields(['object' => $object]);
+    }
+
+    public function countDuplicatedContacts(array $uniqueFieldAliases): int
+    {
+        return $this->leadRepository->getContactCountWithDuplicateValues($uniqueFieldAliases);
+    }
+
+    public function getOneDuplicateContact(array $uniqueFieldAliases): ?Lead
+    {
+        if (!$contactId = $this->leadRepository->getOneDuplicatedContactId($uniqueFieldAliases)) {
+            return null;
+        }
+
+        return $this->leadRepository->getEntity($contactId);
+    }
+
     /**
+     * To save RAM.
+     */
+    public function detachContacts(array $contacts): void
+    {
+        $this->leadRepository->detachEntities($contacts);
+    }
+
+    /**
+     * @param Lead[] $duplicates
+     */
+    public function mergeContacts(array $duplicates): void
+    {
+        if (empty($duplicates)) {
+            return;
+        }
+
+        $loser = reset($duplicates);
+        while ($winner = next($duplicates)) {
+            try {
+                $this->contactMerger->merge($winner, $loser);
+            } catch (SameContactException $exception) {
+            }
+
+            $loser = $winner;
+        }
+    }
+
+    /**
+     * @deprecated Use the other methods in this service to compose what you need. See DeduplicateCommand for an example.
+     * 
      * @param bool $mergeNewerIntoOlder
      *
      * @return int
      */
     public function deduplicate($mergeNewerIntoOlder = false, OutputInterface $output = null)
     {
-        $this->mergeNewerIntoOlder = $mergeNewerIntoOlder;
         $lastContactId             = 0;
         $totalContacts             = $this->leadRepository->getIdentifiedContactCount();
         $progress                  = null;
@@ -58,7 +94,7 @@ class ContactDeduper
         while ($contact = $this->leadRepository->getNextIdentifiedContact($lastContactId)) {
             $lastContactId = $contact->getId();
             $fields        = $contact->getProfileFields();
-            $duplicates    = $this->checkForDuplicateContacts($fields);
+            $duplicates    = $this->checkForDuplicateContacts($fields, $mergeNewerIntoOlder);
 
             if ($progress) {
                 $progress->advance();
@@ -95,7 +131,7 @@ class ContactDeduper
     /**
      * @return Lead[]
      */
-    public function checkForDuplicateContacts(array $queryFields)
+    public function checkForDuplicateContacts(array $queryFields, bool $mergeNewerIntoOlder = false)
     {
         $duplicates = [];
         $uniqueData = $this->getUniqueData($queryFields);
@@ -103,7 +139,7 @@ class ContactDeduper
             $duplicates = $this->leadRepository->getLeadsByUniqueFields($uniqueData);
 
             // By default, duplicates are ordered by newest first
-            if (!$this->mergeNewerIntoOlder) {
+            if (!$mergeNewerIntoOlder) {
                 // Reverse the array so that oldest are on "top" in order to merge oldest into the next until they all have been merged into the
                 // the newest record
                 $duplicates = array_reverse($duplicates);
