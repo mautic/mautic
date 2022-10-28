@@ -191,12 +191,19 @@ trait FilterTrait
                 switch ($fieldType) {
                     case 'timezone':
                         $choiceKey = 'timezones';
+                        $options[$choiceKey] = ArrayHelper::flipArray($options[$choiceKey]);
                         break;
                     case 'country':
                         $choiceKey = 'countries';
+                        $customOptions['choice_value'] = function ($value) {
+                            return $value;
+                        };
                         break;
                     case 'region':
                         $choiceKey = 'regions';
+                        $customOptions['choice_value'] = function ($value) {
+                            return $value;
+                        };
                         break;
                     case 'locale':
                         $choiceKey = 'locales';
@@ -273,7 +280,7 @@ trait FilterTrait
                                 ?
                                 FormFieldHelper::parseBooleanList($list)
                                 :
-                                FormFieldHelper::parseList($list)
+                                FormFieldHelper::parseListForChoices($list)
                         );
                 }
 
