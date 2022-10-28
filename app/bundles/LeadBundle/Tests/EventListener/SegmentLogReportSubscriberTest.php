@@ -106,10 +106,6 @@ class SegmentLogReportSubscriberTest extends TestCase
             ->method('isNotNull')
             ->willReturn('');
 
-        $mockQueryBuilder->expects($this->exactly(1))
-            ->method('groupBy')
-            ->willReturn($mockQueryBuilder);
-
         // Mock event
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -139,10 +135,6 @@ class SegmentLogReportSubscriberTest extends TestCase
                 'dateFrom' => new \DateTime(),
                 'dateTo'   => new \DateTime(),
             ]);
-
-        $mockEvent->expects($this->exactly(1))
-            ->method('hasGroupBy')
-            ->willReturn(false);
 
         $mockEvent->expects($this->exactly(2))
             ->method('hasColumn')
