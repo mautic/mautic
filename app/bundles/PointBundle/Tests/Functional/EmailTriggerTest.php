@@ -16,6 +16,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
 {
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testButtonsAreEnabledOnEditSendEmailToUserWhenEmailIsSelected(): void
     {
@@ -44,6 +45,7 @@ class EmailTriggerTest extends MauticMysqlTestCase
 
     /**
      * @runInSeparateProcess
+     * @preserveGlobalState disabled
      */
     public function testButtonsAreDisabledWhenEmailIsNotSelected(): void
     {
