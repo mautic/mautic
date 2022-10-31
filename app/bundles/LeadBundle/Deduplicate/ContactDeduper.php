@@ -44,14 +44,39 @@ class ContactDeduper
 
     /**
      * @param string[] $uniqueFieldAliases
+     *
+     * @return string[]
      */
-    public function getOneDuplicateContact(array $uniqueFieldAliases): ?Lead
+    public function getDuplicateContactIdBatch(array $uniqueFieldAliases, int $limit, int $lastId = 1): array
     {
-        if (!$contactId = $this->leadRepository->getOneDuplicatedContactId($uniqueFieldAliases)) {
-            return null;
-        }
+        return $this->leadRepository->getDuplicatedContactIds($uniqueFieldAliases, $limit, $lastId);
+    }
 
-        return $this->leadRepository->getEntity($contactId);
+    /**
+     * @param string[]|int[] $contactIds
+     *
+     * @return Lead[]
+     */
+    public function getContactsByIds(array $contactIds): array
+    {
+        return $this->leadRepository->getEntities(['id' => $contactIds]);
+    }
+
+    /**
+     * @param Lead[] $contacts
+     */
+    public function deduplicateContactBatch(array $contacts, bool $newerIntoOlder, callable $onContactProcessed = null): void
+    {
+        foreach ($contacts as $contact) {
+            $duplicates = $this->checkForDuplicateContacts($contact->getProfileFields(), $newerIntoOlder);
+
+            $this->mergeContacts($duplicates);
+            $this->detachContacts($duplicates);
+
+            if ($onContactProcessed) {
+                $onContactProcessed($contact);
+            }
+        }
     }
 
     /**

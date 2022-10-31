@@ -1240,13 +1240,18 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * @param string[] $uniqueFields
+     *
+     * @return string[]
      */
-    public function getOneDuplicatedContactId(array $uniqueFields): int
+    public function getDuplicatedContactIds(array $uniqueFields, int $limit, int $lastId = 1): array
     {
         $qb = $this->getDuplicateValuesQuery($uniqueFields);
-        $qb->setMaxResults(1);
+        $qb->setMaxResults($limit);
+        $qb->andWhere($this->getTableAlias().'.id > :lastId');
+        $qb->setParameter('lastId', $lastId);
+        $qb->orderBy($this->getTableAlias().'.id', 'ASC');
 
-        return (int) $qb->execute()->fetchOne();
+        return $qb->execute()->fetchFirstColumn();
     }
 
     /**
@@ -1256,7 +1261,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $fieldsWithAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
         $qb                = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select([$this->getTableAlias().'.id', 'count(*) as duplicates'])
+            ->select([$this->getTableAlias().'.id']) //, 'count(*) as duplicates'
             ->from($this->getTableName(), $this->getTableAlias());
 
         $andWhere = [$qb->expr()->isNotNull($this->getTableAlias().'.date_identified')];
