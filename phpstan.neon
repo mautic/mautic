@@ -28,6 +28,7 @@ parameters:
 		- app/bundles/CoreBundle/Loader/ParameterLoader.php
 		- app/bundles/CoreBundle/Helper/PathsHelper.php
 		- app/bundles/CoreBundle/Configurator/Configurator.php
+		- app/bundles/CoreBundle/Entity/UpsertTrait.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX
