@@ -9,8 +9,6 @@ use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20211020114811 extends AbstractMauticMigration
 {
-    private const DATA_TYPES_FOR_CHANGE_CHARSET = ['longtext', 'varchar', 'char', 'tinytext'];
-
     public function up(Schema $schema): void
     {
         $this->addSql('SET FOREIGN_KEY_CHECKS=0;');
