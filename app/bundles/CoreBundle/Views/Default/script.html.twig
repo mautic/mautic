@@ -1,4 +1,4 @@
-{% set mautic_content = mauticTemplateVars.mauticContent is defined ? mauticTemplateVars.mauticContent : '' %}
+{% set mautic_content = mauticContent is defined ? mauticContent : '' %}
 
 <script>
     var mauticBasePath    = '{{ app.request.getBasePath() }}';

@@ -89,7 +89,7 @@ class PageSubscriber implements EventSubscriberInterface
                         )
                     )
                 ) {
-                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], true)
+                    $script = '<script src="'.$this->router->generate('mautic_focus_generate', ['id' => $id], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL)
                         .'" type="text/javascript" charset="utf-8" async="async"></script>';
                     $content = preg_replace('#{focus='.$id.'}#', $script, $content);
                 } else {

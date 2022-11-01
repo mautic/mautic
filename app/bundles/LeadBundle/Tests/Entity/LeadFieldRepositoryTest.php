@@ -38,8 +38,6 @@ final class LeadFieldRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->connection    = $this->createMock(Connection::class);
 
@@ -48,7 +46,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $this->repository = new LeadFieldRepository($this->entityManager, $classMetadata);
     }
 
-    public function testCompareDateValueForContactField()
+    public function testCompareDateValueForContactField(): void
     {
         $contactId        = 12;
         $fieldAlias       = 'date_field';
@@ -141,7 +139,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $this->assertFalse($this->repository->compareDateValue($contactId, $fieldAlias, $value));
     }
 
-    public function testCompareDateValueForCompanyField()
+    public function testCompareDateValueForCompanyField(): void
     {
         $contactId        = 12;
         $fieldAlias       = 'date_field';

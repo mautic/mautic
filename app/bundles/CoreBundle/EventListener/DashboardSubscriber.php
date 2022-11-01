@@ -11,7 +11,7 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -124,7 +124,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 }
 
                 $iconEvent = new IconEvent($this->security);
-                $this->dispatcher->dispatch(CoreEvents::FETCH_ICONS, $iconEvent);
+                $this->dispatcher->dispatch($iconEvent, CoreEvents::FETCH_ICONS);
                 $event->setTemplateData(['logs' => $logs, 'icons' => $iconEvent->getIcons()]);
             }
 

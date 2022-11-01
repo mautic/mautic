@@ -29,12 +29,9 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CommonApiController.
- */
 class CommonApiController extends AbstractFOSRestController implements MauticController
 {
     use RequestTrait;
@@ -530,7 +527,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
     /**
      * Initialize some variables.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->security = $this->get('mautic.security');
 
@@ -1099,7 +1096,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
         $form->submit($submitParams, 'PATCH' !== $method);
 
-        if ($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->setCategory($entity, $categoryId);
             $preSaveError = $this->preSaveEntity($entity, $form, $submitParams, $action);
 
@@ -1109,7 +1106,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
             try {
                 if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_PRE_SAVE)) {
-                    $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_PRE_SAVE, new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request));
+                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request), ApiEvents::API_ON_ENTITY_PRE_SAVE);
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());
@@ -1131,7 +1128,7 @@ class CommonApiController extends AbstractFOSRestController implements MauticCon
 
             try {
                 if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_POST_SAVE)) {
-                    $this->dispatcher->dispatch(ApiEvents::API_ON_ENTITY_POST_SAVE, new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request));
+                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request), ApiEvents::API_ON_ENTITY_POST_SAVE);
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());

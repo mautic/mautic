@@ -4,8 +4,9 @@ namespace Mautic\FormBundle\Event;
 
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\Form;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class FormBuilderEvent.
@@ -30,14 +31,11 @@ class FormBuilderEvent extends Event
     private $validators = [];
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
-     */
-    public function __construct($translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }

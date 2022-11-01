@@ -132,7 +132,6 @@ class MappingHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(
                     function (InternalObjectFindEvent $event) use ($internalObject) {
                         Assert::assertSame($internalObject, $event->getObject());
@@ -140,7 +139,8 @@ class MappingHelperTest extends TestCase
 
                         return true;
                     }
-                )
+                ),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -182,7 +182,6 @@ class MappingHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(
                     function (InternalObjectFindEvent $event) use ($internalObject) {
                         Assert::assertSame($internalObject, $event->getObject());
@@ -199,7 +198,8 @@ class MappingHelperTest extends TestCase
 
                         return true;
                     }
-                )
+                ),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject($mappingManual, $internalObjectName, $integrationObjectDAO);
@@ -241,7 +241,6 @@ class MappingHelperTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(
                     function (InternalObjectFindEvent $event) use ($internalObject) {
                         Assert::assertSame($internalObject, $event->getObject());
@@ -258,7 +257,8 @@ class MappingHelperTest extends TestCase
 
                         return true;
                     }
-                )
+                ),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $foundInternalObject = $this->mappingHelper->findMauticObject(

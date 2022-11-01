@@ -82,12 +82,4 @@ class DynamicContentFilterType extends AbstractType
             ]
         );
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'dynamic_content_filter';
-    }
 }

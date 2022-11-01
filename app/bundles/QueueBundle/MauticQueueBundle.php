@@ -31,7 +31,7 @@ class MauticQueueBundle extends Bundle
         }
 
         if (QueueProtocol::RABBITMQ === $this->queueProtocol) {
-            $container->addCompilerPass(new RegisterPartsPass());
+            $container->addCompilerPass(new RegisterPartsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         }
 
         if (file_exists(__DIR__.'/Config/'.$this->queueProtocol.'.php')) {

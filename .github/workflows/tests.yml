@@ -9,6 +9,9 @@ on:
     # Run every day at 10:45 AM UTC to discover potential issues with dependencies like PHP updates etc.
     - cron: '45 10 * * *'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   phpunit:
     # We don't want the scheduled jobs to run on forks of Mautic
@@ -17,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.0']
         db-types: ['mysql', 'mariadb']
   
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
@@ -63,7 +66,9 @@ jobs:
         mysqldump --print-defaults
 
     - name: Set SYMFONY_ENV to test
-      run: echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+      run: |
+        echo "SYMFONY_ENV=test" >> $GITHUB_ENV
+        echo "MAUTIC_ENV=test" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
@@ -75,7 +80,7 @@ jobs:
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
         export DB_PORT=${!DB_PORT_STRING}
 
-        if [[ "${{ matrix.php-versions }}" == "7.4" ]] && [[ "${{ matrix.db-types }}" == "mysql" ]]; then
+        if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
           composer test -- --coverage-clover=coverage.xml
         else
           composer test
@@ -85,7 +90,7 @@ jobs:
         mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
     - name: Upload coverage report
-      if: ${{ matrix.php-versions == '7.4' && matrix.db-types == 'mysql' && github.repository == 'mautic/mautic' }}
+      if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
       uses: codecov/codecov-action@v2
       with:
         files: ./coverage.xml
@@ -114,13 +119,21 @@ jobs:
       fail-fast: false
       matrix:
         commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
+        php-versions: ['8.0']
 
-    name: ${{ matrix.commands }}
+    name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+
+    - name: Rector Cache
+      uses: actions/cache@v3
+      with:
+        path: ./var/cache/rector
+        key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-rector-
 
     - name: Get changed files
       id: changed-files
@@ -129,7 +142,7 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
@@ -142,6 +155,8 @@ jobs:
         if [[ "${{ matrix.commands }}" == "PHPSTAN" ]]; then
           composer phpstan
         elif [[ "${{ matrix.commands }}" == "Rector" ]]; then
+          export SYMFONY_ENV=test
+          bin/console cache:warmup
           composer rector -- --dry-run --no-progress-bar
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do

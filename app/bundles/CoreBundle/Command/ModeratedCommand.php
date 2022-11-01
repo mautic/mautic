@@ -2,7 +2,8 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,15 +11,15 @@ use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
 
-abstract class ModeratedCommand extends ContainerAwareCommand
+abstract class ModeratedCommand extends Command
 {
-    const MODE_PID   = 'pid';
-    const MODE_FLOCK = 'flock';
+    public const MODE_PID   = 'pid';
+    public const MODE_FLOCK = 'flock';
 
     /**
      * @deprecated Symfony 4 Removed LockHandler and the replacement is the lock from the Lock component so there is no need for something custom
      */
-    const MODE_LOCK = 'file_lock';
+    public const MODE_LOCK = 'file_lock';
 
     protected $checkFile;
     protected $moderationKey;
@@ -37,6 +38,15 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      * @var OutputInterface
      */
     protected $output;
+
+    protected PathsHelper $pathsHelper;
+
+    public function __construct(PathsHelper $pathsHelper)
+    {
+        $this->pathsHelper = $pathsHelper;
+
+        parent::__construct();
+    }
 
     /**
      * Set moderation options.
@@ -91,7 +101,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         $this->moderationKey = $this->getName().$moderationKey;
 
         // Setup the run directory for lock/pid files
-        $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
+        $this->runDirectory = $this->pathsHelper->getSystemPath('cache').'/../run';
         if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
             // This needs to throw an exception in order to not silently fail when there is an issue
             throw new \RuntimeException($this->runDirectory.' could not be created.');
@@ -147,7 +157,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         }
 
         $pid = fgets($fp, 8192);
-        if ($pid && posix_getpgid($pid)) {
+        if ($pid && posix_getpgid((int) $pid)) {
             $this->output->writeln('<info>Script with pid '.$pid.' in progress.</info>');
 
             flock($fp, LOCK_UN);
@@ -160,7 +170,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
         ftruncate($fp, 0);
         rewind($fp);
 
-        fputs($fp, getmypid());
+        fputs($fp, (string) getmypid());
         fflush($fp);
 
         flock($fp, LOCK_UN);

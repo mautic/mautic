@@ -6,7 +6,6 @@ use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Symfony\Bridge\Monolog\Logger;
 
 class ContactSegmentService
 {
@@ -21,14 +20,14 @@ class ContactSegmentService
     private $contactSegmentQueryBuilder;
 
     /**
-     * @var Logger
+     * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
-        Logger $logger
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
         $this->contactSegmentQueryBuilder  = $queryBuilder;
@@ -248,14 +247,14 @@ class ContactSegmentService
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
-        $qbO = new QueryBuilder($queryBuilder->getConnection());
-        $qbO->select('orp.lead_id as id, orp.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
-        $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
+        $expr = $queryBuilder->expr();
+        $qbO  = $queryBuilder->createQueryBuilder();
+        $qbO->select('orp.lead_id as id, orp.leadlist_id');
+        $qbO->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
-        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($qbO->expr()->isNull('members.id'));
-        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
+        $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
+        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
+        $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
         $qbO->setParameter(':orpsegid', $segment->getId());
         $this->addLeadLimiter($qbO, $batchLimiters, 'orp.lead_id');
 

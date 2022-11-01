@@ -7,11 +7,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class PointApiController.
- */
 class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -24,7 +21,7 @@ class PointApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel('point');
         $this->leadModel        = $this->getModel('lead');
