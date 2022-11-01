@@ -3,13 +3,15 @@
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Portability\Statement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
-use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -17,15 +19,31 @@ use PHPUnit\Framework\TestCase;
 
 final class LeadFieldRepositoryTest extends TestCase
 {
-    use RepositoryConfiguratorTrait;
+    /**
+     * @var EntityManager|MockObject
+     */
+    private $entityManager;
 
-    private LeadFieldRepository $repository;
+    /**
+     * @var Connection|MockObject
+     */
+    private $connection;
+
+    /**
+     * @var LeadFieldRepository
+     */
+    private $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->repository = $this->configureRepository(LeadField::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->connection    = $this->createMock(Connection::class);
+
+        /** @var ClassMetadata<LeadFieldRepository>|MockObject $classMetadata */
+        $classMetadata    = $this->createMock(ClassMetadata::class);
+        $this->repository = new LeadFieldRepository($this->entityManager, $classMetadata);
     }
 
     public function testCompareDateValueForContactField(): void
@@ -39,7 +57,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $statementCompare = $this->createMock(Statement::class);
         $exprCompare      = $this->createMock(ExpressionBuilder::class);
 
-        // $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
         $builderCompare->method('expr')->willReturn($exprCompare);
 
