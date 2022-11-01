@@ -183,7 +183,6 @@ class SyncProcessTest extends TestCase
             ->withConsecutive(
                 [
                     // the integration to mautic batch event should be dispatched
-                    IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC,
                     $this->callback(function (CompletedSyncIterationEvent $event) {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getUpdatedObjectMappings('bar'));
@@ -193,10 +192,10 @@ class SyncProcessTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC,
                 ],
                 [
                     // the integration to mautic batch event should be dispatched
-                    IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION,
                     $this->callback(function (CompletedSyncIterationEvent $event) {
                         $orderResult = $event->getOrderResults();
                         Assert::assertCount(1, $orderResult->getNewObjectMappings('bar'));
@@ -204,6 +203,7 @@ class SyncProcessTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION,
                 ]
             );
 
