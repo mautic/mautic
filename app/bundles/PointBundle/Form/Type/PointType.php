@@ -193,12 +193,4 @@ class PointType extends AbstractType
         $resolver->setRequired(['pointActions']);
         $resolver->setDefined(['actionType']);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'point';
-    }
 }

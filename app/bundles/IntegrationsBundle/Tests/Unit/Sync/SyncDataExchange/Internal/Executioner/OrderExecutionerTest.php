@@ -64,7 +64,6 @@ class OrderExecutionerTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectUpdateEvent $event) {
                         $this->assertSame(Contact::NAME, $event->getObject()->getName());
                         $this->assertSame([1, 2], $event->getIdentifiedObjectIds());
@@ -72,15 +71,16 @@ class OrderExecutionerTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectCreateEvent $event) {
                         $this->assertSame(Contact::NAME, $event->getObject()->getName());
                         $this->assertCount(1, $event->getCreateObjects());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                 ]
             );
 
@@ -104,7 +104,6 @@ class OrderExecutionerTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectUpdateEvent $event) {
                         $this->assertSame(Company::NAME, $event->getObject()->getName());
                         $this->assertSame([1, 2], $event->getIdentifiedObjectIds());
@@ -112,15 +111,16 @@ class OrderExecutionerTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectCreateEvent $event) {
                         $this->assertSame(Company::NAME, $event->getObject()->getName());
                         $this->assertCount(1, $event->getCreateObjects());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                 ]
             );
 
@@ -155,36 +155,36 @@ class OrderExecutionerTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectUpdateEvent $event) {
                         $this->assertSame(Contact::NAME, $event->getObject()->getName());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectUpdateEvent $event) {
                         $this->assertSame(Company::NAME, $event->getObject()->getName());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectCreateEvent $event) {
                         $this->assertSame(Contact::NAME, $event->getObject()->getName());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectCreateEvent $event) {
                         $this->assertSame(Company::NAME, $event->getObject()->getName());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                 ]
             );
 

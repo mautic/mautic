@@ -2,46 +2,48 @@
 
 declare(strict_types=1);
 
-use Rector\Core\Configuration\Option;
-use Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector;
-use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 
-return static function (ContainerConfigurator $containerConfigurator): void {
-    // here we can define, what sets of rules will be applied
-    $parameters = $containerConfigurator->parameters();
-
-    // Define what rule sets will be applied
-    // $containerConfigurator->import(SetList::DEAD_CODE);
-
-    $parameters->set(
-        Option::PATHS,
-        [
-            __DIR__.'/app/bundles',
-            __DIR__.'/plugins',
-        ]
-    );
-
-    $parameters->set(
-        Option::SKIP,
+return static function (Rector\Config\RectorConfig $rectorConfig): void {
+    $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
+    $rectorConfig->skip(
         [
             __DIR__.'/*/test/*',
             __DIR__.'/*/tests/*',
             __DIR__.'/*/Test/*',
             __DIR__.'/*/Tests/*',
-            __DIR__.'/*/InstallFixtures/*',
-            __DIR__.'/*/Fixtures/*',
             __DIR__.'/*.html.php',
             __DIR__.'/*.less.php',
             __DIR__.'/*.inc.php',
             __DIR__.'/*.js.php',
-            __DIR__.'/app/bundles/LeadBundle/Entity/LeadField.php',
-            __DIR__.'/app/bundles/WebhookBundle/Entity/Webhook.php',
-            __DIR__.'/app/bundles/UserBundle/Entity/UserToken.php',
-            __DIR__.'/app/bundles/EmailBundle/Entity/EmailReplyRepository.php',
+            \Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class => [
+                __DIR__.'/app/bundles/AssetBundle/Controller/UploadController.php', // This is just overrride of the DropzoneController.
+                __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
+                __DIR__.'/plugins/MauticCitrixBundle/MauticCitrixBundle.php', // Requires quite a refactoring.
+                __DIR__.'/app/bundles/CoreBundle/Helper/TemplatingHelper.php', // Will be removed once Twig refactoring is done.
+                __DIR__.'/app/bundles/CoreBundle/Templating/TemplateNameParser.php', // Will be removed once Twig refactoring is done.
+            ],
         ]
     );
 
-    $services = $containerConfigurator->services();
-    $services->set(RemoveAndTrueRector::class);
-    // $services->set(RemoveAlwaysTrueIfConditionRector::class); // 41 files would have changed (we should have a separate PR to enable this)
+    $rectorConfig->parallel();
+
+    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/test/appAppKernelTestDebugContainer.xml');
+
+    $rectorConfig->cacheClass(FileCacheStorage::class);
+    $rectorConfig->cacheDirectory(__DIR__.'/var/cache/rector');
+
+    // Define what rule sets will be applied
+    $rectorConfig->sets([
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
+
+        // @todo implement the whole set. Start rule by rule below.
+        // \Rector\Set\ValueObject\SetList::DEAD_CODE
+    ]);
+
+    // Define what single rules will be applied
+    $rectorConfig->rule(\Rector\DeadCode\Rector\BooleanAnd\RemoveAndTrueRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class);
 };

@@ -113,8 +113,8 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
         } elseif ('page.header.left' === $customContentEvent->getContext()) {
             // Inject fileManager URL and list of images within all pages
             $passParams['assets']     = json_encode($this->fileManager->getImages());
-            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], true);
-            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], true);
+            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
 
             $content = $this->templatingHelper->getTemplating()->render(
                 'GrapesJsBuilderBundle:Setting:vars.html.php',

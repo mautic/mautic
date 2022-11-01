@@ -21,9 +21,9 @@ class MauticEmailBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new SpoolTransportPass());
-        $container->addCompilerPass(new EmailTransportPass());
-        $container->addCompilerPass(new SwiftmailerDynamicMailerPass());
-        $container->addCompilerPass(new StatHelperPass());
+        $container->addCompilerPass(new SpoolTransportPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new EmailTransportPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new SwiftmailerDynamicMailerPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new StatHelperPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

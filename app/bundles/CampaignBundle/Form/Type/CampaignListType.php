@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CampaignListType.
@@ -73,10 +73,5 @@ class CampaignListType extends AbstractType
     public function getParent()
     {
         return ChoiceType::class;
-    }
-
-    public function getBlockPrefix()
-    {
-        return 'campaign_list';
     }
 }

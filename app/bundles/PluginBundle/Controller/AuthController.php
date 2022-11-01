@@ -118,11 +118,11 @@ class AuthController extends FormController
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $event = $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
             new PluginIntegrationAuthRedirectEvent(
                 $integrationObject,
                 $integrationObject->getAuthLoginUrl()
-            )
+            ),
+            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
         );
         $oauthUrl = $event->getAuthUrl();
 

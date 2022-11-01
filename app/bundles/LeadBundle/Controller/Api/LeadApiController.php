@@ -3,23 +3,24 @@
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class LeadApiController.
- *
  * @property LeadModel $model
  */
 class LeadApiController extends CommonApiController
@@ -28,9 +29,9 @@ class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
-    const MODEL_ID = 'lead.lead';
+    public const MODEL_ID = 'lead.lead';
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel(self::MODEL_ID);
         $this->entityClass      = Lead::class;
@@ -461,9 +462,9 @@ class LeadApiController extends CommonApiController
     /**
      * Add/Remove a UTM Tagset to/from the contact.
      *
-     * @param int       $id
-     * @param string    $method
-     * @param array/int $data
+     * @param int              $id
+     * @param string           $method
+     * @param array<mixed>|int $data
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -567,7 +568,18 @@ class LeadApiController extends CommonApiController
         if ('edit' === $action) {
             // Merge existing duplicate contact based on unique fields if exist
             // new endpoints will leverage getNewEntity in order to return the correct status codes
-            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
+            $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
+            $contactMerger  = $this->get('mautic.lead.merger');
+            \assert($contactMerger instanceof ContactMerger);
+
+            if ($entity->getId() && $existingEntity->getId()) {
+                try {
+                    $entity = $contactMerger->merge($entity, $existingEntity);
+                } catch (SameContactException $exception) {
+                }
+            } elseif ($existingEntity->getId()) {
+                $entity = $existingEntity;
+            }
         }
 
         $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';
@@ -603,6 +615,7 @@ class LeadApiController extends CommonApiController
         //Since the request can be from 3rd party, check for an IP address if included
         if (isset($this->entityRequestParameters['ipAddress'])) {
             $ipAddress = $this->get('mautic.helper.ip_lookup')->getIpAddress($this->entityRequestParameters['ipAddress']);
+            \assert($ipAddress instanceof IpAddress);
 
             if (!$entity->getIpAddresses()->contains($ipAddress)) {
                 $entity->addIpAddress($ipAddress);
@@ -690,6 +703,6 @@ class LeadApiController extends CommonApiController
     {
         $form->submit($data, 'PATCH' !== $this->request->getMethod());
 
-        return $form->isValid();
+        return $form->isSubmitted() && $form->isValid();
     }
 }

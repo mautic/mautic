@@ -393,12 +393,4 @@ class PageType extends AbstractType
             'data_class' => Page::class,
         ]);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'page';
-    }
 }

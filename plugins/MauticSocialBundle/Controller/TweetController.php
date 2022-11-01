@@ -55,14 +55,6 @@ class TweetController extends FormController
     /**
      * @return mixed
      */
-    protected function getControllerBase()
-    {
-        return 'MauticSocialBundle:Tweet';
-    }
-
-    /**
-     * @return mixed
-     */
     protected function getTranslationBase()
     {
         return 'mautic.integration.Twitter';
@@ -140,7 +132,7 @@ class TweetController extends FormController
      *
      * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName($file, string $engine = self::ENGINE_PHP)
     {
         if ('form.html.php' === $file && 1 == $this->request->get('modal')) {
             return parent::getTemplateName('form.modal.html.php');

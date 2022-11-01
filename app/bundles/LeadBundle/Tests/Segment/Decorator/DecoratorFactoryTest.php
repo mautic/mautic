@@ -55,7 +55,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->eventDispatcherMock            = $this->createMock(EventDispatcherInterface::class);
         $this->contactSegmentFilterDictionary = new ContactSegmentFilterDictionary($this->eventDispatcherMock);
@@ -111,7 +110,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcherMock->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE,
                 $this->callback(
                     function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate) {
                         $this->assertNull($event->getDecorator());
@@ -119,7 +117,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                )
+                ),
+                LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE
             );
 
         $this->assertSame(
@@ -139,7 +138,6 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcherMock->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE,
                 $this->callback(
                     function (LeadListFiltersDecoratorDelegateEvent $event) use ($contactSegmentFilterCrate, $filterDecoratorInterface) {
                         $this->assertNull($event->getDecorator());
@@ -149,7 +147,8 @@ class DecoratorFactoryTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                )
+                ),
+                LeadEvents::SEGMENT_ON_DECORATOR_DELEGATE
             );
 
         $this->assertSame(

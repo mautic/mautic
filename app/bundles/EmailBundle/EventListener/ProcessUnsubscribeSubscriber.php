@@ -12,8 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ProcessUnsubscribeSubscriber implements EventSubscriberInterface
 {
-    const BUNDLE     = 'EmailBundle';
-    const FOLDER_KEY = 'unsubscribes';
+    public const BUNDLE     = 'EmailBundle';
+    public const FOLDER_KEY = 'unsubscribes';
 
     /**
      * @var Unsubscribe

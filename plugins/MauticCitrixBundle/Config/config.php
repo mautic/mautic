@@ -9,11 +9,11 @@ return [
         'public' => [
             'mautic_citrix_proxy' => [
                 'path'       => '/citrix/proxy',
-                'controller' => 'MauticCitrixBundle:Public:proxy',
+                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::proxyAction',
             ],
             'mautic_citrix_sessionchanged' => [
                 'path'       => '/citrix/sessionChanged',
-                'controller' => 'MauticCitrixBundle:Public:sessionChanged',
+                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::sessionChangedAction',
             ],
         ],
     ],
@@ -110,6 +110,16 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['doctrine.orm.entity_manager'],
                 'optional'  => true,
+            ],
+        ],
+        'commands' => [
+            'mautic.citrix.command.sync' => [
+                'class'     => \MauticPlugin\MauticCitrixBundle\Command\SyncCommand::class,
+                'arguments' => [
+                    'mautic.citrix.model.citrix',
+                    'mautic.helper.paths',
+                ],
+                'tag' => 'console.command',
             ],
         ],
         'integrations' => [
