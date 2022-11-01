@@ -4,29 +4,32 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Command;
 
-use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\ExitCode;
-use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Service\ProcessQueue;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Stopwatch\Stopwatch;
 
-class DeduplicateCommand extends ModeratedCommand
+class DeduplicateCommand extends Command
 {
     public const NAME = 'mautic:contacts:deduplicate';
 
     private ContactDeduper $contactDeduper;
+    private ParameterBagInterface $params;
 
-    public function __construct(ContactDeduper $contactDeduper, PathsHelper $pathsHelper)
+    public function __construct(ContactDeduper $contactDeduper, ParameterBagInterface $params)
     {
-        parent::__construct($pathsHelper);
-
         $this->contactDeduper = $contactDeduper;
+        $this->params         = $params;
     }
 
-    public function configure()
+    public function configure(): void
     {
         parent::configure();
 
@@ -39,23 +42,18 @@ class DeduplicateCommand extends ModeratedCommand
                 'By default, this command will merge older contacts and activity into the newer. Use this flag to reverse that behavior.'
             )
             ->addOption(
-                '--contact-ids',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Comma separated list of contact IDs to deduplicate. If not provided, all contacts will be deduplicated.'
-            )
-            ->addOption(
                 '--batch',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'How many contact duplicates to process at once. Defaults to 1000.',
-                1000
+                'How many contact duplicates to process at once. Defaults to 100.',
+                100
             )
             ->addOption(
-                '--prepare-commands',
+                '--processes',
                 null,
-                InputOption::VALUE_NONE,
-                'In case you want to run this command in parallel then this option will just print the commands with concrete contact IDs so the commands do not overlap the work.',
+                InputOption::VALUE_REQUIRED,
+                'The commands can run in multiple PHP processes. This option defines how many processes to run. Defaults to 1.',
+                1
             )
             ->setHelp(
                 <<<'EOT'
@@ -69,40 +67,81 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $newerIntoOlder  = (bool) $input->getOption('newer-into-older');
-        $prepareCommands = (bool) $input->getOption('prepare-commands');
         $batch           = (int) $input->getOption('batch');
-        $contactIds      = $input->getOption('contact-ids');
+        $processes       = (int) $input->getOption('processes');
         $uniqueFields    = $this->contactDeduper->getUniqueFields('lead');
         $duplicateCount  = $this->contactDeduper->countDuplicatedContacts(array_keys($uniqueFields));
-        $progressBar     = new ProgressBar($output, $duplicateCount);
+        $stopwatch       = new Stopwatch();
+
+        if (!$duplicateCount) {
+            $output->writeln('<error>No contacts to deduplicate.</error>');
+
+            return ExitCode::FAILURE;
+        }
+
+        $stopwatch->start('deduplicate');
 
         $output->writeln('Deduplicating contacts based on unique identifiers: '.implode(', ', $uniqueFields));
         $output->writeln("{$duplicateCount} contacts found to deduplicate");
 
-        if ($prepareCommands) {
-            $lastId = 1;
-            while ($contactIds = $this->contactDeduper->getDuplicateContactIdBatch($uniqueFields, $batch, $lastId)) {
-                $output->writeln(sprintf('bin/console %s --contact-ids=%s', self::NAME, implode(',', $contactIds)));
-                $lastId = (int) end($contactIds);
+        $processQueue = new ProcessQueue($processes);
+        $processCount = (int) ceil($duplicateCount / $processes);
+
+        $output->writeln('');
+        $output->writeln("Finding duplicates and creating processes for deduplication. {$processCount} processes will be queued.");
+
+        $contactIds      = $this->contactDeduper->getDuplicateContactIdBatch($uniqueFields);
+        $contactIdChunks = array_chunk($contactIds, $batch);
+        foreach ($contactIdChunks as $contactIdBatch) {
+            $command = [
+                $this->params->get('kernel.project_dir').'/bin/console',
+                DeduplicateIdsCommand::NAME,
+                '--contact-ids',
+                implode(',', $contactIdBatch),
+                '-e',
+                MAUTIC_ENV,
+            ];
+
+            if ($newerIntoOlder) {
+                $command[] = '--newer-into-older';
             }
 
-            return ExitCode::SUCCESS;
+            $processQueue->enqueue(new Process($command));
         }
 
+        $output->writeln('');
+        $output->writeln("Starting to execute the {$processCount} processes for deduplication. {$processes} processes will be executed in parallel.");
+
+        $progressBar = new ProgressBar($output, $processCount);
         $progressBar->setFormat('debug');
         $progressBar->start();
 
-        if ($contactIds) {
-            $contacts = $this->contactDeduper->getContactsByIds(explode(',', $contactIds));
-            $this->contactDeduper->deduplicateContactBatch($contacts, $newerIntoOlder, fn () => $progressBar->advance());
-        } else {
-            while ($contactIds = $this->contactDeduper->getDuplicateContactIdBatch($uniqueFields, $batch)) {
-                $contacts = $this->contactDeduper->getContactsByIds($contactIds);
-                $this->contactDeduper->deduplicateContactBatch($contacts, $newerIntoOlder, fn () => $progressBar->advance());
+        $processQueue->refresh();
+
+        while ($processQueue->isProcessing()) {
+            usleep(100);
+            $processQueue->refresh();
+            $progressBar->setProgress($processQueue->getProcessedCount());
+        }
+
+        $output->writeln('');
+        $output->writeln('');
+        $output->writeln('All processes have finished. The output of each process is below.');
+
+        foreach ($processQueue->getProcessed() as $process) {
+            $output->writeln("<comment>{$process->getCommandLine()}</comment>");
+            if (ExitCode::SUCCESS === $process->getExitCode()) {
+                $output->writeln("<info>{$process->getOutput()}</info>");
+            } else {
+                $output->writeln("<error>{$process->getErrorOutput()}</error>");
             }
         }
 
         $progressBar->finish();
+
+        $event = $stopwatch->stop('deduplicate');
+        $output->writeln('');
+        $output->writeln("Duration: {$event->getDuration()} ms, Memory: {$event->getMemory()} bytes");
 
         return ExitCode::SUCCESS;
     }

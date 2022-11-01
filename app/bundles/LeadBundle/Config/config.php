@@ -1037,13 +1037,6 @@ return [
             ],
         ],
         'command' => [
-            'mautic.lead.command.deduplicate' => [
-                'class'     => \Mautic\LeadBundle\Command\DeduplicateCommand::class,
-                'arguments' => [
-                    'mautic.lead.deduper',
-                ],
-                'tag' => 'console.command',
-            ],
             'mautic.lead.command.create_custom_field' => [
                 'class'     => \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class,
                 'arguments' => [

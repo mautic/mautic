@@ -1243,13 +1243,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @return string[]
      */
-    public function getDuplicatedContactIds(array $uniqueFields, int $limit, int $lastId = 1): array
+    public function getDuplicatedContactIds(array $uniqueFields): array
     {
         $qb = $this->getDuplicateValuesQuery($uniqueFields);
-        $qb->setMaxResults($limit);
-        $qb->andWhere($this->getTableAlias().'.id > :lastId');
-        $qb->setParameter('lastId', $lastId);
-        $qb->orderBy($this->getTableAlias().'.id', 'ASC');
+        $qb->andWhere($this->getTableAlias().'.id > 1'); // enformces faster primary index.
 
         return $qb->execute()->fetchFirstColumn();
     }

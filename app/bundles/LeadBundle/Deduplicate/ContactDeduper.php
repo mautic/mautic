@@ -47,9 +47,9 @@ class ContactDeduper
      *
      * @return string[]
      */
-    public function getDuplicateContactIdBatch(array $uniqueFieldAliases, int $limit, int $lastId = 1): array
+    public function getDuplicateContactIdBatch(array $uniqueFieldAliases): array
     {
-        return $this->leadRepository->getDuplicatedContactIds($uniqueFieldAliases, $limit, $lastId);
+        return $this->leadRepository->getDuplicatedContactIds($uniqueFieldAliases);
     }
 
     /**
@@ -59,7 +59,7 @@ class ContactDeduper
      */
     public function getContactsByIds(array $contactIds): array
     {
-        return $this->leadRepository->getEntities(['id' => $contactIds]);
+        return $this->leadRepository->getEntities(['ids' => $contactIds, 'ignore_paginator' => false]);
     }
 
     /**
