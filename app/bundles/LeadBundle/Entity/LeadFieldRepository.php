@@ -388,7 +388,7 @@ class LeadFieldRepository extends CommonRepository
     public function getFieldSchemaData(string $object): array
     {
         return $this->_em->createQueryBuilder()
-            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer, f.charLengthLimit')
+            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
             ->from($this->_entityName, 'f', 'f.alias')
             ->where('f.object = :object')
             ->setParameter('object', $object)
