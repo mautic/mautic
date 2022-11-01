@@ -30,7 +30,6 @@ class ReferenceResolverTest extends TestCase
 
     protected function setup(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
         $this->connection        = $this->createMock(Connection::class);
         $this->referenceResolver = new ReferenceResolver($this->connection);
     }
