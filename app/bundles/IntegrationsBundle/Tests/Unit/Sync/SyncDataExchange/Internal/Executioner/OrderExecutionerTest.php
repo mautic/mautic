@@ -134,7 +134,6 @@ class OrderExecutionerTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectUpdateEvent $event) {
                         Assert::assertSame(Contact::NAME, $event->getObject()->getName());
                         Assert::assertSame([1, 2], $event->getIdentifiedObjectIds());
@@ -165,15 +164,16 @@ class OrderExecutionerTest extends TestCase
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS,
                 ],
                 [
-                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                     $this->callback(function (InternalObjectCreateEvent $event) {
                         Assert::assertSame(Contact::NAME, $event->getObject()->getName());
                         Assert::assertCount(1, $event->getCreateObjects());
 
                         return true;
                     }),
+                    IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS,
                 ]
             );
 
@@ -375,7 +375,7 @@ class OrderExecutionerTest extends TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $this->isInstanceOf(InternalObjectCreateEvent::class));
+            ->with($this->isInstanceOf(InternalObjectCreateEvent::class), IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS);
 
         $this->orderExecutioner->execute($syncOrder);
     }
@@ -387,7 +387,7 @@ class OrderExecutionerTest extends TestCase
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $this->isInstanceOf(InternalObjectUpdateEvent::class));
+            ->with($this->isInstanceOf(InternalObjectUpdateEvent::class), IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS);
 
         $this->orderExecutioner->execute($syncOrder);
     }

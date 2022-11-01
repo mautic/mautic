@@ -204,8 +204,8 @@ class SyncProcess
             // Dispatch an event to allow subscribers to take action after this batch of objects has been synced to Mautic
             $orderResults = $this->getOrderResultsForIntegrationSync($syncOrder, $objectMappings);
             $this->eventDispatcher->dispatch(
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC,
-                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO)
+                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO),
+                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_INTEGRATION_TO_MAUTIC
             );
             unset($orderResults);
 
@@ -274,8 +274,8 @@ class SyncProcess
             // Dispatch an event to allow subscribers to take action after this batch of objects has been synced to the integration
             $orderResults = $this->getOrderResultsForInternalSync($syncOrder);
             $this->eventDispatcher->dispatch(
-                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION,
-                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO)
+                new CompletedSyncIterationEvent($orderResults, $this->syncIteration, $this->inputOptionsDAO, $this->mappingManualDAO),
+                IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_MAUTIC_TO_INTEGRATION
             );
             unset($orderResults);
 
