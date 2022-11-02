@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 
 class Interval implements ScheduleModeInterface
 {
-    const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
+    public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
 
     /**
      * @var LoggerInterface
