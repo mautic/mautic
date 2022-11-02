@@ -24,23 +24,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ForeignValueFilterQueryBuilderTest extends TestCase
 {
-    /**
-     * @var RandomParameterName
-     */
-    private $randomParameter;
+    private RandomParameterName $randomParameter;
 
     /**
-     * @var EventDispatcherInterface|MockObject
+     * @var EventDispatcherInterface&MockObject
      */
     private $dispatcher;
 
-    /**
-     * @var ForeignValueFilterQueryBuilder
-     */
-    private $queryBuilder;
+    private ForeignValueFilterQueryBuilder $queryBuilder;
 
     /**
-     * @var Connection|MockObject
+     * @var Connection&MockObject
      */
     private $connectionMock;
 
@@ -69,8 +63,8 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
      */
     public function dataApplyQuery(): iterable
     {
-        yield ['regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE par1.url REGEXP '.com$')"];
-        yield ['notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE par1.url NOT REGEXP '.com$')"];
+        yield ['regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url REGEXP '.com$')"];
+        yield ['notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url NOT REGEXP '.com$')"];
         yield ['eq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE par1.url = 'https://acquia.com')"];
         yield ['neq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE NOT EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = l.id) AND ((par1.url = 'https://acquia.com') OR (par1.url IS NULL)))"];
         yield ['empty', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1)'];
@@ -152,15 +146,15 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
      */
     public function dataApplyQueryWithBatchFilters(): iterable
     {
-        yield [['minId' => 1, 'maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url REGEXP '.com$'))"];
-        yield [['minId' => 1], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url REGEXP '.com$'))"];
-        yield [['maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url REGEXP '.com$'))"];
-        yield [['lead_id' => 1], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url REGEXP '.com$'))"];
+        yield [['minId' => 1, 'maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url REGEXP '.com$'))"];
+        yield [['minId' => 1], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url REGEXP '.com$'))"];
+        yield [['maxId' => 2], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url REGEXP '.com$'))"];
+        yield [['lead_id' => 1], 'regexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url REGEXP '.com$'))"];
 
-        yield [['minId' => 1, 'maxId' => 2], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url NOT REGEXP '.com$'))"];
-        yield [['minId' => 1], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url NOT REGEXP '.com$'))"];
-        yield [['maxId' => 2], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url NOT REGEXP '.com$'))"];
-        yield [['lead_id' => 1], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE EXISTS(SELECT NULL FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['minId' => 1, 'maxId' => 2], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['minId' => 1], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['maxId' => 2], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id <= 2) AND (par1.url NOT REGEXP '.com$'))"];
+        yield [['lead_id' => 1], 'notRegexp', '.com$', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id = 1) AND (par1.url NOT REGEXP '.com$'))"];
 
         yield [['minId' => 1, 'maxId' => 2], 'eq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id BETWEEN 1 and 2) AND (par1.url = 'https://acquia.com'))"];
         yield [['minId' => 1], 'eq', 'https://acquia.com', "SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT par1.lead_id FROM __PREFIX__page_hits par1 WHERE (par1.lead_id >= 1) AND (par1.url = 'https://acquia.com'))"];
