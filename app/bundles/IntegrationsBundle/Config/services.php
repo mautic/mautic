@@ -18,6 +18,7 @@ return function (ContainerConfigurator $configurator) {
         'Auth/Support/Oauth2/Token',
         'Sync/DAO',
         'Sync/Exception',
+        'Sync/SyncDataExchange/Internal/Executioner/Exception',
         'Sync/SyncProcess/SyncProcess.php',
         'Integration/IntegrationObject.php',
     ];
