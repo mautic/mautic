@@ -525,6 +525,8 @@ class LeadModel extends FormModel
             // Save after the lead in for new leads created through the API and maybe other places
             $this->companyModel->addLeadToCompany($companyEntity, $entity);
             $this->setPrimaryCompany($companyEntity->getId(), $entity->getId());
+        } else if (array_key_exists('company', $updatedFields) && empty($updatedFields['company'])) {
+            $this->companyModel->getCompanyLeadRepository()->removeContactPrimaryCompany($entity->getId());
         }
 
         $this->em->clear(CompanyChangeLog::class);
