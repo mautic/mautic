@@ -686,7 +686,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Should have no companies associated
         $this->assertCount(1, $collection);
 
-        $contact->setCompany(null);
+        $this->em->flush();
+
+        $contact->addUpdatedField('company', null);
         $contactModel->saveEntity($contact);
 
         $companies  = $this->getCompanyLeads($contact->getId());
@@ -694,7 +696,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Should have no companies associated
         $this->assertCount(0, $collection);
     }
-
 
     private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog
     {
