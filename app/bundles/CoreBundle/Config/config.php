@@ -754,129 +754,18 @@ return [
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
-            // Twig
-            'templating.twig.extension.slot' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension::class,
-                'arguments' => [
-                    'templating.helper.slots',
+            // Form extensions
+            'mautic.form.extension.custom' => [
+                'class'        => \Mautic\CoreBundle\Form\Extension\CustomFormExtension::class,
+                'arguments'    => [
+                    'event_dispatcher',
                 ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.asset' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
-                'arguments' => [
-                    'templating.helper.assets',
+                'tag'          => 'form.type_extension',
+                'tagArguments' => [
+                    'extended_type' => Symfony\Component\Form\Extension\Core\Type\FormType::class,
                 ],
-                'tag' => 'twig.extension',
             ],
-            'templating.twig.extension.menu' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MenuExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.menu',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.gravatar' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\GravatarExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.gravatar',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.version' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\VersionExtension::class,
-                'arguments' => [
-                    'mautic.helper.app_version',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.mautibot' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\MautibotExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.mautibot',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.formatter' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\FormatterExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.formatter',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.date' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\DateExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.date',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.button' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ButtonExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.button',
-                    'request_stack',
-                    'router',
-                    'translator',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.content' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ContentExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.content',
-                ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.numeric' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\NumericExtension::class,
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.form' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\FormExtension::class,
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.class' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ClassExtension::class,
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.security' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SecurityExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.security',
-                ],
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.translator' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\TranslatorExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.translator',
-                ],
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.config' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\ConfigExtension::class,
-                'arguments' => [
-                    'mautic.helper.template.config',
-                ],
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.storage' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\StorageExtension::class,
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.publish_status' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\CoreHelpersExtension::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.template.date',
-                ],
-                'tag'       => 'twig.extension',
-            ],
-            'templating.twig.extension.object' => [
-                'class' => \Mautic\CoreBundle\Templating\Twig\Extension\ObjectExtension::class,
-                'tag'   => 'twig.extension',
-            ],
+
             'mautic.doctrine.loader.mautic_fixtures_loader' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
                 'arguments' => [
