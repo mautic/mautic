@@ -754,18 +754,6 @@ return [
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
-            // Form extensions
-            'mautic.form.extension.custom' => [
-                'class'        => \Mautic\CoreBundle\Form\Extension\CustomFormExtension::class,
-                'arguments'    => [
-                    'event_dispatcher',
-                ],
-                'tag'          => 'form.type_extension',
-                'tagArguments' => [
-                    'extended_type' => Symfony\Component\Form\Extension\Core\Type\FormType::class,
-                ],
-            ],
-
             'mautic.doctrine.loader.mautic_fixtures_loader' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
                 'arguments' => [
