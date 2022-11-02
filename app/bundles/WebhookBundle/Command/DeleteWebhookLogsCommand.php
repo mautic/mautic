@@ -40,7 +40,7 @@ class DeleteWebhookLogsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $logMaxLimit  = $this->coreParametersHelper->get('webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX);
+        $logMaxLimit  = (int) $this->coreParametersHelper->get('webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX);
         $webHookIds   = $this->logRepository->getWebhooksBasedOnLogLimit($logMaxLimit);
         $webhookCount = count($webHookIds);
         $output->writeln("<info>There is {$webhookCount} webhooks with logs more than defined limit.</info>");
