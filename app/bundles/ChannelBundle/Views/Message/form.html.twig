@@ -4,7 +4,7 @@
 {% set tabs, active = [], true %}
 
 {% for channel, config in channels %}
-    {# {% if form.channels[channel] is defined %}
+    {% if form.channels[channel] is defined %}
         {% set tab = {
             'active'        : active,
             'id'            : 'channel_' ~ channel,
@@ -21,8 +21,8 @@
         {% endif %}
 
 
-        {% set tabs, active = tabs|merge(tab), false %}
-    {% endif %} #}
+        {% set tabs, active = tabs|merge([tab]), false %}
+    {% endif %}
     
 {% endfor %}
 
@@ -46,3 +46,4 @@
 {{ form_row(form.publishUp) }}
 {{ form_row(form.publishDown) }}
 {% endblock %}
+{% block _content %}{% endblock %}

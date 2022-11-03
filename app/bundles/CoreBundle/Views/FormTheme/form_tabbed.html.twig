@@ -1,18 +1,19 @@
 {% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
 {% extends "MauticCoreBundle:FormTheme:form.html.twig" %}
+{% set hasRightColumn = block('rightFormContent') is defined %}
 {% block mainFormContent %}
 {{ form_start(form) }}
     <div class="box-layout">
-        <div class="col-md-<?php echo $hasRightColumn ? 9 : 12; ?> height-auto bg-white">
+        <div class="col-md-{{ hasRightColumn ? 9 : 12 }} height-auto bg-white">
             <div class="row">
                 <div class="col-xs-12">
                     {{ form_errors(form) }}
                     {% block aboveTabsContent %}{% endblock %}
                     {{ customContent('tabs.above', mauticTemplateVars) }}
-                    {{- include('MauticCoreBundle:Helper:tabs.html.php', {'tabs' : tabs}) -}}
+                    {{- include('MauticCoreBundle:Helper:tabs.html.twig', {'tabs' : tabs}) -}}
                     <div class="pr-md pl-md">
-                        {% if block('content') is not empty %}
-                            {{ block('content') }}
+                        {% if block('_content') is defined %}
+                            {{ block('_content') }}
                         {% else %}
                             {{ form_rest(form) }}
                         {% endif %}
@@ -22,10 +23,11 @@
                 </div>
             </div>
         </div>
-        {% if block('rightFormContent') is not empty %}
+        {% set rightContent = block('rightFormContent') %}
+        {% if rightContent is not empty %}
         <div class="col-md-3 bg-white height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
-                {{ block('rightFormContent') }}
+                {{rightContent|raw }}
             </div>
         </div>
         {% endif %}
