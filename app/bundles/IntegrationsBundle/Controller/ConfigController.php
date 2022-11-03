@@ -249,6 +249,7 @@ class ConfigController extends AbstractFormController
             'enabled'       => $this->integrationConfiguration->getIsPublished(),
             'name'          => $this->integrationConfiguration->getName(),
             'mauticContent' => 'integrationsConfig',
+            'flashes'       => $this->getFlashContent(),
         ];
 
         if ($this->integrationObject instanceof ConfigFormAuthorizeButtonInterface) {

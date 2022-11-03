@@ -15136,16 +15136,6 @@ parameters:
 			path: app/bundles/CoreBundle/Form/EventListener/FormExitSubscriber.php
 
 		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Extension\\\\CustomFormExtension\\:\\:buildForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/Extension/CustomFormExtension.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Form\\\\Extension\\\\CustomFormExtension\\:\\:buildForm\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Form/Extension/CustomFormExtension.php
-
-		-
 			message: "#^Cannot call method getCreatedBy\\(\\) on class\\-string\\|object\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Form/Type/AbstractFormStandardType.php

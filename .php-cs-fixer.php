@@ -1,5 +1,7 @@
 <?php
 
+require 'autoload.php';
+
 $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__.'/app/bundles')
     ->exclude('CoreBundle/Tests/_support/_generated')
@@ -33,5 +35,7 @@ return (new PhpCsFixer\Config())
         'header_comment'        => [
             'header' => '',
         ],
+        'Mautic/no_table_prefix_definition_in_tests' => true,
     ])
+    ->registerCustomFixers([new Mautic\CodingStandards\PhpCSFixer\NoTablePrefixDefinitionInTestsFixer()])
     ->setFinder($finder);

@@ -851,6 +851,24 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "putzwasser",
+      "name": "putzwasser",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26040044?v=4",
+      "profile": "https://github.com/putzwasser",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "beetofly",
+      "name": "erk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/105105707?v=4",
+      "profile": "https://github.com/beetofly",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
