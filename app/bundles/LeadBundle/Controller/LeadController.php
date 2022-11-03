@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
@@ -1381,10 +1382,17 @@ class LeadController extends FormController
 
                     $bodyCheck = trim(strip_tags($email['body']));
                     if (!empty($bodyCheck)) {
+                        /** @var MailHelper $mailer */
                         $mailer = $this->get('mautic.helper.mailer')->getMailer();
 
                         // To lead
                         $mailer->addTo($leadEmail, $leadName);
+
+                        if (!empty($email[EmailType::REPLY_TO_ADDRESS])) {
+                            $addresses = explode(',', $email[EmailType::REPLY_TO_ADDRESS]);
+
+                            $mailer->setReplyTo($addresses);
+                        }
 
                         // From user
                         $user = $this->get('mautic.helper.user')->getUser();

@@ -7,6 +7,7 @@ if ($dnc && \Mautic\LeadBundle\Entity\DoNotContact::BOUNCED === $dnc->getReason(
 
     echo $view['form']->row($form['fromname']);
     echo $view['form']->row($form['from']);
+    echo $view['form']->row($form['replyToAddress']);
     echo $view['form']->row($form['subject']);
     echo $view['form']->row($form['body']);
     echo $view['form']->row($form['templates']);
