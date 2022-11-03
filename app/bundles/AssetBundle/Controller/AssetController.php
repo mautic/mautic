@@ -177,6 +177,8 @@ class AssetController extends FormController
 
         $templ = $this->request->get('templ') ?? 'twig';
 
+        $templ = $this->request->get('templ') ?? 'twig';
+
         return $this->delegateView([
             'returnUrl'      => $action,
             'viewParameters' => [

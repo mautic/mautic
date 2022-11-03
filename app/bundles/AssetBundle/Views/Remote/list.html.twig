@@ -4,7 +4,7 @@
             <input type='text' class='remote-file-search form-control mb-lg' autocomplete='off' placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" />
 
             <div class="list-group remote-file-list">
-                {% if items.dirs is defined %}
+                {% if array_key_exists('dirs', items) %}
                     {% for item in items.dirs %}
                         <a class="list-group-item" href="#" onclick="Mautic.updateRemoteBrowser('{{ integration.getName() }}', '/{{ item|trim('/','right') }}');">
                             {{ item }}

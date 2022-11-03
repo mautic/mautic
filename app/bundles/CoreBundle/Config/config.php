@@ -1178,6 +1178,10 @@ return [
                 ],
                 'tag'       => 'twig.extension',
             ],
+            'templating.twig.extension.object' => [
+                'class' => \Mautic\CoreBundle\Templating\Twig\Extension\ObjectExtension::class,
+                'tag'   => 'twig.extension',
+            ],
             'mautic.doctrine.loader.mautic_fixtures_loader' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
                 'arguments' => [
