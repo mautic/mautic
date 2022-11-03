@@ -28,7 +28,7 @@ class EmailType extends AbstractType
         $this->userHelper = $userHelper;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['body' => 'html']));
 
@@ -53,7 +53,7 @@ class EmailType extends AbstractType
                 'label'      => 'mautic.lead.email.from_name',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'    => 'form-control',
                     'preaddon' => 'fa fa-user',
                 ],
                 'required'   => false,
@@ -69,7 +69,7 @@ class EmailType extends AbstractType
                 'label'       => 'mautic.lead.email.from_email',
                 'label_attr'  => ['class' => 'control-label'],
                 'attr'        => [
-                    'class' => 'form-control',
+                    'class'    => 'form-control',
                     'preaddon' => 'fa fa-envelope',
                 ],
                 'required'    => false,
