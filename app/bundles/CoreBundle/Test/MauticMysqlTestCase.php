@@ -216,7 +216,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function dumpToFile(string $sqlDumpFile): void
     {
         $connection = $this->connection;
-        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
+        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}"  > "${:db_backup_file}"  --column-statistics=0';
         $envVars    = [
             'MYSQL_PWD'      => $connection->getPassword(),
             'db_host'        => $connection->getHost(),

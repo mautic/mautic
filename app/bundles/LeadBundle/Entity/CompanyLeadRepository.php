@@ -166,7 +166,7 @@ class CompanyLeadRepository extends CommonRepository
         }
     }
 
-    public function removeContactPrimaryCompany(int $leadId)
+    public function removeContactPrimaryCompany(int $leadId): void
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
