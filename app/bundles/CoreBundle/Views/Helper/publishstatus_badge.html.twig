@@ -1,0 +1,4 @@
+{% set publishStatus, cases = entity.getPublishStatus(), {'published': 'success', 'unpublished': 'danger', 'expired': 'danger', 'pending': 'warning'} %}
+{% set labelColor = cases[entity.getPublishStatus()] %}
+{% set labelText = ('mautic.core.form.' ~ publishStatus)|trans %}
+<h4 class="fw-sb"><span class="tt-u label label-{{ labelColor }}">{{ labelText }}</span></h4>

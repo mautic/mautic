@@ -26,14 +26,14 @@
 {% endif %}
 {% set attr = form.vars.attr %}
 
-{# {% if block('formAttr') is defined and block('formAttr') is not empty %} #}
-    {# {% set attr = attr|merge(block('formAttr')) %} #}
-{# {% endif %} #}
+{% if block('formAttr') is defined and block('formAttr') is not empty %}
+    {% set attr = attr|merge(block('formAttr')) %}
+{% endif %}
 
 {% block content %}
-{# {{ form_start(form, {'attr': attr}) }}
+{{ form_start(form, {'attr': attr}) }}
 {% block mainFormContent %}{% endblock %}
 {{ form_end(form) }}
-{% block postFormContent %}{% endblock %} #}
+{% block postFormContent %}{% endblock %}
 {% endblock %}
 
