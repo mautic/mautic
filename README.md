@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-91-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-92-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -192,6 +192,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://github.com/T0mTom"><img src="https://avatars.githubusercontent.com/u/9713824?v=4?s=100" width="100px;" alt="Tomazz Jurich"/><br /><sub><b>Tomazz Jurich</b></sub></a><br /><a href="#userTesting-T0mTom" title="User Testing">📓</a></td>
       <td align="center"><a href="https://github.com/putzwasser"><img src="https://avatars.githubusercontent.com/u/26040044?v=4?s=100" width="100px;" alt="putzwasser"/><br /><sub><b>putzwasser</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Aputzwasser" title="Bug reports">🐛</a></td>
       <td align="center"><a href="https://github.com/beetofly"><img src="https://avatars.githubusercontent.com/u/105105707?v=4?s=100" width="100px;" alt="erk"/><br /><sub><b>erk</b></sub></a><br /><a href="#userTesting-beetofly" title="User Testing">📓</a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://github.com/doppelD-LF"><img src="https://avatars.githubusercontent.com/u/77049101?v=4?s=100" width="100px;" alt="Daniel"/><br /><sub><b>Daniel</b></sub></a><br /><a href="#userTesting-doppelD-LF" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
