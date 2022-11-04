@@ -17,12 +17,12 @@ class AppExtension extends AbstractExtension
         ];
     }
 
-    public function isInstanceof($var, $instance)
+    public function isInstanceof(mixed $var, string $instance): bool
     {
         return $var instanceof $instance;
     }
 
-    public function is_string($value)
+    public function is_string(mixed $value): bool
     {
         return is_string($value);
     }
