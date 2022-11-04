@@ -3,8 +3,11 @@
 namespace Mautic\CoreBundle\Event;
 
 use Symfony\Bundle\FrameworkBundle\Templating\PhpEngine;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @deprecated Deprecated in Mautic 4.3. Will be removed in Mautic 5.0
+ */
 class SidebarCanvasEvent extends Event
 {
     /**

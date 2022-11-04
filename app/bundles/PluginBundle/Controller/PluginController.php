@@ -258,7 +258,7 @@ class PluginController extends FormController
                             $this->get('monolog.logger.mautic')->info('Event dispatcher has integration config save listeners.');
                             $event = new PluginIntegrationEvent($integrationObject);
 
-                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+                            $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
                         }
@@ -271,11 +271,11 @@ class PluginController extends FormController
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
                         $event = $this->dispatcher->dispatch(
-                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
                                 $integrationObject->getAuthLoginUrl()
-                            )
+                            ),
+                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
                         );
                         $oauthUrl = $event->getAuthUrl();
 
@@ -425,7 +425,7 @@ class PluginController extends FormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_plugin_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticPluginBundle:Plugin:index',
+                'contentTemplate' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'plugin',

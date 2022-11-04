@@ -13,8 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class FieldType.
@@ -47,6 +47,7 @@ class FieldType extends AbstractType
             'inputAttributes'     => 'string',
             'containerAttributes' => 'string',
             'label'               => 'strict_html',
+            'helpMessage'         => 'strict_html',
         ];
 
         $addHelpMessage         =

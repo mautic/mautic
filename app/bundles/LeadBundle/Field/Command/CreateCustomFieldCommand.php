@@ -13,28 +13,17 @@ use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommand extends ContainerAwareCommand
+class CreateCustomFieldCommand extends Command
 {
-    /**
-     * @var BackgroundService
-     */
-    private $backgroundService;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private BackgroundService $backgroundService;
+    private TranslatorInterface $translator;
+    private LeadFieldRepository $leadFieldRepository;
 
     public function __construct(
         BackgroundService $backgroundService,
@@ -57,7 +46,7 @@ class CreateCustomFieldCommand extends ContainerAwareCommand
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(
                 <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
+The <info>%command.name%</info> command will create a column in a lead_fields table if the process should run in background.
 
 <info>php %command.full_name%</info>
 EOT

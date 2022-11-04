@@ -10,9 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PublicController extends CommonController
 {
-    public function contactDataAction()
+    public function contactDataAction(\Symfony\Component\HttpFoundation\Request $request)
     {
-        $content = $this->get('request')->getContent();
+        $content = $request->getContent();
         if (!empty($content)) {
             $data = json_decode($content, true); // 2nd param to get as array
         } else {

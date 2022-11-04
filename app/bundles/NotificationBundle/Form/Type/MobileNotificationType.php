@@ -209,12 +209,4 @@ class MobileNotificationType extends AbstractType
 
         $resolver->setDefined(['update_select']);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'mobile_notification';
-    }
 }

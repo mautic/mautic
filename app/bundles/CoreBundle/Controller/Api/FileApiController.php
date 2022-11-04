@@ -5,11 +5,8 @@ namespace Mautic\CoreBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class FileApiController.
- */
 class FileApiController extends CommonApiController
 {
     /**
@@ -19,7 +16,7 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';

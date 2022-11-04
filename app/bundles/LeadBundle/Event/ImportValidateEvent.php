@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\Form;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ImportValidateEvent extends Event
 {
     private string $routeObjectName;
     private Form $form;
-    private ?int $ownerId;
-    private ?int $list;
+    private ?int $ownerId = null;
+    private ?int $list    = null;
 
     /**
      * @var mixed[]

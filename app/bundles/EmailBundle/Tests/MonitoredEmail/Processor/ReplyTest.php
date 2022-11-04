@@ -173,7 +173,7 @@ BODY;
 
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::EMAIL_ON_REPLY, $this->isInstanceOf(EmailReplyEvent::class));
+            ->with($this->isInstanceOf(EmailReplyEvent::class), EmailEvents::EMAIL_ON_REPLY);
 
         $this->processor->createReplyByHash($trackingHash, 'api-msg1d');
     }

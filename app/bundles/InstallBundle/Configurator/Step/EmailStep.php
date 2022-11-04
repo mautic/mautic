@@ -75,6 +75,13 @@ class EmailStep implements StepInterface
     public $mailer_amazon_other_region;
 
     /**
+     * Sparkpost Region.
+     *
+     * @var string
+     */
+    public $mailer_sparkpost_region;
+
+    /**
      * Mailer API key if applicable.
      *
      * @var string
@@ -108,7 +115,7 @@ class EmailStep implements StepInterface
      *
      * @var string
      */
-    public $mailer_spool_path = '%kernel.root_dir%/../var/spool';
+    public $mailer_spool_path = '%kernel.project_dir%/var/spool';
 
     public function __construct(Session $session)
     {

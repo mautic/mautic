@@ -9,70 +9,65 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Psr\Container\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallService
 {
-    const CHECK_STEP    = 0;
-    const DOCTRINE_STEP = 1;
-    const USER_STEP     = 2;
-    const EMAIL_STEP    = 3;
-    const FINAL_STEP    = 4;
+    public const CHECK_STEP    = 0;
+    public const DOCTRINE_STEP = 1;
+    public const USER_STEP     = 2;
+    public const EMAIL_STEP    = 3;
+    public const FINAL_STEP    = 4;
 
-    private $configurator;
+    private Configurator $configurator;
+    private CacheHelper $cacheHelper;
+    protected PathsHelper $pathsHelper;
+    private EntityManager $entityManager;
+    private TranslatorInterface $translator;
+    private KernelInterface $kernel;
+    private ValidatorInterface $validator;
+    private UserPasswordEncoder $encoder;
+    private FixturesLoaderInterface $fixturesLoader;
 
-    private $cacheHelper;
-
-    protected $pathsHelper;
-
-    private $entityManager;
-
-    private $translator;
-
-    private $kernel;
-
-    private $validator;
-
-    private $encoder;
-
-    /**
-     * InstallService constructor.
-     */
-    public function __construct(Configurator $configurator,
-                                CacheHelper $cacheHelper,
-                                PathsHelper $pathsHelper,
-                                EntityManager $entityManager,
-                                TranslatorInterface $translator,
-                                KernelInterface $kernel,
-                                ValidatorInterface $validator,
-                                UserPasswordEncoder $encoder)
-    {
-        $this->configurator             = $configurator;
-        $this->cacheHelper              = $cacheHelper;
-        $this->pathsHelper              = $pathsHelper;
-        $this->entityManager            = $entityManager;
-        $this->translator               = $translator;
-        $this->kernel                   = $kernel;
-        $this->validator                = $validator;
-        $this->encoder                  = $encoder;
+    public function __construct(
+        Configurator $configurator,
+        CacheHelper $cacheHelper,
+        PathsHelper $pathsHelper,
+        EntityManager $entityManager,
+        TranslatorInterface $translator,
+        KernelInterface $kernel,
+        ValidatorInterface $validator,
+        UserPasswordEncoder $encoder,
+        FixturesLoaderInterface $fixturesLoader
+    ) {
+        $this->configurator   = $configurator;
+        $this->cacheHelper    = $cacheHelper;
+        $this->pathsHelper    = $pathsHelper;
+        $this->entityManager  = $entityManager;
+        $this->translator     = $translator;
+        $this->kernel         = $kernel;
+        $this->validator      = $validator;
+        $this->encoder        = $encoder;
+        $this->fixturesLoader = $fixturesLoader;
     }
 
     /**
@@ -345,12 +340,12 @@ class InstallService
     /**
      * Load the database fixtures in the database.
      */
-    public function createFixturesStep(ContainerInterface $container): array
+    public function createFixturesStep(): array
     {
         $messages = [];
 
         try {
-            $this->installDatabaseFixtures($container);
+            $this->installDatabaseFixtures();
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.adding.fixtures',
@@ -367,22 +362,12 @@ class InstallService
      *
      * @throws \InvalidArgumentException
      */
-    public function installDatabaseFixtures(ContainerInterface $container): void
+    public function installDatabaseFixtures(): void
     {
-        $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
-        /** @phpstan-ignore-next-line */
-        $loader = new ContainerAwareLoader($container);
-
-        foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
-            }
-        }
-
-        $fixtures = $loader->getFixtures();
+        $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
         if (!$fixtures) {
-            throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
+            throw new \InvalidArgumentException('Could not find any fixtures to load with the "group_install" group.');
         }
 
         $purger = new ORMPurger($this->entityManager);
@@ -406,12 +391,13 @@ class InstallService
 
         //ensure the username and email are unique
         try {
-            $existingUser = $entityManager->getRepository('MauticUserBundle:User')->find(1);
+            /** @var User $existingUser */
+            $existingUser = $entityManager->getRepository(User::class)->find(1);
         } catch (\Exception $e) {
             $existingUser = null;
         }
 
-        if (null != $existingUser) {
+        if (null !== $existingUser) {
             $user = $existingUser;
         } else {
             $user = new User();
@@ -464,15 +450,15 @@ class InstallService
 
         $encoder = $this->encoder;
 
-        $user->setFirstName($data['firstname']);
-        $user->setLastName($data['lastname']);
-        $user->setUsername($data['username']);
-        $user->setEmail($data['email']);
+        $user->setFirstName(InputHelper::clean($data['firstname']));
+        $user->setLastName(InputHelper::clean($data['lastname']));
+        $user->setUsername(InputHelper::clean($data['username']));
+        $user->setEmail(InputHelper::email($data['email']));
         $user->setPassword($encoder->encodePassword($user, $data['password']));
 
         $adminRole = null;
         try {
-            $adminRole = $entityManager->getReference('MauticUserBundle:Role', 1);
+            $adminRole = $entityManager->getReference(Role::class, 1);
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.getting.role',

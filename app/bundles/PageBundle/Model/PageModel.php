@@ -19,6 +19,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -35,9 +36,9 @@ use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class PageModel extends FormModel
 {
@@ -110,9 +111,8 @@ class PageModel extends FormModel
      */
     private $contactTracker;
 
-    /**
-     * PageModel constructor.
-     */
+    private ContactRequestHelper $contactRequestHelper;
+
     public function __construct(
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
@@ -124,7 +124,8 @@ class PageModel extends FormModel
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        ContactRequestHelper $contactRequestHelper
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -138,6 +139,7 @@ class PageModel extends FormModel
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->contactRequestHelper = $contactRequestHelper;
     }
 
     /**
@@ -326,7 +328,7 @@ class PageModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -459,7 +461,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->contactRequestHelper->getContactFromQuery($query);
 
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
@@ -629,43 +631,41 @@ class PageModel extends FormModel
         // Check if this is a unique page hit
         $isUnique = $this->getHitRepository()->isUniquePageHit($page, $trackingId, $lead);
 
-        if (!empty($page)) {
-            if ($page instanceof Page) {
-                $hit->setPageLanguage($page->getLanguage());
+        if ($page instanceof Page) {
+            $hit->setPageLanguage($page->getLanguage());
 
-                $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
+            $isVariant = ($isUnique) ? $page->getVariantStartDate() : false;
 
-                try {
-                    $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
-                } catch (\Exception $exception) {
+            try {
+                $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
+            } catch (\Exception $exception) {
+                $this->logger->addError(
+                    $exception->getMessage(),
+                    ['exception' => $exception]
+                );
+            }
+        } elseif ($page instanceof Redirect) {
+            try {
+                $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
+
+                // If this is a trackable, up the trackable counts as well
+                if ($hit->getSource() && $hit->getSourceId()) {
+                    $this->pageTrackableModel->getRepository()->upHitCount(
+                        $page->getId(),
+                        $hit->getSource(),
+                        $hit->getSourceId(),
+                        1,
+                        $isUnique
+                    );
+                }
+            } catch (\Exception $exception) {
+                if (MAUTIC_ENV === 'dev') {
+                    throw $exception;
+                } else {
                     $this->logger->addError(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
-                }
-            } elseif ($page instanceof Redirect) {
-                try {
-                    $this->pageRedirectModel->getRepository()->upHitCount($page->getId(), 1, $isUnique);
-
-                    // If this is a trackable, up the trackable counts as well
-                    if ($hit->getSource() && $hit->getSourceId()) {
-                        $this->pageTrackableModel->getRepository()->upHitCount(
-                            $page->getId(),
-                            $hit->getSource(),
-                            $hit->getSourceId(),
-                            1,
-                            $isUnique
-                        );
-                    }
-                } catch (\Exception $exception) {
-                    if (MAUTIC_ENV === 'dev') {
-                        throw $exception;
-                    } else {
-                        $this->logger->addError(
-                            $exception->getMessage(),
-                            ['exception' => $exception]
-                        );
-                    }
                 }
             }
         }
@@ -694,7 +694,7 @@ class PageModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
+                if (($pos = strpos(';q=', $l)) !== false) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
@@ -719,7 +719,7 @@ class PageModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
     }
 
@@ -763,7 +763,7 @@ class PageModel extends FormModel
     public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }

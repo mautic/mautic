@@ -67,7 +67,7 @@ class ListController extends CommonController
                     'tmpl'              => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:list.html.php',
+                'contentTemplate' => 'MarketplaceBundle:Package:list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'route'         => $route,

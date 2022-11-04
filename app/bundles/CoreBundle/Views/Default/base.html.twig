@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+    {{ include('MauticCoreBundle:Default:head.html.twig') }}
+    <body class="header-fixed">
+        <section id="app-wrapper">
+            {{ outputScripts('bodyOpen') }}
+
+            <aside class="app-sidebar sidebar-left">
+                {{ include('MauticCoreBundle:LeftPanel:index.html.twig') }}
+            </aside>
+
+            <aside class="app-sidebar sidebar-right">
+                {{ include('MauticCoreBundle:RightPanel:index.html.twig') }}
+            </aside>
+
+            <header id="app-header" class="navbar">
+                {{ include('MauticCoreBundle:Default:navbar.html.twig') }}
+
+                {{ include('MauticCoreBundle:Notification:flashes.html.twig') }}
+            </header>
+
+            <!-- start: app-footer(need to put on top of #app-content)-->
+            <footer id="app-footer">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-xs-6 text-muted">{% trans with {'%date%': 'now' | date('Y') } %}mautic.core.copyright{% endtrans %}</div>
+                        <div class="col-xs-6 text-muted text-right small">v{{ mauticAppVersion() }}</div>
+                    </div>
+                </div>
+            </footer>
+            <!--/ end: app-footer -->
+
+            <section id="app-content">
+                {{ include('MauticCoreBundle:Default:output.html.twig') }}
+            </section>
+
+            <script>
+                Mautic.onPageLoad('body');
+                {% if app.environment is same as 'dev' %}
+                mQuery( document ).ajaxComplete(function(event, XMLHttpRequest, ajaxOption){
+                    if(XMLHttpRequest.responseJSON && typeof XMLHttpRequest.responseJSON.ignore_wdt == 'undefined' && XMLHttpRequest.getResponseHeader('x-debug-token')) {
+                        if (mQuery('[class*="sf-tool"]').length) {
+                            mQuery('[class*="sf-tool"]').remove();
+                        }
+
+                        mQuery.get(mauticBaseUrl + '_wdt/'+XMLHttpRequest.getResponseHeader('x-debug-token'),function(data){
+                            mQuery('body').append('<div class="sf-toolbar-reload">'+data+'</div>');
+                        });
+                    }
+                });
+                {% endif %}
+            </script>
+            {{ outputScripts('bodyClose') }}
+            {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+                id: 'MauticSharedModal',
+                footerButtons: true
+            }) }}
+        </section>
+    </body>
+</html>

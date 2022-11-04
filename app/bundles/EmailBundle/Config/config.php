@@ -5,19 +5,19 @@ return [
         'main' => [
             'mautic_email_index' => [
                 'path'       => '/emails/{page}',
-                'controller' => 'MauticEmailBundle:Email:index',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::indexAction',
             ],
             'mautic_email_graph_stats' => [
                 'path'       => '/emails-graph-stats/{objectId}/{isVariant}/{dateFrom}/{dateTo}',
-                'controller' => 'MauticEmailBundle:EmailGraphStats:view',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailGraphStatsController::viewAction',
             ],
             'mautic_email_action' => [
                 'path'       => '/emails/{objectAction}/{objectId}',
-                'controller' => 'MauticEmailBundle:Email:execute',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::executeAction',
             ],
             'mautic_email_contacts' => [
                 'path'       => '/emails/view/{objectId}/contact/{page}',
-                'controller' => 'MauticEmailBundle:Email:contacts',
+                'controller' => 'Mautic\EmailBundle\Controller\EmailController::contactsAction',
             ],
         ],
         'api' => [
@@ -25,56 +25,56 @@ return [
                 'standard_entity' => true,
                 'name'            => 'emails',
                 'path'            => '/emails',
-                'controller'      => 'MauticEmailBundle:Api\EmailApi',
+                'controller'      => 'Mautic\EmailBundle\Controller\Api\EmailApiController',
             ],
             'mautic_api_sendemail' => [
                 'path'       => '/emails/{id}/send',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:send',
+                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendAction',
                 'method'     => 'POST',
             ],
             'mautic_api_sendcontactemail' => [
                 'path'       => '/emails/{id}/contact/{leadId}/send',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:sendLead',
+                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::sendLeadAction',
                 'method'     => 'POST',
             ],
             'mautic_api_reply' => [
                 'path'       => '/emails/reply/{trackingHash}',
-                'controller' => 'MauticEmailBundle:Api\EmailApi:reply',
+                'controller' => 'Mautic\EmailBundle\Controller\Api\EmailApiController::replyAction',
                 'method'     => 'POST',
             ],
         ],
         'public' => [
             'mautic_plugin_tracker' => [
                 'path'         => '/plugin/{integration}/tracking.gif',
-                'controller'   => 'MauticEmailBundle:Public:pluginTrackingGif',
+                'controller'   => 'Mautic\EmailBundle\Controller\PublicController::pluginTrackingGifAction',
                 'requirements' => [
                     'integration' => '.+',
                 ],
             ],
             'mautic_email_tracker' => [
                 'path'       => '/email/{idHash}.gif',
-                'controller' => 'MauticEmailBundle:Public:trackingImage',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::trackingImageAction',
             ],
             'mautic_email_webview' => [
                 'path'       => '/email/view/{idHash}',
-                'controller' => 'MauticEmailBundle:Public:index',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::indexAction',
             ],
             'mautic_email_unsubscribe' => [
                 'path'       => '/email/unsubscribe/{idHash}',
-                'controller' => 'MauticEmailBundle:Public:unsubscribe',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::unsubscribeAction',
             ],
             'mautic_email_resubscribe' => [
                 'path'       => '/email/resubscribe/{idHash}',
-                'controller' => 'MauticEmailBundle:Public:resubscribe',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::resubscribeAction',
             ],
             'mautic_mailer_transport_callback' => [
                 'path'       => '/mailer/{transport}/callback',
-                'controller' => 'MauticEmailBundle:Public:mailerCallback',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::mailerCallbackAction',
                 'method'     => ['GET', 'POST'],
             ],
             'mautic_email_preview' => [
                 'path'       => '/email/preview/{objectId}',
-                'controller' => 'MauticEmailBundle:Public:preview',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
         ],
     ],
@@ -196,6 +196,7 @@ return [
                     'mautic.lead.model.company_report_data',
                     'mautic.email.repository.stat',
                     'mautic.generated.columns.provider',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             'mautic.email.leadbundle.subscriber' => [
@@ -310,6 +311,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.stage.model.stage',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.theme',
                 ],
             ],
             'mautic.form.type.email.utm_tags' => [
@@ -623,6 +625,7 @@ return [
                     'mautic.email.model.transport_callback',
                     'mautic.sparkpost.factory',
                     'monolog.logger.mautic',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.sparkpost.factory' => [
@@ -827,6 +830,7 @@ return [
                     'mautic.lead.model.dnc',
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
@@ -875,6 +879,7 @@ return [
                     'swiftmailer.mailer.default.transport.real',
                     'event_dispatcher',
                     'mautic.helper.core_parameters',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -946,7 +951,7 @@ return [
         'mailer_amazon_other_region'     => null,
         'mailer_custom_headers'          => [],
         'mailer_spool_type'              => 'memory', //memory = immediate; file = queue
-        'mailer_spool_path'              => '%kernel.root_dir%/../var/spool',
+        'mailer_spool_path'              => '%kernel.project_dir%/var/spool',
         'mailer_spool_msg_limit'         => null,
         'mailer_spool_time_limit'        => null,
         'mailer_spool_recover_timeout'   => 900,
@@ -1010,5 +1015,7 @@ return [
         'mailer_mailjet_sandbox_default_mail' => null,
         'disable_trackable_urls'              => false,
         'theme_email_default'                 => 'blank',
+        'mailer_sparkpost_region'             => 'us',
+        'mailer_memory_msg_limit'             => 100,
     ],
 ];

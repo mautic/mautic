@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -16,6 +16,7 @@ use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadClickData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadDncData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData;
 use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadSegmentsData;
+use Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadTagData;
 use Mautic\PageBundle\DataFixtures\ORM\LoadPageCategoryData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
@@ -45,7 +46,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadCompanyData::class,
                 LoadLeadListData::class,
                 LoadLeadData::class,
-                LoadLeadFieldData::class,
+                LeadFieldData::class,
                 LoadPageHitData::class,
                 LoadSegmentsData::class,
                 LoadPageCategoryData::class,
@@ -53,6 +54,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadUserData::class,
                 LoadDncData::class,
                 LoadClickData::class,
+                LoadTagData::class,
             ],
             false
         )->getReferenceRepository();
@@ -118,6 +120,10 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'clicked-link-in-any-email-on-specific-date'                         => 2,
             'clicked-link-in-any-sms'                                            => 3,
             'clicked-link-in-any-sms-on-specific-date'                           => 2,
+            'tags-empty'                                                         => 52,
+            'tags-not-empty'                                                     => 2,
+            'segment-having-company'                                             => 50,
+            'segment-not-having-company'                                         => 4,
         ];
     }
 

@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\InstallCommand;
 use Mautic\MarketplaceBundle\DTO\PackageDetail;
 use Mautic\MarketplaceBundle\Exception\ApiException;
-use Mautic\MarketplaceBundle\Exception\InstallException;
 use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use PHPUnit\Framework\Assert;
@@ -153,14 +152,14 @@ final class InstallCommandTest extends AbstractMauticTestCase
             ->willReturn($this->getPackageDetail());
 
         $command = new InstallCommand($this->composerHelper, $this->packageModel);
-
-        $this->expectException(InstallException::class);
-
-        $result = $this->testSymfonyCommand(
+        $result  = $this->testSymfonyCommand(
             'mautic:marketplace:install',
             ['package' => $packageName],
             $command
         );
+
+        Assert::assertSame(1, $result->getStatusCode());
+        Assert::assertSame("Installing mautic/crash-package, this might take a while...\nError while installing this plugin.\nSomething went wrong during the installation\n", $result->getDisplay());
     }
 
     private function getPackageDetail(): PackageDetail
