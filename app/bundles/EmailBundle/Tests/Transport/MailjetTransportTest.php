@@ -37,7 +37,8 @@ class MailjetTransportTest extends \PHPUnit\Framework\TestCase
                 [$this->equalTo('2'), 'blocked: blocked', DoNotContact::BOUNCED],
                 [$this->equalTo('3'), 'User reported email as spam, source: spam button', DoNotContact::UNSUBSCRIBED],
                 [$this->equalTo('4'), 'bounced: bounced', DoNotContact::BOUNCED],
-                [$this->equalTo('5'), 'bounced: bounced', DoNotContact::BOUNCED]
+                [$this->equalTo('5'), 'bounced: bounced', DoNotContact::BOUNCED],
+                [$this->equalTo('6'), 'bounced: bounced', DoNotContact::BOUNCED]
             );
 
         $this->transportCallback->expects($this->once())
@@ -152,6 +153,21 @@ class MailjetTransportTest extends \PHPUnit\Framework\TestCase
     "hard_bounce": "",
     "error_related_to": "bounced",
     "error": "bounce without hash"
+  },
+ {
+    "event": "bounce",
+    "time": 1513975372,
+    "MessageID": 0,
+    "email": "bounce@test-test.com",
+    "mj_campaign_id": 0,
+    "mj_contact_id": 0,
+    "customcampaign": "",
+    "CustomID": "6-BOUNCE@TEST-TEST.COM",
+    "Payload": "",
+    "blocked": "",
+    "hard_bounce": "",
+    "error_related_to": "bounced",
+    "error": "bounced"
   }
 ]
 JSON;
