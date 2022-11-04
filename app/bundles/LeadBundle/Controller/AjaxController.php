@@ -520,8 +520,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function removeBounceStatusAction(Request $request)
     {
-        $dataArray = ['success' => 0];
-        $dncId     = $request->request->get('id');
+        $dataArray   = ['success' => 0];
+        $dncId       = $request->request->get('id');
+        $channel     = $request->request->get('channel', 'email');
 
         if (!empty($dncId)) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -539,7 +540,7 @@ class AjaxController extends CommonAjaxController
             $lead = $dnc->getLead();
             if ($lead) {
                 // Use lead model to trigger listeners
-                $doNotContact->removeDncForContact($lead->getId(), 'email');
+                $doNotContact->removeDncForContact($lead->getId(), $channel);
             } else {
                 $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
             }
