@@ -8,6 +8,9 @@ use Predis\Replication\ReplicationStrategy;
 
 class MasterOnlyStrategy extends ReplicationStrategy
 {
+    /**
+     * @return mixed[]
+     */
     protected function getReadOnlyOperations(): array
     {
         return [];

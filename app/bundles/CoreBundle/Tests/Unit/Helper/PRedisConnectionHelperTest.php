@@ -69,7 +69,7 @@ class PRedisConnectionHelperTest extends TestCase
         $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix]);
         $options = $client->getOptions();
 
-        Assert::assertInstanceOf(KeyPrefixProcessor::class, $options->prefix);
+        \assert($options->prefix instanceof KeyPrefixProcessor);
         Assert::assertSame($prefix, $options->prefix->getPrefix());
         Assert::assertNull($options->aggregate);
     }
@@ -80,7 +80,7 @@ class PRedisConnectionHelperTest extends TestCase
         $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix, 'replication' => 'sentinel']);
         $options = $client->getOptions();
 
-        Assert::assertInstanceOf(KeyPrefixProcessor::class, $options->prefix);
+        \assert($options->prefix instanceof KeyPrefixProcessor);
         Assert::assertSame($prefix, $options->prefix->getPrefix());
         Assert::assertIsCallable($options->aggregate);
 

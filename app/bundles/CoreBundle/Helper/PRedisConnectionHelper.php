@@ -71,6 +71,10 @@ class PRedisConnectionHelper
         return $redisOptions;
     }
 
+    /**
+     * @param mixed[] $endpoints
+     * @param mixed[] $options
+     */
     public static function createClient(array $endpoints, array $options): Client
     {
         $replication = $options['replication'] ?? null;
