@@ -19,7 +19,7 @@ trait ContextTrait
             return false;
         }
 
-        $type = ($this->event instanceof Event) ? $this->event->getType() : ($this->event['type'] ?? null);
+        $type = ($this->event instanceof Event) ? $this->event->getType() : $this->event['type'];
 
         return strtolower($eventType) === strtolower($type);
     }
