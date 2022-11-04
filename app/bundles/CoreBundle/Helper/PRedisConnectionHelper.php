@@ -79,7 +79,7 @@ class PRedisConnectionHelper
     {
         $replication = $options['replication'] ?? null;
 
-        if ('sentinel_master_only' === $replication) {
+        if ('sentinel' === $replication) {
             $options['aggregate'] = function () {
                 return function ($sentinels, $options) {
                     return new SentinelReplication(

@@ -77,7 +77,7 @@ class PRedisConnectionHelperTest extends TestCase
     public function testCreateClientWithSentinel(): void
     {
         $prefix  = 'somePrefix';
-        $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix, 'replication' => 'sentinel_master_only']);
+        $client  = PRedisConnectionHelper::createClient(['tcp://1.1.1.1'], ['prefix' => $prefix, 'replication' => 'sentinel']);
         $options = $client->getOptions();
 
         \assert($options->prefix instanceof KeyPrefixProcessor);
