@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 class DateTimeHelper
 {
-    const FORMAT_DB = 'Y-m-d H:i:s';
+    public const FORMAT_DB = 'Y-m-d H:i:s';
 
     /**
      * @var string
