@@ -869,6 +869,24 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "doppelD-LF",
+      "name": "Daniel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/77049101?v=4",
+      "profile": "https://github.com/doppelD-LF",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "agencia904",
+      "name": "agencia904",
+      "avatar_url": "https://avatars.githubusercontent.com/u/90470877?v=4",
+      "profile": "https://github.com/agencia904",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
