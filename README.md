@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-93-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-94-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -196,6 +196,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center"><a href="https://github.com/doppelD-LF"><img src="https://avatars.githubusercontent.com/u/77049101?v=4?s=100" width="100px;" alt="Daniel"/><br /><sub><b>Daniel</b></sub></a><br /><a href="#userTesting-doppelD-LF" title="User Testing">📓</a></td>
       <td align="center"><a href="https://github.com/agencia904"><img src="https://avatars.githubusercontent.com/u/90470877?v=4?s=100" width="100px;" alt="agencia904"/><br /><sub><b>agencia904</b></sub></a><br /><a href="#userTesting-agencia904" title="User Testing">📓</a></td>
+      <td align="center"><a href="https://marceloflorentino.000webhostapp.com"><img src="https://avatars.githubusercontent.com/u/45359558?v=4?s=100" width="100px;" alt="mbfds"/><br /><sub><b>mbfds</b></sub></a><br /><a href="#userTesting-mbfds" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
