@@ -896,6 +896,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "lucaslazarinii",
+      "name": "Lucas Lazarini",
+      "avatar_url": "https://avatars.githubusercontent.com/u/106190294?v=4",
+      "profile": "https://github.com/lucaslazarinii",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
