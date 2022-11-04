@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Exception;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -13,16 +14,17 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ListController extends FormController
 {
     use EntityContactsTrait;
 
-    const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
-    const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+    public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
     /**
      * @var array
@@ -35,6 +37,8 @@ class ListController extends FormController
      * @param int $page
      *
      * @return JsonResponse|Response
+     *
+     * @throws Exception
      */
     public function indexAction($page = 1)
     {
@@ -85,7 +89,7 @@ class ListController extends FormController
             $filter['force'] = "($mine or $global)";
         }
 
-        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -103,7 +107,7 @@ class ListController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:List:index',
+                'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'mauticContent' => 'leadlist',
@@ -115,7 +119,7 @@ class ListController extends FormController
         $session->set('mautic.segment.page', $page);
 
         $listIds    = array_keys($items->getIterator()->getArrayCopy());
-        $leadCounts = (!empty($listIds)) ? $model->getRepository()->getLeadCount($listIds) : [];
+        $leadCounts = (!empty($listIds)) ? $model->getSegmentContactCountFromCache($listIds) : [];
 
         $parameters = [
             'items'                          => $items,
@@ -193,7 +197,7 @@ class ListController extends FormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticLeadBundle:List:index',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_segment_index',
                         'mauticContent' => 'leadlist',
@@ -422,13 +426,13 @@ class ListController extends FormController
         if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_segment_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
-            $contentTemplate = 'MauticLeadBundle:List:view';
+            $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::viewAction';
         } else {
             //set the page we came from
             $page            = $this->get('session')->get('mautic.segment.page', 1);
             $returnUrl       = $this->generateUrl('mautic_segment_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
-            $contentTemplate = 'MauticLeadBundle:List:index';
+            $contentTemplate = 'Mautic\LeadBundle\Controller\ListController::indexAction';
         }
 
         return [
@@ -460,7 +464,7 @@ class ListController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:List:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'lead',
@@ -536,7 +540,7 @@ class ListController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:List:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'lead',
@@ -637,7 +641,7 @@ class ListController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticLeadBundle:Lead:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\LeadController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'lead',
@@ -739,7 +743,7 @@ class ListController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticLeadBundle:List:index',
+                'contentTemplate' => 'Mautic\LeadBundle\Controller\ListController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'mauticContent' => 'list',
@@ -805,15 +809,6 @@ class ListController extends FormController
                         'filter_added'     => $translator->trans('mautic.segment.contact.filter.added'),
                     ],
                 ],
-                'contacts' => $this->forward(
-                    'MauticLeadBundle:List:contacts',
-                    [
-                        'objectId'   => $list->getId(),
-                        'page'       => $this->get('session')->get('mautic.segment.contact.page', 1),
-                        'ignoreAjax' => true,
-                        'filters'    => $filters,
-                    ]
-                )->getContent(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:details.html.php',
             'passthroughVars' => [
@@ -886,7 +881,7 @@ class ListController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
 
                     $newFilters[$clmn][] = $fltr;
                 }
@@ -947,13 +942,17 @@ class ListController extends FormController
     }
 
     /**
-     * @param     $objectId
+     * @param int $objectId
      * @param int $page
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function contactsAction($objectId, $page = 1)
     {
+        $session = $this->get('session');
+        \assert($session instanceof SessionInterface);
+        $session->set('mautic.segment.contact.page', $page);
+
         $manuallyRemoved = 0;
         $listFilters     = ['manually_removed' => $manuallyRemoved];
         if ('POST' === $this->request->getMethod() && $this->request->request->has('includeEvents')) {

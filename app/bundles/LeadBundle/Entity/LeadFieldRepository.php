@@ -84,7 +84,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return string[][]
      */
     protected function getDefaultOrder()
     {
@@ -367,7 +367,7 @@ class LeadFieldRepository extends CommonRepository
         $qb = $this->createQueryBuilder($this->getTableAlias());
         $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
         $qb->orderBy("{$this->getTableAlias()}.dateAdded", 'ASC');
-        $qb->getMaxResults(1);
+        $qb->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
@@ -380,5 +380,19 @@ class LeadFieldRepository extends CommonRepository
     public function getFieldsByType($type)
     {
         return $this->findBy(['type' => $type]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFieldSchemaData(string $object): array
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
+            ->from($this->_entityName, 'f', 'f.alias')
+            ->where('f.object = :object')
+            ->setParameter('object', $object)
+            ->getQuery()
+            ->execute();
     }
 }

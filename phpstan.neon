@@ -12,7 +12,7 @@ parameters:
 		- app/bundles
 		- app/migrations
 		- plugins
-	excludes_analyse:
+	excludePaths:
 		- *.html.php
 		- *.js.php
 		- *.less.php
@@ -45,3 +45,5 @@ parameters:
 		# Following 2 ignores are there due to https://symfony.com/blog/new-in-symfony-4-3-simpler-event-dispatching
 		- '#Method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) invoked with 2 parameters, 1 required\.#'
 		- '#Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) expects object, string given\.#'
+		# Following will be fixed in new PHP version. See https://github.com/doctrine/dbal/issues/4264
+		- '#Return type of call to static method Doctrine\\DBAL\\DriverManager::getConnection\(\) contains unresolvable type\.#'

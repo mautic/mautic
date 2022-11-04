@@ -12,6 +12,7 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     if (mQuery('#CampaignEventPanel').length) {
+        var tooltipTimeout = null;
         // setup button clicks
         mQuery('#CampaignEventPanelGroups button').on('click', function() {
             var eventType = mQuery(this).data('type');
@@ -55,7 +56,14 @@ Mautic.campaignOnLoad = function (container, response) {
                 Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
             }).on('keyup.tooltip', function() {
                 // Recreate tooltips for those left
-                Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
+                if (tooltipTimeout) {
+                    clearTimeout(tooltipTimeout);
+                }
+
+                // wrap into setTimeout for fast typing users.
+                tooltipTimeout = setTimeout(function () {
+                    Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
+                }, 200);
             });
         });
 
@@ -137,19 +145,42 @@ Mautic.lazyLoadContactListOnCampaignDetail = function() {
  * Update chosen tooltips
  *
  * @param theSelect
- * @param destroy
+ * @param onlyDestroy
  */
-Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy) {
-    mQuery('#'+theSelect+' option').each(function () {
+Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy) {
+    const $select = mQuery('#'+theSelect);
+    const dataAttribute = 'tooltips';
+
+    // create a stack
+    if (undefined === $select.data(dataAttribute)) {
+        $select.data(dataAttribute, []);
+    }
+
+    // remove existing tooltips before we create new ones.
+    const tooltips = $select.data(dataAttribute);
+
+    mQuery.each(tooltips, function (index, $tooltip) {
+        if (undefined === $tooltip) {
+            return;
+        }
+
+        $tooltip.tooltip('hide');
+        $tooltip.tooltip('destroy');
+    });
+    $select.data(dataAttribute, []);
+
+    if (true === onlyDestroy) {
+        return;
+    }
+
+    // create tooltips.
+    $select.find('option').each(function () {
         if (mQuery(this).attr('id')) {
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
-            var chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
+            const chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
 
-            if (destroy) {
-                mQuery(chosenOption).tooltip('destroy');
-            } else {
-                mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
-            }
+            const $tooltip = mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
+            $select.data(dataAttribute).push($tooltip);
         }
     });
 }
@@ -170,12 +201,10 @@ Mautic.campaignOnUnload = function(container) {
  */
 Mautic.campaignEventOnLoad = function (container, response) {
     if (mQuery('#campaignevent_triggerHour').length) {
-        Mautic.campaignEventShowHideIntervalSettings();
         Mautic.campaignEventUpdateIntervalHours();
         mQuery('#campaignevent_triggerHour').on('change', Mautic.campaignEventUpdateIntervalHours);
         mQuery('#campaignevent_triggerRestrictedStartHour').on('change', Mautic.campaignEventUpdateIntervalHours);
         mQuery('#campaignevent_triggerRestrictedStopHour').on('change', Mautic.campaignEventUpdateIntervalHours);
-        mQuery('#campaignevent_triggerIntervalUnit').on('change', Mautic.campaignEventShowHideIntervalSettings);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_0').on('change', Mautic.campaignEventSelectDOW);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_1').on('change', Mautic.campaignEventSelectDOW);
         mQuery('#campaignevent_triggerRestrictedDaysOfWeek_2').on('change', Mautic.campaignEventSelectDOW);
@@ -291,18 +320,6 @@ Mautic.campaignEventUpdateIntervalHours = function () {
         mQuery('#campaignevent_triggerHour').prop('disabled', false);
         mQuery('#campaignevent_triggerRestrictedStartHour').prop('disabled', false);
         mQuery('#campaignevent_triggerRestrictedStopHour').prop('disabled', false);
-    }
-};
-
-/**
- * Show/hide interval settings
- */
-Mautic.campaignEventShowHideIntervalSettings = function() {
-    var unit = mQuery('#campaignevent_triggerIntervalUnit').val();
-    if (unit === 'i' || unit === 'h') {
-        mQuery('#interval_settings').addClass('hide');
-    } else {
-        mQuery('#interval_settings').removeClass('hide');
     }
 };
 

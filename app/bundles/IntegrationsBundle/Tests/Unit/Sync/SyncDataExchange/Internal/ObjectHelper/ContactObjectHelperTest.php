@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Statement;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -50,8 +49,6 @@ class ContactObjectHelperTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->model             = $this->createMock(LeadModel::class);
         $this->repository        = $this->createMock(LeadRepository::class);
         $this->connection        = $this->createMock(Connection::class);
@@ -75,8 +72,8 @@ class ContactObjectHelperTest extends TestCase
             ->method('detachEntity');
 
         $objects = [
-            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 1, new \DateTime()),
-            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 2, new \DateTime()),
+            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 1, new DateTime()),
+            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 2, new DateTime()),
         ];
 
         $objectMappings = $this->getObjectHelper()->create($objects);
@@ -96,8 +93,8 @@ class ContactObjectHelperTest extends TestCase
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
-        $objectChangeDaoA = new ObjectChangeDAO('Test', Contact::NAME, 0, 'MappedObject', 0, new \DateTime());
-        $objectChangeDaoB = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDaoA = new ObjectChangeDAO('Test', Contact::NAME, 0, 'MappedObject', 0, new DateTime());
+        $objectChangeDaoB = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objects          = [$objectChangeDaoA, $objectChangeDaoB];
         $companyId        = 1234;
         $companyValue     = new ReferenceValueDAO();
@@ -107,7 +104,7 @@ class ContactObjectHelperTest extends TestCase
         $emailField       = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
         $companyField     = new FieldDAO(
             MauticSyncDataExchange::OBJECT_COMPANY,
-            new NormalizedValueDAO('reference', $companyValue, $companyValue)
+            new NormalizedValueDAO('reference', $companyValue, 'Company A')
         );
 
         $objectChangeDaoA->addField($emailField);
@@ -127,25 +124,6 @@ class ContactObjectHelperTest extends TestCase
                     $contact2,
                 ]
             );
-
-        $queryBuilder = new QueryBuilder($this->connection);
-        $statement    = $this->createMock(Statement::class);
-
-        $this->connection->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                'SELECT c.companyname FROM '.MAUTIC_TABLE_PREFIX.'companies c WHERE c.id = :id',
-                ['id' => $companyId]
-            )
-            ->willReturn($statement);
-
-        $statement->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn('Company A');
 
         $contact1->expects($this->exactly(2))
             ->method('addUpdatedField')
@@ -170,7 +148,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('addDncForContact')
             ->with(1, 'email', 1, 'Test', true, true, true);
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 1)));
 
         $objects = [
@@ -193,7 +171,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('removeDncForContact')
             ->with(1, 'email');
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 0)));
 
         $objects = [
@@ -216,7 +194,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('addDncForContact')
             ->with(1, 'email', 3, 'Test', true, true, true);
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 4)));
 
         $objects = [

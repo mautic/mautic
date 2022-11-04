@@ -114,8 +114,8 @@ class MappingHelper
         $event->setFieldValues($identifiers);
 
         $this->dispatcher->dispatch(
+            $event,
             IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-            $event
         );
 
         $foundObjects = $event->getFoundObjects();
@@ -257,5 +257,8 @@ class MappingHelper
         $objectMapping->setLastSyncDate($updatedObjectMappingDAO->getObjectModifiedDate());
 
         $this->saveObjectMapping($objectMapping);
+
+        // Make the ObjectMapping available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        $updatedObjectMappingDAO->setObjectMapping($objectMapping);
     }
 }

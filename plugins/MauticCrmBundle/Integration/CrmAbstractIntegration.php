@@ -287,7 +287,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -346,7 +346,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead
@@ -355,7 +355,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);

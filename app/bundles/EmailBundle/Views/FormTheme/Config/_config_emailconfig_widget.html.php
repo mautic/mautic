@@ -60,6 +60,10 @@ $template  = '<div class="col-md-6">{content}</div>';
             </div>
 
             <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_sparkpost_region', $template); ?>
+            </div>
+
+            <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_port', $template); ?>
             </div>

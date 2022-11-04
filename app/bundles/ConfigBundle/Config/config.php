@@ -5,11 +5,11 @@ return [
         'main' => [
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'MauticConfigBundle:Config:execute',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
             ],
             'mautic_sysinfo_index' => [
                 'path'       => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index',
+                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
             ],
         ],
     ],
@@ -64,6 +64,8 @@ return [
                     'mautic.helper.core_parameters',
                     'translator',
                     'doctrine.dbal.default_connection',
+                    'mautic.install.service',
+                    'mautic.install.configurator.step.check',
                 ],
             ],
         ],
@@ -100,7 +102,6 @@ return [
 
     'parameters' => [
         'config_allowed_parameters' => [
-            'kernel.root_dir',
             'kernel.project_dir',
             'kernel.logs_dir',
         ],

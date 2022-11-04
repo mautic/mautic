@@ -5,27 +5,27 @@ return [
         'main' => [
             'mautic_campaignevent_action'  => [
                 'path'       => '/campaigns/events/{objectAction}/{objectId}',
-                'controller' => 'MauticCampaignBundle:Event:execute',
+                'controller' => 'Mautic\CampaignBundle\Controller\EventController::executeAction',
             ],
             'mautic_campaignsource_action' => [
                 'path'       => '/campaigns/sources/{objectAction}/{objectId}',
-                'controller' => 'MauticCampaignBundle:Source:execute',
+                'controller' => 'Mautic\CampaignBundle\Controller\SourceController::executeAction',
             ],
             'mautic_campaign_index'        => [
                 'path'       => '/campaigns/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:index',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
             ],
             'mautic_campaign_action'       => [
                 'path'       => '/campaigns/{objectAction}/{objectId}',
-                'controller' => 'MauticCampaignBundle:Campaign:execute',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::executeAction',
             ],
             'mautic_campaign_contacts'     => [
                 'path'       => '/campaigns/view/{objectId}/contact/{page}',
-                'controller' => 'MauticCampaignBundle:Campaign:contacts',
+                'controller' => 'Mautic\CampaignBundle\Controller\CampaignController::contactsAction',
             ],
             'mautic_campaign_preview'      => [
                 'path'       => '/campaign/preview/{objectId}',
-                'controller' => 'MauticEmailBundle:Public:preview',
+                'controller' => 'Mautic\EmailBundle\Controller\PublicController::previewAction',
             ],
         ],
         'api'  => [
@@ -33,7 +33,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'campaigns',
                 'path'            => '/campaigns',
-                'controller'      => 'MauticCampaignBundle:Api\CampaignApi',
+                'controller'      => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController',
             ],
             'mautic_api_campaigneventsstandard'       => [
                 'standard_entity'     => true,
@@ -43,45 +43,45 @@ return [
                 ],
                 'name'                => 'events',
                 'path'                => '/campaigns/events',
-                'controller'          => 'MauticCampaignBundle:Api\EventApi',
+                'controller'          => 'Mautic\CampaignBundle\Controller\Api\EventApiController',
             ],
             'mautic_api_campaigns_events_contact'     => [
                 'path'       => '/campaigns/events/contact/{contactId}',
-                'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::getContactEventsAction',
                 'method'     => 'GET',
             ],
             'mautic_api_campaigns_edit_contact_event' => [
                 'path'       => '/campaigns/events/{eventId}/contact/{contactId}/edit',
-                'controller' => 'MauticCampaignBundle:Api\EventLogApi:editContactEvent',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::editContactEventAction',
                 'method'     => 'PUT',
             ],
             'mautic_api_campaigns_batchedit_events'   => [
                 'path'       => '/campaigns/events/batch/edit',
-                'controller' => 'MauticCampaignBundle:Api\EventLogApi:editEvents',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::editEventsAction',
                 'method'     => 'PUT',
             ],
             'mautic_api_campaign_contact_events'      => [
                 'path'       => '/campaigns/{campaignId}/events/contact/{contactId}',
-                'controller' => 'MauticCampaignBundle:Api\EventLogApi:getContactEvents',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\EventLogApiController::getContactEventsAction',
                 'method'     => 'GET',
             ],
             'mautic_api_campaigngetcontacts'          => [
                 'path'       => '/campaigns/{id}/contacts',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:getContacts',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::getContactsAction',
             ],
             'mautic_api_campaignaddcontact'           => [
                 'path'       => '/campaigns/{id}/contact/{leadId}/add',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:addLead',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::addLeadAction',
                 'method'     => 'POST',
             ],
             'mautic_api_campaignremovecontact'        => [
                 'path'       => '/campaigns/{id}/contact/{leadId}/remove',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:removeLead',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::removeLeadAction',
                 'method'     => 'POST',
             ],
             'mautic_api_contact_clone_campaign' => [
                 'path'       => '/campaigns/clone/{campaignId}',
-                'controller' => 'MauticCampaignBundle:Api\CampaignApi:cloneCampaign',
+                'controller' => 'Mautic\CampaignBundle\Controller\Api\CampaignApiController::cloneCampaignAction',
                 'method'     => 'POST',
             ],
         ],
@@ -119,14 +119,6 @@ return [
                     'mautic.campaign.event_collector',
                     'translator',
                     'doctrine.orm.entity_manager',
-                    'router',
-                ],
-            ],
-            'mautic.campaign.calendarbundle.subscriber' => [
-                'class'     => \Mautic\CampaignBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'translator',
                     'router',
                 ],
             ],
@@ -460,7 +452,7 @@ return [
                     'mautic.campaign.event_collector',
                     'mautic.campaign.scheduler',
                     'mautic.tracker.contact',
-                    'mautic.campaign.repository.lead',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.executioner.inactive'     => [
@@ -474,6 +466,12 @@ return [
                     'mautic.campaign.event_executioner',
                 ],
             ],
+            'mautic.campaign.helper.decision' => [
+                'class'     => \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class,
+                'arguments' => [
+                    'mautic.campaign.repository.lead',
+                ],
+            ],
             'mautic.campaign.helper.inactivity' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Helper\InactiveHelper::class,
                 'arguments' => [
@@ -482,6 +480,7 @@ return [
                     'mautic.campaign.repository.lead_event_log',
                     'mautic.campaign.repository.event',
                     'monolog.logger.mautic',
+                    'mautic.campaign.helper.decision',
                 ],
             ],
             'mautic.campaign.helper.removed_contact_tracker' => [
@@ -565,6 +564,9 @@ return [
                     'mautic.campaign.executioner.inactive',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.lead.model.list',
+                    'mautic.helper.segment.count.cache',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -594,6 +596,7 @@ return [
                     'mautic.campaign.membership.builder',
                     'monolog.logger.mautic',
                     'mautic.helper.template.formatter',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],
@@ -602,6 +605,7 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.campaign.model.summary',
+                    'mautic.helper.paths',
                 ],
                 'tag' => 'console.command',
             ],

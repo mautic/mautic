@@ -88,7 +88,7 @@ class PreAuthAuthenticator implements AuthenticationProviderInterface
                     $authenticatingService,
                     $integrations
                 );
-                $this->dispatcher->dispatch(UserEvents::USER_PRE_AUTHENTICATION, $authEvent);
+                $this->dispatcher->dispatch($authEvent, UserEvents::USER_PRE_AUTHENTICATION);
 
                 if ($authenticated = $authEvent->isAuthenticated()) {
                     $eventToken = $authEvent->getToken();

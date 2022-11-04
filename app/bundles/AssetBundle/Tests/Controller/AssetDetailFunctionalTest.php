@@ -8,13 +8,6 @@ use PHPUnit\Framework\Assert;
 
 class AssetDetailFunctionalTest extends MauticMysqlTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testLeadViewPreventsXSS(): void
     {
         $title      = 'aaa" onerror=alert(1) a="';

@@ -10,24 +10,24 @@ return [
         'main' => [
             'mautic_integration_config' => [
                 'path'       => '/integration/{integration}/config',
-                'controller' => 'IntegrationsBundle:Config:edit',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\ConfigController::editAction',
             ],
             'mautic_integration_config_field_pagination' => [
                 'path'       => '/integration/{integration}/config/{object}/{page}',
-                'controller' => 'IntegrationsBundle:FieldPagination:paginate',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\FieldPaginationController::paginateAction',
                 'defaults'   => [
                     'page' => 1,
                 ],
             ],
             'mautic_integration_config_field_update' => [
                 'path'       => '/integration/{integration}/config/{object}/field/{field}',
-                'controller' => 'IntegrationsBundle:UpdateField:update',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\UpdateFieldController::updateAction',
             ],
         ],
         'public' => [
             'mautic_integration_public_callback' => [
                 'path'       => '/integration/{integration}/callback',
-                'controller' => 'IntegrationsBundle:Auth:callback',
+                'controller' => 'Mautic\IntegrationsBundle\Controller\AuthController::callbackAction',
             ],
         ],
     ],
@@ -284,6 +284,21 @@ return [
                     'mautic.integrations.helper.sync_mapping',
                     'event_dispatcher',
                     'mautic.integrations.internal.object_provider',
+                    'mautic.integrations.internal.reference_resolver',
+                    'mautic.integrations.internal.field_validator',
+                ],
+            ],
+            'mautic.integrations.internal.field_validator' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\FieldValidator::class,
+                'arguments' => [
+                    'mautic.lead.repository.field',
+                    'mautic.integrations.sync.notification.bulk_notification',
+                ],
+            ],
+            'mautic.integrations.internal.reference_resolver' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner\ReferenceResolver::class,
+                'arguments' => [
+                    'doctrine.dbal.default_connection',
                 ],
             ],
             'mautic.integrations.sync.data_exchange.mautic.field_helper' => [
@@ -466,10 +481,24 @@ return [
                 'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper::class,
                 'arguments' => [
                     'mautic.integrations.sync.notification.writer',
+                    'mautic.integrations.sync.notification.user_notification_builder',
+                ],
+            ],
+            'mautic.integrations.sync.notification.user_notification_builder' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder::class,
+                'arguments' => [
                     'mautic.integrations.sync.notification.helper_user',
                     'mautic.integrations.sync.notification.helper.owner_provider',
                     'mautic.integrations.sync.notification.helper_route',
                     'translator',
+                ],
+            ],
+            'mautic.integrations.sync.notification.bulk_notification' => [
+                'class'     => \Mautic\IntegrationsBundle\Sync\Notification\BulkNotification::class,
+                'arguments' => [
+                    'mautic.core.service.bulk_notification',
+                    'mautic.integrations.sync.notification.user_notification_builder',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.integrations.sync.notification.helper_user_summary_notification' => [

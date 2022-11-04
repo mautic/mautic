@@ -8,7 +8,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class CampaignApiController extends CommonApiController
 {
@@ -19,7 +19,7 @@ class CampaignApiController extends CommonApiController
      */
     private $membershipManager;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model             = $this->getModel('campaign');
         $this->membershipManager = $this->get('mautic.campaign.membership.manager');
@@ -255,7 +255,7 @@ class CampaignApiController extends CommonApiController
         ];
 
         return $this->forward(
-            'MauticCoreBundle:Api\StatsApi:list',
+            'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
             [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',

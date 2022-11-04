@@ -348,8 +348,8 @@ class EventScheduler
     private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_SCHEDULED,
-            new ScheduledEvent($config, $log, $isReschedule)
+            new ScheduledEvent($config, $log, $isReschedule),
+            CampaignEvents::ON_EVENT_SCHEDULED
         );
     }
 
@@ -363,8 +363,8 @@ class EventScheduler
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
-            new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
+            new ScheduledBatchEvent($config, $event, $logs, $isReschedule),
+            CampaignEvents::ON_EVENT_SCHEDULED_BATCH
         );
     }
 

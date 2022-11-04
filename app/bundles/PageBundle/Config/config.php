@@ -5,19 +5,19 @@ return [
         'main' => [
             'mautic_page_index' => [
                 'path'       => '/pages/{page}',
-                'controller' => 'MauticPageBundle:Page:index',
+                'controller' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             ],
             'mautic_page_action' => [
                 'path'       => '/pages/{objectAction}/{objectId}',
-                'controller' => 'MauticPageBundle:Page:execute',
+                'controller' => 'Mautic\PageBundle\Controller\PageController::executeAction',
             ],
             'mautic_page_results' => [
                 'path'       => '/pages/results/{objectId}/{page}',
-                'controller' => 'MauticPageBundle:Page:results',
+                'controller' => 'Mautic\PageBundle\Controller\PageController::resultsAction',
             ],
             'mautic_page_export' => [
                 'path'       => '/pages/results/{objectId}/export/{format}',
-                'controller' => 'MauticPageBundle:Page:export',
+                'controller' => 'Mautic\PageBundle\Controller\PageController::exportAction',
                 'defaults'   => [
                     'format' => 'csv',
                 ],
@@ -26,31 +26,31 @@ return [
         'public' => [
             'mautic_page_tracker' => [
                 'path'       => '/mtracking.gif',
-                'controller' => 'MauticPageBundle:Public:trackingImage',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::trackingImageAction',
             ],
             'mautic_page_tracker_cors' => [
                 'path'       => '/mtc/event',
-                'controller' => 'MauticPageBundle:Public:tracking',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::trackingAction',
             ],
             'mautic_page_tracker_getcontact' => [
                 'path'       => '/mtc',
-                'controller' => 'MauticPageBundle:Public:getContactId',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::getContactIdAction',
             ],
             'mautic_url_redirect' => [
                 'path'       => '/r/{redirectId}',
-                'controller' => 'MauticPageBundle:Public:redirect',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_redirect' => [
                 'path'       => '/redirect/{redirectId}',
-                'controller' => 'MauticPageBundle:Public:redirect',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_preview' => [
                 'path'       => '/page/preview/{id}',
-                'controller' => 'MauticPageBundle:Public:preview',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::previewAction',
             ],
             'mautic_gated_video_hit' => [
                 'path'       => '/video/hit',
-                'controller' => 'MauticPageBundle:Public:hitVideo',
+                'controller' => 'Mautic\PageBundle\Controller\PublicController::hitVideoAction',
             ],
         ],
         'api' => [
@@ -58,13 +58,13 @@ return [
                 'standard_entity' => true,
                 'name'            => 'pages',
                 'path'            => '/pages',
-                'controller'      => 'MauticPageBundle:Api\PageApi',
+                'controller'      => 'Mautic\PageBundle\Controller\Api\PageApiController',
             ],
         ],
         'catchall' => [
             'mautic_page_public' => [
                 'path'         => '/{slug}',
-                'controller'   => 'MauticPageBundle:Public:index',
+                'controller'   => 'Mautic\PageBundle\Controller\PublicController::indexAction',
                 'requirements' => [
                     'slug' => '^(?!(_(profiler|wdt)|css|images|js|favicon.ico|apps/bundles/|plugins/)).+',
                 ],
@@ -155,16 +155,6 @@ return [
                     'setModelFactory' => ['mautic.model.factory'],
                 ],
             ],
-            'mautic.page.calendarbundle.subscriber' => [
-                'class'     => \Mautic\PageBundle\EventListener\CalendarSubscriber::class,
-                'arguments' => [
-                    'mautic.page.model.page',
-                    'doctrine.dbal.default_connection',
-                    'mautic.security',
-                    'translator',
-                    'router',
-                ],
-            ],
             'mautic.page.configbundle.subscriber' => [
                 'class' => \Mautic\PageBundle\EventListener\ConfigSubscriber::class,
             ],
@@ -228,6 +218,7 @@ return [
                     'mautic.page.model.page',
                     'mautic.security',
                     'mautic.helper.user',
+                    'mautic.helper.theme',
                 ],
             ],
             'mautic.form.type.pagevariant' => [
@@ -298,6 +289,7 @@ return [
                     'mautic.tracker.device',
                     'mautic.tracker.contact',
                     'mautic.helper.core_parameters',
+                    'mautic.lead.helper.contact_request_helper',
                 ],
                 'methodCalls' => [
                     'setCatInUrl' => [
