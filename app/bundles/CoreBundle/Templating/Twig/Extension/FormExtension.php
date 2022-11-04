@@ -30,6 +30,11 @@ class FormExtension extends AbstractExtension
         return FormFieldHelper::formatList($format, $v);
     }
 
+    /**
+     * check if form contains errors.
+     *
+     * @param array<string> $exluding
+     */
     public function containsErrors(FormView $form, array $exluding = []): bool
     {
         if (count($form->vars['errors'])) {
