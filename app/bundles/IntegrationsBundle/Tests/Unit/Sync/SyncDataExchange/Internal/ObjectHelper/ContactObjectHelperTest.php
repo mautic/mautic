@@ -117,10 +117,10 @@ class ContactObjectHelperTest extends TestCase
         $objectChangeDaoA->addField($emailField);
         $objectChangeDaoA->addField($companyField);
 
-        $contact1 = $this->createPartialMock(Lead::class, ['getId', 'getEntities', 'addUpdatedField']);
+        $contact1 = $this->createPartialMock(Lead::class, ['getId', 'addUpdatedField']);
         $contact1->method('getId')
             ->willReturn(0);
-        $contact2 = $this->createPartialMock(Lead::class, ['getId', 'getEntities']);
+        $contact2 = $this->createPartialMock(Lead::class, ['getId']);
         $contact2->method('getId')
             ->willReturn(1);
         $this->model->expects($this->once())
