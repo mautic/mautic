@@ -324,4 +324,21 @@ class UrlHelper
 
         return (bool) filter_var($url, FILTER_VALIDATE_URL);
     }
+
+    /**
+     * Decode &amp; (HTML), &#38; (decimal) and &#x26; (hex) ampersands.
+     * This even works with double encoded ampersands.
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    public static function decodeAmpersands($url)
+    {
+        while (false !== strpos($url, '&amp;') || false !== strpos($url, '&#38;') || false !== strpos($url, '&#x26;')) {
+            $url = str_replace(['&amp;', '&#38;', '&#x26;'], '&', $url);
+        }
+
+        return $url;
+    }
 }
