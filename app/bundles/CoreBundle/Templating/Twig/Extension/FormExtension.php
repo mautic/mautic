@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Templating\Helper\FormHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
@@ -31,7 +30,8 @@ class FormExtension extends AbstractExtension
         return FormFieldHelper::formatList($format, $v);
     }
 
-    public function containsErrors(FormView $form, array $exluding = []){
+    public function containsErrors(FormView $form, array $exluding = [])
+    {
         if (count($form->vars['errors'])) {
             return true;
         }
@@ -54,5 +54,4 @@ class FormExtension extends AbstractExtension
 
         return false;
     }
-
 }
