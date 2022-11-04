@@ -950,7 +950,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.' . $template),
+                    'contentTemplate' => $this->getTemplateName('list.html.'.$template),
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
