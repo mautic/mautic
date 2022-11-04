@@ -30,7 +30,7 @@ class PRedisConnectionHelperTest extends TestCase
         Assert::assertIsArray($connInfo);
         Assert::assertGreaterThan(1, count($connInfo));
         foreach ($connInfo as $c) {
-            Assert::assertRegExp('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
+            Assert::assertMatchesRegularExpression('/^(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)(?:[.](?:25[0-5]|2[0-4]\d|1\d\d|[1-9]\d|\d)){3}$/', $c['host']);
             Assert::assertSame('tcp', $c['scheme']);
             Assert::assertSame(8888, $c['port']);
             Assert::assertSame('test=car', $c['query']);
