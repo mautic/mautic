@@ -116,9 +116,7 @@ class TrackableModel extends AbstractCommonModel
         }
 
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        $url = UrlHelper::decodeAmpersands($url);
 
         $trackable = $this->getRepository()->findByUrl($url, $channel, $channelId);
         if (null == $trackable) {
@@ -421,10 +419,8 @@ class TrackableModel extends AbstractCommonModel
         // Ensure it's clean
         $url = trim($url);
 
-        // Ensure these are & for the sake of parsing
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        // Ensure ampersands are & for the sake of parsing
+        $url = UrlHelper::decodeAmpersands($url);
 
         // If this is just a token, validate it's supported before going further
         if (preg_match('/^{.*?}$/i', $url) && !$this->validateTokenIsTrackable($url)) {
