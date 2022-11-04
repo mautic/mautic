@@ -143,7 +143,7 @@ class MailjetTransportTest extends \PHPUnit\Framework\TestCase
     "CustomID": "5-bounce3@test-test.com",
     "Payload": "",
     "blocked": "",
-    "hard_bounce": "true",
+    "hard_bounce": true,
     "error_related_to": "bounced",
     "error": "bounced"
   },
