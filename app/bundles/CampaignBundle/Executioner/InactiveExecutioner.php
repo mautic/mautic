@@ -17,9 +17,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InactiveExecutioner implements ExecutionerInterface
+class InactiveExecutioner implements ExecutionerInterface, ResetInterface
 {
     /**
      * @var Campaign
@@ -80,6 +81,8 @@ class InactiveExecutioner implements ExecutionerInterface
      * @var InactiveHelper
      */
     private $helper;
+
+    private ?\DateTime $now = null;
 
     /**
      * InactiveExecutioner constructor.
@@ -169,6 +172,19 @@ class InactiveExecutioner implements ExecutionerInterface
     }
 
     /**
+     * @internal Used in tests
+     */
+    public function setNowTime(\DateTime $dateTime): void
+    {
+        $this->now = $dateTime;
+    }
+
+    public function reset(): void
+    {
+        $this->now = null;
+    }
+
+    /**
      * @throws NoEventsFoundException
      */
     private function checkCampaignIsPublished()
@@ -231,7 +247,7 @@ class InactiveExecutioner implements ExecutionerInterface
     private function executeEvents()
     {
         // Use the same timestamp across all contacts processed
-        $now = new \DateTime();
+        $now = $this->now ?? new \DateTime();
 
         /** @var Event $decisionEvent */
         foreach ($this->decisions as $decisionEvent) {
