@@ -611,6 +611,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
             'event' => [
                 'campaign'   => ['id' => 1],
                 'properties' => ['integration' => 'vTiger', 'config' => ['campaigns' => 1]],
+                'type'       => 'test',
             ],
             'eventDetails'    => null,
             'systemTriggered' => false,
