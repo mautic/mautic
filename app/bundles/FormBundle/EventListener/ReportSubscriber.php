@@ -137,8 +137,8 @@ class ReportSubscriber implements EventSubscriberInterface
             $formResultPrefix  = 'fr.';
 
             // select only the table for an existing report, if the setting is disabled
-            if ($this->coreParametersHelper->get('form_results_data_sources') === false) {
-                $reportSource = !empty($event->getContext()) ? $event->getContext() : $event->getReportSource() ?? '';
+            if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
+                $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
                 $alias = $this->formRepository->getFormTableNameViaResults($reportSource);
                 $args  = [
