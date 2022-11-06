@@ -842,6 +842,69 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "T0mTom",
+      "name": "Tomazz Jurich",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9713824?v=4",
+      "profile": "https://github.com/T0mTom",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "putzwasser",
+      "name": "putzwasser",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26040044?v=4",
+      "profile": "https://github.com/putzwasser",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "beetofly",
+      "name": "erk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/105105707?v=4",
+      "profile": "https://github.com/beetofly",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "doppelD-LF",
+      "name": "Daniel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/77049101?v=4",
+      "profile": "https://github.com/doppelD-LF",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "agencia904",
+      "name": "agencia904",
+      "avatar_url": "https://avatars.githubusercontent.com/u/90470877?v=4",
+      "profile": "https://github.com/agencia904",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "mbfds",
+      "name": "mbfds",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45359558?v=4",
+      "profile": "https://marceloflorentino.000webhostapp.com",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "lucaslazarinii",
+      "name": "Lucas Lazarini",
+      "avatar_url": "https://avatars.githubusercontent.com/u/106190294?v=4",
+      "profile": "https://github.com/lucaslazarinii",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -849,5 +912,6 @@
   "projectOwner": "mautic",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }

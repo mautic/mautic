@@ -150,6 +150,12 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.core.service.bulk_notification' => [
+                'class'     => \Mautic\CoreBundle\Service\BulkNotification::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                ],
+            ],
             'mautic.core.service.local_file_adapter' => [
                 'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                 'arguments' => [
@@ -1043,18 +1049,6 @@ return [
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
-            // Form extensions
-            'mautic.form.extension.custom' => [
-                'class'        => \Mautic\CoreBundle\Form\Extension\CustomFormExtension::class,
-                'arguments'    => [
-                    'event_dispatcher',
-                ],
-                'tag'          => 'form.type_extension',
-                'tagArguments' => [
-                    'extended_type' => Symfony\Component\Form\Extension\Core\Type\FormType::class,
-                ],
-            ],
-
             // Twig
             'templating.twig.extension.slot' => [
                 'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension::class,
@@ -1173,6 +1167,10 @@ return [
                     'mautic.helper.template.date',
                 ],
                 'tag'       => 'twig.extension',
+            ],
+            'templating.twig.extension.object' => [
+                'class' => \Mautic\CoreBundle\Templating\Twig\Extension\ObjectExtension::class,
+                'tag'   => 'twig.extension',
             ],
             'mautic.doctrine.loader.mautic_fixtures_loader' => [
                 'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
@@ -1831,6 +1829,10 @@ return [
         'transliterate_page_title'  => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
+        'headers_sts'               => false,
+        'headers_sts_expire_time'   => 60,
+        'headers_sts_subdomains'    => false,
+        'headers_sts_preload'       => false,
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
         'debug'                     => false,

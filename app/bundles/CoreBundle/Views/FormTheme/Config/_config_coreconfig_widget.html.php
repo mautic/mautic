@@ -138,6 +138,24 @@ $template  = '<div class="col-md-6">{content}</div>';
 </div>
 <?php endif; ?>
 
+<?php if (count(array_intersect($fieldKeys, ['headers_sts']))): ?>
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.response.headers'); ?></h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'headers_sts', $template); ?>
+            </div>
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_subdomains', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_preload', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_expire_time', $template); ?>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <?php if (count(array_intersect($fieldKeys, ['update_stability', 'composer_updates']))): ?>
 <div class="panel panel-primary">
     <div class="panel-heading">

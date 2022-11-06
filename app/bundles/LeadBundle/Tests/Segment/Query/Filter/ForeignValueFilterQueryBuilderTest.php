@@ -47,7 +47,6 @@ class ForeignValueFilterQueryBuilderTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $this->randomParameter     = new RandomParameterName();
         $this->dispatcher          = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->createMock(Connection::class);

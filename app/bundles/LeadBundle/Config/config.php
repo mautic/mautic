@@ -1589,11 +1589,6 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => ['doctrine.orm.entity_manager', 'mautic.helper.core_parameters'],
             ],
-            'mautic.lead.fixture.contact_field' => [
-                'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class,
-                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['translator'],
-            ],
             'mautic.lead.fixture.segment' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,

@@ -110,7 +110,7 @@ class AssetController extends FormController
                 'page'        => $page,
                 'security'    => $this->get('mautic.security'),
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:list.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Asset:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -169,6 +169,8 @@ class AssetController extends FormController
         // Audit Log
         $logs = $this->getModel('core.auditlog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
+        $templ = $this->request->get('templ') ?? 'twig';
+
         return $this->delegateView([
             'returnUrl'      => $action,
             'viewParameters' => [
@@ -203,7 +205,7 @@ class AssetController extends FormController
                 'logs'             => $logs,
                 'dateRangeForm'    => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:'.$tmpl.'.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Asset:'.$tmpl.'.html.'.$templ,
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -390,7 +392,7 @@ class AssetController extends FormController
                 'extensions'       => $extensions,
                 'extensionError'   => $extensionError,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -556,7 +558,7 @@ class AssetController extends FormController
                 'extensions'       => $extensions,
                 'extensionError'   => $extensionError,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -755,7 +757,7 @@ class AssetController extends FormController
                 'integrations' => $integrations,
                 'tmpl'         => $tmpl,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Remote:browse.html.php',
+            'contentTemplate' => 'MauticAssetBundle:Remote:browse.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
