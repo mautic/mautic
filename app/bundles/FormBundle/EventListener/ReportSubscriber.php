@@ -283,7 +283,7 @@ class ReportSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Get form fields and create the list of the form results table columns
+     * Get form fields and create the list of the form results table columns.
      *
      * @return array<string, array<string, string>>
      */
