@@ -219,6 +219,38 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
+    public function testOnReportGenerateFormResultsContext(): void
+    {
+        $mockQueryBuilder = $this->createMock(QueryBuilder::class);
+        $mockEvent        = $this->getMockBuilder(ReportGeneratorEvent::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'getContext',
+                'getQueryBuilder',
+                'addLeadLeftJoin',
+                'setQueryBuilder',
+            ])
+            ->getMock();
+
+        $mockQueryBuilder->expects($this->once())
+            ->method('from')
+            ->willReturn($mockQueryBuilder);
+
+        $mockQueryBuilder->expects($this->once())
+            ->method('leftJoin')
+            ->willReturn($mockQueryBuilder);
+
+        $mockEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($mockQueryBuilder);
+
+        $mockEvent->expects($this->once())
+            ->method('getContext')
+            ->willReturn('form.results');
+
+        $this->subscriber->onReportGenerate($mockEvent);
+    }
+
     public function testOnReportGraphGenerateBadContextWillReturn(): void
     {
         $mockEvent = $this->createMock(ReportGraphEvent::class);
