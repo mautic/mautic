@@ -248,6 +248,14 @@ $view['slots']->set(
                                                             </a>
                                                                 <?php elseif (is_string($field['value']) && 'datetime' === $field['type']): ?>
                                                                     <?php echo $view['date']->toFullConcat($field['value'], 'UTC'); ?>
+                                                                <?php elseif (is_string($field['value']) && 'time' === $field['type']): ?>
+                                                                    <?php echo $view['date']->toTime(
+                                                                        sprintf(
+                                                                            "%s %s",
+                                                                            '%s %s',
+                                                                            (new DateTime())->format('Y-m-d'),
+                                                                            $field['value']
+                                                                        ), 'UTC'); ?>
                                                                 <?php else: ?>
                                                                     <?php echo $view->escape($field['normalizedValue']); ?>
                                                                 <?php endif; ?>
