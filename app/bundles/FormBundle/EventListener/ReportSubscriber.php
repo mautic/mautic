@@ -139,14 +139,14 @@ class ReportSubscriber implements EventSubscriberInterface
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
-                $alias = $this->formRepository->getFormTableNameViaResults($reportSource);
-                $args  = [
+                $id   = $this->formRepository->getFormTableIdViaResults($reportSource);
+                $args = [
                     'filter' => [
                         'force' => [
                             [
-                                'column' => 'f.alias',
+                                'column' => 'f.id',
                                 'expr'   => 'eq',
-                                'value'  => $alias,
+                                'value'  => $id,
                             ],
                         ],
                     ],
