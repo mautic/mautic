@@ -6,6 +6,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
@@ -51,6 +52,8 @@ class ReportSubscriberTest extends TestCase
 
     public function setUp(): void
     {
+        $this->configParams['form_results_data_sources'] = true;
+
         parent::setUp();
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
@@ -95,7 +98,7 @@ class ReportSubscriberTest extends TestCase
             ->method('getCampaignByChannelColumns')
             ->willReturn([]);
 
-        $mockEvent->expects($this->once())
+        $mockEvent->expects($this->exactly(2))
             ->method('getLeadColumns')
             ->willReturn([]);
 
@@ -103,14 +106,14 @@ class ReportSubscriberTest extends TestCase
             ->method('getIpColumn')
             ->willReturn([]);
 
-        $mockEvent->expects($this->exactly(2))
+        $mockEvent->expects($this->exactly(3))
             ->method('checkContext')
             ->willReturn(true);
 
         $setTables = [];
         $setGraphs = [];
 
-        $mockEvent->expects($this->exactly(2))
+        $mockEvent->expects($this->exactly(3))
             ->method('addTable')
             ->willReturnCallback(function () use (&$setTables) {
                 $args = func_get_args();
@@ -126,14 +129,29 @@ class ReportSubscriberTest extends TestCase
                 $setGraphs[] = $args;
             });
 
-        $this->companyReportData->expects($this->once())
+        $form = $this->getMockBuilder(Form::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'getFields',
+            ])
+            ->getMock();
+
+        $form->expects($this->once())
+            ->method('getFields')
+            ->willReturn([]);
+
+        $this->formRepository->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([[$form, 1]]);
+
+        $this->companyReportData->expects($this->exactly(2))
             ->method('getCompanyData')
             ->with()
             ->willReturn([]);
 
         $this->subscriber->onReportBuilder($mockEvent);
 
-        $this->assertCount(2, $setTables);
+        $this->assertCount(3, $setTables);
         $this->assertCount(3, $setGraphs);
     }
 

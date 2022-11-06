@@ -4,6 +4,7 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -134,8 +135,6 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
-            $formResultPrefix  = 'fr.';
-
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
@@ -156,37 +155,13 @@ class ReportSubscriber implements EventSubscriberInterface
 
             $forms = $this->formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
-                $formEntity  = $form[0];
-                $fields      = $formEntity->getFields();
-                $formColumns = [];
+                $formEntity          = $form[0];
 
-                foreach ($fields as $field) {
-                    if ('button' !== $field->getType()) {
-                        $index               = $formResultPrefix.$field->getAlias();
-                        $formColumns[$index] = [
-                            'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),
-                            'type'  => 'number' === $field->getType() ? 'int' : 'string',
-                            'alias' => $field->getAlias(),
-                        ];
-                    }
-                }
-
-                $formColumns[$formResultPrefix.'submission_id'] = [
-                    'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.submission.id')]),
-                    'type'  => 'int',
-                    'alias' => 'submissionId',
-                ];
-                $formColumns[$formResultPrefix.'form_id']       = [
-                    'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.form_id')]),
-                    'type'  => 'int',
-                    'link'  => 'mautic_form_action',
-                    'alias' => 'submissionId',
-                ];
-
+                $formResultsColumns = $this->getFormResultsColumns($formEntity);
                 $leadColumns        = $event->getLeadColumns();
                 $companyColumns     = $this->companyReportData->getCompanyData();
 
-                $formResultsColumns = array_merge($formColumns, $leadColumns, $companyColumns);
+                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns);
 
                 $data = [
                     'display_name' => $formEntity->getId().' '.$formEntity->getName(),
@@ -305,5 +280,41 @@ class ReportSubscriber implements EventSubscriberInterface
             }
             unset($queryBuilder);
         }
+    }
+
+    /**
+     * Get form fields and create the list of the form results table columns
+     *
+     * @return array<string, array<string, string>>
+     */
+    private function getFormResultsColumns(Form $form): array
+    {
+        $prefix = 'fr.';
+        $fields = $form->getFields();
+
+        foreach ($fields as $field) {
+            if ('button' !== $field->getType()) {
+                $index = $prefix.$field->getAlias();
+                $formResultsColumns[$index] = [
+                    'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),
+                    'type'  => 'number' === $field->getType() ? 'int' : 'string',
+                    'alias' => $field->getAlias(),
+                ];
+            }
+        }
+
+        $formResultsColumns[$prefix.'submission_id'] = [
+            'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.submission.id')]),
+            'type'  => 'int',
+            'alias' => 'submissionId',
+        ];
+        $formResultsColumns[$prefix.'form_id']       = [
+            'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $this->translator->trans('mautic.form.report.form_id')]),
+            'type'  => 'int',
+            'link'  => 'mautic_form_action',
+            'alias' => 'submissionId',
+        ];
+
+        return $formResultsColumns;
     }
 }
