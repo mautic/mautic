@@ -294,7 +294,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         foreach ($fields as $field) {
             if ('button' !== $field->getType()) {
-                $index = $prefix.$field->getAlias();
+                $index                      = $prefix.$field->getAlias();
                 $formResultsColumns[$index] = [
                     'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),
                     'type'  => 'number' === $field->getType() ? 'int' : 'string',
