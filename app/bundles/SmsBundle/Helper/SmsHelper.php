@@ -4,12 +4,14 @@ namespace Mautic\SmsBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
 use libphonenumber\PhoneNumberFormat;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PhoneNumberHelper;
 use Mautic\LeadBundle\Entity\DoNotContact as DoNotContactEntity;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\SmsBundle\Form\Type\ConfigType;
 use Mautic\SmsBundle\Model\SmsModel;
 
 class SmsHelper
@@ -39,6 +41,8 @@ class SmsHelper
      */
     protected $integrationHelper;
 
+    private CoreParametersHelper $coreParametersHelper;
+
     /**
      * @var DoNotContact
      */
@@ -50,7 +54,8 @@ class SmsHelper
         PhoneNumberHelper $phoneNumberHelper,
         SmsModel $smsModel,
         IntegrationHelper $integrationHelper,
-        DoNotContact $doNotContact
+        DoNotContact $doNotContact,
+        CoreParametersHelper $coreParametersHelper
     ) {
         $this->em                   = $em;
         $this->leadModel            = $leadModel;
@@ -58,6 +63,7 @@ class SmsHelper
         $this->smsModel             = $smsModel;
         $this->integrationHelper    = $integrationHelper;
         $this->doNotContact         = $doNotContact;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function unsubscribe($number)
@@ -99,14 +105,8 @@ class SmsHelper
         return $this->doNotContact->addDncForContact($lead->getId(), 'sms', DoNotContactEntity::UNSUBSCRIBED);
     }
 
-    /**
-     * @return bool
-     */
-    public function getDisableTrackableUrls()
+    public function getDisableTrackableUrls(): bool
     {
-        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
-        $settings    = $integration->getIntegrationSettings()->getFeatureSettings();
-
-        return !empty($settings['disable_trackable_urls']) ? true : false;
+        return $this->coreParametersHelper->get(ConfigType::SMS_DISABLE_TRACKABLE_URLS);
     }
 }

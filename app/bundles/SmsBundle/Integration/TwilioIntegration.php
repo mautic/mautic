@@ -2,7 +2,6 @@
 
 namespace Mautic\SmsBundle\Integration;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -77,17 +76,6 @@ class TwilioIntegration extends AbstractIntegration
                         'class'   => 'form-control',
                         'tooltip' => 'mautic.sms.config.form.sms.sending_phone_number.tooltip',
                     ],
-                ]
-            );
-            $builder->add(
-                'disable_trackable_urls',
-                YesNoButtonGroupType::class,
-                [
-                    'label' => 'mautic.sms.config.form.sms.disable_trackable_urls',
-                    'attr'  => [
-                        'tooltip' => 'mautic.sms.config.form.sms.disable_trackable_urls.tooltip',
-                    ],
-                    'data'=> !empty($data['disable_trackable_urls']) ? true : false,
                 ]
             );
             $builder->add('frequency_number', NumberType::class,

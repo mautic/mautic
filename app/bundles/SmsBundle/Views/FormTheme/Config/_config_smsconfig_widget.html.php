@@ -23,6 +23,9 @@
                 <?php echo $view['translator']->trans('mautic.sms.config.smsconfig'); ?>
             <?php endif; ?>
             </div>
+            <div class="col-md-6">
+                <?php echo $view['form']->row($form[\Mautic\SmsBundle\Form\Type\ConfigType::SMS_DISABLE_TRACKABLE_URLS]); ?>
+            </div>
         </div>
     </div>
 </div>
