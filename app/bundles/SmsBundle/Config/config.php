@@ -125,6 +125,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.helper.integration',
                     'mautic.lead.model.dnc',
+                    'mautic.helper.core_parameters',
                 ],
                 'alias' => 'sms_helper',
             ],
