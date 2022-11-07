@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
@@ -113,6 +114,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
                 ['onCampaignTriggerActionChangeOwner', 7],
                 ['onCampaignTriggerActionUpdateCompany', 8],
+                ['onCampaignTriggerActionSetManipulator', 100],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -515,6 +517,17 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         return $event->setResult($result);
+    }
+
+    public function onCampaignTriggerActionSetManipulator(CampaignExecutionEvent $event): void
+    {
+        $lead = $event->getLead();
+
+        if (!$lead instanceof Lead) {
+            return;
+        }
+
+        $lead->setManipulator(new LeadManipulator('campaign', 'trigger-action'));
     }
 
     /**
