@@ -892,7 +892,16 @@
         };
 
         Core.parseToObject = function(params) {
-            return JSON.parse('{"' + decodeURI(params.trim().replace(/&/g, "\",\"").replace(/=/g,"\":\"")) + '"}');
+            return params.split('&')
+                .reduce((params, param) => {
+                    const item = param.split('=');
+                    const key = decodeURIComponent(item[0] || '');
+                    const value = decodeURIComponent(item[1] || '');
+                    if (key) {
+                        params[key] = value;
+                    }
+                    return params;
+                }, {});
         };
 
         Core.setConfig = function (options) {
