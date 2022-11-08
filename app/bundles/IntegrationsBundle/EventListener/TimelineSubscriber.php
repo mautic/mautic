@@ -109,7 +109,9 @@ class TimelineSubscriber implements EventSubscriberInterface
             'integration_sync_issues',
             'mautic.integration.sync.timeline_notices',
             'fa-refresh',
-            'integrations'
+            'integrations',
+            null,
+            'sync'
         );
     }
 }
