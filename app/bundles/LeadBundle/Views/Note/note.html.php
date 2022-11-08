@@ -62,7 +62,7 @@ switch ($type) {
                          </a>
                      <?php endif; ?>
                 </div>
-                <?php echo $text; ?>
+                <?php echo htmlspecialchars($text); ?>
                 <div class="mt-15 text-muted"><i class="fa fa-clock-o fa-fw"></i><span class="small"><?php echo $view['date']->toFullConcat($date); ?></span> <i class="fa fa-user fa-fw"></i><span class="small"><?php echo $author; ?></span></div>
             </div>
         </div>
