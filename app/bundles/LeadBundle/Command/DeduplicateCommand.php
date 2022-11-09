@@ -85,12 +85,12 @@ EOT
         $output->writeln("{$duplicateCount} contacts found to deduplicate");
 
         $processQueue = new ProcessQueue($processes);
-        $processCount = (int) ceil($duplicateCount / $processes);
+        $processCount = (int) ceil($duplicateCount / $batch);
 
         $output->writeln('');
         $output->writeln("Finding duplicates and creating processes for deduplication. {$processCount} processes will be queued.");
 
-        $contactIds      = $this->contactDeduper->getDuplicateContactIdBatch($uniqueFields);
+        $contactIds      = $this->contactDeduper->getDuplicateContactIds($uniqueFields);
         $contactIdChunks = array_chunk($contactIds, $batch);
         foreach ($contactIdChunks as $contactIdBatch) {
             $command = [
