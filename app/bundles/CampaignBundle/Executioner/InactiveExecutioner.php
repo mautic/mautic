@@ -17,10 +17,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class InactiveExecutioner implements ExecutionerInterface, ResetInterface
+class InactiveExecutioner implements ExecutionerInterface
 {
     /**
      * @var Campaign
@@ -82,7 +81,7 @@ class InactiveExecutioner implements ExecutionerInterface, ResetInterface
      */
     private $helper;
 
-    private ?\DateTime $now = null;
+    protected ?\DateTime $now = null;
 
     /**
      * InactiveExecutioner constructor.
@@ -169,19 +168,6 @@ class InactiveExecutioner implements ExecutionerInterface, ResetInterface
         }
 
         return $this->counter;
-    }
-
-    /**
-     * @internal Used in tests
-     */
-    public function setNowTime(\DateTime $dateTime): void
-    {
-        $this->now = $dateTime;
-    }
-
-    public function reset(): void
-    {
-        $this->now = null;
     }
 
     /**

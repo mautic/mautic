@@ -357,8 +357,6 @@ return [
                     'mautic.campaign.helper.inactivity',
                     'mautic.campaign.event_executioner',
                 ],
-                'tag'          => 'kernel.reset',
-                'tagArguments' => ['method' => 'reset'],
             ],
             'mautic.campaign.helper.decision' => [
                 'class'     => \Mautic\CampaignBundle\Executioner\Helper\DecisionHelper::class,

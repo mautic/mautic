@@ -84,7 +84,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     private $counter;
 
-    private ?\DateTime $now = null;
+    protected ?\DateTime $now = null;
 
     /**
      * ScheduledExecutioner constructor.
@@ -213,14 +213,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         $this->progressBar->finish();
 
         return $this->counter;
-    }
-
-    /**
-     * @internal Used in tests
-     */
-    public function setNowTime(\DateTime $now): void
-    {
-        $this->now = $now;
     }
 
     public function reset(): void
