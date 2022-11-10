@@ -6,7 +6,6 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
@@ -162,45 +161,31 @@ class EmailRepository extends CommonRepository
         $countWithMaxMin = false,
         $maxDate = null
     ) {
-        // Do not include leads in the do not contact table
-        $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $dncQb->select('dnc.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
-            ->where($dncQb->expr()->eq('dnc.channel', $dncQb->expr()->literal('email')));
+        /** @var Connection $connection */
+        $connection = $this->getEntityManager()->getConnection();
+        if ($connection instanceof MasterSlaveConnection) {
+            // Prefer a slave connection if available.
+            $connection->connect('slave');
+        }
 
-        // Do not include contacts where the message is pending in the message queue
-        $mqQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $mqQb->select('mq.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'message_queue', 'mq')
-            ->where(
-                $mqQb->expr()->andX(
-                    $mqQb->expr()->neq('mq.status', $mqQb->expr()->literal(MessageQueue::STATUS_SENT)),
-                    $mqQb->expr()->eq('mq.channel', $mqQb->expr()->literal('email'))
-                )
-            );
+        /** @var QueryBuilder $queryBuilder */
+        $q = new QueryBuilder($connection);
+        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
-        // Do not include leads that have already been emailed
-        $statQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $statQb->select('stat.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'stat');
-
-        $statQb->andWhere($statQb->expr()->isNotNull('stat.lead_id'));
-
-        if ($variantIds) {
-            if (!in_array($emailId, $variantIds)) {
-                $variantIds[] = (string) $emailId;
+        if ($countOnly) {
+            $q->select('count(*) as count');
+            if ($countWithMaxMin) {
+                $q->addSelect('MIN(l.id) as min_id, MAX(l.id) as max_id');
             }
-            $statQb->andWhere($statQb->expr()->in('stat.email_id', $variantIds));
-            $mqQb->andWhere($mqQb->expr()->in('mq.channel_id', $variantIds));
         } else {
-            $statQb->andWhere($statQb->expr()->eq('stat.email_id', (int) $emailId));
-            $mqQb->andWhere($mqQb->expr()->eq('mq.channel_id', (int) $emailId));
+            $q->select('l.*');
         }
 
         // Only include those who belong to the associated lead lists
         if (is_null($listIds)) {
             // Get a list of lists associated with this email
-            $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            $listsQ = new QueryBuilder($connection);
+            $lists  = $listsQ
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
@@ -217,43 +202,64 @@ class EmailRepository extends CommonRepository
             $listIds = [$listIds];
         }
 
-        // Only include those in associated segments
-        $segmentQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $segmentQb->select('ll.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
-            ->where(
-                $segmentQb->expr()->andX(
-                    $segmentQb->expr()->in('ll.leadlist_id', $listIds),
-                    $segmentQb->expr()->eq('ll.manually_removed', ':false')
+        if ($variantIds) {
+            if (!in_array($emailId, $variantIds)) {
+                $variantIds[] = (string) $emailId;
+            }
+            $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'email_stats', 'stat',
+            $q->expr()->andX(
+                $q->expr()->eq('stat.lead_id', 'l.id'),
+                $q->expr()->in('stat.email_id', $variantIds),
+                $q->expr()->isNotNull('stat.lead_id')
+            ));
+        } else {
+            $q->leftJoin('l', MAUTIC_TABLE_PREFIX.'email_stats', 'stat',
+            $q->expr()->andX(
+                $q->expr()->eq('stat.lead_id', 'l.id'),
+                $q->expr()->eq('stat.email_id', (int) $emailId),
+                $q->expr()->isNull('stat.lead_id')
+            ))
+            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'message_queue', 'mq',
+            $q->expr()->andX(
+                $q->expr()->eq('mq.lead_id', 'l.id'),
+                $q->expr()->eq('mq.status', 'sent'),
+                $q->expr()->eq('mq.channel', 'email'),
+                $q->expr()->eq('mq.channel_id', (int) $emailId),
+            ));
+            $q->where(
+                $q->expr()->andX(
+                    $q->expr()->isNull('mq.id')
                 )
             );
+        }
+
+        $q->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll', $q->expr()->andX(
+            $q->expr()->eq('ll.lead_id', 'l.id'),
+            $q->expr()->in('ll.leadlist_id', $listIds),
+            $q->expr()->eq('ll.manually_removed', 0)
+        ))
+        ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc', $q->expr()->andX(
+            $q->expr()->eq('dnc.lead_id', 'l.id'),
+            $q->expr()->eq('dnc.channel', "'email'")
+        ))
+        ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_categories', 'lc', $q->expr()->andX(
+             $q->expr()->eq('lc.lead_id', 'l.id'),
+             $q->expr()->eq('lc.manually_removed', 1)
+        ))
+        ->leftJoin('l', MAUTIC_TABLE_PREFIX.'emails', 'e', $q->expr()->andX(
+            $q->expr()->eq('e.id', (int) $emailId),
+            $q->expr()->eq('e.category_id', 'lc.category_id'),
+        ))
+        ->andWhere($q->expr()->andX(
+            $q->expr()->isNull('dnc.id'),
+            $q->expr()->isNull('stat.id'),
+            $q->expr()->isNull('lc.id')
+        ));
 
         if (null !== $maxDate) {
-            $segmentQb->andWhere($segmentQb->expr()->lte('ll.date_added', ':max_date'));
-            $segmentQb->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
+            $q->andWhere('ll.date_added', ':max_date');
+            $q->setParameter('max_date', $maxDate, \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE);
         }
-
-        // Main query
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        if ($countOnly) {
-            $q->select('count(*) as count');
-            if ($countWithMaxMin) {
-                $q->addSelect('MIN(l.id) as min_id, MAX(l.id) as max_id');
-            }
-        } else {
-            $q->select('l.*');
-        }
-
-        $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->andWhere(sprintf('l.id IN (%s)', $segmentQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $dncQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $statQb->getSQL()))
-            ->andWhere(sprintf('l.id NOT IN (%s)', $mqQb->getSQL()))
-            ->setParameter('false', false, 'boolean');
-
-        // Do not include leads which are not subscribed to the category set for email.
-        $unsubscribeLeadsQb = $this->getCategoryUnsubscribedLeadsQuery((int) $emailId);
-        $q->andWhere(sprintf('l.id NOT IN (%s)', $unsubscribeLeadsQb->getSQL()));
 
         $q = $this->setMinMaxIds($q, 'l.id', $minContactId, $maxContactId);
 
