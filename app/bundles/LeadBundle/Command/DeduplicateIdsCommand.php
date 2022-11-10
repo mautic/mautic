@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Command;
 
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -64,7 +63,7 @@ EOT
         if (!$contactIds) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
-            return ExitCode::FAILURE;
+            return 1;
         }
 
         $output->writeln("{$duplicateCount} contacts passed to deduplicate");
@@ -81,6 +80,6 @@ EOT
         $event = $stopwatch->stop('deduplicate');
         $output->writeln("Duration: {$event->getDuration()} ms, Memory: {$event->getMemory()} bytes");
 
-        return ExitCode::SUCCESS;
+        return 0;
     }
 }

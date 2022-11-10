@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Command;
 
-use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Service\ProcessQueue;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Symfony\Component\Console\Command\Command;
@@ -76,7 +75,7 @@ EOT
         if (!$duplicateCount) {
             $output->writeln('<error>No contacts to deduplicate.</error>');
 
-            return ExitCode::FAILURE;
+            return 1;
         }
 
         $stopwatch->start('deduplicate');
@@ -130,7 +129,7 @@ EOT
 
         foreach ($processQueue->getProcessed() as $process) {
             $output->writeln("<comment>{$process->getCommandLine()}</comment>");
-            if (ExitCode::SUCCESS === $process->getExitCode()) {
+            if (0 === $process->getExitCode()) {
                 $output->writeln("<info>{$process->getOutput()}</info>");
             } else {
                 $output->writeln("<error>{$process->getErrorOutput()}</error>");
@@ -143,6 +142,6 @@ EOT
         $output->writeln('');
         $output->writeln("Duration: {$event->getDuration()} ms, Memory: {$event->getMemory()} bytes");
 
-        return ExitCode::SUCCESS;
+        return 0;
     }
 }
