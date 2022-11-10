@@ -1928,6 +1928,7 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
-        'composer_updates' => false,
+        'composer_updates'   => false,
+        'redis_primary_only' => false,
     ],
 ];

@@ -63,6 +63,7 @@ return [
                     '%mautic.cache_adapter_redis%',
                     '%mautic.cache_prefix%',
                     '%mautic.cache_lifetime%',
+                    '%mautic.redis_primary_only%',
                 ],
                 'tag'       => 'mautic.cache.adapter',
             ],
