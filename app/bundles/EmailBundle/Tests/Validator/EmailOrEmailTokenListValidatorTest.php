@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\EmailBundle\Tests\Validator;
 
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\EmailBundle\Event\EmailOrEmailTokenValidationEvent;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenList;
 use Mautic\EmailBundle\Validator\EmailOrEmailTokenListValidator;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 final class EmailOrEmailTokenListValidatorTest extends TestCase
 {
@@ -22,7 +24,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
      * @param mixed $value
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider')]
-    public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult): void
+    public function testNoEmailsProvided($value, int $expectedViolationCount, callable $getFieldMocker, callable $violationResult, bool $eventShouldValidate = false): void
     {
         $context = new class extends ExecutionContext {
             /**
@@ -94,8 +96,17 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
 
         $emaiOrEmailTokenListValidator = new EmailOrEmailTokenListValidator(
             new EmailValidator($translator, $dispatcher),
-            new CustomFieldValidator($fieldModel, $translator)
+            new CustomFieldValidator($fieldModel, $translator),
+            $dispatcher = $this->createMock(EventDispatcherInterface::class)
         );
+
+        if ($eventShouldValidate) {
+            $dispatcher->expects($this->any())
+                ->method('dispatch')
+                ->willReturnCallback(function (EmailOrEmailTokenValidationEvent $event) {
+                    $event->setIsValid(true);
+                });
+        }
 
         $emaiOrEmailTokenListValidator->initialize($context);
         $emaiOrEmailTokenListValidator->validate($value, new EmailOrEmailTokenList());
@@ -287,6 +298,18 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
                     $parameters
                 );
             },
+        ];
+
+        // Test that plugins can successfully validate
+        yield [
+            '{plugin-token=something}',
+            function () {
+                $this->fail('Field should not be fetched');
+            },
+            function () {
+                $this->fail('Plugins are allowed to validate first.');
+            },
+            true,
         ];
     }
 }

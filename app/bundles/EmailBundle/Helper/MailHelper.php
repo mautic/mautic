@@ -234,6 +234,9 @@ class MailHelper
 
     private array $embedImagesReplaces = [];
 
+    /** @var array<?string, ?string> */
+    private $advancedFrom = [];
+
     public function __construct(
         private MailerInterface $mailer,
         private FromEmailHelper $fromEmailHelper,
@@ -447,18 +450,29 @@ class MailHelper
 
             // Metadata has to be set for each recipient
             foreach ($this->queuedRecipients as $email => $name) {
-                $from        = $this->fromEmailHelper->getFromAddressConsideringOwner($this->getFrom(), $this->lead, $this->email);
-                $fromAddress = $from->getEmail();
+                $from   = $this->fromEmailHelper->getFromAddressArrayConsideringOwner($this->advancedFrom, $this->lead, $this->email);
+                $tokens = $this->getTokens();
 
-                $tokens                = $this->getTokens();
-                $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
+                // replace tokens remaining in the from address
+                $fromAddress = key($from);
+                $fromName    = $from[key($from)];
+                $fromAddress = str_replace(array_keys($tokens), array_values($tokens), $fromAddress);
+                $fromName    = str_replace(array_keys($tokens), array_values($tokens), $fromName);
+                $fromKey     = $fromAddress.':'.$fromName;
 
-                if (!isset($this->metadata[$fromAddress])) {
-                    $this->metadata[$fromAddress] = [
-                        'from'     => $from,
+                if (!isset($this->metadata[$fromKey])) {
+                    // same for reply to
+                    $replyTo = $this->fromEmailHelper->getReplyToAddressConsideringOwner($this->replyTo, $this->lead, $this->email);
+                    $replyTo = str_replace(array_keys($tokens), array_values($tokens), $replyTo);
+
+                    $this->metadata[$fromKey] = [
+                        'from'     => [$fromAddress => $fromName],
+                        'replyTo'  => $replyTo,
                         'contacts' => [],
                     ];
                 }
+
+                $tokens['{signature}'] = $this->fromEmailHelper->getSignature();
 
                 $this->metadata[$fromAddress]['contacts'][$email] = $this->buildMetadata($name, $tokens);
             }
