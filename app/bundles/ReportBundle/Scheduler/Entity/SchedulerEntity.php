@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Entity;
 
 use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
@@ -74,6 +65,11 @@ class SchedulerEntity implements SchedulerInterface
     public function getScheduleMonthFrequency()
     {
         return $this->scheduleMonthFrequency;
+    }
+
+    public function isScheduledNow(): bool
+    {
+        return SchedulerEnum::UNIT_NOW === $this->getScheduleUnit();
     }
 
     public function isScheduledDaily()

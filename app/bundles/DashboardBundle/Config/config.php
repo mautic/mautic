@@ -1,20 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_dashboard_index' => [
                 'path'       => '/dashboard',
                 'controller' => 'MauticDashboardBundle:Dashboard:index',
+            ],
+            'mautic_dashboard_widget' => [
+                'path'       => '/dashboard/widget/{widgetId}',
+                'controller' => 'MauticDashboardBundle:Dashboard:widget',
             ],
             'mautic_dashboard_action' => [
                 'path'       => '/dashboard/{objectAction}/{objectId}',
@@ -61,6 +56,16 @@ return [
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
                     'symfony.filesystem',
+                ],
+            ],
+        ],
+        'other' => [
+            'mautic.dashboard.widget' => [
+                'class'     => \Mautic\DashboardBundle\Dashboard\Widget::class,
+                'arguments' => [
+                    'mautic.dashboard.model.dashboard',
+                    'mautic.helper.user',
+                    'session',
                 ],
             ],
         ],

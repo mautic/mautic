@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
@@ -26,9 +17,15 @@ class ConfigType extends AbstractType
      */
     private $restrictionHelper;
 
-    public function __construct(RestrictionHelper $restrictionHelper)
+    /**
+     * @var EscapeTransformer
+     */
+    private $escapeTransformer;
+
+    public function __construct(RestrictionHelper $restrictionHelper, EscapeTransformer $escapeTransformer)
     {
         $this->restrictionHelper = $restrictionHelper;
+        $this->escapeTransformer = $escapeTransformer;
     }
 
     /**
@@ -63,6 +60,8 @@ class ConfigType extends AbstractType
                         'data' => $config['parameters'],
                     ]
                 );
+
+                $this->addTransformers($builder->get($config['formAlias']));
             }
         }
 
@@ -108,5 +107,18 @@ class ConfigType extends AbstractType
                 'fileFields' => [],
             ]
         );
+    }
+
+    private function addTransformers(FormBuilderInterface $builder): void
+    {
+        if (0 === $builder->count()) {
+            $builder->addModelTransformer($this->escapeTransformer);
+
+            return;
+        }
+
+        foreach ($builder as $childBuilder) {
+            $this->addTransformers($childBuilder);
+        }
     }
 }

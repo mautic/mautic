@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Controller\MauticController;
@@ -425,11 +416,11 @@ class CoreSubscriber implements EventSubscriberInterface
         } elseif ('api' == $type) {
             $defaults['_format'] = 'json';
         }
-        $method = '';
+        $method = [];
         if (isset($details['method'])) {
-            $method = $details['method'];
+            $method = (array) $details['method'];
         } elseif ('api' === $type) {
-            $method = 'GET';
+            $method = ['GET'];
         }
         // Set requirements
         $requirements = (!empty($details['requirements'])) ? $details['requirements'] : [];

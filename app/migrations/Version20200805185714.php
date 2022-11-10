@@ -2,23 +2,17 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   <year> Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
 final class Version20200805185714 extends AbstractMauticMigration
 {
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration|SchemaException
      */
     public function preUp(Schema $schema): void
     {

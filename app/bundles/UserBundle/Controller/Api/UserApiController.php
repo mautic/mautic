@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
@@ -65,7 +56,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+            $encoder           = $this->get('security.password_encoder');
             $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
 
@@ -101,7 +92,7 @@ class UserApiController extends CommonApiController
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $encoder           = $this->get('security.encoder_factory')->getEncoder($entity);
+                    $encoder           = $this->get('security.password_encoder');
                     $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
                 }
             }
@@ -116,11 +107,6 @@ class UserApiController extends CommonApiController
                 //Changing username via API is forbidden
                 if (!empty($parameters['username'])) {
                     unset($parameters['username']);
-                }
-
-                //Changing the role via the API is forbidden
-                if (!empty($parameters['role'])) {
-                    unset($parameters['role']);
                 }
             } else {
                 //PUT requires the entire entity so overwrite the username with the original
@@ -145,7 +131,7 @@ class UserApiController extends CommonApiController
                     }
                 }
 
-                $encoder = $this->get('security.encoder_factory')->getEncoder($entity);
+                $encoder = $this->get('security.password_encoder');
                 $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
                 break;
         }

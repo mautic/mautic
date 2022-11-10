@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'public' => [
@@ -50,13 +41,13 @@ return [
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
-            'mautic.install.fixture.page_hit' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\PageHitIndex::class,
+            'mautic.install.fixture.report_data' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
-            'mautic.install.fixture.report_data' => [
-                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
+            'mautic.install.fixture.grape_js' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
                 'arguments' => [],
             ],
@@ -131,8 +122,13 @@ return [
                     'translator',
                     'kernel',
                     'validator',
-                    'security.encoder_factory',
+                    'security.password_encoder',
                 ],
+            ],
+            'mautic.install.leadcolumns' => [
+                'class'     => \Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [],
             ],
         ],
     ],

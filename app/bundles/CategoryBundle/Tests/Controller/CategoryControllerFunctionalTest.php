@@ -5,6 +5,8 @@ namespace Mautic\CategoryBundle\Tests\Controller;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class CategoryControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -28,7 +30,7 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
         /** @var CategoryModel $model */
-        $model      = $this->container->get('mautic.category.model.category');
+        $model      = self::$container->get('mautic.category.model.category');
 
         foreach ($categoriesData as $categoryData) {
             $category = new Category();
@@ -65,5 +67,26 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
         $this->assertStringContainsString('TestTitleCategoryController1', $clientResponseContent, 'The return must contain TestTitleCategoryController1');
         $this->assertStringNotContainsString('TestTitleCategoryController2', $clientResponseContent, 'The return must not contain TestTitleCategoryController2');
+    }
+
+    public function testNewActionWithInForm()
+    {
+        $crawler                = $this->client->request(Request::METHOD_GET, 's/categories/category/new');
+        $clientResponse         = json_decode($this->client->getResponse()->getContent(), true);
+        $html                   = $clientResponse['newContent'];
+        $crawler->addHtmlContent($html);
+        $saveButton = $crawler->selectButton('category_form[buttons][save]');
+        $form       = $saveButton->form();
+        $form['category_form[bundle]']->setValue('category');
+        $form['category_form[title]']->setValue('Test');
+        $form['category_form[isPublished]']->setValue(1);
+        $form['category_form[inForm]']->setValue(1);
+
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        $clientResponse = $this->client->getResponse();
+        $body           = json_decode($clientResponse->getContent(), true);
+        $this->assertArrayHasKey('categoryId', $body);
+        $this->assertArrayHasKey('categoryName', $body);
     }
 }

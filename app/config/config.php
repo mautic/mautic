@@ -1,5 +1,12 @@
 <?php
 
+use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
+use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+
+/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+
 // Include path settings
 $root = $container->getParameter('kernel.root_dir');
 
@@ -27,7 +34,9 @@ $container->setParameter('mautic.ip_lookup_services', $bundleMetadataBuilder->ge
 // Load parameters
 include __DIR__.'/parameters.php';
 $container->loadFromExtension('mautic_core');
-$configParameterBag = (new \Mautic\CoreBundle\Loader\ParameterLoader())->getParameterBag();
+$parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
+$configParameterBag      = $parameterLoader->getParameterBag();
+$localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
 // Set template engines
 $engines = ['php', 'twig'];
@@ -107,7 +116,8 @@ $dbalSettings = [
         'point' => 'string',
         'bit'   => 'string',
     ],
-    'server_version' => '%mautic.db_server_version%',
+    'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
+    'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
 ];
 
 $container->loadFromExtension('doctrine', [
@@ -116,6 +126,11 @@ $container->loadFromExtension('doctrine', [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
+        'dql'                         => [
+            'string_functions' => [
+                'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+            ],
+        ],
     ],
 ]);
 
@@ -175,17 +190,12 @@ $container->loadFromExtension('oneup_uploader', [
 
 //FOS Rest for API
 $container->loadFromExtension('fos_rest', [
-    'routing_loader' => [
-        'default_format' => 'json',
-        'include_format' => false,
-    ],
-    'view' => [
+    'routing_loader' => false,
+    'body_listener'  => true,
+    'view'           => [
         'formats' => [
             'json' => true,
             'xml'  => false,
-            'html' => false,
-        ],
-        'templating_formats' => [
             'html' => false,
         ],
     ],
@@ -205,7 +215,7 @@ $container->loadFromExtension('jms_serializer', [
         'lower_case' => false,
     ],
     'metadata' => [
-        'cache'          => 'none',
+        'cache'          => 'file',
         'auto_detection' => false,
         'directories'    => $bundleMetadataBuilder->getSerializerConfig(),
     ],
@@ -252,41 +262,38 @@ $container->register('mautic.monolog.fulltrace.formatter', 'Monolog\Formatter\Li
     ->addMethodCall('ignoreEmptyContextAndExtra', [true]);
 
 //Register command line logging
-use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
-
 $container->setParameter(
-    'console_exception_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleExceptionListener'
+    'console_error_listener.class',
+    ConsoleErrorListener::class
 );
-$definitionConsoleExceptionListener = new Definition(
-    '%console_exception_listener.class%',
+$definitionConsoleErrorListener = new Definition(
+    '%console_error_listener.class%',
     [new Reference('monolog.logger.mautic')]
 );
-$definitionConsoleExceptionListener->addTag(
+$definitionConsoleErrorListener->addTag(
     'kernel.event_listener',
-    ['event' => 'console.exception']
+    ['event' => 'console.error']
 );
 $container->setDefinition(
     'mautic.kernel.listener.command_exception',
-    $definitionConsoleExceptionListener
+    $definitionConsoleErrorListener
 );
 
 $container->setParameter(
     'console_terminate_listener.class',
-    'Mautic\CoreBundle\EventListener\ConsoleTerminateListener'
+    ConsoleTerminateListener::class
 );
-$definitionConsoleExceptionListener = new Definition(
+$definitionConsoleErrorListener = new Definition(
     '%console_terminate_listener.class%',
     [new Reference('monolog.logger.mautic')]
 );
-$definitionConsoleExceptionListener->addTag(
+$definitionConsoleErrorListener->addTag(
     'kernel.event_listener',
     ['event' => 'console.terminate']
 );
 $container->setDefinition(
     'mautic.kernel.listener.command_terminate',
-    $definitionConsoleExceptionListener
+    $definitionConsoleErrorListener
 );
 
 // ElFinder File Manager
@@ -294,25 +301,37 @@ $container->loadFromExtension('fm_elfinder', [
     'assets_path' => 'media/assets',
     'instances'   => [
         'default' => [
-            'locale'          => 'LANG',
+            'locale'          => '%mautic.locale%',
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
-            'include_assets'  => true,
+            //'include_assets'  => true,
             'relative_path'   => false,
             'connector'       => [
                 'debug' => '%kernel.debug%',
+                'binds' => [
+                    'upload.pre mkdir.pre mkfile.pre rename.pre archive.pre ls.pre' => [
+                        'Plugin.Sanitizer.cmdPreprocess',
+                    ],
+                    'upload.presave paste.copyfrom'                                 => [
+                        'Plugin.Sanitizer.onUpLoadPreSave',
+                    ],
+                ],
+                'plugins' => [
+                    'Sanitizer' => [
+                        'enable'   => true,
+                        'targets'  => [' ', '\\', '/', ':', '*', '?', '"', '<', '>', '|'], // target chars
+                        'replace'  => '-', // replace to this
+                    ],
+                ],
                 'roots' => [
                     'local' => [
-                        'driver'    => 'Flysystem',
-                        'path'      => '',
-                        'flysystem' => [
-                            'type'    => 'local',
-                            'options' => [
-                                'local' => [
-                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                                ],
-                            ],
+                        'driver'        => 'Flysystem',
+                        'path'          => '',
+                        'flysystem'     => [
+                            'type'            => 'custom',
+                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'   => ['all'],

@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
-use Debril\RssAtomBundle\Protocol\FeedReader;
-use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
 use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -23,9 +13,6 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Class NotificationModel.
- */
 class NotificationModel extends FormModel
 {
     /**
@@ -49,27 +36,17 @@ class NotificationModel extends FormModel
     protected $updateHelper;
 
     /**
-     * @var FeedReader
-     */
-    protected $rssReader;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
 
-    /**
-     * NotificationModel constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
-        FeedReader $rssReader,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->pathsHelper          = $pathsHelper;
         $this->updateHelper         = $updateHelper;
-        $this->rssReader            = $rssReader;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -79,7 +56,7 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * @param $disableUpdates
+     * @param bool $disableUpdates
      */
     public function setDisableUpdates($disableUpdates)
     {
@@ -87,13 +64,11 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CoreBundle\Entity\NotificationRepository
+     * @return NotificationRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCoreBundle:Notification');
+        return $this->em->getRepository(Notification::class);
     }
 
     /**
@@ -173,8 +148,6 @@ class NotificationModel extends FormModel
             return [[], false, ''];
         }
 
-        $this->updateUpstreamNotifications();
-
         $showNewIndicator = false;
         $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
 
@@ -229,46 +202,5 @@ class NotificationModel extends FormModel
         }
 
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
-    }
-
-    /**
-     * Fetch upstream notifications via RSS.
-     */
-    public function updateUpstreamNotifications()
-    {
-        $url = $this->coreParametersHelper->get('rss_notification_url');
-
-        if (empty($url)) {
-            return;
-        }
-
-        //check to see when we last checked for an update
-        $lastChecked = $this->session->get('mautic.upstream.checked', 0);
-
-        if (time() - $lastChecked > 3600) {
-            $this->session->set('mautic.upstream.checked', time());
-            $lastDate = $this->getRepository()->getUpstreamLastDate();
-
-            try {
-                /** @var FeedContent $feed */
-                $feed = $this->rssReader->getFeedContent($url, $lastDate);
-
-                /** @var Item $item */
-                foreach ($feed->getItems() as $item) {
-                    $description = $item->getDescription();
-                    if (mb_strlen(strip_tags($description)) > 300) {
-                        $description = mb_substr(strip_tags($description), 0, 300);
-                        $description .= '... <a href="'.$item->getLink().'" target="_blank">'.$this->translator->trans(
-                                'mautic.core.notification.read_more'
-                            ).'</a>';
-                    }
-                    $header = $item->getTitle();
-
-                    $this->addNotification($description, 'upstream', false, ($header) ? $header : null, 'fa-bullhorn');
-                }
-            } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
-            }
-        }
     }
 }

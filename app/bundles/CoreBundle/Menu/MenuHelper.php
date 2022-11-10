@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -28,9 +18,9 @@ class MenuHelper
     protected $security;
 
     /**
-     * @var Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * Stores items that are assigned to another parent outside it's bundle.
@@ -56,14 +46,13 @@ class MenuHelper
     {
         $this->security              = $security;
         $this->coreParametersHelper  = $coreParametersHelper;
-        $this->request               = $requestStack->getCurrentRequest();
+        $this->requestStack          = $requestStack;
         $this->integrationHelper     = $integrationHelper;
     }
 
     /**
      * Converts menu config into something KNP menus expects.
      *
-     * @param        $items
      * @param int    $depth
      * @param int    $defaultPriority
      * @param string $type
@@ -307,7 +296,7 @@ class MenuHelper
      */
     protected function handleRequestChecks($name, $value)
     {
-        return $this->request->get($name) == $value;
+        return $this->requestStack->getCurrentRequest()->get($name) == $value;
     }
 
     /**

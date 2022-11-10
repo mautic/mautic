@@ -2,22 +2,12 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\IntegrationsBundle\Entity\ObjectMappingRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -54,7 +44,6 @@ final class ObjectMappingRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->queryBuilder  = new QueryBuilder($this->entityManager);
@@ -63,7 +52,8 @@ final class ObjectMappingRepositoryTest extends TestCase
         // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
         $this->query = $this->getMockBuilder(AbstractQuery::class)
             ->disableOriginalConstructor()
-            ->setMethods(['setParameters', 'setFirstResult', 'setMaxResults', 'getSingleResult', 'getSQL', '_doExecute'])
+            ->onlyMethods(['setParameters', 'getSingleResult', 'getSQL', '_doExecute'])
+            ->addMethods(['setFirstResult', 'setMaxResults'])
             ->getMock();
 
         $this->entityManager->expects($this->once())

@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -129,6 +122,11 @@ class Form extends FormEntity
     private $noIndex;
 
     /**
+     * @var int
+     */
+    private $progressiveProfilingLimit;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
@@ -176,7 +174,7 @@ class Form extends FormEntity
             ->columnName('post_action')
             ->build();
 
-        $builder->createField('postActionProperty', 'string')
+        $builder->createField('postActionProperty', Types::TEXT)
             ->columnName('post_action_property')
             ->nullable()
             ->build();
@@ -225,6 +223,8 @@ class Form extends FormEntity
             ->columnName('no_index')
             ->nullable()
             ->build();
+
+        $builder->addNullableField('progressiveProfilingLimit', Type::INTEGER, 'progressive_profiling_limit');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -252,6 +252,12 @@ class Form extends FormEntity
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
+
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
+            'value'   => 0,
+            'message' => 'mautic.form.form.progressive_profiling_limit.error',
+            'groups'  => ['progressiveProfilingLimit'],
+        ]));
     }
 
     /**
@@ -268,6 +274,10 @@ class Form extends FormEntity
             $groups[] = 'messageRequired';
         } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        }
+
+        if ('' != $data->getProgressiveProfilingLimit()) {
+            $groups[] = 'progressiveProfilingLimit';
         }
 
         return $groups;
@@ -774,20 +784,17 @@ class Form extends FormEntity
     }
 
     /**
-     * Set noIndex.
-     *
-     * @param bool $noIndex
+     * @param bool|null $noIndex
      */
     public function setNoIndex($noIndex)
     {
-        $this->isChanged('noIndex', $noIndex);
-        $this->noIndex = $noIndex;
+        $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
+        $this->isChanged('noIndex', $sanitizedNoIndex);
+        $this->noIndex = $sanitizedNoIndex;
     }
 
     /**
-     * Get noIndex.
-     *
-     * @return bool
+     * @return bool|null
      */
     public function getNoIndex()
     {
@@ -852,6 +859,12 @@ class Form extends FormEntity
 
         // Progressive profiling must be turned off in the kiosk mode
         if (false === $this->getInKioskMode()) {
+            if ('' != $this->getProgressiveProfilingLimit()) {
+                $this->usesProgressiveProfiling = true;
+
+                return $this->usesProgressiveProfiling;
+            }
+
             // Search for a field with a progressive profiling setting on
             foreach ($this->fields->toArray() as $field) {
                 if (false === $field->getShowWhenValueExists() || $field->getShowAfterXSubmissions() > 0) {
@@ -865,5 +878,30 @@ class Form extends FormEntity
         $this->usesProgressiveProfiling = false;
 
         return $this->usesProgressiveProfiling;
+    }
+
+    /**
+     * @param int $progressiveProfilingLimit
+     *
+     * @return Form
+     */
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    {
+        $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
+        $this->progressiveProfilingLimit = $progressiveProfilingLimit;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProgressiveProfilingLimit()
+    {
+        if (0 === $this->progressiveProfilingLimit) {
+            $this->progressiveProfilingLimit = '';
+        }
+
+        return $this->progressiveProfilingLimit;
     }
 }

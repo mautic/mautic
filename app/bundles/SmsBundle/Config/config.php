@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'services' => [
         'events' => [
@@ -90,6 +81,12 @@ return [
                 'arguments' => [
                     'translator',
                     'mautic.lead.repository.lead_event_log',
+                ],
+            ],
+            'mautic.sms.webhook.subscriber' => [
+                'class'     => \Mautic\SmsBundle\EventListener\WebhookSubscriber::class,
+                'arguments' => [
+                    'mautic.webhook.model.webhook',
                 ],
             ],
         ],

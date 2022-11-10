@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Scheduler\Date;
 
 use Mautic\ReportBundle\Scheduler\Builder\SchedulerBuilder;
@@ -41,9 +32,10 @@ class DateBuilder
     public function getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
     {
         $entity = new SchedulerEntity($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $count  = $entity->isScheduledNow() ? 1 : 10;
 
         try {
-            $recurrences = $this->schedulerBuilder->getNextEvents($entity, 10);
+            $recurrences = $this->schedulerBuilder->getNextEvents($entity, $count);
         } catch (InvalidSchedulerException $e) {
             return [];
         } catch (NotSupportedScheduleTypeException $e) {

@@ -75,26 +75,26 @@ $view['slots']->set(
                                 ['entity' => $activeAsset]
                             ); ?>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans(
                                             'mautic.asset.asset.size'
                                         ); ?></span></td>
                                 <td><?php echo $activeAsset->getSize(); ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans(
                                             'mautic.asset.asset.path.relative'
                                         ); ?></span></td>
                                 <td><?php echo $assetDownloadUrl; ?></td>
                             </tr>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans(
                                             'mautic.asset.filename.original'
                                         ); ?></span></td>
                                 <td><?php echo $activeAsset->getOriginalFilename(); ?></td>
                             </tr>
                             <tr>
                                 <?php $location = $activeAsset->getStorageLocation(); ?>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans(
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans(
                                             'mautic.asset.filename.'.$location
                                         ); ?></span></td>
                                 <td><?php echo ('local' == $location) ? $activeAsset->getPath()

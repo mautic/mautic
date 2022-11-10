@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Functional\Sync\Notification;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -36,11 +27,11 @@ class NotifierTest extends MauticMysqlTestCase
         $leads = $leadRepository->findBy([], [], 2);
 
         /** @var SyncIntegrationsHelper $syncIntegrationsHelper */
-        $syncIntegrationsHelper = $this->container->get('mautic.integrations.helper.sync_integrations');
+        $syncIntegrationsHelper = self::$container->get('mautic.integrations.helper.sync_integrations');
         $syncIntegrationsHelper->addIntegration(new ExampleIntegration(new ExampleSyncDataExchange()));
 
         /** @var Notifier $notifier */
-        $notifier = $this->container->get('mautic.integrations.sync.notifier');
+        $notifier = self::$container->get('mautic.integrations.sync.notifier');
 
         $contactNotification = new NotificationDAO(
             new ObjectChangeDAO(

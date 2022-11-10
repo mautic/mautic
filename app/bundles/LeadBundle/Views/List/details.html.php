@@ -79,7 +79,7 @@ $view['slots']->set(
                                 ['entity' => $list]
                             ); ?>
                             <tr>
-                                <td width="20%"><span class="fw-b"><?php echo $view['translator']->trans('mautic.lead.leads'); ?></span></td>
+                                <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.lead.leads'); ?></span></td>
                                 <td><?php echo $segmentCount; ?></td>
                             </tr>
                             </tbody>
@@ -168,8 +168,14 @@ $view['slots']->set(
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
-            <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
-                <?php echo $contacts; ?>
+            <div class="tab-pane active bdr-w-0 page-list" id="contacts-container" data-target-url="<?php
+            echo $view['router']->url(
+                'mautic_segment_contacts',
+                ['objectId' => $list->getId(), 'page' => $app->getSession()->get('mautic.segment.contact.page', 1)]
+            );
+            ?>">
+
+            <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
             </div>
             <div class="tab-pane bdr-w-0 page-list" id="campaign-container">
                 <div id="campaign-share-container" style="position: relative">

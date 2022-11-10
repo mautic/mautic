@@ -1,16 +1,9 @@
 <?php
 
-/*
- * @package     Mautic
- * @copyright   2019 Mautic Contributors. All rights reserved.
- * @author      Mautic
- * @link        http://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
 
@@ -21,7 +14,7 @@ class Version20191017140848 extends AbstractMauticMigration
 {
     /**
      * @throws SkipMigration
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public function preUp(Schema $schema): void
     {
@@ -32,7 +25,7 @@ class Version20191017140848 extends AbstractMauticMigration
     }
 
     /**
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     public function up(Schema $schema): void
     {

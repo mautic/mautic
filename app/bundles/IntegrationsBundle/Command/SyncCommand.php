@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Command;
 
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
@@ -92,6 +83,12 @@ class SyncCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Notate if the sync should execute only pulling items from integration to the Mautic'
+            )
+            ->addOption(
+                '--option',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Provide option pass to InputOptions Example: --option="type:1" --option="channel_id:1"'
             );
 
         parent::configure();

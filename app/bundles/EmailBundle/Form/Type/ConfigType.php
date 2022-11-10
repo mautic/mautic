@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -209,6 +200,52 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.email.required',
                         ]
                     ),
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_reply_to_email',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.reply_to_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'    => false,
+                'constraints' => [
+                    new Email(
+                        [
+                            'message' => 'mautic.core.email.required',
+                            'mode'    => Email::VALIDATION_MODE_HTML5,
+                        ]
+                    ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'mailer_reply_to_email',
+            TextType::class,
+            [
+                'label'       => 'mautic.email.reply_to_email',
+                'label_attr'  => ['class' => 'control-label'],
+                'attr'        => [
+                    'class'    => 'form-control',
+                    'tooltip'  => 'mautic.email.reply_to_email.tooltip',
+                    'onchange' => 'Mautic.disableSendTestEmailButton()',
+                ],
+                'required'    => false,
+                'constraints' => [
                     new Email(
                         [
                             'message' => 'mautic.core.email.required',

@@ -29,14 +29,14 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailController extends FormController
 {
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
-
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
+    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -128,7 +128,7 @@ class EmailController extends FormController
 
             if ($updatedFilters) {
                 foreach ($updatedFilters as $updatedFilter) {
-                    list($clmn, $fltr) = explode(':', $updatedFilter);
+                    [$clmn, $fltr] = explode(':', $updatedFilter);
 
                     $newFilters[$clmn][] = $fltr;
                 }
@@ -186,8 +186,8 @@ class EmailController extends FormController
             }
         }
 
-        $orderBy    = $session->get('mautic.email.orderby', 'e.subject');
-        $orderByDir = $session->get('mautic.email.orderbydir', 'DESC');
+        $orderBy    = $session->get('mautic.email.orderby', 'e.dateModified');
+        $orderByDir = $session->get('mautic.email.orderbydir', $this->getDefaultOrderDirection());
 
         $emails = $model->getEntities(
             [
@@ -304,7 +304,7 @@ class EmailController extends FormController
         }
 
         //get A/B test information
-        list($parent, $children) = $email->getVariants();
+        [$parent, $children]     = $email->getVariants();
         $properties              = [];
         $variantError            = false;
         $weight                  = 0;
@@ -361,7 +361,7 @@ class EmailController extends FormController
         }
 
         //get related translations
-        list($translationParent, $translationChildren) = $email->getTranslations();
+        [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Audit Log
         $logs = $this->getModel('core.auditlog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
@@ -381,7 +381,6 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'email'        => $email,
                     'trackables'   => $trackableLinks,
-                    'pending'      => $model->getPendingLeads($email, null, true),
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
                     'variants'     => [
@@ -413,7 +412,7 @@ class EmailController extends FormController
                     'previewUrl'    => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $email->getId()],
-                        true
+                        UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                     'contacts' => $this->forward(
                         'MauticEmailBundle:Email:contacts',
@@ -695,8 +694,7 @@ class EmailController extends FormController
                                     'objectId'     => $entity->getId(),
                                 ]
                             ),
-                        ],
-                        'warning'
+                        ]
                     );
                 }
             } else {
@@ -803,7 +801,7 @@ class EmailController extends FormController
                     'previewUrl'         => $this->generateUrl(
                         'mautic_email_preview',
                         ['objectId' => $entity->getId()],
-                        true
+                        UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                 ],
                 'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
@@ -1532,5 +1530,15 @@ class EmailController extends FormController
             'email',
             'email_id'
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'email';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

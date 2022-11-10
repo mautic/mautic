@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -111,22 +102,7 @@ class IndexSchemaHelper
      */
     public function addIndex($columns, $name, $options = [])
     {
-        if (!is_array($columns)) {
-            $columns = [$columns];
-        }
-        foreach ($columns as $column) {
-            if (!in_array($column, $this->allowedColumns)) {
-                $columnSchema = $this->table->getColumn($column);
-
-                $type = $columnSchema->getType();
-                if (!$type instanceof TextType) {
-                    $this->allowedColumns[] = $columnSchema->getName();
-                }
-            }
-        }
-
-        // Indexes are only allowed on columns that are string
-        $columns = array_intersect($columns, $this->allowedColumns);
+        $columns = $this->getTextColumns($columns);
 
         if (!empty($columns)) {
             $index = new Index($this->prefix.$name, $columns, false, false, $options);
@@ -136,6 +112,27 @@ class IndexSchemaHelper
             } else {
                 $this->addedIndexes[] = $index;
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param mixed  $columns
+     * @param string $name
+     * @param array  $options
+     *
+     * @return self
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function dropIndex($columns, $name, $options = [])
+    {
+        $textColumns = $this->getTextColumns($columns);
+
+        $index = new Index($name, $textColumns, false, false, $options);
+        if ($this->table->hasIndex($name)) {
+            $this->dropIndexes[] = $index;
         }
 
         return $this;
@@ -176,5 +173,34 @@ class IndexSchemaHelper
             $this->dropIndexes    = [];
             $this->addedIndexes   = [];
         }
+    }
+
+    /**
+     * @param $columns
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    private function getTextColumns($columns)
+    {
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
+        foreach ($columns as $column) {
+            if (!in_array($column, $this->allowedColumns)) {
+                $columnSchema = $this->table->getColumn($column);
+
+                $type = $columnSchema->getType();
+                if (!$type instanceof TextType) {
+                    $this->allowedColumns[] = $columnSchema->getName();
+                }
+            }
+        }
+
+        // Indexes are only allowed on columns that are string
+        $columns = array_intersect($columns, $this->allowedColumns);
+
+        return $columns;
     }
 }

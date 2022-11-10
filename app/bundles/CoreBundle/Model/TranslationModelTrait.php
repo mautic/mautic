@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
@@ -52,7 +43,7 @@ trait TranslationModelTrait
             $translationList = [];
             foreach ($translations as $id => $language) {
                 $core = $this->getTranslationLocaleCore($language);
-                if (!isset($languageList[$core])) {
+                if (!isset($translationList[$core])) {
                     $translationList[$core] = [];
                 }
                 $translationList[$core][$language] = $id;
@@ -74,18 +65,16 @@ trait TranslationModelTrait
                 $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
                 if (!empty($browserLanguages)) {
                     $browserLanguages = explode(',', $browserLanguages);
-                    if (!empty($browserLanguages)) {
-                        foreach ($browserLanguages as $language) {
-                            if ($pos = false !== strpos($language, ';q=')) {
-                                //remove weights
-                                $language = substr($language, 0, ($pos + 1));
-                            }
-                            //change - to _
-                            $language = str_replace('-', '_', $language);
+                    foreach ($browserLanguages as $language) {
+                        if (($pos = strpos($language, ';q=')) !== false) {
+                            //remove weights
+                            $language = substr($language, 0, ($pos + 1));
+                        }
+                        //change - to _
+                        $language = str_replace('-', '_', $language);
 
-                            if (!isset($languageList[$language])) {
-                                $languageList[$language] = $language;
-                            }
+                        if (!isset($languageList[$language])) {
+                            $languageList[$language] = $language;
                         }
                     }
                 }

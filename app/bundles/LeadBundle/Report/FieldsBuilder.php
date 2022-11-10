@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Report;
 
 use Mautic\LeadBundle\Entity\LeadField;
@@ -87,10 +78,15 @@ class FieldsBuilder
         ];
 
         $ownerPrefix           = $prefix.'owner_id';
+        $ownersList            = [];
+        $owners                = $this->userModel->getUserList('', 0);
+        foreach ($owners as $owner) {
+            $ownersList[$owner['id']] = sprintf('%s %s', $owner['firstName'], $owner['lastName']);
+        }
         $filters[$ownerPrefix] = [
             'label' => 'mautic.lead.list.filter.owner',
             'type'  => 'select',
-            'list'  => $this->userModel->getUserList('', 0),
+            'list'  => $ownersList,
         ];
 
         return $filters;

@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\DependencyInjection\Builder;
 
 use Mautic\CoreBundle\DependencyInjection\Builder\BundleMetadataBuilder;
+use Mautic\CoreBundle\Security\Permissions\SystemPermissions;
+use MauticPlugin\MauticFocusBundle\Security\Permissions\FocusPermissions;
 use PHPUnit\Framework\TestCase;
 
 class BundleMetadataBuilderTest extends TestCase
@@ -57,7 +50,7 @@ class BundleMetadataBuilderTest extends TestCase
         $this->assertEquals('Mautic\CoreBundle', $bundleMetadata['namespace']);
         $this->assertEquals('Mautic\CoreBundle\MauticCoreBundle', $bundleMetadata['bundleClass']);
         $this->assertTrue(isset($bundleMetadata['permissionClasses']));
-        $this->assertTrue(isset($bundleMetadata['permissionClasses']['core']));
+        $this->assertTrue(isset($bundleMetadata['permissionClasses'][SystemPermissions::class]));
         $this->assertTrue(isset($bundleMetadata['config']));
         $this->assertTrue(isset($bundleMetadata['config']['routes']));
     }
@@ -82,7 +75,7 @@ class BundleMetadataBuilderTest extends TestCase
         $this->assertEquals('MauticPlugin\MauticFocusBundle', $bundleMetadata['namespace']);
         $this->assertEquals('MauticPlugin\MauticFocusBundle\MauticFocusBundle', $bundleMetadata['bundleClass']);
         $this->assertTrue(isset($bundleMetadata['permissionClasses']));
-        $this->assertTrue(isset($bundleMetadata['permissionClasses']['focus']));
+        $this->assertTrue(isset($bundleMetadata['permissionClasses'][FocusPermissions::class]));
         $this->assertTrue(isset($bundleMetadata['config']));
         $this->assertTrue(isset($bundleMetadata['config']['routes']));
     }

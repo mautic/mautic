@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
@@ -16,6 +7,7 @@ use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Exception\FileIOException;
 use Mautic\ReportBundle\ReportEvents;
+use Mautic\ReportBundle\Scheduler\Enum\SchedulerEnum;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -79,19 +71,22 @@ class ReportExporter
         $report = $scheduler->getReport();
 
         if (!is_null($scheduler->getScheduleDate())) {
-            /** @var /DateTime $dateTo */
             $dateTo = clone $scheduler->getScheduleDate();
             $dateTo->setTime(0, 0, 0);
 
             $dateFrom = clone $dateTo;
             switch ($report->getScheduleUnit()) {
-                case 'DAILY':
+                case SchedulerEnum::UNIT_NOW:
+                    $dateFrom->sub(new \DateInterval('P10Y'));
+                    $this->schedulerModel->turnOffScheduler($report);
+                    break;
+                case SchedulerEnum::UNIT_DAILY:
                     $dateFrom->sub(new \DateInterval('P1D'));
                     break;
-                case 'WEEKLY':
+                case SchedulerEnum::UNIT_WEEKLY:
                     $dateFrom->sub(new \DateInterval('P7D'));
                     break;
-                case 'MONTHLY':
+                case SchedulerEnum::UNIT_MONTHLY:
                     $dateFrom->sub(new \DateInterval('P1M'));
                     break;
             }
@@ -118,8 +113,7 @@ class ReportExporter
                 $this->reportExportOptions->nextBatch();
             }
 
-            $file = $this->reportFileWriter->getFilePath($scheduler);
-
+            $file  = $this->reportFileWriter->getFilePath($scheduler);
             $event = new ReportScheduleSendEvent($scheduler, $file);
             $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
         }

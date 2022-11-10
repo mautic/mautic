@@ -1,15 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-// Defaults
 $appendAttribute = function (&$attributes, $attributeName, $append) {
     if (false === stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';
@@ -87,11 +77,24 @@ if (!empty($inForm)) {
 
 // Container
 $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
+
 if (!isset($containerClass)) {
     $containerClass = $containerType;
 }
 $order                 = (isset($field['order'])) ? $field['order'] : 0;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
+
+if ($field['parent'] && isset($fields[$field['parent']])) {
+    $values = implode('|', $field['conditions']['values']);
+
+    if (!empty($field['conditions']['any']) && 'notIn' != $field['conditions']['expr']) {
+        $values = '*';
+    }
+
+    $containerAttr .= " data-mautic-form-show-on=\"{$fields[$field['parent']]->getAlias()}:".$values.'" data-mautic-form-expr="'.$field['conditions']['expr'].'"';
+
+    $defaultContainerClass .= '  mauticform-field-hidden';
+}
 
 // Field is required
 $validationMessage = '';

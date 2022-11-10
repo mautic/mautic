@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Report\FieldDAO as ReportFieldDAO;
@@ -73,7 +64,8 @@ class FieldBuilder
         string $field,
         array $mauticObject,
         RequestObjectDAO $requestObject,
-        string $integration
+        string $integration,
+        string $defaultState = ReportFieldDAO::FIELD_CHANGED
     ) {
         $this->mauticObject  = $mauticObject;
         $this->requestObject = $requestObject;
@@ -98,7 +90,7 @@ class FieldBuilder
             return $this->addContactTimelineField($integration, $field);
         }
 
-        return $this->addCustomField($field);
+        return $this->addCustomField($field, $defaultState);
     }
 
     /**
@@ -168,7 +160,7 @@ class FieldBuilder
      *
      * @throws FieldNotFoundException
      */
-    private function addCustomField(string $field)
+    private function addCustomField(string $field, string $defaultState)
     {
         // The rest should be Mautic custom fields and if not, just ignore
         $mauticFields = $this->fieldHelper->getFieldList($this->requestObject->getObject());
@@ -184,7 +176,7 @@ class FieldBuilder
         return new ReportFieldDAO(
             $field,
             $normalizedValue,
-            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : ReportFieldDAO::FIELD_UNCHANGED
+            in_array($field, $requiredFields) ? ReportFieldDAO::FIELD_REQUIRED : $defaultState
         );
     }
 }

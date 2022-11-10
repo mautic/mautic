@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
@@ -19,6 +10,13 @@ return [
             'mautic_report_export' => [
                 'path'       => '/reports/view/{objectId}/export/{format}',
                 'controller' => 'MauticReportBundle:Report:export',
+                'defaults'   => [
+                    'format' => 'csv',
+                ],
+            ],
+            'mautic_report_download' => [
+                'path'       => '/reports/download/{reportId}/{format}',
+                'controller' => 'MauticReportBundle:Report:download',
                 'defaults'   => [
                     'format' => 'csv',
                 ],
@@ -42,6 +40,10 @@ return [
                     'scheduleDay'            => '',
                     'scheduleMonthFrequency' => '',
                 ],
+            ],
+            'mautic_report_schedule' => [
+                'path'       => '/reports/schedule/{reportId}/now',
+                'controller' => 'MauticReportBundle:Schedule:now',
             ],
             'mautic_report_action' => [
                 'path'       => '/reports/{objectAction}/{objectId}',
@@ -213,6 +215,15 @@ return [
                 'arguments' => [
                     'mautic.helper.mailer',
                     'mautic.report.model.message_schedule',
+                    'mautic.report.model.file_handler',
+                ],
+            ],
+            'mautic.report.model.file_handler' => [
+                'class'     => \Mautic\ReportBundle\Scheduler\Model\FileHandler::class,
+                'arguments' => [
+                    'mautic.helper.file_path_resolver',
+                    'mautic.helper.file_properties',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.message_schedule' => [

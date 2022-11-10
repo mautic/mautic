@@ -1,21 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
-use Twig_Extension;
-use Twig_SimpleFunction;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class SlotExtension extends Twig_Extension
+class SlotExtension extends AbstractExtension
 {
     /**
      * @var SlotsHelper
@@ -33,8 +26,8 @@ class SlotExtension extends Twig_Extension
     public function getFunctions()
     {
         return [
-            'slot'           => new Twig_SimpleFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
-            'slotHasContent' => new Twig_SimpleFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']]),
+            new TwigFunction('slot', [$this, 'getSlot'], ['is_safe' => ['html']]),
+            new TwigFunction('slotHasContent', [$this, 'slotHasContent'], ['is_safe' => ['html']]),
         ];
     }
 

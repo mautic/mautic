@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Entity;
 
 use Mautic\ReportBundle\Entity\Report;
@@ -119,6 +110,28 @@ class ReportTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(\UnexpectedValueException::class);
         $report->getFilterValue('I need coffee');
+    }
+
+    public function testSetAsScheduledNow()
+    {
+        $email  = 'john@doe.email';
+        $report = new Report();
+        $report->setAsScheduledNow($email);
+
+        $this->assertTrue($report->isScheduled());
+        $this->assertSame($email, $report->getToAddress());
+        $this->assertSame(SchedulerEnum::UNIT_NOW, $report->getScheduleUnit());
+    }
+
+    public function testIsScheduledNowIfNot()
+    {
+        $report = new Report();
+
+        $this->assertFalse($report->isScheduledNow());
+
+        $report->setScheduleUnit(SchedulerEnum::UNIT_NOW);
+
+        $this->assertTrue($report->isScheduledNow());
     }
 
     /**

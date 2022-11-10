@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\QueueBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
@@ -39,18 +30,25 @@ class QueueEvent extends CommonEvent
     private $queueName;
 
     /**
+     * @var int|null
+     */
+    private $timeout;
+
+    /**
      * QueueEvent constructor.
      *
      * @param string   $protocol
      * @param string   $queueName
      * @param int|null $messages
+     * @param int|null $timeout
      */
-    public function __construct($protocol, $queueName, array $payload = [], $messages = null)
+    public function __construct($protocol, $queueName, array $payload = [], $messages = null, $timeout = null)
     {
         $this->messages  = $messages;
         $this->payload   = $payload;
         $this->protocol  = $protocol;
         $this->queueName = $queueName;
+        $this->timeout   = $timeout;
     }
 
     /**
@@ -83,6 +81,14 @@ class QueueEvent extends CommonEvent
     public function getQueueName()
     {
         return $this->queueName;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getTimeout()
+    {
+        return $this->timeout;
     }
 
     /**

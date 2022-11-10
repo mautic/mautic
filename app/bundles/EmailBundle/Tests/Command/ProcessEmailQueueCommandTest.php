@@ -1,24 +1,19 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Command\ProcessEmailQueueCommand;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Bundle\SwiftmailerBundle\Command\SendEmailCommand;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -29,6 +24,11 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
     private $container;
     private $transport;
     private $application;
+
+    /**
+     * @var MockObject&SendEmailCommand
+     */
+    private $subCommand;
 
     /**
      * @var ProcessEmailQueueCommand
@@ -44,6 +44,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         $this->container            = $this->createMock(Container::class);
         $this->transport            = $this->createMock(\Swift_Transport::class);
         $this->application          = $this->createMock(Application::class);
+        $this->subCommand           = $this->createMock(SendEmailCommand::class);
 
         $this->application->method('getHelperSet')
             ->willReturn($this->createMock(HelperSet::class));
@@ -54,22 +55,13 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
             ->willReturn($inputDefinition);
 
         $inputDefinition->method('getOptions')
-            ->willReturn([]);
+          ->will($this->returnValue([
+              new InputOption('--quiet', '-q', InputOption::VALUE_OPTIONAL, 'Do not output any message'),
+          ]));
 
-        $this->command = new ProcessEmailQueueCommand();
+        $this->command = new ProcessEmailQueueCommand($this->transport, $this->dispatcher, $this->coreParametersHelper);
         $this->command->setContainer($this->container);
         $this->command->setApplication($this->application);
-
-        $this->container->method('get')
-            ->withConsecutive(
-                ['event_dispatcher'],
-                ['mautic.helper.core_parameters'],
-                ['swiftmailer.transport.real']
-            )->willReturnOnConsecutiveCalls(
-                $this->dispatcher,
-                $this->coreParametersHelper,
-                $this->transport
-            );
     }
 
     public function testCommandWhenQueueIsDisabled()
@@ -102,18 +94,16 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         copy($tryAgainMessage, $tmpTryAgainMessageFile);
 
         $this->coreParametersHelper->method('get')
-            ->withConsecutive(['mailer_spool_type'])
-            ->willReturnOnConsecutiveCalls(true);
-
-        $this->container->method('getParameter')
             ->withConsecutive(
+                ['mailer_spool_type'],
                 ['mautic.mailer_spool_path'],
                 ['mautic.mailer_spool_msg_limit']
             )
-            ->will($this->onConsecutiveCalls(
+            ->willReturnOnConsecutiveCalls(
+                'file',
                 $tmpSpoolDir,
                 10
-            ));
+            );
 
         $this->transport->expects($this->once())
             ->method('send')
@@ -127,7 +117,7 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         $this->application->expects($this->once())
             ->method('find')
             ->with('swiftmailer:spool:send')
-            ->willReturn($this->createMock(Command::class));
+            ->willReturn($this->subCommand);
 
         $input  = new ArrayInput(['--bypass-locking' => true, '--clear-timeout' => 10]);
         $output = new BufferedOutput();
@@ -138,5 +128,37 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
 
         // Cleanup.
         unset($tmpSpoolDir);
+    }
+
+    public function testCommandWithQuietFlag(): void
+    {
+        $this->coreParametersHelper->expects($this->any())
+          ->method('get')
+          ->will($this->returnValueMap([['mailer_spool_type', null, 'file']]));
+
+        $this->subCommand->expects($this->exactly(2))
+          ->method('run')
+          ->willReturnCallback(function (InputInterface $input, OutputInterface $output) {
+              $output->writeln('0 messages send');
+
+              return 0;
+          });
+
+        $this->application->expects($this->exactly(2))
+          ->method('find')
+          ->with('swiftmailer:spool:send')
+          ->willReturn($this->subCommand);
+
+        // test non-quiet mode
+        $input  = new ArrayInput(['--bypass-locking' => true, '--clear-timeout' => 10, '--quiet' => 0]);
+        $output = new BufferedOutput();
+        $this->assertSame(0, $this->command->run($input, $output));
+        $this->assertSame("0 messages send\n", $output->fetch());
+
+        // test quiet mode
+        $input  = new ArrayInput(['--bypass-locking' => true, '--clear-timeout' => 10, '--quiet' => 1]);
+        $output = new BufferedOutput();
+        $this->assertSame(0, $this->command->run($input, $output));
+        $this->assertSame('', $output->fetch());
     }
 }

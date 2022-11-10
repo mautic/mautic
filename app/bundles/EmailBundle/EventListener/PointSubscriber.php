@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
@@ -27,11 +18,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PointSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var PointModel
+     */
     private $pointModel;
 
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
-
-    private $triggered = [];
 
     public function __construct(PointModel $pointModel, EntityManager $entityManager)
     {
@@ -39,9 +34,6 @@ class PointSubscriber implements EventSubscriberInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public static function getSubscribedEvents()
     {
         return [
@@ -118,21 +110,6 @@ class PointSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->shouldTriggerPointEmailSendAction($event, $lead)) {
-            $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
-        }
-    }
-
-    private function shouldTriggerPointEmailSendAction(EmailSendEvent $event, Lead $lead)
-    {
-        if ($event->getEmail()) {
-            if (!isset($this->triggered[$lead->getId()][$event->getEmail()->getId()])) {
-                $this->triggered[$lead->getId()][$event->getEmail()->getId()] = true;
-
-                return true;
-            }
-        }
-
-        return false;
+        $this->pointModel->triggerAction('email.send', $event->getEmail(), null, $lead, true);
     }
 }

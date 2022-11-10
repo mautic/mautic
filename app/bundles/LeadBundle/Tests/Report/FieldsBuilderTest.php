@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Report;
 
 use Mautic\FormBundle\Entity\Field;
@@ -147,7 +138,10 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($userSegments);
 
-        $users = ['John', 'Doe'];
+        $users = [
+            0 => ['id' => 1, 'firstName' => 'John', 'lastName' => 'Doe'],
+            1 => ['id' => 2, 'firstName' => 'Joe', 'lastName' => 'Smith'],
+        ];
 
         $userModel->expects($this->once())
             ->method('getUserList')
@@ -229,8 +223,8 @@ class FieldsBuilderTest extends \PHPUnit\Framework\TestCase
                 'label' => 'mautic.lead.list.filter.owner',
                 'type'  => 'select',
                 'list'  => [
-                    0 => 'John',
-                    1 => 'Doe',
+                    1 => 'John Doe',
+                    2 => 'Joe Smith',
                 ],
             ],
         ];

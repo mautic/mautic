@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Type;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Mautic\CoreBundle\Helper\UTF8Helper;
-use Symfony\Component\Debug\Exception\ContextErrorException;
 
 /**
  * Type that maps a PHP array to a clob SQL type.
@@ -82,7 +72,7 @@ class ArrayType extends \Doctrine\DBAL\Types\ArrayType
             return $value;
         } catch (ConversionException $exception) {
             return [];
-        } catch (ContextErrorException $exeption) {
+        } catch (\ErrorException $exeption) {
             return [];
         }
     }

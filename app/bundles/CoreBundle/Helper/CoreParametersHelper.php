@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
@@ -45,6 +36,12 @@ class CoreParametersHelper
         $this->resolveParameters();
     }
 
+    /**
+     * @param string $name
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
     public function get($name, $default = null)
     {
         $name = $this->stripMauticPrefix($name);
@@ -63,6 +60,9 @@ class CoreParametersHelper
         return $this->parameters->get($name, $default);
     }
 
+    /**
+     * @param string $name
+     */
     public function has($name): bool
     {
         return $this->parameters->has($this->stripMauticPrefix($name));

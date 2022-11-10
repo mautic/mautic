@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
 use Doctrine\DBAL\Connection;
@@ -95,6 +86,12 @@ class CompanyObjectHelper implements ObjectHelperInterface
      */
     public function update(array $ids, array $objects): array
     {
+        $updatedMappedObjects = [];
+
+        if (!$ids) {
+            return $updatedMappedObjects;
+        }
+
         /** @var Company[] $companies */
         $companies = $this->model->getEntities(['ids' => $ids]);
         DebugLogger::log(
@@ -107,7 +104,6 @@ class CompanyObjectHelper implements ObjectHelperInterface
             __CLASS__.':'.__FUNCTION__
         );
 
-        $updatedMappedObjects = [];
         foreach ($companies as $company) {
             /** @var ObjectChangeDAO $changedObject */
             $changedObject = $objects[$company->getId()];
@@ -196,7 +192,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
 
         foreach ($fields as $col => $val) {
             // Use andWhere because Mautic treats conflicting unique identifiers as different objects
-            $q->andWhere("c.$col = :".$col)
+            $q->{$this->repository->getUniqueIdentifiersWherePart()}("c.$col = :".$col)
                 ->setParameter($col, $val);
         }
 

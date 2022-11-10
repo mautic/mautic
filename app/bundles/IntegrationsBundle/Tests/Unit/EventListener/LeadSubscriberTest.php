@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
@@ -101,7 +92,7 @@ class LeadSubscriberTest extends TestCase
     public function testOnLeadPostSaveAnonymousLead(): void
     {
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(true);
         $lead->expects($this->never())
@@ -120,7 +111,7 @@ class LeadSubscriberTest extends TestCase
     public function testOnLeadPostSaveLeadObjectSyncNotEnabled(): void
     {
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->never())
@@ -138,32 +129,12 @@ class LeadSubscriberTest extends TestCase
         $this->subscriber->onLeadPostSave($this->leadEvent);
     }
 
-    public function testOnLeadCompanyChange(): void
-    {
-        $leadId      = 3;
-        $companyName = 'Dell';
-
-        $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
-            ->method('getCompany')
-            ->willReturn($companyName);
-        $lead->expects($this->at(0))
-            ->method('getId')
-            ->willReturn($leadId);
-
-        $this->leadEvent->expects($this->once())
-            ->method('getLead')
-            ->willReturn($lead);
-
-        $this->subscriber->onLeadPostSave($this->leadEvent);
-    }
-
     public function testOnLeadPostSaveNoAction(): void
     {
         $fieldChanges = [];
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -199,7 +170,7 @@ class LeadSubscriberTest extends TestCase
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -236,7 +207,7 @@ class LeadSubscriberTest extends TestCase
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -275,7 +246,7 @@ class LeadSubscriberTest extends TestCase
         $objectType = Lead::class;
 
         $lead = $this->createMock(Lead::class);
-        $lead->expects($this->at(0))
+        $lead->expects($this->once())
             ->method('isAnonymous')
             ->willReturn(false);
         $lead->expects($this->once())
@@ -303,21 +274,39 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostDelete(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Lead();
         $lead->deletedId = $deletedId;
+        $lead->setEmail('john@doe.email');
 
-        $this->leadEvent->expects($this->exactly(2))
-            ->method('getLead')
+        $this->leadEvent->method('getLead')
             ->willReturn($lead);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+            ->with((int) $deletedId, Lead::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
             ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+
+        $this->subscriber->onLeadPostDelete($this->leadEvent);
+    }
+
+    public function testOnLeadPostDeleteForAnonymousLeads(): void
+    {
+        $deletedId       = 5;
+        $lead            = new Lead();
+        $lead->deletedId = $deletedId;
+
+        $this->leadEvent->method('getLead')
+            ->willReturn($lead);
+
+        $this->fieldChangeRepository->expects($this->never())
+            ->method('deleteEntitiesForObject');
+
+        $this->objectMappingRepository->expects($this->never())
+            ->method('deleteEntitiesForObject');
 
         $this->subscriber->onLeadPostDelete($this->leadEvent);
     }
@@ -435,7 +424,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnCompanyPostDelete(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Company();
         $lead->deletedId = $deletedId;
 
@@ -464,17 +453,18 @@ class LeadSubscriberTest extends TestCase
             ->willReturn($enabledIntegrations);
 
         $fieldNames = [];
+        $values     = [];
+        $valueDAOs  = [];
         $i          = 0;
         foreach ($fieldChanges as $fieldName => [$oldValue, $newValue]) {
-            $valueDao = new EncodedValueDAO($objectType, (string) $newValue);
-
-            $this->variableExpresserHelper->expects($this->at($i))
-                ->method('encodeVariable')
-                ->with($newValue)
-                ->willReturn($valueDao);
-
+            $values[]     = [$newValue];
+            $valueDAOs[]  = new EncodedValueDAO($objectType, (string) $newValue);
             $fieldNames[] = $fieldName;
         }
+
+        $this->variableExpresserHelper->method('encodeVariable')
+                ->withConsecutive(...$values)
+                ->willReturn(...$valueDAOs);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObjectByColumnName')

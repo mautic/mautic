@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -137,7 +128,7 @@ class UserController extends FormController
                 //check to see if the password needs to be rehashed
                 $formUser          = $this->request->request->get('user', []);
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $encoder           = $this->get('security.encoder_factory')->getEncoder($user);
+                $encoder           = $this->get('security.password_encoder');
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
                 if ($valid = $this->isFormValid($form)) {
@@ -269,7 +260,7 @@ class UserController extends FormController
                 //check to see if the password needs to be rehashed
                 $formUser          = $this->request->request->get('user', []);
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
-                $encoder           = $this->get('security.encoder_factory')->getEncoder($user);
+                $encoder           = $this->get('security.password_encoder');
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
                 if ($valid = $this->isFormValid($form)) {

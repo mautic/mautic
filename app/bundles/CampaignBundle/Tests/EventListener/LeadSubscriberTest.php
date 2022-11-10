@@ -13,7 +13,6 @@ use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\EventListener\LeadSubscriber;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -95,8 +94,7 @@ class LeadSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createMock(LeadModel::class),
             $this->createMock(Translator::class),
             $this->makeBatchEntityManagerMock(),
-            $this->createMock(Router::class),
-            $this->createMock(CorePermissions::class)
+            $this->createMock(Router::class)
         );
 
         $leadSubscriber->onLeadListBatchChange($event);
@@ -128,8 +126,7 @@ class LeadSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->createMock(LeadModel::class),
             $this->createMock(Translator::class),
             $this->makeBatchEntityManagerMock(),
-            $this->createMock(Router::class),
-            $this->createMock(CorePermissions::class)
+            $this->createMock(Router::class)
         );
 
         $leadSubscriber->onLeadListBatchChange($event);
@@ -171,8 +168,7 @@ class LeadSubscriberTest extends \PHPUnit\Framework\TestCase
             $leadModel,
             $this->createMock(Translator::class),
             $this->makeSingleEntityManagerMock(),
-            $this->createMock(Router::class),
-            $this->createMock(CorePermissions::class)
+            $this->createMock(Router::class)
         );
 
         $leadSubscriber->onLeadListChange($event);
@@ -214,8 +210,7 @@ class LeadSubscriberTest extends \PHPUnit\Framework\TestCase
             $leadModel,
             $this->createMock(Translator::class),
             $this->makeSingleEntityManagerMock(),
-            $this->createMock(Router::class),
-            $this->createMock(CorePermissions::class)
+            $this->createMock(Router::class)
         );
 
         $leadSubscriber->onLeadListChange($event);

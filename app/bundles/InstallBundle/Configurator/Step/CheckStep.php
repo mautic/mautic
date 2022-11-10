@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -109,7 +100,9 @@ class CheckStep implements StepInterface
             $messages[] = 'mautic.install.php.version.not.supported';
         }
 
-        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer')) {
+        // Allow for the vendor folder to live
+        // above the application folder.
+        if (!is_dir(dirname($this->kernelRoot).'/vendor/composer') && !is_dir(dirname($this->kernelRoot).'/../vendor/composer')) {
             $messages[] = 'mautic.install.composer.dependencies';
         }
 
@@ -238,7 +231,7 @@ class CheckStep implements StepInterface
 
         $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
         $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::$memory_limit);
-        if ($memoryLimit < $suggestedLimit) {
+        if ($memoryLimit > -1 && $memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }
 
@@ -254,6 +247,10 @@ class CheckStep implements StepInterface
             } catch (\Exception $exception) {
                 $messages[] = 'mautic.install.intl.config';
             }
+        }
+
+        if (-1 !== (int) ini_get('zend.assertions')) {
+            $messages[] = 'mautic.install.zend_assertions';
         }
 
         return $messages;

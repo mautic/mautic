@@ -79,8 +79,6 @@ PHP
 
     mPDF - GPL - Copyright © 2005 - 2014  Ian N Back
 
-    OAuth1 Server Bundle - MIT - Copyright (c) 2011-2012 William Durand
-
     OAuth2 Server Bundle, Rest Bundle - MIT - Copyright (c) 2010 Tim Ridgely
 
     Password-compat - MIT - Copyright (c) 2012 Anthony Ferrara

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -25,7 +16,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
 
     public function testMergedContactFound()
     {
-        $model = $this->container->get('mautic.lead.model.lead');
+        $model = self::$container->get('mautic.lead.model.lead');
 
         $bob = new Lead();
         $bob->setFirstname('Bob')
@@ -76,9 +67,9 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     public function testMergedContactsPointsAreAccurate()
     {
         /** @var LeadModel $model */
-        $model = $this->container->get('mautic.lead.model.lead');
+        $model = self::$container->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
-        $em   = $this->container->get('doctrine.orm.entity_manager');
+        $em   = self::$container->get('doctrine.orm.entity_manager');
 
         // Startout Jane with 50 points
         $jane = new Lead();
@@ -137,13 +128,13 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
     public function testSavingPrimaryCompanyAfterPointsAreSetByListenerAreNotResetToDefaultOf0BecauseOfPointsFieldDefaultIs0()
     {
         /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = $this->container->get('event_dispatcher');
+        $eventDispatcher = self::$container->get('event_dispatcher');
         $eventDispatcher->addListener(LeadEvents::LEAD_POST_SAVE, [$this, 'addPointsListener']);
 
         /** @var LeadModel $model */
-        $model = $this->container->get('mautic.lead.model.lead');
+        $model = self::$container->get('mautic.lead.model.lead');
         /** @var EntityManager $em */
-        $em   = $this->container->get('doctrine.orm.entity_manager');
+        $em   = self::$container->get('doctrine.orm.entity_manager');
 
         // Set company to trigger setPrimaryCompany()
         $lead = new Lead();
@@ -176,7 +167,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
         $lead->adjustPoints(10);
 
         /** @var LeadModel $model */
-        $model = $this->container->get('mautic.lead.model.lead');
+        $model = self::$container->get('mautic.lead.model.lead');
         $model->saveEntity($lead);
     }
 }

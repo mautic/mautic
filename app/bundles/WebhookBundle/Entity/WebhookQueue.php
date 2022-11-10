@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -52,7 +43,6 @@ class WebhookQueue
             ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addId();
         $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('queues')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
         $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');

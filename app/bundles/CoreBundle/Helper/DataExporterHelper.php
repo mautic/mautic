@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Sam
- * Date: 05/04/2017
- * Time: 16:58.
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;

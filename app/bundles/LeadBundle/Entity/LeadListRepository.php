@@ -1,36 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Types\DateType;
-use Doctrine\DBAL\Types\FloatType;
-use Doctrine\DBAL\Types\IntegerType;
-use Doctrine\DBAL\Types\TimeType;
-use Mautic\CoreBundle\Doctrine\QueryFormatter\AbstractFormatter;
-use Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType;
+use Exception;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\Serializer;
-use Mautic\LeadBundle\Event\LeadListFilteringEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class LeadListRepository extends CommonRepository
 {
-    use OperatorListTrait;
+    use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
     use ExpressionHelperTrait;
     use RegexTrait;
 
@@ -77,7 +57,7 @@ class LeadListRepository extends CommonRepository
                 ->setParameter('listId', $id)
                 ->getQuery()
                 ->getSingleResult();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $entity = null;
         }
 
@@ -127,10 +107,10 @@ class LeadListRepository extends CommonRepository
     /**
      * Get lists for a specific lead.
      *
-     * @param      $lead
-     * @param bool $forList
-     * @param bool $singleArrayHydration
-     * @param bool $isPublic
+     * @param int|Lead[] $lead                 Lead ID or array of Leads
+     * @param bool       $forList
+     * @param bool       $singleArrayHydration
+     * @param bool       $isPublic
      *
      * @return mixed
      */
@@ -234,7 +214,7 @@ class LeadListRepository extends CommonRepository
             )
             ->setParameter('leadId', $lead->getId());
 
-        return  (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**
@@ -278,25 +258,34 @@ class LeadListRepository extends CommonRepository
     /**
      * Get a count of leads that belong to the list.
      *
-     * @param $listIds
+     * @param int|int[] $listIds
      *
-     * @return array
+     * @return array|int
+     *
+     * @throws Exception
      */
     public function getLeadCount($listIds)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
-
-        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
-
-        $returnArray = (is_array($listIds));
-
-        if (!$returnArray) {
+        if (!(is_array($listIds))) {
             $listIds = [$listIds];
         }
 
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('count(l.lead_id) as thecount, l.leadlist_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l');
+
+        $expression   = null;
+        $countListIds = count($listIds);
+
+        if (1 === $countListIds) {
+            $q          = $this->forceUseIndex($q, MAUTIC_TABLE_PREFIX.'manually_removed');
+            $expression = $q->expr()->eq('l.leadlist_id', $listIds[0]);
+        } else {
+            $expression = $q->expr()->in('l.leadlist_id', $listIds);
+        }
+
         $q->where(
-            $q->expr()->in('l.leadlist_id', $listIds),
+            $expression,
             $q->expr()->eq('l.manually_removed', ':false')
         )
             ->setParameter('false', false, 'boolean')
@@ -316,7 +305,17 @@ class LeadListRepository extends CommonRepository
             }
         }
 
-        return ($returnArray) ? $return : $return[$listIds[0]];
+        return (1 === $countListIds) ? $return[$listIds[0]] : $return;
+    }
+
+    private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
+    {
+        $fromPart             = $qb->getQueryPart('from');
+        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
+        $qb->resetQueryPart('from');
+        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+
+        return $qb;
     }
 
     /**
@@ -435,7 +434,7 @@ class LeadListRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = parent::addSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = parent::addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -450,25 +449,10 @@ class LeadListRepository extends CommonRepository
                 $expr            = $q->expr()->eq('l.isGlobal', ":$unique");
                 $forceParameters = [$unique => true];
                 break;
-            case $this->translator->trans('mautic.core.searchcommand.ispublished'):
-            case $this->translator->trans('mautic.core.searchcommand.ispublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isPublished', ":$unique");
-                $forceParameters = [$unique => true];
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished'):
-            case $this->translator->trans('mautic.core.searchcommand.isunpublished', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.isPublished', ":$unique");
-                $forceParameters = [$unique => false];
-                break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
             case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
                 $expr            = $q->expr()->like('l.name', ':'.$unique);
                 $returnParameter = true;
-                break;
-            case $this->translator->trans('mautic.core.searchcommand.ismine'):
-            case $this->translator->trans('mautic.core.searchcommand.ismine', [], null, 'en_US'):
-                $expr            = $q->expr()->eq('l.createdBy', ":$unique");
-                $forceParameters = [$unique => $this->currentUser->getId()];
                 break;
         }
 
@@ -496,6 +480,7 @@ class LeadListRepository extends CommonRepository
             'mautic.core.searchcommand.isunpublished',
             'mautic.core.searchcommand.name',
             'mautic.core.searchcommand.ismine',
+            'mautic.core.searchcommand.category',
         ];
 
         return array_merge($commands, parent::getSearchCommands());
@@ -554,5 +539,15 @@ class LeadListRepository extends CommonRepository
     public function getTableAlias()
     {
         return 'l';
+    }
+
+    public function leadListExists(int $id): bool
+    {
+        $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
+        $result    = (int) $this->getEntityManager()->getConnection()
+            ->executeQuery("SELECT EXISTS(SELECT 1 FROM {$tableName} WHERE id = {$id})")
+            ->fetchColumn();
+
+        return 1 === $result;
     }
 }

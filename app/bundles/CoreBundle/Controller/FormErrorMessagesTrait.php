@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
@@ -65,8 +56,24 @@ trait FormErrorMessagesTrait
         return $errors;
     }
 
+    public function getFormErrorCodes(Form $form): array
+    {
+        $codes = [];
+
+        foreach ($form->getErrors(true) as $error) {
+            $code         = $error->getCause()->getCode();
+            $codes[$code] = $code;
+        }
+
+        return $codes;
+    }
+
     public function getFormErrorForBuilder(Form $form)
     {
+        if (!$form->isSubmitted()) {
+            return null;
+        }
+
         if ($form->isValid()) {
             return null;
         }

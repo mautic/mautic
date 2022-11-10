@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -89,8 +80,14 @@ class AjaxController extends CommonAjaxController
                 $log->setIsScheduled(false);
 
                 /** @var EventLogModel $logModel */
-                $logModel = $this->getModel('campaign.event_log');
-                $logModel->saveEntity($log);
+                $logModel           = $this->getModel('campaign.event_log');
+                $metadata           = $log->getMetadata();
+                $metadata['errors'] = $this->translator->trans(
+                    'mautic.campaign.event.cancelled.time',
+                    ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
+                );
+                $log->setMetadata($metadata);
+                $logModel->getRepository()->saveEntity($log);
 
                 $dataArray = ['success' => 1];
             }

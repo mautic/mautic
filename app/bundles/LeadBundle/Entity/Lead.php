@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,7 +14,7 @@ use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
@@ -32,6 +23,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     const POINTS_SUBTRACT = 'minus';
     const POINTS_MULTIPLY = 'times';
     const POINTS_DIVIDE   = 'divide';
+    const DEFAULT_ALIAS   = 'l';
 
     /**
      * Used to determine social identity.
@@ -462,6 +454,16 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
             ->build();
     }
 
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'firstname',
+            'lastname',
+            'company',
+            'email',
+        ];
+    }
+
     /**
      * @param string $prop
      * @param mixed  $val
@@ -586,9 +588,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get owner.
-     *
-     * @return User
+     * @return User|null
      */
     public function getOwner()
     {
@@ -718,7 +718,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
      */
     public function getSecondaryIdentifier()
     {
-        if (!$this->getCompany()) {
+        if ($this->getCompany()) {
             return $this->getCompany();
         }
 

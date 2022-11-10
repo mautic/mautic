@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\ORM\ORMException;
@@ -27,6 +18,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
+use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
@@ -282,7 +274,7 @@ class ImportModel extends FormModel
     public function process(Import $import, Progress $progress, $limit = 0)
     {
         //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', true);
+        ini_set('auto_detect_line_endings', '1');
 
         try {
             $file = new \SplFileObject($import->getFilePath());
@@ -300,10 +292,7 @@ class ImportModel extends FormModel
         $config           = $import->getParserConfig();
         $counter          = 0;
 
-        if ($lastImportedLine > 0) {
-            // Seek is zero-based line numbering and
-            $file->seek($lastImportedLine - 1);
-        }
+        $file->seek($lastImportedLine);
 
         $lineNumber = $lastImportedLine + 1;
         $this->logDebug('The import is starting on line '.$lineNumber, $import);
@@ -316,7 +305,9 @@ class ImportModel extends FormModel
         });
 
         while ($batchSize && !$file->eof()) {
-            $data = $file->fgetcsv($config['delimiter'], $config['enclosure'], $config['escape']);
+            $string = $file->current();
+            $file->next();
+            $data = str_getcsv($string, $config['delimiter'], $config['enclosure'], $config['escape']);
             $import->setLastLineImported($lineNumber);
 
             // Ignore the header row
@@ -350,20 +341,11 @@ class ImportModel extends FormModel
                 $data = array_combine($headers, $data);
 
                 try {
-                    $entityModel = 'company' === $import->getObject() ? $this->companyModel : $this->leadModel;
+                    $event = new ImportProcessEvent($import, $eventLog, $data);
 
-                    $merged = $entityModel->import(
-                        $import->getMatchedFields(),
-                        $data,
-                        $import->getDefault('owner'),
-                        $import->getDefault('list'),
-                        $import->getDefault('tags'),
-                        true,
-                        $eventLog,
-                        $import->getId()
-                    );
+                    $this->dispatcher->dispatch(LeadEvents::IMPORT_ON_PROCESS, $event);
 
-                    if ($merged) {
+                    if ($event->wasMerged()) {
                         $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
                         $import->increaseUpdatedCount();
                     } else {
@@ -377,9 +359,16 @@ class ImportModel extends FormModel
             }
 
             if ($errorMessage) {
+                // Log the error first
                 $import->increaseIgnoredCount();
-                $this->logImportRowError($eventLog, $errorMessage);
                 $this->logDebug('Line '.$lineNumber.' error: '.$errorMessage, $import);
+                if (!$this->em->isOpen()) {
+                    // Something bad must have happened if the entity manager is closed.
+                    // We will not be able to save any entities.
+                    throw new ORMException($errorMessage);
+                }
+                // This should be called only if the entity manager is open
+                $this->logImportRowError($eventLog, $errorMessage);
             } else {
                 $this->leadEventLogRepo->saveEntity($eventLog);
             }
@@ -509,7 +498,7 @@ class ImportModel extends FormModel
         $eventLog = new LeadEventLog();
         $eventLog->setUserId($import->getCreatedBy())
             ->setUserName($import->getCreatedByUser())
-            ->setBundle('lead')
+            ->setBundle($import->getObject())
             ->setObject('import')
             ->setObjectId($import->getId())
             ->setProperties(
@@ -554,17 +543,18 @@ class ImportModel extends FormModel
     /**
      * Returns a list of failed rows for the import.
      *
-     * @param int $importId
+     * @param int    $importId
+     * @param string $object
      *
      * @return array|null
      */
-    public function getFailedRows($importId = null)
+    public function getFailedRows($importId = null, $object = 'lead')
     {
         if (!$importId) {
             return null;
         }
 
-        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id']);
+        return $this->getEventLogRepository()->getFailedRows($importId, ['select' => 'properties,id'], $object);
     }
 
     /**

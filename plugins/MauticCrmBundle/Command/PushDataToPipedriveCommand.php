@@ -1,9 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Command;
 
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,10 +20,28 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class PushDataToPipedriveCommand extends ContainerAwareCommand
 {
-    /**
-     * @var SymfonyStyle
-     */
-    private $io;
+    private SymfonyStyle $io;
+    private IntegrationHelper $integrationHelper;
+    private TranslatorHelper $translatorHelper;
+    private EntityManager $entityManager;
+    private CompanyExport $companyExport;
+    private LeadExport $leadExport;
+
+    public function __construct(
+        IntegrationHelper $integrationHelper,
+        TranslatorHelper $translatorHelper,
+        EntityManager $entityManager,
+        CompanyExport $companyExport,
+        LeadExport $leadExport
+    ) {
+        $this->integrationHelper = $integrationHelper;
+        $this->translatorHelper  = $translatorHelper;
+        $this->entityManager     = $entityManager;
+        $this->companyExport     = $companyExport;
+        $this->leadExport        = $leadExport;
+
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -40,22 +65,22 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $integrationHelper = $this->getContainer()->get('mautic.helper.integration');
-        $integrationObject = $integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
+        /** @var PipeDriveIntegration $integrationObject */
+        $integrationObject = $this->integrationHelper
+            ->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
         $this->io          = new SymfonyStyle($input, $output);
-        $em                = $this->getContainer()->get('doctrine')->getManager();
 
         $pushed = 0;
 
-        if (!$integrationObject->getIntegrationSettings()->getIsPublished()) {
-            $this->io->note('Pipedrive integration id disabled.');
+        if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
+            $this->io->note('Pipedrive integration is disabled.');
 
             return;
         }
 
         if ($input->getOption('restart')) {
             $this->io->note(
-                $this->getContainer()->get('templating.helper.translator')->trans(
+                $this->translatorHelper->trans(
                     'mautic.plugin.config.integration.restarted',
                     ['%integration%' => $integrationObject->getName()]
                 )
@@ -65,25 +90,23 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
 
         if ($integrationObject->isCompanySupportEnabled()) {
             $this->io->title('Pushing Companies');
-            $companyExport = $this->getContainer()->get('mautic_integration.pipedrive.export.company');
-            $companyExport->setIntegration($integrationObject);
+            $this->companyExport->setIntegration($integrationObject);
 
-            $companies = $em->getRepository(Company::class)->findAll();
+            $companies = $this->entityManager->getRepository(Company::class)->findAll();
             foreach ($companies as $company) {
-                if ($companyExport->pushCompany($company)) {
+                if ($this->companyExport->pushCompany($company)) {
                     ++$pushed;
                 }
             }
             $this->io->text('Pushed '.$pushed);
         }
 
-        $leads = $em->getRepository(Lead::class)->findAll();
+        $leads = $this->entityManager->getRepository(Lead::class)->findAll();
         $this->io->title('Pushing Leads');
-        $leadExport = $this->getContainer()->get('mautic_integration.pipedrive.export.lead');
-        $leadExport->setIntegration($integrationObject);
+        $this->leadExport->setIntegration($integrationObject);
         $pushed = 0;
         foreach ($leads as $lead) {
-            if ($leadExport->create($lead)) {
+            if ($this->leadExport->create($lead)) {
                 ++$pushed;
             }
         }

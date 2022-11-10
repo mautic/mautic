@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -31,6 +22,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $swiftMailer = $this->getMockBuilder(\Swift_Mailer::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $swiftMailer->method('getTransport')->willReturn('');
 
         $tokens = [
             '{test}' => 'value',
@@ -101,7 +93,7 @@ CONTENT
         /** @var TokenSubscriber $subscriber */
         $subscriber = $this->getMockBuilder(TokenSubscriber::class)
             ->setConstructorArgs([$dispatcher, $primaryCompanyHelper])
-            ->setMethods(null)
+            ->onlyMethods([])
             ->getMock();
 
         $dispatcher->addSubscriber($subscriber);

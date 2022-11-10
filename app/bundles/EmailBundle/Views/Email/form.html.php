@@ -90,6 +90,7 @@ if (!isset($previewUrl)) {
                             <?php echo $view['translator']->trans('mautic.core.dynamicContent'); ?>
                         </a>
                     </li>
+                    <?php echo $view['content']->getCustomContent('email.tabs', $mauticTemplateVars); ?>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
@@ -128,6 +129,17 @@ if (!isset($previewUrl)) {
                             </div>
                             <div class="col-md-6">
                                 <?php echo $view['form']->row($form['headers']); ?>
+                            </div>
+                            <div class="col-md-6">
+                                <?php echo $view['form']->row($form['useOwnerAsMailer']); ?>
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="row hidden" id="custom-html-row">
+                            <div class="col-md-12">
+                                <?php echo $view['form']->label($form['customHtml']); ?>
+                                <?php echo $view['form']->widget($form['customHtml']); ?>
                             </div>
                         </div>
 
@@ -174,6 +186,7 @@ if (!isset($previewUrl)) {
                             </div>
                         </div>
                     </div>
+                    <?php echo $view['content']->getCustomContent('email.tabs.content', $mauticTemplateVars); ?>
                 </div>
             </div>
         </div>
@@ -227,7 +240,6 @@ if (!isset($previewUrl)) {
     </div>
 </div>
 
-<?php echo $view['form']->row($form['customHtml']); ?>
 <?php echo $view['form']->end($form); ?>
 
 <div id="dynamicContentPrototype" data-prototype="<?php echo $view->escape($view['form']->widget($dynamicContentPrototype)); ?>"></div>

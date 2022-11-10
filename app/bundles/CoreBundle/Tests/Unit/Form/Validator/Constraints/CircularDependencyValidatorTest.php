@@ -84,7 +84,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 'field'    => 'leadlist',
                 'object'   => 'lead',
                 'type'     => 'leadlist',
-                'filter'   => [2],
+                'filter'   => [2], // Keeping filter in the root to test also for BC segments.
                 'display'  => null,
                 'operator' => 'in',
             ],
@@ -92,25 +92,25 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
 
         $filters2 = [
             [
-                'glue'     => 'and',
-                'field'    => 'leadlist',
-                'object'   => 'lead',
-                'type'     => 'leadlist',
-                'filter'   => [1],
-                'display'  => null,
-                'operator' => 'in',
+                'glue'       => 'and',
+                'field'      => 'leadlist',
+                'object'     => 'lead',
+                'type'       => 'leadlist',
+                'properties' => ['filter' => [1]],
+                'display'    => null,
+                'operator'   => 'in',
             ],
         ];
 
         $filters3 = [
             [
-                'glue'     => 'and',
-                'field'    => 'first_name',
-                'object'   => 'lead',
-                'type'     => 'text',
-                'filter'   => 'John',
-                'display'  => null,
-                'operator' => '=',
+                'glue'       => 'and',
+                'field'      => 'first_name',
+                'object'     => 'lead',
+                'type'       => 'text',
+                'properties' => ['filter' => 'John'],
+                'display'    => null,
+                'operator'   => '=',
             ],
         ];
 
@@ -195,7 +195,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                         'field'    => 'leadlist',
                         'object'   => 'lead',
                         'type'     => 'leadlist',
-                        'filter'   => [1],
+                        'filter'   => [1], // Keeping filter in the root to test also for BC segments.
                         'display'  => null,
                         'operator' => 'in',
                     ],
@@ -207,13 +207,13 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 1, // current segment id
                 [
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [2],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [2]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                 ],
             ],
@@ -224,13 +224,13 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 1, // current segment id
                 [
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [3],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [3]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                 ],
             ],
@@ -244,7 +244,7 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                         'field'    => 'first_name',
                         'object'   => 'lead',
                         'type'     => 'text',
-                        'filter'   => 'Doe',
+                        'filter'   => 'Doe', // Keeping filter in the root to test also for BC segments.
                         'display'  => null,
                         'operator' => '=',
                     ],
@@ -256,22 +256,22 @@ class CircularDependencyValidatorTest extends \PHPUnit\Framework\TestCase
                 2, // current segment id
                 [
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [1],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [1]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                     [
-                        'glue'     => 'and',
-                        'field'    => 'leadlist',
-                        'object'   => 'lead',
-                        'type'     => 'leadlist',
-                        'filter'   => [3],
-                        'display'  => null,
-                        'operator' => 'in',
+                        'glue'       => 'and',
+                        'field'      => 'leadlist',
+                        'object'     => 'lead',
+                        'type'       => 'leadlist',
+                        'properties' => ['filter' => [3]],
+                        'display'    => null,
+                        'operator'   => 'in',
                     ],
                 ],
             ],

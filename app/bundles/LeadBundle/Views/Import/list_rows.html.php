@@ -12,6 +12,14 @@
 /** @var \Mautic\LeadBundle\Entity\Import $item */
 ?>
 <?php foreach ($items as $item): ?>
+    <?php
+        $objectRoute = null;
+        switch ($item->getObject()) {
+            case 'lead':
+                $objectRoute = 'mautic_contact_index';
+                break;
+        }
+    ?>
     <tr>
         <td class="col-actions text-center">
             <span class="label label-<?php echo $item->getSatusLabelClass(); ?>">
@@ -40,9 +48,45 @@
         </td>
         <td class="visible-md visible-lg"><?php echo $item->getRunTime() ? $view['date']->formatRange($item->getRunTime()) : ''; ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getProgressPercentage(); ?>%</td>
-        <td class="visible-md visible-lg"><?php echo $item->getLineCount(); ?></td>
-        <td class="visible-md visible-lg"><?php echo $item->getInsertedCount(); ?></td>
-        <td class="visible-md visible-lg"><?php echo $item->getUpdatedCount(); ?></td>
+        <td class="visible-md visible-lg">
+            <?php if (null !== $objectRoute) : ?>
+                <span class="mt-xs label label-primary has-click-event clickable-stat">
+                    <a href="<?php echo $view['router']->path(
+                        $objectRoute,
+                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.import_id').':'.$item->getId()]
+                    ); ?>"><?php echo $item->getLineCount(); ?>
+                    </a>
+                </span>
+            <?php else : ?>
+                <?php echo $item->getLineCount(); ?>
+            <?php endif; ?>
+        </td>
+        <td class="visible-md visible-lg">
+            <?php if (null !== $objectRoute) : ?>
+                <span class="mt-xs label label-primary has-click-event clickable-stat">
+                    <a href="<?php echo $view['router']->path(
+                        $objectRoute,
+                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.import_id').':'.$item->getId().' '.$view['translator']->trans('mautic.lead.lead.searchcommand.import_action').':inserted']
+                    ); ?>"><?php echo $item->getInsertedCount(); ?>
+                    </a>
+                </span>
+            <?php else : ?>
+                <?php echo $item->getInsertedCount(); ?>
+            <?php endif; ?>
+        </td>
+        <td class="visible-md visible-lg">
+            <?php if (null !== $objectRoute) : ?>
+                <span class="mt-xs label label-primary has-click-event clickable-stat">
+                    <a href="<?php echo $view['router']->path(
+                        $objectRoute,
+                        ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.import_id').':'.$item->getId().' '.$view['translator']->trans('mautic.lead.lead.searchcommand.import_action').':updated']
+                    ); ?>"><?php echo $item->getUpdatedCount(); ?>
+                    </a>
+                </span>
+            <?php else : ?>
+                <?php echo $item->getUpdatedCount(); ?>
+            <?php endif; ?>
+        </td>
         <td class="visible-md visible-lg"><?php echo $item->getIgnoredCount(); ?></td>
         <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
         <td class="visible-md visible-lg">

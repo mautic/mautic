@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
@@ -65,8 +56,12 @@ abstract class AbstractMaxmindLookup extends AbstractRemoteDataLookup
                 if (isset($data->postal)) {
                     $this->zipcode = $data->postal->code;
                 }
-                $this->country = $data->country->names->en;
-                $this->city    = $data->city->names->en;
+                if (isset($data->country)) {
+                    $this->country = $data->country->names->en;
+                }
+                if (isset($data->city)) {
+                    $this->city    = $data->city->names->en;
+                }
 
                 if (isset($data->subdivisions[0])) {
                     if (count($data->subdivisions) > 1) {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -63,9 +54,15 @@ class CustomFieldValueHelper
             }
             switch ($type) {
                 case self::TYPE_BOOLEAN:
-                    $values = array_values($properties);
-                    if (isset($values[$value])) {
-                        $value = $values[$value];
+                    foreach ($properties as $key => $property) {
+                        if ('yes' === $key && !isset($properties[1])) {
+                            $properties[1] = $property;
+                        } elseif ('no' === $key && !isset($properties[0])) {
+                            $properties[0] = $property;
+                        }
+                    }
+                    if (isset($properties[$value])) {
+                        $value = $properties[$value];
                     }
                     break;
                 case self::TYPE_SELECT:
@@ -89,7 +86,7 @@ class CustomFieldValueHelper
      *
      * @return string
      */
-    private static function setValueFromPropertiesList(array $properties, $value)
+    public static function setValueFromPropertiesList(array $properties, $value)
     {
         if (isset($properties['list']) && is_array($properties['list'])) {
             $list = $properties['list'];
@@ -97,8 +94,10 @@ class CustomFieldValueHelper
                 return $value;
             }
             foreach ($list as $property) {
-                if ($property['value'] == $value) {
-                    $value = $property['label'];
+                if (isset($property[$value])) {
+                    return $property[$value];
+                } elseif (isset($property['value']) && $property['value'] == $value) {
+                    return $property['label'];
                 }
             }
         }

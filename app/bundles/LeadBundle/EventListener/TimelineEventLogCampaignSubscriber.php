@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -112,6 +103,8 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
                 ->setObjectId($campaign->getId())
                 ->setProperties(
                     [
+                        'campaign_id'        => $campaign->getId(),
+                        'campaign_name'      => $campaign->getName(),
                         'object_description' => $campaign->getName(),
                     ]
                 );

@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-aurora",
+            "directory": "themes/aurora",
+            "target": "git@github.com:mautic/theme-aurora.git"
+        }
+    ]
+}

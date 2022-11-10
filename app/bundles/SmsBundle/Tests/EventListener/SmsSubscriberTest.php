@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
@@ -48,7 +39,7 @@ class SmsSubscriberTest extends TestCase
         $mockSmsHelper->expects($this->any())->method('getDisableTrackableUrls')->willReturn(false);
 
         $lead                  = new Lead();
-        $tokenReplacementEvent = new TokenReplacementEvent($this->messageText, $lead, ['channel' => ['sms' => 1]]);
+        $tokenReplacementEvent = new TokenReplacementEvent($this->messageText, $lead, ['channel' => [1 => 'sms']]);
         $subscriber            = new SmsSubscriber(
             $mockAuditLogModel,
             $mockTrackableModel,

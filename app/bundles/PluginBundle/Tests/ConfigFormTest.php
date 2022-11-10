@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
@@ -26,12 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ConfigFormTest extends KernelTestCase
 {
-    protected $container;
-
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->container = self::$kernel->getContainer();
     }
 
     public function testConfigForm()
@@ -109,8 +97,8 @@ class ConfigFormTest extends KernelTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $registeredPluginBundles = $this->container->getParameter('mautic.plugin.bundles');
-        $mauticPlugins           = $this->container->getParameter('mautic.bundles');
+        $registeredPluginBundles = self::$container->getParameter('mautic.plugin.bundles');
+        $mauticPlugins           = self::$container->getParameter('mautic.bundles');
         $bundleHelper->expects($this->any())->method('getPluginBundles')->willReturn([$registeredPluginBundles]);
 
         $bundleHelper->expects($this->any())->method('getMauticBundles')->willReturn(array_merge($mauticPlugins, $registeredPluginBundles));

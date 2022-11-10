@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Model;
 
 use Mautic\CategoryBundle\CategoryEvents;
@@ -27,16 +18,16 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 class CategoryModel extends FormModel
 {
     /**
-     * @var \Symfony\Component\HttpFoundation\Request|null
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * CategoryModel constructor.
      */
     public function __construct(RequestStack $requestStack)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
     public function getRepository()
@@ -52,7 +43,7 @@ class CategoryModel extends FormModel
     public function getPermissionBase($bundle = null)
     {
         if (null === $bundle) {
-            $bundle = $this->request->get('bundle');
+            $bundle = $this->requestStack->getCurrentRequest()->get('bundle');
         }
 
         if ('global' === $bundle || empty($bundle)) {

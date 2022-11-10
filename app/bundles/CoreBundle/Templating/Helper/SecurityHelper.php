@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Event\AuthenticationContentEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Templating\Helper\Helper;
@@ -31,9 +21,9 @@ class SecurityHelper extends Helper
     private $security;
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * @var Dispatcher
@@ -55,7 +45,7 @@ class SecurityHelper extends Helper
         CsrfTokenManagerInterface $tokenManager
     ) {
         $this->security     = $security;
-        $this->request      = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
         $this->dispatcher   = $dispatcher;
         $this->tokenManager = $tokenManager;
     }
@@ -97,14 +87,15 @@ class SecurityHelper extends Helper
      */
     public function getAuthenticationContent()
     {
+        $request = $this->requestStack->getCurrentRequest();
         $content = '';
         if ($this->dispatcher->hasListeners(UserEvents::USER_AUTHENTICATION_CONTENT)) {
-            $event = new AuthenticationContentEvent($this->request);
+            $event = new AuthenticationContentEvent($request);
             $this->dispatcher->dispatch(UserEvents::USER_AUTHENTICATION_CONTENT, $event);
             $content = $event->getContent();
 
             // Remove post_logout session after content has been generated
-            $this->request->getSession()->remove('post_logout');
+            $request->getSession()->remove('post_logout');
         }
 
         return $content;

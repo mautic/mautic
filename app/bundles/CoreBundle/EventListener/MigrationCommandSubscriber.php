@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\EventListener;
 
 use Doctrine\DBAL\Driver\Connection;
@@ -67,7 +58,7 @@ class MigrationCommandSubscriber implements EventSubscriberInterface
 
         if (!$this->generatedColumnsProvider->generatedColumnsAreSupported()) {
             $output->writeln('');
-            $output->writeln("<comment>Your database version ({$this->versionProvider->getVersion()}) does not support generated columns. Upgrade at least to {$this->generatedColumnsProvider->getMinimalSupportedVersion()} and update `db_server_version` accordingly to get the speed improvements.</comment>");
+            $output->writeln("<comment>Your database version ({$this->versionProvider->getVersion()}) does not support generated columns. Upgrade at least to {$this->generatedColumnsProvider->getMinimalSupportedVersion()} to get the speed improvements.</comment>");
             $output->writeln('');
 
             return;

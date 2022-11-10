@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'Integrations',
     'description' => 'Adds support for plugin integrations',
@@ -173,6 +164,12 @@ return [
             ],
             'mautic.integrations.helper.config_integrations' => [
                 'class'     => \Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
+            'mautic.integrations.helper.builder_integrations' => [
+                'class'     => \Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper::class,
                 'arguments' => [
                     'mautic.integrations.helper',
                 ],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Chart;
 
 use Doctrine\DBAL\Connection;
@@ -70,6 +61,10 @@ class ChartQuery extends AbstractChart
     ];
 
     /**
+     * Possible values are 'd'/'H'/'i'/'i'/'W'/'m'/'Y'.
+     *
+     * @see \Mautic\CoreBundle\Helper\Chart\DateRangeUnitTrait::getTimeUnitFromDateRange()
+     *
      * @param string|null $unit
      */
     public function __construct(Connection $connection, \DateTime $dateFrom, \DateTime $dateTo, $unit = null)
@@ -206,13 +201,13 @@ class ChartQuery extends AbstractChart
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true)
+    public function prepareTimeDataQuery($table, $column, $filters = [], $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
         // Convert time unitst to the right form for current database platform
         $query = $this->connection->createQueryBuilder();
         $query->from($this->prepareTable($table), 't');
 
-        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable);
+        $this->modifyTimeDataQuery($query, $column, 't', $countColumn, $isEnumerable, $useSqlOrder);
         $this->applyFilters($query, $filters);
         $this->applyDateFilters($query, $column);
 
@@ -228,12 +223,11 @@ class ChartQuery extends AbstractChart
      * @param string       $countColumn
      * @param bool|string  $isEnumerable true = COUNT, string sum = SUM
      */
-    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true)
+    public function modifyTimeDataQuery($query, $column, $tablePrefix = 't', $countColumn = '*', $isEnumerable = true, bool $useSqlOrder = true)
     {
-        // Convert time unitst to the right form for current database platform
+        // Convert time units to the right form for current database platform
         $limit         = $this->countAmountFromDateRange();
         $dateConstruct = $this->getDateConstruct($tablePrefix, $column);
-        $count         = (true === $isEnumerable) ? 'COUNT('.$countColumn.') AS count' : $countColumn.' AS count';
 
         if (true === $isEnumerable) {
             $count = 'COUNT('.$countColumn.') AS count';
@@ -245,7 +239,10 @@ class ChartQuery extends AbstractChart
 
         $query->select($dateConstruct.' AS date, '.$count);
         $query->groupBy($dateConstruct);
-        $query->orderBy($dateConstruct, 'ASC');
+        if ($useSqlOrder) {
+            // Some queries needs to avoid this because of query performance
+            $query->orderBy($dateConstruct, 'ASC');
+        }
         $query->setMaxResults($limit);
     }
 
@@ -275,7 +272,7 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function fetchSumTimeData($table, $column, $filters = [], $sumColumn)
+    public function fetchSumTimeData($table, $column, $filters, $sumColumn)
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 
@@ -309,6 +306,9 @@ class ChartQuery extends AbstractChart
         $limit         = $this->countAmountFromDateRange();
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
+
+        // Do not let hours to mess with date comparisions.
+        $previousDate->setTime(0, 0, 0);
 
         if ('Y' === $this->unit) {
             $previousDate->modify('first day of January');
@@ -576,7 +576,11 @@ class ChartQuery extends AbstractChart
         return MAUTIC_TABLE_PREFIX.$table;
     }
 
-    private function getDateConstruct(string $tablePrefix, string $column): string
+    /**
+     * @param string $tablePrefix
+     * @param string $column
+     */
+    private function getDateConstruct($tablePrefix, $column)
     {
         if ($this->generatedColumnProvider) {
             $generatedColumns = $this->generatedColumnProvider->getGeneratedColumns();

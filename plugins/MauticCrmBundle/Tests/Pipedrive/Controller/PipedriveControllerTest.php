@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Controller;
 
+use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 
 /**
@@ -10,9 +11,11 @@ use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
  */
 class PipedriveControllerTest extends PipedriveTest
 {
+    use IsolatedTestTrait;
+
     public function testWithoutIntegration()
     {
-        $this->makeRequest('POST', []);
+        $this->makeRequest('POST', '');
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
@@ -25,7 +28,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(false);
 
-        $this->makeRequest('POST', []);
+        $this->makeRequest('POST', '');
 
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
@@ -38,7 +41,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true);
 
-        $this->makeRequest('POST', [], false);
+        $this->makeRequest('POST', '', false);
 
         $response = $this->client->getResponse();
 
@@ -49,7 +52,7 @@ class PipedriveControllerTest extends PipedriveTest
     {
         $this->installPipedriveIntegration(true, [], [], [], false);
 
-        $this->makeRequest('POST', []);
+        $this->makeRequest('POST', '');
 
         $response = $this->client->getResponse();
 

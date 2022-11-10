@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle;
 
 /**
@@ -147,4 +138,12 @@ final class PageEvents
      * @var string
      */
     const ON_DETERMINE_DWELL_TIME_WINNER = 'mautic.page.on_dwell_time_winner';
+
+    /**
+     * The mautic.page.on_contact_tracked event is dispatched when a contact is tracked via the mt() tracking event.
+     *
+     * The event listener receives a
+     * Mautic\PageBundle\Event\TrackingEvent
+     */
+    const ON_CONTACT_TRACKED = 'mautic.page.on_contact_tracked';
 }

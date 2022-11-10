@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ReportBuilder;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
@@ -31,6 +22,7 @@ use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ReportBuilder\Parti
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -39,27 +31,27 @@ class PartialObjectReportBuilderTest extends TestCase
     private const INTEGRATION_NAME = 'Test';
 
     /**
-     * @var FieldChangeRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldChangeRepository|MockObject
      */
     private $fieldChangeRepository;
 
     /**
-     * @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldHelper|MockObject
      */
     private $fieldHelper;
 
     /**
-     * @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+     * @var EventDispatcherInterface|MockObject
      */
     private $dispatcher;
 
     /**
-     * @var FieldBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldBuilder|MockObject
      */
     private $fieldBuilder;
 
     /**
-     * @var ObjectProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @var ObjectProvider|MockObject
      */
     private $objectProvider;
 
@@ -97,7 +89,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $requestObject->addField('firstname');
         $requestDAO->addObject($requestObject);
 
-        $this->fieldBuilder->expects($this->at(0))
+        $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
             ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
             ->willReturn(
@@ -188,7 +180,7 @@ class PartialObjectReportBuilderTest extends TestCase
         $requestObject->addField('companyname');
         $requestDAO->addObject($requestObject);
 
-        $this->fieldBuilder->expects($this->at(0))
+        $this->fieldBuilder->expects($this->once())
             ->method('buildObjectField')
             ->with('email', $this->anything(), $requestObject, MauticSyncDataExchange::NAME)
             ->willReturn(

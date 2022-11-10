@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Form\Helper;
 
 use Mautic\ConfigBundle\Form\Helper\RestrictionHelper;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
+use Mautic\ConfigBundle\Form\Type\EscapeTransformer;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\StandAloneButtonType;
@@ -275,6 +267,7 @@ class RestrictionHelperTest extends TypeTestCase
 
         // This is what we're really testing here
         $restrictionHelper = new RestrictionHelper($translator, $this->restrictedFields, $this->displayMode);
+        $escapeTransformer = new EscapeTransformer([]);
 
         return [
             // register the type instances with the PreloadedExtension
@@ -291,7 +284,7 @@ class RestrictionHelperTest extends TypeTestCase
                     new \Mautic\EmailBundle\Form\Type\ConfigType($translator, $transportType),
                     new ConfigMonitoredEmailType($dispatcher),
                     new ConfigMonitoredMailboxesType($imapHelper),
-                    new ConfigType($restrictionHelper),
+                    new ConfigType($restrictionHelper, $escapeTransformer),
                 ],
                 []
             ),

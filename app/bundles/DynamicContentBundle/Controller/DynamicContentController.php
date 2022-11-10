@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -122,7 +113,7 @@ class DynamicContentController extends FormController
      */
     public function newAction($entity = null)
     {
-        if (!$this->accessGranted('dynamiccontent:dynamiccontents:viewown')) {
+        if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')) {
             return $this->accessDenied();
         }
 
@@ -234,7 +225,7 @@ class DynamicContentController extends FormController
      * @param            $objectId
      * @param bool|false $ignorePost
      *
-     * @return array | JsonResponse | RedirectResponse | Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -494,6 +485,8 @@ class DynamicContentController extends FormController
                     'msg'     => 'mautic.dynamicContent.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -23,9 +14,15 @@ class PageRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
+        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+        $sq = $this->_em->createQueryBuilder()
+            ->select('count(fs.id)')
+            ->from('MauticFormBundle:Submission', 'fs')
+            ->where('fs.page = p');
+
         $q = $this
             ->createQueryBuilder('p')
-            ->select('p')
+            ->select('p, ('.$sq->getDql().') as submission_count')
             ->leftJoin('p.category', 'c');
 
         $args['qb'] = $q;
@@ -66,10 +63,11 @@ class PageRepository extends CommonRepository
      * @param bool   $topLevel
      * @param array  $ignoreIds
      * @param array  $extraColumns
+     * @param bool   $publishedOnly
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], $publishedOnly = false)
     {
         $q = $this->createQueryBuilder('p');
         $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
@@ -95,6 +93,11 @@ class PageRepository extends CommonRepository
             $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
                 ->setParameter('pageIds', $ignoreIds);
         }
+
+        if ($publishedOnly) {
+            $q->andWhere($q->expr()->eq('p.isPublished', 1));
+        }
+
         $q->orderBy('p.title');
 
         if (!empty($limit)) {

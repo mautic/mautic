@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Event;
 
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Event\LeadListEvent;
 
@@ -36,5 +28,19 @@ class LeadListEventTest extends \PHPUnit\Framework\TestCase
         $segment2->setName('otherSegmentName');
         $event->setList($segment2);
         $this->assertEquals($segment2, $event->getList());
+
+        $isNew = true;
+        $event = new LeadListEvent($segment, $isNew);
+
+        $category = new Category();
+        $category->setTitle('Segment Category 1');
+        $category->setAlias('segment-category-1');
+        $category->setBundle('segment');
+
+        $segment3 = new LeadList();
+        $segment3->setName('Segment 1');
+        $segment3->setCategory($category);
+        $event->setList($segment3);
+        $this->assertEquals($segment3, $event->getList());
     }
 }

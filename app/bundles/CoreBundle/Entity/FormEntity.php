@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -170,9 +161,10 @@ class FormEntity extends CommonEntity
     public function __clone()
     {
         $this->dateAdded    = null;
-        $this->dateModified = null;
+        $this->dateModified = new \DateTime();
         $this->checkedOut   = null;
         $this->isPublished  = false;
+        $this->createdBy    = null;
         $this->changes      = [];
     }
 
@@ -278,9 +270,7 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set createdBy.
-     *
-     * @param User $createdBy
+     * @param User|int|null $createdBy
      *
      * @return $this
      */

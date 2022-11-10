@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -27,6 +18,8 @@ class EmailGraphStatsController extends Controller
      * @param string $dateTo
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Exception
      */
     public function viewAction(Request $request, $objectId, $isVariant, $dateFrom = null, $dateTo = null)
     {

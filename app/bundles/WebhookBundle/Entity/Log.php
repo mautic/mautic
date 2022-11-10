@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
-use DateTime;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -146,7 +136,7 @@ class Log
     }
 
     /**
-     * Strips tags and keeps first 254 characters so it would fit in the varchar 191 limit.
+     * Strips tags and keeps first 191 characters so it would fit in the varchar 191 limit.
      *
      * @param string $note
      *
@@ -154,7 +144,7 @@ class Log
      */
     public function setNote($note)
     {
-        $this->note = substr(strip_tags($note), 0, 190);
+        $this->note = substr(strip_tags(iconv('UTF-8', 'UTF-8//IGNORE', $note)), 0, 190);
 
         return $this;
     }

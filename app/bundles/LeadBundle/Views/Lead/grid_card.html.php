@@ -68,6 +68,8 @@ $img = $view['lead_avatar']->getAvatar($contact);
                         </div>
                     <?php endif; ?>
 
+                    <?php echo $view['content']->getCustomContent('lead.grid', $mauticTemplateVars); ?>
+
                 </div>
             </div>
         </div>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Model;
 
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -57,7 +48,7 @@ class DashboardModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         PathsHelper $pathsHelper,
         Filesystem $filesystem
-        ) {
+    ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->pathsHelper          = $pathsHelper;
         $this->filesystem           = $filesystem;
@@ -313,10 +304,8 @@ class DashboardModel extends FormModel
 
     /**
      * Generate default date range filter and time unit.
-     *
-     * @return array
      */
-    public function getDefaultFilter()
+    public function getDefaultFilter(): array
     {
         $dateRangeDefault = $this->coreParametersHelper->get('default_daterange_filter', '-1 month');
         $dateRangeStart   = new \DateTime();
@@ -328,7 +317,7 @@ class DashboardModel extends FormModel
 
         return [
             'dateFrom' => $dateFrom,
-            'dateTo'   => $dateTo,
+            'dateTo'   => $dateTo->modify('23:59:59'), // till end of the 'to' date selected
         ];
     }
 }
