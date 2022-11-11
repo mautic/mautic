@@ -11,15 +11,19 @@ use Symfony\Component\Process\Process;
 final class ProcessQueue
 {
     private int $processLimit;
+
+    /**
+     * @var SplQueue<Process>
+     */
     private SplQueue $pending;
 
     /**
-     * @var SplObjectStorage<Process>
+     * @var SplObjectStorage<Process,Process>
      */
     private SplObjectStorage $processing;
 
     /**
-     * @var SplObjectStorage<Process>
+     * @var SplObjectStorage<Process,Process>
      */
     private SplObjectStorage $processed;
 
@@ -77,7 +81,7 @@ final class ProcessQueue
     }
 
     /**
-     * @return SplObjectStorage<Process>
+     * @return SplObjectStorage<Process,Process>
      */
     public function getProcessed(): SplObjectStorage
     {
