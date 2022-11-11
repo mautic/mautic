@@ -1258,7 +1258,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     {
         $fieldsWithAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
         $qb                = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select([$this->getTableAlias().'.id']) //, 'count(*) as duplicates'
+            ->select(array_merge(["ANY_VALUE({$this->getTableAlias()}.id)"], $fieldsWithAliases))
             ->from($this->getTableName(), $this->getTableAlias());
 
         $andWhere = [$qb->expr()->isNotNull($this->getTableAlias().'.date_identified')];
