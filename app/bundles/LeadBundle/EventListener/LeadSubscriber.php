@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -78,6 +79,7 @@ class LeadSubscriber implements EventSubscriberInterface
         EntityManager $entityManager,
         TranslatorInterface $translator,
         RouterInterface $router,
+        ModelFactory $modelFactory,
         $isTest = false
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
@@ -88,6 +90,8 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->translator          = $translator;
         $this->router              = $router;
         $this->isTest              = $isTest;
+
+        $this->setModelFactory($modelFactory);
     }
 
     /**

@@ -2,17 +2,18 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -20,8 +21,13 @@ use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CommonRepository extends EntityRepository
+class CommonRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
+    {
+        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', get_class($this)));
+    }
+
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
      *

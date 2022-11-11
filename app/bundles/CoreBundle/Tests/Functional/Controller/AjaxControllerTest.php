@@ -18,9 +18,11 @@ final class AjaxControllerTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['composer_updates'] = 'testUpdateRunChecksAction' !== $this->getName();
+
         parent::setUp();
 
-        $this->clientMockHandler = self::$container->get('mautic.http.client.mock_handler');
+        $this->clientMockHandler = self::$container->get(\GuzzleHttp\Handler\MockHandler::class);
     }
 
     public function testUpdateRunChecksAction(): void

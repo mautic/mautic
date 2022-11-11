@@ -20,18 +20,6 @@ return [
                 ],
             ],
         ],
-        'commands' => [
-            'mautic.cache.command.clear_cache' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\CacheBundle\Command\ClearCacheCommand::class,
-                'arguments' => [
-                    'mautic.cache.provider',
-                ],
-            ],
-        ],
-        'forms'     => [],
-        'helpers'   => [],
-        'menus'     => [],
         'other'     => [
             'mautic.cache.provider'           => [
                 'class'     => \Mautic\CacheBundle\Cache\CacheProvider::class,

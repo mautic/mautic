@@ -39,7 +39,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $statRepository;
 
     /**
-     * @var MockObject|GeneratedColumnsProviderInterface
+     * @var MockObject&GeneratedColumnsProviderInterface
      */
     private $generatedColumnsProvider;
 
@@ -58,10 +58,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $queryBuilder;
 
-    /**
-     * @var ReportSubscriber
-     */
-    private $subscriber;
+    private ReportSubscriber $subscriber;
 
     /**
      * @var MockObject|FieldsBuilder
@@ -77,7 +74,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->statRepository           = $this->createMock(StatRepository::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
-
         $this->subscriber               = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
