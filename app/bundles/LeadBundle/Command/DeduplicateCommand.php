@@ -26,6 +26,8 @@ class DeduplicateCommand extends Command
     {
         $this->contactDeduper = $contactDeduper;
         $this->params         = $params;
+
+        parent::__construct();
     }
 
     public function configure(): void
@@ -105,7 +107,7 @@ EOT
                 $command[] = '--newer-into-older';
             }
 
-            $processQueue->enqueue(new Process($command));
+            $processQueue->enqueue(new Process($command, null, ['MAUTIC_TABLE_PREFIX' => MAUTIC_TABLE_PREFIX]));
         }
 
         $output->writeln('');
