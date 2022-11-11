@@ -24,6 +24,8 @@ return function (ContainerConfigurator $configurator) {
         'Helper/Tree/IntNode.php',
         'Helper/Update/Github/Release.php',
         'Helper/Update/PreUpdateChecks',
+        'Predis/Replication/StrategyConfig.php',
+        'Predis/Replication/MasterOnlyStrategy.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
         'Templating/Engine/PhpEngine.php', // Will be removed in M5
         'Templating/Helper/FormHelper.php',
