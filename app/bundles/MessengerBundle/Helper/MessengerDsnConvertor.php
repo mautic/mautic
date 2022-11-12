@@ -40,7 +40,6 @@ class MessengerDsnConvertor
         switch ($parameters['messenger_transport']) {
             case 'sync':
                 return 'sync://';
-                break;
             case 'doctrine':
                 /*
                 * We will use a static Dsn string, that matches the default Dsn string
