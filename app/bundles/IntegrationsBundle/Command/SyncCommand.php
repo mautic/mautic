@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Command;
 
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\IntegrationsBundle\Exception\InvalidValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO;
 use Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface;
@@ -13,7 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class SyncCommand extends Command
+class SyncCommand extends ModeratedCommand
 {
     public const NAME = 'mautic:integrations:sync';
 
@@ -29,7 +30,7 @@ class SyncCommand extends Command
         $this->syncService = $syncService;
     }
 
-    protected function configure(): void
+    protected function configure()
     {
         $this->setName(self::NAME)
             ->setDescription('Fetch objects from integration.')
@@ -41,7 +42,7 @@ class SyncCommand extends Command
             )
             ->addOption(
                 '--start-datetime',
-                '-t',
+                '-start',
                 InputOption::VALUE_OPTIONAL,
                 'Set start date/time for updated values in UTC timezone.'
             )
@@ -65,7 +66,7 @@ class SyncCommand extends Command
             )
             ->addOption(
                 '--first-time-sync',
-                '-f',
+                '-first',
                 InputOption::VALUE_NONE,
                 'Notate if this is a first time sync where Mautic will sync existing objects instead of just tracked changes'
             )
@@ -107,6 +108,10 @@ class SyncCommand extends Command
             $io->error($e->getMessage());
 
             return 1;
+        }
+
+        if (!$this->checkRunStatus($input, $output, json_encode($inputOptions))) {
+            return 0;
         }
 
         try {
