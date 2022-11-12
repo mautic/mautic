@@ -333,6 +333,28 @@ class EmailStepType extends AbstractType
 
         $builder->add('mailer_spool_path', HiddenType::class);
 
+        $messengerConditions     = '{"install_email_step_messenger_type":["async"]}';
+        $messengerHideConditions = '{"install_email_step_messenger_type":["sync"]}';
+
+        $builder->add(
+            'messenger_type',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.messenger.config.enabled.true'    => 'async',
+                    'mautic.messenger.config.enabled.false'   => 'sync',
+                ],
+                'label'       => 'mautic.messenger.config.enabled',
+                'label_attr'  => ['class' => 'control-label'],
+                'required'    => true,
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.messenger.config.enabled.tooltip',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
         $builder->add(
             'messenger_transport',
             ChoiceType::class,
@@ -341,16 +363,13 @@ class EmailStepType extends AbstractType
                 'label'             => 'mautic.install.form.email.messenger',
                 'required'          => false,
                 'attr'              => [
-                    'class'    => 'form-control',
-                    'tooltip'  => 'mautic.email.config.mailer.messenger.tooltip',
+                    'data-show-on' => $messengerConditions,
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.tooltip',
                 ],
                 'placeholder' => false,
             ]
         );
-
-        $builder->add('messenger_type', HiddenType::class, [
-            'data'   => 'async',
-        ]);
 
         $builder->add(
             'buttons',

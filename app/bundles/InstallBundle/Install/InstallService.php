@@ -509,7 +509,7 @@ class InstallService
         $required = [
             'mailer_from_name',
             'mailer_from_email',
-            'messneger_transport',
+            'messenger_type',
         ];
 
         $messages = [];
@@ -547,6 +547,9 @@ class InstallService
             return $messages;
         }
         if ($step instanceof EmailStep) {
+            if ('sync' === $data['messenger_type']) {
+                $data['messenger_transport'] = 'sync';
+            }
             $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
         }
 

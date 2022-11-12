@@ -31,6 +31,8 @@ return function (ContainerConfigurator $configurator) {
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
+        'Helper/Dsn/Dsn.php',
+        'Helper/Dsn/Dsn/DsnGenerator.php',
     ];
 
     $services->load('Mautic\\CoreBundle\\', '../')

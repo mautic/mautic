@@ -94,7 +94,10 @@ if ('index' === $tmpl) {
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
+                <?php echo $view['form']->row($form['messenger_type']); ?>
+            </div>
+            <div class="col-sm-6">
                 <?php echo $view['form']->row($form['messenger_transport']); ?>
             </div>
         </div>

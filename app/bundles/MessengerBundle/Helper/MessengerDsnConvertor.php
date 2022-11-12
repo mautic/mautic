@@ -15,13 +15,13 @@ class MessengerDsnConvertor
     {
         $parameters = [];
 
-        $dsn                               = Dsn::fromString($dsnString);
-        $parameters['messenger_dsn']       = $dsnString;
-        $parameters['messenger_transport'] = 'mautic.messenger.'.$dsn->getScheme();
-        $parameters['messenger_host']      = $dsn->getHost();
-        $parameters['messenger_port']      = $dsn->getPort();
-        $parameters['messenger_user']      = $dsn->getUser();
-        $parameters['messenger_password']  = $dsn->getPassword();
+        $dsn                              = Dsn::fromString($dsnString);
+        $parameters['messenger_dsn']      = $dsnString;
+        $parameters['messenger_type']     = 'mautic.messenger.'.$dsn->getScheme();
+        $parameters['messenger_host']     = $dsn->getHost();
+        $parameters['messenger_port']     = $dsn->getPort();
+        $parameters['messenger_user']     = $dsn->getUser();
+        $parameters['messenger_password'] = $dsn->getPassword();
         foreach ($dsn->getOptions() as $option => $value) {
             $parameters['messenger_'.$option] = $value;
         }
@@ -40,6 +40,7 @@ class MessengerDsnConvertor
         switch ($parameters['messenger_transport']) {
             case 'sync':
                 return 'sync://';
+                break;
             case 'doctrine':
                 /*
                 * We will use a static Dsn string, that matches the default Dsn string

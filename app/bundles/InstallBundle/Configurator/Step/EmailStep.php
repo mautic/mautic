@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class EmailStep implements StepInterface
 {
     private const SKIP_PARAMETERS = [
-        'messenger_type',
         'messenger_transport',
     ];
 
@@ -125,19 +124,19 @@ class EmailStep implements StepInterface
     /**
      * @var string
      */
-    public $messenger_dsn = 'doctrine://default';
+    public $messenger_dsn = 'sync://';
 
     /**
      * @var string
      */
-    public $messenger_type;
+    public $messenger_type = 'sync';
 
     /**
      * Messneger mode.
      *
      * @var string
      */
-    public $messenger_transport = 'doctrine';
+    public $messenger_transport = 'sync';
 
     /**
      * Messenger Retry Strategy Max Retries.
