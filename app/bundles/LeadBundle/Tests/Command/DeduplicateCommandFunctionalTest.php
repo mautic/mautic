@@ -72,6 +72,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
         \assert($phoneField instanceof LeadField);
         $phoneField->setIsUniqueIdentifer(true);
+        $phoneField->setLabel('Cell phone'); // Testing also field with more words.
         $this->em->persist($phoneField);
 
         $this->em->flush();
