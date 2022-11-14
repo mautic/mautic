@@ -347,6 +347,13 @@ return [
                 ],
                 'tag'       => 'validator.constraint_validator',
             ],
+            'mautic.validator.unique_emailaddress' => [
+                'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\UniqueEmailAddressValidator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                ],
+                'tag'       => 'validator.constraint_validator',
+            ],
             \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class => [
                 'class'     => \Mautic\LeadBundle\Form\Validator\Constraints\FieldAliasKeywordValidator::class,
                 'tag'       => 'validator.constraint_validator',
