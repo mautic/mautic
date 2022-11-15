@@ -107,7 +107,12 @@ EOT
                 $command[] = '--newer-into-older';
             }
 
-            $processQueue->enqueue(new Process($command, null, ['MAUTIC_TABLE_PREFIX' => MAUTIC_TABLE_PREFIX]));
+            $envParams = [
+                'db_table_prefix'                     => MAUTIC_TABLE_PREFIX,
+                'contact_unique_identifiers_operator' => $this->params->get('mautic.contact_unique_identifiers_operator'),
+            ];
+
+            $processQueue->enqueue(new Process($command, null, ['MAUTIC_CONFIG_PARAMETERS' => json_encode($envParams)]));
         }
 
         $output->writeln('');

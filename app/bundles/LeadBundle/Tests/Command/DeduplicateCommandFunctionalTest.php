@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Command;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
 use Mautic\LeadBundle\Deduplicate\ContactDeduper;
@@ -16,6 +17,15 @@ use PHPUnit\Framework\Assert;
 final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
+
+    protected function setUp(): void
+    {
+        if ('testDeduplicateCommandWithAnotherUniqueFieldAndAnd' === $this->getName()) {
+            $this->configParams['contact_unique_identifiers_operator'] = CompositeExpression::TYPE_AND;
+        }
+
+        parent::setUp();
+    }
 
     public function testDeduplicateCommandWithUniqueEmail(): void
     {
@@ -50,7 +60,7 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(3, $contactRepository->count([]), $output);
     }
 
-    public function testDeduplicateCommandWithAnotherUniqueField(): void
+    public function testDeduplicateCommandWithAnotherUniqueFieldAndAnd(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
         \assert($contactRepository instanceof LeadRepository);
@@ -82,6 +92,40 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
         $output = $this->runCommand(DeduplicateCommand::NAME);
 
         Assert::assertSame(5, $contactRepository->count([]), $output);
+    }
+
+    public function testDeduplicateCommandWithAnotherUniqueFieldAndOr(): void
+    {
+        $contactRepository = $this->em->getRepository(Lead::class);
+        \assert($contactRepository instanceof LeadRepository);
+
+        $fieldRepository = $this->em->getRepository(LeadField::class);
+        \assert($fieldRepository instanceof LeadFieldRepository);
+
+        Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
+
+        $this->saveContact('john@doe.email', '111111111'); // 1
+        $this->saveContact('john@doe.email', '111111111'); // 1
+        $this->saveContact('john@doe.email', '222222222'); // 1
+        $this->saveContact('john@doe.email', '222222222'); // 1
+        $this->saveContact('anna@munic.email', '333333333'); // 2
+        $this->saveContact('anna@munic.email', '333333333'); // 2
+        $this->saveContact('jane@gabriel.email', '4444444444'); // 3
+        $this->saveContact('jane.gabriel@gmail.com', '4444444444'); // 3
+
+        $phoneField = $fieldRepository->findOneBy(['alias' => 'phone']);
+        \assert($phoneField instanceof LeadField);
+        $phoneField->setIsUniqueIdentifer(true);
+        $phoneField->setLabel('Cell phone'); // Testing also field with more words.
+        $this->em->persist($phoneField);
+
+        $this->em->flush();
+
+        Assert::assertSame(8, $contactRepository->count([]));
+
+        $output = $this->runCommand(DeduplicateCommand::NAME);
+
+        Assert::assertSame(3, $contactRepository->count([]), $output);
     }
 
     private function saveContact(string $email, string $phone = null): Lead

@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -286,12 +287,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-        // loop through the fields and
-        foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
-                ->setParameter($col, $val);
-        }
 
         // if we have a lead ID lets use it
         if (!empty($leadId)) {
@@ -1231,9 +1226,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getContactCountWithDuplicateValues(array $uniqueFields): int
     {
-        $subQueryBuilder = $this->getDuplicateValuesQuery($uniqueFields);
-        $qb              = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $qb->select('count(*)')->from(sprintf('(%s)', $subQueryBuilder->getSQL()), 'sub');
+        $sql = $this->buildDuplicateValuesQuery($uniqueFields);
+        $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb->select('count(*)')->from(sprintf('(%s)', $sql), 'sub');
 
         return (int) $qb->execute()->fetchOne();
     }
@@ -1245,33 +1240,9 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getDuplicatedContactIds(array $uniqueFields): array
     {
-        $qb = $this->getDuplicateValuesQuery($uniqueFields);
-        $qb->andWhere($this->getTableAlias().'.id > 0'); // enforces faster primary index.
-
-        return $qb->execute()->fetchFirstColumn();
-    }
-
-    /**
-     * @param string[] $uniqueFields
-     */
-    public function getDuplicateValuesQuery(array $uniqueFields): QueryBuilder
-    {
-        $fieldsWithAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
-        $qb                = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select(array_merge(["MIN({$this->getTableAlias()}.id)"], $fieldsWithAliases))
-            ->from($this->getTableName(), $this->getTableAlias());
-
-        $andWhere = [$qb->expr()->isNotNull($this->getTableAlias().'.date_identified')];
-
-        foreach ($fieldsWithAliases as $field) {
-            $andWhere[] = $qb->expr()->isNotNull($field);
-        }
-
-        $qb->where($qb->expr()->and(...$andWhere));
-        $qb->groupBy($fieldsWithAliases);
-        $qb->having('count(*) > 1');
-
-        return $qb;
+        return $this->getEntityManager()->getConnection()->fetchFirstColumn(
+            $this->buildDuplicateValuesQuery($uniqueFields)
+        );
     }
 
     /**
@@ -1427,5 +1398,51 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         unset($fields['points']);
 
         $this->defaultPrepareDbalFieldsForSave($fields);
+    }
+
+    /**
+     * @param string[] $uniqueFields
+     */
+    private function buildDuplicateValuesQuery(array $uniqueFields): string
+    {
+        $fieldsAliases = array_map(fn ($uniqueField) => $this->getTableAlias().'.'.$uniqueField, $uniqueFields);
+
+        if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
+            return $this->getDuplicateValuesQuery($fieldsAliases)->getSQL();
+        }
+
+        $queries = array_map(
+            fn ($fieldAlias) => $this->getDuplicateValuesQuery([$fieldAlias])->getSQL(),
+            $fieldsAliases
+        );
+
+        $unionQueries = implode(' UNION ', $queries);
+
+        return $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('minId')
+            ->from("({$unionQueries})", 'duplicate_values')
+            ->groupBy('minId');
+    }
+
+    /**
+     * @param string[] $fieldsAliases
+     */
+    private function getDuplicateValuesQuery(array $fieldsAliases): QueryBuilder
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select(array_merge(["MIN({$this->getTableAlias()}.id) as minId"], $fieldsAliases))
+            ->from($this->getTableName(), $this->getTableAlias());
+
+        $andWhere = [$qb->expr()->isNotNull($this->getTableAlias().'.date_identified')];
+
+        foreach ($fieldsAliases as $field) {
+            $andWhere[] = $qb->expr()->isNotNull($field);
+        }
+
+        $qb->where($qb->expr()->and(...$andWhere));
+        $qb->groupBy($fieldsAliases);
+        $qb->having('count(*) > 1');
+
+        return $qb;
     }
 }
