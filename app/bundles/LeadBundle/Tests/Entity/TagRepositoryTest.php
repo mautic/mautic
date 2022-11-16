@@ -2,14 +2,15 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
 class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetTagByNameOrCreateNewOneWithSomeExistingTag()
+    use RepositoryConfiguratorTrait;
+
+    public function testGetTagByNameOrCreateNewOneWithSomeExistingTag(): void
     {
         $fetchedEntity = new Tag('sometag');
 
@@ -26,7 +27,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('sometag'));
     }
 
-    public function testGetTagByNameOrCreateNewOneWithSomeNewTag()
+    public function testGetTagByNameOrCreateNewOneWithSomeNewTag(): void
     {
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
@@ -44,7 +45,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($newEntity->getId());
     }
 
-    public function testGetTagByNameOrCreateNewOneInputFilter()
+    public function testGetTagByNameOrCreateNewOneInputFilter(): void
     {
         $fetchedEntity = new Tag('hello" world');
 
@@ -61,17 +62,9 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('hello" world'));
     }
 
-    public function testRemoveMinusFromTags()
+    public function testRemoveMinusFromTags(): void
     {
-        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockMetadata = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $repository = new TagRepository($mockEntityManager, $mockMetadata);
+        $repository = $this->configureRepository(Tag::class);
 
         $tags = [
             'sometag1',

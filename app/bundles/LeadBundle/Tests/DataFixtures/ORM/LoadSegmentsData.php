@@ -1031,6 +1031,30 @@ class LoadSegmentsData extends AbstractFixture implements OrderedFixtureInterfac
                 ],
                 'populate' => true,
             ],
+            [ // ID 51
+                'name'     => 'Has Email and visited URL',
+                'alias'    => 'has-email-and-visited-url',
+                'public'   => true,
+                'filters'  => [
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'email',
+                        'object'     => 'lead',
+                        'field'      => 'email',
+                        'operator'   => '!empty',
+                        'properties' => ['filter' => null, 'display' => null],
+                    ],
+                    [
+                        'glue'       => 'and',
+                        'type'       => 'text',
+                        'object'     => 'behaviors',
+                        'field'      => 'hit_url',
+                        'operator'   => 'regexp',
+                        'properties' => ['filter' => 'segment-[[:digit:]]+'],
+                    ],
+                ],
+                'populate' => true,
+            ],
         ];
 
         foreach ($segments as $segmentConfig) {

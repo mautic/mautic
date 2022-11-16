@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
@@ -24,9 +24,9 @@ class InstallCommand extends Command
     public const COMMAND = 'mautic:install';
 
     private InstallService $installer;
-    private Registry $doctrineRegistry;
+    private ManagerRegistry $doctrineRegistry;
 
-    public function __construct(InstallService $installer, Registry $doctrineRegistry)
+    public function __construct(InstallService $installer, ManagerRegistry $doctrineRegistry)
     {
         $this->installer        = $installer;
         $this->doctrineRegistry = $doctrineRegistry;
