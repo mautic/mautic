@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContentPreviewSettingsTypeTest extends TestCase
 {
@@ -216,17 +216,17 @@ class ContentPreviewSettingsTypeTest extends TestCase
     public function testBuildFormWithTranslationAndVariantFieldAvailable(): void
     {
         $parentEmailId = 1;
-        $parentEmail   = new Email();
+        $parentEmail   = $this->createEmail();
         $parentEmail->setId($parentEmailId);
         $parentEmail->setName('Parent');
         $parentEmail->setLanguage('en');
 
-        $translationEmail1 = new Email();
+        $translationEmail1 = $this->createEmail();
         $translationEmail1->setId(2);
         $translationEmail1->setName('Translation 1');
         $translationEmail1->setLanguage('cs_CZ');
 
-        $translationEmail2 = new Email();
+        $translationEmail2 = $this->createEmail();
         $translationEmail2->setId(3);
         $translationEmail2->setName('Translation 2');
         $translationEmail2->setLanguage('dz_BT');
@@ -237,11 +237,11 @@ class ContentPreviewSettingsTypeTest extends TestCase
             'Translation 2 - Dzongkha (Bhutan) - ID 3' => 3,
         ];
 
-        $variantEmail1 = new Email();
+        $variantEmail1 = $this->createEmail();
         $variantEmail1->setId(2);
         $variantEmail1->setName('Variant 1');
 
-        $variantEmail2 = new Email();
+        $variantEmail2 = $this->createEmail();
         $variantEmail2->setId(3);
         $variantEmail2->setName('Variant 2');
 
@@ -334,5 +334,22 @@ class ContentPreviewSettingsTypeTest extends TestCase
                     ],
                 ],
             ];
+    }
+
+    private function createEmail(): Email
+    {
+        return new class() extends Email {
+            private int $id = 0;
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+
+            public function setId(int $id): void
+            {
+                $this->id = $id;
+            }
+        };
     }
 }

@@ -291,10 +291,8 @@ class PageController extends FormController
         $variants = [
             'parent'             => $parent,
             'children'           => $children,
-            'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+            'properties'         => $properties,
             'criteria'           => $criteria['criteria'],
-            'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
-            'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
         ];
 
         $translations = [

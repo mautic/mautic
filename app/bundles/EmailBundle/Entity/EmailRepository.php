@@ -636,21 +636,4 @@ class EmailRepository extends CommonRepository
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
     }
-
-    private function getPublishedEmailsWithVariantQb()
-    {
-        $qb = $this->getEntityManager()
-                   ->createQueryBuilder();
-        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
-
-        $qb->select('DISTINCT '.$this->getTableAlias())
-           ->from('MauticEmailBundle:Email', $this->getTableAlias())
-           ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
-               $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
-               $qb->expr()->eq('v.isPublished', true)
-           ))
-           ->where($expr);
-
-        return $qb;
-    }
 }

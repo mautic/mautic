@@ -12,7 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Intl\Intl;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Preview settings form used for pages and emails in detail view page.
@@ -25,15 +25,9 @@ class ContentPreviewSettingsType extends AbstractType
     private const CHOICE_TYPE_TRANSLATION = 'translation';
     private const CHOICE_TYPE_VARIANT     = 'variant';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /**
-     * @var CorePermissions
-     */
-    private $security;
+    private CorePermissions $security;
 
     public function __construct(TranslatorInterface $translator, CorePermissions $security)
     {

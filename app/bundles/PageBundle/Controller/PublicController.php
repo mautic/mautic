@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServic
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\Event\TrackingEvent;
-use Mautic\PageBundle\Helper\PageConfig;
 use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
@@ -314,8 +313,6 @@ class PublicController extends CommonFormController
             $contact             = $leadModel->getEntity($contactId);
         }
 
-        /** @var PageConfig $pageConfig */
-        $pageConfig   = $this->get('mautic.helper.page_config');
         /** @var PageModel $model */
         $model        = $this->getModel('page');
         /** @var Page $page */

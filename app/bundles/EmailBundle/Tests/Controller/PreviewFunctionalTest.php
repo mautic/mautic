@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2021 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use DateTime;
@@ -51,13 +42,14 @@ class PreviewFunctionalTest extends MauticMysqlTestCase
         self::assertStringContainsString($expectedContent, $crawler->text());
     }
 
-    private function createEmail(): Email
+    private function createEmail(bool $publicPreview = true): Email
     {
         $email = new Email();
         $email->setDateAdded(new DateTime());
         $email->setName('Email name');
         $email->setSubject('Email subject');
         $email->setTemplate('Blank');
+        $email->setPublicPreview($publicPreview);
         $email->setCustomHtml('Contact emails is {contactfield=email}');
         $this->em->persist($email);
 
