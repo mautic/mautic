@@ -35,7 +35,7 @@ class ContentPreviewSettingsType extends AbstractType
         $this->security   = $security;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $objectId              = $options['objectId'];
         $translations          = $options['translations'];
@@ -85,11 +85,9 @@ class ContentPreviewSettingsType extends AbstractType
         $resolver->addAllowedTypes('objectId', 'int');
     }
 
-    public function getBlockPrefix(): string
-    {
-        return 'content_preview_settings';
-    }
-
+    /**
+     * @param array<mixed> $variants
+     */
     private function addTranslationOrVariantChoicesElement(
         FormBuilderInterface $builder,
         string $type,

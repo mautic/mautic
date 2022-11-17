@@ -217,17 +217,17 @@ class ContentPreviewSettingsTypeTest extends TestCase
     {
         $parentEmailId = 1;
         $parentEmail   = $this->createEmail();
-        $parentEmail->setId($parentEmailId);
+        $parentEmail->setId($parentEmailId); // @phpstan-ignore-line
         $parentEmail->setName('Parent');
         $parentEmail->setLanguage('en');
 
         $translationEmail1 = $this->createEmail();
-        $translationEmail1->setId(2);
+        $translationEmail1->setId(2); // @phpstan-ignore-line
         $translationEmail1->setName('Translation 1');
         $translationEmail1->setLanguage('cs_CZ');
 
         $translationEmail2 = $this->createEmail();
-        $translationEmail2->setId(3);
+        $translationEmail2->setId(3); // @phpstan-ignore-line
         $translationEmail2->setName('Translation 2');
         $translationEmail2->setLanguage('dz_BT');
 
@@ -238,11 +238,11 @@ class ContentPreviewSettingsTypeTest extends TestCase
         ];
 
         $variantEmail1 = $this->createEmail();
-        $variantEmail1->setId(2);
+        $variantEmail1->setId(2); // @phpstan-ignore-line
         $variantEmail1->setName('Variant 1');
 
         $variantEmail2 = $this->createEmail();
-        $variantEmail2->setId(3);
+        $variantEmail2->setId(3); // @phpstan-ignore-line
         $variantEmail2->setName('Variant 2');
 
         $expectedVariantChoices = [
@@ -317,6 +317,9 @@ class ContentPreviewSettingsTypeTest extends TestCase
         $this->form->buildForm($formBuilder, $formOptions);
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function getContactFieldDefinition(): array
     {
         return [

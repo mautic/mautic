@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Helper\TokenHelper;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Entity\Page;
@@ -302,23 +303,23 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function previewAction(Request $request, int $id, $objectType = null)
+    public function previewAction(Request $request, int $id)
     {
-        $contactId   = (int) $request->query->get('contactId');
+        $contactId = (int) $request->query->get('contactId');
 
         if ($contactId) {
-            /** @var LeadModel $fieldModel */
+            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead.lead');
             /** @var Lead $contact */
-            $contact             = $leadModel->getEntity($contactId);
+            $contact = $leadModel->getEntity($contactId);
         }
 
         /** @var PageModel $model */
-        $model        = $this->getModel('page');
+        $model = $this->getModel('page');
         /** @var Page $page */
-        $page         = $model->getEntity($id);
+        $page = $model->getEntity($id);
 
-        if (null === $page) {
+        if (!$page->getId()) {
             return $this->notFound();
         }
 
@@ -383,7 +384,7 @@ class PublicController extends CommonFormController
         $dispatcher = $this->get('event_dispatcher');
         if ($dispatcher->hasListeners(PageEvents::PAGE_ON_DISPLAY)) {
             $event = new PageDisplayEvent($content, $page);
-            if ($contactId && $contact) {
+            if (isset($contact)) {
                 $event->setLead($contact);
             }
             $dispatcher->dispatch($event, PageEvents::PAGE_ON_DISPLAY);

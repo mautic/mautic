@@ -16,6 +16,8 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
@@ -519,7 +521,7 @@ class PublicController extends CommonFormController
         // Prepare contact
         if ($contactId) {
             // We have one from request parameter
-            /** @var LeadModel $fieldModel */
+            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead.lead');
             /** @var Lead $contact */
             $contact = $leadModel->getEntity($contactId);
