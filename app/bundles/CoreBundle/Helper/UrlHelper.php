@@ -341,4 +341,29 @@ class UrlHelper
 
         return $url;
     }
+
+    /**
+     * This method implements unicode slugs instead of transliteration.
+     */
+    public static function stringURLUnicodeSlug(string $string): string
+    {
+        // Replace double byte whitespaces by single byte (East Asian languages)
+        $str = preg_replace('/\xE3\x80\x80/', ' ', $string);
+
+        // Remove any '-' from the string as they will be used as concatenator.
+        // Would be great to let the spaces in but only Firefox is friendly with this
+        $str = str_replace('-', ' ', $str);
+
+        // Replace forbidden characters by whitespaces
+        $str = preg_replace('#[:\#\*"@+=;!><&\.%()\]\/\'\\\\|\[]#', "\x20", $str);
+
+        // Delete all '?'
+        $str = str_replace('?', '', $str);
+
+        // Trim white spaces at beginning and end of alias and make lowercase
+        $str = trim(strtolower($str));
+
+        // Remove any duplicate whitespace and replace whitespaces by hyphens
+        return preg_replace('#\x20+#', '-', $str);
+    }
 }
