@@ -290,6 +290,56 @@ class LanguageHelper
         ];
     }
 
+    /**
+     * Returns Mautic translation files.
+     *
+     * @return array<string,string[]>
+     */
+    public function getLanguageFiles(): array
+    {
+        $files         = [];
+        $mauticBundles = $this->coreParametersHelper->get('bundles');
+        $pluginBundles = $this->coreParametersHelper->get('plugin.bundles');
+
+        foreach ($mauticBundles as $bundle) {
+            // Parse the namespace into a filepath
+            $translationsDir = $bundle['directory'].'/Translations/en_US';
+
+            if (is_dir($translationsDir)) {
+                $files[$bundle['bundle']] = [];
+
+                // Get files within the directory
+                $finder = new Finder();
+                $finder->files()->in($translationsDir)->name('*.ini');
+
+                /** @var \Symfony\Component\Finder\SplFileInfo $file */
+                foreach ($finder as $file) {
+                    $files[$bundle['bundle']][] = $file->getPathname();
+                }
+            }
+        }
+
+        foreach ($pluginBundles as $bundle) {
+            // Parse the namespace into a filepath
+            $translationsDir = $bundle['directory'].'/Translations/en_US';
+
+            if (is_dir($translationsDir)) {
+                $files[$bundle['bundle']] = [];
+
+                // Get files within the directory
+                $finder = new Finder();
+                $finder->files()->in($translationsDir)->name('*.ini');
+
+                /** @var \Symfony\Component\Finder\SplFileInfo $file */
+                foreach ($finder as $file) {
+                    $files[$bundle['bundle']][] = $file->getPathname();
+                }
+            }
+        }
+
+        return $files;
+    }
+
     private function loadSupportedLanguages()
     {
         // Find available translations
