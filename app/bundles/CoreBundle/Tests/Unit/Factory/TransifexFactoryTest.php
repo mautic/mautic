@@ -2,9 +2,9 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
-use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\Transifex\Exception\InvalidConfigurationException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
@@ -32,28 +32,24 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
         $this->transifexFactory     = new TransifexFactory($this->client, $this->coreParametersHelper);
     }
 
-    public function testCreatingTransifexWithoutCredentials()
+    public function testCreatingTransifexWithoutCredentials(): void
     {
-        $this->expectException(BadConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->transifexFactory->getTransifex();
     }
 
-    public function testCreatingTransifexWithCredentials()
+    public function testCreatingTransifexWithCredentials(): void
     {
-        $this->coreParametersHelper->expects($this->exactly(2))
+        $this->coreParametersHelper->expects($this->once())
             ->method('get')
-            ->withConsecutive(
-                ['transifex_username'],
-                ['transifex_password']
-            )
-            ->willReturnOnConsecutiveCalls(
-                'the_username',
-                'the_password'
-            );
+            ->with('transifex_api_token')
+            ->willReturn('the_api_key');
 
         $transifex = $this->transifexFactory->getTransifex();
 
-        $this->assertSame('the_username', $transifex->getOption('api.username'));
-        $this->assertSame('the_password', $transifex->getOption('api.password'));
+        $this->assertSame('the_api_key', $transifex->getConfig()->getApiToken());
+        $this->assertSame('https://rest.api.transifex.com', $transifex->getConfig()->getBaseUri());
+        $this->assertSame('mautic', $transifex->getConfig()->getOrganization());
+        $this->assertSame('mautic', $transifex->getConfig()->getProject());
     }
 }
