@@ -301,8 +301,9 @@ return [
     ],
 
     'parameters' => [
-        'form_upload_dir'        => '%kernel.project_dir%/media/files/form',
-        'blacklisted_extensions' => ['php', 'sh'],
-        'do_not_submit_emails'   => [],
+        'form_upload_dir'           => '%kernel.project_dir%/media/files/form',
+        'blacklisted_extensions'    => ['php', 'sh'],
+        'do_not_submit_emails'      => [],
+        'form_results_data_sources' => false,
     ],
 ];
