@@ -1,19 +1,9 @@
 {% set extra = event.extra %}
 {% set log = extra.log %}
-{% set evenType = log.type %}
+{% set eventType = log.type %}
 {% set eventSettings = extra.campaignEventSettings %}
-{% set messageSettings  = eventSettings['action'][eventType]['timelineTemplateVars']['messageSettings'] %}
+{% set messageSettings = eventSettings['action'][eventType]['timelineTemplateVars']['messageSettings'] %}
 <?php
-
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 $extra            = $event['extra'];
 $log              = $extra['log'];
 $eventType        = $log['type'];
@@ -36,41 +26,39 @@ $getChannelOutput = function ($channel) use ($view, $event, $log, $eventSettings
         }
 
         return $view['translator']->trans($msg);
-    }
+}
 
-    $template                     = 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.php';
-    $channelEvent                 = $event;
-    $channelEvent['extra']['log'] = $log;
-    $vars                         = [
-        'event' => $channelEvent,
-    ];
+{% set template = 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.twig' %}
+{% set channelEvent = event %}
+{% set channelEvent = channelEvent|merge({extra: {log: log}}) %}
+{% set vars = {
+    'event' => channelEvent
+} %}
 
-    // Successful send through this channel
-    if (!empty($messageSettings[$channel]['campaignAction'])) {
-        $eventType = $messageSettings[$channel]['campaignAction'];
-        if (!empty($eventSettings['action'][$eventType]['timelineTemplate'])) {
-            $template = $eventSettings['action'][$eventType]['timelineTemplate'];
-        }
-        if (!empty($eventSettings['action'][$eventType]['timelineTemplateVars'])) {
-            $vars['event']['extra'] = array_merge(
-                $vars['event']['extra'],
-                $eventSettings['action'][$eventType]['timelineTemplateVars']
-            );
-        }
-    }
+{# Successful send through this channel #}
+{% if messageSettings[channel]['campaignAction'] is not empty %}
+    {% set eventType = messageSettings[channel]['campaignAction'] %}
+    {% if eventSettings['action'][eventType]['timelineTemplate'] is not empty %}
+        {% set template = eventSettings['action'][eventType]['timelineTemplate'] %}
+    {% endif %}
+    {% if eventSettings['action'][eventType]['timelineTemplateVars'] is not empty %}
+        {% set vars = {
+            'event': {
+                'extra': vars.event.extra|merge(eventSettings['action'][eventType]['timelineTemplateVars'])
+            }
+        } %}
+    {% endif %}
+{% endif %}
 
-    return $view->render($template, $vars);
-};
-$counter = count($extra['log']['metadata']);
-?>
-
-<?php foreach ($extra['log']['metadata'] as $channel => $results): ?>
-    <?php if (isset($messageSettings[$channel])): ?>
-        <h4><?php echo $messageSettings[$channel]['label']; ?></h4>
-        <?php echo $getChannelOutput($channel); ?>
-        <?php --$counter; ?>
-        <?php if ($counter > 0): ?>
-            <hr/>
-        <?php endif; ?>
-    <?php endif; ?>
-<?php endforeach; ?>
+{{- include(template, vars) -}}
+{% set counter = extra.log.metadata|length %}
+{% for channel, results in extra.log.metadata %}
+{% if messageSettings[channel] is defined %}
+<h4>{{ messageSettings[channel]['label'] }}</h4>
+{{ channelOutput(channel) }}
+{%  set counter = counter - 1 %}
+{% if counter > 0 %}
+<hr/>
+{% endif %}
+{% endif %}
+{% endfor %}
