@@ -41,5 +41,6 @@ return function (ContainerConfigurator $configurator) {
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);
     $services->alias('templating.helper.assets', \Mautic\CoreBundle\Templating\Helper\AssetsHelper::class);
+    $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->get(\Mautic\CoreBundle\Templating\Helper\AssetsHelper::class)->tag('templating.helper', ['alias' => 'assets']);
 };
