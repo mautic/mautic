@@ -2,7 +2,6 @@
 {% extends "MauticCoreBundle:FormTheme:form.html.twig" %}
 {% set hasRightColumn = block('rightFormContent') is defined %}
 {% block mainFormContent %}
-    {{ dump(formTabs) }}
     {{ form_start(form) }}
     <div class="box-layout">
         <div class="col-md-{{ hasRightColumn ? 9 : 12 }} height-auto bg-white">
