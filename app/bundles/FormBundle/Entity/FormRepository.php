@@ -203,6 +203,14 @@ class FormRepository extends CommonRepository
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
     }
 
+    public function getFormTableIdViaResults(string $resultsTableName): ?string
+    {
+        $regexp = '/.*'.MAUTIC_TABLE_PREFIX.'form_results_([0-9]+)_(.*)/i';
+        preg_match($regexp, $resultsTableName, $matches);
+
+        return $matches[1] ?? null;
+    }
+
     /**
      * {@inheritdoc}
      */
