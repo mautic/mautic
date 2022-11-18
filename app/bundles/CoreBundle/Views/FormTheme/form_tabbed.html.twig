@@ -2,7 +2,8 @@
 {% extends "MauticCoreBundle:FormTheme:form.html.twig" %}
 {% set hasRightColumn = block('rightFormContent') is defined %}
 {% block mainFormContent %}
-{{ form_start(form) }}
+    {{ dump(formTabs) }}
+    {{ form_start(form) }}
     <div class="box-layout">
         <div class="col-md-{{ hasRightColumn ? 9 : 12 }} height-auto bg-white">
             <div class="row">
@@ -10,7 +11,7 @@
                     {{ form_errors(form) }}
                     {% block aboveTabsContent %}{% endblock %}
                     {{ customContent('tabs.above', mauticTemplateVars) }}
-                    {{- include('MauticCoreBundle:Helper:tabs.html.twig', {'tabs' : tabs}) -}}
+                    {{- include('MauticCoreBundle:Helper:tabs.html.twig', {'tabs' : formTabs }) -}}
                     <div class="pr-md pl-md">
                         {% if block('_content') is defined %}
                             {{ block('_content') }}
@@ -27,7 +28,7 @@
         {% if rightContent is not empty %}
         <div class="col-md-3 bg-white height-auto bdr-l">
             <div class="pr-lg pl-lg pt-md pb-md">
-                {{rightContent|raw }}
+                {{ rightContent|raw }}
             </div>
         </div>
         {% endif %}
