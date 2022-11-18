@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mautic\MarketplaceBundle\Model;
+namespace Mautic\MarketplaceBundle\DTO;
 
-class ConsoleOutputModel
+final class ConsoleOutput
 {
     /**
      * Console exit code. 0 when everything went fine, or an error code.

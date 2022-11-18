@@ -2,28 +2,6 @@
 
 return [
     'services' => [
-        'events' => [
-            'mautic.queue.rabbitmq.subscriber' => [
-                'class'     => \Mautic\QueueBundle\EventListener\RabbitMqSubscriber::class,
-                'arguments' => 'service_container',
-            ],
-            'mautic.queue.beanstalkd.subscriber' => [
-                'class'     => \Mautic\QueueBundle\EventListener\BeanstalkdSubscriber::class,
-                'arguments' => [
-                    'service_container',
-                    'mautic.queue.service',
-                ],
-            ],
-        ],
-        'commands' => [
-            'mautic.queue.command.fetch_leads' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\QueueBundle\Command\ConsumeQueueCommand::class,
-                'arguments' => [
-                    'mautic.queue.service',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.queue.service' => [
                 'class'     => \Mautic\QueueBundle\Queue\QueueService::class,

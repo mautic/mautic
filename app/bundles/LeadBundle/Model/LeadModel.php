@@ -53,7 +53,7 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Intl\Countries;
@@ -114,7 +114,7 @@ class LeadModel extends FormModel
     protected $categoryModel;
 
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     protected $formFactory;
 
@@ -187,7 +187,7 @@ class LeadModel extends FormModel
         IntegrationHelper $integrationHelper,
         FieldModel $leadFieldModel,
         ListModel $leadListModel,
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         CompanyModel $companyModel,
         CategoryModel $categoryModel,
         ChannelListHelper $channelListHelper,
@@ -361,10 +361,10 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Lead                                $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param Lead                 $entity
+     * @param FormFactoryInterface $formFactory
+     * @param string|null          $action
+     * @param array                $options
      *
      * @return \Symfony\Component\Form\Form
      *

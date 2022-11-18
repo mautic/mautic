@@ -13,7 +13,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 abstract class CommonStatsSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CommonRepository[]
+     * @var mixed[]
      */
     protected $repositories = [];
 

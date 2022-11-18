@@ -36151,56 +36151,6 @@ parameters:
 			path: app/bundles/IntegrationsBundle/EventListener/LeadSubscriber.php
 
 		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:addEvents\\(\\) has parameter \\$eventType with no type specified\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:addEvents\\(\\) has parameter \\$eventTypeName with no type specified\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:addEvents\\(\\) has parameter \\$icon with no type specified\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:getEventEntry\\(\\) has parameter \\$eventType with no type specified\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:getEventEntry\\(\\) has parameter \\$eventTypeName with no type specified\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:getEventEntry\\(\\) has parameter \\$icon with no type specified\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:getEventEntry\\(\\) has parameter \\$log with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:getEventEntry\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
-			message: "#^Parameter \\#5 \\$bundle of method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\TimelineSubscriber\\:\\:addEvents\\(\\) expects null, string given\\.$#"
-			count: 1
-			path: app/bundles/IntegrationsBundle/EventListener/TimelineSubscriber.php
-
-		-
 			message: "#^Method Mautic\\\\IntegrationsBundle\\\\EventListener\\\\UIContactIntegrationsTabSubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/IntegrationsBundle/EventListener/UIContactIntegrationsTabSubscriber.php

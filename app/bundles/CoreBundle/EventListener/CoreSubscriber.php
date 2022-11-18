@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -54,7 +54,7 @@ class CoreSubscriber implements EventSubscriberInterface
     private $assetsHelper;
 
     /**
-     * @var AuthorizationChecker
+     * @var AuthorizationCheckerInterface
      */
     private $securityContext;
 
@@ -104,7 +104,7 @@ class CoreSubscriber implements EventSubscriberInterface
         UserHelper $userHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
-        AuthorizationChecker $securityContext,
+        AuthorizationCheckerInterface $securityContext,
         UserModel $userModel,
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
