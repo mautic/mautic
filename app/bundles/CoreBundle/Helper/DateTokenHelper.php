@@ -11,7 +11,7 @@ class DateTokenHelper
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function getTokens(string $content): array
+    public function getTokens(string $content, string $contactTimezone = null): array
     {
         $tokens = [];
         preg_match_all('/{today(.*?)}/', $content, $matches);
@@ -23,19 +23,20 @@ class DateTokenHelper
                     continue;
                 }
 
-                $tokens[$token] = $this->getToday($modifier);
+                $tokens[$token] = $this->getToday($modifier, $contactTimezone);
             }
         }
 
         return $tokens;
     }
 
-    private function getToday(string $modifier): string
+    private function getToday(string $modifier, ?string $contactTimezone): string
     {
-        $defaultDateFormat = $this->coreParametersHelper->get('date_format_dateonly');
-        $defaultTimeFormat = $this->coreParametersHelper->get('date_format_timeonly');
+        $defaultDateFormat     = $this->coreParametersHelper->get('date_format_dateonly');
+        $defaultTimeFormat     = $this->coreParametersHelper->get('date_format_timeonly');
         $defaultDatetimeFormat = sprintf('%s %s', $defaultDateFormat, $defaultTimeFormat);
-        $dateTime          = new \DateTime('now', new \DateTimeZone($this->coreParametersHelper->get('default_timezone')));
+        $contactTimezone       = $contactTimezone?: $this->coreParametersHelper->get('default_timezone', 'UTC');
+        $dateTime              = new \DateTime('now', new \DateTimeZone($contactTimezone));
 
         $parseModifier = explode('|', ltrim($modifier, '|'));
         $modifier      = $parseModifier[0] ?? '';

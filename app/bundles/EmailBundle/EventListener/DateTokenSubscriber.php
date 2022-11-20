@@ -47,7 +47,9 @@ class DateTokenSubscriber implements EventSubscriberInterface
         $content .= $event->getPlainText();
         $content .= implode(' ', $event->getTextHeaders());
 
-        $tokenList = $this->dateTokenHelper->getTokens($content);
+        $leadArray = $event->getLead();
+        $timezone = !$event->isInternalSend() && $leadArray && is_array($leadArray) ?  ($leadArray['timezone'] ?? null) : null;
+        $tokenList = $this->dateTokenHelper->getTokens($content, $timezone);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);
