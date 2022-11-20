@@ -23,6 +23,7 @@ function launchBuilderGrapesjs(formName) {
   const assets = AssetService.getAssets();
 
   const builder = new BuilderService(assets);
+  Mautic.builder = builder;
 
   Mautic.showChangeThemeWarning = true;
 

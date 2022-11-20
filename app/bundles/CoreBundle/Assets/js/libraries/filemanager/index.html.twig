@@ -57,6 +57,11 @@
         $window.resize();
         {% endif %}
     });
+    window.addEventListener('beforeunload', function (e) {
+        if (window.opener.Mautic.builder) {
+            window.opener.Mautic.builder.editor.AssetManager.close();
+        }
+    });
 </script>
 <div class="elfinder"></div>
 </body>
