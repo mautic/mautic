@@ -25,11 +25,11 @@ class DateTokenSubscriber implements EventSubscriberInterface
     {
         $this->translator      = $translator;
         $this->dateTokenHelper = $dateTokenHelper;
-        $this->security = $security;
-        $this->contactTracker = $contactTracker;
+        $this->security        = $security;
+        $this->contactTracker  = $contactTracker;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             PageEvents::PAGE_ON_BUILD                     => ['onPageBuild', 0],
@@ -37,12 +37,12 @@ class DateTokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onPageBuild(PageBuilderEvent $event)
+    public function onPageBuild(PageBuilderEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
     }
 
-    public function onPageDisplay(PageDisplayEvent $event)
+    public function onPageDisplay(PageDisplayEvent $event): void
     {
         $content   = $event->getContent();
         $contact   = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;

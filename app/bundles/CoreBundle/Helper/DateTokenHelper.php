@@ -11,6 +11,9 @@ class DateTokenHelper
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getTokens(string $content, string $contactTimezone = null): array
     {
         $tokens = [];

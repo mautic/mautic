@@ -21,7 +21,7 @@ class DateTokenSubscriber implements EventSubscriberInterface
         $this->dateTokenHelper = $dateTokenHelper;
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             EmailEvents::EMAIL_ON_BUILD                     => ['onEmailBuild', 0],
@@ -30,26 +30,26 @@ class DateTokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onEmailBuild(EmailBuilderEvent $event)
+    public function onEmailBuild(EmailBuilderEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
     }
 
-    public function onEmailDisplay(EmailSendEvent $event)
+    public function onEmailDisplay(EmailSendEvent $event): void
     {
         $this->onEmailGenerate($event);
     }
 
-    public function onEmailGenerate(EmailSendEvent $event)
+    public function onEmailGenerate(EmailSendEvent $event): void
     {
         $content = $event->getSubject();
         $content .= $event->getContent();
         $content .= $event->getPlainText();
         $content .= implode(' ', $event->getTextHeaders());
 
-        $leadArray = $event->getLead();
-        $timezone = !$event->isInternalSend() && $leadArray && is_array($leadArray) ?  ($leadArray['timezone'] ?? null) : null;
-        $tokenList = $this->dateTokenHelper->getTokens($content, $timezone);
+        $leadArray       = $event->getLead();
+        $contactTimezone = $event->isInternalSend() || !is_array($leadArray) ? null : ($leadArray['timezone'] ?? null);
+        $tokenList       = $this->dateTokenHelper->getTokens($content, $contactTimezone);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);

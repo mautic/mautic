@@ -56,7 +56,7 @@ class EmailSendEvent extends CommonEvent
     private $tokens = [];
 
     /**
-     * @var internalSend
+     * @var bool
      */
     private $internalSend = false;
 
@@ -103,7 +103,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Check if this email is an internal send or to the lead; if an internal send, don't append lead tracking.
      *
-     * @return internalSend
+     * @return bool
      */
     public function isInternalSend()
     {
@@ -166,7 +166,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Get email content.
      *
-     * @return array
+     * @return string
      */
     public function getPlainText()
     {
@@ -242,7 +242,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return array|object
      */
     public function getLead()
     {
