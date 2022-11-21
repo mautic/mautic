@@ -10,7 +10,11 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\Transifex\Connector\Statistics;
 use Mautic\Transifex\Connector\Translations;
+use Mautic\Transifex\DTO\DownloadContentDTO;
+use Mautic\Transifex\DTO\DownloadDTO;
 use Mautic\Transifex\Exception\InvalidConfigurationException;
+use Mautic\Transifex\Exception\ResponseException;
+use SplQueue;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,6 +50,7 @@ class PullTransifexCommand extends Command
         $this->setName('mautic:transifex:pull')
             ->setDescription('Fetches translations for Mautic from Transifex')
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
 
@@ -61,6 +66,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $languageFilter = $input->getOption('language');
+        $bundleFilter   = $input->getOption('bundle');
         $files          = $this->languageHelper->getLanguageFiles();
         $translationDir = $this->pathsHelper->getTranslationsPath().'/';
 
@@ -72,20 +78,26 @@ EOT
             return 1;
         }
 
+        $statisticsConnector = $transifex->get(Statistics::class);
+        \assert($statisticsConnector instanceof Statistics);
+
+        $translationsConnector = $transifex->get(Translations::class);
+        \assert($translationsConnector instanceof Translations);
+
+        /** @var SplQueue<DownloadDTO> $downloadDtoQueue */
+        $downloadDtoQueue = new SplQueue();
+
         foreach ($files as $bundle => $stringFiles) {
+            if ($bundleFilter && $bundle !== $bundleFilter) {
+                continue;
+            }
             foreach ($stringFiles as $file) {
-                $name  = $bundle.' '.str_replace('.ini', '', basename($file));
-                $alias = UrlHelper::stringURLUnicodeSlug($name);
+                $name     = $bundle.' '.str_replace('.ini', '', basename($file));
+                $resource = UrlHelper::stringURLUnicodeSlug($name);
                 $output->writeln($this->translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
 
                 try {
-                    $statisticsConnector = $transifex->get(Statistics::class);
-                    \assert($statisticsConnector instanceof Statistics);
-
-                    $translationsConnector = $transifex->get(Translations::class);
-                    \assert($translationsConnector instanceof Translations);
-
-                    $response      = $statisticsConnector->getStatistics($alias);
+                    $response      = $statisticsConnector->getStatistics($resource);
                     $languageStats = json_decode((string) $response->getBody(), true);
 
                     foreach ($languageStats['data'] as $stats) {
@@ -105,54 +117,34 @@ EOT
 
                         // We only want resources which are 80% completed
                         if ($completed >= 0.8) {
-                            $response    = $translationsConnector->getTranslation($alias, $language);
-                            $translation = json_decode((string) $response->getBody(), true);
-                            $path        = $translationDir.$language.'/'.$bundle.'/'.basename($file);
-
-                            // Verify the directories exist
-                            if (!is_dir($translationDir.$language)) {
-                                if (!mkdir($translationDir.$language)) {
-                                    $output->writeln(
-                                        $this->translator->trans('mautic.core.command.transifex_error_creating_directory', [
-                                            '%directory%' => $translationDir.$language,
-                                            '%language%'  => $language,
-                                        ]));
-
-                                    continue;
-                                }
+                            $path = $translationDir.$language.'/'.$bundle.'/'.basename($file);
+                            try {
+                                $downloadDtoQueue->enqueue($translationsConnector->getDownloadDTO($resource, $language, $path));
+                            } catch (ResponseException $responseException) {
+                                $output->writeln($this->translator->trans($responseException->getMessage()));
                             }
-
-                            if (!is_dir($translationDir.$language.'/'.$bundle)) {
-                                if (!mkdir($translationDir.$language.'/'.$bundle)) {
-                                    $output->writeln(
-                                        $this->translator->trans('mautic.core.command.transifex_error_creating_directory', [
-                                            '%directory%' => $translationDir.$language.'/'.$bundle,
-                                            '%language%'  => $language,
-                                        ]));
-
-                                    continue;
-                                }
-                            }
-
-                            // Write the file to the system
-                            if (!file_put_contents($path, $translation['content'])) {
-                                $output->writeln(
-                                    $this->translator->trans('mautic.core.command.transifex_error_creating_file',
-                                        ['%file%' => $path, '%language%' => $language]
-                                    )
-                                );
-
-                                continue;
-                            }
-
-                            $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_downloaded'));
                         }
                     }
                 } catch (\Exception $exception) {
                     $output->writeln($this->translator->trans('mautic.core.command.transifex_error_pulling_data', ['%message%' => $exception->getMessage()]));
+
+                    return 1;
                 }
             }
         }
+
+        $translationsConnector->downloadTranslations(
+            $downloadDtoQueue,
+            function (DownloadContentDTO $downloadContentDTO) use ($output) {
+                try {
+                    $this->languageHelper->createLanguageFile($downloadContentDTO->getDownloadDTO()->getFilePath(), $downloadContentDTO->getContent());
+                } catch (\Exception $exception) {
+                    $output->writeln($exception->getMessage());
+                }
+            }
+        );
+
+        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_downloaded'));
 
         return 0;
     }
