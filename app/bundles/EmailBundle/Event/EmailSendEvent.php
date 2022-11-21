@@ -123,7 +123,7 @@ class EmailSendEvent extends CommonEvent
     /**
      * Returns the Email entity.
      *
-     * @return Email
+     * @return Email|null
      */
     public function getEmail()
     {
@@ -242,7 +242,7 @@ class EmailSendEvent extends CommonEvent
     }
 
     /**
-     * @return array|object
+     * @return array|object|null
      */
     public function getLead()
     {
