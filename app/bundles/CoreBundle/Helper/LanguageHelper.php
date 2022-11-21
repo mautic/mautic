@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\Language\Installer;
 use Monolog\Logger;
 use Symfony\Component\Finder\Finder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Helper class for managing Mautic's installed languages.
@@ -18,16 +19,23 @@ class LanguageHelper
     private Logger $logger;
     private Installer $installer;
     private CoreParametersHelper $coreParametersHelper;
+    private TranslatorInterface $translator;
     private array $supportedLanguages = [];
     private string $installedTranslationsDirectory;
     private string $defaultTranslationsDirectory;
 
-    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Client $client)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        Logger $logger,
+        CoreParametersHelper $coreParametersHelper,
+        Client $client,
+        TranslatorInterface $translator
+    ) {
         $this->pathsHelper                    = $pathsHelper;
         $this->logger                         = $logger;
         $this->coreParametersHelper           = $coreParametersHelper;
         $this->client                         = $client;
+        $this->translator                     = $translator;
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
         $this->installer                      = new Installer($this->installedTranslationsDirectory);
@@ -338,6 +346,26 @@ class LanguageHelper
         }
 
         return $files;
+    }
+
+    public function createLanguageFile(string $filePath, string $content): void
+    {
+        $bundleDir   = dirname($filePath, 1);
+        $languageDir = dirname($filePath, 2);
+
+        foreach ([$bundleDir, $languageDir] as $dir) {
+            if (is_dir($dir)) {
+                continue;
+            }
+
+            if (!mkdir($dir)) {
+                throw new \RuntimeException($this->translator->trans('mautic.core.command.transifex_error_creating_directory', ['%directory%' => $dir]));
+            }
+        }
+
+        if (!file_put_contents($filePath, $content)) {
+            throw new \RuntimeException($this->translator->trans('mautic.core.command.transifex_error_creating_file', ['%file%' => $filePath]));
+        }
     }
 
     private function loadSupportedLanguages()
