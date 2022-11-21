@@ -9,13 +9,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const DATE_FORMAT = 'F j, Y';
+    public const DATE_FORMAT = 'F j, Y';
 
-    const TIME_FORMAT  = 'g:i a';
+    public const TIME_FORMAT  = 'g:i a';
 
-    const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
+    public const DATE_TIME_FORMAT = self::DATE_FORMAT.' '.self::TIME_FORMAT;
 
-    const TIMEZONE = 'Europe/Paris';
+    public const TIMEZONE = 'Europe/Paris';
 
     /**
      * @dataProvider getContents

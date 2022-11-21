@@ -35,7 +35,7 @@ class DateTokenHelper
         $defaultDateFormat     = $this->coreParametersHelper->get('date_format_dateonly');
         $defaultTimeFormat     = $this->coreParametersHelper->get('date_format_timeonly');
         $defaultDatetimeFormat = sprintf('%s %s', $defaultDateFormat, $defaultTimeFormat);
-        $contactTimezone       = $contactTimezone?: $this->coreParametersHelper->get('default_timezone', 'UTC');
+        $contactTimezone       = $contactTimezone ?: $this->coreParametersHelper->get('default_timezone', 'UTC');
         $dateTime              = new \DateTime('now', new \DateTimeZone($contactTimezone));
 
         $parseModifier = explode('|', ltrim($modifier, '|'));
