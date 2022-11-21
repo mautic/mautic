@@ -727,14 +727,6 @@ class NotificationController extends AbstractFormController
         $model        = $this->getModel('notification');
         $notification = $model->getEntity($objectId);
 
-        if (null != $notification
-            && $this->get('mautic.security')->hasEntityAccess(
-                'notification:notifications:editown',
-                'notification:notifications:editother'
-            )
-        ) {
-        }
-
         return $this->delegateView(
             [
                 'viewParameters' => [

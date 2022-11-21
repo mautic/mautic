@@ -372,11 +372,11 @@ class TagController extends FormController
      */
     private function getTag($tagId)
     {
-        /** @var Tag $tag */
+        /** @var Tag|null $tag */
         $tag = $this->getModel('lead.tag')->getEntity($tagId);
 
         // Check if exists
-        if (!$tag instanceof Tag) {
+        if (!$tag) {
             throw new EntityNotFoundException(sprintf('Tag with id %d not found.', $tagId));
         }
 
