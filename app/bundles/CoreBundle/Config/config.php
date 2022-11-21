@@ -652,15 +652,6 @@ return [
                     'mautic.cipher.openssl',
                 ],
             ],
-            'mautic.helper.language' => [
-                'class'     => \Mautic\CoreBundle\Helper\LanguageHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                ],
-            ],
             'mautic.helper.url' => [
                 'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
                 'arguments' => [
