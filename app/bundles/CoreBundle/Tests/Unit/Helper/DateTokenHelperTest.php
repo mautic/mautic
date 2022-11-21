@@ -18,6 +18,8 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public const TIMEZONE_CUSTOM = 'America/Chicago';
 
     /**
+     * @param array<string,string> $expected
+     *
      * @dataProvider getContents
      */
     public function testGetTokens(string $content, array $expected, string $contactTimezone = null): void
@@ -43,7 +45,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return iterable<array<int,array<string,string>|string>>
+     * @return iterable<array<int, array<string, string>|string>>
      */
     public function getContents(): iterable
     {
