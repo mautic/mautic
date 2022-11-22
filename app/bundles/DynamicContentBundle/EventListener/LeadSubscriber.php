@@ -92,7 +92,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                 'type' => 'sent',
                             ],
                             'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                            'icon'            => 'fa-envelope',
+                            'icon'            => 'fa-puzzle-piece',
                             'contactId'       => $contactId,
                         ]
                     );
