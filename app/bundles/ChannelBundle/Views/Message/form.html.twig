@@ -1,8 +1,44 @@
 {% extends "MauticCoreBundle:FormTheme:form_tabbed.html.twig" %}
+{% form_theme form _self %}
+{%  block channel_row %}
+    {% if form.children.channel is defined %}
+        {% set channel = form.children['channel'].vars['data'] %}
+        {% set hide = form.children['isEnabled'].vars['data'] is empty %}
+        {% set channelContent = customContent('channel.right', mauticTemplateVars is defined ? mauticTemplateVars : []) %}
+        {% set leftCol = channelContent ? 6 : 12 %}
+        {% set enableCol = channelContent ? '' : 'col-md-2' %}
+        {% set propsCol = channelContent ? '' : 'col-md-10' %}
 
+        {{ form_row(form.children['channel']) }}
+        {{ form_errors(form) }}
+        <div class="row">
+            <div class="col-md-{{ leftCol }}">
+                <div class="{{ enableCol }}">
+                    {{ form_row(form.children.isEnabled) }}
+                </div>
+                <div class="{{ propsCol }}">
+                    <div class="message_channel_properties_{{ channel }}{% if hide %} hide{% endif %}">
+                        {% if form.children.channelId is defined %}
+                            {{ form_row(form.children.channelId) }}
+                        {% endif %}
+
+                        {% if form.children.properties is defined and form.children.properties is not empty %}
+                            {{ form_row(form.children.properties) }}
+                            {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if channelContent %}
+            <div class="col-md-6">
+                {{ channelContent }}
+            </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}
 {# active, id, name, content #}
 {% set tabs, active = [], true %}
-
+{% set _channel = '' %}
 {% for channel, config in channels %}
     {% if form.channels[channel] is defined %}
         {% set tab = {
@@ -19,7 +55,6 @@
         {% elseif form.channels[channel].isEnabled.vars.data %}
             {% set tab = tab|merge({'published': true}) %}
         {% endif %}
-
 
         {% set tabs, active = tabs|merge([tab]), false %}
     {% endif %}

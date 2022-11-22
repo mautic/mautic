@@ -64,7 +64,7 @@
             {% set tab = tab|merge({'containerAttr': attr|join(' ')}) %}
         {% endif %}
         {% set containerAttr = (tab['containerAttr'] is not empty) ? ' ' ~ tab['containerAttr'] : '' %}
-        <div class="tab-pane fade {{ (tab['active'] is not empty) ? 'in active' : '' }} bdr-w-0{{ containerClass }}" id="{{ tab['id'] }}"{{ containerAttr }}>
+        <div class="tab-pane fade {{ (tab['active'] is not empty) ? 'in active' : '' }} bdr-w-0{{ containerClass }}" id="{{ tab['id'] }}"{{ containerAttr|purify }}>
             {{ tab['content']|raw }}
         </div>
     {% endfor %}

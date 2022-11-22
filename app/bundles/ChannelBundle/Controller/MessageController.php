@@ -200,17 +200,7 @@ class MessageController extends AbstractStandardFormController
      */
     protected function getFormView(Form $form, $view)
     {
-        $themes = ['MauticChannelBundle:FormTheme'];
-        /** @var MessageModel $model */
-        $model    = $this->getModel($this->getModelName());
-        $channels = $model->getChannels();
-        foreach ($channels as $channel) {
-            if (isset($channel['formTheme'])) {
-                $themes[] = $channel['formTheme'];
-            }
-        }
-
-        return $this->setFormTheme($form, 'MauticChannelBundle:Message:form.html.php', $themes);
+        return $form->createView();
     }
 
     /**
