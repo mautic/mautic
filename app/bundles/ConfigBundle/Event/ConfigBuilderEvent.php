@@ -29,6 +29,11 @@ class ConfigBuilderEvent extends Event
      */
     protected $encodedFields = [];
 
+    /**
+     * @var array<string> Array of field names which are not exist in local.php but are needed for generation other field
+     */
+    protected array $temporaryFields = [];
+
     public function __construct(BundleHelper $bundleHelper)
     {
         $this->bundleHelper = $bundleHelper;
@@ -128,5 +133,25 @@ class ConfigBuilderEvent extends Event
     public function getFileFields()
     {
         return $this->encodedFields;
+    }
+
+    /**
+     * Adds temporary fields for config.
+     *
+     * @param array<string> $fields
+     */
+    public function addTemporaryFields(array $fields): void
+    {
+        $this->temporaryFields = array_merge($this->temporaryFields, $fields);
+    }
+
+    /**
+     * Return a list of temporary fields.
+     *
+     * @return array<string>
+     */
+    public function getTemporaryFields(): array
+    {
+        return $this->temporaryFields;
     }
 }
