@@ -13,6 +13,7 @@ class MessageRepository extends CommonRepository
     {
         $args['qb'] = $this->createQueryBuilder($this->getTableAlias());
         $args['qb']->join('MauticChannelBundle:Channel', 'channel', 'WITH', 'channel.message = '.$this->getTableAlias().'.id');
+        $args['qb']->leftJoin('MauticCategoryBundle:Category', 'cat', 'WITH', 'cat.id = '.$this->getTableAlias().'.category');
 
         return parent::getEntities($args);
     }
