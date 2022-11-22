@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\Language\Installer;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -16,7 +16,7 @@ class LanguageHelper
     private string $cacheFile;
     private Client $client;
     private PathsHelper $pathsHelper;
-    private Logger $logger;
+    private LoggerInterface $logger;
     private Installer $installer;
     private CoreParametersHelper $coreParametersHelper;
     private TranslatorInterface $translator;
@@ -26,7 +26,7 @@ class LanguageHelper
 
     public function __construct(
         PathsHelper $pathsHelper,
-        Logger $logger,
+        LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
         Client $client,
         TranslatorInterface $translator
@@ -353,7 +353,7 @@ class LanguageHelper
         $bundleDir   = dirname($filePath, 1);
         $languageDir = dirname($filePath, 2);
 
-        foreach ([$bundleDir, $languageDir] as $dir) {
+        foreach ([$languageDir, $bundleDir] as $dir) {
             if (is_dir($dir)) {
                 continue;
             }
