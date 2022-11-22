@@ -396,11 +396,11 @@ class ListController extends FormController
      */
     private function getSegment($segmentId)
     {
-        /** @var LeadList $segment */
+        /** @var LeadList|null $segment */
         $segment = $this->getModel('lead.list')->getEntity($segmentId);
 
         // Check if exists
-        if (!$segment instanceof LeadList) {
+        if (!$segment) {
             throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
         }
 

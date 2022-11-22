@@ -28,7 +28,14 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     $rectorConfig->parallel();
 
-    $rectorConfig->symfonyContainerXml(__DIR__.'/var/cache/test/appAppKernelTestDebugContainer.xml');
+    foreach (['dev', 'test', 'prod'] as $environment) {
+        $environmentCap = ucfirst($environment);
+        $xmlPath        = __DIR__."/var/cache/{$environment}/appAppKernel{$environmentCap}DebugContainer.xml";
+        if (file_exists($xmlPath)) {
+            $rectorConfig->symfonyContainerXml($xmlPath);
+            break;
+        }
+    }
 
     $rectorConfig->cacheClass(FileCacheStorage::class);
     $rectorConfig->cacheDirectory(__DIR__.'/var/cache/rector');
@@ -46,4 +53,9 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\Stmt\RemoveUnreachableStatementRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\ClassConst\RemoveUnusedPrivateClassConstantRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\ClassMethod\RemoveUnusedPrivateMethodParameterRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\Concat\RemoveConcatAutocastRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\Return_\RemoveDeadConditionAboveReturnRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
+    $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
 };
