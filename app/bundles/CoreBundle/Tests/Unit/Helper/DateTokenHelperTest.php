@@ -57,6 +57,12 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
                 '{today}' => $now->format(self::DATE_TIME_FORMAT),
                 ],
         ], [
+                '<html lang="en"><head><title></title></head><body>{today|datetime}</body></html>',
+                [
+                    '{today|datetime}' => $now->format(self::DATE_TIME_FORMAT),
+                ],
+            ],
+            [
             '<html lang="en"><head><title></title></head><body>{today|date}</body></html>',
             [
                 '{today|date}' => $now->format(self::DATE_FORMAT),
