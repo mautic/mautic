@@ -17,12 +17,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
     public const TIMEZONE        = 'Europe/Paris';
     public const TIMEZONE_CUSTOM = 'America/Chicago';
 
-    /**
-     * @param array<string,string> $expected
-     *
-     * @dataProvider getContents
-     */
-    public function testGetTokens(string $content, array $expected, string $contactTimezone = null): void
+    public function testGetTokens(): void
     {
         $coreParametersHelper = new class($this->createMock(ContainerInterface::class)) extends CoreParametersHelper {
             public function get($name, $default = null)
@@ -39,78 +34,74 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
         };
 
         $dateTokenHelper = new DateTokenHelper($coreParametersHelper);
-        $tokens          = $dateTokenHelper->getTokens($content, $contactTimezone);
+        foreach ($this->getContents() as $contents) {
+            $content         = $contents[0];
+            $expected        = $contents[1];
+            $contactTimezone = $contents[2] ?? null;
 
-        $this->assertSame($expected, $tokens);
+            $tokens          = $dateTokenHelper->getTokens($content, $contactTimezone);
+            $this->assertSame($expected, $tokens);
+        }
     }
 
     /**
-     * @return iterable<array<int, array<string, string>|string>>
+     * @return array<int, array<int, array<string, string>|string>>
      */
-    public function getContents(): iterable
+    public function getContents(): array
     {
-        $now = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
-        yield [
+        $now      = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
+        $contents =  [
+            [
             '<html lang="en"><head><title></title></head><body>{today}</body></html>',
             [
                 '{today}' => $now->format(self::DATE_TIME_FORMAT),
                 ],
-        ];
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body>{today|date}</body></html>',
             [
                 '{today|date}' => $now->format(self::DATE_FORMAT),
             ],
-        ];
-
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body>{today|time}</body></html>',
             [
                 '{today|time}' => $now->format(self::TIME_FORMAT),
             ],
-        ];
-
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body>{today|date} {today|time}</body></html>',
             [
                 '{today|date}' => $now->format(self::DATE_FORMAT),
                 '{today|time}' => $now->format(self::TIME_FORMAT),
             ],
-        ];
-
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'}</body></html>',
             [
                 '{today|'.self::DATE_TIME_FORMAT.'}' => $now->format(self::DATE_TIME_FORMAT),
             ],
-        ];
-
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'|+ 1 month}</body></html>',
             [
                 '{today|'.self::DATE_TIME_FORMAT.'|+ 1 month}' => (clone $now)->modify('+1 month')->format(self::DATE_TIME_FORMAT),
             ],
-        ];
-
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_FORMAT.'|+1 day}</body></html>',
             [
                 '{today|'.self::DATE_FORMAT.'|+1 day}' => (clone $now)->modify('+1 day')->format(self::DATE_FORMAT),
             ],
-        ];
-
-        yield [
+        ], [
             '<html lang="en"><head><title></title></head><body></body></html>',
             [],
+        ],
         ];
 
-        $now = (clone $now)->setTimezone(new \DateTimeZone(self::TIMEZONE_CUSTOM));
-        yield [
+        $now        = (clone $now)->setTimezone(new \DateTimeZone(self::TIMEZONE_CUSTOM));
+        $contents[] = [
             '<html lang="en"><head><title></title></head><body>{today|'.self::DATE_TIME_FORMAT.'|+1 day}</body></html>',
             [
                 '{today|'.self::DATE_TIME_FORMAT.'|+1 day}' => $now->modify('+1 day')->format(self::DATE_TIME_FORMAT),
             ],
             self::TIMEZONE_CUSTOM,
         ];
+
+        return $contents;
     }
 }
