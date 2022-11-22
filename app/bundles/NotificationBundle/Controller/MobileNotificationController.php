@@ -728,14 +728,6 @@ class MobileNotificationController extends FormController
         $model        = $this->getModel('notification');
         $notification = $model->getEntity($objectId);
 
-        if (null != $notification
-            && $this->get('mautic.security')->hasEntityAccess(
-                'notification:mobile_notifications:editown',
-                'notification:mobile_notifications:editother'
-            )
-        ) {
-        }
-
         return $this->delegateView(
             [
                 'viewParameters' => [
