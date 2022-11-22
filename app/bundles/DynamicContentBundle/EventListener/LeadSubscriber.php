@@ -54,7 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
-        $eventTypeKey      = 'dynamic.content.triggered';
+        $eventTypeKey      = 'dynamic.content.sent';
         $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.triggered');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
         $event->addSerializerGroup('dwcList');
