@@ -301,33 +301,22 @@ class LanguageHelper
     /**
      * Returns Mautic translation files.
      *
+     * @param string[] $forBundles empty array means all bundles
+     *
      * @return array<string,string[]>
      */
-    public function getLanguageFiles(): array
+    public function getLanguageFiles(array $forBundles = []): array
     {
         $files         = [];
         $mauticBundles = $this->coreParametersHelper->get('bundles');
         $pluginBundles = $this->coreParametersHelper->get('plugin.bundles');
 
-        foreach ($mauticBundles as $bundle) {
-            // Parse the namespace into a filepath
-            $translationsDir = $bundle['directory'].'/Translations/en_US';
-
-            if (is_dir($translationsDir)) {
-                $files[$bundle['bundle']] = [];
-
-                // Get files within the directory
-                $finder = new Finder();
-                $finder->files()->in($translationsDir)->name('*.ini');
-
-                /** @var \Symfony\Component\Finder\SplFileInfo $file */
-                foreach ($finder as $file) {
-                    $files[$bundle['bundle']][] = $file->getPathname();
-                }
+        foreach (array_merge($mauticBundles, $pluginBundles) as $bundle) {
+            // Apply the bundle filter.
+            if (!empty($forBundles) && !in_array($bundle['bundle'], $forBundles)) {
+                continue;
             }
-        }
 
-        foreach ($pluginBundles as $bundle) {
             // Parse the namespace into a filepath
             $translationsDir = $bundle['directory'].'/Translations/en_US';
 
