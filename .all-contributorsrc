@@ -905,6 +905,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "gonzalo",
+      "name": "Gonzalo Cao Cabeza de Vaca",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57393?v=4",
+      "profile": "http://zoogon.net",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
