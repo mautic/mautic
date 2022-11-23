@@ -4,16 +4,28 @@ namespace Mautic\WebhookBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\WebhookBundle\Entity\Webhook;
+use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Webhook>
+ */
 class WebhookApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var WebhookModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('webhook');
+        $webhookModel = $this->getModel('webhook');
+
+        if (!$webhookModel instanceof WebhookModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
         $this->entityNameMulti  = 'hooks';
@@ -24,12 +36,8 @@ class WebhookApiController extends CommonApiController
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
-     *
-     * @param string $action
-     *
-     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         // We have to use this hack to have a simple array instead of the one the serializer gives us
         $entity->buildTriggers();

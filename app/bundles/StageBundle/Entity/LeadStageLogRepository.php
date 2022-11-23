@@ -5,7 +5,7 @@ namespace Mautic\StageBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadStageLogRepository.
+ * @extends CommonRepository<LeadStageLog>
  */
 class LeadStageLogRepository extends CommonRepository
 {

@@ -13,8 +13,10 @@ use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
@@ -143,6 +145,7 @@ class PublicController extends CommonFormController
                 $unsubscribeForm = $email->getUnsubscribeForm();
                 if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
+                    /** @var FormModel $formModel */
                     $formModel    = $this->getModel('form');
                     $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
@@ -325,6 +328,7 @@ class PublicController extends CommonFormController
     public function resubscribeAction($idHash)
     {
         //find the email
+        /** @var EmailModel $model */
         $model = $this->getModel('email');
         $stat  = $model->getEmailStatus($idHash);
 
@@ -633,7 +637,9 @@ class PublicController extends CommonFormController
 
         // email is a semicolon delimited list of emails
         $emails = explode(';', $query['email']);
-        $repo   = $this->getModel('lead')->getRepository();
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+        $repo      = $leadModel->getRepository();
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
@@ -721,6 +727,7 @@ class PublicController extends CommonFormController
      */
     private function createLead($email, $repo)
     {
+        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
         $lead  = $model->getEntity();
         // set custom field values

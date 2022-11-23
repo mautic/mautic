@@ -1044,7 +1044,9 @@ class CampaignController extends AbstractStandardFormController
         if (is_array($campaignSources)) {
             foreach ($campaignSources as $type => $sources) {
                 if (!empty($sources)) {
-                    $sourceList                   = $this->getModel('campaign')->getSourceLists($type);
+                    /** @var CampaignModel $campaignModel */
+                    $campaignModel                = $this->getModel('campaign');
+                    $sourceList                   = $campaignModel->getSourceLists($type);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,

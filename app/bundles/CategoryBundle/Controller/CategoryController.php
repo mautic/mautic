@@ -53,7 +53,9 @@ class CategoryController extends AbstractFormController
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
-        $permissionBase = $this->getModel('category')->getPermissionBase($bundle);
+        /** @var CategoryModel $categoryModel */
+        $categoryModel  = $this->getModel('category');
+        $permissionBase = $categoryModel->getPermissionBase($bundle);
         $permissions    = $this->get('mautic.security')->isGranted(
             [
                 $permissionBase.':view',
@@ -97,7 +99,7 @@ class CategoryController extends AbstractFormController
         $orderBy    = $this->get('session')->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->get('session')->get('mautic.category.orderbydir', 'DESC');
 
-        $entities = $this->getModel('category')->getEntities(
+        $entities = $categoryModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -177,10 +179,11 @@ class CategoryController extends AbstractFormController
      */
     public function newAction($bundle)
     {
-        $session    = $this->get('session');
+        /** @var CategoryModel $model */
         $model      = $this->getModel('category');
+        $session    = $this->get('session');
         $entity     = $model->getEntity();
-        $success    = $closeModal    = 0;
+        $success    = 0;
         $cancelled  = $valid  = false;
         $method     = $this->request->getMethod();
         $inForm     = $this->getInFormValue($method);
@@ -198,17 +201,17 @@ class CategoryController extends AbstractFormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
         $form['inForm']->setData($inForm);
         ///Check for a submitted form and process it
-        if ('POST' == $method) {
+        if (Request::METHOD_POST === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.category.notice.created', [
-                        '%name%' => $entity->getName(),
+                        '%name%' => $entity->getTitle(),
                     ]);
                 }
             } else {
@@ -216,7 +219,7 @@ class CategoryController extends AbstractFormController
             }
         }
 
-        $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+        $closeModal = ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
 
         if ($closeModal) {
             if ($inForm) {
@@ -224,7 +227,7 @@ class CategoryController extends AbstractFormController
                     'mauticContent' => 'category',
                     'closeModal'    => 1,
                     'inForm'        => 1,
-                    'categoryName'  => $entity->getName(),
+                    'categoryName'  => $entity->getTitle(),
                     'categoryId'    => $entity->getId(),
                 ]);
             }
@@ -308,7 +311,7 @@ class CategoryController extends AbstractFormController
                     $success = 1;
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash(
                         'mautic.category.notice.updated',
@@ -341,7 +344,7 @@ class CategoryController extends AbstractFormController
             $model->lockEntity($entity);
         }
 
-        $closeModal = ($closeModal || $cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+        $closeModal = ($closeModal || $cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
 
         if ($closeModal) {
             if ($inForm) {
@@ -420,7 +423,8 @@ class CategoryController extends AbstractFormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var CategoryModel $model */
             $model  = $this->getModel('category');
             $entity = $model->getEntity($objectId);
 
@@ -483,7 +487,8 @@ class CategoryController extends AbstractFormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var CategoryModel $model */
             $model     = $this->getModel('category');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];

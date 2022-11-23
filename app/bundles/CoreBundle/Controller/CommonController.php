@@ -3,12 +3,14 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -32,6 +34,11 @@ class CommonController extends AbstractController implements MauticController
      * @var MauticFactory
      */
     protected $factory;
+
+    /**
+     * @var ModelFactory<object>
+     */
+    protected ModelFactory $modelFactory;
 
     /**
      * @var \Symfony\Component\HttpFoundation\Request
@@ -71,6 +78,15 @@ class CommonController extends AbstractController implements MauticController
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
+    }
+
+    /**
+     * @param ModelFactory<object> $modelFactory
+     * @required
+     */
+    public function setModelFactory(ModelFactory $modelFactory): void
+    {
+        $this->modelFactory = $modelFactory;
     }
 
     public function setUser(User $user)
@@ -130,7 +146,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @param string $modelNameKey
      *
-     * @return AbstractCommonModel
+     * @return AbstractCommonModel<object>
      */
     protected function getModel($modelNameKey)
     {
@@ -251,7 +267,7 @@ class CommonController extends AbstractController implements MauticController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function postActionRedirect($args = [])
+    public function postActionRedirect(array $args = [])
     {
         $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
         $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : [];
@@ -482,6 +498,7 @@ class CommonController extends AbstractController implements MauticController
     {
         $page_404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page_404)) {
+            /** @var PageModel $pageModel */
             $pageModel = $this->getModel('page');
             $page      = $pageModel->getEntity($page_404);
             if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
@@ -746,11 +763,11 @@ class CommonController extends AbstractController implements MauticController
      *
      * Overwrite in your controller if required.
      *
-     * @param int|null $start
+     * @param AbstractCommonModel<object> $model
      *
      * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
     {
         $data = new DataExporterHelper();
 

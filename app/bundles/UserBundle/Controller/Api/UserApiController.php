@@ -3,19 +3,32 @@
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * @extends CommonApiController<User>
+ */
 class UserApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var UserModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('user.user');
-        $this->entityClass      = 'Mautic\UserBundle\Entity\User';
+        $userModel = $this->getModel('user.user');
+
+        if (!$userModel instanceof UserModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model            = $userModel;
+        $this->entityClass      = User::class;
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
@@ -182,7 +195,7 @@ class UserApiController extends CommonApiController
 
         $filter = $this->request->query->get('filter', null);
         $limit  = $this->request->query->get('limit', null);
-        $roles  = $this->getModel('user')->getLookupResults('role', $filter, $limit);
+        $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['roleList']);

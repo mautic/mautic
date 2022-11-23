@@ -6,7 +6,11 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Form\Type\ContactType;
+use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends FormController
 {
@@ -174,7 +178,7 @@ class UserController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
@@ -213,6 +217,7 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
+        /** @var UserModel $model */
         $model = $this->getModel('user.user');
         $user  = $model->getEntity($objectId);
 
@@ -266,7 +271,7 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $user->setPassword($password);
-                    $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     //check if the user's locale has been downloaded already, fetch it if not
                     /** @var LanguageHelper $languageHelper */
@@ -309,7 +314,7 @@ class UserController extends FormController
                 $model->unlockEntity($user);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
@@ -360,6 +365,7 @@ class UserController extends FormController
         if ('POST' == $this->request->getMethod()) {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
+                /** @var UserModel $model */
                 $model  = $this->getModel('user.user');
                 $entity = $model->getEntity($objectId);
 
@@ -475,7 +481,9 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $this->factory->getIpAddressFromRequest(),
                     ];
-                    $this->getModel('core.auditlog')->writeToLog($log);
+                    /** @var AuditLogModel $auditLogModel */
+                    $auditLogModel = $this->getModel('core.auditlog');
+                    $auditLogModel->writeToLog($log);
 
                     $this->addFlash('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }
@@ -494,6 +502,7 @@ class UserController extends FormController
             $form->get('returnUrl')->setData($returnUrl);
 
             if (!empty($reEntity) && !empty($reEntityId)) {
+                /** @var FormModel<object> $model */
                 $model  = $this->getModel($reEntity);
                 $entity = $model->getEntity($reEntityId);
 
@@ -538,7 +547,8 @@ class UserController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var UserModel $model */
             $model       = $this->getModel('user');
             $ids         = json_decode($this->request->query->get('ids', ''));
             $deleteIds   = [];

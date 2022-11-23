@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -17,7 +18,7 @@ class AjaxController extends CommonAjaxController
      */
     public function getSourceDataAction(Request $request)
     {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
+        /** @var ReportModel $model */
         $model   = $this->getModel('report');
         $context = $request->get('context');
 

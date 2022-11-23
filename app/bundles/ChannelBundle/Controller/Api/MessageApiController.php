@@ -7,20 +7,26 @@ use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\Message;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Message>
+ */
 class MessageApiController extends CommonApiController
 {
     /**
-     * @var MessageModel|AbstractCommonModel
+     * @var MessageModel|null
      */
-    protected $model;
+    protected $model = null;
 
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('channel.message');
+        $messageModel = $this->getModel('channel.message');
+        if (!$messageModel instanceof MessageModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+        $this->model            = $messageModel;
         $this->entityClass      = Message::class;
         $this->entityNameOne    = 'message';
         $this->entityNameMulti  = 'messages';
@@ -29,7 +35,7 @@ class MessageApiController extends CommonApiController
         parent::initialize($event);
     }
 
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
+    protected function prepareParametersFromRequest(Form $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
     {
         parent::prepareParametersFromRequest($form, $params, $entity, $masks);
 
@@ -53,12 +59,8 @@ class MessageApiController extends CommonApiController
 
     /**
      * Load and set channel names to the response.
-     *
-     * @param string $action
-     *
-     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         $event = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
 

@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticTagManagerBundle\Model;
 
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
+use MauticPlugin\MauticTagManagerBundle\Entity\TagRepository;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -16,20 +17,26 @@ class TagModel extends BaseTagModel
     /**
      * {@inheritdoc}
      *
-     * @return object
+     * @return TagRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Tag::class);
+        $result = $this->em->getRepository(Tag::class);
+
+        if (!$result instanceof TagRepository) {
+            throw new \RuntimeException('Wrong repository given.');
+        }
+
+        return $result;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @param Tag   $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Tag         $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *

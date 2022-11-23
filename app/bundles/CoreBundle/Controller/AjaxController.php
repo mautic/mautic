@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -278,6 +279,9 @@ class AjaxController extends CommonController
                         $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
                         $model->getRepository()->saveEntity($entity);
                     } else {
+                        if (!$model instanceof FormModel) {
+                            throw new \RuntimeException('The model given is not form model.');
+                        }
                         $refresh = $model->togglePublishStatus($entity);
                     }
                     if (!empty($refresh)) {
@@ -336,6 +340,9 @@ class AjaxController extends CommonController
             $checkedOut = $entity->getCheckedOutBy();
             if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+                if (!$model instanceof FormModel) {
+                    throw new \RuntimeException('The model given is not form model.');
+                }
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
             }

@@ -5,8 +5,11 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Model\TriggerEventModel;
+use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class TriggerController extends FormController
@@ -221,7 +224,7 @@ class TriggerController extends FormController
                             ]),
                         ]);
 
-                        if (!$form->get('buttons')->get('save')->isClicked()) {
+                        if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                             //return edit view so that all the session stuff is loaded
                             return $this->editAction($entity->getId(), true);
                         }
@@ -229,7 +232,7 @@ class TriggerController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
                 $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
@@ -352,11 +355,13 @@ class TriggerController extends FormController
                         $model->setEvents($entity, $events);
 
                         //form is valid so process the data
-                        $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                        $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         //delete entities
                         if (count($deletedEvents)) {
-                            $this->getModel('point.triggerevent')->deleteEntities($deletedEvents);
+                            /** @var TriggerEventModel $triggerEventModel */
+                            $triggerEventModel = $this->getModel('point.triggerevent');
+                            $triggerEventModel->deleteEntities($deletedEvents);
                         }
 
                         $this->addFlash('mautic.core.notice.updated', [
@@ -374,7 +379,7 @@ class TriggerController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_pointtrigger_index', $viewParameters);
                 $template       = 'Mautic\PointBundle\Controller\TriggerController::indexAction';
@@ -486,7 +491,8 @@ class TriggerController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var TriggerModel $model */
             $model  = $this->getModel('point.trigger');
             $entity = $model->getEntity($objectId);
 
@@ -543,7 +549,8 @@ class TriggerController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var TriggerModel $model */
             $model     = $this->getModel('point.trigger');
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];

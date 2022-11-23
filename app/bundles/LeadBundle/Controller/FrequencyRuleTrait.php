@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
@@ -27,7 +28,7 @@ trait FrequencyRuleTrait
      * @param null  $action
      * @param bool  $isPreferenceCenter
      *
-     * @return bool|Form
+     * @return true|Form
      */
     protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
@@ -50,6 +51,7 @@ trait FrequencyRuleTrait
         //find the email
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
+            /** @var EmailModel $emailModel */
             $emailModel = $this->getModel('email');
             if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {

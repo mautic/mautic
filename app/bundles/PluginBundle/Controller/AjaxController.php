@@ -328,7 +328,9 @@ class AjaxController extends CommonAjaxController
         }
         $entity->setFeatureSettings($featureSettings);
 
-        $this->getModel('plugin')->saveFeatureSettings($entity);
+        /** @var PluginModel $pluginModel */
+        $pluginModel = $this->getModel('plugin');
+        $pluginModel->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
     }

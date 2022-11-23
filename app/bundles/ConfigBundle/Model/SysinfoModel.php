@@ -5,11 +5,12 @@ namespace Mautic\ConfigBundle\Model;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SysinfoModel
+class SysinfoModel implements MauticModelInterface
 {
     /**
      * @var string|null

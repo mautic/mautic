@@ -5,9 +5,12 @@ namespace Mautic\NotificationBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class MobileNotificationController extends FormController
@@ -184,7 +187,9 @@ class MobileNotificationController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        /** @var AuditLogModel $auditLogModel */
+        $auditLogModel = $this->getModel('core.auditlog');
+        $logs          = $auditLogModel->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
@@ -300,7 +305,7 @@ class MobileNotificationController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $entity->getId(),
@@ -339,7 +344,7 @@ class MobileNotificationController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -448,7 +453,7 @@ class MobileNotificationController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -493,7 +498,7 @@ class MobileNotificationController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -599,7 +604,8 @@ class MobileNotificationController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var NotificationModel $model */
             $model  = $this->getModel('notification');
             $entity = $model->getEntity($objectId);
 
@@ -663,7 +669,8 @@ class MobileNotificationController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var NotificationModel $model */
             $model = $this->getModel('notification');
             $ids   = json_decode($this->request->query->get('ids', '{}'));
 

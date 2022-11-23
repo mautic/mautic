@@ -6,6 +6,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
@@ -57,13 +58,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $dispatcher;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     protected $modelFactory;
 
     /**
-     * @param AuditLogModel   $router
-     * @param CorePermissions $dispatcher
+     * @param AuditLogModel        $router
+     * @param CorePermissions      $dispatcher
+     * @param ModelFactory<object> $modelFactory
      */
     public function __construct(
         AuditLogModel $auditLogModel,
@@ -97,6 +99,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                         try {
                             $model = $this->modelFactory->getModel($log['bundle'].'.'.$log['object']);
+                            if (!$model instanceof FormModel) {
+                                throw new \RuntimeException('Wrong model given.');
+                            }
                             $item  = $model->getEntity($log['objectId']);
                             if (method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();

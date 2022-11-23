@@ -49,7 +49,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     /** @var Logger */
     private $logger;
 
-    /** @var ModelFactory */
+    /** @var ModelFactory<RedirectModel|PageModel>&MockObject */
     private $modelFactory;
 
     /** @var RedirectModel */

@@ -6,9 +6,9 @@ use Exception;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -31,15 +31,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AjaxController extends CommonAjaxController
 {
-    use AjaxLookupControllerTrait;
-
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function userListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->getModel('lead.lead')->getLookupResults('user', $filter);
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead.lead');
+        $results   = $leadModel->getLookupResults('user', $filter);
         $dataArray = [];
         foreach ($results as $r) {
             $name        = $r['firstName'].' '.$r['lastName'];
@@ -63,7 +63,9 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['items' => []];
 
         if ($field && $value) {
-            $repo                       = $this->getModel('lead.lead')->getRepository();
+            /** @var LeadModel $leadModel */
+            $leadModel                  = $this->getModel('lead.lead');
+            $repo                       = $leadModel->getRepository();
             $leads                      = $repo->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
 
@@ -542,7 +544,9 @@ class AjaxController extends CommonAjaxController
                 // Use lead model to trigger listeners
                 $doNotContact->removeDncForContact($lead->getId(), $channel);
             } else {
-                $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
+                /** @var EmailModel $emailModel */
+                $emailModel = $this->getModel('email');
+                $emailModel->getRepository()->deleteDoNotEmailEntry($dncId);
             }
 
             $dataArray['success'] = 1;
@@ -721,6 +725,7 @@ class AjaxController extends CommonAjaxController
         $tags = json_decode($tags, true);
 
         if (is_array($tags)) {
+            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
             $newTags   = [];
 
@@ -773,6 +778,7 @@ class AjaxController extends CommonAjaxController
                 }
             }
 
+            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
             if (!empty($newUtmTags)) {
@@ -887,7 +893,9 @@ class AjaxController extends CommonAjaxController
             $dataArray['options']   = $options;
 
             if ('field' === $changed) {
-                $dataArray['operators'] = $this->getModel('lead')->getOperatorsForFieldType($leadFieldType, ['date']);
+                /** @var LeadModel $leadModel */
+                $leadModel              = $this->getModel('lead');
+                $dataArray['operators'] = $leadModel->getOperatorsForFieldType($leadFieldType, ['date']);
                 foreach ($dataArray['operators'] as $value => $label) {
                     $dataArray['operators'][$value] = $this->get('translator')->trans($label);
                 }
@@ -925,6 +933,7 @@ class AjaxController extends CommonAjaxController
         $companyId            = InputHelper::clean($request->request->get('companyId'));
         $leadId               = InputHelper::clean($request->request->get('leadId'));
 
+        /** @var LeadModel $leadModel */
         $leadModel      = $this->getModel('lead');
         $primaryCompany = $leadModel->setPrimaryCompany($companyId, $leadId);
 

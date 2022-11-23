@@ -132,6 +132,7 @@ class DashboardController extends AbstractFormController
         //retrieve the entity
         $widget = new Widget();
 
+        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
@@ -194,6 +195,7 @@ class DashboardController extends AbstractFormController
      */
     public function editAction($objectId)
     {
+        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
@@ -352,8 +354,10 @@ class DashboardController extends AbstractFormController
      */
     public function exportAction()
     {
-        $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
-        $response = new JsonResponse($this->getModel('dashboard')->toArray($filename));
+        /** @var DashboardModel $dashboardModel */
+        $dashboardModel = $this->getModel('dashboard');
+        $filename       = InputHelper::filename($this->getNameFromRequest(), 'json');
+        $response       = new JsonResponse($dashboardModel->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');

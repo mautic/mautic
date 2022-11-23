@@ -39,7 +39,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private $translatorMock;
 
     /**
-     * @var MockObject|ModelFactory
+     * @var MockObject|ModelFactory<DashboardModel>
      */
     private $modelFactoryMock;
 

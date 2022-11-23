@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -2078,6 +2079,7 @@ class MailHelper
                 if (!isset($contact['owner_id'])) {
                     $contact['owner_id'] = 0;
                 } elseif (isset($contact['owner_id'])) {
+                    /** @var LeadModel $leadModel */
                     $leadModel = $this->factory->getModel('lead');
                     if (isset(self::$leadOwners[$contact['owner_id']])) {
                         $owner = self::$leadOwners[$contact['owner_id']];

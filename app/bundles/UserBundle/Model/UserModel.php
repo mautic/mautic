@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
 use Mautic\UserBundle\Event\UserEvent;
@@ -17,6 +18,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<User>
+ */
 class UserModel extends FormModel
 {
     /**
@@ -37,12 +41,15 @@ class UserModel extends FormModel
         $this->userTokenService = $userTokenService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRepository()
+    public function getRepository(): UserRepository
     {
-        return $this->em->getRepository(User::class);
+        $result = $this->em->getRepository(User::class);
+
+        if (!$result instanceof UserRepository) {
+            throw new \RuntimeException('Wrong repository given.');
+        }
+
+        return $result;
     }
 
     /**
@@ -281,7 +288,7 @@ class UserModel extends FormModel
         try {
             $this->em->flush();
         } catch (\Exception $exception) {
-            $this->logger->addError($exception->getMessage());
+            $this->logger->error($exception->getMessage());
             throw new \RuntimeException();
         }
         $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);

@@ -7,17 +7,32 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Company>
+ */
 class CompanyApiController extends CommonApiController
 {
     use CustomFieldsApiControllerTrait;
     use LeadAccessTrait;
 
+    /**
+     * @var CompanyModel|null
+     */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model              = $this->getModel('lead.company');
+        $companyModel = $this->getModel('lead.company');
+
+        if (!$companyModel instanceof CompanyModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model              = $companyModel;
         $this->entityClass        = Company::class;
         $this->entityNameOne      = 'company';
         $this->entityNameMulti    = 'companies';
@@ -37,7 +52,9 @@ class CompanyApiController extends CommonApiController
         $parameters = $this->request->request->all();
 
         if (empty($parameters['force'])) {
-            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $this->getModel('lead.company'));
+            /** @var CompanyModel $leadCompanyModel */
+            $leadCompanyModel                = $this->getModel('lead.company');
+            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {
                 return $this->editEntityAction($company['id']);

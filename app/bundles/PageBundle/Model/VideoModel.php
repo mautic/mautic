@@ -7,12 +7,13 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
+use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class PageModel.
+ * @extends FormModel<VideoHit>
  */
 class VideoModel extends FormModel
 {
@@ -37,12 +38,15 @@ class VideoModel extends FormModel
         $this->contactTracker = $contactTracker;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\VideoHitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): VideoHitRepository
     {
-        return $this->em->getRepository('MauticPageBundle:VideoHit');
+        $result = $this->em->getRepository(VideoHit::class);
+
+        if (!$result instanceof VideoHitRepository) {
+            throw new \RuntimeException('Wrong repository given.');
+        }
+
+        return $result;
     }
 
     /**
@@ -148,7 +152,7 @@ class VideoModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );

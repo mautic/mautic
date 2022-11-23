@@ -2,6 +2,7 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,8 +19,10 @@ class AjaxController extends CommonAjaxController
     {
         $bundle    = InputHelper::clean($request->query->get('bundle'));
         $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->getModel('category')->getLookupResults($bundle, $filter, 10);
-        $dataArray = [];
+        /** @var CategoryModel $categoryModel */
+        $categoryModel = $this->getModel('category');
+        $results       = $categoryModel->getLookupResults($bundle, $filter, 10);
+        $dataArray     = [];
         foreach ($results as $r) {
             $dataArray[] = [
                 'label' => $r['title']." ({$r['id']})",

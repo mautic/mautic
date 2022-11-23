@@ -5,17 +5,24 @@ namespace Mautic\FormBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Submission>
+ */
 class SubmissionApiController extends CommonApiController
 {
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('form.submission');
+        $formSubmissionModel = $this->getModel('form.submission');
+
+        if (!$formSubmissionModel instanceof SubmissionModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
         $this->entityNameMulti  = 'submissions';

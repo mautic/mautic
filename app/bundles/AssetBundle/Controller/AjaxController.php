@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\Controller;
 use Gaufrette\Filesystem;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,9 +20,11 @@ class AjaxController extends CommonAjaxController
      */
     protected function categoryListAction(Request $request)
     {
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->getModel('asset')->getLookupResults('category', $filter, 10);
-        $dataArray = [];
+        /** @var AssetModel $assetModel */
+        $assetModel = $this->getModel('asset');
+        $filter     = InputHelper::clean($request->query->get('filter'));
+        $results    = $assetModel->getLookupResults('category', $filter, 10);
+        $dataArray  = [];
         foreach ($results as $r) {
             $dataArray[] = [
                 'label' => $r['title']." ({$r['id']})",

@@ -4,20 +4,34 @@ namespace Mautic\FormBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Model\ActionModel;
+use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Form>
+ */
 class FormApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var FormModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('form');
-        $this->entityClass      = 'Mautic\FormBundle\Entity\Form';
+        $formModel = $this->getModel('form');
+
+        if (!$formModel instanceof FormModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model            = $formModel;
+        $this->entityClass      = Form::class;
         $this->entityNameOne    = 'form';
         $this->entityNameMulti  = 'forms';
         $this->serializerGroups = ['formDetails', 'categoryList', 'publishDetails'];
@@ -28,14 +42,6 @@ class FormApiController extends CommonApiController
         ];
 
         parent::initialize($event);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function preSerializeEntity(&$entity, $action = 'view')
-    {
-        $entity->automaticJs = '<script type="text/javascript" src="'.$this->generateUrl('mautic_form_generateform', ['id' => $entity->getId()], true).'"></script>';
     }
 
     /**
@@ -103,9 +109,11 @@ class FormApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $method      = $this->request->getMethod();
+        /** @var FieldModel $fieldModel */
         $fieldModel  = $this->getModel('form.field');
+        /** @var ActionModel $actionModel */
         $actionModel = $this->getModel('form.action');
+        $method      = $this->request->getMethod();
         $isNew       = false;
         $alias       = $entity->getAlias();
 
@@ -159,6 +167,7 @@ class FormApiController extends CommonApiController
                     return $this->returnError($msg, Response::HTTP_NOT_FOUND);
                 }
 
+                /** @var array{formId: ?int, alias?: string, label: string} $fieldEntityArray */
                 $fieldEntityArray           = $fieldEntity->convertToArray();
                 $fieldEntityArray['formId'] = $formId;
 
@@ -265,7 +274,10 @@ class FormApiController extends CommonApiController
         $components = $formModel->getCustomComponents();
         $type       = $action['type'] ?? $entity->getType();
 
-        return $this->getModel('form.action')->createForm(
+        /** @var ActionModel $formActionModel */
+        $formActionModel = $this->getModel('form.action');
+
+        return $formActionModel->createForm(
             $entity,
             $this->get('form.factory'),
             null,
@@ -286,7 +298,10 @@ class FormApiController extends CommonApiController
      */
     protected function createFieldEntityForm($entity)
     {
-        return $this->getModel('form.field')->createForm(
+        /** @var FieldModel $formFieldModel */
+        $formFieldModel = $this->getModel('form.field');
+
+        return $formFieldModel->createForm(
             $entity,
             $this->get('form.factory'),
             null,

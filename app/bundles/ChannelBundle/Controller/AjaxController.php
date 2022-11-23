@@ -2,14 +2,12 @@
 
 namespace Mautic\ChannelBundle\Controller;
 
+use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 class AjaxController extends CommonAjaxController
 {
-    use AjaxLookupControllerTrait;
-
     /**
      * @param $eventId
      * @param $contactId
@@ -22,6 +20,7 @@ class AjaxController extends CommonAjaxController
     {
         $dataArray      = ['success' => 0];
         $messageQueueId = (int) $request->request->get('channelId');
+        /** @var MessageQueueModel $queueModel */
         $queueModel     = $this->getModel('channel.queue');
         $queuedMessage  = $queueModel->getEntity($messageQueueId);
         if ($queuedMessage) {

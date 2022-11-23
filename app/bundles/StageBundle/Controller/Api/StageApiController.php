@@ -4,9 +4,15 @@ namespace Mautic\StageBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Stage>
+ */
 class StageApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -16,8 +22,14 @@ class StageApiController extends CommonApiController
      */
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('stage');
-        $this->entityClass      = 'Mautic\StageBundle\Entity\Stage';
+        $stageModel = $this->getModel('stage');
+
+        if (!$stageModel instanceof StageModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model            = $stageModel;
+        $this->entityClass      = Stage::class;
         $this->entityNameOne    = 'stage';
         $this->entityNameMulti  = 'stages';
         $this->serializerGroups = ['stageDetails', 'categoryList', 'publishDetails'];
@@ -53,7 +65,9 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->addToStages($contact, $stage)->saveEntity($contact);
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+        $leadModel->addToStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
@@ -86,7 +100,9 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->removeFromStages($contact, $stage)->saveEntity($contact);
+        /** @var LeadModel $leadModel */
+        $leadModel = $this->getModel('lead');
+        $leadModel->removeFromStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }

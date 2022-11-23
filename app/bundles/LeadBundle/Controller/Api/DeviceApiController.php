@@ -5,16 +5,26 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Model\DeviceModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<LeadDevice>
+ */
 class DeviceApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
     public function initialize(ControllerEvent $event)
     {
-        $this->model           = $this->getModel('lead.device');
+        $leadDeviceModel = $this->getModel('lead.device');
+
+        if (!$leadDeviceModel instanceof DeviceModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->model           = $leadDeviceModel;
         $this->entityClass     = LeadDevice::class;
         $this->entityNameOne   = 'device';
         $this->entityNameMulti = 'devices';

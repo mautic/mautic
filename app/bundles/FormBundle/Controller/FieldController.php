@@ -3,7 +3,6 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\FormEvents;
@@ -15,25 +14,27 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class FieldController extends CommonFormController
 {
-    /**
-     * @var FormModel|AbstractCommonModel
-     */
-    private $formModel;
+    private FormModel $formModel;
 
-    /**
-     * @var FieldModel|AbstractCommonModel
-     */
-    private $formFieldModel;
+    private FieldModel $formFieldModel;
 
-    /**
-     * @var FormFieldHelper
-     */
-    private $fieldHelper;
+    private FormFieldHelper $fieldHelper;
 
     public function initialize(ControllerEvent $event)
     {
-        $this->formModel      = $this->getModel('form');
-        $this->formFieldModel = $this->getModel('form.field');
+        $formModel = $this->getModel('form');
+        if (!$formModel instanceof FormModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+
+        $this->formModel      = $formModel;
+
+        $formFieldModel = $this->getModel('form.field');
+        if (!$formFieldModel instanceof FieldModel) {
+            throw new \RuntimeException('Wrong model given.');
+        }
+        $this->formFieldModel = $formFieldModel;
+
         $this->fieldHelper    = $this->get('mautic.helper.form.field_helper');
     }
 
@@ -104,7 +105,9 @@ class FieldController extends CommonFormController
 
                     // Generate or ensure a unique alias
                     $alias              = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    $formField['alias'] = $this->getModel('form.field')->generateAlias($alias, $aliases);
+                    /** @var FieldModel $formFieldModel */
+                    $formFieldModel     = $this->getModel('form.field');
+                    $formField['alias'] = $formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
                     if ('captcha' == $formField['type']) {
@@ -164,6 +167,8 @@ class FieldController extends CommonFormController
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
+            /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
+            $leadFieldModel               = $this->getModel('lead.field');
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
@@ -174,8 +179,8 @@ class FieldController extends CommonFormController
                     'id'                   => $keyId,
                     'formId'               => $formId,
                     'formName'             => null === $formEntity ? 'newform' : $formEntity->generateFormName(),
-                    'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'contactFields'        => $leadFieldModel->getFieldListWithProperties(),
+                    'companyFields'        => $leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'viewOnlyFields'       => $customComponents['viewOnlyFields'],
@@ -315,6 +320,8 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
+            /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
+            $leadFieldModel               = $this->getModel('lead.field');
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
@@ -324,8 +331,8 @@ class FieldController extends CommonFormController
                     'field'                => $formField,
                     'id'                   => $objectId,
                     'formId'               => $formId,
-                    'contactFields'        => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'        => $this->getModel('lead.field')->getFieldListWithProperties('company'),
+                    'contactFields'        => $leadFieldModel->getFieldListWithProperties(),
+                    'companyFields'        => $leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'            => true,
                     'fields'               => $this->fieldHelper->getChoiceList($customComponents['fields']),
                     'formFields'           => $fields,
@@ -411,10 +418,14 @@ class FieldController extends CommonFormController
     private function getFieldForm($formId, array $formField)
     {
         //fire the form builder event
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        /** @var FormModel $formModel */
+        $formModel        = $this->getModel('form.form');
+        $customComponents = $formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$formField['type']])) ? $customComponents['fields'][$formField['type']] : false;
 
-        $form = $this->getModel('form.field')->createForm(
+        /** @var FieldModel $formFieldModel */
+        $formFieldModel = $this->getModel('form.field');
+        $form           = $formFieldModel->createForm(
             $formField,
             $this->get('form.factory'),
             (!empty($formField['id'])) ?
