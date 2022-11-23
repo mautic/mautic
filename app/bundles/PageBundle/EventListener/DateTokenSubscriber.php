@@ -9,7 +9,6 @@ use Mautic\PageBundle\Event\PageBuilderEvent;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTokenSubscriber implements EventSubscriberInterface
 {
@@ -19,11 +18,8 @@ class DateTokenSubscriber implements EventSubscriberInterface
 
     private CorePermissions $security;
 
-    private TranslatorInterface $translator;
-
-    public function __construct(TranslatorInterface $translator, DateTokenHelper $dateTokenHelper, CorePermissions $security, ContactTracker $contactTracker)
+    public function __construct(DateTokenHelper $dateTokenHelper, CorePermissions $security, ContactTracker $contactTracker)
     {
-        $this->translator      = $translator;
         $this->dateTokenHelper = $dateTokenHelper;
         $this->security        = $security;
         $this->contactTracker  = $contactTracker;
@@ -39,11 +35,7 @@ class DateTokenSubscriber implements EventSubscriberInterface
 
     public function onPageBuild(PageBuilderEvent $event): void
     {
-        $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
-        $event->addToken(
-            sprintf('{%s}', $this->translator->trans('mautic.lead.list.today')),
-            $this->translator->trans('mautic.email.token.today')
-        );
+        $event->addTokens($this->dateTokenHelper->getTokens());
     }
 
     public function onPageDisplay(PageDisplayEvent $event): void
@@ -51,7 +43,7 @@ class DateTokenSubscriber implements EventSubscriberInterface
         $content   = $event->getContent();
         $contact   = $this->security->isAnonymous() ? $this->contactTracker->getContact() : null;
 
-        $tokenList = $this->dateTokenHelper->getTokens($content, $contact ? $contact->getTimezone() : null);
+        $tokenList = $this->dateTokenHelper->getReplacedTokens($content, $contact ? $contact->getTimezone() : null);
         $event->setContent(str_replace(array_keys($tokenList), $tokenList, $content));
     }
 }
