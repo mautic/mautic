@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Tests\Helper\DateTime;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;
-use Mautic\CoreBundle\Helper\DateTime\DateTimeTokenHelper;
+use Mautic\CoreBundle\Helper\DateTime\DateTimeToken;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -42,7 +42,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $dateTokenHelper = new DateTimeTokenHelper($coreParametersHelper, $dateTimeLocalization);
+        $dateTokenHelper = new DateTimeToken($coreParametersHelper, $dateTimeLocalization);
         foreach ($this->getContents() as $contents) {
             $content         = $contents[0];
             $expected        = $contents[1];
