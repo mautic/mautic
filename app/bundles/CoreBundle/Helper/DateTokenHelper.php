@@ -2,13 +2,18 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 class DateTokenHelper
 {
     private CoreParametersHelper $coreParametersHelper;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    private TranslatorInterface $translator;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -16,17 +21,32 @@ class DateTokenHelper
      */
     public function getTokens(string $content, string $contactTimezone = null): array
     {
-        $tokens = [];
-        preg_match_all('/{today(.*?)}/', $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $modifier) {
-                $token = $matches[0][$key];
+        $tokens       = [];
+        $matchesArray = [];
 
-                if (isset($tokens[$token])) {
-                    continue;
+        preg_match_all(
+            '/{today(.*?)}/',
+            $content,
+            $matchesDefault
+        );
+        $matchesArray[] = $matchesDefault;
+        preg_match_all(
+            '/{'.$this->translator->trans('mautic.lead.list.today').'(.*?)}/',
+            $content,
+            $matchesTranslation
+        );
+        $matchesArray[] = $matchesTranslation;
+        foreach ($matchesArray as $matches) {
+            if (!empty($matches[1])) {
+                foreach ($matches[1] as $key => $modifier) {
+                    $token = $matches[0][$key];
+
+                    if (isset($tokens[$token])) {
+                        continue;
+                    }
+
+                    $tokens[$token] = $this->getToday($modifier, $contactTimezone);
                 }
-
-                $tokens[$token] = $this->getToday($modifier, $contactTimezone);
             }
         }
 
