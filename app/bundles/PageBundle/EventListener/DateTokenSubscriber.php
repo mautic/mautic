@@ -40,10 +40,6 @@ class DateTokenSubscriber implements EventSubscriberInterface
     public function onPageBuild(PageBuilderEvent $event): void
     {
         $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
-        $event->addToken(
-            sprintf('{%s}', $this->translator->trans('mautic.lead.list.today')),
-            $this->translator->trans('mautic.email.token.today')
-        );
     }
 
     public function onPageDisplay(PageDisplayEvent $event): void
