@@ -9,6 +9,10 @@ use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\Transifex\Connector\Resources;
 use Mautic\Transifex\Exception\InvalidConfigurationException;
+use Mautic\Transifex\Exception\ResponseException;
+use Mautic\Transifex\Promise;
+use Psr\Http\Message\ResponseInterface;
+use SplQueue;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -36,33 +40,27 @@ class PushTransifexCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mautic:transifex:push')
             ->setDescription('Pushes Mautic translation resources to Transifex')
-            ->setDefinition([
-                new InputOption(
-                    'create', null, InputOption::VALUE_NONE,
-                    'Flag to create new resources.'
-                ),
-            ])
+            ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
 
 <info>php %command.full_name%</info>
 
-You can optionally choose to create new resources with the --create option:
+You can optionally choose to update resources for one bundle only with the --bundle option:
 
-<info>php %command.full_name% --create</info>
+<info>php %command.full_name% --bundle AssetBundle</info>
 EOT
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $options = $input->getOptions();
-        $create  = $options['create'];
-        $files   = $this->languageHelper->getLanguageFiles();
+        $bundleFilter = $input->getOption('bundle');
+        $files        = $this->languageHelper->getLanguageFiles([$bundleFilter]);
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
@@ -72,28 +70,52 @@ EOT
             return 1;
         }
 
+        $resources = $transifex->getConnector(Resources::class);
+        \assert($resources instanceof Resources);
+
+        $existingResources = json_decode((string) $resources->getAll()->getBody(), true);
+        $promises          = new SplQueue();
+
         foreach ($files as $bundle => $stringFiles) {
             foreach ($stringFiles as $file) {
-                $name  = $bundle.' '.str_replace('.ini', '', basename($file));
-                $alias = UrlHelper::stringURLUnicodeSlug($name);
+                $name    = $bundle.' '.str_replace('.ini', '', basename($file));
+                $alias   = UrlHelper::stringURLUnicodeSlug($name);
+                $content = file_get_contents($file);
                 $output->writeln($this->translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
 
-                /** @var Resources $resourcesConnector */
-                $resourcesConnector = $transifex->get('resources');
-
                 try {
-                    if ($create) {
-                        $resourcesConnector->createResource('mautic', $name, $alias, 'PHP_INI', ['file' => $file]);
-                        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_created'));
+                    if (false === $content) {
+                        throw new \RuntimeException('Unable to read file '.$file);
+                    }
+                    if ($resources->resourceExists($existingResources['data'], $alias)) {
+                        $promise = $transifex->getApiConnector()->createPromise($resources->uploadContent($alias, $content));
+                        $promise->setFilePath($file);
+                        $promises->enqueue($promise);
                     } else {
-                        $resourcesConnector->updateResourceContent('mautic', $alias, $file, 'file');
-                        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_updated'));
+                        $resources->create($name, $alias, 'INI');
+                        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_created'));
                     }
                 } catch (\Exception $exception) {
                     $output->writeln($this->translator->trans('mautic.core.command.transifex_error_pushing_data', ['%message%' => $exception->getMessage()]));
                 }
             }
         }
+
+        $transifex->getApiConnector()->fulfillPromises(
+            $promises,
+            function (ResponseInterface $response, Promise $promise) use ($output) {
+                $output->writeln(
+                    $this->translator->trans(
+                        'mautic.core.command.transifex_resource_updated',
+                        ['%file%' => $promise->getFilePath()]
+                    )
+                );
+            },
+            function (ResponseException $exception, Promise $promise) use ($output) {
+                $output->writeln($promise->getFilePath());
+                $output->writeln($exception->getMessage());
+            }
+        );
 
         return 0;
     }

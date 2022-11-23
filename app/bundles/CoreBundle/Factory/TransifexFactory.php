@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Factory;
 
 use Http\Factory\Guzzle\RequestFactory;
 use Http\Factory\Guzzle\StreamFactory;
 use Http\Factory\Guzzle\UriFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\Transifex\ApiFactory;
 use Mautic\Transifex\Config;
 use Mautic\Transifex\Exception\InvalidConfigurationException;
 use Mautic\Transifex\Transifex;
@@ -44,18 +45,11 @@ class TransifexFactory
      */
     private function create(ClientInterface $client, string $apiToken): TransifexInterface
     {
-        $apiFactory = new ApiFactory(
-            $client,
-            new RequestFactory(),
-            new StreamFactory(),
-            new UriFactory()
-        );
-
         $config = new Config();
         $config->setApiToken($apiToken);
         $config->setOrganization('mautic');
         $config->setProject('mautic');
 
-        return new Transifex($apiFactory, $config);
+        return new Transifex($client, new RequestFactory(), new StreamFactory(), new UriFactory(), $config);
     }
 }

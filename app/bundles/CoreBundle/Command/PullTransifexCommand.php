@@ -10,10 +10,10 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\Transifex\Connector\Statistics;
 use Mautic\Transifex\Connector\Translations;
-use Mautic\Transifex\DTO\DownloadContentDTO;
-use Mautic\Transifex\DTO\DownloadDTO;
 use Mautic\Transifex\Exception\InvalidConfigurationException;
 use Mautic\Transifex\Exception\ResponseException;
+use Mautic\Transifex\Promise;
+use Psr\Http\Message\ResponseInterface;
 use SplQueue;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -78,14 +78,14 @@ EOT
             return 1;
         }
 
-        $statisticsConnector = $transifex->get(Statistics::class);
-        \assert($statisticsConnector instanceof Statistics);
+        $statistics = $transifex->getConnector(Statistics::class);
+        \assert($statistics instanceof Statistics);
 
-        $translationsConnector = $transifex->get(Translations::class);
-        \assert($translationsConnector instanceof Translations);
+        $translations = $transifex->getConnector(Translations::class);
+        \assert($translations instanceof Translations);
 
-        /** @var SplQueue<DownloadDTO> $downloadDtoQueue */
-        $downloadDtoQueue = new SplQueue();
+        /** @var SplQueue<Promise> $queue */
+        $queue = new SplQueue();
 
         foreach ($files as $bundle => $stringFiles) {
             if ($bundleFilter && $bundle !== $bundleFilter) {
@@ -97,7 +97,7 @@ EOT
                 $output->writeln($this->translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
 
                 try {
-                    $response      = $statisticsConnector->getStatistics($resource);
+                    $response      = $statistics->get($resource);
                     $languageStats = json_decode((string) $response->getBody(), true);
 
                     foreach ($languageStats['data'] as $stats) {
@@ -107,7 +107,7 @@ EOT
                         }
 
                         // If we are filtering on a specific language, skip anything that doesn't match
-                        if ($languageFilter && $languageFilter != $language) {
+                        if ($languageFilter && $languageFilter !== $language) {
                             continue;
                         }
 
@@ -119,7 +119,9 @@ EOT
                         if ($completed >= 0.8) {
                             $path = $translationDir.$language.'/'.$bundle.'/'.basename($file);
                             try {
-                                $downloadDtoQueue->enqueue($translationsConnector->getDownloadDTO($resource, $language, $path));
+                                $promise = $transifex->getApiConnector()->createPromise($translations->download($resource, $language, $path));
+                                $promise->setFilePath($path);
+                                $queue->enqueue($promise);
                             } catch (ResponseException $responseException) {
                                 $output->writeln($this->translator->trans($responseException->getMessage()));
                             }
@@ -133,14 +135,17 @@ EOT
             }
         }
 
-        $translationsConnector->downloadTranslations(
-            $downloadDtoQueue,
-            function (DownloadContentDTO $downloadContentDTO) use ($output) {
+        $transifex->getApiConnector()->fulfillPromises(
+            $queue,
+            function (ResponseInterface $response, Promise $promise) use ($output) {
                 try {
-                    $this->languageHelper->createLanguageFile($downloadContentDTO->getDownloadDTO()->getFilePath(), $downloadContentDTO->getContent());
+                    $this->languageHelper->createLanguageFile($promise->getFilePath(), $response->getBody()->__toString());
                 } catch (\Exception $exception) {
                     $output->writeln($exception->getMessage());
                 }
+            },
+            function (ResponseException $exception) use ($output) {
+                $output->writeln($exception->getMessage());
             }
         );
 
