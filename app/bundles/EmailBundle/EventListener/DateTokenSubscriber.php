@@ -7,13 +7,17 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTokenSubscriber implements EventSubscriberInterface
 {
     private DateTokenHelper $dateTokenHelper;
 
-    public function __construct(DateTokenHelper $dateTokenHelper)
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator, DateTokenHelper $dateTokenHelper)
     {
+        $this->translator      = $translator;
         $this->dateTokenHelper = $dateTokenHelper;
     }
 
@@ -28,7 +32,11 @@ class DateTokenSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event): void
     {
-        $event->addTokens($this->dateTokenHelper->getTokens());
+        $event->addToken('{today}', $this->translator->trans('mautic.email.token.today'));
+        $event->addToken(
+            sprintf('{%s}', $this->translator->trans('mautic.lead.list.today')),
+            $this->translator->trans('mautic.email.token.today')
+        );
     }
 
     public function onEmailDisplay(EmailSendEvent $event): void
@@ -45,7 +53,7 @@ class DateTokenSubscriber implements EventSubscriberInterface
 
         $leadArray       = $event->getLead();
         $contactTimezone = $event->isInternalSend() || !is_array($leadArray) ? null : ($leadArray['timezone'] ?? null);
-        $tokenList       = $this->dateTokenHelper->getReplacedTokens($content, $contactTimezone);
+        $tokenList       = $this->dateTokenHelper->getTokens($content, $contactTimezone);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);

@@ -16,18 +16,10 @@ class DateTokenHelper
         $this->translator           = $translator;
     }
 
-    public function getTokens()
-    {
-        return [
-            '{today}' => $this->translator->trans('mautic.email.token.today', [], null, 'en_US'),
-            sprintf('{%s}', $this->translator->trans('mautic.lead.list.today', [], null, $this->coreParametersHelper->get('locale'))) =>  $this->translator->trans('mautic.email.token.today'),
-            ];
-    }
-
     /**
      * @return array<string>
      */
-    public function getReplacedTokens(string $content, string $contactTimezone = null): array
+    public function getTokens(string $content, string $contactTimezone = null): array
     {
         $tokens       = [];
         $matchesArray = [];

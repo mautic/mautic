@@ -51,7 +51,7 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
             $expected        = $contents[1];
             $contactTimezone = $contents[2] ?? null;
 
-            $tokens = $dateTokenHelper->getReplacedTokens($content, $contactTimezone);
+            $tokens = $dateTokenHelper->getTokens($content, $contactTimezone);
             $this->assertSame($expected, $tokens);
         }
     }
