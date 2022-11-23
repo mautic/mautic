@@ -18,6 +18,9 @@ class DateTimeLocalization
         return str_replace($this->getDictionary(), array_keys($this->getDictionary()), $format);
     }
 
+    /**
+     * @return array<string,string>
+     */
     private function getDictionary(): array
     {
         $months = [
