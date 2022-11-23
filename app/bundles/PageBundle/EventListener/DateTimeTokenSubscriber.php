@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\DateTokenHelper;
+use Mautic\CoreBundle\Helper\DateTime\DateTimeTokenHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Event\PageBuilderEvent;
@@ -11,17 +11,17 @@ use Mautic\PageBundle\PageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTokenSubscriber implements EventSubscriberInterface
+class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
     private ContactTracker $contactTracker;
 
-    private DateTokenHelper $dateTokenHelper;
+    private DateTimeTokenHelper $dateTokenHelper;
 
     private CorePermissions $security;
 
     private TranslatorInterface $translator;
 
-    public function __construct(TranslatorInterface $translator, DateTokenHelper $dateTokenHelper, CorePermissions $security, ContactTracker $contactTracker)
+    public function __construct(TranslatorInterface $translator, DateTimeTokenHelper $dateTokenHelper, CorePermissions $security, ContactTracker $contactTracker)
     {
         $this->translator      = $translator;
         $this->dateTokenHelper = $dateTokenHelper;

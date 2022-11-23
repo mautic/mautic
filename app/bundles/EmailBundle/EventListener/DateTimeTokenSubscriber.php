@@ -2,20 +2,20 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\DateTokenHelper;
+use Mautic\CoreBundle\Helper\DateTime\DateTimeTokenHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DateTokenSubscriber implements EventSubscriberInterface
+class DateTimeTokenSubscriber implements EventSubscriberInterface
 {
-    private DateTokenHelper $dateTokenHelper;
+    private DateTimeTokenHelper $dateTokenHelper;
 
     private TranslatorInterface $translator;
 
-    public function __construct(TranslatorInterface $translator, DateTokenHelper $dateTokenHelper)
+    public function __construct(TranslatorInterface $translator, DateTimeTokenHelper $dateTokenHelper)
     {
         $this->translator      = $translator;
         $this->dateTokenHelper = $dateTokenHelper;
