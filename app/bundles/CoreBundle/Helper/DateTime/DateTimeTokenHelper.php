@@ -1,14 +1,19 @@
 <?php
 
-namespace Mautic\CoreBundle\Helper;
+namespace Mautic\CoreBundle\Helper\DateTime;
 
-class DateTokenHelper
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+
+class DateTimeTokenHelper
 {
     private CoreParametersHelper $coreParametersHelper;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper)
+    private DateTimeLocalization $dateTimeLocalization;
+
+    public function __construct(CoreParametersHelper $coreParametersHelper, DateTimeLocalization $dateTimeLocalization)
     {
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->dateTimeLocalization = $dateTimeLocalization;
     }
 
     /**
@@ -63,6 +68,6 @@ class DateTokenHelper
             $dateTime->modify($relativeDate);
         }
 
-        return $dateTime->format($format);
+        return $this->dateTimeLocalization->localize($dateTime->format($format));
     }
 }
