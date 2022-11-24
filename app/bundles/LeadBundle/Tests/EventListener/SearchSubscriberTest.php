@@ -23,10 +23,8 @@ class SearchSubscriberTest extends TestCase
     /**
      * Tests emailread search command.
      */
-    public function testOnBuildSearchCommands()
+    public function testOnBuildSearchCommands(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $contactRepository = $this->createMock(LeadRepository::class);
         $emailRepository   = $this->createMock(EmailRepository::class);
         $connection        = $this->createMock(Connection::class);

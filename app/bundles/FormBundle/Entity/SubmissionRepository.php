@@ -59,7 +59,7 @@ class SubmissionRepository extends CommonRepository
                 $fq->expr()->notIn('f.type', $viewOnlyFields),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
-            ->orderBy('f.field_order', 'ASC')
+            ->orderBy('f.field_order, f.id', 'ASC')
             ->setParameter('saveResult', true);
         $results = $fq->execute()->fetchAll();
 

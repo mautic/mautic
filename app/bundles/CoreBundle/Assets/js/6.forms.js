@@ -685,5 +685,5 @@ Mautic.updateFieldOperatorValue = function(field, action, valueOnChange, valueOn
             }
         }
         Mautic.removeLabelLoadingIndicator();
-    });
+    }, false, false, "POST");
 };

@@ -579,4 +579,47 @@ class ThemeHelperTest extends TestCase
         Assert::assertArrayHasKey('name', $themes['theme-legacy-all']);
         Assert::assertArrayHasKey('dir', $themes['theme-legacy-all']);
     }
+
+    public function testGetCurrentThemeWillReturnCodeModeIfTheThemeIsCodeMode(): void
+    {
+        $themeHelper = new ThemeHelper(
+            new class() extends PathsHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends TemplatingHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Translator {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends CoreParametersHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Filesystem {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Finder {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends BuilderIntegrationsHelper {
+                public function __construct()
+                {
+                }
+            }
+        );
+
+        Assert::assertSame('mautic_code_mode', $themeHelper->getCurrentTheme('mautic_code_mode', 'foo'));
+    }
 }
