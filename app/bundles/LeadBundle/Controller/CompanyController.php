@@ -906,19 +906,19 @@ class CompanyController extends FormController
                     }
 
                     //Both leads are good so now we merge them
-                    $mainCompany = $model->companyMerge($primaryCompany, $secondaryCompany, false);
+                    $model->companyMerge($primaryCompany, $secondaryCompany, false);
                 }
 
                 if ($valid) {
                     $viewParameters = [
                         'objectId'     => $primaryCompany->getId(),
-                        'objectAction' => 'edit',
+                        'objectAction' => 'view',
                     ];
                 }
             } else {
                 $viewParameters = [
                     'objectId'     => $secondaryCompany->getId(),
-                    'objectAction' => 'edit',
+                    'objectAction' => 'view',
                 ];
             }
 
