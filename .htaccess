@@ -60,6 +60,17 @@
     php_value always_populate_raw_post_data -1
 </IfModule>
 
+<IfModule mod_headers.c>
+        # When headers are activated, this makes sure, Font Files and other resources
+        # can be loaded from the server to a different destination. In this case if makes
+        # sure, that e-mail clients can load the font files from the Mautic theme
+        # directory. If there is a proxy in front of apache, this directive needs 
+        # probably be added there as well.
+	<FilesMatch “\.(ttf|ttc|otf|eot|woff|woff2|font.css|css|js)$“>
+		Header set Access-Control-Allow-Origin “*”
+	</FilesMatch>
+</IfModule>
+
 <IfModule mod_deflate.c>
     <IfModule mod_filter.c>
         AddOutputFilterByType DEFLATE application/javascript
