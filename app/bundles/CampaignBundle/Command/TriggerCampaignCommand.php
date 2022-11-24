@@ -210,7 +210,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
         $id = $input->getOption('campaign-id');
 
-        $moderationKey = ($id ? "id:" . $id : "") . ($threadId ? "t:" . $threadId : "");
+        $moderationKey = ($id ? 'id:'.$id : '').($threadId ? 't:'.$threadId : '');
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
             return 0;
         }
