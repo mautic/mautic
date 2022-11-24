@@ -135,9 +135,9 @@ export default class BuilderService {
           { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-'] },
           { name: 'colors', items: ['TextColor', 'BGColor'] },
           { name: 'document', items: ['Source'] },
-          { name: 'insert', items: ['SpecialChar'] },
+          { name: 'insert', items: ['SpecialChar','Token'] },
         ],
-        extraPlugins: ['sharedspace', 'colorbutton'],
+        extraPlugins: ['sharedspace', 'colorbutton', 'mautictoken'],
       },
     };
   }
@@ -178,11 +178,18 @@ export default class BuilderService {
     // validate
     mjmlService.mjmlToHtml(components);
 
+    const styles = [
+      `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
+    ];
+
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
       components,
       height: '100%',
+      canvas: {
+        styles,
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsmjml, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],
@@ -206,12 +213,19 @@ export default class BuilderService {
       throw new Error('no components');
     }
 
+    const styles = [
+      `${mauticBaseUrl}plugins/GrapesJsBuilderBundle/Assets/library/js/grapesjs-editor.css`
+    ];
+
     // Launch GrapesJS with body part
     this.editor = grapesjs.init({
       clearOnRender: true,
       container: '.builder-panel',
       components,
       height: '100%',
+      canvas: {
+        styles,
+      },
       storageManager: false,
       assetManager: this.getAssetManagerConf(),
       plugins: [grapesjsnewsletter, grapesjspostcss, grapesjsmautic, 'gjs-plugin-ckeditor'],

@@ -59,7 +59,7 @@ class RedirectModel extends FormModel
     {
         if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);
-            $this->dispatcher->dispatch(PageEvents::ON_REDIRECT_GENERATE, $event);
+            $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
 
             $clickthrough = $event->getClickthrough();
         }
@@ -105,16 +105,14 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param  $url
+     * @param $url
      *
      * @return Redirect|null
      */
     public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        $url = UrlHelper::decodeAmpersands($url);
 
         $repo     = $this->getRepository();
         $redirect = $repo->findOneBy(['url' => $url]);

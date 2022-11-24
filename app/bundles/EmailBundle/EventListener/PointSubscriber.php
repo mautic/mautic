@@ -82,7 +82,7 @@ class PointSubscriber implements EventSubscriberInterface
           'group'           => 'mautic.email.point.trigger',
           'label'           => 'mautic.email.point.trigger.send_email_to_user',
           'formType'        => EmailToUserType::class,
-          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
+          'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
           'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
           'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
         ];

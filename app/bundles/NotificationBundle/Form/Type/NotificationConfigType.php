@@ -106,12 +106,4 @@ class NotificationConfigType extends AbstractType
             },
         ]);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'notification_config';
-    }
 }

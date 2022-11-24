@@ -12,10 +12,10 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class UserModel extends FormModel
 {
@@ -94,7 +94,7 @@ class UserModel extends FormModel
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
-                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', 'validators'));
+                throw new \InvalidArgumentException($this->translator->trans('mautic.user.user.password.minlength', [], 'validators'));
             }
         }
 
@@ -192,7 +192,7 @@ class UserModel extends FormModel
                 $event = new UserEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

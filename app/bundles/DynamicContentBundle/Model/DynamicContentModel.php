@@ -16,8 +16,8 @@ use Mautic\DynamicContentBundle\Entity\Stat;
 use Mautic\DynamicContentBundle\Event\DynamicContentEvent;
 use Mautic\DynamicContentBundle\Form\Type\DynamicContentType;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -229,7 +229,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

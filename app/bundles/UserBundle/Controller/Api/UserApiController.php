@@ -4,18 +4,15 @@ namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-/**
- * Class UserApiController.
- */
 class UserApiController extends CommonApiController
 {
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel('user.user');
         $this->entityClass      = 'Mautic\UserBundle\Entity\User';

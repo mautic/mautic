@@ -10,13 +10,15 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\EventListener\ImportCompanySubscriber;
 use Mautic\LeadBundle\Field\FieldList;
 use Mautic\LeadBundle\Model\CompanyModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,6 +44,9 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param array<mixed> $requestedPermission
+                 */
                 public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
@@ -66,6 +71,9 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param array<mixed> $requestedPermission
+                 */
                 public function isGranted($requestedPermission, $mode = 'MATCH_ALL', $userEntity = null, $allowUnknown = false)
                 {
                     Assert::assertSame('lead:imports:create', $requestedPermission);
@@ -106,6 +114,11 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param array<string, mixed> $filters
+                 *
+                 * @return array<string>
+                 */
                 public function getFieldList(bool $byGroup = true, bool $alphabetical = true, array $filters = ['isPublished' => true, 'object' => 'lead']): array
                 {
                     return ['some fields'];
@@ -160,6 +173,10 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
                 {
                 }
 
+                /**
+                 * @param array<mixed> $fields
+                 * @param array<mixed> $data
+                 */
                 public function import($fields, $data, $owner = null, $skipIfExists = false)
                 {
                     return true;
@@ -172,6 +189,52 @@ final class ImportCompanySubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new ImportProcessEvent($import, new LeadEventLog(), []);
         $subscriber->onImportProcess($event);
         Assert::assertTrue($event->wasMerged());
+    }
+
+    public function testImportCompanySubscriberDoesHaveTranslatorInitialized(): void
+    {
+        $fieldListMock         = $this->createMock(FieldList::class);
+        $missingRequiredFields = ['Company Name'];
+        $matchedFields         = ['Company Email'];
+        $fieldListMock->expects($this->once())
+            ->method('getFieldList')
+            ->with(false, false, [
+                'isPublished' => true,
+                'object'      => 'company',
+                'isRequired'  => true,
+            ])
+            ->willReturn($missingRequiredFields);
+        $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
+        $subscriber              = new ImportCompanySubscriber(
+            $fieldListMock,
+            $this->getCorePermissionsFake(),
+            $this->getCompanyModelFake(),
+            $translatorInterfaceMock
+        );
+        $importValidateEventMock = $this->createMock(ImportValidateEvent::class);
+        $importValidateEventMock->expects($this->once())
+            ->method('importIsForRouteObject')
+            ->with('companies')
+            ->willReturn(true);
+        $formMock = $this->createMock(Form::class);
+        $importValidateEventMock->expects($this->exactly(2))
+            ->method('getForm')
+            ->willReturn($formMock);
+        $formMock->expects($this->once())
+            ->method('getData')
+            ->willReturnOnConsecutiveCalls($matchedFields);
+        $translatorInterfaceMock->expects($this->once())
+            ->method('trans')
+            ->with(
+                'mautic.import.missing.required.fields',
+                [
+                    '%requiredFields%' => implode(', ', $missingRequiredFields),
+                    '%fieldOrFields%'  => 'field',
+                ],
+                'validators'
+            );
+
+        $subscriber->onValidateImport($importValidateEventMock);
     }
 
     private function getFieldListFake(): FieldList

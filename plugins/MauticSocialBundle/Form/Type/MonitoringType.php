@@ -135,9 +135,4 @@ class MonitoringType extends AbstractType
         // allow the specific network type - single
         $resolver->setDefined(['networkType']);
     }
-
-    public function getBlockPrefix()
-    {
-        return 'monitoring';
-    }
 }

@@ -9,7 +9,7 @@ use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -136,7 +136,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
                     'height' => $event->getWidget()->getHeight() - 80,
-                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], $canViewOthers),
+                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
                 ]);
             }
 

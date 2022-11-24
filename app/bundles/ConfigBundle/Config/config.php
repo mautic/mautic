@@ -5,11 +5,11 @@ return [
         'main' => [
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'MauticConfigBundle:Config:execute',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
             ],
             'mautic_sysinfo_index' => [
                 'path'       => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index',
+                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
             ],
         ],
     ],
@@ -38,24 +38,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.config.subscriber' => [
-                'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
-                'arguments' => [
-                    'mautic.config.config_change_logger',
-                ],
-            ],
-        ],
-
-        'forms' => [
-            'mautic.form.type.config' => [
-                'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'mautic.config.form.restriction_helper',
-                    'mautic.config.form.escape_transformer',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.config.model.sysinfo' => [
                 'class'     => \Mautic\ConfigBundle\Model\SysinfoModel::class,
@@ -64,6 +46,8 @@ return [
                     'mautic.helper.core_parameters',
                     'translator',
                     'doctrine.dbal.default_connection',
+                    'mautic.install.service',
+                    'mautic.install.configurator.step.check',
                 ],
             ],
         ],
@@ -100,7 +84,6 @@ return [
 
     'parameters' => [
         'config_allowed_parameters' => [
-            'kernel.root_dir',
             'kernel.project_dir',
             'kernel.logs_dir',
         ],

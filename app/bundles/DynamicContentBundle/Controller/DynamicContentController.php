@@ -113,7 +113,7 @@ class DynamicContentController extends FormController
      */
     public function newAction($entity = null)
     {
-        if (!$this->accessGranted('dynamiccontent:dynamiccontents:viewown')) {
+        if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')) {
             return $this->accessDenied();
         }
 
@@ -161,7 +161,7 @@ class DynamicContentController extends FormController
                             'objectId'     => $entity->getId(),
                         ];
                         $retUrl   = $this->generateUrl('mautic_dynamicContent_action', $viewParameters);
-                        $template = 'MauticDynamicContentBundle:DynamicContent:view';
+                        $template = 'Mautic\DynamicContentBundle\Controller\DynamicContentController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -170,7 +170,7 @@ class DynamicContentController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $retUrl         = $this->generateUrl('mautic_dynamicContent_index', $viewParameters);
-                $template       = 'MauticDynamicContentBundle:DynamicContent:index';
+                $template       = 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction';
             }
 
             $passthrough = [
@@ -238,7 +238,7 @@ class DynamicContentController extends FormController
         $postActionVars = [
             'returnUrl'       => $retUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:index',
+            'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dynamicContent_index',
                 'mauticContent' => 'dynamicContent',
@@ -354,7 +354,7 @@ class DynamicContentController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:index',
+                    'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_dynamicContent_index',
                         'mauticContent' => 'dynamicContent',
@@ -468,7 +468,7 @@ class DynamicContentController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:index',
+            'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_dynamicContent_index',
                 'mauticContent' => 'dynamicContent',
@@ -485,6 +485,8 @@ class DynamicContentController extends FormController
                     'msg'     => 'mautic.dynamicContent.error.notfound',
                     'msgVars' => ['%id%' => $objectId],
                 ];
+
+                return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
             } elseif (!$this->get('mautic.security')->hasEntityAccess(
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',
@@ -525,7 +527,7 @@ class DynamicContentController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:index',
+            'contentTemplate' => 'Mautic\DynamicContentBundle\Controller\DynamicContentController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dynamicContent_index',
                 'mauticContent' => 'dynamicContent',

@@ -3,7 +3,7 @@
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ConfigBuilderEvent extends Event
 {

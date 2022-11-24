@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class CustomFieldHelper
 {
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_NUMBER  = 'number';
-    const TYPE_SELECT  = 'select';
+    public const TYPE_BOOLEAN = 'boolean';
+    public const TYPE_NUMBER  = 'number';
+    public const TYPE_SELECT  = 'select';
 
     /**
      * Fixes value type for specific field types.

@@ -7,11 +7,8 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class SmsApiController.
- */
 class SmsApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -24,7 +21,7 @@ class SmsApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model           = $this->getModel('sms');
         $this->entityClass     = 'Mautic\SmsBundle\Entity\Sms';

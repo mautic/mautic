@@ -3,24 +3,21 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Intl\Intl;
+use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * Class AbstractCommonModel.
- */
-abstract class AbstractCommonModel
+abstract class AbstractCommonModel implements MauticModelInterface
 {
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -43,7 +40,7 @@ abstract class AbstractCommonModel
     protected $router;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -82,7 +79,7 @@ abstract class AbstractCommonModel
         $this->router = $router;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }
@@ -140,7 +137,7 @@ abstract class AbstractCommonModel
         static $commonRepo;
 
         if (null === $commonRepo) {
-            $commonRepo = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
+            $commonRepo = $this->em->getRepository(FormEntity::class);
         }
 
         return $commonRepo;
@@ -256,7 +253,7 @@ abstract class AbstractCommonModel
         $lang     = null;
 
         $slugCount = count($slugs);
-        $locales   = Intl::getLocaleBundle()->getLocaleNames();
+        $locales   = Locales::getNames();
 
         switch (true) {
             case 3 === $slugCount:
@@ -311,7 +308,9 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * @param $alias
+     * @param string      $alias
+     * @param string|null $categoryAlias
+     * @param string|null $lang
      *
      * @return object|null
      */

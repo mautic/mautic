@@ -12,7 +12,9 @@ use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,13 +34,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->em->persist($leadCompany);
 
         return $leadCompany;
-    }
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
     }
 
     protected function beforeBeginTransaction(): void
@@ -381,6 +376,12 @@ class LeadControllerTest extends MauticMysqlTestCase
         $elementPlaceholder  = $crawler->filter('#lead_timezone')->filter('select')->attr('data-placeholder');
         $expectedPlaceholder = self::$container->get('translator')->trans('mautic.lead.field.timezone');
         $this->assertEquals($expectedPlaceholder, $elementPlaceholder);
+
+        // Test that a locale option is present correctly.
+        $this->assertStringContainsString(
+            '<option value="cs_CZ" >Czech (Czechia)</option>',
+            $this->client->getResponse()->getContent()
+        );
     }
 
     public function testAddContactsErrorMessage(): void
@@ -402,6 +403,22 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
 
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
+    }
+
+    public function testAddContactsErrorMessageForEmailWithTwoDots(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[email]' => 'john..doe@email.com',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertStringContainsString('email: john..doe@email.com is invalid.', $clientResponse->getContent());
     }
 
     public function testCompanyIdSearchCommand(): void
@@ -545,5 +562,64 @@ class LeadControllerTest extends MauticMysqlTestCase
         // Primary company should be in the UI of the details dropdown tray
         $details = $crawler->filter('#lead-details')->html();
         $this->assertStringContainsString($primaryCompanyName, $details);
+    }
+
+    public function testContactCompanyEditShowsOldCompanyNameInAuditLog(): void
+    {
+        /** @var CompanyModel $companyModel */
+        $companyModel = self::$container->get('mautic.lead.model.company');
+        /** @var LeadModel $contactModel */
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        // Create companies
+        $company = (new Company())
+            ->setName('Co.');
+        $newCompany = (new Company())
+            ->setName('New Co.');
+        $companyModel->saveEntities([$company, $newCompany]);
+        $companyId    = $company->getId();
+        $newCompanyId = $newCompany->getId();
+
+        // Create contact with first 'Co.' company
+        $contact = (new Lead())
+            ->setFirstname('C1')
+            ->setCompany($company);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log
+        $createAuditLog        = $this->getContactAuditLogForSpecificAction($contact, 'create');
+        $createAuditLogDetails = $createAuditLog->getDetails();
+        // `dateIdentified` is added to the audit log when contact is identified, we want to remove this for easier comparison
+        unset($createAuditLogDetails['dateIdentified']);
+        Assert::assertSame(
+            [
+                'firstname' => [null, 'C1'],
+                'company'   => [null, $companyId],
+            ],
+            $createAuditLogDetails
+        );
+
+        // Edit contact with second 'New Co.' company
+        $contact->setCompany($newCompany);
+        $contactModel->saveEntity($contact);
+
+        // Check contact detail view audit log for old value
+        $updateAuditLog = $this->getContactAuditLogForSpecificAction($contact, 'update');
+        Assert::assertSame(
+            [
+                'company' => [$companyId, $newCompanyId],
+            ],
+            $updateAuditLog->getDetails()
+        );
+    }
+
+    private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog
+    {
+        return $this->em->getRepository(AuditLog::class)->findOneBy([
+            'bundle'   => 'lead',
+            'object'   => 'lead',
+            'objectId' => $contact->getId(),
+            'action'   => $action,
+        ]);
     }
 }

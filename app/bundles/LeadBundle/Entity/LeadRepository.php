@@ -947,7 +947,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
         if ($this->dispatcher) {
             $event = new LeadBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
-            $this->dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();
                 $filter->strict  = $event->getStrict();
@@ -1086,6 +1086,33 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         return $result;
+    }
+
+    /**
+     * Check Lead segments by ids.
+     *
+     * @param array<integer> $stages
+     */
+    public function isContactInOneOfStages(Lead $lead, array $stages = []): bool
+    {
+        if (empty($stages)) {
+            return false;
+        }
+
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->select('s.id')
+            ->from(MAUTIC_TABLE_PREFIX.'stages', 's');
+        $q->join('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.stage_id = s.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('s.id', ':stageIds'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
     }
 
     /**

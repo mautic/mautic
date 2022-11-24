@@ -105,7 +105,7 @@ class NotificationController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticNotificationBundle:Notification:index',
+                    'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_notification_index',
                         'mauticContent' => 'notification',
@@ -164,7 +164,7 @@ class NotificationController extends AbstractFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticNotificationBundle:Notification:index',
+                    'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_notification_index',
                         'mauticContent' => 'notification',
@@ -225,7 +225,7 @@ class NotificationController extends AbstractFormController
                 'security'    => $security,
                 'entityViews' => $entityViews,
                 'contacts'    => $this->forward(
-                    'MauticNotificationBundle:Notification:contacts',
+                    'Mautic\NotificationBundle\Controller\NotificationController::contactsAction',
                     [
                         'objectId'   => $notification->getId(),
                         'page'       => $this->get('session')->get('mautic.notification.contact.page', 1),
@@ -310,7 +310,7 @@ class NotificationController extends AbstractFormController
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_notification_action', $viewParameters);
-                        $template  = 'MauticNotificationBundle:Notification:view';
+                        $template  = 'Mautic\NotificationBundle\Controller\NotificationController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -319,7 +319,7 @@ class NotificationController extends AbstractFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_notification_index', $viewParameters);
-                $template       = 'MauticNotificationBundle:Notification:index';
+                $template       = 'Mautic\NotificationBundle\Controller\NotificationController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.notification.'.$entity->getId().'.content');
             }
@@ -399,7 +399,7 @@ class NotificationController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticNotificationBundle:Notification:index',
+            'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_notification_index',
                 'mauticContent' => 'notification',
@@ -475,7 +475,7 @@ class NotificationController extends AbstractFormController
                 $model->unlockEntity($entity);
             }
 
-            $template    = 'MauticNotificationBundle:Notification:view';
+            $template    = 'Mautic\NotificationBundle\Controller\NotificationController::viewAction';
             $passthrough = [
                 'activeLink'    => 'mautic_notification_index',
                 'mauticContent' => 'notification',
@@ -591,7 +591,7 @@ class NotificationController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticNotificationBundle:Notification:index',
+            'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_notification_index',
                 'mauticContent' => 'notification',
@@ -655,7 +655,7 @@ class NotificationController extends AbstractFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticNotificationBundle:Notification:index',
+            'contentTemplate' => 'Mautic\NotificationBundle\Controller\NotificationController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_notification_index',
                 'mauticContent' => 'notification',

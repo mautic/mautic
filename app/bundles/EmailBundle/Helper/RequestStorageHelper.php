@@ -13,7 +13,7 @@ class RequestStorageHelper
     /**
      * Separator between the transport class name and random hash.
      */
-    const KEY_SEPARATOR = ':webhook_request:';
+    public const KEY_SEPARATOR = ':webhook_request:';
 
     /**
      * @var CacheStorageHelper
@@ -123,7 +123,7 @@ class RequestStorageHelper
         $keyLength = strlen($key);
 
         if ($keyLength > 191) {
-            throw new \LengthException(sprintf('Key %s must be shorter than 256 characters. It has %d characters', $key, $keyLength));
+            throw new \LengthException(sprintf('Key %s must be shorter than 191 characters. It has %d characters', $key, $keyLength));
         }
 
         return $key;
