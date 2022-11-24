@@ -130,9 +130,9 @@
     </FilesMatch>
 
     # Except those allowed below.
-    <If "%{REQUEST_URI} =~ m#^/(index|index_dev|upgrade/upgrade)\.php#">
+    <FilesMatch "^(index|index_dev|upgrade/upgrade)\.php$">
         Order allow,deny
         Allow from all
-    </If>
+    </FilesMatch>
 </IfModule>
 
