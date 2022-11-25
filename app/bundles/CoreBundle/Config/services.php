@@ -38,10 +38,15 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
+    $services->set('mautic.http.client', \GuzzleHttp\Client::class)->autowire();
+    $services->alias(\GuzzleHttp\Client::class, 'mautic.http.client');
+    $services->alias(\Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
+
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);
     $services->alias('templating.helper.assets', \Mautic\CoreBundle\Templating\Helper\AssetsHelper::class);
     $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
+
     $services->get(\Mautic\CoreBundle\Templating\Helper\AssetsHelper::class)->tag('templating.helper', ['alias' => 'assets']);
 };

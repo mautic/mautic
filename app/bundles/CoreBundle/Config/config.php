@@ -436,9 +436,6 @@ return [
                     '%kernel.environment%',
                 ],
             ],
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
-            ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
