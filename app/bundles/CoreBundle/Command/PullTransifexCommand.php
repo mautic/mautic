@@ -26,6 +26,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PullTransifexCommand extends Command
 {
+    public const NAME = 'mautic:transifex:pull';
+
     private TransifexFactory $transifexFactory;
     private TranslatorInterface $translator;
     private PathsHelper $pathsHelper;
@@ -45,12 +47,13 @@ class PullTransifexCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
-        $this->setName('mautic:transifex:pull')
+        $this->setName(self::NAME)
             ->setDescription('Fetches translations for Mautic from Transifex')
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
+            ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.', null)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to retrieve updated Mautic translations from Transifex and writes them to the filesystem.
 
@@ -67,8 +70,9 @@ EOT
     {
         $languageFilter = $input->getOption('language');
         $bundleFilter   = $input->getOption('bundle');
+        $path           = $input->getOption('path');
         $files          = $this->languageHelper->getLanguageFiles();
-        $translationDir = $this->pathsHelper->getTranslationsPath().'/';
+        $translationDir = ($path ?? $this->pathsHelper->getTranslationsPath()).'/';
 
         try {
             $transifex = $this->transifexFactory->getTransifex();
@@ -97,7 +101,7 @@ EOT
                 $output->writeln($this->translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
 
                 try {
-                    $response      = $statistics->get($resource);
+                    $response      = $statistics->getLanguageStats($resource);
                     $languageStats = json_decode((string) $response->getBody(), true);
 
                     foreach ($languageStats['data'] as $stats) {
