@@ -107,7 +107,8 @@ EOT
                             $translationsConnector = $transifex->get('translations');
                             $response              = $translationsConnector->getTranslation('mautic', $alias, $language);
                             $translation           = json_decode((string) $response->getBody(), true);
-                            $path                  = $translationDir.$language.'/'.$bundle.'/'.basename($file);
+                            $filename              = str_replace('.ini', '.'.$language.'.ini', basename($file));
+                            $path                  = $translationDir.$language.'/'.$bundle.'/'.$filename;
 
                             // Verify the directories exist
                             if (!is_dir($translationDir.$language)) {

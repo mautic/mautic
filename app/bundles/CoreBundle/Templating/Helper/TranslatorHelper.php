@@ -49,7 +49,13 @@ class TranslatorHelper extends BaseHelper
     public function getJsLang()
     {
         $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');
-        $messages        = $this->translator->getCatalogue()->all('javascript');
+
+        $fallbackLocales = $this->translator->getFallbackLocales();
+        foreach ($fallbackLocales as $fallbackLocale) {
+            $defaultMessages = array_merge($defaultMessages, $this->translator->getCatalogue($fallbackLocale)->all('javascript'));
+        }
+
+        $messages = $this->translator->getCatalogue()->all('javascript');
 
         $oldKeys = [
             'chosenChooseOne'     => $this->trans('mautic.core.form.chooseone'),

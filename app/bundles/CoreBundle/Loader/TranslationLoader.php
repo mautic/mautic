@@ -114,6 +114,7 @@ class TranslationLoader extends ArrayLoader implements LoaderInterface
         }
 
         $domain        = substr($file->getFilename(), 0, -4);
+        $domain        = str_replace('.'.$locale, '', $domain);
         $thisCatalogue = parent::load($messages, $locale, $domain);
         $catalogue->addCatalogue($thisCatalogue);
     }

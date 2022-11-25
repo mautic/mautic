@@ -27,6 +27,8 @@ class Installer
      */
     private $filesystem;
 
+    private string $languageCode;
+
     /**
      * Installer constructor.
      *
@@ -48,6 +50,7 @@ class Installer
     {
         $this->sourceDirectory  = $sourceDirectory.'/'.$languageCode;
         $this->installDirectory = $this->translationsDirectory.'/'.$languageCode;
+        $this->languageCode     = $languageCode;
 
         $this->createLanguageDirectory();
         $this->copyConfig();
@@ -109,7 +112,8 @@ class Installer
         $iniFinder = new Finder();
         $iniFinder->files()->name('*.ini')->in($sourceDirectory);
         foreach ($iniFinder as $iniFile) {
-            $this->filesystem->copy($iniFile->getPathname(), $targetDirectory.'/'.$iniFile->getFilename());
+            $filename = str_replace('.ini', '.'.$this->languageCode.'.ini', $iniFile->getFilename());
+            $this->filesystem->copy($iniFile->getPathname(), $targetDirectory.'/'.$filename);
         }
     }
 }
