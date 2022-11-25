@@ -251,7 +251,6 @@ $view['slots']->set(
                                                                 <?php elseif (is_string($field['value']) && 'time' === $field['type']): ?>
                                                                     <?php echo $view['date']->toTime(
                                                                         sprintf(
-                                                                            "%s %s",
                                                                             '%s %s',
                                                                             (new DateTime())->format('Y-m-d'),
                                                                             $field['value']
