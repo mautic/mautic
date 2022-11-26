@@ -699,12 +699,12 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         $event = new CompanyMergeEvent($mainCompany, $secCompany);
-        $this->dispatcher->dispatch(LeadEvents::COMPANY_PRE_MERGE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_PRE_MERGE);
 
         //save the updated company
         $this->saveEntity($mainCompany, false);
 
-        $this->dispatcher->dispatch(LeadEvents::COMPANY_POST_MERGE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_POST_MERGE);
 
         //delete the old company
         $this->deleteEntity($secCompany);
