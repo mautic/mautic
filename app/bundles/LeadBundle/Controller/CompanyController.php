@@ -926,7 +926,7 @@ class CompanyController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_company_action', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::editAction',
+                    'contentTemplate' => 'Mautic\LeadBundle\Controller\CompanyController::viewAction',
                     'passthroughVars' => [
                         'closeModal' => 1,
                     ],
