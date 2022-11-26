@@ -2,24 +2,32 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CommonRepository extends EntityRepository
+class CommonRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
+    {
+        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', get_class($this)));
+    }
+
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
      *
@@ -100,7 +108,7 @@ class CommonRepository extends EntityRepository
                 foreach ($args['order'] as &$o) {
                     $alias = '';
                     if (false !== strpos($o, '.')) {
-                        list($alias, $o) = explode('.', $o);
+                        [$alias, $o] = explode('.', $o);
                     }
 
                     if (in_array($o, $properties)) {
@@ -311,7 +319,9 @@ class CommonRepository extends EntityRepository
     /**
      * Get a list of entities.
      *
-     * @return array|\Doctrine\ORM\Internal\Hydration\IterableResult|Paginator
+     * @param array<string,mixed> $args
+     *
+     * @return object[]|array<int,mixed>|\Doctrine\ORM\Internal\Hydration\IterableResult<object>|Paginator<object>|SimplePaginator<mixed>
      */
     public function getEntities(array $args = [])
     {
@@ -344,8 +354,13 @@ class CommonRepository extends EntityRepository
             // Hydrate one by one
             return $query->iterate(null, $hydrationMode);
         } elseif (empty($args['ignore_paginator'])) {
-            // Paginator
-            return new Paginator($query, false);
+            if (!empty($args['use_simple_paginator'])) {
+                // FAST paginator that can handle only simple queries using no joins or ManyToOne joins.
+                return new SimplePaginator($query);
+            } else {
+                // SLOW paginator that can handle complex queries using oneToMany/ManyToMany joins.
+                return new Paginator($query, false);
+            }
         } else {
             // All results
             return $query->getResult($hydrationMode);
@@ -405,7 +420,7 @@ class CommonRepository extends EntityRepository
             foreach ($filter['group'] as $orGroup) {
                 $groupExpr = $q->expr()->andX();
                 foreach ($orGroup as $subFilter) {
-                    list($subExpr, $subParameters) = $this->getFilterExpr($q, $subFilter);
+                    [$subExpr, $subParameters] = $this->getFilterExpr($q, $subFilter);
 
                     $groupExpr->add($subExpr);
                     if (!empty($subParameters)) {
@@ -422,7 +437,7 @@ class CommonRepository extends EntityRepository
                 $subFilter           = $filter;
                 $subFilter['column'] = trim($c);
 
-                list($subExpr, $parameterUsed) = $this->getFilterExpr($q, $subFilter, $unique);
+                [$subExpr, $parameterUsed] = $this->getFilterExpr($q, $subFilter, $unique);
 
                 if ($parameterUsed) {
                     $setParameter = true;
@@ -780,6 +795,80 @@ class CommonRepository extends EntityRepository
         if ($flush) {
             $this->getEntityManager()->flush($entity);
         }
+    }
+
+    /**
+     * Insert entity if it does not exist, update if it does.
+     * ID is set to the enity after upsert.
+     * Main reason to use this over fetch/save is to avoid race conditions.
+     *
+     * Warning: This method use DBAL, not ORM. It will save only the entity you send it.
+     * It will NOT save the entity's associations. Entity manager won't know that the entity was flushed.
+     */
+    public function upsert(object $entity): void
+    {
+        $connection = $this->getEntityManager()->getConnection();
+        $metadata   = $this->getClassMetadata();
+        $identifier = $metadata->getSingleIdentifierFieldName();
+        $makeUpdate = fn (string $column) => "{$column} = VALUES({$column})";
+        $columns    = [];
+        $values     = [];
+        $types      = [];
+        $set        = [];
+        $update     = [];
+        $hasId      = $metadata->containsForeignIdentifier;
+
+        foreach ($metadata->getFieldNames() as $fieldName) {
+            $value = $metadata->getFieldValue($entity, $fieldName);
+            if ($metadata->isIdentifier($fieldName)) {
+                if ($value) {
+                    $hasId = true;
+                } else {
+                    continue;
+                }
+            }
+            $column    = $metadata->getColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $value;
+            $types[]   = $metadata->getTypeOfField($fieldName);
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        foreach ($metadata->getAssociationNames() as $fieldName) {
+            $assocEntity = $metadata->getFieldValue($entity, $fieldName);
+            if (!$metadata->isAssociationWithSingleJoinColumn($fieldName) || !is_object($assocEntity)) {
+                continue;
+            }
+            $idCol     = ucfirst($metadata->getSingleAssociationReferencedJoinColumnName($fieldName));
+            $idGetter  = "get{$idCol}";
+            $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $assocEntity->$idGetter();
+            $types[]   = Types::STRING;
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        $numberOfRowsAffected = $connection->executeStatement(
+            'INSERT INTO '.$this->getTableName().' ('.implode(', ', $columns).')'.
+            ' VALUES ('.implode(', ', $set).')'.
+            ' ON DUPLICATE KEY UPDATE '.implode(', ', $update),
+            $values,
+            $types
+        );
+
+        if ($entity instanceof UpsertInterface) {
+            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT === $numberOfRowsAffected);
+            $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
+        }
+        if ($hasId) {
+            return;
+        }
+
+        $id = (int) $connection->lastInsertId();
+
+        $metadata->setFieldValue($entity, $identifier, $id);
     }
 
     /**
@@ -1203,7 +1292,7 @@ class CommonRepository extends EntityRepository
     {
         if (!empty($args['index_by'])) {
             if (is_array($args['index_by'])) {
-                list($indexAlias, $indexBy) = $args['index_by'];
+                [$indexAlias, $indexBy] = $args['index_by'];
             } else {
                 $indexAlias = $this->getTableAlias();
                 $indexBy    = $args['index_by'];
@@ -1295,7 +1384,7 @@ class CommonRepository extends EntityRepository
             $selects = [];
             foreach ($args['select'] as $select) {
                 if (false !== strpos($select, '.')) {
-                    list($alias, $select) = explode('.', $select);
+                    [$alias, $select] = explode('.', $select);
                 } else {
                     $alias = $this->getTableAlias();
                 }
@@ -1406,7 +1495,7 @@ class CommonRepository extends EntityRepository
                                     unset($criterion->parameters);
                                 }
                             } elseif (is_array($criterion)) {
-                                list($expr, $parameters) = $this->getFilterExpr($q, $criterion);
+                                [$expr, $parameters] = $this->getFilterExpr($q, $criterion);
                                 $queryExpression->add($expr);
                                 if (is_array($parameters)) {
                                     $queryParameters = array_merge($queryParameters, $parameters);
@@ -1438,7 +1527,7 @@ class CommonRepository extends EntityRepository
                 }
                 $this->advancedFilterCommands = $advancedFilters->commands;
 
-                list($expr, $parameters) = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
+                [$expr, $parameters] = $this->addAdvancedSearchWhereClause($q, $advancedFilters);
                 $this->appendExpression($queryExpression, $expr);
 
                 if (is_array($parameters)) {
@@ -1579,7 +1668,7 @@ class CommonRepository extends EntityRepository
      */
     public function generateRandomParameterName(): string
     {
-        $value = base_convert($this->lastUsedParameterId, 10, 36);
+        $value = base_convert((string) $this->lastUsedParameterId, 10, 36);
 
         ++$this->lastUsedParameterId;
 
@@ -1655,20 +1744,20 @@ class CommonRepository extends EntityRepository
     {
         foreach ($parseFilters as $f) {
             if (isset($f->children)) {
-                list($expr, $params) = $this->addAdvancedSearchWhereClause($qb, $f);
+                [$expr, $params] = $this->addAdvancedSearchWhereClause($qb, $f);
             } else {
                 if (!empty($f->command)) {
                     if ($this->isSupportedSearchCommand($f->command, $f->string)) {
-                        list($expr, $params) = $this->addSearchCommandWhereClause($qb, $f);
+                        [$expr, $params] = $this->addSearchCommandWhereClause($qb, $f);
                     } else {
                         //treat the command:string as if its a single word
-                        $f->string           = $f->command.':'.$f->string;
-                        $f->not              = false;
-                        $f->strict           = true;
-                        list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
+                        $f->string       = $f->command.':'.$f->string;
+                        $f->not          = false;
+                        $f->strict       = true;
+                        [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                     }
                 } else {
-                    list($expr, $params) = $this->addCatchAllWhereClause($qb, $f);
+                    [$expr, $params] = $this->addCatchAllWhereClause($qb, $f);
                 }
             }
             if (!empty($params)) {
@@ -1699,7 +1788,7 @@ class CommonRepository extends EntityRepository
             $col   = $f[$key];
             $alias = '';
             if (false !== strpos($col, '.')) {
-                list($alias, $col) = explode('.', $col);
+                [$alias, $col] = explode('.', $col);
             }
 
             if (in_array($col, $properties)) {

@@ -8,7 +8,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ReportBundle\Entity\Report;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class ReportApiController extends CommonApiController
 {
@@ -20,7 +20,7 @@ class ReportApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel('report');
         $this->entityClass      = Report::class;

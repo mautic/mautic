@@ -4,13 +4,13 @@ namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
@@ -20,13 +20,13 @@ class ApiSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
@@ -48,7 +48,7 @@ class ApiSubscriber implements EventSubscriberInterface
      *
      * @throws AccessDeniedHttpException
      */
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelRequest(RequestEvent $event)
     {
         if (!$event->isMasterRequest()) {
             return;
@@ -104,7 +104,7 @@ class ApiSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onKernelResponse(FilterResponseEvent $event)
+    public function onKernelResponse(ResponseEvent $event)
     {
         $request      = $event->getRequest();
         $isApiRequest = RequestHelper::isApiRequest($request);

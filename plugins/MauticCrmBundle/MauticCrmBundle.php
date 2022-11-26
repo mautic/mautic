@@ -6,12 +6,19 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
+use MauticPlugin\MauticCrmBundle\DependencyInjection\Compiler\TestPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-/**
- * Class MauticCrmBundle.
- */
 class MauticCrmBundle extends PluginBundleBase
 {
+    public function build(ContainerBuilder $container): void
+    {
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new TestPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        }
+    }
+
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
     {
         if (null === $metadata) {

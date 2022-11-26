@@ -144,7 +144,6 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame($internalObject, $event->getObject());
                     $this->assertSame([1], $event->getIds());
@@ -159,7 +158,8 @@ class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);
@@ -235,7 +235,6 @@ class PartialObjectReportBuilderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
                 $this->callback(function (InternalObjectFindEvent $event) use ($internalObject) {
                     $this->assertSame([1], $event->getIds());
                     $this->assertSame($internalObject, $event->getObject());
@@ -250,7 +249,8 @@ class PartialObjectReportBuilderTest extends TestCase
                     ]);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS
             );
 
         $report  = $this->reportBuilder->buildReport($requestDAO);

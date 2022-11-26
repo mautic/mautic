@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -48,8 +49,8 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -170,7 +171,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
+        Connection $connection
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -189,6 +191,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
+        $this->connection               = $connection;
     }
 
     /**
@@ -302,8 +305,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */
@@ -459,7 +462,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -540,7 +543,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
             $event = new EmailOpenEvent($stat, $request, $firstTime);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+            $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
         }
 
         if ($email) {
@@ -576,7 +579,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', $tokenFilter = null, $withBC = true)
     {
         $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
@@ -1747,7 +1750,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
         return $event;
     }

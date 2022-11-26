@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\Tree\JsPlumbFormatter;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FormAdjustmentsProviderInterface;
 use Mautic\LeadBundle\Segment\Stat\SegmentCampaignShare;
+use Mautic\LeadBundle\Services\SegmentDependencyTreeFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -346,7 +348,7 @@ class AjaxController extends CommonAjaxController
                 // Trigger the TIMELINE_ON_GENERATE event to fetch the timeline events from subscribed bundles
                 $dispatcher = $this->dispatcher;
                 $event      = new LeadTimelineEvent($lead, $filter);
-                $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $event);
+                $dispatcher->dispatch($event, LeadEvents::TIMELINE_ON_GENERATE);
 
                 $events     = $event->getEvents();
                 $eventTypes = $event->getEventTypes();
@@ -518,8 +520,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function removeBounceStatusAction(Request $request)
     {
-        $dataArray = ['success' => 0];
-        $dncId     = $request->request->get('id');
+        $dataArray   = ['success' => 0];
+        $dncId       = $request->request->get('id');
+        $channel     = $request->request->get('channel', 'email');
 
         if (!empty($dncId)) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -537,7 +540,7 @@ class AjaxController extends CommonAjaxController
             $lead = $dnc->getLead();
             if ($lead) {
                 // Use lead model to trigger listeners
-                $doNotContact->removeDncForContact($lead->getId(), 'email');
+                $doNotContact->removeDncForContact($lead->getId(), $channel);
             } else {
                 $this->getModel('email')->getRepository()->deleteDoNotEmailEntry($dncId);
             }
@@ -855,7 +858,7 @@ class AjaxController extends CommonAjaxController
                         $options = FormFieldHelper::getTimezonesChoices();
                         break;
                     case 'locale':
-                        $options = FormFieldHelper::getLocaleChoices();
+                        $options = array_flip(FormFieldHelper::getLocaleChoices());
                         break;
                     case 'date':
                     case 'datetime':
@@ -952,7 +955,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getLeadCountAction(Request $request): JsonResponse
     {
-        $id = (int) InputHelper::clean($request->request->get('id'));
+        $id = (int) InputHelper::clean($request->get('id'));
 
         /** @var ListModel $model */
         $model          = $this->getModel('lead.list');
@@ -968,15 +971,34 @@ class AjaxController extends CommonAjaxController
         return new JsonResponse($this->prepareJsonResponse($leadCount));
     }
 
+    protected function getSegmentDependencyTreeAction(Request $request): JsonResponse
+    {
+        /** @var ListModel $model */
+        $model   = $this->getModel('lead.list');
+        $id      = (int) $request->get('id');
+        $segment = $model->getEntity($id);
+
+        if (!$segment) {
+            return new JsonResponse(['message' => "Segment {$id} could not be found."], Response::HTTP_NOT_FOUND);
+        }
+
+        /** @var SegmentDependencyTreeFactory $segmentDependencyTreeFactory */
+        $segmentDependencyTreeFactory = $this->get('mautic.lead.service.segment_dependency_tree_factory');
+
+        $parentNode = $segmentDependencyTreeFactory->buildTree($segment);
+        $formatter  = new JsPlumbFormatter();
+
+        return new JsonResponse($formatter->format($parentNode));
+    }
+
     /**
      * @return array<string, mixed>
      */
     private function prepareJsonResponse(int $leadCount): array
     {
         return [
-            'html' => $this->translator->transChoice(
+            'html' => $this->translator->trans(
                 'mautic.lead.list.viewleads_count',
-                $leadCount,
                 ['%count%' => $leadCount]
             ),
             'leadCount' => $leadCount,

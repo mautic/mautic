@@ -132,7 +132,7 @@ class VideoModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
+                if (($pos = strpos(';q=', $l)) !== false) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
@@ -157,7 +157,7 @@ class VideoModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::VIDEO_ON_HIT)) {
             $event = new VideoHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch(PageEvents::VIDEO_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::VIDEO_ON_HIT);
         }
     }
 }

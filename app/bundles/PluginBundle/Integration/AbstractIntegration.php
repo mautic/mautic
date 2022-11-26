@@ -7,6 +7,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\CurlHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\RequestOptions;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -32,18 +33,16 @@ use Mautic\PluginBundle\Helper\Cleaner;
 use Mautic\PluginBundle\Helper\oAuthHelper;
 use Mautic\PluginBundle\Model\IntegrationEntityModel;
 use Mautic\PluginBundle\PluginEvents;
-use Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method pushLead(Lead $lead, array $config = [])
@@ -55,11 +54,11 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 abstract class AbstractIntegration implements UnifiedIntegrationInterface
 {
-    const FIELD_TYPE_STRING   = 'string';
-    const FIELD_TYPE_BOOL     = 'boolean';
-    const FIELD_TYPE_NUMBER   = 'number';
-    const FIELD_TYPE_DATETIME = 'datetime';
-    const FIELD_TYPE_DATE     = 'date';
+    public const FIELD_TYPE_STRING   = 'string';
+    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const FIELD_TYPE_NUMBER   = 'number';
+    public const FIELD_TYPE_DATETIME = 'datetime';
+    public const FIELD_TYPE_DATE     = 'date';
 
     protected bool $coreIntegration = false;
     protected \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher;
@@ -69,7 +68,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     protected \Doctrine\ORM\EntityManager $em;
     protected ?SessionInterface $session;
     protected ?Request $request;
-    protected Router $router;
+    protected RouterInterface $router;
     protected LoggerInterface $logger;
     protected TranslatorInterface $translator;
     protected EncryptionHelper $encryptionHelper;
@@ -100,11 +99,11 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         EventDispatcherInterface $eventDispatcher,
         CacheStorageHelper $cacheStorageHelper,
         EntityManager $entityManager,
-        Session $session,
+        SessionInterface $session,
         RequestStack $requestStack,
-        Router $router,
+        RouterInterface $router,
         TranslatorInterface $translator,
-        Logger $logger,
+        LoggerInterface $logger,
         EncryptionHelper $encryptionHelper,
         LeadModel $leadModel,
         CompanyModel $companyModel,
@@ -146,7 +145,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @return \Mautic\CoreBundle\Translation\Translator
+     * @return TranslatorInterface
      */
     public function getTranslator()
     {
@@ -601,6 +600,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function parseCallbackResponse($data, $postAuthorization = false)
     {
+        // remove control characters that will break json_decode from parsing
+        $data = preg_replace('/[[:cntrl:]]/', '', $data);
         if (!$parsed = json_decode($data, true)) {
             parse_str($data, $parsed);
         }
@@ -690,8 +691,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         if (empty($settings['ignore_event_dispatch'])) {
             $event = $this->dispatcher->dispatch(
-                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST,
-                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType)
+                new PluginIntegrationRequestEvent($this, $url, $parameters, $headers, $method, $settings, $authType),
+                PluginEvents::PLUGIN_ON_INTEGRATION_REQUEST
             );
 
             $headers    = $event->getHeaders();
@@ -828,14 +829,19 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                     ]);
                     break;
             }
-        } catch (\Exception $exception) {
-            return ['error' => ['message' => $exception->getMessage(), 'code' => $exception->getCode()]];
+        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+            return [
+                'error' => [
+                    'message' => $exception->getResponse()->getBody()->getContents(),
+                    'code'    => $exception->getCode(),
+                ],
+            ];
         }
         if (empty($settings['ignore_event_dispatch'])) {
             $event->setResponse($result);
             $this->dispatcher->dispatch(
-                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE,
-                $event
+                $event,
+                PluginEvents::PLUGIN_ON_INTEGRATION_RESPONSE
             );
         }
         if (!empty($settings['return_raw'])) {
@@ -1080,8 +1086,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
 
         /** @var PluginIntegrationAuthCallbackUrlEvent $event */
         $event = $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL,
-            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl)
+            new PluginIntegrationAuthCallbackUrlEvent($this, $defaultUrl),
+            PluginEvents::PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL
         );
 
         return $event->getCallbackUrl();
@@ -1730,10 +1736,10 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     /**
      * Create or update existing Mautic lead from the integration's profile data.
      *
-     * @param mixed       $data        Profile data from integration
-     * @param bool|true   $persist     Set to false to not persist lead to the database in this method
-     * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed      $data        Profile data from integration
+     * @param bool|true  $persist     Set to false to not persist lead to the database in this method
+     * @param array|null $socialCache
+     * @param mixed|null $identifiers
      *
      * @return Lead
      */
@@ -1741,7 +1747,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         if (is_object($data)) {
             // Convert to array in all levels
-            $data = json_encode(json_decode($data), true);
+            $data = json_encode(json_decode($data, true));
         } elseif (is_string($data)) {
             // Assume JSON
             $data = json_decode($data, true);
@@ -2118,8 +2124,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     public function modifyForm($builder, $options)
     {
         $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD,
-            new PluginIntegrationFormBuildEvent($this, $builder, $options)
+            new PluginIntegrationFormBuildEvent($this, $builder, $options),
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_BUILD
         );
     }
 
@@ -2159,8 +2165,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         /** @var PluginIntegrationFormDisplayEvent $event */
         $event = $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY,
-            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings())
+            new PluginIntegrationFormDisplayEvent($this, $this->getFormSettings()),
+            PluginEvents::PLUGIN_ON_INTEGRATION_FORM_DISPLAY
         );
 
         return $event->getSettings();
@@ -2230,8 +2236,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     {
         /** @var PluginIntegrationKeyEvent $event */
         $event = $this->dispatcher->dispatch(
-            $eventName,
-            new PluginIntegrationKeyEvent($this, $keys)
+            new PluginIntegrationKeyEvent($this, $keys),
+            $eventName
         );
 
         return $event->getKeys();
@@ -2379,15 +2385,15 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param null  $entity
-     * @param array $params
-     * @param bool  $ignoreEntityChanges
+     * @param CommonEntity|null $entity
+     * @param array             $params
+     * @param bool              $ignoreEntityChanges
      *
      * @return bool|\DateTime|null
      */
     protected function getLastSyncDate($entity = null, $params = [], $ignoreEntityChanges = true)
     {
-        $isNew = method_exists($entity, 'isNew') && $entity->isNew();
+        $isNew = ($entity instanceof FormEntity) && $entity->isNew();
         if (!$isNew && !$ignoreEntityChanges && isset($params['start']) && $entity && method_exists($entity, 'getChanges')) {
             // Check to see if this contact was modified prior to the fetch so that the push catches it
             /** @var FormEntity $entity */

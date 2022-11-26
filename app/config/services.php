@@ -2,19 +2,32 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-// This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire Commands
-// as they were done in M3 which must be done when the bundle config.php's services are processed to prevent
-// Symfony attempting to auto-wire commands manually registered by bundle
+use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-return function (ContainerConfigurator $configurator) {
+// This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire services
+// if the bundle do not cover it itself by their own *Extension and services.php which is prefered.
+return function (ContainerConfigurator $configurator, ContainerInterface $container) {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
-        ->autoconfigure() // Automatically registers services as commands as was in M3
-        ->public() // Set as public as was the default in M3
+        ->autoconfigure()
+        ->public()
     ;
 
-    // Auto-register Commands as it worked in M3
-    $services->load('Mautic\\', '../bundles/*/Command/*');
-    $services->load('MauticPlugin\\', '../../plugins/*/Command/*');
+    $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
+
+    // Autoconfigure services for bundles that do not have its own Config/services.php
+    foreach ($bundles as $bundle) {
+        if (file_exists($bundle['directory'].'/Config/services.php')) {
+            continue;
+        }
+
+        $services->load($bundle['namespace'].'\\', $bundle['directory'])
+            ->exclude($bundle['directory'].'/{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+
+        if (is_dir($bundle['directory'].'/Entity')) {
+            $services->load($bundle['namespace'].'\\Entity\\', $bundle['directory'].'/Entity/*Repository.php');
+        }
+    }
 };
