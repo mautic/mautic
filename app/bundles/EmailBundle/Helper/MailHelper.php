@@ -2134,13 +2134,23 @@ class MailHelper
 
         // Set custom headers
         if (!empty($headers)) {
+            $tokens = $this->getTokens();
+            // Replace tokens
+            $search  = array_keys($tokens);
+            $replace = $tokens;
+
             $messageHeaders = $this->message->getHeaders();
             foreach ($headers as $headerKey => $headerValue) {
-                if ($messageHeaders->has($headerKey)) {
-                    $header = $messageHeaders->get($headerKey);
-                    $header->setFieldBodyModel($headerValue);
-                } else {
-                    $messageHeaders->addTextHeader($headerKey, $headerValue);
+                $headerValue = str_ireplace($search, $replace, $headerValue);
+                try {
+                    if ($messageHeaders->has($headerKey)) {
+                        $header = $messageHeaders->get($headerKey);
+                        $header->setFieldBodyModel($headerValue);
+                    } else {
+                        $messageHeaders->addTextHeader($headerKey, $headerValue);
+                    }
+                } catch (\Swift_RfcComplianceException $complianceException) {
+                    $messageHeaders->remove($headerKey);
                 }
             }
         }
