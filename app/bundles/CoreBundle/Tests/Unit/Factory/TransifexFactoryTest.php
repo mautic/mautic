@@ -1,29 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\CoreBundle\Tests\Unit\Factory;
 
 use Mautic\CoreBundle\Factory\TransifexFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\Transifex\Exception\InvalidConfigurationException;
+use Mautic\Transifex\Connector\Resources;
+use Mautic\Transifex\Exception\MissingCredentialsException;
+use Mautic\Transifex\TransifexInterface;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Http\Client\ClientInterface;
 
 class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ClientInterface|MockObject
+     * @var ClientInterface&MockObject
      */
     private $client;
 
     /**
-     * @var CoreParametersHelper|MockObject
+     * @var CoreParametersHelper&MockObject
      */
     private $coreParametersHelper;
 
-    /**
-     * @var TransifexFactory
-     */
-    private $transifexFactory;
+    private TransifexFactory $transifexFactory;
 
     protected function setUp(): void
     {
@@ -34,7 +36,7 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreatingTransifexWithoutCredentials(): void
     {
-        $this->expectException(InvalidConfigurationException::class);
+        $this->expectException(MissingCredentialsException::class);
         $this->transifexFactory->getTransifex();
     }
 
@@ -47,9 +49,9 @@ class TransifexFactoryTest extends \PHPUnit\Framework\TestCase
 
         $transifex = $this->transifexFactory->getTransifex();
 
-        $this->assertSame('the_api_key', $transifex->getConfig()->getApiToken());
-        $this->assertSame('https://rest.api.transifex.com', $transifex->getConfig()->getBaseUri());
-        $this->assertSame('mautic', $transifex->getConfig()->getOrganization());
-        $this->assertSame('mautic', $transifex->getConfig()->getProject());
+        Assert::assertTrue($transifex instanceof TransifexInterface);
+
+        // Getting a connector validates the config, so this should throw an exception.
+        Assert::assertTrue($transifex->getConnector(Resources::class) instanceof Resources);
     }
 }
