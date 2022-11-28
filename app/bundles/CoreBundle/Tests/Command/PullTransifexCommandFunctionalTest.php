@@ -19,6 +19,8 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['transifex_api_token'] = 'some_api_token';
+
         parent::setUp();
 
         $this->filesystem = self::$container->get('mautic.filesystem');
@@ -28,6 +30,9 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
     public function testPullCommand(): void
     {
         Assert::assertFalse($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs'), 'Translations directory already exist');
+
+        // Using the same translation for both file as we don't know which response will be processed first.
+        $someTranslation = 'some.translation="Some translation"';
 
         $handlerStack = self::$container->get(MockHandler::class);
         \assert($handlerStack instanceof MockHandler);
@@ -41,9 +46,9 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
             // Creates the download request for webhook's flashes.ini
             new Response(SymfonyResponse::HTTP_OK, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/translation-download.json')),
             // Fetches the webhook's messages.ini content
-            new Response(SymfonyResponse::HTTP_OK, [], 'messages.some=Some translation'),
+            new Response(SymfonyResponse::HTTP_OK, [], $someTranslation),
             // Fetches the webhook's flashes.ini content
-            new Response(SymfonyResponse::HTTP_OK, [], 'flashes.some=Some translation'),
+            new Response(SymfonyResponse::HTTP_OK, [], $someTranslation),
         );
 
         $commandTester = $this->testSymfonyCommand(PullTransifexCommand::NAME, ['--bundle' => 'WebhookBundle', '--language' => 'cs', '--path' => realpath(self::FAKE_TRANSLATION_DIR)]);
@@ -52,8 +57,8 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs'));
         Assert::assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
         Assert::assertTrue($this->filesystem->exists(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
-        Assert::assertSame('messages.some=Some translation', $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
-        Assert::assertSame('flashes.some=Some translation', $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
+        Assert::assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/messages.ini'));
+        Assert::assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
     }
 
     protected function tearDown(): void
