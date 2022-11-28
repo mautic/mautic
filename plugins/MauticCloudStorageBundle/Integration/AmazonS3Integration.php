@@ -113,7 +113,7 @@ class AmazonS3Integration extends CloudStorageIntegration
                 'version' => 'latest',
                 'region' => (empty($keys['region'])) ? 'us-east-1' : $keys['region'],
                 'credentials' => [
-                    'key' => $keys['client_id'],
+                    'key'    => $keys['client_id'],
                     'secret' => $keys['client_secret'],
                 ],
             ];
