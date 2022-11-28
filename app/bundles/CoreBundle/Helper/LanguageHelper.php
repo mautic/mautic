@@ -185,7 +185,7 @@ class LanguageHelper
             ksort($languages);
         } catch (\Exception $exception) {
             // Log the error
-            $this->logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
+            $this->logger->error('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
 
             return (!$returnError)
                 ? []
@@ -197,7 +197,7 @@ class LanguageHelper
 
         if (200 != $data->getStatusCode()) {
             // Log the error
-            $this->logger->addError(
+            $this->logger->error(
                 sprintf(
                     'An unexpected %1$s code was returned while attempting to fetch the language.  The message received was: %2$s',
                     $data->code,
@@ -257,7 +257,7 @@ class LanguageHelper
         try {
             $data = $this->client->get($langUrl);
         } catch (\Exception $exception) {
-            $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
+            $this->logger->error('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
             return [
                 'error'   => true,

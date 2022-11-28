@@ -123,7 +123,7 @@ EOT
                         if ($completed >= 0.8) {
                             $path = $translationDir.$language.'/'.$bundle.'/'.basename($file);
                             try {
-                                $promise = $transifex->getApiConnector()->createPromise($translations->download($resource, $language, $path));
+                                $promise = $transifex->getApiConnector()->createPromise($translations->download($resource, $language));
                                 $promise->setFilePath($path);
                                 $queue->enqueue($promise);
                             } catch (ResponseException $responseException) {
