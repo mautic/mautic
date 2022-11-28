@@ -1,8 +1,5 @@
 <?php
 
-/*
- * Common file for preparing an installation package
- */
 
 // Step 4 - Remove stuff that shouldn't be distro'ed
 echo "Removing extra files\n";
