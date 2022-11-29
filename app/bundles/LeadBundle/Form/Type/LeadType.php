@@ -218,6 +218,10 @@ class LeadType extends AbstractType
                     continue;
                 }
 
+                if (!$field['isUniqueIdentifer']) {
+                    continue;
+                }
+
                 $constraints[] = new UniqueEmailAddress();
             }
 
