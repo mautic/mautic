@@ -36,19 +36,7 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
             }
         );
 
-        // Starting the upload of content for the first resource
-        $handlerStack->append(
-            function (RequestInterface $request) {
-                $body = json_decode($request->getBody()->__toString(), true);
-                Assert::assertSame('POST', $request->getMethod());
-                Assert::assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
-                Assert::assertNotEmpty($body['data']['attributes']['content']);
-
-                return new Response(SymfonyResponse::HTTP_ACCEPTED, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources-upload.json'));
-            }
-        );
-
-        // The other resource does not exist and must be created
+        // The first resource does not exist and must be created
         $handlerStack->append(
             function (RequestInterface $request) {
                 $body = json_decode($request->getBody()->__toString(), true);
@@ -60,6 +48,18 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
                 Assert::assertSame('o:mautic:p:mautic', $body['data']['relationships']['project']['data']['id']);
 
                 return new Response(SymfonyResponse::HTTP_CREATED, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources-create.json'));
+            }
+        );
+
+        // Starting the upload of content for the first resource
+        $handlerStack->append(
+            function (RequestInterface $request) {
+                $body = json_decode($request->getBody()->__toString(), true);
+                Assert::assertSame('POST', $request->getMethod());
+                Assert::assertSame('https://rest.api.transifex.com/resource_strings_async_uploads', $request->getUri()->__toString());
+                Assert::assertNotEmpty($body['data']['attributes']['content']);
+
+                return new Response(SymfonyResponse::HTTP_ACCEPTED, [], file_get_contents(__DIR__.'/../Fixtures/Transifex/resources-upload.json'));
             }
         );
 
@@ -99,11 +99,11 @@ class PushTransifexCommandFunctionalTest extends MauticMysqlTestCase
         $dir           = realpath(__DIR__.'/../../..');
 
         $expectedOutput = <<<EOT
-Processing Resource 'WebhookBundle messages'
 Processing Resource 'WebhookBundle flashes'
 Resource created successfully
-Resource for {$dir}/WebhookBundle/Translations/en_US/messages.ini updated successfully
+Processing Resource 'WebhookBundle messages'
 Resource for {$dir}/WebhookBundle/Translations/en_US/flashes.ini updated successfully
+Resource for {$dir}/WebhookBundle/Translations/en_US/messages.ini updated successfully
 
 EOT;
 
