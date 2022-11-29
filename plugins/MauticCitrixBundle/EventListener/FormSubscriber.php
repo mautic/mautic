@@ -204,7 +204,7 @@ class FormSubscriber implements EventSubscriberInterface
             $validationException = new ValidationException($ex->getMessage());
             $validationException->setViolations(
                 [
-                    'email' => $ex->getMessage(),
+                    $this->getEmailFieldAlias($fields) => $ex->getMessage(),
                 ]
             );
             throw $validationException;
@@ -360,7 +360,6 @@ class FormSubscriber implements EventSubscriberInterface
     {
         $form   = $event->getForm();
         $fields = $form->getFields()->getValues();
-
         // Verify if the form is well configured
         if (0 !== count($fields)) {
             $violations = $this->_checkFormValidity($form);
@@ -599,5 +598,19 @@ class FormSubscriber implements EventSubscriberInterface
                     break;
             }
         }
+    }
+
+    /**
+     * @param array<int,Field> $fields
+     */
+    protected function getEmailFieldAlias($fields): string
+    {
+        foreach ($fields as $field) {
+            if ('email' === $field->getType()) {
+                return $field->getAlias();
+            }
+        }
+
+        return 'email';
     }
 }
