@@ -331,6 +331,8 @@ class LanguageHelper
                 foreach ($finder as $file) {
                     $files[$bundle['bundle']][] = $file->getPathname();
                 }
+
+                asort($files[$bundle['bundle']]);
             }
         }
 
