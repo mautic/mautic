@@ -7,6 +7,7 @@ namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Import;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
+use Symfony\Component\HttpFoundation\Response;
 
 class LeadTest extends PipedriveTest
 {

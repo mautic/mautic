@@ -35,7 +35,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $_SERVER['SERVER_NAME']     = 'www.example.com';
         $_SERVER['REQUEST_URI']     = '/index.php';
 
-        $this->mockHandler = self::$container->get(MockHandler::class);
+        $this->mockHandler = self::$container->get('mautic.http.client.mock_handler');
     }
 
     public function tearDown(): void
