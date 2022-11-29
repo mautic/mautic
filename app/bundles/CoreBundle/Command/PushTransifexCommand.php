@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\Transifex\Connector\Resources;
 use Mautic\Transifex\Exception\InvalidConfigurationException;
 use Mautic\Transifex\Exception\ResponseException;
+use Mautic\Transifex\Exception\TransifexException;
 use Mautic\Transifex\Promise;
 use Psr\Http\Message\ResponseInterface;
 use SplQueue;
@@ -24,6 +25,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class PushTransifexCommand extends Command
 {
+    public const NAME = 'mautic:transifex:push';
+
     private TransifexFactory $transifexFactory;
     private TranslatorInterface $translator;
     private LanguageHelper $languageHelper;
@@ -42,7 +45,7 @@ class PushTransifexCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('mautic:transifex:push')
+        $this->setName(self::NAME)
             ->setDescription('Pushes Mautic translation resources to Transifex')
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->setHelp(<<<'EOT'
@@ -65,7 +68,9 @@ EOT
         try {
             $transifex = $this->transifexFactory->getTransifex();
         } catch (InvalidConfigurationException $e) {
-            $output->writeln($this->translator->trans('mautic.core.command.transifex_no_credentials'));
+            $output->writeln($this->translator->trans(
+                'mautic.core.command.transifex_no_credentials')
+            );
 
             return 1;
         }
@@ -81,22 +86,37 @@ EOT
                 $name    = $bundle.' '.str_replace('.ini', '', basename($file));
                 $alias   = UrlHelper::stringURLUnicodeSlug($name);
                 $content = file_get_contents($file);
-                $output->writeln($this->translator->trans('mautic.core.command.transifex_processing_resource', ['%resource%' => $name]));
+                $output->writeln(
+                    $this->translator->trans(
+                        'mautic.core.command.transifex_processing_resource',
+                        ['%resource%' => $name]
+                    )
+                );
 
                 try {
                     if (false === $content) {
                         throw new \RuntimeException('Unable to read file '.$file);
                     }
-                    if ($resources->resourceExists($existingResources['data'], $alias)) {
-                        $promise = $transifex->getApiConnector()->createPromise($resources->uploadContent($alias, $content));
-                        $promise->setFilePath($file);
-                        $promises->enqueue($promise);
-                    } else {
+
+                    if (!$resources->resourceExists($existingResources['data'], $alias)) {
                         $resources->create($name, $alias, 'INI');
-                        $output->writeln($this->translator->trans('mautic.core.command.transifex_resource_created'));
+                        $output->writeln(
+                            $this->translator->trans('mautic.core.command.transifex_resource_created')
+                        );
                     }
-                } catch (\Exception $exception) {
-                    $output->writeln($this->translator->trans('mautic.core.command.transifex_error_pushing_data', ['%message%' => $exception->getMessage()]));
+
+                    $promise = $transifex->getApiConnector()->createPromise(
+                        $resources->uploadContent($alias, $content)
+                    );
+                    $promise->setFilePath($file);
+                    $promises->enqueue($promise);
+                } catch (TransifexException $exception) {
+                    $output->writeln(
+                        $this->translator->trans(
+                            'mautic.core.command.transifex_error_pushing_data',
+                            ['%message%' => $exception->getMessage()]
+                        )
+                    );
                 }
             }
         }
