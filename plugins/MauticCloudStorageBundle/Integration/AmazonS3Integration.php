@@ -110,8 +110,8 @@ class AmazonS3Integration extends CloudStorageIntegration
             $keys = $this->getDecryptedApiKeys();
 
             $s3Args = [
-                'version' => 'latest',
-                'region' => (empty($keys['region'])) ? 'us-east-1' : $keys['region'],
+                'version'     => 'latest',
+                'region'      => (empty($keys['region'])) ? 'us-east-1' : $keys['region'],
                 'credentials' => [
                     'key'    => $keys['client_id'],
                     'secret' => $keys['client_secret'],
