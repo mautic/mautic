@@ -905,6 +905,24 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "gonzalo",
+      "name": "Gonzalo Cao Cabeza de Vaca",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57393?v=4",
+      "profile": "http://zoogon.net",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "Robmobius",
+      "name": "Robmobius",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16938630?v=4",
+      "profile": "https://github.com/Robmobius",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,

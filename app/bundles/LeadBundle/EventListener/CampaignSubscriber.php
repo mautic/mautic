@@ -521,13 +521,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     public function onCampaignTriggerActionSetManipulator(CampaignExecutionEvent $event): void
     {
-        $lead = $event->getLead();
-
-        if (!$lead instanceof Lead) {
-            return;
-        }
-
-        $lead->setManipulator(new LeadManipulator('campaign', 'trigger-action'));
+        $event->getLead()->setManipulator(new LeadManipulator('campaign', 'trigger-action'));
     }
 
     /**
