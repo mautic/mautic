@@ -26,17 +26,17 @@ class DetailsType extends AbstractType
     {
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $formSettings = $options['integration_object']->getFormDisplaySettings();
-        if ($keys = $options['integration_object']->getRequiredKeyFields()) {
-            $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+        $formSettings  = $options['integration_object']->getFormDisplaySettings();
+        $decryptedKeys = $options['integration_object']->decryptApiKeys($options['data']->getApiKeys());
+        $keys          = $options['integration_object']->getRequiredKeyFields();
 
-            if (!empty($formSettings['hide_keys'])) {
-                foreach ($formSettings['hide_keys'] as $key) {
-                    unset($keys[$key]);
-                }
+        if (!empty($formSettings['hide_keys'])) {
+            foreach ($formSettings['hide_keys'] as $key) {
+                unset($keys[$key]);
             }
+        }
 
-            $builder->add(
+        $builder->add(
                 'apiKeys',
                 KeysType::class,
                 [
@@ -47,7 +47,7 @@ class DetailsType extends AbstractType
                 ]
             );
 
-            $builder->addEventListener(
+        $builder->addEventListener(
                 FormEvents::PRE_SUBMIT,
                 function (FormEvent $event) use ($keys, $decryptedKeys, $options) {
                     $data = $event->getData();
@@ -67,11 +67,11 @@ class DetailsType extends AbstractType
                 }
             );
 
-            if (!empty($formSettings['requires_authorization'])) {
-                $disabled = false;
-                $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
+        if (!empty($formSettings['requires_authorization'])) {
+            $disabled = false;
+            $label    = ($options['integration_object']->isAuthorized()) ? 'reauthorize' : 'authorize';
 
-                $builder->add(
+            $builder->add(
                     'authButton',
                     StandAloneButtonType::class,
                     [
@@ -84,7 +84,6 @@ class DetailsType extends AbstractType
                         'disabled' => $disabled,
                     ]
                 );
-            }
         }
 
         $features = $options['integration_object']->getSupportedFeatures();
