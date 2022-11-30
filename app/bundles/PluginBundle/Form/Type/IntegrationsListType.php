@@ -99,7 +99,7 @@ class IntegrationsListType extends AbstractType
                     'attr'  => [
                         'class' => 'integration-config-container',
                     ],
-                    'integration' => (isset($integrationObjects[$data['integration']])) ? $integrationObjects[$data['integration']] : null,
+                    'integration' => (isset($integrationObjects[$data['integration'] ?? null])) ? $integrationObjects[$data['integration']] : null,
                     'campaigns'   => $campaignChoices,
                     'data'        => (isset($data['config'])) ? $data['config'] : [],
                 ]
