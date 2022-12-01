@@ -31,9 +31,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function getIntegrationFieldsAction(Request $request)
     {
-        $integration = $request->request->get('integration');
-        $settings    = $request->request->get('settings');
-        $page        = $request->request->get('page');
+        $integration = $request->query->get('integration');
+        $settings    = $request->query->get('settings');
+        $page        = $request->query->get('page');
 
         $dataArray = ['success' => 0];
 
