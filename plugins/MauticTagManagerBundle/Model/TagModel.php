@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticTagManagerBundle\Model;
 
+use Mautic\LeadBundle\Entity\Tag as LeadTag;
 use Mautic\LeadBundle\Model\TagModel as BaseTagModel;
 use MauticPlugin\MauticTagManagerBundle\Entity\Tag;
 use MauticPlugin\MauticTagManagerBundle\Form\Type\TagEntityType;
@@ -26,9 +27,9 @@ class TagModel extends BaseTagModel
     /**
      * {@inheritdoc}
      *
-     * @param Tag    $entity
-     * @param string $action
-     * @param array  $options
+     * @param LeadTag $entity
+     * @param string  $action
+     * @param array   $options
      *
      * @return mixed
      *
@@ -36,7 +37,7 @@ class TagModel extends BaseTagModel
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        if (!$entity instanceof \Mautic\LeadBundle\Entity\Tag) {
+        if (!$entity instanceof LeadTag) {
             throw new MethodNotAllowedHttpException(['Tag']);
         }
 
