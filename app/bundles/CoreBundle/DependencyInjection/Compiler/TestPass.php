@@ -13,8 +13,8 @@ final class TestPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         // Stub Guzzle HTTP client to prevent accidental request to third parties
-        $container->register('mautic.http.client', \GuzzleHttp\Client::class)
-            ->setPublic(true)
+        $definition = $container->getDefinition('mautic.http.client');
+        $definition->setPublic(true)
             ->setFactory([\Mautic\CoreBundle\Test\Guzzle\ClientFactory::class, 'stub'])
             ->addArgument(new Reference(\GuzzleHttp\Handler\MockHandler::class));
     }
