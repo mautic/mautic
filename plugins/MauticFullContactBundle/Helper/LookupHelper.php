@@ -9,7 +9,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticFullContactBundle\Integration\Config;
 use MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration;
+use MauticPlugin\MauticFullContactBundle\Services\CompanyStorageHelper;
+use MauticPlugin\MauticFullContactBundle\Services\ContactStorageHelper;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Company;
 use MauticPlugin\MauticFullContactBundle\Services\FullContact_Person;
 use Monolog\Logger;
@@ -48,20 +51,41 @@ class LookupHelper
      */
     protected $companyModel;
 
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * @var ContactStorageHelper
+     */
+    protected $contactStorageHelper;
+
+    /**
+     * @var CompanyStorageHelper
+     */
+    protected $companyStorageHelper;
+
     public function __construct(
         IntegrationHelper $integrationHelper,
         UserHelper $userHelper,
         Logger $logger,
         Router $router,
         LeadModel $leadModel,
-        CompanyModel $companyModel
+        CompanyModel $companyModel,
+        Config $config,
+        ContactStorageHelper $contactStorageHelper,
+        CompanyStorageHelper $companyStorageHelper
     ) {
-        $this->integration  = $integrationHelper->getIntegrationObject('FullContact');
-        $this->userHelper   = $userHelper;
-        $this->logger       = $logger;
-        $this->router       = $router;
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
+        $this->integration          = $integrationHelper->getIntegrationObject('FullContact');
+        $this->userHelper           = $userHelper;
+        $this->logger               = $logger;
+        $this->router               = $router;
+        $this->leadModel            = $leadModel;
+        $this->companyModel         = $companyModel;
+        $this->config               = $config;
+        $this->contactStorageHelper = $contactStorageHelper;
+        $this->companyStorageHelper = $companyStorageHelper;
     }
 
     /**
@@ -90,6 +114,7 @@ class LookupHelper
                             $webhookId
                         );
                         $res = $fullcontact->lookupByEmail($lead->getEmail());
+                        $this->contactStorageHelper->processContactData($res, $lead);
                         // Prevent from filling up the cache
                         $cache['fullcontact'] = [
                             $cacheId => serialize($res),
@@ -137,6 +162,7 @@ class LookupHelper
                             $webhookId
                         );
                         $res = $fullcontact->lookupByDomain($parse['host']);
+                        $this->companyStorageHelper->processCompanyData($res, $company);
                         // Prevent from filling up the cache
                         $cache['fullcontact'] = [
                             $cacheId => serialize($res),
@@ -205,7 +231,7 @@ class LookupHelper
         }
 
         // get api_key from plugin settings
-        $keys = $this->integration->getDecryptedApiKeys();
+        $keys = $this->config->getApiKeys();
 
         return ($person) ? new FullContact_Person($keys['apikey']) : new FullContact_Company($keys['apikey']);
     }

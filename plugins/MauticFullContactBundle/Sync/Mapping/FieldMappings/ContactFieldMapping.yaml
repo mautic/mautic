@@ -1,0 +1,50 @@
+---
+-
+    displayName: "Email Address"
+    name: email
+    type: text
+    required: true
+-
+    displayName: "First Name"
+    name: given
+    type: text
+-
+    displayName: "Last Name"
+    name: family
+    type: text
+-
+    displayName: "Job Title"
+    name: title
+    type: text
+-
+    displayName: "City"
+    name: city
+    type: text
+-
+    displayName: "State"
+    name: region
+    type: text
+-
+    displayName: "Country"
+    name: country
+    type: text
+-
+    displayName: "Twitter"
+    name: twitter
+    type: text
+-
+    displayName: "Website"
+    name: website
+    type: text
+-
+    displayName: "LinkedIn"
+    name: linkedin
+    type: text
+-
+    displayName: "Facebook"
+    name: facebook
+    type: text
+-
+    displayName: "Organization"
+    name: organization
+    type: text

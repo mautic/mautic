@@ -56,30 +56,75 @@ return [
                     'router',
                     'mautic.lead.model.lead',
                     'mautic.lead.model.company',
+                    'mautic.plugin.fullcontact.integration.config',
+                    'mautic.plugin.fullcontact.service.contact.sync',
+                    'mautic.plugin.fullcontact.service.company.sync',
+                ],
+            ],
+            'mautic.plugin.fullcontact.integration.config'            => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Config::class,
+                'arguments' => [
+                    'mautic.integrations.helper',
+                ],
+            ],
+            'mautic.plugin.fullcontact.service.contact.sync' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Services\ContactStorageHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'monolog.logger.mautic',
+                    'mautic.plugin.fullcontact.integration.config',
+                ],
+            ],
+            'mautic.plugin.fullcontact.service.company.sync' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Services\CompanyStorageHelper::class,
+                'arguments' => [
+                    'mautic.lead.model.company',
+                    'monolog.logger.mautic',
+                    'mautic.plugin.fullcontact.integration.config',
                 ],
             ],
         ],
         'integrations' => [
             'mautic.integration.fullcontact' => [
                 'class'     => \MauticPlugin\MauticFullContactBundle\Integration\FullContactIntegration::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.helper.cache_storage',
-                    'doctrine.orm.entity_manager',
-                    'session',
-                    'request_stack',
-                    'router',
-                    'translator',
-                    'logger',
-                    'mautic.helper.encryption',
-                    'mautic.lead.model.lead',
-                    'mautic.lead.model.company',
-                    'mautic.helper.paths',
-                    'mautic.core.model.notification',
-                    'mautic.lead.model.field',
-                    'mautic.plugin.model.integration_entity',
-                    'mautic.lead.model.dnc',
+                'tags'      => [
+                    'mautic.integration',
+                    'mautic.basic_integration',
                 ],
+            ],
+            'mautic.integration.fullcontact.configuration' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Support\ConfigSupport::class,
+                'tags'      => [
+                  'mautic.config_integration',
+                ],
+                'arguments' => [
+                    'mautic.plugin.fullcontact.fields.repository',
+                ],
+            ],
+            'mautic.integration.fullcontact.sync'          => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Integration\Support\SyncSupport::class,
+                'arguments' => [
+                    'mautic.plugin.fullcontact.mapping_manual.factory',
+                ],
+                'tags'      => [
+                    'mautic.sync_integration',
+                ],
+            ],
+            'mautic.integration.fullcontact.field.repository'      => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository::class,
+                'arguments' => [],
+            ],
+        ],
+        'sync' => [
+            'mautic.plugin.fullcontact.mapping_manual.factory' => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Sync\Mapping\Manual\MappingManualFactory::class,
+                'arguments' => [
+                    'mautic.plugin.fullcontact.fields.repository',
+                ],
+            ],
+            'mautic.plugin.fullcontact.fields.repository'      => [
+                'class'     => \MauticPlugin\MauticFullContactBundle\Sync\Mapping\Field\FieldRepository::class,
+                'arguments' => [],
             ],
         ],
     ],
