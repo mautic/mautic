@@ -50,10 +50,10 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        /** @var CampaignModel $campaignModel */
         $campaignModel = $this->getModel('campaign');
-        $sourceList    = $campaignModel->getSourceLists($sourceType);
-        $form          = $this->get('form.factory')->create(
+        \assert($campaignModel instanceof CampaignModel);
+        $sourceList = $campaignModel->getSourceLists($sourceType);
+        $form       = $this->get('form.factory')->create(
             CampaignLeadSourceType::class,
             $source,
             [
@@ -157,10 +157,10 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        /** @var CampaignModel $campaignModel */
         $campaignModel = $this->getModel('campaign');
-        $sourceList    = $campaignModel->getSourceLists($sourceType);
-        $form          = $this->get('form.factory')->create(
+        \assert($campaignModel instanceof CampaignModel);
+        $sourceList = $campaignModel->getSourceLists($sourceType);
+        $form       = $this->get('form.factory')->create(
             CampaignLeadSourceType::class,
             $source,
             [

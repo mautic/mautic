@@ -37,9 +37,9 @@ class PageController extends FormController
      */
     public function indexAction($page = 1)
     {
-        /** @var PageModel $pageModel */
         $pageModel = $this->getModel('page.page');
-        $model     = $pageModel;
+        \assert($pageModel instanceof PageModel);
+        $model = $pageModel;
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted([
@@ -279,9 +279,9 @@ class PageController extends FormController
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Audit Log
-        /** @var AuditLogModel $auditLogModel */
         $auditLogModel = $this->getModel('core.auditlog');
-        $logs          = $auditLogModel->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         $pageviews = $model->getHitsLineChartData(
             null,

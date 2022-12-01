@@ -38,8 +38,8 @@ class AjaxController extends CommonAjaxController
     protected function pageListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        /** @var PageModel $pageModel */
         $pageModel = $this->getModel('page.page');
+        \assert($pageModel instanceof PageModel);
         $results   = $pageModel->getLookupResults('page', $filter);
         $dataArray = [];
 

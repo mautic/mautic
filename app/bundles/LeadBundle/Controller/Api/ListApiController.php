@@ -74,11 +74,11 @@ class ListApiController extends CommonApiController
      */
     public function getListsAction()
     {
-        /** @var ListModel $listModel */
         $listModel = $this->getModel('lead.list');
-        $lists     = $listModel->getUserLists();
-        $view      = $this->view($lists, Response::HTTP_OK);
-        $context   = $view->getContext()->setGroups(['leadListList']);
+        \assert($listModel instanceof ListModel);
+        $lists   = $listModel->getUserLists();
+        $view    = $this->view($lists, Response::HTTP_OK);
+        $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);
 
         return $this->handleView($view);
@@ -113,8 +113,8 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
         $leadModel->addToLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
@@ -156,8 +156,8 @@ class ListApiController extends CommonApiController
             if ($contact instanceof Response) {
                 $responseDetail[$contactId] = ['success' => false];
             } else {
-                /** @var LeadModel $leadModel */
                 $leadModel = $this->getModel('lead');
+                \assert($leadModel instanceof LeadModel);
                 /* @var \Mautic\LeadBundle\Entity\Lead $contact */
                 $leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
@@ -198,8 +198,8 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
         $leadModel->removeFromLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);

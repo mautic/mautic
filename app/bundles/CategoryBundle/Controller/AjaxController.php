@@ -17,12 +17,12 @@ class AjaxController extends CommonAjaxController
      */
     protected function categoryListAction(Request $request)
     {
-        $bundle    = InputHelper::clean($request->query->get('bundle'));
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        /** @var CategoryModel $categoryModel */
+        $bundle        = InputHelper::clean($request->query->get('bundle'));
+        $filter        = InputHelper::clean($request->query->get('filter'));
         $categoryModel = $this->getModel('category');
-        $results       = $categoryModel->getLookupResults($bundle, $filter, 10);
-        $dataArray     = [];
+        \assert($categoryModel instanceof CategoryModel);
+        $results   = $categoryModel->getLookupResults($bundle, $filter, 10);
+        $dataArray = [];
         foreach ($results as $r) {
             $dataArray[] = [
                 'label' => $r['title']." ({$r['id']})",

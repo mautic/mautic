@@ -175,8 +175,8 @@ class ReportController extends FormController
         ];
 
         if (HttpFoundation\Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var ReportModel $model */
-            $model  = $this->getModel('report');
+            $model = $this->getModel('report');
+            \assert($model instanceof ReportModel);
             $entity = $model->getEntity($objectId);
 
             $check = $this->checkEntityAccess(
@@ -236,8 +236,8 @@ class ReportController extends FormController
         ];
 
         if (HttpFoundation\Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var ReportModel $model */
-            $model     = $this->getModel('report');
+            $model = $this->getModel('report');
+            \assert($model instanceof ReportModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -299,8 +299,8 @@ class ReportController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        /** @var ReportModel $model */
-        $model   = $this->getModel('report');
+        $model = $this->getModel('report');
+        \assert($model instanceof ReportModel);
         $entity  = $model->getEntity($objectId);
         $session = $this->container->get('session');
         $page    = $session->get('mautic.report.page', 1);
@@ -445,8 +445,8 @@ class ReportController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var ReportModel $model */
         $model = $this->getModel('report');
+        \assert($model instanceof ReportModel);
 
         if (!($entity instanceof Report)) {
             /** @var \Mautic\ReportBundle\Entity\Report $entity */
@@ -545,8 +545,8 @@ class ReportController extends FormController
      */
     public function viewAction($objectId, $reportPage = 1)
     {
-        /** @var ReportModel $model */
-        $model    = $this->getModel('report');
+        $model = $this->getModel('report');
+        \assert($model instanceof ReportModel);
         $entity   = $model->getEntity($objectId);
         $security = $this->container->get('mautic.security');
 

@@ -18,8 +18,8 @@ class AjaxController extends CommonAjaxController
      */
     public function getSourceDataAction(Request $request)
     {
-        /** @var ReportModel $model */
-        $model   = $this->getModel('report');
+        $model = $this->getModel('report');
+        \assert($model instanceof ReportModel);
         $context = $request->get('context');
 
         $graphs  = $model->getGraphList($context);

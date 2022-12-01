@@ -109,13 +109,13 @@ class FormApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        /** @var FieldModel $fieldModel */
-        $fieldModel  = $this->getModel('form.field');
-        /** @var ActionModel $actionModel */
+        $fieldModel = $this->getModel('form.field');
+        \assert($fieldModel instanceof FieldModel);
         $actionModel = $this->getModel('form.action');
-        $method      = $this->request->getMethod();
-        $isNew       = false;
-        $alias       = $entity->getAlias();
+        \assert($actionModel instanceof ActionModel);
+        $method = $this->request->getMethod();
+        $isNew  = false;
+        $alias  = $entity->getAlias();
 
         if (empty($alias)) {
             // Set clean alias to prevent SQL errors
@@ -274,8 +274,8 @@ class FormApiController extends CommonApiController
         $components = $formModel->getCustomComponents();
         $type       = $action['type'] ?? $entity->getType();
 
-        /** @var ActionModel $formActionModel */
         $formActionModel = $this->getModel('form.action');
+        \assert($formActionModel instanceof ActionModel);
 
         return $formActionModel->createForm(
             $entity,
@@ -298,8 +298,8 @@ class FormApiController extends CommonApiController
      */
     protected function createFieldEntityForm($entity)
     {
-        /** @var FieldModel $formFieldModel */
         $formFieldModel = $this->getModel('form.field');
+        \assert($formFieldModel instanceof FieldModel);
 
         return $formFieldModel->createForm(
             $entity,

@@ -144,8 +144,8 @@ class NoteController extends FormController
         $note = new LeadNote();
         $note->setLead($lead);
 
-        /** @var NoteModel $model */
-        $model  = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -227,8 +227,8 @@ class NoteController extends FormController
             return $lead;
         }
 
-        /** @var NoteModel $model */
-        $model      = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $note       = $model->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
@@ -312,9 +312,9 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-        /** @var NoteModel $model */
         $model = $this->getModel('lead.note');
-        $note  = $model->getEntity($objectId);
+        \assert($model instanceof NoteModel);
+        $note = $model->getEntity($objectId);
 
         if (null === $note) {
             return $this->notFound();

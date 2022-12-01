@@ -183,9 +183,9 @@ trait CustomFieldsApiControllerTrait
      */
     protected function setCleaningRules($object = 'lead')
     {
-        /** @var FieldModel $leadFieldModel */
         $leadFieldModel = $this->getModel('lead.field');
-        $fields         = $leadFieldModel->getFieldListWithProperties($object);
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getFieldListWithProperties($object);
         foreach ($fields as $field) {
             if (!empty($field['properties']['allowHtml'])) {
                 $this->dataInputMasks[$field['alias']]  = 'html';

@@ -91,9 +91,9 @@ class CompanyController extends FormController
 
         $pageHelper->rememberPage($page);
 
-        $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        /** @var CompanyModel $model */
-        $model      = $this->getModel('lead.company');
+        $tmpl  = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $model = $this->getModel('lead.company');
+        \assert($model instanceof CompanyModel);
         $companyIds = array_keys($companies);
         $leadCounts = (!empty($companyIds)) ? $model->getRepository()->getLeadCount($companyIds) : [];
 
@@ -189,8 +189,8 @@ class CompanyController extends FormController
      */
     public function newAction($entity = null)
     {
-        /** @var CompanyModel $model */
         $model = $this->getModel('lead.company');
+        \assert($model instanceof CompanyModel);
 
         if (!($entity instanceof Company)) {
             /** @var \Mautic\LeadBundle\Entity\Company $entity */
@@ -212,10 +212,10 @@ class CompanyController extends FormController
                 : $this->request->get('updateSelect', false)
         );
 
-        /** @var FieldModel $leadFieldModel */
         $leadFieldModel = $this->getModel('lead.field');
-        $fields         = $leadFieldModel->getPublishedFieldArrays('company');
-        $form           = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $form   = $model->createForm($entity, $this->get('form.factory'), $action, ['fields' => $fields, 'update_select' => $updateSelect]);
 
         $viewParameters = ['page' => $page];
         $returnUrl      = $this->generateUrl('mautic_company_index', $viewParameters);
@@ -333,8 +333,8 @@ class CompanyController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        /** @var CompanyModel $model */
-        $model  = $this->getModel('lead.company');
+        $model = $this->getModel('lead.company');
+        \assert($model instanceof CompanyModel);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -388,10 +388,10 @@ class CompanyController extends FormController
             ? ($company['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
 
-        /** @var FieldModel $leadFieldModel */
         $leadFieldModel = $this->getModel('lead.field');
-        $fields         = $leadFieldModel->getPublishedFieldArrays('company');
-        $form           = $model->createForm(
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('company');
+        $form   = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,
@@ -711,8 +711,8 @@ class CompanyController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var CompanyModel $model */
-            $model  = $this->getModel('lead.company');
+            $model = $this->getModel('lead.company');
+            \assert($model instanceof CompanyModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -771,8 +771,8 @@ class CompanyController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var CompanyModel $model */
-            $model     = $this->getModel('lead.company');
+            $model = $this->getModel('lead.company');
+            \assert($model instanceof CompanyModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 

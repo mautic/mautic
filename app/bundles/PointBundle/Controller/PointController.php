@@ -44,8 +44,8 @@ class PointController extends AbstractFormController
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.point.orderby', 'p.name');
         $orderByDir = $this->get('session')->get('mautic.point.orderbydir', 'ASC');
-        /** @var PointModel $pointModel */
         $pointModel = $this->getModel('point');
+        \assert($pointModel instanceof PointModel);
         $points     = $pointModel->getEntities([
             'start'      => $start,
             'limit'      => $limit,
@@ -106,8 +106,8 @@ class PointController extends AbstractFormController
      */
     public function newAction($entity = null)
     {
-        /** @var PointModel $model */
         $model = $this->getModel('point');
+        \assert($model instanceof PointModel);
 
         if (!($entity instanceof Point)) {
             /** @var \Mautic\PointBundle\Entity\Point $entity */
@@ -210,8 +210,8 @@ class PointController extends AbstractFormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        /** @var PointModel $model */
-        $model  = $this->getModel('point');
+        $model = $this->getModel('point');
+        \assert($model instanceof PointModel);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -381,8 +381,8 @@ class PointController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var PointModel $model */
-            $model  = $this->getModel('point');
+            $model = $this->getModel('point');
+            \assert($model instanceof PointModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -439,8 +439,8 @@ class PointController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var PointModel $model */
-            $model     = $this->getModel('point');
+            $model = $this->getModel('point');
+            \assert($model instanceof PointModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 

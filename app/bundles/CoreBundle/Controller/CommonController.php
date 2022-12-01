@@ -498,9 +498,9 @@ class CommonController extends AbstractController implements MauticController
     {
         $page_404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page_404)) {
-            /** @var PageModel $pageModel */
             $pageModel = $this->getModel('page');
-            $page      = $pageModel->getEntity($page_404);
+            \assert($pageModel instanceof PageModel);
+            $page = $pageModel->getEntity($page_404);
             if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug = $pageModel->generateSlug($page);
 

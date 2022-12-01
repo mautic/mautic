@@ -145,9 +145,9 @@ class PublicController extends CommonFormController
                 $unsubscribeForm = $email->getUnsubscribeForm();
                 if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
-                    /** @var FormModel $formModel */
                     $formModel    = $this->getModel('form');
-                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    \assert($formModel instanceof FormModel);
+                    $formContent = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
         }
@@ -328,9 +328,9 @@ class PublicController extends CommonFormController
     public function resubscribeAction($idHash)
     {
         //find the email
-        /** @var EmailModel $model */
         $model = $this->getModel('email');
-        $stat  = $model->getEmailStatus($idHash);
+        \assert($model instanceof EmailModel);
+        $stat = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
             $email = $stat->getEmail();
@@ -636,10 +636,10 @@ class PublicController extends CommonFormController
         $model = $this->getModel('email');
 
         // email is a semicolon delimited list of emails
-        $emails = explode(';', $query['email']);
-        /** @var LeadModel $leadModel */
+        $emails    = explode(';', $query['email']);
         $leadModel = $this->getModel('lead');
-        $repo      = $leadModel->getRepository();
+        \assert($leadModel instanceof LeadModel);
+        $repo = $leadModel->getRepository();
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
@@ -727,8 +727,8 @@ class PublicController extends CommonFormController
      */
     private function createLead($email, $repo)
     {
-        /** @var LeadModel $model */
         $model = $this->getModel('lead.lead');
+        \assert($model instanceof LeadModel);
         $lead  = $model->getEntity();
         // set custom field values
         $data = ['email' => $email];

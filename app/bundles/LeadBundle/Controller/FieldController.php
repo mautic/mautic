@@ -352,8 +352,8 @@ class FieldController extends FormController
      */
     public function cloneAction($objectId)
     {
-        /** @var FieldModel $model */
-        $model  = $this->getModel('lead.field');
+        $model = $this->getModel('lead.field');
+        \assert($model instanceof FieldModel);
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {

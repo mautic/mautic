@@ -53,8 +53,8 @@ class CategoryController extends AbstractFormController
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
-        /** @var CategoryModel $categoryModel */
         $categoryModel  = $this->getModel('category');
+        \assert($categoryModel instanceof CategoryModel);
         $permissionBase = $categoryModel->getPermissionBase($bundle);
         $permissions    = $this->get('mautic.security')->isGranted(
             [
@@ -179,8 +179,8 @@ class CategoryController extends AbstractFormController
      */
     public function newAction($bundle)
     {
-        /** @var CategoryModel $model */
-        $model      = $this->getModel('category');
+        $model = $this->getModel('category');
+        \assert($model instanceof CategoryModel);
         $session    = $this->get('session');
         $entity     = $model->getEntity();
         $success    = 0;
@@ -275,8 +275,8 @@ class CategoryController extends AbstractFormController
     public function editAction($bundle, $objectId, $ignorePost = false)
     {
         $session = $this->get('session');
-        /** @var CategoryModel $model */
-        $model     = $this->getModel('category');
+        $model   = $this->getModel('category');
+        \assert($model instanceof CategoryModel);
         $entity    = $model->getEntity($objectId);
         $success   = $closeModal   = 0;
         $cancelled = $valid = false;
@@ -424,8 +424,8 @@ class CategoryController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var CategoryModel $model */
             $model  = $this->getModel('category');
+            \assert($model instanceof CategoryModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -488,8 +488,8 @@ class CategoryController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var CategoryModel $model */
-            $model     = $this->getModel('category');
+            $model = $this->getModel('category');
+            \assert($model instanceof CategoryModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 

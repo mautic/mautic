@@ -217,9 +217,9 @@ class UserController extends FormController
         if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
-        /** @var UserModel $model */
         $model = $this->getModel('user.user');
-        $user  = $model->getEntity($objectId);
+        \assert($model instanceof UserModel);
+        $user = $model->getEntity($objectId);
 
         //set the page we came from
         $page = $this->get('session')->get('mautic.user.page', 1);
@@ -365,8 +365,8 @@ class UserController extends FormController
         if ('POST' == $this->request->getMethod()) {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                /** @var UserModel $model */
-                $model  = $this->getModel('user.user');
+                $model = $this->getModel('user.user');
+                \assert($model instanceof UserModel);
                 $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
@@ -481,8 +481,8 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $this->factory->getIpAddressFromRequest(),
                     ];
-                    /** @var AuditLogModel $auditLogModel */
                     $auditLogModel = $this->getModel('core.auditlog');
+                    \assert($auditLogModel instanceof AuditLogModel);
                     $auditLogModel->writeToLog($log);
 
                     $this->addFlash('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
@@ -548,8 +548,8 @@ class UserController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var UserModel $model */
-            $model       = $this->getModel('user');
+            $model = $this->getModel('user');
+            \assert($model instanceof UserModel);
             $ids         = json_decode($this->request->query->get('ids', ''));
             $deleteIds   = [];
             $currentUser = $this->user;

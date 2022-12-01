@@ -45,9 +45,9 @@ class AppCallbackController extends CommonController
             $notification     = $notificationRepo->getEntity($stat['notification_id']);
 
             if (null !== $notification) {
-                $statCreated = true;
-                /** @var NotificationModel $notificationModel */
+                $statCreated       = true;
                 $notificationModel = $this->getModel('notification');
+                \assert($notificationModel instanceof NotificationModel);
                 $notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
             }
         }

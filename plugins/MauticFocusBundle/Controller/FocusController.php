@@ -150,8 +150,8 @@ class FocusController extends AbstractStandardFormController
             $args['viewParameters']['dateRangeForm'] = $dateRangeForm->createView();
 
             if ('link' === $item->getType()) {
-                /** @var TrackableModel $trackableModel */
-                $trackableModel                       = $this->getModel('page.trackable');
+                $trackableModel = $this->getModel('page.trackable');
+                \assert($trackableModel instanceof TrackableModel);
                 $args['viewParameters']['trackables'] = $trackableModel->getTrackableList('focus', $item->getId());
             }
         }

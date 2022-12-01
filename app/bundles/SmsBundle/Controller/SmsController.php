@@ -177,9 +177,9 @@ class SmsController extends FormController
         }
 
         // Audit Log
-        /** @var AuditLogModel $auditLogModel */
         $auditLogModel = $this->getModel('core.auditlog');
-        $logs          = $auditLogModel->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
@@ -587,8 +587,8 @@ class SmsController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var SmsModel $model */
-            $model  = $this->getModel('sms');
+            $model = $this->getModel('sms');
+            \assert($model instanceof SmsModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -650,9 +650,9 @@ class SmsController extends FormController
         ];
 
         if (Request::METHOD_POST == $this->request->getMethod()) {
-            /** @var SmsModel $model */
             $model = $this->getModel('sms');
-            $ids   = json_decode($this->request->query->get('ids', '{}'));
+            \assert($model instanceof SmsModel);
+            $ids = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 

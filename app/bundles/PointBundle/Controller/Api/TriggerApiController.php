@@ -105,8 +105,8 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm($entity)
     {
-        /** @var TriggerEventModel $triggerEventModel */
         $triggerEventModel = $this->getModel('point.triggerevent');
+        \assert($triggerEventModel instanceof TriggerEventModel);
 
         return $triggerEventModel->createForm(
             $entity,

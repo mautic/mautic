@@ -209,8 +209,8 @@ class CampaignApiController extends CommonApiController
         }
 
         if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
-            /** @var EventModel $campaignEventModel */
             $campaignEventModel = $this->getModel('campaign.event');
+            \assert($campaignEventModel instanceof EventModel);
             $campaignEventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }

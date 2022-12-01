@@ -29,8 +29,8 @@ class DashboardController extends AbstractFormController
      */
     public function indexAction()
     {
-        /** @var DashboardModel $model */
         $model   = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $widgets = $model->getWidgets();
 
         // Apply the default dashboard if no widget exists
@@ -132,8 +132,8 @@ class DashboardController extends AbstractFormController
         //retrieve the entity
         $widget = new Widget();
 
-        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
         //get the user form factory
@@ -195,8 +195,8 @@ class DashboardController extends AbstractFormController
      */
     public function editAction($objectId)
     {
-        /** @var DashboardModel $model */
         $model  = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
@@ -354,10 +354,10 @@ class DashboardController extends AbstractFormController
      */
     public function exportAction()
     {
-        /** @var DashboardModel $dashboardModel */
         $dashboardModel = $this->getModel('dashboard');
-        $filename       = InputHelper::filename($this->getNameFromRequest(), 'json');
-        $response       = new JsonResponse($dashboardModel->toArray($filename));
+        \assert($dashboardModel instanceof DashboardModel);
+        $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
+        $response = new JsonResponse($dashboardModel->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');

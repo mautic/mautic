@@ -53,8 +53,9 @@ class TriggerEventController extends CommonFormController
         //fire the builder event
         /** @var TriggerModel $pointTriggerModel */
         $pointTriggerModel = $this->getModel('point.trigger');
-        $events            = $pointTriggerModel->getEvents();
-        $form              = $this->get('form.factory')->create(TriggerEventType::class, $triggerEvent, [
+        \assert($pointTriggerModel instanceof TriggerModel);
+        $events = $pointTriggerModel->getEvents();
+        $form   = $this->get('form.factory')->create(TriggerEventType::class, $triggerEvent, [
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', ['objectAction' => 'new']),
             'settings' => $events[$eventType],
         ]);
@@ -155,9 +156,9 @@ class TriggerEventController extends CommonFormController
         $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
 
         if (null !== $triggerEvent) {
-            $eventType                = $triggerEvent['type'];
-            /** @var TriggerModel $pointTriggerModel */
-            $pointTriggerModel        = $this->getModel('point.trigger');
+            $eventType         = $triggerEvent['type'];
+            $pointTriggerModel = $this->getModel('point.trigger');
+            \assert($pointTriggerModel instanceof TriggerModel);
             $events                   = $pointTriggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 

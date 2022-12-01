@@ -26,8 +26,8 @@ class TagController extends FormController
     {
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
-        /** @var \MauticPlugin\MauticTagManagerBundle\Model\TagModel $model */
-        $model   = $this->getModel('tagmanager.tag');
+        $model = $this->getModel('tagmanager.tag');
+        \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
         $session = $this->get('session');
 
         //set some permissions
@@ -151,8 +151,8 @@ class TagController extends FormController
 
         //retrieve the entity
         $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
-        /** @var \MauticPlugin\MauticTagManagerBundle\Model\TagModel $model */
         $model = $this->getModel('tagmanager.tag');
+        \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
         //set the page we came from
         $page = $this->get('session')->get('mautic.tagmanager.page', 1);
         //set the return URL for post actions
@@ -501,9 +501,9 @@ class TagController extends FormController
         if ('POST' == $this->request->getMethod()) {
             /** @var TagModel $model */
             $model         = $this->getModel('lead.tag');
-            /** @var \MauticPlugin\MauticTagManagerBundle\Model\TagModel $overrideModel */
             $overrideModel = $this->getModel('tagmanager.tag');
-            $tag           = $model->getEntity($objectId);
+            \assert($overrideModel instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
+            $tag = $model->getEntity($objectId);
 
             if (null === $tag) {
                 $flashes[] = [

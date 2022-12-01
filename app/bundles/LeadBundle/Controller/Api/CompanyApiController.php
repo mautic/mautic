@@ -52,8 +52,8 @@ class CompanyApiController extends CommonApiController
         $parameters = $this->request->request->all();
 
         if (empty($parameters['force'])) {
-            /** @var CompanyModel $leadCompanyModel */
-            $leadCompanyModel                = $this->getModel('lead.company');
+            $leadCompanyModel = $this->getModel('lead.company');
+            \assert($leadCompanyModel instanceof CompanyModel);
             list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {

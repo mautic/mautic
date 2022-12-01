@@ -2079,8 +2079,8 @@ class MailHelper
                 if (!isset($contact['owner_id'])) {
                     $contact['owner_id'] = 0;
                 } elseif (isset($contact['owner_id'])) {
-                    /** @var LeadModel $leadModel */
                     $leadModel = $this->factory->getModel('lead');
+                    \assert($leadModel instanceof LeadModel);
                     if (isset(self::$leadOwners[$contact['owner_id']])) {
                         $owner = self::$leadOwners[$contact['owner_id']];
                     } elseif ($owner = $leadModel->getRepository()->getLeadOwner($contact['owner_id'])) {

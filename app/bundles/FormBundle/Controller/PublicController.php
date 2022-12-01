@@ -93,9 +93,9 @@ class PublicController extends CommonFormController
                 } elseif ('published' != $status) {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
                 } else {
-                    /** @var SubmissionModel $formSubmissionModel */
                     $formSubmissionModel = $this->getModel('form.submission');
-                    $result              = $formSubmissionModel->saveSubmission($post, $server, $form, $this->request, true);
+                    \assert($formSubmissionModel instanceof SubmissionModel);
+                    $result = $formSubmissionModel->saveSubmission($post, $server, $form, $this->request, true);
                     if (!empty($result['errors'])) {
                         if ($messengerMode || $isAjax) {
                             $error = $result['errors'];
@@ -282,8 +282,8 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id = 0)
     {
-        /** @var FormModel $model */
-        $model             = $this->getModel('form.form');
+        $model = $this->getModel('form.form');
+        \assert($model instanceof FormModel);
         $objectId          = (empty($id)) ? (int) $this->request->get('id') : $id;
         $css               = InputHelper::string($this->request->get('css'));
         $form              = $model->getEntity($objectId);
@@ -362,8 +362,8 @@ class PublicController extends CommonFormController
 
         $formId = (int) $this->request->get('id');
 
-        /** @var FormModel $model */
         $model = $this->getModel('form.form');
+        \assert($model instanceof FormModel);
         $form  = $model->getEntity($formId);
         $js    = '';
 

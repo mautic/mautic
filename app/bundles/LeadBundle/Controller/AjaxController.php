@@ -37,8 +37,8 @@ class AjaxController extends CommonAjaxController
     protected function userListAction(Request $request)
     {
         $filter    = InputHelper::clean($request->query->get('filter'));
-        /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
+        \assert($leadModel instanceof LeadModel);
         $results   = $leadModel->getLookupResults('user', $filter);
         $dataArray = [];
         foreach ($results as $r) {
@@ -63,8 +63,8 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['items' => []];
 
         if ($field && $value) {
-            /** @var LeadModel $leadModel */
-            $leadModel                  = $this->getModel('lead.lead');
+            $leadModel = $this->getModel('lead.lead');
+            \assert($leadModel instanceof LeadModel);
             $repo                       = $leadModel->getRepository();
             $leads                      = $repo->getLeadsByFieldValue($field, $value, $ignore);
             $dataArray['existsMessage'] = $this->translator->trans('mautic.lead.exists.by.field').': ';
@@ -544,8 +544,8 @@ class AjaxController extends CommonAjaxController
                 // Use lead model to trigger listeners
                 $doNotContact->removeDncForContact($lead->getId(), $channel);
             } else {
-                /** @var EmailModel $emailModel */
                 $emailModel = $this->getModel('email');
+                \assert($emailModel instanceof EmailModel);
                 $emailModel->getRepository()->deleteDoNotEmailEntry($dncId);
             }
 
@@ -725,8 +725,8 @@ class AjaxController extends CommonAjaxController
         $tags = json_decode($tags, true);
 
         if (is_array($tags)) {
-            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
+            \assert($leadModel instanceof LeadModel);
             $newTags   = [];
 
             foreach ($tags as $tag) {
@@ -778,8 +778,8 @@ class AjaxController extends CommonAjaxController
                 }
             }
 
-            /** @var LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
+            \assert($leadModel instanceof LeadModel);
 
             if (!empty($newUtmTags)) {
                 $leadModel->getUtmTagRepository()->saveEntities($newUtmTags);
@@ -893,8 +893,8 @@ class AjaxController extends CommonAjaxController
             $dataArray['options']   = $options;
 
             if ('field' === $changed) {
-                /** @var LeadModel $leadModel */
-                $leadModel              = $this->getModel('lead');
+                $leadModel = $this->getModel('lead');
+                \assert($leadModel instanceof LeadModel);
                 $dataArray['operators'] = $leadModel->getOperatorsForFieldType($leadFieldType, ['date']);
                 foreach ($dataArray['operators'] as $value => $label) {
                     $dataArray['operators'][$value] = $this->get('translator')->trans($label);
@@ -933,8 +933,8 @@ class AjaxController extends CommonAjaxController
         $companyId            = InputHelper::clean($request->request->get('companyId'));
         $leadId               = InputHelper::clean($request->request->get('leadId'));
 
-        /** @var LeadModel $leadModel */
-        $leadModel      = $this->getModel('lead');
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
         $primaryCompany = $leadModel->setPrimaryCompany($companyId, $leadId);
 
         $dataArray = array_merge($dataArray, $primaryCompany);

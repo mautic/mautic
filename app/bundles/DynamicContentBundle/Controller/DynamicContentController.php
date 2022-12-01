@@ -88,8 +88,8 @@ class DynamicContentController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        /** @var PageModel $pageModel */
         $pageModel  = $this->getModel('page');
+        \assert($pageModel instanceof PageModel);
         $categories = $pageModel->getLookupResults('category', '', 0);
 
         return $this->delegateView(
@@ -127,8 +127,8 @@ class DynamicContentController extends FormController
             $entity = new DynamicContent();
         }
 
-        /** @var DynamicContentModel $model */
-        $model        = $this->getModel('dynamicContent');
+        $model = $this->getModel('dynamicContent');
+        \assert($model instanceof DynamicContentModel);
         $method       = $this->request->getMethod();
         $page         = $this->get('session')->get('mautic.dynamicContent.page', 1);
         $retUrl       = $this->generateUrl('mautic_dynamicContent_index', ['page' => $page]);
@@ -344,8 +344,8 @@ class DynamicContentController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var DynamicContentModel $model */
-        $model    = $this->getModel('dynamicContent');
+        $model = $this->getModel('dynamicContent');
+        \assert($model instanceof DynamicContentModel);
         $security = $this->get('mautic.security');
         $entity   = $model->getEntity($objectId);
 
@@ -388,8 +388,8 @@ class DynamicContentController extends FormController
         list($translationParent, $translationChildren) = $entity->getTranslations();
 
         // Audit Log
-        /** @var AuditLogModel $auditLogModel */
         $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
         $logs          = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
 
         // Init the date range filter form
@@ -404,9 +404,9 @@ class DynamicContentController extends FormController
             ['dynamic_content_id' => $entity->getId(), 'flag' => 'total_and_unique']
         );
 
-        /** @var TrackableModel $trackableModel */
         $trackableModel = $this->getModel('page.trackable');
-        $trackables     = $trackableModel->getTrackableList('dynamicContent', $entity->getId());
+        \assert($trackableModel instanceof TrackableModel);
+        $trackables = $trackableModel->getTrackableList('dynamicContent', $entity->getId());
 
         return $this->delegateView(
             [
@@ -486,8 +486,8 @@ class DynamicContentController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var DynamicContentModel $model */
             $model  = $this->getModel('dynamicContent');
+            \assert($model instanceof DynamicContentModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -546,9 +546,9 @@ class DynamicContentController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var DynamicContentModel $model */
             $model = $this->getModel('dynamicContent');
-            $ids   = json_decode($this->request->query->get('ids', '{}'));
+            \assert($model instanceof DynamicContentModel);
+            $ids = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 

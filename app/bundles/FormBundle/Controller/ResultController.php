@@ -306,8 +306,8 @@ class ResultController extends CommonFormController
         $flashes  = [];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var SubmissionModel $model */
             $model = $this->getModel('form.submission');
+            \assert($model instanceof SubmissionModel);
 
             // Find the result
             $entity = $model->getEntity($objectId);

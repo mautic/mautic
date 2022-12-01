@@ -359,8 +359,8 @@ class TriggerController extends FormController
 
                         //delete entities
                         if (count($deletedEvents)) {
-                            /** @var TriggerEventModel $triggerEventModel */
                             $triggerEventModel = $this->getModel('point.triggerevent');
+                            \assert($triggerEventModel instanceof TriggerEventModel);
                             $triggerEventModel->deleteEntities($deletedEvents);
                         }
 
@@ -492,8 +492,8 @@ class TriggerController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var TriggerModel $model */
-            $model  = $this->getModel('point.trigger');
+            $model = $this->getModel('point.trigger');
+            \assert($model instanceof TriggerModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -550,8 +550,8 @@ class TriggerController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var TriggerModel $model */
-            $model     = $this->getModel('point.trigger');
+            $model = $this->getModel('point.trigger');
+            \assert($model instanceof TriggerModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 

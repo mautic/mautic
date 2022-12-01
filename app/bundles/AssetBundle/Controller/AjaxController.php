@@ -20,8 +20,8 @@ class AjaxController extends CommonAjaxController
      */
     protected function categoryListAction(Request $request)
     {
-        /** @var AssetModel $assetModel */
         $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
         $filter     = InputHelper::clean($request->query->get('filter'));
         $results    = $assetModel->getLookupResults('category', $filter, 10);
         $dataArray  = [];

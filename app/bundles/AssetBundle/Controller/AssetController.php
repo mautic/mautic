@@ -19,8 +19,8 @@ class AssetController extends FormController
      */
     public function indexAction($page = 1)
     {
-        /** @var AssetModel $assetModel */
         $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted([
@@ -131,8 +131,8 @@ class AssetController extends FormController
      */
     public function viewAction($objectId)
     {
-        /** @var AssetModel $model */
         $model       = $this->getModel('asset');
+        \assert($model instanceof AssetModel);
         $security    = $this->get('mautic.security');
         $activeAsset = $model->getEntity($objectId);
 
@@ -171,8 +171,8 @@ class AssetController extends FormController
         }
 
         // Audit Log
-        /** @var AuditLogModel $auditLogModel */
         $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
         $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         $templ = $this->request->get('templ') ?? 'twig';

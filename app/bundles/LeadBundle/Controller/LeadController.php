@@ -152,9 +152,9 @@ class LeadController extends FormController
             $listArgs['filter']['force'] = " $mine";
         }
 
-        /** @var ListModel $leadListModel */
         $leadListModel = $this->getModel('lead.list');
-        $lists         = $leadListModel->getUserLists();
+        \assert($leadListModel instanceof ListModel);
+        $lists = $leadListModel->getUserLists();
 
         //check to see if in a single list
         $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
@@ -176,8 +176,8 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $leadDNCModel */
-        $leadDNCModel  = $this->getModel('lead.dnc');
+        $leadDNCModel = $this->getModel('lead.dnc');
+        \assert($leadDNCModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
         $dncRepository = $leadDNCModel->getDncRepo();
 
         return $this->delegateView(
@@ -341,8 +341,8 @@ class LeadController extends FormController
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
 
-        /** @var CompanyModel $companyModel * */
-        $companyModel  = $this->getModel('lead.company');
+        $companyModel = $this->getModel('lead.company');
+        \assert($companyModel instanceof CompanyModel);
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
@@ -368,11 +368,11 @@ class LeadController extends FormController
 
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
-        /** @var ListModel $model */
         $model = $this->getModel('lead.list');
-        $lists = $model->getRepository()->getLeadLists([$lead], true, true);
-        /** @var NoteModel $leadNoteModel */
+        \assert($model instanceof ListModel);
+        $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
         $leadNoteModel = $this->getModel('lead.note');
+        \assert($leadNoteModel instanceof NoteModel);
 
         return $this->delegateView(
             [
@@ -435,12 +435,12 @@ class LeadController extends FormController
         }
 
         //set the page we came from
-        $page   = $this->get('session')->get('mautic.lead.page', 1);
-        $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        /** @var FieldModel $leadFieldModel */
+        $page           = $this->get('session')->get('mautic.lead.page', 1);
+        $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
         $leadFieldModel = $this->getModel('lead.field');
-        $fields         = $leadFieldModel->getPublishedFieldArrays('lead');
-        $form           = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
         if (Request::METHOD_POST === $this->request->getMethod()) {
@@ -641,11 +641,11 @@ class LeadController extends FormController
             return $this->isLocked($postActionVars, $lead, 'lead.lead');
         }
 
-        $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        /** @var FieldModel $leadFieldModel */
+        $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $leadFieldModel = $this->getModel('lead.field');
-        $fields         = $leadFieldModel->getPublishedFieldArrays('lead');
-        $form           = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
+        $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
         if (!$ignorePost && 'POST' == $this->request->getMethod()) {
@@ -1078,8 +1078,8 @@ class LeadController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var LeadModel $model */
-            $model  = $this->getModel('lead.lead');
+            $model = $this->getModel('lead.lead');
+            \assert($model instanceof LeadModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1144,8 +1144,8 @@ class LeadController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var LeadModel $model */
-            $model     = $this->getModel('lead');
+            $model = $this->getModel('lead');
+            \assert($model instanceof LeadModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -1259,9 +1259,9 @@ class LeadController extends FormController
                 $lead->getOwner()
             )
         ) {
-            /** @var CompanyModel $companyModel */
             $companyModel = $this->getModel('lead.company');
-            $companies    = $companyModel->getUserCompanies();
+            \assert($companyModel instanceof CompanyModel);
+            $companies = $companyModel->getUserCompanies();
 
             // Get a list of lists for the lead
             $companyLeads = $lead->getCompanies();
@@ -1896,10 +1896,10 @@ class LeadController extends FormController
                 ]
             );
         } else {
-            /** @var UserModel $userModel */
             $userModel = $this->getModel('user.user');
-            $users     = $userModel->getRepository()->getUserList('', 0);
-            $items     = [];
+            \assert($userModel instanceof UserModel);
+            $users = $userModel->getRepository()->getUserList('', 0);
+            $items = [];
             foreach ($users as $user) {
                 $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
             }

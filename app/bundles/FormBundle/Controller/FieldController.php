@@ -104,9 +104,9 @@ class FieldController extends CommonFormController
                     }
 
                     // Generate or ensure a unique alias
-                    $alias              = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
-                    /** @var FieldModel $formFieldModel */
-                    $formFieldModel     = $this->getModel('form.field');
+                    $alias          = empty($formField['alias']) ? $formField['label'] : $formField['alias'];
+                    $formFieldModel = $this->getModel('form.field');
+                    \assert($formFieldModel instanceof FieldModel);
                     $formField['alias'] = $formFieldModel->generateAlias($alias, $aliases);
 
                     // Force required for captcha if not a honeypot
@@ -167,8 +167,8 @@ class FieldController extends CommonFormController
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
             $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.php';
-            /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
             $leadFieldModel               = $this->getModel('lead.field');
+            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
@@ -320,8 +320,8 @@ class FieldController extends CommonFormController
             $blank     = $entity->convertToArray();
             $formField = array_merge($blank, $formField);
 
-            /** @var \Mautic\LeadBundle\Model\FieldModel $leadFieldModel */
-            $leadFieldModel               = $this->getModel('lead.field');
+            $leadFieldModel = $this->getModel('lead.field');
+            \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
                 'MauticFormBundle:Builder:fieldwrapper.html.php',
                 [
@@ -418,14 +418,14 @@ class FieldController extends CommonFormController
     private function getFieldForm($formId, array $formField)
     {
         //fire the form builder event
-        /** @var FormModel $formModel */
-        $formModel        = $this->getModel('form.form');
+        $formModel = $this->getModel('form.form');
+        \assert($formModel instanceof FormModel);
         $customComponents = $formModel->getCustomComponents();
         $customParams     = (isset($customComponents['fields'][$formField['type']])) ? $customComponents['fields'][$formField['type']] : false;
 
-        /** @var FieldModel $formFieldModel */
         $formFieldModel = $this->getModel('form.field');
-        $form           = $formFieldModel->createForm(
+        \assert($formFieldModel instanceof FieldModel);
+        $form = $formFieldModel->createForm(
             $formField,
             $this->get('form.factory'),
             (!empty($formField['id'])) ?

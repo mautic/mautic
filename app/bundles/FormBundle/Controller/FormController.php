@@ -183,17 +183,17 @@ class FormController extends CommonFormController
         );
 
         // Audit Log
-        /** @var AuditLogModel $auditLogModel */
         $auditLogModel = $this->getModel('core.auditlog');
-        $logs          = $auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        /** @var SubmissionModel $formSubmissionModel */
         $formSubmissionModel = $this->getModel('form.submission');
+        \assert($formSubmissionModel instanceof SubmissionModel);
         // Submission stats per time period
         $timeStats = $formSubmissionModel->getSubmissionsLineChartData(
             null,
@@ -427,8 +427,8 @@ class FormController extends CommonFormController
         /** @var FormFieldHelper $fieldHelper */
         $fieldHelper = $this->get('mautic.helper.form.field_helper');
 
-        /** @var FieldModel $leadFieldModel */
         $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
 
         return $this->delegateView(
             [
@@ -815,8 +815,8 @@ class FormController extends CommonFormController
             $deletedActions = [];
         }
 
-        /** @var FieldModel $leadFieldModel */
         $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
 
         return $this->delegateView(
             [
@@ -1009,8 +1009,8 @@ class FormController extends CommonFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var FormModel $model */
-            $model  = $this->getModel('form.form');
+            $model = $this->getModel('form.form');
+            \assert($model instanceof FormModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1075,8 +1075,8 @@ class FormController extends CommonFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var FormModel $model */
-            $model     = $this->getModel('form');
+            $model = $this->getModel('form');
+            \assert($model instanceof FormModel);
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = [];
 

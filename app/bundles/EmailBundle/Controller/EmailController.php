@@ -108,8 +108,8 @@ class EmailController extends FormController
         }
 
         //retrieve a list of Lead Lists
-        /** @var ListModel $leadListModel */
-        $leadListModel                                                = $this->getModel('lead.list');
+        $leadListModel = $this->getModel('lead.list');
+        \assert($leadListModel instanceof ListModel);
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
             'options' => $leadListModel->getUserLists(),
             'prefix'  => 'list',
@@ -370,9 +370,9 @@ class EmailController extends FormController
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Audit Log
-        /** @var AuditLogModel $auditLog */
         $auditLog = $this->getModel('core.auditlog');
-        $logs     = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
+        \assert($auditLog instanceof AuditLogModel);
+        $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
@@ -450,8 +450,8 @@ class EmailController extends FormController
      */
     public function newAction($entity = null)
     {
-        /** @var EmailModel $model */
         $model = $this->getModel('email');
+        \assert($model instanceof EmailModel);
 
         if (!($entity instanceof Email)) {
             /** @var \Mautic\EmailBundle\Entity\Email $entity */
@@ -769,9 +769,9 @@ class EmailController extends FormController
             }
         }
 
-        $assets         = $form['assetAttachments']->getData();
-        /** @var AssetModel $assetModel */
-        $assetModel     = $this->getModel('asset');
+        $assets     = $form['assetAttachments']->getData();
+        $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
         $attachmentSize = $assetModel->getTotalFilesize($assets);
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
@@ -885,8 +885,8 @@ class EmailController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var EmailModel $model */
-            $model  = $this->getModel('email');
+            $model = $this->getModel('email');
+            \assert($model instanceof EmailModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1061,8 +1061,8 @@ class EmailController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var EmailModel $model */
-            $model  = $this->getModel('email');
+            $model = $this->getModel('email');
+            \assert($model instanceof EmailModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1277,9 +1277,9 @@ class EmailController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var EmailModel $model */
             $model = $this->getModel('email');
-            $ids   = json_decode($this->request->query->get('ids', '{}'));
+            \assert($model instanceof EmailModel);
+            $ids = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
@@ -1337,8 +1337,8 @@ class EmailController extends FormController
      */
     public function sendExampleAction($objectId)
     {
-        /** @var EmailModel $model */
-        $model  = $this->getModel('email');
+        $model = $this->getModel('email');
+        \assert($model instanceof EmailModel);
         /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 

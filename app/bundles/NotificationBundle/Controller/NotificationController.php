@@ -191,9 +191,9 @@ class NotificationController extends AbstractFormController
         }
 
         // Audit Log
-        /** @var AuditLogModel $auditLog */
         $auditLog = $this->getModel('core.auditlog');
-        $logs     = $auditLog->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
+        \assert($auditLog instanceof AuditLogModel);
+        $logs = $auditLog->getLogForObject('notification', $notification->getId(), $notification->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
@@ -604,8 +604,8 @@ class NotificationController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var NotificationModel $model */
-            $model  = $this->getModel('notification');
+            $model = $this->getModel('notification');
+            \assert($model instanceof NotificationModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -669,9 +669,9 @@ class NotificationController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var NotificationModel $model */
             $model = $this->getModel('notification');
-            $ids   = json_decode($this->request->query->get('ids', '{}'));
+            \assert($model instanceof NotificationModel);
+            $ids = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 

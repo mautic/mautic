@@ -108,8 +108,8 @@ class ClientController extends FormController
      */
     public function authorizedClientsAction()
     {
-        /** @var ClientModel $apiClientModel */
         $apiClientModel = $this->getModel('api.client');
+        \assert($apiClientModel instanceof ClientModel);
         $me             = $this->get('security.token_storage')->getToken()->getUser();
         $clients        = $apiClientModel->getUserClients($me);
 

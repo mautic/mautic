@@ -36,9 +36,9 @@ class RoleController extends FormController
         $orderByDir = $this->get('session')->get('mautic.role.orderbydir', 'ASC');
         $filter     = $this->request->get('search', $this->get('session')->get('mautic.role.filter', ''));
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        /** @var RoleModel $model */
         $model      = $this->getModel('user.role');
-        $items      = $model->getEntities(
+        \assert($model instanceof RoleModel);
+        $items = $model->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -113,8 +113,8 @@ class RoleController extends FormController
 
         //retrieve the entity
         $entity = new Entity\Role();
-        /** @var RoleModel $model */
         $model  = $this->getModel('user.role');
+        \assert($model instanceof RoleModel);
 
         //set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_role_index');
@@ -376,8 +376,8 @@ class RoleController extends FormController
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
             try {
-                /** @var RoleModel $model */
-                $model  = $this->getModel('user.role');
+                $model = $this->getModel('user.role');
+                \assert($model instanceof RoleModel);
                 $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
@@ -438,7 +438,8 @@ class RoleController extends FormController
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
             /** @var RoleModel $model */
-            $model       = $this->getModel('user.role');
+            $model = $this->getModel('user.role');
+            \assert($model instanceof RoleModel);
             $ids         = json_decode($this->request->query->get('ids', ''));
             $deleteIds   = [];
 

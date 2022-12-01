@@ -47,9 +47,9 @@ class StageController extends AbstractFormController
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.stage.orderby', 's.name');
         $orderByDir = $this->get('session')->get('mautic.stage.orderbydir', 'ASC');
-        /** @var StageModel $stageModel */
         $stageModel = $this->getModel('stage');
-        $stages     = $stageModel->getEntities(
+        \assert($stageModel instanceof StageModel);
+        $stages = $stageModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -115,8 +115,8 @@ class StageController extends AbstractFormController
      */
     public function newAction($entity = null)
     {
-        /** @var StageModel $model */
         $model = $this->getModel('stage');
+        \assert($model instanceof StageModel);
 
         if (!($entity instanceof Stage)) {
             /** @var \Mautic\StageBundle\Entity\Stage $entity */
@@ -236,8 +236,8 @@ class StageController extends AbstractFormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        /** @var StageModel $model */
-        $model  = $this->getModel('stage');
+        $model = $this->getModel('stage');
+        \assert($model instanceof StageModel);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -425,8 +425,8 @@ class StageController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var StageModel $model */
-            $model  = $this->getModel('stage');
+            $model = $this->getModel('stage');
+            \assert($model instanceof StageModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -486,8 +486,8 @@ class StageController extends AbstractFormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            /** @var StageModel $model */
-            $model     = $this->getModel('stage');
+            $model = $this->getModel('stage');
+            \assert($model instanceof StageModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
