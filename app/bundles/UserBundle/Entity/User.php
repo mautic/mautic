@@ -39,10 +39,8 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
 
     /**
      * Used for generate automatic password to user.
-     *
-     * @var string
      */
-    private $automaticPassword;
+    private string $automaticPassword = '';
 
     /**
      * Used for updating account.
