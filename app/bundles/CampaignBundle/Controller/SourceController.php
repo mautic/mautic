@@ -83,7 +83,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['sourceHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.php',
+                    'MauticCampaignBundle:Source:index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -105,7 +105,7 @@ class SourceController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -188,7 +188,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['updateHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.php',
+                    'MauticCampaignBundle:Source:index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -211,7 +211,7 @@ class SourceController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]

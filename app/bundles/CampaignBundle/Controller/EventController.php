@@ -120,7 +120,7 @@ class EventController extends CommonFormController
                 $formThemes[] = $event['settings']['formTheme'];
             }
 
-            $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);
+            $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes); // @ticket TPROD-308
             $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
             $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
                 $event['settings']['description']
@@ -141,7 +141,7 @@ class EventController extends CommonFormController
             $blank  = $entity->convertToArray();
             $event  = array_merge($blank, $event);
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
+            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.twig'
                 : $event['settings']['template'];
 
             $passthroughVars['event']     = $event;
@@ -198,7 +198,7 @@ class EventController extends CommonFormController
         } else {
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
+                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -329,14 +329,14 @@ class EventController extends CommonFormController
             }
 
             $viewParams = array_merge($viewParams, [
-                'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes),
+                'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes), // @ticket TPROD-308
                 'eventHeader'      => $event['settings']['label'],
                 'eventDescription' => $event['settings']['description'],
             ]);
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
+                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -348,7 +348,7 @@ class EventController extends CommonFormController
             $event    = array_merge((new Event())->convertToArray(), $event);
             $template = isset($event['settings']['template'])
                 ? $event['settings']['template']
-                : 'MauticCampaignBundle:Event:generic.html.php';
+                : 'MauticCampaignBundle:Event:generic.html.twig';
 
             $passthroughVars = array_merge($passthroughVars, [
                 'event'      => $event,
@@ -517,7 +517,7 @@ class EventController extends CommonFormController
                 $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
             }
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
+            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.twig'
                 : $event['settings']['template'];
 
             //prevent undefined errors
