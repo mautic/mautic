@@ -18,10 +18,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($user->isGuest());
     }
 
-    /**
-     * @return void
-     */
-    public function testSetAutomaticPassword()
+    public function testSetAutomaticPassword(): void
     {
         $user = new User();
         $user->setAutomaticPassword('1');
