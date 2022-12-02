@@ -363,12 +363,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         return $this->plainPassword;
     }
 
-    /**
-     * Get automatic password.
-     *
-     * @return string
-     */
-    public function getAutomaticPassword()
+    public function getAutomaticPassword(): string
     {
         return $this->automaticPassword;
     }
@@ -490,14 +485,7 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
         return $this;
     }
 
-    /**
-     * Set automatic password.
-     *
-     * @param string $automaticPassword
-     *
-     * @return User
-     */
-    public function setAutomaticPassword($automaticPassword)
+    public function setAutomaticPassword(string $automaticPassword): self
     {
         $this->automaticPassword = $automaticPassword;
 
