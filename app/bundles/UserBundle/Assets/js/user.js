@@ -9,12 +9,7 @@ Mautic.userOnLoad = function (container) {
             Mautic.activateSearchAutocomplete('list-search', 'user.user');
         }
     }
-    if(mQuery("#user_automaticPassword_1").prop('checked')) {
-        const randomPassword = Math.random().toString(36).slice(-8);
-        mQuery("#user_plainPassword #user_plainPassword_password").val(randomPassword);
-        mQuery("#user_plainPassword #user_plainPassword_confirm").val(randomPassword);
-        mQuery("#user_plainPassword").toggleClass("hide");
-    }
+    Mautic.togglePasswordInput();
 };
 
 Mautic.roleOnLoad = function (container, response) {
