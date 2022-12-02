@@ -11,25 +11,16 @@ class RestrictionHelper
     public const MODE_REMOVE = 'remove';
     public const MODE_MASK   = 'mask';
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $restrictedFields;
+    private array $restrictedFields;
 
-    /**
-     * @var string
-     */
-    private $displayMode;
+    private string $displayMode;
 
-    /**
-     * RestrictionHelper constructor.
-     */
-    public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
+    public function __construct(TranslatorInterface $translator, array $restrictedFields, string $mode)
     {
         $this->translator       = $translator;
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);

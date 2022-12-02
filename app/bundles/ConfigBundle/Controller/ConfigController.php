@@ -6,6 +6,7 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
+use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -34,7 +35,10 @@ class ConfigController extends FormController
         $fileFields      = $event->getFileFields();
         $formThemes      = $event->getFormThemes();
         $temporaryFields = $event->getTemporaryFields();
-        $formConfigs     = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
+
+        $configMapper = $this->get(ConfigMapper::class);
+        \assert($configMapper instanceof ConfigMapper);
+        $formConfigs = $configMapper->bindFormConfigsWithRealValues($event->getForms());
 
         $this->mergeParamsWithLocal($formConfigs, $temporaryFields);
 

@@ -8,26 +8,23 @@ use Symfony\Contracts\EventDispatcher\Event;
 class ConfigBuilderEvent extends Event
 {
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $forms = [];
+    private array $forms = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $formThemes = [
+    private array $formThemes = [
         'MauticConfigBundle:FormTheme',
     ];
 
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    private BundleHelper $bundleHelper;
 
     /**
-     * @var array
+     * @var string[]
      */
-    protected $encodedFields = [];
+    protected array $encodedFields = [];
 
     /**
      * @var array<string> Array of field names which are not exist in local.php but are needed for generation other field
