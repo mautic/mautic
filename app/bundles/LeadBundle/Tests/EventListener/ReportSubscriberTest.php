@@ -388,7 +388,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider eventDataProvider
      */
-    public function testOnReportBuilder($event)
+    public function testOnReportBuilder(string $event):void
     {
         if ('companies' != $event) {
             $this->fieldsBuilderMock->expects($this->once())
