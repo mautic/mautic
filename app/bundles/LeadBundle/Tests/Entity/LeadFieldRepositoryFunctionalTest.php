@@ -170,7 +170,6 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         \assert($contactModel instanceof LeadModel);
 
         $contactModel->saveEntity($lead);
-
         $repository = $fieldModel->getRepository();
 
         $this->assertTrue($repository->compareValue(1, 'colors', ['green', 'blue'], 'in'));
