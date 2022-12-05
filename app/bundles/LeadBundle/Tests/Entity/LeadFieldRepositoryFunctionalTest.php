@@ -4,9 +4,14 @@ namespace Mautic\LeadBundle\Tests\Entity;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\LeadBundle\Model\LeadModel;
 
 class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement([
@@ -129,5 +134,46 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($repository->compareValue(1, 'country', ['Australia', 'Poland'], 'notIn'));
         $this->assertFalse($repository->compareValue(1, 'country', ['United Kingdom'], 'notIn'));
+    }
+
+    public function testCompareValueInOperatorWithMultiselectField(): void
+    {
+        $field = new LeadField();
+        $field->setType('multiselect');
+        $field->setObject('lead');
+        $field->setAlias('colors');
+        $field->setName('Colors');
+        $field->setProperties(
+            [
+                'list' => [
+                    [
+                        'label' => 'Red',
+                        'value' => 'red',
+                    ], [
+                        'label' => 'Green',
+                        'value' => 'green',
+                    ], [
+                        'label' => 'Blue',
+                        'value' => 'blue',
+                    ],
+                ],
+            ]
+        );
+
+        $fieldModel = self::$container->get(FieldModel::class);
+        \assert($fieldModel instanceof FieldModel);
+        $fieldModel->saveEntity($field);
+
+        $lead = new Lead();
+        $lead->addUpdatedField('colors', 'green|blue');
+        $contactModel = self::$container->get(LeadModel::class);
+        \assert($contactModel instanceof LeadModel);
+
+        $contactModel->saveEntity($lead);
+
+        $repository = $fieldModel->getRepository();
+
+        $this->assertTrue($repository->compareValue(1, 'colors', ['green', 'blue'], 'in'));
+        $this->assertFalse($repository->compareValue(1, 'colors', ['red', 'green'], 'in'));
     }
 }

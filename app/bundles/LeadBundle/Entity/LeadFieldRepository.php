@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 class LeadFieldRepository extends CommonRepository
 {
@@ -232,17 +233,44 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $property = $this->getPropertyByField($field, $q);
-                $values   = (!is_array($value)) ? [$value] : $value;
+                $property  = $this->getPropertyByField($field, $q);
+                $fieldType = $this->findOneBy(['alias' => $field])->getType();
+                $values    = (!is_array($value)) ? [$value] : $value;
 
-                $expr = $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead'),
-                    ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
-                );
+                if ('multiselect' == $fieldType) {
+                    // multiselect field values are separated by `|` and must be queried using regexp
+                    $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
 
-                $q->where($expr)
-                    ->setParameter('lead', (int) $lead)
-                    ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
+                    $expr = $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead')
+                    );
+
+                    // require all multiselect values in condition
+                    $andExpr = $q->expr()->andX();
+                    foreach ($value as $v) {
+                        $v = $q->expr()->literal(
+                            InputHelper::clean($v)
+                        );
+
+                        $v = trim($v, "'");
+                        $andExpr->add(
+                            $property." $operator '\\\\|?$v\\\\|?'"
+                        );
+                    }
+                    $expr->add($andExpr);
+
+                    $q->where($expr)
+                        ->setParameter('lead', (int) $lead);
+                } else {
+                    $expr = $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
+                    );
+
+                    $q->where($expr)
+                        ->setParameter('lead', (int) $lead)
+                        ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
+                }
             } else {
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
