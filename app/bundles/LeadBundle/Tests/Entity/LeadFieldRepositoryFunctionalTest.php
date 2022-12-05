@@ -12,13 +12,6 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
-    protected function beforeBeginTransaction(): void
-    {
-        $this->resetAutoincrement([
-            'leads',
-        ]);
-    }
-
     public function testCompareValueEqualsOperator(): void
     {
         $lead = new Lead();
@@ -28,8 +21,8 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'firstname', 'John', 'eq'));
-        $this->assertFalse($repository->compareValue(1, 'firstname', 'Jack', 'eq'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'firstname', 'John', 'eq'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'firstname', 'Jack', 'eq'));
     }
 
     public function testCompareValueNotEqualsOperator(): void
@@ -41,73 +34,73 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'firstname', 'Annie', 'neq'));
-        $this->assertFalse($repository->compareValue(1, 'firstname', 'Ada', 'neq'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'firstname', 'Annie', 'neq'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'firstname', 'Ada', 'neq'));
     }
 
     public function testCompareValueEmptyOperator(): void
     {
         $lead = new Lead();
-        $this->em->persist($lead);
         $lead->setFirstname('Ada');
+        $this->em->persist($lead);
         $this->em->flush();
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'lastname', null, 'empty'));
-        $this->assertFalse($repository->compareValue(1, 'firstname', null, 'empty'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'lastname', null, 'empty'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'firstname', null, 'empty'));
     }
 
     public function testCompareValueNotEmptyOperator(): void
     {
         $lead = new Lead();
-        $this->em->persist($lead);
         $lead->setFirstname('Ada');
+        $this->em->persist($lead);
         $this->em->flush();
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'firstname', null, 'notEmpty'));
-        $this->assertFalse($repository->compareValue(1, 'lastname', null, 'notEmpty'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'firstname', null, 'notEmpty'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'lastname', null, 'notEmpty'));
     }
 
     public function testCompareValueStartsWithOperator(): void
     {
         $lead = new Lead();
-        $this->em->persist($lead);
         $lead->setEmail('MaryWNevarez@armyspy.com');
+        $this->em->persist($lead);
         $this->em->flush();
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'email', 'Mary', 'startsWith'));
-        $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'startsWith'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'email', 'Mary', 'startsWith'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'startsWith'));
     }
 
     public function testCompareValueEndWithOperator(): void
     {
         $lead = new Lead();
-        $this->em->persist($lead);
         $lead->setEmail('MaryWNevarez@armyspy.com');
+        $this->em->persist($lead);
         $this->em->flush();
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'email', 'armyspy.com', 'endsWith'));
-        $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'endsWith'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'email', 'armyspy.com', 'endsWith'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'endsWith'));
     }
 
     public function testCompareValueContainsOperator(): void
     {
         $lead = new Lead();
-        $this->em->persist($lead);
         $lead->setEmail('MaryWNevarez@armyspy.com');
+        $this->em->persist($lead);
         $this->em->flush();
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'email', 'Nevarez', 'contains'));
-        $this->assertFalse($repository->compareValue(1, 'email', 'Unicorn', 'contains'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'email', 'Nevarez', 'contains'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'email', 'Unicorn', 'contains'));
     }
 
     public function testCompareValueInOperator(): void
@@ -119,8 +112,8 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'country', ['United Kingdom', 'South Africa'], 'in'));
-        $this->assertFalse($repository->compareValue(1, 'country', ['Poland', 'Canada'], 'in'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'country', ['United Kingdom', 'South Africa'], 'in'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'country', ['Poland', 'Canada'], 'in'));
     }
 
     public function testCompareValueNotInOperator(): void
@@ -132,8 +125,8 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
 
         $repository = $this->getContainer()->get('mautic.lead.model.field')->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'country', ['Australia', 'Poland'], 'notIn'));
-        $this->assertFalse($repository->compareValue(1, 'country', ['United Kingdom'], 'notIn'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'country', ['Australia', 'Poland'], 'notIn'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'country', ['United Kingdom'], 'notIn'));
     }
 
     public function testCompareValueInOperatorWithMultiselectField(): void
@@ -172,7 +165,7 @@ class LeadFieldRepositoryFunctionalTest extends MauticMysqlTestCase
         $contactModel->saveEntity($lead);
         $repository = $fieldModel->getRepository();
 
-        $this->assertTrue($repository->compareValue(1, 'colors', ['green', 'blue'], 'in'));
-        $this->assertFalse($repository->compareValue(1, 'colors', ['red', 'green'], 'in'));
+        $this->assertTrue($repository->compareValue($lead->getId(), 'colors', ['green', 'blue'], 'in'));
+        $this->assertFalse($repository->compareValue($lead->getId(), 'colors', ['red', 'green'], 'in'));
     }
 }
