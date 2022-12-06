@@ -34,6 +34,11 @@ class LeadController extends FormController
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
 
+    public function __construct(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+    }
+
     /**
      * @param int $page
      *
@@ -176,9 +181,7 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        $leadDNCModel = $this->getModel('lead.dnc');
-        \assert($leadDNCModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
-        $dncRepository = $leadDNCModel->getDncRepo();
+        $dncRepository = $this->doNotContactModel->getDncRepo();
 
         return $this->delegateView(
             [

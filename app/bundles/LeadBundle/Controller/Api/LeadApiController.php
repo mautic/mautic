@@ -36,6 +36,11 @@ class LeadApiController extends CommonApiController
      */
     protected $model = null;
 
+    public function __construct(DoNotContactModel $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+    }
+
     public function initialize(ControllerEvent $event)
     {
         $leadModel = $this->getModel(self::MODEL_ID);
@@ -426,7 +431,7 @@ class LeadApiController extends CommonApiController
 
         $comments = InputHelper::clean($this->request->request->get('comments'));
 
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+        /** @var DoNotContactModel $doNotContact */
         $doNotContact = $this->get('mautic.lead.model.dnc');
         $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
@@ -444,7 +449,7 @@ class LeadApiController extends CommonApiController
      */
     public function removeDncAction($id, $channel)
     {
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+        /** @var DoNotContactModel $doNotContact */
         $doNotContact = $this->get('mautic.lead.model.dnc');
 
         $entity = $this->model->getEntity((int) $id);

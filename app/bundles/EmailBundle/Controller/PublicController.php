@@ -29,6 +29,11 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
+    public function __construct(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+    }
+
     /**
      * @param $idHash
      *
