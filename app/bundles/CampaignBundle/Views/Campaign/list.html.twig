@@ -1,26 +1,42 @@
-{% set isIndex = tmpl == 'index' ? true : false %}
+{% extends (app.request.isXmlHttpRequest) ? 'MauticCoreBundle:Default:raw_output.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %}
 
-{# @todo #}
-{#% extends isIndex ? 'MauticCoreBundle:Standard:index.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %#}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
-
-{% block headerTitle %}{% trans %}mautic.campaign.campaigns{% endtrans %}{% endblock %}
+{% block headerTitle %}{{ 'mautic.campaign.campaigns'|trans }}{% endblock %}
 
 {% block actions %}
+  {% if false == app.request.isXmlHttpRequest %}
 	{{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
          'templateButtons': {
-                'new': permissions['campaign:campaigns:create'],
+            'new': permissions['campaign:campaigns:create'],
          },
             'routeBase': 'campaign',
             'langVar': 'campaign.campaigns',
     }) -}}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
+  {% if false == app.request.isXmlHttpRequest %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': searchHelp|default(null),
+                'action': currentRoute,
+                'actionRoute': actionRoute,
+                'indexRoute': indexRoute,
+                'translationBase': translationBase,
+                'preCustomButtons': toolBarButtons|default(null),
+                'templateButtons': {
+                    'delete': permissions[permissionBase~':delete'],
+                },
+                'filters': filters|default([]),
+        }) -}}
+        <div class="page-list">
+            {{- customContent('content.above', mauticTemplateVars|default({})) -}}
+  {% endif %}
   {% if items|length > 0 %}
     <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
-            <thead>
+          <thead>
             <tr>
               {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
                   'checkall': 'true',
@@ -74,8 +90,8 @@
                   'class': 'visible-md visible-lg col-campaign-id',
               }) -}}
             </tr>
-            </thead>
-            <tbody>
+          </thead>
+          <tbody>
             {% for item in items %}
                 {% set mauticTemplateVars = {'item': item} %}
                 <tr>
@@ -146,5 +162,11 @@
     </div>
   {% else %}
     {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'tip' : 'mautic.campaign.noresults.tip'}) -}}
+  {% endif %}
+
+  {% if false == app.request.isXmlHttpRequest %}
+            {{- customContent('content.below', mauticTemplateVars|default({})) -}}
+        </div>
+    </div>
   {% endif %}
 {% endblock %}
