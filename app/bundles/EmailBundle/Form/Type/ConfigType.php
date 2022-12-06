@@ -651,6 +651,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'add_mass_mailing_header',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.add_mass_mailing_header',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.add_mass_mailing_header.tooltip',
+                ],
+                'data'       => !empty($options['data']['add_mass_mailing_header']),
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_spool_path',
             TextType::class,
             [

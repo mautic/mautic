@@ -88,6 +88,7 @@ $template  = '<div class="col-md-6">{content}</div>';
 
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'add_mass_mailing_header', $template); ?>
             </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>

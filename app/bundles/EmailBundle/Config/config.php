@@ -718,5 +718,6 @@ return [
         'theme_email_default'                 => 'blank',
         'mailer_sparkpost_region'             => 'us',
         'mailer_memory_msg_limit'             => 100,
+        'add_mass_mailing_header'             => true,
     ],
 ];

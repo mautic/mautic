@@ -1506,8 +1506,10 @@ class MailHelper
         $headers = array_merge($this->headers, $this->getSystemHeaders());
 
         // Personal and transactional emails do not contain unsubscribe header
-        $email = $this->getEmail();
-        if (empty($email) || 'template' === $email->getEmailType()) {
+        $email                = $this->getEmail();
+        $emailType            = $email->getEmailType();
+        $addUnsubscribeHeader = $this->factory->getParameter('add_mass_mailing_header');
+        if (empty($email) || ('template' === $emailType && !$addUnsubscribeHeader)) {
             return $headers;
         }
 
