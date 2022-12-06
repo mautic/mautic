@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Entity;
 
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 
@@ -169,6 +170,25 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $parentField->method('getId')->willReturn($parentFieldId);
         $parentField->method('getAlias')->willReturn($parentFieldAlias);
         $data = [$parentFieldAlias => [0]];
+
+        $this->assertTrue($field->showForConditionalField($data));
+    }
+
+    public function testShowForConditionalFieldWithParentAndAliasAndInValueMatchesSpecialCharacters(): void
+    {
+        $parentFieldId    = '55';
+        $parentFieldAlias = 'field_a';
+        $field            = new Field();
+        $parentField      = $this->createMock(Field::class);
+        $form             = new Form();
+        $form->addField(0, $parentField);
+        $field->setForm($form);
+        $field->setParent($parentFieldId);
+        $specialValue = 'čé+äà>&"\'è';
+        $field->setConditions(['expr' => 'in', 'values' => [InputHelper::clean($specialValue)]]);
+        $parentField->method('getId')->willReturn($parentFieldId);
+        $parentField->method('getAlias')->willReturn($parentFieldAlias);
+        $data = [$parentFieldAlias => [$specialValue]];
 
         $this->assertTrue($field->showForConditionalField($data));
     }

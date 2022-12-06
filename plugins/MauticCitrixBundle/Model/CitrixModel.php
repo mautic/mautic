@@ -14,9 +14,6 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * Class CitrixModel.
- */
 class CitrixModel extends FormModel
 {
     /**
@@ -29,9 +26,6 @@ class CitrixModel extends FormModel
      */
     protected $eventModel;
 
-    /**
-     * CitrixModel constructor.
-     */
     public function __construct(LeadModel $leadModel, EventModel $eventModel)
     {
         $this->leadModel  = $leadModel;
@@ -236,12 +230,12 @@ class CitrixModel extends FormModel
     }
 
     /**
-     * @param      $product
-     * @param      $productId
-     * @param      $eventName
-     * @param      $eventDesc
-     * @param int  $count
-     * @param null $output
+     * @param mixed                $product
+     * @param mixed                $productId
+     * @param mixed                $eventName
+     * @param mixed                $eventDesc
+     * @param int                  $count
+     * @param OutputInterface|null $output
      */
     public function syncEvent($product, $productId, $eventName, $eventDesc, &$count = 0, $output = null)
     {
@@ -397,7 +391,7 @@ class CitrixModel extends FormModel
             foreach ($newEntities as $entity) {
                 if ($this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_EVENT_UPDATE)) {
                     $citrixEvent = new CitrixEventUpdateEvent($product, $eventName, $eventDesc, $eventType, $entity->getLead());
-                    $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_EVENT_UPDATE, $citrixEvent);
+                    $this->dispatcher->dispatch($citrixEvent, CitrixEvents::ON_CITRIX_EVENT_UPDATE);
                     unset($citrixEvent);
                 }
             }

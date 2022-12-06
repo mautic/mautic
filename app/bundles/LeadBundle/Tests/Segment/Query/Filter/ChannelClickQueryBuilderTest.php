@@ -45,7 +45,6 @@ class ChannelClickQueryBuilderTest extends TestCase
 
     public function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->createMock(Connection::class);
@@ -71,10 +70,10 @@ class ChannelClickQueryBuilderTest extends TestCase
      */
     public function dataApplyQuery(): iterable
     {
-        yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
-        yield ['eq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
-        yield ['neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
-        yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
+        yield ['eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
+        yield ['eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
+        yield ['neq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
+        yield ['neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email))'];
     }
 
     /**
@@ -82,7 +81,8 @@ class ChannelClickQueryBuilderTest extends TestCase
      */
     public function testApplyQuery(string $operator, string $parameterValue, string $expectedQuery): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
+        $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
+        $queryBuilder  = new QueryBuilder($this->connectionMock);
         $queryBuilder->select('1');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
@@ -101,25 +101,25 @@ class ChannelClickQueryBuilderTest extends TestCase
      */
     public function dataApplyQueryWithBatchLimitersMinMaxBoth(): iterable
     {
-        yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
-        yield [['minId' => 1, 'maxId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
-        yield [['minId' => 1, 'maxId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
-        yield [['minId' => 1, 'maxId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'neq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
+        yield [['minId' => 1, 'maxId' => 1], 'neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id BETWEEN 1 and 1))'];
 
-        yield [['minId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
-        yield [['minId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
-        yield [['minId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
-        yield [['minId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
+        yield [['minId' => 1], 'eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
+        yield [['minId' => 1], 'eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
+        yield [['minId' => 1], 'neq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
+        yield [['minId' => 1], 'neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id >= 1))'];
 
-        yield [['maxId' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
-        yield [['maxId' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
-        yield [['maxId' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
-        yield [['maxId' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
+        yield [['maxId' => 1], 'eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
+        yield [['maxId' => 1], 'eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
+        yield [['maxId' => 1], 'neq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
+        yield [['maxId' => 1], 'neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id <= 1))'];
 
-        yield [['lead_id' => 1], 'eq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
-        yield [['lead_id' => 1], 'eq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
-        yield [['lead_id' => 1], 'neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
-        yield [['lead_id' => 1], 'neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT para1.lead_id FROM page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
+        yield [['lead_id' => 1], 'eq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
+        yield [['lead_id' => 1], 'eq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
+        yield [['lead_id' => 1], 'neq', '1', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id NOT IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
+        yield [['lead_id' => 1], 'neq', '0', 'SELECT 1 FROM __PREFIX__leads l WHERE l.id IN (SELECT para1.lead_id FROM __PREFIX__page_hits para1 WHERE (para1.redirect_id IS NOT NULL) AND (para1.lead_id IS NOT NULL) AND (para1.source = email) AND (para1.lead_id = 1))'];
     }
 
     /**
@@ -129,7 +129,8 @@ class ChannelClickQueryBuilderTest extends TestCase
      */
     public function testApplyQueryWithBatchLimitersMinMaxBoth(array $batchLimiters, string $operator, string $parameterValue, string $expectedQuery): void
     {
-        $queryBuilder = new QueryBuilder($this->connectionMock);
+        $expectedQuery = str_replace('__PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
+        $queryBuilder  = new QueryBuilder($this->connectionMock);
         $queryBuilder->select('1');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 

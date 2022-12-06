@@ -5,14 +5,14 @@ namespace Mautic\PointBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class TriggerApiController extends CommonApiController
 {
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->model            = $this->getModel('point.trigger');
         $this->entityClass      = 'Mautic\PointBundle\Entity\Trigger';
@@ -61,7 +61,7 @@ class TriggerApiController extends CommonApiController
                 $triggerEventForm = $this->createTriggerEventEntityForm($triggerEventEntity);
                 $triggerEventForm->submit($eventParams, 'PATCH' !== $method);
 
-                if (!$triggerEventForm->isValid()) {
+                if (!($triggerEventForm->isSubmitted() && $triggerEventForm->isValid())) {
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 

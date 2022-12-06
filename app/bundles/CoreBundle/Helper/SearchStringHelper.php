@@ -7,9 +7,9 @@ namespace Mautic\CoreBundle\Helper;
  */
 class SearchStringHelper
 {
-    const COMMAND_NEGATE  = 0;
-    const COMMAND_POSIT   = 1;
-    const COMMAND_NEUTRAL = 2;
+    public const COMMAND_NEGATE  = 0;
+    public const COMMAND_POSIT   = 1;
+    public const COMMAND_NEUTRAL = 2;
 
     /**
      * @var array
@@ -201,6 +201,12 @@ class SearchStringHelper
 
                     if ($c === $this->closingChars[$key] && $openingCount === $closingCount) {
                         //found the matching character (accounts for nesting)
+
+                        //does group have a negative?
+                        if (0 === strpos($string, '!')) {
+                            $filters->{$baseName}[$keyCount]->not = 1;
+                            $string                               = substr($string, 1);
+                        }
 
                         //remove wrapping grouping chars
                         if (0 === strpos($string, $char) && substr($string, -1) === $c) {

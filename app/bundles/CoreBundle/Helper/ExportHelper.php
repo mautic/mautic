@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -114,7 +115,7 @@ class ExportHelper
 
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $response->headers->set('Expires', 0);
+        $response->headers->set('Expires', '0');
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Pragma', 'public');
 
@@ -183,5 +184,18 @@ class ExportHelper
         }
 
         return $filePath;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function parseLeadToExport(Lead $lead): array
+    {
+        $leadExport = $lead->getProfileFields();
+
+        $stage               = $lead->getStage();
+        $leadExport['stage'] = $stage ? $stage->getName() : null;
+
+        return $leadExport;
     }
 }

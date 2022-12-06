@@ -11,15 +11,15 @@ return [
         'main'   => [
             'grapesjsbuilder_upload' => [
                 'path'       => '/grapesjsbuilder/upload',
-                'controller' => 'GrapesJsBuilderBundle:FileManager:upload',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::uploadAction',
             ],
             'grapesjsbuilder_delete' => [
                 'path'       => '/grapesjsbuilder/delete',
-                'controller' => 'GrapesJsBuilderBundle:FileManager:delete',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
             ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
-                'controller' => 'GrapesJsBuilderBundle:GrapesJs:builder',
+                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
             ],
         ],
         'public' => [],
@@ -77,33 +77,6 @@ return [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
-                ],
-            ],
-        ],
-        'events'  => [
-            'grapesjsbuilder.event.assets.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'mautic.install.service',
-                ],
-            ],
-            'grapesjsbuilder.event.email.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                ],
-            ],
-            'grapesjsbuilder.event.content.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\InjectCustomContentSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                    'grapesjsbuilder.helper.filemanager',
-                    'mautic.helper.templating',
-                    'request_stack',
-                    'router',
                 ],
             ],
         ],

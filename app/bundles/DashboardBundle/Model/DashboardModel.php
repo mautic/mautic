@@ -245,7 +245,7 @@ class DashboardModel extends FormModel
         $event->setWidget($widget);
         $event->setCacheDir($cacheDir, $this->userHelper->getUser()->getId());
         $event->setSecurity($this->security);
-        $this->dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE, $event);
+        $this->dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_DETAIL_GENERATE);
     }
 
     /**
@@ -312,13 +312,12 @@ class DashboardModel extends FormModel
         $dateRangeStart->modify($dateRangeDefault);
 
         $today    = new \DateTime();
-        $dateFrom = $this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00'));
-        $dateFrom = new \DateTime($dateFrom);
+        $dateFrom = new \DateTime($this->session->get('mautic.daterange.form.from', $dateRangeStart->format('Y-m-d 00:00:00')));
         $dateTo   = new \DateTime($this->session->get('mautic.daterange.form.to', $today->format('Y-m-d 23:59:59')));
 
         return [
             'dateFrom' => $dateFrom,
-            'dateTo'   => $dateTo,
+            'dateTo'   => $dateTo->modify('23:59:59'), // till end of the 'to' date selected
         ];
     }
 }

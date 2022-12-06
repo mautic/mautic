@@ -823,9 +823,10 @@ var Mautic = {
      * @param data
      * @param successClosure
      * @param showLoadingBar
-     * @param failureClosure
+     * @param queue
+     * @param method
      */
-    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue) {
+    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue, method = "POST") {
         if (typeof Mautic.ajaxActionXhrQueue == 'undefined') {
             Mautic.ajaxActionXhrQueue = {};
         }
@@ -837,7 +838,7 @@ var Mautic = {
                     Mautic.ajaxActionXhrQueue[action] = [];
                 }
 
-                Mautic.ajaxActionXhrQueue[action].push({action: action, data: data, successClosure: successClosure, showLoadingBar: showLoadingBar});
+                Mautic.ajaxActionXhrQueue[action].push({action: action, data: data, successClosure: successClosure, showLoadingBar: showLoadingBar, method: method});
 
                 return;
             } else {
@@ -852,7 +853,7 @@ var Mautic = {
 
         Mautic.ajaxActionXhr[action] = mQuery.ajax({
             url: mauticAjaxUrl + '?action=' + action,
-            type: 'POST',
+            type: method,
             data: data,
             showLoadingBar: showLoadingBar,
             success: function (response) {
@@ -869,7 +870,7 @@ var Mautic = {
                 if (typeof Mautic.ajaxActionXhrQueue[action] !== 'undefined' && Mautic.ajaxActionXhrQueue[action].length) {
                     var next = Mautic.ajaxActionXhrQueue[action].shift();
 
-                    Mautic.ajaxActionRequest(next.action, next.data, next.successClosure, next.showLoadingBar, false);
+                    Mautic.ajaxActionRequest(next.action, next.data, next.successClosure, next.showLoadingBar, false, next.method);
                 }
             }
         });

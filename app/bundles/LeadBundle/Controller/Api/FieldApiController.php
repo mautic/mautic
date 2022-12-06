@@ -6,11 +6,8 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class FieldApiController.
- */
 class FieldApiController extends CommonApiController
 {
     /**
@@ -20,7 +17,7 @@ class FieldApiController extends CommonApiController
      */
     protected $fieldObject;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->fieldObject     = $this->request->get('object');
         $this->model           = $this->getModel('lead.field');

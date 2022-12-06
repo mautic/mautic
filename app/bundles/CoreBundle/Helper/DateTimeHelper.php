@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Helper;
 
 class DateTimeHelper
 {
-    const FORMAT_DB = 'Y-m-d H:i:s';
+    public const FORMAT_DB = 'Y-m-d H:i:s';
 
     /**
      * @var string
@@ -365,7 +365,7 @@ class DateTimeHelper
         // Sanitize input
         $offset = (int) $offset;
 
-        $timezone = timezone_name_from_abbr('', $offset, false);
+        $timezone = timezone_name_from_abbr('', $offset, 0);
 
         // In case http://bugs.php.net/44780 bug happens
         if (empty($timezone)) {

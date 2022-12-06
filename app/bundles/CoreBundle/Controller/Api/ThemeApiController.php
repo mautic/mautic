@@ -8,11 +8,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class ThemeApiController.
- */
 class ThemeApiController extends CommonApiController
 {
     /**
@@ -20,7 +17,7 @@ class ThemeApiController extends CommonApiController
      */
     protected $themeHelper;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->themeHelper = $this->container->get('mautic.helper.theme');
 

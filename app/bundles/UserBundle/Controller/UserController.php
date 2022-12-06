@@ -63,7 +63,7 @@ class UserController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticUserBundle:User:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_user_index',
                     'mauticContent' => 'user',
@@ -86,7 +86,7 @@ class UserController extends FormController
                     'delete' => $this->get('mautic.security')->isGranted('user:users:deleteother'),
                 ],
             ],
-            'contentTemplate' => 'MauticUserBundle:User:list.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:list.html.twig',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_user_index', ['page' => $page]),
                 'mauticContent' => 'user',
@@ -178,7 +178,7 @@ class UserController extends FormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticUserBundle:User:index',
+                    'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_user_index',
                         'mauticContent' => 'user',
@@ -191,7 +191,7 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => ['form' => $form->createView()],
-            'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_new',
                 'route'         => $action,
@@ -225,7 +225,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',
@@ -319,7 +319,7 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => ['form' => $form->createView()],
-            'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $action,
@@ -349,7 +349,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $returnUrl,
@@ -414,7 +414,7 @@ class UserController extends FormController
         if (null === $user) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-                'contentTemplate' => 'MauticUserBundle:User:contact',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::contactAction',
                 'flashes'         => [
                     [
                         'type'    => 'error',
@@ -509,7 +509,7 @@ class UserController extends FormController
                 'form' => $form->createView(),
                 'user' => $user,
             ],
-            'contentTemplate' => 'MauticUserBundle:User:contact.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:contact.html.twig',
             'passthroughVars' => [
                 'route'         => $action,
                 'mauticContent' => 'user',
@@ -531,7 +531,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',

@@ -25,15 +25,15 @@
     "mautic/core-lib": "^4.0"
   },
   "require-dev": {
-    "friendsofphp/php-cs-fixer": "^2.19.2",
+    "friendsofphp/php-cs-fixer": "^3.0",
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.2",
-    "liip/test-fixtures-bundle": "^1.6",
-    "mautic/transifex": "^4.0",
+    "liip/test-fixtures-bundle": "^2.0",
+    "mautic/transifex": "^5.0",
     "php-http/mock-client": "^1.4",
-    "phpstan/phpstan": "^1.6",
+    "phpstan/phpstan": "^1.8.2",
     "phpunit/phpunit": "^9.5",
-    "rector/rector": "^0.12.22",
+    "rector/rector": "^0.14",
     "symfony/browser-kit": "~4.4.0",
     "symfony/dom-crawler": "~4.4.0",
     "symfony/maker-bundle": "^1.38",
@@ -88,13 +88,13 @@
       "url": "app",
       "options": {
         "versions": {
-            "mautic/core-lib": "4.1.0"
+            "mautic/core-lib": "4.4.x-dev"
         }
       }
     },
     {
       "type": "git",
-      "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
     }
   ],
   "conflict": {
@@ -123,6 +123,9 @@
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf"
   },
   "config": {
+    "platform": {
+      "php": "8.0"
+    },
     "bin-dir": "bin",
     "component-dir": "media/assets",
     "process-timeout": 5000,

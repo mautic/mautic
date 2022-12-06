@@ -14,6 +14,8 @@ use Psr\Log\LoggerInterface;
 
 class Interval implements ScheduleModeInterface
 {
+    public const LOG_DATE_FORMAT = 'Y-m-d H:i:s T';
+
     /**
      * @var LoggerInterface
      */
@@ -50,19 +52,19 @@ class Interval implements ScheduleModeInterface
 
         try {
             $this->logger->debug(
-                'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format('Y-m-d H:i:s T')
+                'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format(self::LOG_DATE_FORMAT)
             );
             $comparedToDateTime->add((new DateTimeHelper())->buildInterval($interval, $unit));
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
 
-            throw new NotSchedulableException();
+            throw new NotSchedulableException($exception->getMessage());
         }
 
         if ($comparedToDateTime > $compareFromDateTime) {
             $this->logger->debug(
-                'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format('Y-m-d H:i:s T').' is later than '
-                .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus returning '.$comparedToDateTime->format('Y-m-d H:i:s T')
+                'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format(self::LOG_DATE_FORMAT).' is later than '
+                .$compareFromDateTime->format(self::LOG_DATE_FORMAT).' and thus returning '.$comparedToDateTime->format(self::LOG_DATE_FORMAT)
             );
 
             //the event is to be scheduled based on the time interval
@@ -70,8 +72,8 @@ class Interval implements ScheduleModeInterface
         }
 
         $this->logger->debug(
-            'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format('Y-m-d H:i:s T').' is earlier than '
-            .$compareFromDateTime->format('Y-m-d H:i:s T').' and thus returning '.$compareFromDateTime->format('Y-m-d H:i:s T')
+            'CAMPAIGN: ('.$event->getId().') '.$comparedToDateTime->format(self::LOG_DATE_FORMAT).' is earlier than '
+            .$compareFromDateTime->format(self::LOG_DATE_FORMAT).' and thus returning '.$compareFromDateTime->format(self::LOG_DATE_FORMAT)
         );
 
         return $compareFromDateTime;
@@ -91,14 +93,26 @@ class Interval implements ScheduleModeInterface
             return $this->getExecutionDateTime($event, $compareFromDateTime, $dateTriggered);
         }
 
+        $interval      = $event->getTriggerInterval();
+        $unit          = $event->getTriggerIntervalUnit();
+
+        if ($interval && $unit) {
+            $dateTriggered->add((new DateTimeHelper())->buildInterval($interval, $unit));
+        }
+
+        if ($dateTriggered < $compareFromDateTime) {
+            $this->logger->debug(
+                sprintf('CAMPAIGN: (%s) %s is earlier than %s and thus setting %s', $event->getId(), $dateTriggered->format(self::LOG_DATE_FORMAT), $compareFromDateTime->format(self::LOG_DATE_FORMAT), $compareFromDateTime->format(self::LOG_DATE_FORMAT))
+            );
+            $dateTriggered = clone $compareFromDateTime;
+        }
+
         $hour      = $event->getTriggerHour();
         $startTime = $event->getTriggerRestrictedStartHour();
         $endTime   = $event->getTriggerRestrictedStopHour();
         $dow       = $event->getTriggerRestrictedDaysOfWeek();
 
-        $diff = $dateTriggered->diff($compareFromDateTime);
-
-        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $diff, $dateTriggered, $hour, $startTime, $endTime, $dow);
+        return $this->getGroupExecutionDateTime($event->getId(), $log->getLead(), $dateTriggered, $hour, $startTime, $endTime, $dow);
     }
 
     /**
@@ -112,18 +126,12 @@ class Interval implements ScheduleModeInterface
         $endTime               = $event->getTriggerRestrictedStopHour();
         $daysOfWeek            = $event->getTriggerRestrictedDaysOfWeek();
 
-        // Get the difference between now and the date we're supposed to be executing
-        $compareFromDateTime = $compareFromDateTime ? clone $compareFromDateTime : new \DateTime('now');
-        $diff                = $compareFromDateTime->diff($executionDate);
-        $diff->f             = 0; // we don't care about microseconds
-
         /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $groupExecutionDate = $this->getGroupExecutionDateTime(
                 $event->getId(),
                 $contact,
-                $diff,
-                $compareFromDateTime,
+                $executionDate,
                 $hour,
                 $startTime,
                 $endTime,
@@ -146,24 +154,28 @@ class Interval implements ScheduleModeInterface
      */
     public function isContactSpecificExecutionDateRequired(Event $event)
     {
-        if (Event::TRIGGER_MODE_INTERVAL !== $event->getTriggerMode()) {
-            return false;
-        }
-
-        // Restrict just for daily scheduling
-        if (!in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y'])) {
-            return false;
-        }
-
-        if (
-            null === $event->getTriggerHour() &&
-            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
-            empty($event->getTriggerRestrictedDaysOfWeek())
-        ) {
+        if (!$this->isTriggerModeInterval($event) || $this->isRestrictedToDailyScheduling($event) || $this->hasTimeRelatedRestrictions($event)) {
             return false;
         }
 
         return true;
+    }
+
+    private function isTriggerModeInterval(Event $event): bool
+    {
+        return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
+    }
+
+    private function isRestrictedToDailyScheduling(Event $event): bool
+    {
+        return !in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']);
+    }
+
+    private function hasTimeRelatedRestrictions(Event $event): bool
+    {
+        return null === $event->getTriggerHour() &&
+            (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
+            empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
     /**
@@ -174,7 +186,6 @@ class Interval implements ScheduleModeInterface
     private function getGroupExecutionDateTime(
         $eventId,
         Lead $contact,
-        \DateInterval $diff,
         \DateTime $compareFromDateTime,
         \DateTime $hour = null,
         \DateTime $startTime = null,
@@ -189,7 +200,7 @@ class Interval implements ScheduleModeInterface
             $this->logger->debug(
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s based on hour of %s', $eventId, $contact->getId(), $hour->format('H:i e'))
             );
-            $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $diff, $eventId, $compareFromDateTime);
+            $groupDateTime = $this->getExecutionDateTimeFromHour($contact, $hour, $eventId, $compareFromDateTime);
         } elseif ($startTime && $endTime) {
             $this->logger->debug(
                 sprintf(
@@ -201,14 +212,13 @@ class Interval implements ScheduleModeInterface
                 )
             );
 
-            $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $diff, $eventId, $compareFromDateTime);
+            $groupDateTime = $this->getExecutionDateTimeBetweenHours($contact, $startTime, $endTime, $eventId, $compareFromDateTime);
         } else {
             $this->logger->debug(
                 sprintf('CAMPAIGN: Scheduling event ID %s for contact ID %s without hour restrictions.', $eventId, $contact->getId())
             );
 
             $groupDateTime = clone $compareFromDateTime;
-            $groupDateTime->add($diff);
         }
 
         if ($daysOfWeek) {
@@ -235,7 +245,7 @@ class Interval implements ScheduleModeInterface
      *
      * @return \DateTime
      */
-    private function getExecutionDateTimeFromHour(Lead $contact, \DateTime $hour, \DateInterval $diff, $eventId, \DateTime $compareFromDateTime)
+    private function getExecutionDateTimeFromHour(Lead $contact, \DateTime $hour, $eventId, \DateTime $compareFromDateTime)
     {
         $groupHour = clone $hour;
 
@@ -253,8 +263,6 @@ class Interval implements ScheduleModeInterface
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
 
-                $groupExecutionDate->add($diff);
-
                 $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
                 return $groupExecutionDate;
@@ -268,7 +276,6 @@ class Interval implements ScheduleModeInterface
 
         $groupExecutionDate = clone $compareFromDateTime;
         $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-        $groupExecutionDate->add($diff);
 
         $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
@@ -284,7 +291,6 @@ class Interval implements ScheduleModeInterface
         Lead $contact,
         \DateTime $startTime,
         \DateTime $endTime,
-        \DateInterval $diff,
         $eventId,
         \DateTime $compareFromDateTime
     ) {
@@ -312,8 +318,6 @@ class Interval implements ScheduleModeInterface
                 // Get now in the contacts timezone then add the number of days from now and the original execution date
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
-
-                $groupExecutionDate->add($diff);
             } catch (\Exception $exception) {
                 // Timezone is not recognized so use the default
                 $this->logger->debug(
@@ -325,7 +329,6 @@ class Interval implements ScheduleModeInterface
         if (!isset($groupExecutionDate)) {
             $groupExecutionDate = clone $compareFromDateTime;
             $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-            $groupExecutionDate->add($diff);
         }
 
         // Is the time between the start and end hours?
@@ -340,7 +343,7 @@ class Interval implements ScheduleModeInterface
             return $testStartDateTime;
         }
 
-        if ($groupExecutionDate > $testStopDateTime) {
+        if ($groupExecutionDate >= $testStopDateTime) {
             // Too late so try again tomorrow
             $groupExecutionDate->modify('+1 day')->setTime($startTime->format('H'), $startTime->format('i'));
         }
