@@ -13,7 +13,7 @@ use Mautic\DynamicContentBundle\Form\Type\DynamicContentSendType;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -22,7 +22,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $dynamicContentModel;
     /**
-     * @var Session
+     * @var SessionInterface
      */
     private $session;
     /**
@@ -30,7 +30,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $dispatcher;
 
-    public function __construct(DynamicContentModel $dynamicContentModel, Session $session, EventDispatcherInterface $dispatcher)
+    public function __construct(DynamicContentModel $dynamicContentModel, SessionInterface $session, EventDispatcherInterface $dispatcher)
     {
         $this->dynamicContentModel = $dynamicContentModel;
         $this->session             = $session;

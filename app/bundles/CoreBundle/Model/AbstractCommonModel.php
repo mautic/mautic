@@ -3,8 +3,8 @@
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-abstract class AbstractCommonModel
+abstract class AbstractCommonModel implements MauticModelInterface
 {
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -137,7 +137,7 @@ abstract class AbstractCommonModel
         static $commonRepo;
 
         if (null === $commonRepo) {
-            $commonRepo = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
+            $commonRepo = $this->em->getRepository(FormEntity::class);
         }
 
         return $commonRepo;

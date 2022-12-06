@@ -184,8 +184,8 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         $form->addField(0, $parentField);
         $field->setForm($form);
         $field->setParent($parentFieldId);
-        $specialValue = 'čé+äà>&"';
-        $field->setConditions(['expr' => 'in', 'values' => [InputHelper::string($specialValue)]]);
+        $specialValue = 'čé+äà>&"\'è';
+        $field->setConditions(['expr' => 'in', 'values' => [InputHelper::clean($specialValue)]]);
         $parentField->method('getId')->willReturn($parentFieldId);
         $parentField->method('getAlias')->willReturn($parentFieldAlias);
         $data = [$parentFieldAlias => [$specialValue]];

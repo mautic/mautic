@@ -12,16 +12,22 @@ class MauticCoreBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new Compiler\ConfiguratorPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
-        $container->addCompilerPass(new Compiler\DbalPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
-        $container->addCompilerPass(new Compiler\TemplatingPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\ConfiguratorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\DbalPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\TemplatingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
         $container->addCompilerPass(new Compiler\TranslationsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
         $container->addCompilerPass(new Compiler\TranslationLoaderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
-        $container->addCompilerPass(new Compiler\ModelPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
-        $container->addCompilerPass(new Compiler\UpdateStepPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
-        $container->addCompilerPass(new Compiler\PermissionsPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
-        $container->addCompilerPass(new Compiler\PreUpdateCheckPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\ModelPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\UpdateStepPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1020);
+        $container->addCompilerPass(new Compiler\PermissionsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\PreUpdateCheckPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\ServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
+        $container->addCompilerPass(new Compiler\ORMPurgerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new Compiler\TestPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        }
     }
 }

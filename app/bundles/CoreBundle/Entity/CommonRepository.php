@@ -2,16 +2,18 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -19,8 +21,13 @@ use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CommonRepository extends EntityRepository
+class CommonRepository extends ServiceEntityRepository
 {
+    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
+    {
+        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', get_class($this)));
+    }
+
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
      *
@@ -788,6 +795,80 @@ class CommonRepository extends EntityRepository
         if ($flush) {
             $this->getEntityManager()->flush($entity);
         }
+    }
+
+    /**
+     * Insert entity if it does not exist, update if it does.
+     * ID is set to the enity after upsert.
+     * Main reason to use this over fetch/save is to avoid race conditions.
+     *
+     * Warning: This method use DBAL, not ORM. It will save only the entity you send it.
+     * It will NOT save the entity's associations. Entity manager won't know that the entity was flushed.
+     */
+    public function upsert(object $entity): void
+    {
+        $connection = $this->getEntityManager()->getConnection();
+        $metadata   = $this->getClassMetadata();
+        $identifier = $metadata->getSingleIdentifierFieldName();
+        $makeUpdate = fn (string $column) => "{$column} = VALUES({$column})";
+        $columns    = [];
+        $values     = [];
+        $types      = [];
+        $set        = [];
+        $update     = [];
+        $hasId      = $metadata->containsForeignIdentifier;
+
+        foreach ($metadata->getFieldNames() as $fieldName) {
+            $value = $metadata->getFieldValue($entity, $fieldName);
+            if ($metadata->isIdentifier($fieldName)) {
+                if ($value) {
+                    $hasId = true;
+                } else {
+                    continue;
+                }
+            }
+            $column    = $metadata->getColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $value;
+            $types[]   = $metadata->getTypeOfField($fieldName);
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        foreach ($metadata->getAssociationNames() as $fieldName) {
+            $assocEntity = $metadata->getFieldValue($entity, $fieldName);
+            if (!$metadata->isAssociationWithSingleJoinColumn($fieldName) || !is_object($assocEntity)) {
+                continue;
+            }
+            $idCol     = ucfirst($metadata->getSingleAssociationReferencedJoinColumnName($fieldName));
+            $idGetter  = "get{$idCol}";
+            $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $assocEntity->$idGetter();
+            $types[]   = Types::STRING;
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        $numberOfRowsAffected = $connection->executeStatement(
+            'INSERT INTO '.$this->getTableName().' ('.implode(', ', $columns).')'.
+            ' VALUES ('.implode(', ', $set).')'.
+            ' ON DUPLICATE KEY UPDATE '.implode(', ', $update),
+            $values,
+            $types
+        );
+
+        if ($entity instanceof UpsertInterface) {
+            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT === $numberOfRowsAffected);
+            $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
+        }
+        if ($hasId) {
+            return;
+        }
+
+        $id = (int) $connection->lastInsertId();
+
+        $metadata->setFieldValue($entity, $identifier, $id);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Sync\Notification;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Model\NotificationModel;
@@ -39,7 +40,7 @@ class Writer
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    public function writeUserNotification(string $header, string $message, int $userId): void
+    public function writeUserNotification(string $header, string $message, int $userId, string $deduplicateValue = null, DateTime $deduplicateDateTimeFrom = null): void
     {
         $this->notificationModel->addNotification(
             $message,
@@ -48,7 +49,9 @@ class Writer
             $header,
             'fa-refresh',
             null,
-            $this->em->getReference(User::class, $userId)
+            $this->em->getReference(User::class, $userId),
+            $deduplicateValue,
+            $deduplicateDateTimeFrom
         );
     }
 
