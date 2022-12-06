@@ -1,0 +1,27 @@
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block headerTitle %}{{ 'mautic.campaign.campaigns'|trans }}{% endblock %}
+
+{% block actions %}
+	{{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+         'templateButtons': {
+            'new': permissions['campaign:campaigns:create'],
+         },
+         'routeBase': 'campaign',
+    }) -}}
+{% endblock %}
+
+{% block content %}
+  <div class="panel panel-default bdr-t-wdh-0">
+      {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+              'searchValue': searchValue,
+              'searchHelp': 'mautic.core.help.searchcommands',
+              'action': currentRoute,
+              'filters': filters,
+      }) -}}
+
+      <div class="page-list">
+          {#<?php $view['slots']->output('_content'); ?>#}
+      </div>
+  </div>
+{% endblock %}
