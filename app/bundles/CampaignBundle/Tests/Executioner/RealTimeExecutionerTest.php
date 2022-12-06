@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,6 +10,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\DecisionAccessor;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
 use Mautic\CampaignBundle\Executioner\Event\DecisionExecutioner;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
+use Mautic\CampaignBundle\Executioner\Helper\DecisionHelper;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
@@ -68,6 +60,11 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
      */
     private $leadRepository;
 
+    /**
+     * @var DecisionHelper
+     */
+    private $decisionHelper;
+
     protected function setUp(): void
     {
         $this->leadModel = $this->getMockBuilder(LeadModel::class)
@@ -101,6 +98,8 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
         $this->leadRepository = $this->getMockBuilder(LeadRepository::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->decisionHelper = new DecisionHelper($this->leadRepository);
     }
 
     public function testContactNotFoundResultsInEmptyResponses()
@@ -418,7 +417,7 @@ class RealTimeExecutionerTest extends \PHPUnit\Framework\TestCase
             $this->eventCollector,
             $this->eventScheduler,
             $this->contactTracker,
-            $this->leadRepository
+            $this->decisionHelper
         );
     }
 }

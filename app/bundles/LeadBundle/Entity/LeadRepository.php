@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -18,6 +9,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
+use Mautic\LeadBundle\Controller\ListController;
 use Mautic\LeadBundle\Event\LeadBuildSearchEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PointBundle\Model\TriggerModel;
@@ -55,6 +47,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     private $triggerModel;
 
     /**
+     * @var ListLeadRepository
+     */
+    private $listLeadRepository;
+
+    /**
      * Used by search functions to search social profiles.
      */
     public function setAvailableSocialFields(array $fields)
@@ -81,6 +78,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    public function setListLeadRepository(ListLeadRepository $listLeadRepository): void
+    {
+        $this->listLeadRepository = $listLeadRepository;
     }
 
     /**
@@ -582,17 +584,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * Get contacts for a specific channel entity.
      *
-     * @param $args - same as getEntity/getEntities
-     * @param        $joinTable
-     * @param        $entityId
-     * @param array  $filters
-     * @param string $entityColumnName
-     * @param array  $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
-     *
-     * @return array
+     * @param array      $args             same as getEntity/getEntities
+     * @param string     $joinTable
+     * @param int        $entityId
+     * @param array      $filters
+     * @param string     $entityColumnName
+     * @param array|null $additionalJoins  [ ['type' => 'join|leftJoin', 'from_alias' => '', 'table' => '', 'condition' => ''], ... ]
      */
-    public function getEntityContacts($args, $joinTable, $entityId, $filters = [], $entityColumnName = 'id', array $additionalJoins = null, $contactColumnName = 'lead_id')
-    {
+    public function getEntityContacts(
+        $args,
+        $joinTable,
+        $entityId,
+        $filters = [],
+        $entityColumnName = 'id',
+        array $additionalJoins = null,
+        $contactColumnName = 'lead_id',
+        \DateTimeInterface $dateFrom = null,
+        \DateTimeInterface $dateTo = null
+    ): array {
         $qb = $this->getEntitiesDbalQueryBuilder();
 
         if (empty($contactColumnName)) {
@@ -647,7 +656,14 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             }
         }
 
-        $args['qb'] = $qb;
+        $args['qb']    = $qb;
+        $args['count'] = (ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) ? $this->listLeadRepository->getContactsCountBySegment($entityId, $filters) : null;
+
+        if ($dateFrom && $dateTo) {
+            $qb->andWhere('entity.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
 
         return $this->getEntities($args);
     }
@@ -719,7 +735,6 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $nullExpr = $operators['null'][$exprType];
         $inExpr   = $operators['in'][$exprType];
         $xExpr    = $operators['x'][$exprType];
-
         switch ($command) {
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous'):
             case $this->translator->trans('mautic.lead.lead.searchcommand.isanonymous', [], null, 'en_US'):
@@ -782,6 +797,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                             $q->expr()->$eqExpr('list_lead.manually_removed', 0)
                         )
                     )
+                );
+                $filter->strict  = true;
+                $returnParameter = true;
+                break;
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id'):
+            case $this->translator->trans('mautic.lead.lead.searchcommand.company_id', [], null, 'en_US'):
+                $this->applySearchQueryRelationship(
+                    $q,
+                    [
+                        [
+                            'from_alias' => 'l',
+                            'table'      => 'companies_leads',
+                            'alias'      => 'comp_lead',
+                            'condition'  => 'l.id = comp_lead.lead_id',
+                        ],
+                    ],
+                    $innerJoinTables,
+                    $this->generateFilterExpression($q, 'comp_lead.company_id', $eqExpr, $unique, null)
                 );
                 $filter->strict  = true;
                 $returnParameter = true;
@@ -948,6 +981,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             'mautic.lead.lead.searchcommand.list',
             'mautic.core.searchcommand.name',
             'mautic.lead.lead.searchcommand.company',
+            'mautic.lead.lead.searchcommand.company_id',
             'mautic.core.searchcommand.email',
             'mautic.lead.lead.searchcommand.owner',
             'mautic.core.searchcommand.ip',
@@ -991,9 +1025,17 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Updates lead's lastActive with now date/time.
      *
      * @param int $leadId
+     *
+     * @return void
      */
     public function updateLastActive($leadId)
     {
+        if (!$leadId) {
+            // Prevent unnecessary queries like:
+            // `UPDATE leads SET last_active = ... WHERE id IS NULL`
+            return;
+        }
+
         $dt     = new DateTimeHelper();
         $fields = ['last_active' => $dt->toUtcString()];
 
@@ -1186,8 +1228,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     /**
      * @param array $tables          $tables[0] should be primary table
      * @param bool  $innerJoinTables
-     * @param null  $whereExpression
-     * @param null  $having
+     * @param mixed $whereExpression
+     * @param mixed $having
      */
     public function applySearchQueryRelationship(QueryBuilder $q, array $tables, $innerJoinTables, $whereExpression = null, $having = null)
     {

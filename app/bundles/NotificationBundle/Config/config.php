@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'services' => [
         'events' => [
@@ -70,6 +61,9 @@ return [
                     'mautic.notification.repository.stat',
                 ],
             ],
+            'mautic.notification.configbundle.subscriber' => [
+                'class' => Mautic\NotificationBundle\EventListener\ConfigSubscriber::class,
+            ],
         ],
         'forms' => [
             'mautic.form.type.notification' => [
@@ -86,6 +80,9 @@ return [
             ],
             'mautic.form.type.notificationconfig' => [
                 'class' => 'Mautic\NotificationBundle\Form\Type\ConfigType',
+            ],
+            'mautic.notification.config' => [
+                'class' => \Mautic\NotificationBundle\Form\Type\NotificationConfigType::class,
             ],
             'mautic.form.type.notificationsend_list' => [
                 'class'     => 'Mautic\NotificationBundle\Form\Type\NotificationSendType',
@@ -276,14 +273,18 @@ return [
     //    'notification' => null
     //],
     'parameters' => [
-        'notification_enabled'               => false,
-        'notification_landing_page_enabled'  => true,
-        'notification_tracking_page_enabled' => false,
-        'notification_app_id'                => null,
-        'notification_rest_api_key'          => null,
-        'notification_safari_web_id'         => null,
-        'gcm_sender_id'                      => '482941778795',
-        'notification_subdomain_name'        => null,
-        'welcomenotification_enabled'        => true,
+        'notification_enabled'                        => false,
+        'notification_landing_page_enabled'           => true,
+        'notification_tracking_page_enabled'          => false,
+        'notification_app_id'                         => null,
+        'notification_rest_api_key'                   => null,
+        'notification_safari_web_id'                  => null,
+        'gcm_sender_id'                               => '482941778795',
+        'notification_subdomain_name'                 => null,
+        'welcomenotification_enabled'                 => true,
+        'campaign_send_notification_to_author'        => true,
+        'campaign_notification_email_addresses'       => null,
+        'webhook_send_notification_to_author'         => true,
+        'webhook_notification_email_addresses'        => null,
     ],
 ];

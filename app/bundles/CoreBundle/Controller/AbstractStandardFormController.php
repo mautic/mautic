@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
@@ -21,6 +12,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
+
+    public const ENGINE_TWIG = 'twig';
+    /**
+     * @deprecated The PHP templating engine is deprecated and will be removed in Mautic 5. Please use ENGINE_TWIG instead.
+     */
+    public const ENGINE_PHP  = 'php';
 
     /**
      * Get this controller's model name.
@@ -725,15 +722,22 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTemplateName($file)
+    protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
     {
+        if (self::ENGINE_TWIG === $engine && strpos($file, '.php')) {
+            $file = str_replace('.php', '.twig', $file);
+        }
         if ($this->get('templating')->exists($this->getControllerBase().':'.$file)) {
             return $this->getControllerBase().':'.$file;
         } elseif ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
             return $this->getTemplateBase().':'.$file;
-        } else {
+        } elseif ($this->get('templating')->exists('MauticCoreBundle:Standard:'.$file)) {
             return 'MauticCoreBundle:Standard:'.$file;
+        } elseif (self::ENGINE_TWIG === $engine) {
+            return $this->getTemplateName(str_replace('.twig', '.php', $file), self::ENGINE_PHP);
         }
+
+        throw new \Exception("Template {$file} not found");
     }
 
     /**
@@ -899,7 +903,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $orderBy    = $session->get('mautic.'.$this->getSessionBase().'.orderby', $repo->getTableAlias().'.'.$this->getDefaultOrderColumn());
         $orderByDir = $session->get('mautic.'.$this->getSessionBase().'.orderbydir', $this->getDefaultOrderDirection());
 
-        list($count, $items) = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
+        [$count, $items] = $this->getIndexItems($start, $limit, $filter, $orderBy, $orderByDir);
 
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
@@ -1084,7 +1088,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {
@@ -1100,7 +1104,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', string $engine = self::ENGINE_PHP)
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);

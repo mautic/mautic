@@ -59,12 +59,13 @@ class ListController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'searchValue'    => $search,
-                    'items'          => $this->pluginCollector->collectPackages($page, $limit, $search),
-                    'count'          => $this->pluginCollector->getTotal(),
-                    'page'           => $page,
-                    'limit'          => $limit,
-                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'searchValue'       => $search,
+                    'items'             => $this->pluginCollector->collectPackages($page, $limit, $search),
+                    'count'             => $this->pluginCollector->getTotal(),
+                    'page'              => $page,
+                    'limit'             => $limit,
+                    'tmpl'              => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'isComposerEnabled' => $this->config->isComposerEnabled(),
                 ],
                 'contentTemplate' => 'MarketplaceBundle:Package:list.html.php',
                 'passthroughVars' => [

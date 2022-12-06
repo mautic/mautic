@@ -62,7 +62,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                 </div>
                 <div class="col-xs-11">
                     <?php if ($isWinner): ?>
-                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.ab_test.makewinner'); ?>">
+                        <div class="mr-xs pull-left" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.ab_test.make_winner'); ?>">
                             <a class="btn btn-warning"
                                data-toggle="confirmation"
                                href="<?php echo $view['router']->path(
@@ -80,7 +80,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
                                ); ?>"
                                data-confirm-text="<?php echo $view->escape(
                                    $view['translator']->trans(
-                                       'mautic.core.ab_test.makewinner'
+                                       'mautic.core.ab_test.make_winner'
                                    )
                                ); ?>"
                                data-confirm-callback="executeAction"

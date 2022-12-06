@@ -44,7 +44,9 @@ final class PackageDetail
                 $array['repository'],
                 $array['description'],
                 (int) $array['downloads']['total'],
-                (int) $array['favers']
+                (int) $array['favers'],
+                $array['type'] ?? null,
+                $array['display_name'] ?? null
             ),
             VersionCollection::fromArray($array['versions']),
             MaintainerCollection::fromArray($array['maintainers']),

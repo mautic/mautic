@@ -31,7 +31,8 @@ For example, Mautic 3.1 will continue receiving security advisories until the re
 |3.1|17 Aug 2020|24 Aug 2020|23 Nov 2020|30 Nov 2020
 |3.2|23 Nov 2020|30 Nov 2020|16 Feb 2021|22 Feb 2021
 |3.3|16 Feb 2021|22 Feb 2021|17 May 2021|24 May 2021
-|4.0|17 May 2021|TBC 2021|TBC 2022|TBC 2022
+|4.x|16 Feb 2021|30 Aug 2021|26 Sept 2022|27 Feb 2023
+|4.0|17 May 2021|30 Aug 2021|29 Nov 2021|29 Nov 2021
 
 \* = Security Support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL like Symfony 2.8.
 
@@ -43,7 +44,7 @@ How to report a potential security issue
 
 If you discover or learn about a potential error, weakness, or threat that can compromise the security of Mautic and is covered by the [Security Advisory Policy](https://www.mautic.org/mautic-security-team/mautic-security-advisory-policy), we ask you to keep it confidential and submit your concern to the Mautic security team.
 
-To make your report please send an e-mail to security@mautic.org.
+To make your report please submit it via [https://huntr.dev](https://huntr.dev).
 
 Do not post it in Github, the forums, or or discuss it in Slack.
 

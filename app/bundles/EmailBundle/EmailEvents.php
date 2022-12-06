@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle;
 
 /**
@@ -26,6 +17,16 @@ final class EmailEvents
      * @var string
      */
     const TOKEN_REPLACEMENT = 'mautic.email_token_replacement';
+
+    /**
+     * The mautic.email_address_token_replacement event is thrown right before a email address token needs replacement.
+     *
+     * The event listener receives a
+     * Mautic\CoreBundle\Event\TokenReplacementEvent instance.
+     *
+     * @var string
+     */
+    const ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT = 'mautic.email_address_token_replacement';
 
     /**
      * The mautic.email_on_open event is dispatched when an email is opened.

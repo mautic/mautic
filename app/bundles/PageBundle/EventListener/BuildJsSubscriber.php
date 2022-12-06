@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -446,7 +437,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                                     }
                                     
                                     // Set a cookie to prevent showing the same form again
-                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
+                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7+"; secure"; 
                                 } 
                                 
                                 if (data.message) {

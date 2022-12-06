@@ -89,7 +89,7 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                             ]);
                             break;
                         case 'select':
-                        case 'multiselect':
+                            case 'multiselect':
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $selectTemplate,
@@ -99,7 +99,7 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
                             echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
                                 'form'           => $form['properties'],
                                 'selectTemplate' => $lookupTemplate,
-                                'isLookup'       => 'lookup',
+                                'type'           => 'lookup',
                             ]);
                                 break;
                         case 'textarea':
@@ -199,8 +199,12 @@ $defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezon
         'selectTemplate' => $selectTemplate,
     ]);
     echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+        'selectTemplate' => $selectTemplate,
+        'type'           => 'multiselect',
+    ]);
+    echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
         'selectTemplate' => $lookupTemplate,
-        'isLookup'       => 'lookup',
+        'type'           => 'lookup',
     ]);
     echo $view->render('MauticLeadBundle:Field:properties_textarea.html.php', [
         'textareaTemplate' => $textareaTemplate,
