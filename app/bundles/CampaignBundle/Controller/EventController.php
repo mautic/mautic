@@ -120,7 +120,7 @@ class EventController extends CommonFormController
                 $formThemes[] = $event['settings']['formTheme'];
             }
 
-            $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes); // @ticket TPROD-308
+            $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.twig', $formThemes);
             $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
             $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
                 $event['settings']['description']
@@ -329,7 +329,7 @@ class EventController extends CommonFormController
             }
 
             $viewParams = array_merge($viewParams, [
-                'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes), // @ticket TPROD-308
+                'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.twig', $formThemes),
                 'eventHeader'      => $event['settings']['label'],
                 'eventDescription' => $event['settings']['description'],
             ]);

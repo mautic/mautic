@@ -1,9 +1,11 @@
-{% extends (app.request.isXmlHttpRequest) ? 'MauticCoreBundle:Default:raw_output.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %}
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
 
 {% block headerTitle %}{{ 'mautic.campaign.campaigns'|trans }}{% endblock %}
 
 {% block actions %}
-  {% if false == app.request.isXmlHttpRequest %}
 	{{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
          'templateButtons': {
             'new': permissions['campaign:campaigns:create'],
@@ -11,11 +13,10 @@
             'routeBase': 'campaign',
             'langVar': 'campaign.campaigns',
     }) -}}
-  {% endif %}
 {% endblock %}
 
 {% block content %}
-  {% if false == app.request.isXmlHttpRequest %}
+  {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
         {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
                 'searchValue': searchValue,
@@ -33,6 +34,7 @@
         <div class="page-list">
             {{- customContent('content.above', mauticTemplateVars|default({})) -}}
   {% endif %}
+
   {% if items|length > 0 %}
     <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered campaign-list" id="campaignTable">
@@ -164,7 +166,7 @@
     {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'tip' : 'mautic.campaign.noresults.tip'}) -}}
   {% endif %}
 
-  {% if false == app.request.isXmlHttpRequest %}
+  {% if isIndex %}
             {{- customContent('content.below', mauticTemplateVars|default({})) -}}
         </div>
     </div>

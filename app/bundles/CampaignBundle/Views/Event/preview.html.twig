@@ -13,7 +13,7 @@
 {% endif %}
 
     <div class="campaign-event-content">
-        <div><span class="campaign-event-name ellipsis">{{ eventName|raw }}</span></div>
+        <div><span class="campaign-event-name ellipsis">{{ eventName|purify }}</span></div>
         <span class="campaign-event-logic">{{ ('mautic.campaign.'~event['type'])|trans }}</span>
     </div>
 
