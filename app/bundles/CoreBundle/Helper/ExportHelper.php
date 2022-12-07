@@ -6,9 +6,9 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\CoreBundle\Exception\FilePathException;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
@@ -67,7 +67,9 @@ class ExportHelper
 
         if (self::EXPORT_TYPE_EXCEL === $type) {
             return $this->exportAsExcel($data, $filename);
-        } elseif (self::EXPORT_TYPE_CSV === $type) {
+        }
+
+        if (self::EXPORT_TYPE_CSV === $type) {
             return $this->exportAsCsv($data, $filename);
         }
 
@@ -163,7 +165,7 @@ class ExportHelper
 
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $response->headers->set('Expires', 0);
+        $response->headers->set('Expires', '0');
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Pragma', 'public');
 

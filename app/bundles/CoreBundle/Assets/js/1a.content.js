@@ -899,10 +899,6 @@ Mautic.ajaxifyLink = function (el, event) {
     }
 
     if (route.indexOf('batchExport') >= 0) {
-        if (route.indexOf('filetype=csv') >= 0) {
-            Mautic.processCsvContactExport(route);
-            return true;
-        }
         Mautic.initiateFileDownload(route);
         return true;
     }
@@ -1773,8 +1769,13 @@ Mautic.closeGlobalSearchResults = function () {
  * @param link
  */
 Mautic.initiateFileDownload = function (link) {
+    if (mauticContactExportInBackground === 1 && link.indexOf('filetype=csv') >= 0) {
+        Mautic.processCsvContactExport(link);
+        return;
+    }
+
     //initialize download links
-    var iframe = mQuery("<iframe/>").attr({
+    mQuery("<iframe/>").attr({
         src: link,
         style: "visibility:hidden;display:none"
     }).appendTo(mQuery('body'));

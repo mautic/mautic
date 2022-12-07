@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Form\Type;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -14,7 +15,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ConfigType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'contact_unique_identifiers_operator',
@@ -47,7 +48,7 @@ class ConfigType extends AbstractType
             ]
         );
 
-        $formModifier = function (FormInterface $form, $currentColumns) {
+        $formModifier = static function (FormInterface $form, $currentColumns) {
             $order        = [];
             $orderColumns = [];
             if (!empty($currentColumns)) {
@@ -96,12 +97,21 @@ class ConfigType extends AbstractType
                 $formModifier($event->getForm(), $columns);
             }
         );
+
+        $builder->add(
+            'contact_export_in_background',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.lead.background.export.csv',
+                'data'  => $options['data']['contact_export_in_background'] ?? false,
+                'attr'  => [
+                    'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
+                ],
+            ]
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return 'leadconfig';
     }

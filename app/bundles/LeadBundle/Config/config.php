@@ -1185,6 +1185,7 @@ return [
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'segment_rebuild_time_warning'                                                          => 30,
+        'contact_export_in_background'                                                          => true,
         'contact_export_dir'                                                                    => '%kernel.root_dir%/../media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
     ],

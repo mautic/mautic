@@ -37,7 +37,12 @@ class ConfigSubscriber implements EventSubscriberInterface
         ]);
 
         $segmentParameters = $event->getParametersFromConfig('MauticLeadBundle');
-        unset($segmentParameters['contact_unique_identifiers_operator'], $segmentParameters['contact_columns'], $segmentParameters['background_import_if_more_rows_than']);
+        unset(
+            $segmentParameters['contact_unique_identifiers_operator'],
+            $segmentParameters['contact_columns'],
+            $segmentParameters['background_import_if_more_rows_than'],
+            $segmentParameters['contact_export_in_background']
+        );
         $event->addForm([
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',

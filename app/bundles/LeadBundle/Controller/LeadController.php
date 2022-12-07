@@ -1948,7 +1948,7 @@ class LeadController extends FormController
 
         $fileType = $this->request->get('filetype', 'csv');
 
-        if ('csv' === $fileType) {
+        if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
             return $this->contactExportCSVScheduler($permissions);
         }
 
