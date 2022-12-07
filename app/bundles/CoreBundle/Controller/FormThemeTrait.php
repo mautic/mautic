@@ -26,10 +26,6 @@ trait FormThemeTrait
             $templating = $templating->getEngine($template);
         }
 
-        if ($templating instanceof \Symfony\Bundle\TwigBundle\TwigEngine) {
-            return $formView;
-        }
-
         // Extract form theme from options if applicable
         $fieldThemes = [];
         $findThemes  = function ($form, $formView) use ($templating, &$findThemes, &$fieldThemes) {
