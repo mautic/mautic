@@ -30,10 +30,7 @@ class RedirectModel extends FormModel
     public function getRepository(): RedirectRepository
     {
         $result = $this->em->getRepository(Redirect::class);
-
-        if (!$result instanceof RedirectRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof RedirectRepository);
 
         return $result;
     }

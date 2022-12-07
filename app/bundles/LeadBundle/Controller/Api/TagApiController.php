@@ -15,10 +15,7 @@ class TagApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $leadTagModel = $this->getModel('lead.tag');
-
-        if (!$leadTagModel instanceof TagModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($leadTagModel instanceof TagModel);
 
         $this->model           = $leadTagModel;
         $this->entityClass     = Tag::class;
@@ -42,10 +39,7 @@ class TagApiController extends CommonApiController
         }
 
         $tagModel = $this->model;
-
-        if (!$tagModel instanceof TagModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($tagModel instanceof TagModel);
 
         return $tagModel->getRepository()->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
     }

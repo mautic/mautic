@@ -29,10 +29,7 @@ class FieldApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $fieldModel = $this->getModel('lead.field');
-
-        if (!$fieldModel instanceof FieldModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($fieldModel instanceof FieldModel);
 
         $this->model           = $fieldModel;
         $this->fieldObject     = $this->request->get('object');

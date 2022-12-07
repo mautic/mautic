@@ -44,10 +44,7 @@ class CitrixModel extends FormModel
     public function getRepository()
     {
         $result = $this->em->getRepository(CitrixEvent::class);
-
-        if (!$result instanceof CitrixEventRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof CitrixEventRepository);
 
         return $result;
     }

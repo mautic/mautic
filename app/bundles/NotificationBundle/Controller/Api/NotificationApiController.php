@@ -22,10 +22,7 @@ class NotificationApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $notificationModel = $this->getModel('notification');
-
-        if (!$notificationModel instanceof NotificationModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($notificationModel instanceof NotificationModel);
 
         $this->model           = $notificationModel;
         $this->contactTracker  = $this->container->get('mautic.tracker.contact');

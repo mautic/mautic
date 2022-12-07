@@ -214,10 +214,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository(): TweetRepository
     {
         $result = $this->em->getRepository(Tweet::class);
-
-        if (!$result instanceof TweetRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof TweetRepository);
 
         return $result;
     }
@@ -225,10 +222,7 @@ class TweetModel extends FormModel implements AjaxLookupModelInterface
     public function getStatRepository(): TweetStatRepository
     {
         $result = $this->em->getRepository(TweetStat::class);
-
-        if (!$result instanceof TweetStatRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof TweetStatRepository);
 
         return $result;
     }

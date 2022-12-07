@@ -19,10 +19,7 @@ class NoteApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $leadNoteModel = $this->getModel('lead.note');
-
-        if (!$leadNoteModel instanceof NoteModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($leadNoteModel instanceof NoteModel);
 
         $this->model            = $leadNoteModel;
         $this->entityClass      = LeadNote::class;

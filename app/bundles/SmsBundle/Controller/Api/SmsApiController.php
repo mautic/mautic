@@ -25,10 +25,7 @@ class SmsApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $smsModel = $this->getModel('sms');
-
-        if (!$smsModel instanceof SmsModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($smsModel instanceof SmsModel);
 
         $this->model           = $smsModel;
         $this->entityClass     = Sms::class;

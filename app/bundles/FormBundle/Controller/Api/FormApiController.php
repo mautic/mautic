@@ -25,10 +25,7 @@ class FormApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $formModel = $this->getModel('form');
-
-        if (!$formModel instanceof FormModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($formModel instanceof FormModel);
 
         $this->model            = $formModel;
         $this->entityClass      = Form::class;

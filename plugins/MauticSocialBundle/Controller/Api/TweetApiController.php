@@ -20,10 +20,7 @@ class TweetApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $tweetModel = $this->getModel('social.tweet');
-
-        if (!$tweetModel instanceof TweetModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($tweetModel instanceof TweetModel);
 
         $this->model           = $tweetModel;
         $this->entityClass     = Tweet::class;

@@ -25,10 +25,7 @@ class ListApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $listModel = $this->getModel('lead.list');
-
-        if (!$listModel instanceof ListModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($listModel instanceof ListModel);
 
         $this->model            = $listModel;
         $this->entityClass      = LeadList::class;

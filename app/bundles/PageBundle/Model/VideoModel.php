@@ -41,10 +41,7 @@ class VideoModel extends FormModel
     public function getHitRepository(): VideoHitRepository
     {
         $result = $this->em->getRepository(VideoHit::class);
-
-        if (!$result instanceof VideoHitRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof VideoHitRepository);
 
         return $result;
     }

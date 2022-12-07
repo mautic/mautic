@@ -12,7 +12,6 @@ use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
-use RuntimeException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -43,9 +42,7 @@ class EventLogApiController extends FetchCommonApiController
     public function initialize(ControllerEvent $event)
     {
         $campaignEventLogModel = $this->getModel('campaign.event_log');
-        if (!$campaignEventLogModel instanceof EventLogModel) {
-            throw new RuntimeException('Wrong model given.');
-        }
+        \assert($campaignEventLogModel instanceof EventLogModel);
         $this->model                    = $campaignEventLogModel;
         $this->entityClass              = LeadEventLog::class;
         $this->entityNameOne            = 'event';

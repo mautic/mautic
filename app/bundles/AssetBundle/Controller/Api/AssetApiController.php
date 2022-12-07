@@ -21,10 +21,7 @@ class AssetApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $assetModel = $this->getModel('asset');
-
-        if (!$assetModel instanceof AssetModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($assetModel instanceof AssetModel);
 
         $this->model            = $assetModel;
         $this->entityClass      = Asset::class;

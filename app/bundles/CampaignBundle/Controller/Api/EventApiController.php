@@ -19,10 +19,7 @@ class EventApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $campaignEventModel = $this->getModel('campaign.event');
-
-        if (!$campaignEventModel instanceof EventModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($campaignEventModel instanceof EventModel);
 
         $this->model                    = $campaignEventModel;
         $this->entityClass              = Event::class;

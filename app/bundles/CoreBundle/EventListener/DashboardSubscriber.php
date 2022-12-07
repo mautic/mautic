@@ -99,9 +99,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                         try {
                             $model = $this->modelFactory->getModel($log['bundle'].'.'.$log['object']);
-                            if (!$model instanceof FormModel) {
-                                throw new \RuntimeException('Wrong model given.');
-                            }
+                            \assert($model instanceof FormModel);
                             $item  = $model->getEntity($log['objectId']);
                             if (method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();

@@ -17,10 +17,7 @@ class SubmissionApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $formSubmissionModel = $this->getModel('form.submission');
-
-        if (!$formSubmissionModel instanceof SubmissionModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($formSubmissionModel instanceof SubmissionModel);
 
         $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;

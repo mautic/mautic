@@ -29,10 +29,7 @@ class EmailApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $emailModel = $this->getModel('email');
-
-        if (!$emailModel instanceof EmailModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($emailModel instanceof EmailModel);
 
         $this->model            = $emailModel;
         $this->entityClass      = Email::class;

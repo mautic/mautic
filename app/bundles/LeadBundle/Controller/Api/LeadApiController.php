@@ -44,9 +44,7 @@ class LeadApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $leadModel = $this->getModel(self::MODEL_ID);
-        if (!$leadModel instanceof LeadModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($leadModel instanceof LeadModel);
         $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';

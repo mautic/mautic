@@ -44,10 +44,7 @@ class UserModel extends FormModel
     public function getRepository(): UserRepository
     {
         $result = $this->em->getRepository(User::class);
-
-        if (!$result instanceof UserRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof UserRepository);
 
         return $result;
     }

@@ -22,10 +22,7 @@ class UserApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $userModel = $this->getModel('user.user');
-
-        if (!$userModel instanceof UserModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($userModel instanceof UserModel);
 
         $this->model            = $userModel;
         $this->entityClass      = User::class;

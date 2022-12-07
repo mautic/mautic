@@ -15,10 +15,7 @@ class DynamicContentApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $dynamicContentModel = $this->getModel('dynamicContent');
-
-        if (!$dynamicContentModel instanceof DynamicContentModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($dynamicContentModel instanceof DynamicContentModel);
 
         $this->model           = $dynamicContentModel;
         $this->entityClass     = DynamicContent::class;

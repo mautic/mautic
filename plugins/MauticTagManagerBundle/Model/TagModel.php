@@ -22,10 +22,7 @@ class TagModel extends BaseTagModel
     public function getRepository()
     {
         $result = $this->em->getRepository(Tag::class);
-
-        if (!$result instanceof TagRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof TagRepository);
 
         return $result;
     }

@@ -114,10 +114,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     public function getRepository(): CompanyRepository
     {
         $repo = $this->em->getRepository(Company::class);
-
-        if (!$repo instanceof CompanyRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($repo instanceof CompanyRepository);
 
         if (!$this->repoSetup) {
             $this->repoSetup = true;

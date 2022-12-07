@@ -33,10 +33,7 @@ class CategoryModel extends FormModel
     public function getRepository(): CategoryRepository
     {
         $result = $this->em->getRepository(Category::class);
-
-        if (!$result instanceof CategoryRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof CategoryRepository);
 
         return $result;
     }

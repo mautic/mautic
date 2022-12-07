@@ -31,10 +31,7 @@ class NoteModel extends FormModel
     public function getRepository(): LeadNoteRepository
     {
         $result = $this->em->getRepository(LeadNote::class);
-
-        if (!$result instanceof LeadNoteRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof LeadNoteRepository);
 
         return $result;
     }

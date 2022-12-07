@@ -31,15 +31,10 @@ class PointApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $leadModel = $this->getModel('lead');
-        if (!$leadModel instanceof LeadModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($leadModel instanceof LeadModel);
 
         $pointModel = $this->getModel('point');
-
-        if (!$pointModel instanceof PointModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($pointModel instanceof PointModel);
 
         $this->model            = $pointModel;
         $this->leadModel        = $leadModel;

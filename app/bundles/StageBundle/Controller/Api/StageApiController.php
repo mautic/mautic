@@ -23,10 +23,7 @@ class StageApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $stageModel = $this->getModel('stage');
-
-        if (!$stageModel instanceof StageModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($stageModel instanceof StageModel);
 
         $this->model            = $stageModel;
         $this->entityClass      = Stage::class;

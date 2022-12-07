@@ -20,10 +20,7 @@ class WebhookApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $webhookModel = $this->getModel('webhook');
-
-        if (!$webhookModel instanceof WebhookModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($webhookModel instanceof WebhookModel);
 
         $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;

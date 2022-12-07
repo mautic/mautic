@@ -27,10 +27,7 @@ class CompanyApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $companyModel = $this->getModel('lead.company');
-
-        if (!$companyModel instanceof CompanyModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($companyModel instanceof CompanyModel);
 
         $this->model              = $companyModel;
         $this->entityClass        = Company::class;

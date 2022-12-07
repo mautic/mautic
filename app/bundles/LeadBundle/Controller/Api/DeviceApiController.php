@@ -19,10 +19,7 @@ class DeviceApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $leadDeviceModel = $this->getModel('lead.device');
-
-        if (!$leadDeviceModel instanceof DeviceModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($leadDeviceModel instanceof DeviceModel);
 
         $this->model           = $leadDeviceModel;
         $this->entityClass     = LeadDevice::class;

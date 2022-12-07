@@ -23,10 +23,7 @@ class TriggerApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $triggerModel = $this->getModel('point.trigger');
-
-        if (!$triggerModel instanceof TriggerModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($triggerModel instanceof TriggerModel);
 
         $this->model            = $triggerModel;
         $this->entityClass      = Trigger::class;

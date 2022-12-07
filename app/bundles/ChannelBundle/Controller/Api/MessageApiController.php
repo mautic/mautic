@@ -23,9 +23,7 @@ class MessageApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $messageModel = $this->getModel('channel.message');
-        if (!$messageModel instanceof MessageModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($messageModel instanceof MessageModel);
         $this->model            = $messageModel;
         $this->entityClass      = Message::class;
         $this->entityNameOne    = 'message';

@@ -20,10 +20,7 @@ class RoleModel extends FormModel
     public function getRepository(): RoleRepository
     {
         $result = $this->em->getRepository(Role::class);
-
-        if (!$result instanceof RoleRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof RoleRepository);
 
         return $result;
     }

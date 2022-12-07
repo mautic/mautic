@@ -15,10 +15,7 @@ class CategoryApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $categoryModel = $this->getModel('category');
-
-        if (!$categoryModel instanceof CategoryModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($categoryModel instanceof CategoryModel);
 
         $this->model            = $categoryModel;
         $this->entityClass      = Category::class;

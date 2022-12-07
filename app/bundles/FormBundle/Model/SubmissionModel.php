@@ -180,10 +180,7 @@ class SubmissionModel extends CommonFormModel
     public function getRepository(): SubmissionRepository
     {
         $result = $this->em->getRepository(Submission::class);
-
-        if (!$result instanceof SubmissionRepository) {
-            throw new \RuntimeException('Wrong repository given.');
-        }
+        \assert($result instanceof SubmissionRepository);
 
         return $result;
     }

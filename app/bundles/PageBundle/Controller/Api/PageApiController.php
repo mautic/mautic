@@ -20,10 +20,7 @@ class PageApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $pageModel = $this->getModel('page');
-
-        if (!$pageModel instanceof PageModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($pageModel instanceof PageModel);
 
         $this->model            = $pageModel;
         $this->entityClass      = Page::class;

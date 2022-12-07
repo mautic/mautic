@@ -23,10 +23,7 @@ class FocusApiController extends CommonApiController
         parent::initialize($event);
 
         $focusModel = $this->getModel('focus');
-
-        if (!$focusModel instanceof FocusModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($focusModel instanceof FocusModel);
 
         $this->model           = $focusModel;
         $this->entityClass     = Focus::class;

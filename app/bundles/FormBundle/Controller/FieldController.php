@@ -23,16 +23,12 @@ class FieldController extends CommonFormController
     public function initialize(ControllerEvent $event)
     {
         $formModel = $this->getModel('form');
-        if (!$formModel instanceof FormModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($formModel instanceof FormModel);
 
         $this->formModel      = $formModel;
 
         $formFieldModel = $this->getModel('form.field');
-        if (!$formFieldModel instanceof FieldModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($formFieldModel instanceof FieldModel);
         $this->formFieldModel = $formFieldModel;
 
         $this->fieldHelper    = $this->get('mautic.helper.form.field_helper');

@@ -20,10 +20,7 @@ class RoleApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $roleModel = $this->getModel('user.role');
-
-        if (!$roleModel instanceof RoleModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($roleModel instanceof RoleModel);
 
         $this->model            = $roleModel;
         $this->entityClass      = Role::class;

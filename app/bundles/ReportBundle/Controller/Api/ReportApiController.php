@@ -29,10 +29,7 @@ class ReportApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $reportModel = $this->getModel('report');
-
-        if (!$reportModel instanceof ReportModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($reportModel instanceof ReportModel);
 
         $this->model            = $reportModel;
         $this->entityClass      = Report::class;

@@ -249,9 +249,7 @@ abstract class AbstractFormController extends CommonController
             $form = $form->get($element);
         }
 
-        if (!$form instanceof ClickableInterface) {
-            throw new \RuntimeException('The form item is not ClickableInterface.');
-        }
+        \assert($form instanceof ClickableInterface);
 
         return $form;
     }

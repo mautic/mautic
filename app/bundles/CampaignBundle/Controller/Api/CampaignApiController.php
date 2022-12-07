@@ -33,10 +33,7 @@ class CampaignApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $campaignModel = $this->getModel('campaign');
-
-        if (!$campaignModel instanceof CampaignModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($campaignModel instanceof CampaignModel);
 
         $this->model             = $campaignModel;
         $this->membershipManager = $this->get('mautic.campaign.membership.manager');

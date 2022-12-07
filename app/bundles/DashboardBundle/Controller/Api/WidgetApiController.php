@@ -25,10 +25,7 @@ class WidgetApiController extends CommonApiController
     public function initialize(ControllerEvent $event)
     {
         $dashboardModel = $this->getModel('dashboard');
-
-        if (!$dashboardModel instanceof DashboardModel) {
-            throw new \RuntimeException('Wrong model given.');
-        }
+        \assert($dashboardModel instanceof DashboardModel);
 
         $this->model            = $dashboardModel;
         $this->entityClass      = Widget::class;
