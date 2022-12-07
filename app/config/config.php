@@ -146,6 +146,21 @@ $dbalSettings = [
     'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
 
+if ($container->hasParameter('mautic.db_host_ro')) {
+    $dbalSettings['wrapper_class'] = \Mautic\CoreBundle\Doctrine\Connection\ConnectionMasterSlaveWrapper::class;
+    $dbalSettings['keep_slave']    = true;
+    $dbalSettings['slaves']        = [
+        'slave1' => [
+            'host'                  => '%mautic.db_host_ro%',
+            'port'                  => '%mautic.db_port%',
+            'dbname'                => '%mautic.db_name%',
+            'user'                  => '%mautic.db_user%',
+            'password'              => '%mautic.db_password%',
+            'charset'               => 'utf8mb4',
+        ],
+    ];
+}
+
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
     'orm'  => [
