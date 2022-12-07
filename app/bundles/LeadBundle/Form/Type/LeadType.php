@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Form\Validator\Constraints\UniqueEmailAddress;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueLeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageListType;
@@ -214,15 +214,13 @@ class LeadType extends AbstractType
 
         $resolver->addNormalizer('constraints', static function (Options $options, array $constraints): array {
             foreach ($options['fields'] as $field) {
-                if ('email' !== $field['alias']) {
-                    continue;
-                }
-
                 if (!$field['isUniqueIdentifer']) {
                     continue;
                 }
 
-                $constraints[] = new UniqueEmailAddress();
+                $constraints[] = new UniqueLeadField([
+                    'field' => $field['alias'],
+                ]);
             }
 
             return $constraints;

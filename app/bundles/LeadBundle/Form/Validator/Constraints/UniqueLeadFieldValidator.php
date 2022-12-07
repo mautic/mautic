@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
-class UniqueEmailAddressValidator extends ConstraintValidator
+class UniqueLeadFieldValidator extends ConstraintValidator
 {
     private LeadModel $leadModel;
 
@@ -26,8 +26,8 @@ class UniqueEmailAddressValidator extends ConstraintValidator
      */
     public function validate($lead, Constraint $constraint): void
     {
-        if (!$constraint instanceof UniqueEmailAddress) {
-            throw new UnexpectedTypeException($constraint, UniqueEmailAddress::class);
+        if (!$constraint instanceof UniqueLeadField) {
+            throw new UnexpectedTypeException($constraint, UniqueLeadField::class);
         }
 
         $form = $this->context->getRoot();
@@ -36,19 +36,21 @@ class UniqueEmailAddressValidator extends ConstraintValidator
         }
 
         // Can't use getEntities, because it refreshes some field data, that can be used in the form
-        $leadIds = $this->leadModel->getRepository()->getContactIdsByEmails([$form->get('email')->getData()]);
+        $leads = $this->leadModel->getRepository()->getLeadIdsByUniqueFields([
+            'email' => $form->get($constraint->field)->getData(),
+        ]);
 
-        if (0 === count($leadIds)) {
+        if (0 === count($leads)) {
             return;
         }
 
-        if ($leadIds[0] === (int) $lead->getId()) {
+        if ((int) $leads[0]['id'] === (int) $lead->getId()) {
             return;
         }
 
         $this->context->buildViolation($constraint->message)
             ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
-            ->atPath('email')
+            ->atPath($constraint->field)
             ->addViolation();
     }
 }
