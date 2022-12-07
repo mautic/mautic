@@ -132,11 +132,17 @@ trait FrequencyRuleTrait
             }
         }
 
-        $data['global_categories'] = (isset($frequencyRules['global_categories']))
-            ? $frequencyRules['global_categories']
-            : $model->getLeadCategories(
-                $lead
-            );
+        if (isset($frequencyRules['global_categories'])) {
+            $globalCategories = $frequencyRules['global_categories'];
+        } else {
+            $leadSubscribedCategories = $model->getLeadCategories($lead);
+            $newGlobalCategories      = $model->getAllNewCategories($lead, 'global');
+
+            $globalCategories = array_merge($leadSubscribedCategories, $newGlobalCategories);
+        }
+
+        $data['global_categories'] = $globalCategories;
+
         $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
         foreach ($this->leadLists as $leadList) {

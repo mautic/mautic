@@ -1264,6 +1264,35 @@ class LeadModel extends FormModel
     }
 
     /**
+     * @return mixed[]
+     */
+    public function getAllNewCategories(Lead $lead, string $type): array
+    {
+        $leadCategories   = $this->getLeadCategoryRepository()->getAllNewCategories($lead, $type);
+
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $leadCategoryList[$category['id']] = $category['id'];
+        }
+
+        return $leadCategoryList;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getUnsubscribedLeadCategoriesIds(Lead $lead): array
+    {
+        $leadCategories   = $this->getLeadCategoryRepository()->getUnsubscribedLeadCategories($lead);
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $leadCategoryList[$category['id']] = $category['category_id'];
+        }
+
+        return $leadCategoryList;
+    }
+
+    /**
      * @param array        $fields
      * @param array        $data
      * @param null         $owner
