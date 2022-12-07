@@ -16,7 +16,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContactScheduledExportCommand extends Command
 {
-    public const COMMAND_NAME = 'mautic:contacts:scheduled_export';
+    private const PICK_SCHEDULED_EXPORTS_LIMIT = 10;
+    public const COMMAND_NAME                  = 'mautic:contacts:scheduled_export';
 
     private ContactExportSchedulerModel $contactExportSchedulerModel;
     private EventDispatcherInterface $eventDispatcher;
@@ -51,9 +52,16 @@ class ContactScheduledExportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ids                     = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
-        $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
-        $count                   = 0;
+        $ids = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
+
+        if ($ids) {
+            $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
+        } else {
+            $contactExportSchedulers = $this->contactExportSchedulerModel->getRepository()
+                ->findBy([], [], self::PICK_SCHEDULED_EXPORTS_LIMIT);
+        }
+
+        $count = 0;
 
         foreach ($contactExportSchedulers as $contactExportScheduler) {
             $contactExportSchedulerEvent = new ContactExportSchedulerEvent($contactExportScheduler);
