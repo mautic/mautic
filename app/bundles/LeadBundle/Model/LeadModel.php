@@ -1135,6 +1135,21 @@ class LeadModel extends FormModel
     /**
      * @return mixed[]
      */
+    public function getAllNewCategories(Lead $lead, string $type): array
+    {
+        $leadCategories   = $this->getLeadCategoryRepository()->getAllNewCategories($lead, $type);
+
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $leadCategoryList[$category['id']] = $category['id'];
+        }
+
+        return $leadCategoryList;
+    }
+
+    /**
+     * @return mixed[]
+     */
     public function getUnsubscribedLeadCategoriesIds(Lead $lead): array
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getUnsubscribedLeadCategories($lead);
@@ -1149,8 +1164,14 @@ class LeadModel extends FormModel
     /**
      * @param array $fields
      * @param array $data
+     * @param null  $owner
+     * @param null  $list
+     * @param null  $tags
      * @param bool  $persist
+     * @param null  $importId
      * @param bool  $skipIfExists
+     *
+     * @return bool|null
      *
      * @throws \Exception
      */
