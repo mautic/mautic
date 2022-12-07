@@ -10,6 +10,8 @@ use Doctrine\DBAL\Exception;
 class ConnectionMasterSlaveWrapper extends MasterSlaveConnection
 {
     /**
+     * @param array<string, string> $dbParams
+     *
      * @throws Exception
      */
     public function initConnection(array $dbParams): void
