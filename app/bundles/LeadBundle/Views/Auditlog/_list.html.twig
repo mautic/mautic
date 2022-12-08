@@ -1,0 +1,82 @@
+{#
+  Variables
+    - lead
+    - events
+#}
+<!-- auditlog -->
+<div class="table-responsive">
+    <table class="table table-hover table-bordered" id="contact-auditlog">
+        <thead>
+        <tr>
+            <th class="timeline-icon">
+                <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details' }}">
+                    <span class="fa fa-fw fa-level-down"></span>
+                </a>
+            </th>
+            {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                'orderBy': 'userName',
+                'text': 'mautic.lead.timeline.user_name',
+                'class': 'timeline-name',
+                'sessionVar': 'lead.'~lead.id~'.auditlog',
+                'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+                'target': '#auditlog-table',
+            }) }}
+            {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                'orderBy': 'action',
+                'text': 'mautic.lead.timeline.event_type',
+                'class': 'visible-md visible-lg timeline-type',
+                'sessionVar': 'lead.'~lead.id~'.auditlog',
+                'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+                'target': '#auditlog-table',
+            }) }}
+            {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                'orderBy': 'dateAdded',
+                'text': 'mautic.lead.timeline.event_timestamp',
+                'class': 'visible-md visible-lg timeline-timestamp',
+                'sessionVar': 'lead.'~lead.id~'.auditlog',
+                'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+                'target': '#auditlog-table',
+            }) }}
+        </tr>
+        <tbody>
+        {% for event in events.events %}
+            {% set counter = loop.index0 + 1 %}
+            {% set icon = event.icon|default('fa-history') %}
+            {% set eventLabel = event.eventLabel|default(event.eventType) %}
+            {% if eventLabel is iterable %}
+                {% set linkType = eventLabel.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
+                {% set eventLabel = '<a href="'~eventLabel.href~'" '~linkType~'>'~eventLabel.label~'</a>' %}
+            {% endif %}
+
+            {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
+            <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
+                <td class="timeline-icon">
+                    <a href="javascript:void(0);" data-activate-details="{{ counter }}" class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined %}disabled{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
+                        <span class="fa fa-fw {{ icon }}"></span>
+                    </a>
+                </td>
+                <td class="timeline-name">{{ eventLabel }}</td>
+                <td class="timeline-type">{% if event.eventType is defined %}{{ ('mautic.lead.event.'~event.eventType)|trans }}{% endif %}
+            </td>
+                <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
+            </tr>
+            {% if event.contentTemplate %}
+                <tr class="timeline-row {{ rowStripe }} timeline-details hide" id="auditlog-details-{{ counter }}">
+                    <td colspan="4">
+                        {{ include(event.contentTemplate, {'event': event, 'lead': lead}) }}
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        'page': events.page,
+        'fixedPages': events.maxPages,
+        'fixedLimit': true,
+        'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
+        'target': '#auditlog-table',
+        'totalItems': events.total,
+}) }}
+<!--/ auditlog -->

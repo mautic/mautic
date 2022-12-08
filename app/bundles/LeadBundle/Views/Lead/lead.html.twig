@@ -1,3 +1,7 @@
+{#
+  Variables
+    - lead
+#}
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
 {% block mauticContent %}lead{% endblock %}
@@ -301,27 +305,37 @@
 
             <!-- #notes-container -->
             <div class="tab-pane fade bdr-w-0" id="notes-container">
-                {{ leadNotes }}
+                {{ render(controller('Mautic\\LeadBundle\\Controller\\NoteController::indexAction', {'leadId': lead.id, 'ignoreAjax': 1})) }}
             </div>
             <!--/ #notes-container -->
 
             <!-- #social-container -->
             {% if not isAnonymous %}
                 <div class="tab-pane fade bdr-w-0" id="social-container">
-                    {{ include('MauticLeadBundle:Social:index.html.twig', {'lead': lead, 'socialProfiles': socialProfiles, 'socialProfileUrls': socialProfileUrls}) }}
+                    {{ include('MauticLeadBundle:Social:index.html.twig', {
+                        'lead': lead,
+                        'socialProfiles': socialProfiles,
+                        'socialProfileUrls': socialProfileUrls,
+                    }) }}
                 </div>
             {% endif %}
             <!--/ #social-container -->
 
             <!-- #integration-container -->
             <div class="tab-pane fade bdr-w-0" id="integration-container">
-                {{ include('MauticLeadBundle:Integration:index.html.twig', {'lead': lead, 'integrations': integrations}) }}
+                {{ include('MauticLeadBundle:Integration:index.html.twig', {
+                     'lead': lead,
+                     'integrations': integrations,
+                }) }}
             </div>
             <!--/ #integration-container -->
 
             <!-- #auditlog-container -->
             <div class="tab-pane fade bdr-w-0" id="auditlog-container">
-                {{ include('MauticLeadBundle:Auditlog:list.html.twig', {'lead': lead, 'events': auditlog, 'tmpl': 'index'}) }}
+                {{ include('MauticLeadBundle:Auditlog:_list.html.twig', {
+                      'lead': lead,
+                      'events': auditlog,
+                }) }}
             </div>
             <!--/ #auditlog-container -->
 

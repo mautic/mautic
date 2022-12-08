@@ -1,0 +1,80 @@
+{#
+  Variables
+    - lead
+    - event
+#}
+$details = $event['details'];
+$type    = $event['eventType'];
+$text    = '';
+$objects = isset($details['fields']) ? $details['fields'] : [];
+unset($objects['dateModified']);
+foreach ($details as $key => $value) {
+    if (!array_key_exists($key, $objects) && 'fields' !== $key && 'dateIdentified' !== $key && 'dateModified' !== $key) {
+        $objects[$key] = $value;
+    }
+}
+if (0 === count($objects)) {
+    return '';
+}
+{% if 'create' == event.eventType %}
+  <table class="table">
+    <tr>
+      <th>Field/Object</th><th>New Value</th><th>Old Value</th>
+    </tr>
+    foreach ($objects as $field => $values) {
+    {% for field, values in event.details.fields|default([]) %}
+        <tr>
+        if (is_array($values)) {
+            if (count($values) >= 2) {
+                <td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>
+            } else {
+                $v = '';
+                foreach ($values as $k => $value) {
+                    $v = $k.': '.$view->escape(implode(', ', $value));
+                }
+                <td>{$view->escape($field)}</td><td>{$view->escape($v)}</td><td>&nbsp;</td>
+            }
+        } else {
+            <td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values))}</td><td>&nbsp;</td>
+        }
+        </tr>
+    }
+    {% endfor %}
+  </table>
+{% endif %}
+{% if 'delete' == event.eventType %}
+  {{ 'mautic.lead.audit.deleted'|trans }}
+{% endif %}
+{% if 'update' == event.eventType %}
+        $text = '<table class="table">';
+        $text .= '<tr>';
+        $text .= '<th>Field/Object</th><th>New Value</th><th>Old Value</th>';
+        $text .= '</tr>';
+        foreach ($objects as $field => $values) {
+            $text .= '<tr>';
+            if (is_array($values)) {
+                if (count($values) >= 2) {
+                    $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>";
+                } else {
+                    $v = '';
+                    foreach ($values as $k => $value) {
+                        $v = $k.': '.$view->escape(implode(', ', $value));
+                    }
+                    $text .= "<td>{$view->escape($field)}</td><td>$v</td><td>&nbsp;</td>";
+                }
+            } else {
+                $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values))}</td><td>&nbsp;</td>";
+            }
+            $text .= '</tr>';
+        }
+        $text .= '</table>';
+{% endif %}
+{% if 'identified' == event.eventType %}
+  {{ 'mautic.lead.audit.identified'|trans }}
+{% endif %}
+{% if 'ipadded' == event.eventType %}
+  {{ 'mautic.lead.audit.accessed'|trans }} implode(',', array_splice($details, 1))
+{% endif %}
+{% if 'merged' == event.eventType %}
+  {{ 'mautic.lead.audit.merged'|trans }}
+{% endif %}
