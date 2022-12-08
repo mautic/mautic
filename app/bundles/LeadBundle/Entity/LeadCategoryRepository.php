@@ -45,7 +45,7 @@ class LeadCategoryRepository extends CommonRepository
 
         // Get the category ids for particular lead
         $subQ = clone $qb;
-        $subQ->select('lc.id');
+        $subQ->select('lc.category_id');
         $subQ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc');
         $subQ->where($qb->expr()->eq('lc.lead_id', ':leadId'));
         $subQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
