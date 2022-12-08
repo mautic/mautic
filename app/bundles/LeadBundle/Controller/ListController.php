@@ -137,7 +137,7 @@ class ListController extends FormController
         return $this->delegateView(
             $this->getViewArguments([
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:List:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
@@ -210,9 +210,9 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
+                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
+            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']),
@@ -338,7 +338,7 @@ class ListController extends FormController
                     ]);
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.php';
+                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_segment_action', [
@@ -372,10 +372,10 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
+                'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'currentListId' => $segment->getId(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
+            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $action,
@@ -810,7 +810,7 @@ class ListController extends FormController
                     ],
                 ],
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:details.html.php',
+            'contentTemplate' => 'MauticLeadBundle:List:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',

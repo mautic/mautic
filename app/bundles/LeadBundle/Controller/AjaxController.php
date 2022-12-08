@@ -197,9 +197,10 @@ class AjaxController extends CommonAjaxController
         }
 
         $formHtml = $this->renderView(
-            'MauticLeadBundle:List:filterpropform.html.php',
+            'MauticLeadBundle:List:filterpropform.html.twig',
             [
-                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.php', []),
+                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.twig', []),
+                'form' => $form->createView(),
             ]
         );
 
@@ -241,7 +242,7 @@ class AjaxController extends CommonAjaxController
                 $socialCount       = count($socialProfiles);
                 if (empty($network) || empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView(
-                        'MauticLeadBundle:Social:index.html.php',
+                        'MauticLeadBundle:Social:index.html.twig',
                         [
                             'socialProfiles'    => $socialProfiles,
                             'lead'              => $lead,
@@ -300,7 +301,7 @@ class AjaxController extends CommonAjaxController
 
                 if (empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView(
-                        'MauticLeadBundle:Social:index.html.php',
+                        'MauticLeadBundle:Social:index.html.twig',
                         [
                             'socialProfiles'    => $socialProfiles,
                             'lead'              => $lead,
@@ -354,7 +355,7 @@ class AjaxController extends CommonAjaxController
                 $eventTypes = $event->getEventTypes();
 
                 $timeline = $this->renderView(
-                    'MauticLeadBundle:Lead:history.html.php',
+                    'MauticLeadBundle:Lead:history.html.twig',
                     [
                         'events'       => $events,
                         'eventTypes'   => $eventTypes,
@@ -628,7 +629,7 @@ class AjaxController extends CommonAjaxController
                 $indexMode          = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
                 $dataArray['leads'] = $this->factory->getTemplating()->render(
-                    "MauticLeadBundle:Lead:{$template}.html.php",
+                    "MauticLeadBundle:Lead:{$template}.html.twig",
                     [
                         'items'         => $results['results'],
                         'noContactList' => $emailRepo->getDoNotEmailList(array_keys($results['results'])),

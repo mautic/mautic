@@ -119,7 +119,7 @@ class NoteController extends FormController
                     'mauticContent' => 'leadNote',
                     'noteCount'     => count($items),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Note:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Note:list.html.twig',
             ]
         );
     }
@@ -184,7 +184,7 @@ class NoteController extends FormController
             if ($valid && !$cancelled) {
                 $passthroughVars['upNoteCount'] = 1;
                 $passthroughVars['noteHtml']    = $this->renderView(
-                    'MauticLeadBundle:Note:note.html.php',
+                    'MauticLeadBundle:Note:note.html.twig',
                     [
                         'note'        => $note,
                         'lead'        => $lead,
@@ -203,7 +203,7 @@ class NoteController extends FormController
                         'lead'        => $lead,
                         'permissions' => $permissions,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.twig',
                 ]
             );
         }
@@ -268,7 +268,7 @@ class NoteController extends FormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['noteHtml'] = $this->renderView(
-                    'MauticLeadBundle:Note:note.html.php',
+                    'MauticLeadBundle:Note:note.html.twig',
                     [
                         'note'        => $note,
                         'lead'        => $lead,
@@ -289,7 +289,7 @@ class NoteController extends FormController
                         'lead'        => $lead,
                         'permissions' => $permissions,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.twig',
                 ]
             );
         }

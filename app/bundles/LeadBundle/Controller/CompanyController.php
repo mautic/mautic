@@ -106,7 +106,7 @@ class CompanyController extends FormController
                     'tmpl'        => $tmpl,
                     'totalItems'  => $count,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -172,7 +172,7 @@ class CompanyController extends FormController
                     'permissions' => $permissions,
                     'security'    => $this->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:list_rows_contacts.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:list_rows_contacts.html.twig',
             ]
         );
     }
@@ -289,7 +289,7 @@ class CompanyController extends FormController
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
@@ -474,7 +474,7 @@ class CompanyController extends FormController
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.php';
+        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
@@ -600,7 +600,7 @@ class CompanyController extends FormController
                     'totalItems'        => $contacts['count'],
                     'limit'             => $contacts['limit'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:company.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:company.html.twig',
             ]
         );
     }
@@ -950,7 +950,7 @@ class CompanyController extends FormController
                         ]
                     ),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.company-merge-options' : null,

@@ -461,13 +461,13 @@ class ImportController extends FormController
         }
 
         if (self::STEP_UPLOAD_CSV === $step || self::STEP_MATCH_FIELDS === $step) {
-            $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
+            $contentTemplate = 'MauticLeadBundle:Import:new.html.twig';
             $viewParameters  = [
                 'form'       => $form->createView(),
                 'objectName' => $initEvent->objectName,
             ];
         } else {
-            $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
+            $contentTemplate = 'MauticLeadBundle:Import:progress.html.twig';
             $viewParameters  = [
                 'progress'         => $progress,
                 'import'           => $import,
