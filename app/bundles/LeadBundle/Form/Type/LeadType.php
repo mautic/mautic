@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Form\Validator\Constraints\UniqueLeadField;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\StageBundle\Form\Type\StageListType;
@@ -18,7 +17,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -211,19 +209,5 @@ class LeadType extends AbstractType
         );
 
         $resolver->setRequired(['fields', 'isShortForm']);
-
-        $resolver->addNormalizer('constraints', static function (Options $options, array $constraints): array {
-            foreach ($options['fields'] as $field) {
-                if (!$field['isUniqueIdentifer']) {
-                    continue;
-                }
-
-                $constraints[] = new UniqueLeadField([
-                    'field' => $field['alias'],
-                ]);
-            }
-
-            return $constraints;
-        });
     }
 }

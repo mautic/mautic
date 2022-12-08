@@ -487,7 +487,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
         self::assertCount(1, $errorContainer);
-        self::assertSame('This email is already used.', $errorContainer->text(null, true));
+        self::assertSame('This field must be unique.', $errorContainer->text(null, true));
     }
 
     public function testEditRendersErrorOnEmailDuplicate(): void
@@ -505,7 +505,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
         $clientResponse = $this->client->getResponse();
-        Assert::assertStringContainsString('email: This email is already used.', $clientResponse->getContent());
+        Assert::assertStringContainsString('email: This field must be unique.', $clientResponse->getContent());
     }
 
     private function createCampaign(): Campaign

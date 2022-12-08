@@ -501,7 +501,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         // Collect the IDs
         $companies = [];

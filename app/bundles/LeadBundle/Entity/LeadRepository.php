@@ -280,7 +280,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      * Get list of lead Ids by unique field data.
      *
      * @param iterable<mixed> $uniqueFieldsWithData is an array of columns & values to filter by
-     * @param int|null $leadId is the current lead id. Added to query to skip and find other leads
+     * @param int|null        $leadId               is the current lead id. Added to query to skip and find other leads
      *
      * @return array
      */
