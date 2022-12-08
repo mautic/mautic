@@ -1,0 +1,72 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+<div class="tab-pane dynamic-content-filter bdr-w-0" id="{{ form.vars.id }}">
+    <div class="row form-group">
+        <div class="col-xs-10">
+            {{ form_label(form.content) }}
+        </div>
+        <div class="col-xs-2">
+            {% if 'emailform_dynamicContent_0_filters_0' !== id %}
+                <a class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-xs-12">
+            {{ form_widget(form.content) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-7">
+            <label>{{ 'Filters'|trans }}</label>
+        </div>
+        <div class="col-xs-5">
+            <div class="form-group">
+                <div class="available-filters pl-0">
+                    <select class="chosen form-control" data-mautic="available_filters">
+                        <option value=""></option>
+                        {% for object, field in fields %}
+                            {% set header = object %}
+                            {% set icon = ('company' == object) ? 'fa-building' : 'fa-user' %}
+
+                            <optgroup label="{{ 'mautic.lead.'.header|trans }}">
+                                {% for value, params in field %}
+                                    {% set list = (params.properties.list is not empty) ? params.properties.list : [] %}
+                                    {# TODO: research to fix this #}
+                                    {% set choices = ('boolean' === params.properties.type) ?
+                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList(list)
+                                        :
+                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices(list)
+                                    %}
+                                    {% set list = choices|json_encode() %}
+                                    {% set callback = (params.properties.callback is not empty) ? params.properties.callback : '' %}
+                                    {% set operators = (params.operators is not empty) ? (params.operators|json_encode())|escape : '{}' %}
+                                {% endfor %}
+
+                                <option value="{{ value|escape }}" data-mautic="available_{{ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-list="{{ list|escape }}" data-field-callback="{{ callback }}" data-field-operators='{{ operators }}' class="segment-filter fa {{ icon }}">{{ params.label|trans }}</option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+    <div data-filter-container data-index="{{ form.filters|length }}">
+    {% for i, filter in form.filters %}
+    {% endfor %}
+    <?php
+    foreach ($form['filters'] as $i => $filter) {
+        $isPrototype = ('__name__' == $filter->vars['name']);
+        if ($isPrototype || isset($form->vars['fields'][$filter->vars['value']['object']][$filter->vars['value']['field']])) {
+            echo $view['form']->widget($filter, ['first' => (0 === $i)]);
+        }
+    }
+    ?>
+    </div>
+</div>

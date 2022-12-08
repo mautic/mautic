@@ -1,0 +1,22 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+<div class="row form-group">
+    <div class="col-xs-10">
+        {{ form_label(form) }}
+    </div>
+    <div class="col-xs-2">
+        {% if 'emailform_dynamicContent_0_content' !== id %}
+            <a class="remove-item btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+        {% endif %}
+    </div>
+</div>
+<div class="row form-group">
+    <div class="col-xs-12">
+        {{ form_widget(form) }}
+    </div>
+</div>

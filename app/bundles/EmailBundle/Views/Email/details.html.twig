@@ -8,43 +8,42 @@
 #}
 
 {% if not isEmbedded %}
+    {% extends "MauticCoreBundle:Default:content.html.twig" %}
 
+    {% block headerTitle %}email.getName(){% endblock %}
+    {% block mauticContent %}email{% endblock %}
 {% endif %}
 
-if (!$isEmbedded) {
-    $view->extend('MauticCoreBundle:Default:content.html.php');
+{% set variantContent = {{- include('MauticCoreBundle:Variant:index.html.twig', {
+    {
+        'activeEntity'      : email,
+        'variants'          : variants,
+        'abTestResults'     : abTestResults,
+        'model'             : 'email',
+        'actionRoute'       : 'mautic_email_action',
+    }
+}) -}} %}
 
-    $view['slots']->set('mauticContent', 'email');
-    $view['slots']->set('headerTitle', $email->getName());
-}
-$variantContent = $view->render(
-    'MauticCoreBundle:Variant:index.html.php',
-    [
-        'activeEntity'  => $email,
-        'variants'      => $variants,
-        'abTestResults' => $abTestResults,
-        'model'         => 'email',
-        'actionRoute'   => 'mautic_email_action',
-    ]
-);
+{% set showVariants = variantContent|trim is not empty %}
 
-$showVariants = !empty(trim($variantContent));
+{% set translationContent = {{- include('MauticCoreBundle:Translation:index.html.twig', {
+    {
+        'activeEntity'      : email,
+        'translations'      : translations,
+        'model'             : 'email',
+        'actionRoute'       : 'mautic_email_action',
+    }
+}) -}} %}
 
-$translationContent = $view->render(
-    'MauticCoreBundle:Translation:index.html.php',
-    [
-        'activeEntity' => $email,
-        'translations' => $translations,
-        'model'        => 'email',
-        'actionRoute'  => 'mautic_email_action',
-    ]
-);
-$showTranslations = !empty(trim($translationContent));
+{% set showTranslations = translationContent|trim is not empty %}
 
-$emailType = $email->getEmailType();
-if (empty($emailType)) {
-    $emailType = 'template';
-}
+{% set emailType = email.getEmailType() %}
+
+{% if emailType is not empty %}
+    {% set emailType = 'template' %}
+{% endif %}
+
+
 
 $customButtons = [];
 if (!$isEmbedded) {

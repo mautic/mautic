@@ -1,0 +1,20 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+<div class="row">
+    <div class="col-md-6">
+        {{ form_row(form.user_id) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.to_owner) }}
+    </div>
+
+</div>
+    {{ form_row(form.to) }}
+    {{ form_row(form.cc) }}
+    {{ form_row(form.bcc) }}
+    {{ form_rest(form) }}
