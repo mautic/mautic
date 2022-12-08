@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ObjectRepository;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -13,33 +13,24 @@ use Mautic\LeadBundle\Entity\ListLead;
 
 class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
 {
-    /**
-     * @var EntityRepository&LeadListRepository
-     */
-    private $leadListRepository;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->leadListRepository = $this->em->getRepository(LeadList::class);
-    }
-
     public function testCheckLeadSegmentsByIds(): void
     {
-        $lead  = $this->createLead();
+        $lead     = $this->createLead();
         $segmentA = $this->createSegment();
         $segmentB = $this->createSegment('B');
         $this->createSegmentMember($segmentA, $lead);
         $this->createSegmentMember($segmentB, $lead, true);
 
-        $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId()]);
+        /** @var LeadListRepository $leadListRepository */
+        $leadListRepository = $this->em->getRepository(LeadList::class);
+
+        $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId()]);
         $this->assertTrue($result);
 
-        $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, [$segmentB->getId()]);
+        $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentB->getId()]);
         $this->assertFalse($result);
 
-        $result = $this->leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId(), $segmentB->getId()]);
+        $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId(), $segmentB->getId()]);
         $this->assertTrue($result);
     }
 
