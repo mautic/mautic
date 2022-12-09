@@ -23,10 +23,10 @@
                                         <a href="{{ path('mautic_dashboard_action', {'objectAction': 'import', 'preview': dashboard}) }}">
                                             {{ 'mautic.dashboard.preview'|trans }}
                                         </a>&#183;
-                                        <a href="{{ path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': config.type~dashboard}) }}">
+                                        <a href="{{ path('mautic_dashboard_action', {'objectAction': 'applyDashboardFile', 'file': config.type~'.'~dashboard}) }}">
                                             {{ 'mautic.core.form.apply'|trans }}
                                         </a>{% if 'user' == config.type %}&#183;
-                                        <a href="{{ path('mautic_dashboard_action', {'objectAction': 'deleteDashboardFile', 'file': config.type~dashboard}) }}" data-toggle="confirmation" data-message="{{ 'mautic.dashboard.delete_layout'|trans|e }}" data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}" data-confirm-callback="executeAction" data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
+                                        <a href="{{ path('mautic_dashboard_action', {'objectAction': 'deleteDashboardFile', 'file': config.type~'.'~dashboard}) }}" data-toggle="confirmation" data-message="{{ 'mautic.dashboard.delete_layout'|trans|e }}" data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}" data-confirm-callback="executeAction" data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
                                             {{ 'mautic.core.form.delete'|trans }}
                                         </a>{% endif %}
                                     </p>
