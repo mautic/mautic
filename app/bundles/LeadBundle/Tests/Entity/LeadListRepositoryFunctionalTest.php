@@ -17,19 +17,23 @@ class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
         $lead     = $this->createLead();
         $segmentA = $this->createSegment();
         $segmentB = $this->createSegment('B');
+        $segmentC = $this->createSegment('C');
         $this->createSegmentMember($segmentA, $lead);
         $this->createSegmentMember($segmentB, $lead, true);
 
-        /** @var LeadListRepository $leadListRepository */
         $leadListRepository = $this->em->getRepository(LeadList::class);
+        \assert($leadListRepository instanceof LeadListRepository);
 
         $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId()]);
         $this->assertTrue($result);
 
         $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentB->getId()]);
         $this->assertFalse($result);
+        
+        $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentC->getId()]);
+        $this->assertFalse($result);
 
-        $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId(), $segmentB->getId()]);
+        $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentA->getId(), $segmentB->getId(), $segmentC->getId()]);
         $this->assertTrue($result);
     }
 
