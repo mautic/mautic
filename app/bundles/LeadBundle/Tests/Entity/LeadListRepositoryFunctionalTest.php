@@ -29,7 +29,7 @@ class LeadListRepositoryFunctionalTest extends AbstractMauticTestCase
 
         $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentB->getId()]);
         $this->assertFalse($result);
-        
+
         $result = $leadListRepository->checkLeadSegmentsByIds($lead, [$segmentC->getId()]);
         $this->assertFalse($result);
 
