@@ -71,6 +71,9 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $isTest;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,

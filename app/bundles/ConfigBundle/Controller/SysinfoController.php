@@ -2,11 +2,19 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
+use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SysinfoController extends FormController
 {
+    private SysinfoModel $sysinfoModel;
+
+    public function __construct(SysinfoModel $sysinfoModel)
+    {
+        $this->sysinfoModel = $sysinfoModel;
+    }
+
     /**
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
@@ -16,17 +24,14 @@ class SysinfoController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
-        $model = $this->getModel('config.sysinfo');
-
         return $this->delegateView([
             'viewParameters' => [
-                'phpInfo'         => $model->getPhpInfo(),
-                'requirements'    => $model->getRequirements(),
-                'recommendations' => $model->getRecommendations(),
-                'folders'         => $model->getFolders(),
-                'log'             => $model->getLogTail(200),
-                'dbInfo'          => $model->getDbInfo(),
+                'phpInfo'         => $this->sysinfoModel->getPhpInfo(),
+                'requirements'    => $this->sysinfoModel->getRequirements(),
+                'recommendations' => $this->sysinfoModel->getRecommendations(),
+                'folders'         => $this->sysinfoModel->getFolders(),
+                'log'             => $this->sysinfoModel->getLogTail(200),
+                'dbInfo'          => $this->sysinfoModel->getDbInfo(),
             ],
             'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
             'passthroughVars' => [

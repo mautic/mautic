@@ -7,6 +7,9 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<object>
+ */
 class FileApiController extends CommonApiController
 {
     /**
@@ -28,7 +31,7 @@ class FileApiController extends CommonApiController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction($dir)
     {
@@ -67,7 +70,7 @@ class FileApiController extends CommonApiController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction($dir)
     {
@@ -98,7 +101,7 @@ class FileApiController extends CommonApiController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteAction($dir, $file)
     {

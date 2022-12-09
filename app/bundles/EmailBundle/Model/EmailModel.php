@@ -52,6 +52,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Email>
+ * @implements AjaxLookupModelInterface<Email>
+ */
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
@@ -353,10 +357,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
@@ -683,7 +687,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param $idHash
      *
-     * @return Stat
+     * @return Stat|null
      */
     public function getEmailStatus($idHash)
     {

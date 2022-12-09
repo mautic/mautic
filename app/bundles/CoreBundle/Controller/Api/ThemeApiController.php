@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<object>
+ */
 class ThemeApiController extends CommonApiController
 {
     /**
@@ -27,7 +30,7 @@ class ThemeApiController extends CommonApiController
     /**
      * Accepts the zip file and installs the theme from it.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function newAction(Request $request)
     {
@@ -80,7 +83,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme dir name
      *
-     * @return BinaryFileResponse
+     * @return Response
      */
     public function getAction($theme)
     {
@@ -112,7 +115,7 @@ class ThemeApiController extends CommonApiController
     /**
      * List the folders (themes) in the /themes directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction()
     {
@@ -136,7 +139,7 @@ class ThemeApiController extends CommonApiController
      *
      * @param string $theme
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteAction($theme)
     {

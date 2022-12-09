@@ -4,6 +4,9 @@ namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Trigger>
+ */
 class TriggerRepository extends CommonRepository
 {
     /**

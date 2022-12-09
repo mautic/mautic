@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -44,7 +45,7 @@ class PageType extends AbstractType
     private $model;
 
     /**
-     * @var \Mautic\UserBundle\Model\UserModel
+     * @var User
      */
     private $user;
 

@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Event;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -196,7 +197,10 @@ class FormBuilderEvent extends Event
         $this->validators[$key] = $validator;
     }
 
-    public function addValidatorsToBuilder(Form $form)
+    /**
+     * @param FormInterface<object> $form
+     */
+    public function addValidatorsToBuilder(FormInterface $form): void
     {
         if (!empty($this->validators)) {
             $validationData = (isset($form->getData()['validation'])) ? $form->getData()['validation'] : [];
