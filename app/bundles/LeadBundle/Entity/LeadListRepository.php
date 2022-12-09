@@ -207,12 +207,13 @@ class LeadListRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'll')
             ->where(
                 $qb->expr()->and(
-                    $qb->expr()->in('ll.leadlist_id', $ids),
+                    $qb->expr()->in('ll.leadlist_id', ':ids'),
                     $qb->expr()->eq('ll.lead_id', ':leadId'),
                     $qb->expr()->eq('ll.manually_removed', 0)
                 )
             )
-            ->setParameter('leadId', $lead->getId());
+            ->setParameter('leadId', $lead->getId())
+            ->setParameter('ids', $ids, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
 
         return (bool) $qb->execute()->fetchOne();
     }
