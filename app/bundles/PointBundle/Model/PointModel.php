@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends CommonFormModel<Point>
+ */
 class PointModel extends CommonFormModel
 {
     /**

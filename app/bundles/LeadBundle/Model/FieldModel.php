@@ -28,6 +28,9 @@ use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<LeadField>
+ */
 class FieldModel extends FormModel
 {
     public static $coreFields = [

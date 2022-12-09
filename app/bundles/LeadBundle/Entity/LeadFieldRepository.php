@@ -6,6 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
+/**
+ * @extends CommonRepository<LeadField>
+ */
 class LeadFieldRepository extends CommonRepository
 {
     /**

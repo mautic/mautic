@@ -57,7 +57,7 @@ abstract class CommonStatsSubscriber implements EventSubscriberInterface
 
     public function onStatsFetch(StatsEvent $event)
     {
-        /** @var CommonRepository $repository */
+        /** @var CommonRepository<object> $repository */
         foreach ($this->repositories as $repository) {
             $table = $repository->getTableName();
 
