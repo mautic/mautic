@@ -2,9 +2,11 @@
 
 namespace Mautic\AssetBundle\Controller;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\FileHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -17,7 +19,8 @@ class AssetController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $model = $this->getModel('asset');
+        $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted([
@@ -58,7 +61,7 @@ class AssetController extends FormController
         $orderBy    = $this->get('session')->get('mautic.asset.orderby', 'a.dateModified');
         $orderByDir = $this->get('session')->get('mautic.asset.orderbydir', $this->getDefaultOrderDirection());
 
-        $assets = $model->getEntities(
+        $assets = $assetModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -96,7 +99,7 @@ class AssetController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $categories = $this->getModel('asset')->getLookupResults('category', '', 0);
+        $categories = $assetModel->getLookupResults('category', '', 0);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -105,7 +108,7 @@ class AssetController extends FormController
                 'categories'  => $categories,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'model'       => $model,
+                'model'       => $assetModel,
                 'tmpl'        => $tmpl,
                 'page'        => $page,
                 'security'    => $this->get('mautic.security'),
@@ -129,6 +132,7 @@ class AssetController extends FormController
     public function viewAction($objectId)
     {
         $model       = $this->getModel('asset');
+        \assert($model instanceof AssetModel);
         $security    = $this->get('mautic.security');
         $activeAsset = $model->getEntity($objectId);
 
@@ -167,7 +171,9 @@ class AssetController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
+        $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
         $templ = $this->request->get('templ') ?? 'twig';
 
@@ -342,7 +348,7 @@ class AssetController extends FormController
                         ]),
                     ]);
 
-                    if (!$form->get('buttons')->get('save')->isClicked()) {
+                    if (!$this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
                     }
@@ -360,7 +366,7 @@ class AssetController extends FormController
                 $template       = 'Mautic\AssetBundle\Controller\AssetController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParameters,
@@ -493,7 +499,7 @@ class AssetController extends FormController
                     $entity->upload();
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     //remove the asset from request
                     $this->request->files->remove('asset');
@@ -525,7 +531,7 @@ class AssetController extends FormController
                 $template   = 'Mautic\AssetBundle\Controller\AssetController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                         'returnUrl'       => $returnUrl,

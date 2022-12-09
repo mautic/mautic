@@ -11,6 +11,9 @@ use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
+/**
+ * @extends CommonRepository<ObjectMapping>
+ */
 class ObjectMappingRepository extends CommonRepository
 {
     /**

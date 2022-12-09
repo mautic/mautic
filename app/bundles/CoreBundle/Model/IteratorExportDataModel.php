@@ -14,7 +14,12 @@ class IteratorExportDataModel implements \Iterator
     private $data;
     private $totalResult;
 
-    public function __construct(AbstractCommonModel $model, $args, callable $callback)
+    /**
+     * @param AbstractCommonModel<T> $model
+     * @param array<mixed>           $args
+     * @template T of object
+     */
+    public function __construct(AbstractCommonModel $model, array $args, callable $callback)
     {
         $this->model       = $model;
         $this->args        = $args;

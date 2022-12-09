@@ -5,6 +5,7 @@ namespace Mautic\NotificationBundle\Controller;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -44,8 +45,10 @@ class AppCallbackController extends CommonController
             $notification     = $notificationRepo->getEntity($stat['notification_id']);
 
             if (null !== $notification) {
-                $statCreated = true;
-                $this->getModel('notification')->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
+                $statCreated       = true;
+                $notificationModel = $this->getModel('notification');
+                \assert($notificationModel instanceof NotificationModel);
+                $notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
             }
         }
 

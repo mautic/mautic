@@ -4,6 +4,9 @@ namespace Mautic\ChannelBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Message>
+ */
 class MessageRepository extends CommonRepository
 {
     /**

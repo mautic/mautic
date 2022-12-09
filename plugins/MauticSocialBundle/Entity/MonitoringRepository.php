@@ -5,6 +5,9 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Monitoring>
+ */
 class MonitoringRepository extends CommonRepository
 {
     /**

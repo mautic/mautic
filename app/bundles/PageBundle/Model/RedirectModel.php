@@ -5,11 +5,12 @@ namespace Mautic\PageBundle\Model;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class RedirectModel.
+ * @extends FormModel<Redirect>
  */
 class RedirectModel extends FormModel
 {
@@ -26,14 +27,12 @@ class RedirectModel extends FormModel
         $this->urlHelper = $urlHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\PageBundle\Entity\RedirectRepository
-     */
-    public function getRepository()
+    public function getRepository(): RedirectRepository
     {
-        return $this->em->getRepository('MauticPageBundle:Redirect');
+        $result = $this->em->getRepository(Redirect::class);
+        \assert($result instanceof RedirectRepository);
+
+        return $result;
     }
 
     /**
@@ -68,8 +67,7 @@ class RedirectModel extends FormModel
             'mautic_url_redirect',
             ['redirectId' => $redirect->getRedirectId()],
             true,
-            $clickthrough,
-            $shortenUrl
+            $clickthrough
         );
 
         if (!empty($utmTags)) {
