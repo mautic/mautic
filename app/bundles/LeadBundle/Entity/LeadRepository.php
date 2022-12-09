@@ -218,28 +218,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getLeadsByUniqueFields($uniqueFieldsWithData, $leadId = null, $limit = null)
     {
-        $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('l.*')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
-        // loop through the fields and
-        foreach ($uniqueFieldsWithData as $col => $val) {
-            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
-                ->setParameter($col, $val);
-        }
-
-        // if we have a lead ID lets use it
-        if (!empty($leadId)) {
-            // make sure that its not the id we already have
-            $q->andWhere('l.id != :leadId')
-                ->setParameter('leadId', $leadId);
-        }
-
-        if ($limit) {
-            $q->setMaxResults($limit);
-        }
-
-        $results = $q->execute()->fetchAll();
+        $results = $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.*', $leadId, $limit);
 
         // Collect the IDs
         $leads = [];
@@ -281,13 +260,24 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      *
      * @param iterable<mixed> $uniqueFieldsWithData is an array of columns & values to filter by
      * @param int|null        $leadId               is the current lead id. Added to query to skip and find other leads
+     * @param int|null        $limit                Limit count of results to return
      *
-     * @return array
+     * @return array<array{id: string}>
      */
-    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, $leadId = null)
+    public function getLeadIdsByUniqueFields($uniqueFieldsWithData, ?int $leadId = null, ?int $limit = null): array
+    {
+        return $this->getLeadFieldsByUniqueFields($uniqueFieldsWithData, 'l.id', $leadId, $limit);
+    }
+
+    /**
+     * @param iterable<mixed> $uniqueFieldsWithData
+     *
+     * @return array<array<mixed>>
+     */
+    private function getLeadFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $leadId = null, ?int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('l.id')
+            ->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         // loop through the fields and
@@ -297,9 +287,13 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         // if we have a lead ID lets use it
-        if (!empty($leadId)) {
+        if ($leadId > 0) {
             // make sure that its not the id we already have
             $q->andWhere('l.id != '.$leadId);
+        }
+
+        if ($limit > 0) {
+            $q->setMaxResults($limit);
         }
 
         return $q->execute()->fetchAllAssociative();

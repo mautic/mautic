@@ -6,8 +6,8 @@ namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,13 +18,13 @@ class UniqueCustomFieldValidator extends ConstraintValidator
 {
     private LeadModel $leadModel;
     private CompanyModel $companyModel;
-    private FieldModel $fieldModel;
+    private FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier;
 
-    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, FieldModel $fieldModel)
+    public function __construct(LeadModel $leadModel, CompanyModel $companyModel, FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier)
     {
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
-        $this->fieldModel   = $fieldModel;
+        $this->leadModel                  = $leadModel;
+        $this->companyModel               = $companyModel;
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
     }
 
     /**
@@ -38,20 +38,15 @@ class UniqueCustomFieldValidator extends ConstraintValidator
         $form = $this->context->getRoot();
         \assert($form instanceof Form);
 
-        $publishedUniqueFields = [];
-        $leadFields            = $this->fieldModel->getPublishedFieldArrays($constraint->object);
-        foreach ($leadFields as $field) {
-            if (false === $field['isPublished'] || $constraint->object !== $field['object']) {
-                continue;
-            }
+        $publishedUniqueFields = $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier([
+            'isPublished'       => true,
+            'isUniqueIdentifer' => true,
+            'object'            => $constraint->object,
+        ]);
 
-            if ($field['isUniqueIdentifer']) {
-                $publishedUniqueFields[] = $field['alias'];
-            }
-        }
+        $publishedUniqueFields = array_keys($publishedUniqueFields);
 
-        $publishedUniqueFields = array_unique($publishedUniqueFields);
-
+        $uniqueFieldsData = [];
         foreach ($publishedUniqueFields as $publishedUniqueField) {
             if (!$form->has($publishedUniqueField)) {
                 continue;
@@ -62,70 +57,101 @@ class UniqueCustomFieldValidator extends ConstraintValidator
                 continue;
             }
 
-            if ($object instanceof Lead && $this->isLeadFieldValid($object, $publishedUniqueField, $data)) {
-                return;
-            }
+            $uniqueFieldsData[$publishedUniqueField] = $data;
+        }
 
-            if ($object instanceof Company && $this->isCompanyFieldValid($object, $publishedUniqueField, $data)) {
-                return;
+        $validatedFields = [];
+        if ($object instanceof Lead) {
+            $validatedFields = $this->getLeadFieldsValid($object, $uniqueFieldsData);
+        }
+
+        if ($object instanceof Company) {
+            $validatedFields = $this->getCompanyFieldsValid($object, $uniqueFieldsData);
+        }
+
+        foreach ($validatedFields as $fieldName => $isValid) {
+            if ($isValid) {
+                continue;
             }
 
             $this->context->buildViolation($constraint->message)
                 ->setCode((string) Response::HTTP_UNPROCESSABLE_ENTITY)
-                ->atPath($publishedUniqueField)
+                ->atPath($fieldName)
                 ->addViolation();
         }
     }
 
     /**
-     * @param mixed $data
+     * @param array<mixed> $fieldsData
+     *
+     * @return array<bool>
      */
-    private function isLeadFieldValid(Lead $lead, string $fieldName, $data): bool
+    private function getLeadFieldsValid(Lead $lead, array $fieldsData): array
     {
+        $leadRepository = $this->leadModel->getRepository();
+        if ('orWhere' === $leadRepository->getUniqueIdentifiersWherePart()) {
+            $fieldsValidation = [];
+            foreach ($fieldsData as $field => $data) {
+                $leads = $leadRepository->getLeadIdsByUniqueFields([$field => $data]);
+
+                $fieldsValidation[] = $this->isValid($leads, [$field], (int) $lead->getId());
+            }
+
+            return array_merge(...$fieldsValidation);
+        }
+
         // Can't use getEntities, because it refreshes some field data, that can be used in the form
-        $leads = $this->leadModel->getRepository()->getLeadIdsByUniqueFields([
-            $fieldName => $data,
-        ]);
+        $leads = $leadRepository->getLeadIdsByUniqueFields($fieldsData);
 
-        $leadsCount = count($leads);
-        if (0 === $leadsCount) {
-            return true;
-        }
-
-        if ($leadsCount > 1) {
-            return false;
-        }
-
-        if ((int) $leads[0]['id'] === (int) $lead->getId()) {
-            return true;
-        }
-
-        return false;
+        return $this->isValid($leads, array_keys($fieldsData), (int) $lead->getId());
     }
 
     /**
-     * @param mixed $data
+     * @param array<mixed> $fieldsData
+     *
+     * @return array<bool>
      */
-    private function isCompanyFieldValid(Company $company, string $fieldName, $data): bool
+    private function getCompanyFieldsValid(Company $company, array $fieldsData): array
     {
+        $companyRepository = $this->companyModel->getRepository();
+        if ('orWhere' === $companyRepository->getUniqueIdentifiersWherePart()) {
+            $fieldsValidation = [];
+            foreach ($fieldsData as $field => $data) {
+                $companies = $companyRepository->getCompanyIdsByUniqueFields([$field => $data]);
+
+                $fieldsValidation[] = $this->isValid($companies, [$field], (int) $company->getId());
+            }
+
+            return array_merge(...$fieldsValidation);
+        }
+
         // Can't use getEntities, because it refreshes some field data, that can be used in the form
-        $companies = $this->companyModel->getRepository()->getCompaniesByUniqueFields([
-            $fieldName => $data,
-        ]);
+        $companies = $companyRepository->getCompanyIdsByUniqueFields($fieldsData);
 
-        $companiesCount = count($companies);
-        if (0 === $companiesCount) {
-            return true;
+        return $this->isValid($companies, array_keys($fieldsData), (int) $company->getId());
+    }
+
+    /**
+     * @param array<array<mixed>> $objects
+     * @param array<string>       $fields
+     *
+     * @return array<bool>
+     */
+    private function isValid(array $objects, array $fields, int $objectId): array
+    {
+        $objectsCount = count($objects);
+        if (0 === $objectsCount) {
+            return array_fill_keys($fields, true);
         }
 
-        if ($companiesCount > 1) {
-            return false;
+        if ($objectsCount > 1) {
+            return array_fill_keys($fields, false);
         }
 
-        if ((int) $companies[0]['id'] === (int) $company->getId()) {
-            return true;
+        if ((int) $objects[0]['id'] === $objectId) {
+            return array_fill_keys($fields, true);
         }
 
-        return false;
+        return array_fill_keys($fields, false);
     }
 }
