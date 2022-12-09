@@ -132,13 +132,9 @@ trait FrequencyRuleTrait
             }
         }
 
-        if (isset($frequencyRules['global_categories'])) {
-            $globalCategories = $frequencyRules['global_categories'];
-        } else {
-            $globalCategories = $model->getSubscribedAndNewCategories($lead, ['global', 'email']);
-        }
-
-        $data['global_categories'] = $globalCategories;
+        $data['global_categories'] = (isset($frequencyRules['global_categories']))
+            ? $frequencyRules['global_categories']
+            : $model->getSubscribedAndNewCategories($lead, ['global', 'email']);
 
         $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
