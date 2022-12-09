@@ -21,8 +21,15 @@ use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * @template T
+ * @extends ServiceEntityRepository<T>
+ */
 class CommonRepository extends ServiceEntityRepository
 {
+    /**
+     * @phpstan-param class-string<T>|null $entityFQCN
+     */
     public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
     {
         parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', get_class($this)));
@@ -36,7 +43,7 @@ class CommonRepository extends ServiceEntityRepository
     protected $advancedFilterCommands = [];
 
     /**
-     * @var User
+     * @var User|null
      */
     protected $currentUser;
 
@@ -405,14 +412,14 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param      $filter
-     * @param null $parameterName
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param array<mixed>                  $filter
      *
      * @return array
      */
-    public function getFilterExpr(&$q, $filter, $parameterName = null)
+    public function getFilterExpr($q, array $filter, ?string $unique = null)
     {
-        $unique    = ($parameterName) ? $parameterName : $this->generateRandomParameterName();
+        $unique    = ($unique) ?: $this->generateRandomParameterName();
         $parameter = [];
 
         if (isset($filter['group'])) {
@@ -486,11 +493,11 @@ class CommonRepository extends ServiceEntityRepository
      * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
      * The Expr() sets a :now and :true parameter that must be set in the calling function.
      *
-     * @param      $q
-     * @param null $alias
-     * @param bool $setNowParameter
-     * @param bool $setTrueParameter
-     * @param bool $allowNullForPublishedUp Allow entities without a published up date
+     * @param             $q
+     * @param string|null $alias
+     * @param bool        $setNowParameter
+     * @param bool        $setTrueParameter
+     * @param bool        $allowNullForPublishedUp Allow entities without a published up date
      *
      * @return mixed
      */
@@ -601,7 +608,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildOrderByClauseFromArray($q, $order);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return [
             'total'   => $count,
@@ -1305,11 +1312,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     *
-     * @return bool
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
-    protected function buildLimiterClauses(&$q, array $args)
+    protected function buildLimiterClauses($q, array $args): void
     {
         $start = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit = array_key_exists('limit', $args) ? $args['limit'] : 0;
@@ -1321,9 +1326,9 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
-    protected function buildOrderByClause($q, array $args)
+    protected function buildOrderByClause($q, array $args): void
     {
         $orderBy = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
 
@@ -1352,8 +1357,8 @@ class CommonRepository extends ServiceEntityRepository
     /**
      * Build order by from an array.
      *
-     * @param QueryBuilder $query
-     * @param array        $clauses [['col' => 'column_a', 'dir' => 'ASC']]
+     * @param QueryBuilder|DbalQueryBuilder $query
+     * @param array                         $clauses [['col' => 'column_a', 'dir' => 'ASC']]
      *
      * @return array
      */
@@ -1443,7 +1448,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
     protected function buildWhereClause($q, array $args)
     {
@@ -1459,21 +1464,22 @@ class CommonRepository extends ServiceEntityRepository
         $queryExpression              = $q->expr()->andX();
 
         if (isset($args['ids'])) {
-            $ids = array_map('intval', $args['ids']);
+            $ids   = array_map('intval', $args['ids']);
+            $param = $this->generateRandomParameterName();
             if ($q instanceof QueryBuilder) {
-                $param = $this->generateRandomParameterName();
                 $queryExpression->add(
                     $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
                 );
                 $queryParameters[$param] = $ids;
             } else {
                 $queryExpression->add(
-                    $q->expr()->in($this->getTableAlias().'.id', $ids)
+                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
                 );
+                $q->setParameter($param, $ids, Connection::PARAM_INT_ARRAY);
             }
         } elseif (!empty($args['ownedBy'])) {
             $queryExpression->add(
-                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], (int) $args['ownedBy'][1])
+                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], (string) $args['ownedBy'][1])
             );
         }
 

@@ -30,7 +30,7 @@ class EntityLookupType extends AbstractType
     private $router;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     private $modelFactory;
 
@@ -44,6 +44,9 @@ class EntityLookupType extends AbstractType
      */
     private $choiceLoaders;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, RouterInterface $router)
     {
         $this->translator   = $translator;

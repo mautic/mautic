@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Model\AbstractCommonModel;
 use MauticPlugin\MauticSocialBundle\Entity\PostCount;
 
 /**
- * Class PostCountModel.
+ * @extends AbstractCommonModel<PostCount>
  */
 class PostCountModel extends AbstractCommonModel
 {

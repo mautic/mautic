@@ -10,7 +10,6 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
-use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
@@ -20,20 +19,30 @@ use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Model\NoteModel;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class LeadController extends FormController
 {
     use LeadDetailsTrait;
     use FrequencyRuleTrait;
+
+    public function __construct(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+    }
 
     /**
      * @param int $page
@@ -153,7 +162,9 @@ class LeadController extends FormController
             $listArgs['filter']['force'] = " $mine";
         }
 
-        $lists = $this->getModel('lead.list')->getUserLists();
+        $leadListModel = $this->getModel('lead.list');
+        \assert($leadListModel instanceof ListModel);
+        $lists = $leadListModel->getUserLists();
 
         //check to see if in a single list
         $inSingleList = (1 === substr_count($search, "$listCommand:")) ? true : false;
@@ -175,8 +186,7 @@ class LeadController extends FormController
         // Get the max ID of the latest lead added
         $maxLeadId = $model->getRepository()->getMaxLeadId();
 
-        /** @var DoNotContactRepository $dncRepository */
-        $dncRepository = $this->getModel('lead.dnc')->getDncRepo();
+        $dncRepository = $this->doNotContactModel->getDncRepo();
 
         return $this->delegateView(
             [
@@ -338,10 +348,9 @@ class LeadController extends FormController
         $integrationHelper = $this->get('mautic.helper.integration');
         $socialProfiles    = (array) $integrationHelper->getUserProfiles($lead, $fields);
         $socialProfileUrls = $integrationHelper->getSocialProfileUrlRegex(false);
-        /* @var \Mautic\LeadBundle\Model\CompanyModel $model */
 
         $companyModel = $this->getModel('lead.company');
-
+        \assert($companyModel instanceof CompanyModel);
         $companiesRepo = $companyModel->getRepository();
         $companies     = $companiesRepo->getCompaniesByLeadId($objectId);
         // Set the social profile templates
@@ -367,9 +376,11 @@ class LeadController extends FormController
 
         $integrationRepo = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPluginBundle:IntegrationEntity');
 
-        /** @var ListModel */
         $model = $this->getModel('lead.list');
-        $lists = $model->getRepository()->getLeadLists([$lead], true, true);
+        \assert($model instanceof ListModel);
+        $lists         = $model->getRepository()->getLeadLists([$lead], true, true);
+        $leadNoteModel = $this->getModel('lead.note');
+        \assert($leadNoteModel instanceof NoteModel);
 
         return $this->delegateView(
             [
@@ -386,7 +397,7 @@ class LeadController extends FormController
                     'events'            => $this->getEngagements($lead),
                     'upcomingEvents'    => $this->getScheduledCampaignEvents($lead),
                     'engagementData'    => $this->getEngagementData($lead),
-                    'noteCount'         => $this->getModel('lead.note')->getNoteCount($lead, true),
+                    'noteCount'         => $leadNoteModel->getNoteCount($lead, true),
                     'integrations'      => $integrationRepo->getIntegrationEntityByLead($lead->getId()),
                     'devices'           => $this->get('mautic.lead.repository.lead_device')->getLeadDevices($lead),
                     'auditlog'          => $this->getAuditlogs($lead),
@@ -432,13 +443,15 @@ class LeadController extends FormController
         }
 
         //set the page we came from
-        $page   = $this->get('session')->get('mautic.lead.page', 1);
-        $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
-        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
+        $page           = $this->get('session')->get('mautic.lead.page', 1);
+        $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'new']);
+        $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
-        if ('POST' === $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -513,7 +526,7 @@ class LeadController extends FormController
                         $viewParameters = ['page' => $page];
                         $returnUrl      = $this->generateUrl('mautic_contact_index', $viewParameters);
                         $template       = 'Mautic\LeadBundle\Controller\LeadController::indexAction';
-                    } elseif ($form->get('buttons')->get('save')->isClicked()) {
+                    } elseif ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $lead->getId(),
@@ -636,8 +649,10 @@ class LeadController extends FormController
             return $this->isLocked($postActionVars, $lead, 'lead.lead');
         }
 
-        $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $fields = $this->getModel('lead.field')->getPublishedFieldArrays('lead');
+        $action         = $this->generateUrl('mautic_contact_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
+        $leadFieldModel = $this->getModel('lead.field');
+        \assert($leadFieldModel instanceof FieldModel);
+        $fields = $leadFieldModel->getPublishedFieldArrays('lead');
         $form   = $model->createForm($lead, $this->get('form.factory'), $action, ['fields' => $fields]);
 
         ///Check for a submitted form and process it
@@ -669,7 +684,7 @@ class LeadController extends FormController
                         $this->get('mautic.helper.user')->getUser()->getName()
                     ));
                     $model->modifyCompanies($lead, $companies);
-                    $model->saveEntity($lead, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($lead, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     // Upload avatar if applicable
                     $image = $form['preferred_profile_image']->getData();
@@ -713,7 +728,7 @@ class LeadController extends FormController
                 $model->unlockEntity($lead);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $lead->getId(),
@@ -1070,8 +1085,9 @@ class LeadController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model  = $this->getModel('lead.lead');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('lead.lead');
+            \assert($model instanceof LeadModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1135,8 +1151,9 @@ class LeadController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model     = $this->getModel('lead');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('lead');
+            \assert($model instanceof LeadModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -1250,9 +1267,9 @@ class LeadController extends FormController
                 $lead->getOwner()
             )
         ) {
-            /** @var \Mautic\LeadBundle\Model\CompanyModel $companyModel */
             $companyModel = $this->getModel('lead.company');
-            $companies    = $companyModel->getUserCompanies();
+            \assert($companyModel instanceof CompanyModel);
+            $companies = $companyModel->getUserCompanies();
 
             // Get a list of lists for the lead
             $companyLeads = $lead->getCompanies();
@@ -1887,7 +1904,9 @@ class LeadController extends FormController
                 ]
             );
         } else {
-            $users = $this->getModel('user.user')->getRepository()->getUserList('', 0);
+            $userModel = $this->getModel('user.user');
+            \assert($userModel instanceof UserModel);
+            $users = $userModel->getRepository()->getUserList('', 0);
             $items = [];
             foreach ($users as $user) {
                 $items[$user['firstName'].' '.$user['lastName']] = $user['id'];
