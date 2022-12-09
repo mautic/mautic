@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
@@ -29,25 +30,28 @@ class LeadCategoryRepository extends CommonRepository
     }
 
     /**
+     * @param string[] $types
+     *
      * @return mixed[]
      */
-    public function getAllNewCategories(Lead $lead, string $type): array
+    public function getSubscribedAndNewCategories(Lead $lead, array $types): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
         // Fetch the records from categories.
         $parentQ = clone $qb;
-        $parentQ->select('c.id, c.title, c.alias');
+        $parentQ->select('c.id, c.title, c.alias, c.bundle');
         $parentQ->from(MAUTIC_TABLE_PREFIX.'categories', 'c');
         $parentQ->where('c.is_published = 1');
-        $parentQ->andWhere($qb->expr()->eq('c.bundle', ':bundle'));
-        $parentQ->setParameter('bundle', $type, Types::STRING);
+        $parentQ->andWhere($qb->expr()->in('c.bundle', ':bundles'));
+        $parentQ->setParameter('bundles', $types, Connection::PARAM_STR_ARRAY);
 
         // Get the category ids for particular lead
         $subQ = clone $qb;
         $subQ->select('lc.category_id');
         $subQ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc');
         $subQ->where($qb->expr()->eq('lc.lead_id', ':leadId'));
+        $subQ->andWhere($qb->expr()->eq('lc.manually_removed', 1));
         $subQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
 
         // Add sub-query
@@ -56,14 +60,7 @@ class LeadCategoryRepository extends CommonRepository
         // Add sub-query parameter.
         $parentQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
 
-        $results = $parentQ->execute()
-            ->fetchAll();
-
-        $categories = [];
-        foreach ($results as $category) {
-            $categories[$category['id']] = $category;
-        }
-
-        return $categories;
+        return $parentQ->execute()
+            ->fetchAllAssociative();
     }
 }

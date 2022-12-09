@@ -135,10 +135,7 @@ trait FrequencyRuleTrait
         if (isset($frequencyRules['global_categories'])) {
             $globalCategories = $frequencyRules['global_categories'];
         } else {
-            $leadSubscribedCategories = $model->getLeadCategories($lead);
-            $newGlobalCategories      = $model->getAllNewCategories($lead, 'global');
-
-            $globalCategories = array_merge($leadSubscribedCategories, $newGlobalCategories);
+            $globalCategories = $model->getSubscribedAndNewCategories($lead, ['global', 'email']);
         }
 
         $data['global_categories'] = $globalCategories;
