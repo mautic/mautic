@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Email;
 
 /**
- * Class RedirectRepository.
+ * @extends CommonRepository<Redirect>
  */
 class RedirectRepository extends CommonRepository
 {

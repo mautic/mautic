@@ -6,7 +6,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ReportRepository.
+ * @extends CommonRepository<Report>
  */
 class ReportRepository extends CommonRepository
 {
