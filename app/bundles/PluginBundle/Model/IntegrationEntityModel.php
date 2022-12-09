@@ -7,7 +7,7 @@ use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Integration\IntegrationObject;
 
 /**
- * Class IntegrationEntityModel.
+ * @extends FormModel<IntegrationEntity>
  */
 class IntegrationEntityModel extends FormModel
 {

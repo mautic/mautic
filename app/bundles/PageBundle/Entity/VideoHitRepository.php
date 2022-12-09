@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class VideoHitRepository.
+ * @extends CommonRepository<VideoHit>
  */
 class VideoHitRepository extends CommonRepository
 {

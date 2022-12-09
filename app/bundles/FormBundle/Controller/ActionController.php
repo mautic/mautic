@@ -5,6 +5,7 @@ namespace Mautic\FormBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -46,7 +47,9 @@ class ActionController extends CommonFormController
         }
 
         //fire the form builder event
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
+        $formModel = $this->getModel('form.form');
+        \assert($formModel instanceof FormModel);
+        $customComponents = $formModel->getCustomComponents();
         $form             = $this->get('form.factory')->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
@@ -149,8 +152,10 @@ class ActionController extends CommonFormController
         $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
         if (null !== $formAction) {
+            $formModel = $this->getModel('form.form');
+            \assert($formModel instanceof FormModel);
             $actionType             = $formAction['type'];
-            $customComponents       = $this->getModel('form.form')->getCustomComponents();
+            $customComponents       = $formModel->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             //ajax only for form fields

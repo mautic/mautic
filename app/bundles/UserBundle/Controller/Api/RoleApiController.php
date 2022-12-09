@@ -3,17 +3,27 @@
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Model\RoleModel;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Role>
+ */
 class RoleApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var RoleModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('user.role');
-        $this->entityClass      = 'Mautic\UserBundle\Entity\Role';
+        $roleModel = $this->getModel('user.role');
+        \assert($roleModel instanceof RoleModel);
+
+        $this->model            = $roleModel;
+        $this->entityClass      = Role::class;
         $this->entityNameOne    = 'role';
         $this->entityNameMulti  = 'roles';
         $this->serializerGroups = ['roleDetails', 'publishDetails'];
