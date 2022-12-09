@@ -51,6 +51,11 @@ class Message extends FormEntity
      */
     private $channels;
 
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
