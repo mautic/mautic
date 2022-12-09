@@ -6,6 +6,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<ContactExportScheduler>
+ */
 class ContactExportSchedulerRepository extends CommonRepository
 {
 }

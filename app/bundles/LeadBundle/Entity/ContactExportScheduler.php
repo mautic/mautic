@@ -22,6 +22,11 @@ class ContactExportScheduler
     /** @var array<mixed> */
     private array $changes = [];
 
+    /**
+     * @template T of ClassMetadata
+     *
+     * @param T $metadata
+     */
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);

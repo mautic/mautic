@@ -45,7 +45,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         $contactExportSchedulerRows = $this->checkContactExportScheduler(1);
         /** @var ContactExportScheduler $contactExportScheduler */
         $contactExportScheduler     = $contactExportSchedulerRows[0];
-        $this->runCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
+        $this->testSymfonyCommand(ContactScheduledExportCommand::COMMAND_NAME, ['--ids' => $contactExportScheduler->getId()]);
         $this->checkContactExportScheduler(0);
         /** @var CoreParametersHelper $coreParametersHelper */
         $coreParametersHelper    = self::$container->get('mautic.helper.core_parameters');

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -25,9 +16,9 @@ class PreUpAssertionMigrationTest extends TestCase
     {
         $migration = new class() extends PreUpAssertionMigration {
             /**
-             * @var array
+             * @var array<string>
              */
-            public $messages = [];
+            public array $messages = [];
 
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct()
@@ -53,9 +44,9 @@ class PreUpAssertionMigrationTest extends TestCase
     {
         $migration = new class() extends PreUpAssertionMigration {
             /**
-             * @var array
+             * @var array<string>
              */
-            public $messages = [];
+            public array $messages = [];
 
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct()
@@ -107,9 +98,9 @@ class PreUpAssertionMigrationTest extends TestCase
     {
         $migration = new class() extends PreUpAssertionMigration {
             /**
-             * @var array
+             * @var array<string>
              */
-            public $messages = [];
+            public array $messages = [];
 
             /** @noinspection PhpMissingParentConstructorInspection */
             public function __construct()

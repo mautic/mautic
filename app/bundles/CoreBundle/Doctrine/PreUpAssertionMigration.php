@@ -10,9 +10,9 @@ use Doctrine\Migrations\Exception\SkipMigration;
 abstract class PreUpAssertionMigration extends AbstractMauticMigration
 {
     /**
-     * @var array[]
+     * @var array<int, array<string>>
      */
-    private $skipAssertions = [];
+    private array $skipAssertions = [];
 
     /**
      * Implement this method to add skip assertions via `PreUpAssertionMigration::skipAssertion()`.

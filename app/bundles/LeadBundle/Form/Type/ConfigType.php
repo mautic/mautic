@@ -105,7 +105,7 @@ class ConfigType extends AbstractType
                 'label' => 'mautic.lead.background.export.csv',
                 'data'  => $options['data']['contact_export_in_background'] ?? false,
                 'attr'  => [
-                    'tooltip' => 'mautic.api.config.form.api.enabled.tooltip',
+                    'tooltip' => 'mautic.lead.background.export.csv.tooltip',
                 ],
             ]
         );

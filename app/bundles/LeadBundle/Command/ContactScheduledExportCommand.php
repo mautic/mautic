@@ -65,9 +65,9 @@ class ContactScheduledExportCommand extends Command
 
         foreach ($contactExportSchedulers as $contactExportScheduler) {
             $contactExportSchedulerEvent = new ContactExportSchedulerEvent($contactExportScheduler);
-            $this->eventDispatcher->dispatch(LeadEvents::CONTACT_EXPORT_PREPARE_FILE, $contactExportSchedulerEvent);
-            $this->eventDispatcher->dispatch(LeadEvents::CONTACT_EXPORT_SEND_EMAIL, $contactExportSchedulerEvent);
-            $this->eventDispatcher->dispatch(LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL, $contactExportSchedulerEvent);
+            $this->eventDispatcher->dispatch($contactExportSchedulerEvent, LeadEvents::CONTACT_EXPORT_PREPARE_FILE);
+            $this->eventDispatcher->dispatch($contactExportSchedulerEvent, LeadEvents::CONTACT_EXPORT_SEND_EMAIL);
+            $this->eventDispatcher->dispatch($contactExportSchedulerEvent, LeadEvents::POST_CONTACT_EXPORT_SEND_EMAIL);
             ++$count;
         }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\ContactExportScheduler;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ContactExportSchedulerEvent extends Event
 {

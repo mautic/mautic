@@ -2099,8 +2099,8 @@ class LeadController extends FormController
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch(
-            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED,
-            new ContactExportSchedulerEvent($contactExportScheduler)
+            new ContactExportSchedulerEvent($contactExportScheduler),
+            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
         );
 
         $this->addFlash('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
