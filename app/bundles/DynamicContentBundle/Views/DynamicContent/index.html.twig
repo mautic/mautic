@@ -1,0 +1,33 @@
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block mauticContent %}mauticWebhook{% endblock %}
+{% block headerTitle %}{% trans %}mautic.dynamicContent.dynamicContents{% endtrans %}{% endblock %}
+
+{% block actions %}
+
+{{- include(
+    'MauticCoreBundle:Helper:page_actions.html.twig', 
+    {
+        templateButtons: {
+            new: permissions['dynamiccontent:dynamiccontents:create'],
+        },
+        routeBase: 'dynamicContent',
+    })
+}}
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+{{- include(
+    'MauticCoreBundle:Helper:list_toolbar.html.twig', 
+    {
+        searchValue: searchValue,
+        searchHelp: 'mautic.page.help.searchcommands',
+        action: currentRoute,
+    })
+}}
+    <div class="page-list">
+        <?php $view['slots']->output('_content'); ?>
+    </div>
+</div>
+{% endblock %}

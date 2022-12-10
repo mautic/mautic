@@ -94,7 +94,7 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:list.html.php',
+                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
@@ -378,8 +378,7 @@ class DynamicContentController extends FormController
             'dynamiccontent:dynamiccontents:viewown',
             'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -446,7 +445,8 @@ class DynamicContentController extends FormController
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
+            if (
+                !$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',
                     'dynamiccontent:dynamiccontents:viewother',
@@ -502,8 +502,7 @@ class DynamicContentController extends FormController
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',
                 $entity->getCreatedBy()
-            )
-            ) {
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'notification');
@@ -566,8 +565,7 @@ class DynamicContentController extends FormController
                     'dynamiccontent:dynamiccontents:viewown',
                     'dynamiccontent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
-                )
-                ) {
+                )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'dynamicContent', true);
