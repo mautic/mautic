@@ -42,9 +42,9 @@
                                         :
                                         \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices(list)
                                     %}
-                                    {% set list = choices|json_encode() %}
+                                    {% set list = choices|json_encode %}
                                     {% set callback = (params.properties.callback is not empty) ? params.properties.callback : '' %}
-                                    {% set operators = (params.operators is not empty) ? (params.operators|json_encode())|escape : '{}' %}
+                                    {% set operators = (params.operators is not empty) ? (params.operators|json_encode)|escape : '{}' %}
                                 {% endfor %}
 
                                 <option value="{{ value|escape }}" data-mautic="available_{{ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-list="{{ list|escape }}" data-field-callback="{{ callback }}" data-field-operators='{{ operators }}' class="segment-filter fa {{ icon }}">{{ params.label|trans }}</option>
@@ -58,15 +58,11 @@
         </div>
     </div>
     <div data-filter-container data-index="{{ form.filters|length }}">
-    {% for i, filter in form.filters %}
-    {% endfor %}
-    <?php
-    foreach ($form['filters'] as $i => $filter) {
-        $isPrototype = ('__name__' == $filter->vars['name']);
-        if ($isPrototype || isset($form->vars['fields'][$filter->vars['value']['object']][$filter->vars['value']['field']])) {
-            echo $view['form']->widget($filter, ['first' => (0 === $i)]);
-        }
-    }
-    ?>
+        {% for i, filter in form.filters %}
+            {% set isPrototype = ('__name__' == filter.vars.name) %}
+            {% if isPrototype or form.vars.fields.{filter.vars.value.object}.{filter.vars.value.object}.{filter.vars.value.field} is defined %}
+                {{ form_widget(filter, {'first' : (0 === i)}) }}
+            {% endif %}
+        {% endfor %}
     </div>
 </div>
