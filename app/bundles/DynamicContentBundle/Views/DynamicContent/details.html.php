@@ -75,21 +75,21 @@ if (!$isEmbedded) {
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div class="text-muted"><?php echo $entity->getDescription(); ?></div>
-                        <?php if ($entity->isVariant(true)): ?>
+                        <?php if ($entity->isVariant(true)) : ?>
                             <div class="small">
                                 <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
                                     <?php echo $view['translator']->trans('mautic.core.variant_of', ['%parent%' => $variants['parent']->getName()]); ?>
                                 </a>
                             </div>
                         <?php endif; ?>
-                        <?php if ($entity->isTranslation(true)): ?>
+                        <?php if ($entity->isTranslation(true)) : ?>
                             <div class="small">
                                 <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
                                     <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
                                 </a>
                             </div>
                         <?php endif; ?>
-                        <?php if (!$entity->getIsCampaignBased()): ?>
+                        <?php if (!$entity->getIsCampaignBased()) : ?>
                             <div class="small">
                                 <?php echo $view['translator']->trans('mautic.dynamicContent.header.is_filter_based', ['%slot%' => $entity->getSlotName()]); ?>
                             </div>
@@ -104,28 +104,28 @@ if (!$isEmbedded) {
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            <?php echo $view->render(
-                                'MauticCoreBundle:Helper:details.html.php',
-                                ['entity' => $entity]
-                            ); ?>
-                            <tr>
-                                <td width="20%"><span class="fw-b textTitle">
-                                    <?php echo $view['translator']->trans('mautic.dynamicContent.slot.campaign'); ?>
-                                </td>
-                                <td>
-                                    <?php echo $entity->getIsCampaignBased() ? 'Yes' : 'No'; ?>
-                                </td>
-                            </tr>
-                            <?php if (!$entity->getIsCampaignBased()) : ?>
-                            <tr>
-                                <td width="20%"><span class="fw-b textTitle">
-                                    <?php echo $view['translator']->trans('mautic.dynamicContent.label.slot_name'); ?>
-                                </td>
-                                <td>
-                                    <?php echo $entity->getSlotName(); ?>
-                                </td>
-                            </tr>
-                            <?php endif; ?>
+                                <?php echo $view->render(
+                                    'MauticCoreBundle:Helper:details.html.php',
+                                    ['entity' => $entity]
+                                ); ?>
+                                <tr>
+                                    <td width="20%"><span class="fw-b textTitle">
+                                            <?php echo $view['translator']->trans('mautic.dynamicContent.slot.campaign'); ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $entity->getIsCampaignBased() ? 'Yes' : 'No'; ?>
+                                    </td>
+                                </tr>
+                                <?php if (!$entity->getIsCampaignBased()) : ?>
+                                    <tr>
+                                        <td width="20%"><span class="fw-b textTitle">
+                                                <?php echo $view['translator']->trans('mautic.dynamicContent.label.slot_name'); ?>
+                                        </td>
+                                        <td>
+                                            <?php echo $entity->getSlotName(); ?>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -137,8 +137,7 @@ if (!$isEmbedded) {
             <!-- page detail collapseable toggler -->
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
-                       data-target="#page-details">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#page-details">
                         <span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?>
                     </a>
                 </span>
@@ -179,12 +178,12 @@ if (!$isEmbedded) {
                         <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
                     </a>
                 </li>
-                <?php if ($showTranslations): ?>
-                <li class>
-                    <a href="#translation-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.core.translations'); ?>
-                    </a>
-                </li>
+                <?php if ($showTranslations) : ?>
+                    <li class>
+                        <a href="#translation-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.core.translations'); ?>
+                        </a>
+                    </li>
                 <?php endif; ?>
             </ul>
             <!--/ tabs controls -->
@@ -200,7 +199,7 @@ if (!$isEmbedded) {
 
             </div>
             <!-- #translation-container -->
-            <?php if ($showTranslations): ?>
+            <?php if ($showTranslations) : ?>
                 <div class="tab-pane bdr-w-0" id="translation-container">
                     <?php echo $translationContent; ?>
                 </div>

@@ -52,17 +52,17 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <div class="col-xs-12">
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active">
-                        <a href="#details" role="tab" data-toggle="tab"<?php echo $mainErrors; ?>>
+                        <a href="#details" role="tab" data-toggle="tab" <?php echo $mainErrors; ?>>
                             <?php echo $view['translator']->trans('mautic.core.details'); ?>
-                            <?php if ($mainErrors): ?>
+                            <?php if ($mainErrors) : ?>
                                 <i class="fa fa-warning"></i>
                             <?php endif; ?>
                         </a>
                     </li>
                     <li class="<?php echo ($form->vars['value']->isCampaignBased() || isset($form['updateSelect'])) ? 'hide' : ''; ?>" id="dwcFiltersTab">
-                        <a href="#filters" role="tab" data-toggle="tab"<?php echo $filterErrors; ?>>
+                        <a href="#filters" role="tab" data-toggle="tab" <?php echo $filterErrors; ?>>
                             <?php echo $view['translator']->trans('mautic.core.filters'); ?>
-                            <?php if ($filterErrors): ?>
+                            <?php if ($filterErrors) : ?>
                                 <i class="fa fa-warning"></i>
                             <?php endif; ?>
                         </a>
@@ -96,18 +96,16 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                 </div>
                                 <div class="col-xs-5">
                                     <div class="form-group">
-                                        <div class="available-filters mb-md pl-0"
-                                             data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>"
-                                             data-index="<?php echo $index + 1; ?>">
+                                        <div class="available-filters mb-md pl-0" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
                                             <select class="chosen form-control" id="available_filters">
                                                 <option value=""></option>
                                                 <?php
-                                                foreach ($fields as $object => $field):
+                                                foreach ($fields as $object => $field) :
                                                     $header = $object;
                                                     $icon   = ('company' == $object) ? 'building' : 'user';
-                                                    ?>
-                                                    <optgroup label="<?php echo $view['translator']->trans('mautic.lead.'.$header); ?>">
-                                                        <?php foreach ($field as $value => $params):
+                                                ?>
+                                                    <optgroup label="<?php echo $view['translator']->trans('mautic.lead.' . $header); ?>">
+                                                        <?php foreach ($field as $value => $params) :
                                                             $list      = (!empty($params['properties']['list'])) ? $params['properties']['list'] : [];
                                                             $choices   = ('boolean' === $params['properties']['type'])
                                                                 ?
@@ -120,15 +118,8 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                             $operators = (!empty($params['operators'])) ? $view->escape(
                                                                 json_encode($params['operators'])
                                                             ) : '{}';
-                                                            ?>
-                                                            <option value="<?php echo $view->escape($value); ?>"
-                                                                    id="available_<?php echo $object.'_'.$value; ?>"
-                                                                    data-field-object="<?php echo $object; ?>"
-                                                                    data-field-type="<?php echo $params['properties']['type']; ?>"
-                                                                    data-field-list="<?php echo $view->escape($list); ?>"
-                                                                    data-field-callback="<?php echo $callback; ?>"
-                                                                    data-field-operators="<?php echo $operators; ?>"
-                                                                    class="segment-filter <?php echo $icon; ?>">
+                                                        ?>
+                                                            <option value="<?php echo $view->escape($value); ?>" id="available_<?php echo $object . '_' . $value; ?>" data-field-object="<?php echo $object; ?>" data-field-type="<?php echo $params['properties']['type']; ?>" data-field-list="<?php echo $view->escape($list); ?>" data-field-callback="<?php echo $callback; ?>" data-field-operators="<?php echo $operators; ?>" class="segment-filter <?php echo $icon; ?>">
                                                                 <?php echo $view['translator']->trans($params['label']); ?>
                                                             </option>
                                                         <?php endforeach; ?>
@@ -167,11 +158,11 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <div id="slotNameDiv" class="<?php echo $form->vars['value']->isCampaignBased() ? 'hide' : ''; ?>">
                 <?php echo $view['form']->row($form['slotName']); ?>
             </div>
-            <hr/>
+            <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
-            <br/>
+            <br />
             <?php
-            foreach ($form['utmTags'] as $utmTag):
+            foreach ($form['utmTags'] as $utmTag) :
                 echo $view['form']->row($utmTag);
             endforeach;
             ?>
@@ -186,22 +177,21 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
 <?php echo $view['form']->end($form); ?>
 
 <div class="hide" id="templates">
-    <?php foreach ($templates as $dataKey => $template): ?>
-        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="'.$view['translator']->trans('mautic.lead.tags.select_or_create')
-            .'" data-no-results-text="'.$view['translator']->trans('mautic.lead.tags.enter_to_create')
-            .'" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
-        <select class="form-control not-chosen <?php echo $template; ?>" name="dwc[filters][__name__][filter]"
-                id="dwc_filters___name___filter"<?php echo $attr; ?>>
+    <?php foreach ($templates as $dataKey => $template) : ?>
+        <?php $attr = ('tags' == $dataKey) ? ' data-placeholder="' . $view['translator']->trans('mautic.lead.tags.select_or_create')
+            . '" data-no-results-text="' . $view['translator']->trans('mautic.lead.tags.enter_to_create')
+            . '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : ''; ?>
+        <select class="form-control not-chosen <?php echo $template; ?>" name="dwc[filters][__name__][filter]" id="dwc_filters___name___filter" <?php echo $attr; ?>>
             <?php
-            if (isset($form->vars[$dataKey])):
-                foreach ($form->vars[$dataKey] as $value => $label):
-                    if (is_array($label)):
+            if (isset($form->vars[$dataKey])) :
+                foreach ($form->vars[$dataKey] as $value => $label) :
+                    if (is_array($label)) :
                         echo "<optgroup label=\"$value\">\n";
-                        foreach ($label as $optionValue => $optionLabel):
+                        foreach ($label as $optionValue => $optionLabel) :
                             echo "<option value=\"$optionValue\">$optionLabel</option>\n";
                         endforeach;
                         echo "</optgroup>\n";
-                    else:
+                    else :
                         if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
                             continue;
                         }
