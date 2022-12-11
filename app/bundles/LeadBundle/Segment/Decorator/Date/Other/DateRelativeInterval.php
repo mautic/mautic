@@ -86,8 +86,14 @@ class DateRelativeInterval implements FilterDecoratorInterface
         $date = $this->dateOptionParameters->getDefaultDate();
         $date->modify($this->originalValue);
 
+        // set now datetime for relative dates like -8 hours, -24 minutes with gt/lt types of operator
+        if ($contactSegmentFilterCrate->hasTimeParts() && in_array($contactSegmentFilterCrate->getOperator(), ['gt', 'lt'])) {
+            return $date->toUtcString('Y-m-d H:i:s');
+        }
+
         $operator = $this->getOperator($contactSegmentFilterCrate);
         $format   = 'Y-m-d';
+
         if ('like' === $operator || 'notLike' === $operator) {
             $format .= '%';
         }
