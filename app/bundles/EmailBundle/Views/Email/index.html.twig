@@ -1,0 +1,35 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% block mauticContent %}email{% endblock %}
+{% block headerTitle %}{% trans %}mautic.email.emails{% endtrans %}{% endblock %}
+
+{% block actions %}
+    {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+        'templateButtons' : {
+            'new' : permissions['email:emails:create'],
+        }
+        'routeBase' : 'email',
+    })
+    -}}
+{% endblock %}
+
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        'searchValue' : searchValue,
+        'searchHelp'  : 'mautic.email.help.searchcommands',
+        'action'      : currentRoute,
+        'filters'     : filters,
+    })
+    -}}
+
+    <div class="page-list">
+        {{ slot('_content') }}
+    </div>
+</div>
+
