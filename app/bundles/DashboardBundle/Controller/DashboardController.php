@@ -29,8 +29,8 @@ class DashboardController extends AbstractFormController
      */
     public function indexAction()
     {
-        /** @var DashboardModel $model */
         $model   = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $widgets = $model->getWidgets();
 
         // Apply the default dashboard if no widget exists
@@ -133,6 +133,7 @@ class DashboardController extends AbstractFormController
         $widget = new Widget();
 
         $model  = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
         //get the user form factory
@@ -195,6 +196,7 @@ class DashboardController extends AbstractFormController
     public function editAction($objectId)
     {
         $model  = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
@@ -352,8 +354,10 @@ class DashboardController extends AbstractFormController
      */
     public function exportAction()
     {
+        $dashboardModel = $this->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
         $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
-        $response = new JsonResponse($this->getModel('dashboard')->toArray($filename));
+        $response = new JsonResponse($dashboardModel->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');

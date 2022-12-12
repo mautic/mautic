@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * @property LeadModel $model
+ * @extends CommonApiController<Lead>
  */
 class LeadApiController extends CommonApiController
 {
@@ -31,9 +31,21 @@ class LeadApiController extends CommonApiController
 
     public const MODEL_ID = 'lead.lead';
 
+    /**
+     * @var LeadModel|null
+     */
+    protected $model = null;
+
+    public function __construct(DoNotContactModel $doNotContactModel)
+    {
+        $this->doNotContactModel = $doNotContactModel;
+    }
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel(self::MODEL_ID);
+        $leadModel = $this->getModel(self::MODEL_ID);
+        \assert($leadModel instanceof LeadModel);
+        $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
@@ -411,13 +423,13 @@ class LeadApiController extends CommonApiController
             return $this->returnError(
                 'Invalid reason code given',
                 Response::HTTP_BAD_REQUEST,
-                'Reason code needs to be an integer and higher than 0.'
+                ['Reason code needs to be an integer and higher than 0.']
             );
         }
 
         $comments = InputHelper::clean($this->request->request->get('comments'));
 
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+        /** @var DoNotContactModel $doNotContact */
         $doNotContact = $this->get('mautic.lead.model.dnc');
         $doNotContact->addDncForContact($entity->getId(), $channel, $reason, $comments);
         $view = $this->view([$this->entityNameOne => $entity]);
@@ -435,7 +447,7 @@ class LeadApiController extends CommonApiController
      */
     public function removeDncAction($id, $channel)
     {
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $doNotContact */
+        /** @var DoNotContactModel $doNotContact */
         $doNotContact = $this->get('mautic.lead.model.dnc');
 
         $entity = $this->model->getEntity((int) $id);
@@ -662,7 +674,7 @@ class LeadApiController extends CommonApiController
             $viewParameters = [];
             $data           = $this->getFrequencyRuleFormData($entity, null, null, false, $parameters['frequencyRules']);
 
-            if (!$frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
+            if (true !== $frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
                 $formErrors = $this->getFormErrorMessages($frequencyForm);
                 $msg        = $this->getFormErrorMessage($formErrors);
 

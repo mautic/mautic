@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class ImportModel.
+ * @extends FormModel<Import>
  */
 class ImportModel extends FormModel
 {

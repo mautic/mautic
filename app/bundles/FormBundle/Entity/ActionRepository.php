@@ -5,7 +5,7 @@ namespace Mautic\FormBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ActionRepository.
+ * @extends CommonRepository<Action>
  */
 class ActionRepository extends CommonRepository
 {

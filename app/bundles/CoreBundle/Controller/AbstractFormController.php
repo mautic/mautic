@@ -2,7 +2,9 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 abstract class AbstractFormController extends CommonController
 {
@@ -239,5 +241,16 @@ abstract class AbstractFormController extends CommonController
         }
 
         return $vars;
+    }
+
+    protected function getFormButton(FormInterface $form, array $elements): ClickableInterface
+    {
+        foreach ($elements as $element) {
+            $form = $form->get($element);
+        }
+
+        \assert($form instanceof ClickableInterface);
+
+        return $form;
     }
 }

@@ -5,6 +5,7 @@ namespace Mautic\DashboardBundle\Controller;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -64,8 +65,10 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateWidgetOrderingAction(Request $request)
     {
-        $data = $request->request->get('ordering');
-        $repo = $this->getModel('dashboard')->getRepository();
+        $data           = $request->request->get('ordering');
+        $dashboardModel = $this->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
+        $repo = $dashboardModel->getRepository();
         $repo->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 

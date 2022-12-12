@@ -6,7 +6,7 @@ use Doctrine\DBAL\Exception;
 use PDO;
 
 /**
- * IpAddressRepository.
+ * @extends CommonRepository<IpAddress>
  */
 class IpAddressRepository extends CommonRepository
 {

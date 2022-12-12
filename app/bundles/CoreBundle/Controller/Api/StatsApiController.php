@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
- * Class StatsApiController.
+ * @extends CommonApiController<object>
  */
 class StatsApiController extends CommonApiController
 {

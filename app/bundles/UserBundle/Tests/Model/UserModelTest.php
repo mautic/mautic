@@ -9,9 +9,9 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -56,7 +56,7 @@ class UserModelTest extends TestCase
     private $userTokenService;
 
     /**
-     * @var MockObject&Logger
+     * @var MockObject&LoggerInterface
      */
     private $logger;
 
@@ -69,7 +69,7 @@ class UserModelTest extends TestCase
         $this->router           = $this->createMock(Router::class);
         $this->translator       = $this->createMock(Translator::class);
         $this->userToken        = $this->createMock(UserToken::class);
-        $this->logger           = $this->createMock(Logger::class);
+        $this->logger           = $this->createMock(LoggerInterface::class);
 
         $this->userModel = new UserModel($this->mailHelper, $this->userTokenService);
         $this->userModel->setEntityManager($this->entityManager);
@@ -118,7 +118,7 @@ class UserModelTest extends TestCase
             ->willThrowException(new \Exception($errorMessage));
 
         $this->logger->expects($this->once())
-            ->method('addError')
+            ->method('error')
             ->with($errorMessage);
 
         $this->userModel->sendResetEmail($this->user);
