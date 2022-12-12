@@ -1,18 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 $mauticContent = $view['slots']->get(
     'mauticContent',
     isset($mauticTemplateVars['mauticContent']) ? $mauticTemplateVars['mauticContent'] : ''
 );
+
+$editorFonts = (array) $view['config']->get('editor_fonts');
+usort($editorFonts, static function ($fontA, $fontB): int {
+    $fontAName = $fontA['name'] ?? '';
+    $fontBName = $fontB['name'] ?? '';
+
+    return strcasecmp($fontAName, $fontBName);
+});
 ?>
 
 <script>
@@ -26,6 +25,6 @@ $mauticContent = $view['slots']->get(
     var mauticEnv         = '<?php echo $app->getEnvironment(); ?>';
     var mauticLang        = <?php echo $view['translator']->getJsLang(); ?>;
     var mauticLocale      = '<?php echo $app->getRequest()->getLocale(); ?>';
-    var mauticEditorFonts = <?php echo json_encode($view['config']->get('editor_fonts')); ?>;
+    var mauticEditorFonts = <?php echo json_encode($editorFonts); ?>;
 </script>
 <?php $view['assets']->outputSystemScripts(true); ?>
