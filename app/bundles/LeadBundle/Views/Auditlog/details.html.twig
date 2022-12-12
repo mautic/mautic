@@ -3,6 +3,7 @@
     - lead
     - event
 #}
+{#
 $details = $event['details'];
 $type    = $event['eventType'];
 $text    = '';
@@ -13,32 +14,28 @@ foreach ($details as $key => $value) {
         $objects[$key] = $value;
     }
 }
-if (0 === count($objects)) {
-    return '';
-}
+#}
 {% if 'create' == event.eventType %}
   <table class="table">
     <tr>
       <th>Field/Object</th><th>New Value</th><th>Old Value</th>
     </tr>
-    foreach ($objects as $field => $values) {
     {% for field, values in event.details.fields|default([]) %}
         <tr>
-        if (is_array($values)) {
-            if (count($values) >= 2) {
-                <td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>
-            } else {
-                $v = '';
-                foreach ($values as $k => $value) {
-                    $v = $k.': '.$view->escape(implode(', ', $value));
-                }
-                <td>{$view->escape($field)}</td><td>{$view->escape($v)}</td><td>&nbsp;</td>
-            }
-        } else {
-            <td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values))}</td><td>&nbsp;</td>
-        }
+          {% if values is iterable %}
+              {% if values|length >= 2 %}
+                  <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values[1])|purify }}</td><td>{{ normalizeStringValue(values[0])|purify }}</td>
+              {% else %}
+                  {% set v = '' %}
+                  {% for k, value in values %}
+                      {% set v = k~': '~value|join(', ')|purify %}
+                  {% endfor %}
+                  <td>{{ field|purify }}</td><td>{{ v|purify }}</td><td>&nbsp;</td>
+              {% endif %}
+          {% else %}
+              <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values)|purify }}</td><td>&nbsp;</td>
+          {% endif %}
         </tr>
-    }
     {% endfor %}
   </table>
 {% endif %}
@@ -46,34 +43,34 @@ if (0 === count($objects)) {
   {{ 'mautic.lead.audit.deleted'|trans }}
 {% endif %}
 {% if 'update' == event.eventType %}
-        $text = '<table class="table">';
-        $text .= '<tr>';
-        $text .= '<th>Field/Object</th><th>New Value</th><th>Old Value</th>';
-        $text .= '</tr>';
-        foreach ($objects as $field => $values) {
-            $text .= '<tr>';
-            if (is_array($values)) {
-                if (count($values) >= 2) {
-                    $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[1]))}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values[0]))}</td>";
-                } else {
-                    $v = '';
-                    foreach ($values as $k => $value) {
-                        $v = $k.': '.$view->escape(implode(', ', $value));
-                    }
-                    $text .= "<td>{$view->escape($field)}</td><td>$v</td><td>&nbsp;</td>";
-                }
-            } else {
-                $text .= "<td>{$view->escape($field)}</td><td>{$view->escape($view['formatter']->normalizeStringValue($values))}</td><td>&nbsp;</td>";
-            }
-            $text .= '</tr>';
-        }
-        $text .= '</table>';
+  <table class="table">
+    <tr>
+      <th>Field/Object</th><th>New Value</th><th>Old Value</th>
+    </tr>
+    {% for field, values in event.details.fields|default([]) %}
+      <tr>
+        {% if values is iterable %}
+          {% if values|length >= 2 %}
+              <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values[1])|purify }}</td><td>{{ normalizeStringValue(values[0])|purify }}</td>
+          {% else %}
+              {% set v = '' %}
+              {% for k, value in values %}
+                  {% set v = k~': '~value|join(', ')|purify %}
+              {% endfor %}
+              <td>{{ field|purify }}</td><td>{{ v }}</td><td>&nbsp;</td>
+          {% endif %}
+        {% else %}
+          <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values)|purify }}</td><td>&nbsp;</td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+  </table>
 {% endif %}
 {% if 'identified' == event.eventType %}
   {{ 'mautic.lead.audit.identified'|trans }}
 {% endif %}
 {% if 'ipadded' == event.eventType %}
-  {{ 'mautic.lead.audit.accessed'|trans }} implode(',', array_splice($details, 1))
+  {{ 'mautic.lead.audit.accessed'|trans }} {{ event.details[1]|join(', ') }}{#implode(',', array_splice($details, 1))#}
 {% endif %}
 {% if 'merged' == event.eventType %}
   {{ 'mautic.lead.audit.merged'|trans }}

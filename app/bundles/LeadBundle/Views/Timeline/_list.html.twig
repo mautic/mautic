@@ -55,6 +55,7 @@
                 <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
             </tr>
             {% if event.contentTemplate is defined %}
+                <!-- contentTemplate: "{{ event.contentTemplate }}" -->
                 <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index0) }} timeline-details hide" id="timeline-details-{{ counter }}">
                     <td colspan="4">
                         {{ include(event.contentTemplate, {'event': event, 'lead': lead}) }}

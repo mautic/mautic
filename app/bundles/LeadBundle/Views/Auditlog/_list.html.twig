@@ -9,7 +9,7 @@
         <thead>
         <tr>
             <th class="timeline-icon">
-                <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details' }}">
+                <a class="btn btn-sm btn-nospin btn-default" data-activate-details="all" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_all_details'|trans }}">
                     <span class="fa fa-fw fa-level-down"></span>
                 </a>
             </th>
@@ -61,6 +61,7 @@
                 <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
             </tr>
             {% if event.contentTemplate %}
+                <!-- contentTemplate: "{{ event.contentTemplate }}" -->
                 <tr class="timeline-row {{ rowStripe }} timeline-details hide" id="auditlog-details-{{ counter }}">
                     <td colspan="4">
                         {{ include(event.contentTemplate, {'event': event, 'lead': lead}) }}
