@@ -32,7 +32,7 @@ class LeadCategoryRepository extends CommonRepository
     /**
      * @param string[] $types
      *
-     * @return mixed[]
+     * @return array<int,array{'id': string, "title": string, "alias": string, "bundle": string}>
      */
     public function getSubscribedAndNewCategories(Lead $lead, array $types): array
     {

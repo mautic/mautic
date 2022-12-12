@@ -1266,12 +1266,11 @@ class LeadModel extends FormModel
     /**
      * @param string[] $types
      *
-     * @return mixed[]
+     * @return array<string,string>
      */
     public function getSubscribedAndNewCategories(Lead $lead, array $types): array
     {
         $leadCategories   = $this->getLeadCategoryRepository()->getSubscribedAndNewCategories($lead, $types);
-        dump($leadCategories);
 
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
