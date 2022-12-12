@@ -10,7 +10,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class CompanyRepository.
+ * @extends CommonRepository<Company>
  */
 class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {

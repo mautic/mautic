@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
@@ -19,6 +20,8 @@ trait FrequencyRuleTrait
      */
     protected $isPublicView = false;
 
+    private \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel;
+
     /**
      * @param       $lead
      * @param array $viewParameters
@@ -27,7 +30,7 @@ trait FrequencyRuleTrait
      * @param null  $action
      * @param bool  $isPreferenceCenter
      *
-     * @return bool|Form
+     * @return true|Form
      */
     protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
@@ -51,6 +54,7 @@ trait FrequencyRuleTrait
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
             $emailModel = $this->getModel('email');
+            \assert($emailModel instanceof EmailModel);
             if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
@@ -158,16 +162,13 @@ trait FrequencyRuleTrait
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $dncModel */
-        $dncModel = $this->getModel('lead.dnc');
-
         // iF subscribed_channels are enabled in form, then touch DNC
         if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels'])) {
             foreach ($formData['lead_channels']['subscribed_channels'] as $contactChannel) {
                 if (!isset($leadChannels[$contactChannel])) {
-                    $contactable = $dncModel->isContactable($lead, $contactChannel);
+                    $contactable = $this->doNotContactModel->isContactable($lead, $contactChannel);
                     if (DoNotContact::UNSUBSCRIBED == $contactable || DoNotContact::MANUAL == $contactable) {
-                        $dncModel->removeDncForContact($lead->getId(), $contactChannel);
+                        $this->doNotContactModel->removeDncForContact($lead->getId(), $contactChannel);
                     }
                 }
             }
@@ -177,7 +178,7 @@ trait FrequencyRuleTrait
                     if ($currentChannelId) {
                         $channel = [$channel => $currentChannelId];
                     }
-                    $dncModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
+                    $this->doNotContactModel->addDncForContact($lead->getId(), $channel, ($this->isPublicView) ? DoNotContact::UNSUBSCRIBED : DoNotContact::MANUAL, 'user');
                 }
             }
         }

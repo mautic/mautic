@@ -18,6 +18,9 @@ use Mautic\PointBundle\PointEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends CommonFormModel<Trigger>
+ */
 class TriggerModel extends CommonFormModel
 {
     protected $triggers = [];

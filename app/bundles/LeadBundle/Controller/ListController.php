@@ -193,7 +193,7 @@ class ListController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
@@ -326,7 +326,7 @@ class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     //form is valid so process the data
-                    $segmentModel->saveEntity($segment, $form->get('buttons')->get('save')->isClicked());
+                    $segmentModel->saveEntity($segment, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
@@ -396,11 +396,11 @@ class ListController extends FormController
      */
     private function getSegment($segmentId)
     {
-        /** @var LeadList $segment */
+        /** @var LeadList|null $segment */
         $segment = $this->getModel('lead.list')->getEntity($segmentId);
 
         // Check if exists
-        if (!$segment instanceof LeadList) {
+        if (!$segment) {
             throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
         }
 

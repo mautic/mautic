@@ -4,7 +4,7 @@ use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesComp
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -26,6 +26,13 @@ $container->loadFromExtension('framework', [
     ],
     'csrf_protection' => [
         'enabled' => true,
+    ],
+    'messenger' => [
+        'transports' => [
+            'email_transport' => [
+                'dsn'            => 'in-memory://',
+            ],
+        ],
     ],
 ]);
 

@@ -3,15 +3,28 @@
 namespace Mautic\AssetBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Model\AssetModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Asset>
+ */
 class AssetApiController extends CommonApiController
 {
+    /**
+     * @var AssetModel|null
+     */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('asset');
-        $this->entityClass      = 'Mautic\AssetBundle\Entity\Asset';
+        $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
+
+        $this->model            = $assetModel;
+        $this->entityClass      = Asset::class;
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';
         $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails'];
@@ -21,12 +34,8 @@ class AssetApiController extends CommonApiController
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
-     *
-     * @param string $action
-     *
-     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
