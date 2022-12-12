@@ -149,7 +149,6 @@
             </thead>
             <tbody>
             {% for contact in contacts %}
-                <?php $fields = $contact->getFields(); ?>
                 {% set fields = contact.fields %}
                 <tr>
                     <td>
@@ -168,19 +167,18 @@
                             }]) %}
                         {% endif %}
 
-                        if (!empty($fields['core']['email']['value'])) {
-                            $custom[] = [
-                                'attr' => [
-                                    'data-toggle' => 'ajaxmodal',
-                                    'data-target' => '#MauticSharedModal',
-                                    'data-header' => $view['translator']->trans('mautic.lead.email.send_email.header', ['%email%' => $fields['core']['email']['value']]),
-                                    'href'        => $view['router']->path('mautic_contact_action', ['objectId' => $contact->getId(), 'objectAction' => 'email', 'list' => 1]),
-                                ],
-                                'btnText'   => 'mautic.lead.email.send_email',
-                                'iconClass' => 'fa fa-send',
-                            ];
-                        }
-
+                        {% if fields.core.email.value is not empty %}
+                            {% set custom = custom|merge([{
+                                'attr': {
+                                    'data-toggle': 'ajaxmodal',
+                                    'data-target': '#MauticSharedModal',
+                                    'data-header': 'mautic.lead.email.send_email.header'|trans({'%email%': fields.core.email.value}),
+                                    'href': path('mautic_contact_action', {'objectId': contact.id, 'objectAction': 'email', 'list': 1}),
+                                },
+                                'btnText': 'mautic.lead.email.send_email',
+                                'iconClass': 'fa fa-send',
+                            }]) %}
+                        {% endif %}
                         {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
                             'item': contact,
                             'templateButtons': {
@@ -200,37 +198,33 @@
                     </td>
                     <td class="visible-md visible-lg">{{ fields.core.email.value|purify }}</td>
                     <td class="visible-md visible-lg">
-                        $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : '';
-                        if (!empty($flag)) :
-                          <img src="<?php echo $flag; ?>" style="max-height: 24px;" class="mr-sm" />
-                        endif;
-                        $location = [];
-                        if (!empty($fields['core']['city']['value'])) :
-                            $location[] = $fields['core']['city']['value'];
-                        endif;
-                        if (!empty($fields['core']['state']['value'])) :
-                            $location[] = $fields['core']['state']['value'];
-                        elseif (!empty($fields['core']['country']['value'])) :
-                            $location[] = $fields['core']['country']['value'];
-                        endif;
-                        echo $view->escape(implode(', ', $location));
+                        {% set flag = fields.core.country is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                        {% if flag is not empty %}
+                          <img src="{{ flag }}" style="max-height: 24px;" class="mr-sm" />
+                        {% endif %}
+                        {% set location = [] %}
+                        {% if fields.core.city.value is not empty %}
+                            {% set location = location|merge([fields.core.city.value]) %}
+                        {% endif %}
+                        {% if fields.core.state.value is not empty %}
+                            {% set location = location|merge([fields.core.state.value]) %}
+                        {% elseif fields.core.country.value is not empty %}
+                            {% set location = location|merge([fields.core.country.value]) %}
+                        {% endif %}
+                        {{ location|join(', ') }}
                         <div class="clearfix"></div>
                     </td>
                     <td class="text-center">
-                        $color = $contact->getColor();
-                        $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';
-                        <?php if ($contact->getStage()) :?>
-                          <span class="label label-default"<?php echo $style; ?>><?php echo $view->escape($contact->getStage()->getName()); ?></span>
-                        <?php endif; ?>
+                        {% if contact.stage %}
+                          <span class="label label-default" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.stage.name|purify }}</span>
+                        {% endif %}
                     </td>
                     <td class="visible-md visible-lg text-center">
-                        $color = $contact->getColor();
-                        $style = !empty($color) ? ' style="background-color: '.$color.';"' : '';
-                        <span class="label label-default"<?php echo $style; ?>><?php echo $contact->getPoints(); ?></span>
+                        <span class="label label-default" style="{% if contact.color %}background-color:{{ contact.color }};{% endif %}">{{ contact.points }}</span>
                     </td>
                     <td class="visible-md visible-lg">
-                        <abbr title="<?php echo $view['date']->toFull($contact->getLastActive()); ?>">
-                            <?php echo $view['date']->toText($contact->getLastActive()); ?>
+                        <abbr title="{{ dateToFull(contact.lastActive)|e }}">
+                            {{ dateToFull(contact.lastActive) }}
                         </abbr>
                     </td>
                     <td class="visible-md visible-lg">{{ contact.id }}</td>
