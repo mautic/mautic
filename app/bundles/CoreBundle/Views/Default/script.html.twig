@@ -1,6 +1,6 @@
 {% set mautic_content = mauticContent is defined ? mauticContent : '' %}
 
-{% set editor_fonts = getSortedEditorFonts(configGetParameter('editor_fonts')|merge(configGetParameter('custom_fonts'))) %}
+{% set editor_fonts = getSortedEditorFonts(configGetParameter('editor_fonts')) %}
 
 <script>
     var mauticBasePath    = '{{ app.request.getBasePath() }}';
