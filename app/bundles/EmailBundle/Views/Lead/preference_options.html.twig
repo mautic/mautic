@@ -75,94 +75,80 @@
                                     {{ form_widget(form['lead_channels']['frequency_time_' ~ channel.value]) }}
                                 </div>
                                 {% else %}
-                                    {%  %}
+                                    {% set form['lead_channels']|filter(v, k) => k != 'frequency_number_' ~ channel.value %}
+                                    {% set form['lead_channels']|filter(v, k) => k != 'frequency_time_' ~ channel.value %}
                                 {% endif %}
-                                <?php
-                                if ($showContactFrequency):?>
 
-                                <?php else:
-                                    unset($form['lead_channels']['frequency_time_'.$channel->value]);
-                                    unset($form['lead_channels']['frequency_number_'.$channel->value]);
-                                endif; ?>
-                                <?php if ($showContactPauseDates):?>
-                                    <div class="col-md-6">
-                                        <label class="text-muted"><?php echo $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
-                                        <?php echo $view['form']->widget($form['lead_channels']['contact_pause_start_date_'.$channel->value]); ?>
-                                        <?php echo $view['form']->label($form['lead_channels']['contact_pause_end_date_'.$channel->value]); ?>
-                                        <?php echo $view['form']->widget($form['lead_channels']['contact_pause_end_date_'.$channel->value]); ?>
-                                    </div>
-                                    <?php
-                                else:
-                                    unset($form['lead_channels']['contact_pause_start_date_'.$channel->value]);
-                                    unset($form['lead_channels']['contact_pause_end_date_'.$channel->value]);
-                                endif; ?>
+                                {% if showContactPauseDates %}
+                                <div class="col-md-6">
+                                    <label class="text-muted">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
+                                    {{ form_widget(form['lead_channels']['contact_pause_start_date_' ~ channel.value]) }}
+                                    {{ form_label(form['lead_channels']['contact_pause_end_date_' ~ channel.value]) }}
+                                    {{ form_widget(form['lead_channels']['contact_pause_end_date_' ~ channel.value]) }}
+                                </div>
+                                {% else %}
+                                    {% set form['lead_channels']|filter(v, k) => k != 'contact_pause_start_date_' ~ channel.value %}
+                                    {% set form['lead_channels']|filter(v, k) => k != 'contact_pause_end_date_' ~ channel.value %}
+                                {% endif %}
                             </div>
                         </td>
                     </tr>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
+                    {% endfor %}
+                    {% endif %}
                 </table>
-                <?php if ($showContactPreferredChannels):?>
+                {% if showContactPreferredChannels %}
                 <hr />
-                <div id="preferred_channel" class="text-left"><?php echo $view['form']->row($form['lead_channels']['preferred_channel']); ?></div>
-                <?php
-                else:
-                    unset($form['lead_channels']['preferred_channel']);
-                endif; ?>
-                <?php if ($showContactSegments && count($form['lead_lists'])):?>
+                <div id="preferred_channel" class="text-left">{{ form_row(form['lead_channels']['preferred_channel']) }}</div>
+                {% else %}
+                    {% set form['lead_channels']|filter(v, k) => k != 'preferred_channel' %}
+                {% endif %}
+                {% if showContactSegments and form['lead_lists']|length %}
                 <hr />
-                <div id="contact-segments"> <div class="text-left"><?php echo  $view['form']->label($form['lead_lists']); ?></div>
-                    <?php
-                    foreach ($form['lead_lists'] as $key=>$leadList) {
-                        ?>
-                        <div id="segment-<?php echo $key; ?>" class="text-left">
-                            <?php echo $view['form']->widget($leadList); ?>
-                            <?php echo $view['form']->label($leadList); ?>
+                <div id="contact-segments"> <div class="text-left">{{ form_label(form['lead_lists']) }}</div>
+                    {% for leadList, key in form['lead_lists'] %}
+                        <div id="segment-{{ key }}" class="text-left">
+                            {{ form_widget(leadList) }}
+                            {{ form_label(leadList) }}
                         </div>
-                    <?php
-                    }
-
-                    unset($form['lead_lists']);
-                    ?>
+                    {% endfor %}
+                    {% set form|filter(v, k) => k != 'lead_channels' %}
                 </div>
-                    <?php
-                else:
-                    unset($form['lead_lists']);
-                endif; ?>
-                <?php if ($showContactCategories && count($form['global_categories'])):?>
+                {% else %}
+                    {% set form|filter(v, k) => k != 'lead_lists' %}
+                {% endif %}
+
+                {% if showContactCategories and form['global_categories']|length %}
                 <hr />
                 <div id="global-categories" class="text-left">
-                    <div><?php echo  $view['form']->label($form['global_categories']); ?></div>
-                    <?php $categoryNumber = count($form['global_categories']->vars['choices']);
-                    for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
-                        <div id="category-<?php echo $i; ?>" class="text-left">
-                            <?php echo $view['form']->widget($form['global_categories'][$i]); ?>
-                            <?php echo $view['form']->label($form['global_categories'][$i]); ?>
-                        </div>
-                    <?php
-                    endfor;
-                    unset($form['global_categories']);
-                    ?>
-                </div>
-                <?php
-                else:
-                    unset($form['global_categories']);
-                endif;
-                ?>
+                    <div>{{ form_label(form['global_categories']) }}</div>
+                    {% set categoryNumber = form['global_categories'].vars['choices']|length %}
+                    {% for i in (categoryNumber - 1)..0  %}
+                        <div id="category-{{ i }}" class="text-left">
+                            {{ form_widget(form['global_categories'][i]) }}
+                            {{ form_label(form['global_categories'][i]) }}
 
-                <?php if (!empty($successMessage)):?>
+                        </div>
+                    {% endfor %}
+                    {% set form|filter(v, k) => k != 'global_categories' %}
+                </div>
+                {% else %}
+                    {% set form|filter(v, k) => k != 'global_categories' %}
+                {% endif %}
+
+                {% if successMessage is not empty %}
                     <hr />
                     <div id="success-message-text">
-                        <?php echo $successMessage; ?>
+                        {{ successMessage }}
                     </div>
-                <?php endif; ?>
+                {% endif %}
             </div>
             <div class="panel-footer text-left">
-                <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?></div>
+                {{ form_row(form['buttons']['save']) }}
+            </div>
+            {% set form['buttons']|filter(v, k) => k != 'cancel' %}
         </div>
     </div>
 
-    <?php
-    unset($form['lead_channels']);
-    echo $view['form']->end($form); ?>
+    {% set form|filter(v, k) => k != 'lead_channels' %}
+    {{ form_end(form) }}
 </div>

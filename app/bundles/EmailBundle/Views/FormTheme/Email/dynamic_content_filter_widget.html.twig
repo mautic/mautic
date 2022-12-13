@@ -11,32 +11,27 @@
     <div class="panel">
         {% set tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_'{{ form.vars.name }} %}
 
-        <?php
-        $tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_'.$form->vars['name'].'">';
-        $tabHtml .= '<li><a role="tab" class="addNewDynamicContentFilter" data-index="'.$form->vars['name']
-            .'"><i class="fa fa-plus text-success"></i> '.$view['translator']->trans('mautic.core.form.new').'</a></li>';
-        $tabHtml .= '<li class="active"><a data-toggle="tab" href="#emailform_dynamicContent_'.$form->vars['name'].'_default" role="tab">Default</a></li>';
-        $tabContentHtml = '<div class="tab-content pa-md"><div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_'.$form->vars['name'].'_default">';
+        {% set tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_'~{{ form.vars['name'] }}~'">' %}
+        {% set tabHtml ~= '<li><a role="tab" class="addNewDynamicContentFilter" data-index="'~{{ form.vars['name'] }}~
+            '"><i class="fa fa-plus text-success"></i> ' ~ {{ 'mautic.core.form.new'|trans }} ~ '</a></li>' %}
+        {% set tabHtml ~= '<li class="active"><a data-toggle="tab" href="#emailform_dynamicContent_'~{{ form.vars['name'] }}~'_default" role="tab">Default</a></li>' %}
+        {% set tabContentHtml = '<div class="tab-content pa-md"><div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_'~{{ form.vars['name'] }}~'_default">' %}
+        {% set tabContentHtml ~= '<div class="row hidden"><div class="col-xs-10">' %}
+        {% set tabContentHtml ~= {{ form_row(form['tokenName']) }} %}
+        {% set tabContentHtml ~= '</div></div>' %}
+        {% set tabContentHtml ~= {{ form_row(form['content']) }} %}
+        {% set tabContentHtml ~= '</div>' %}
 
-        $tabContentHtml .= '<div class="row hidden"><div class="col-xs-10">';
-        $tabContentHtml .= $view['form']->row($form['tokenName']);
-        $tabContentHtml .= '</div></div>';
+        {% for filter, i in form['filters'] %}
+            {% set isFirst = 0 === i ? ' active' : '' %}
+            {% set tabHtml ~= '<li><a role="tab" data-toggle="tab" href="#'~{{ filter.vars['id'] }}~'">'~ {{ 'mautic.core.dynamicContent.tab'|trans }} ~' '~(i + 1)~'</a></li>' %}
+            {% set tabContentHtml ~= {{ form_widget(filter)}} %}
+        {% endfor %}
 
-        $tabContentHtml .= $view['form']->row($form['content']);
-        $tabContentHtml .= '</div>';
+        {% set tabHtml ~= '</ul>' %}
+        {% set tabContentHtml ~= '</div>' %}
 
-        foreach ($form['filters'] as $i => $filter) {
-            $isFirst = 0 === $i ? ' active' : '';
-            $tabHtml .= '<li><a role="tab" data-toggle="tab" href="#'.$filter->vars['id'].'">'.$view['translator']->trans('mautic.core.dynamicContent.tab').' '.($i + 1).'</a></li>';
-
-            $tabContentHtml .= $view['form']->widget($filter);
-        }
-
-        $tabHtml .= '</ul>';
-        $tabContentHtml .= '</div>';
-
-        echo $tabHtml;
-        echo $tabContentHtml;
-        ?>
+        {{ tabHtml }}
+        {{ tabContentHtml }}
     </div>
 </div>
