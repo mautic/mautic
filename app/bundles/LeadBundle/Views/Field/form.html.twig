@@ -1,0 +1,216 @@
+{#
+  Variables
+    - form
+    - currentRoute
+#}
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block mauticContent %}leadField{% endblock %}
+
+{% block headerTitle %}
+  {%- if form.vars.data.id -%}
+    {{- 'mautic.lead.field.header.edit'|trans({'%name%': form.vars.data.label}) -}}
+  {%- else -%}
+    {{- 'mautic.lead.field.header.new'|trans -}}
+  {%- endif -%}
+{% endblock %}
+
+{% block content %}
+{#
+$userId = $form->vars['data']->getId();
+if (!empty($userId)) {
+    $isNew  = false;
+    $field  = $form->vars['data']->getLabel();
+} else {
+    $isNew  = true;
+}
+
+#}
+
+{{ form_start(form) }}
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-8 bg-auto height-auto bdr-r">
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.label) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.alias) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.object) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.group) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.type) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.defaultValue) }}
+                </div>
+            </div>
+
+{#
+            $type          = $form['type']->vars['data'];
+            $properties    = $form['properties']->vars['data'];
+            $errors        = count($form['properties']->vars['errors']);
+            $feedbackClass = (!empty($errors)) ? ' has-error' : '';
+#}
+            {% set type = form.type.vars.data %}
+            {% set properties = form.properties.vars.data %}
+            {% set errors = form.properties.vars.errors|length %}
+            {% set feedbackClass = errors > 0 ? 'has-error' : '' %}
+            <div class="row">
+                <div class="form-group col-md-6 {{ feedbackClass }}">
+                    <div id="leadfield_properties">
+                        {% if 'boolean' == type %}
+                            echo $view->render('MauticLeadBundle:Field:properties_boolean.html.php', [
+                                'yes' => isset($properties['yes']) ? $properties['yes'] : '',
+                                'no'  => isset($properties['no']) ? $properties['no'] : '',
+                            ]);
+                        {% elseif 'number' == type %}
+                            echo $view->render('MauticLeadBundle:Field:properties_number.html.php', [
+                                'roundMode' => isset($properties['roundmode']) ? $properties['roundmode'] : '',
+                                'scale'     => isset($properties['scale']) ? $properties['scale'] : '',
+                            ]);
+                        {% elseif 'select' == type or 'multiselect' == type %}
+                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+                                'form'           => $form['properties'],
+                                'selectTemplate' => $selectTemplate,
+                            ]);
+                        {% elseif 'lookup' == type %}
+                            echo $view->render('MauticLeadBundle:Field:properties_select.html.php', [
+                                'form'           => $form['properties'],
+                                'selectTemplate' => $lookupTemplate,
+                                'type'           => 'lookup',
+                            ]);
+                        {% elseif 'textarea' == type %}
+                            echo $view->render('MauticLeadBundle:Field:properties_textarea.html.php', [
+                                'form'             => $form['properties'],
+                                'textareaTemplate' => $textareaTemplate,
+                            ]);
+                        {% endif %}
+                    </div>
+                    {{ form_errors(form.properties) }}
+                </div>
+            </div>
+            {#<?php $form['properties']->setRendered(); ?>#}
+        </div>
+    </div>
+    <div class="col-md-4 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form_row(form.order) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isPublished) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.isRequired) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isVisible) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.isShortVisible) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isListable) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.isPubliclyUpdatable) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isUniqueIdentifer) }}
+                </div>
+            </div>
+            <div class="row unique-identifier-warning" style="{% if not form.isUniqueIdentifer.vars.data %}display:none;{% endif %}">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">{{ 'mautic.lead.field.form.isuniqueidentifer.warning'|trans|purify }}</div>
+                </div>
+            </div>
+            {#{{ form_rest(form) }}#}
+        </div>
+    </div>
+</div>
+
+{#
+// Render the templates so they don't get rendered automatically
+$textareaTemplate        = $view['form']->row($form['properties_textarea_template']);
+$selectTemplate          = $view['form']->row($form['properties_select_template']);
+$lookupTemplate          = $view['form']->row($form['properties_lookup_template']);
+$defaultTextTemplate     = $view['form']->widget($form['default_template_text']);
+$defaultTextareaTemplate = $view['form']->widget($form['default_template_textarea']);
+$defaultLocaleTemplate   = $view['form']->widget($form['default_template_locale']);
+$defaultSelectTemplate   = $view['form']->widget($form['default_template_select']);
+$defaultBoolTemplate     = $view['form']->widget($form['default_template_boolean']);
+$defaultCountryTemplate  = $view['form']->widget($form['default_template_country']);
+$defaultRegionTemplate   = $view['form']->widget($form['default_template_region']);
+$defaultTimezoneTemplate = $view['form']->widget($form['default_template_timezone']);
+#}
+{% if form.vars.data.id is empty %}
+<div id="field-templates" class="hide">
+    <div class="default_template_text">
+        {{ form_widget(form.default_template_text) }}
+    </div>
+    <div class="default_template_textarea">
+        {{ form_widget(form.default_template_textarea) }}
+    </div>
+    <div class="default_template_boolean">
+        {{ form_widget(form.default_template_boolean) }}
+    </div>
+    <div class="default_template_country">
+        {{ form_widget(form.default_template_country) }}
+    </div>
+    <div class="default_template_region">
+        {{ form_widget(form.default_template_region) }}
+    </div>
+    <div class="default_template_locale">
+        {{ form_widget(form.default_template_locale) }}
+    </div>
+    <div class="default_template_timezone">
+        {{ form_widget(form.default_template_timezone) }}
+    </div>
+    <div class="default_template_select">
+        {{ form_widget(form.default_template_select) }}
+    </div>
+    {{ include('MauticLeadBundle:Field:properties_number.html.twig') }}
+    {{ include('MauticLeadBundle:Field:properties_boolean.html.twig') }}
+    {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+        'selectTemplate': form_row(form.properties_select_template),
+        'type': 'select',
+    }) }}
+
+    {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+        'selectTemplate': form_row(form.properties_select_template),
+        'type': 'multiselect',
+    }) }}
+
+    {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+        'selectTemplate': form_row(form.properties_select_template),
+        'type': 'lookup',
+    }) }}
+
+    {{ include('MauticLeadBundle:Field:properties_textarea.html.twig', {
+        'textareaTemplate': form_row(form.properties_textarea_template),
+    }) }}
+</div>
+{% endif %}
+{{ form_end(form, {'render_rest': false}) }}
+{% endblock %}
