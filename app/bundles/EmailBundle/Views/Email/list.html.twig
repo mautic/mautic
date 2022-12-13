@@ -155,85 +155,68 @@
                 <span class="mt-xs label label-default has-click-event clickable-stat{{ item.getPendingCount() > 0 and 'list' === item.getEmailType() ? '' : ' hide' }}"
                       id="pending-{{ item.getId() }}"
                       data-toggle="tooltip"
-                      title="<?php echo $view['translator']->trans('mautic.email.stat.leadcount.tooltip'); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_pending').':'.$item->getId()]
-                            ); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.leadcount', ['%count%' => $item->getPendingCount()]); ?>
+                      title="{{ 'mautic.email.stat.leadcount.tooltip'|trans }}">
+                            <a href="{{ path('mautic_contact_index', {'search' : {{ 'mautic.lead.lead.searchcommand.email_pending'|trans }} ~ ':' ~ item.getId()}) }}">
+                                {{ 'mautic.email.stat.leadcount'|trans ({'%count%' : item.getPendingCount()}) }}
                             </a>
                         </span>
-                <span class="mt-xs label label-default has-click-event clickable-stat<?php echo $item->getQueuedCount() > 0 ? '' : ' hide'; ?>"
-                      id="queued-<?php echo $item->getId(); ?>"
+                <span class="mt-xs label label-default has-click-event clickable-stat{{ item.getQueuedCount() > 0 ? '' : ' hide' }}"
+                      id="queued-{{ item.getId() }}"
                       data-toggle="tooltip"
-                      title="<?php echo $view['translator']->trans('mautic.email.stat.queued.tooltip'); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_queued').':'.$item->getId()]
-                            ); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.queued', ['%count%' => $item->getQueuedCount()]); ?>
+                      title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
+                            <a href="{{ path('mautic_contact_index', {'search' : {{ 'mautic.lead.lead.searchcommand.email_queued'|trans }} ~ ':' ~ item.getId()}) }}">
+                                {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
                             </a>
                         </span>
                 <span class="mt-xs label label-warning has-click-event clickable-stat"
-                      id="sent-count-<?php echo $item->getId(); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_sent').':'.$item->getId()]
-                            ); ?>" data-toggle="tooltip"
-                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.sentcount', ['%count%' => $item->getSentCount(true)]); ?>
+                      id="sent-count-{{ item.getId() }}">
+                            <a href="{{ path('mautic_contact_index', {'search' : {{ 'mautic.lead.lead.searchcommand.email_sent'|trans }} ~ ':' ~ item.getId()}) }}" data-toggle="tooltip"
+                               title="{{ 'mautic.email.stat.tooltip'|trans }}">
+                                {{ 'mautic.email.stat.sentcount'|trans ({'%count%' : item.getSentCount(true)}) }}
                             </a>
                         </span>
                 <span class="mt-xs label label-success has-click-event clickable-stat"
-                      id="read-count-<?php echo $item->getId(); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
-                            ); ?>" data-toggle="tooltip"
-                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.readcount', ['%count%' => $item->getReadCount(true)]); ?>
+                      id="read-count-{{ item.getId() }}">
+                            <a href="{{ path('mautic_contact_index', {'search' : {{ 'mautic.lead.lead.searchcommand.email_read'|trans }} ~ ':' ~ item.getId()}) }}" data-toggle="tooltip"
+                               title="{{ 'mautic.email.stat.tooltip'|trans }}">
+                                {{ 'mautic.email.stat.readcount'|trans ({'%count%' : item.getReadCount(true)}) }}
                             </a>
                         </span>
                 <span class="mt-xs label label-primary has-click-event clickable-stat"
-                      id="read-percent-<?php echo $item->getId(); ?>">
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_contact_index',
-                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.email_read').':'.$item->getId()]
-                            ); ?>" data-toggle="tooltip"
-                               title="<?php echo $view['translator']->trans('mautic.email.stat.tooltip'); ?>">
-                                <?php echo $view['translator']->trans('mautic.email.stat.readpercent', ['%count%' => $item->getReadPercentage(true)]); ?>
+                      id="read-percent-{{ item.getId() }}">
+                            <a href="{{ path('mautic_contact_index', {'search' : {{ 'mautic.lead.lead.searchcommand.email_read'|trans }} ~ ':' ~ item.getId()}) }}" data-toggle="tooltip"
+                               title="{{ 'mautic.email.stat.tooltip'|trans }}">
+                                {{ 'mautic.email.stat.readpercent'|trans ({'%count%' : item.getReadPercentage(true)}) }}
                             </a>
                         </span>
-                <?php echo $view['content']->getCustomContent('email.stats', $mauticTemplateVars); ?>
-                <?php echo $view['content']->getCustomContent('email.stats.below', $mauticTemplateVars); ?>
+                {{ customContent('email.stats', mauticTemplateVars) }}
+                {{ customContent('email.stats.below', mauticTemplateVars) }}
             </td>
             <td class="visible-lg"
-                title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
-                <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+                {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
             </td>
             <td class="visible-lg"
-                title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
-                <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+                {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
             </td>
-            <td class="visible-lg"><?php echo $view->escape($item->getCreatedByUser()); ?></td>
-            <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+            <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>
+            <td class="visible-md visible-lg">{{ item.getId() }}</td>
         </tr>
-        <?php endforeach; ?>
+        {% endfor %}
         </tbody>
     </table>
 </div>
 <div class="panel-footer">
-    <?php echo $view->render(
-    'MauticCoreBundle:Helper:pagination.html.php',
-    [
-    'totalItems' => $totalItems,
-    'page' => $page,
-    'limit' => $limit,
-    'baseUrl' => $view['router']->path('mautic_email_index'),
-    'sessionVar' => 'email',
-    ]
-    ); ?>
+    {{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+        'totalItems'    : totalItems,
+        'page'          : page,
+        'limit'         : limit,
+        'baseUrl'       : path('mautic_email_index'),
+        'sessionVar'    : 'email',
+    })
+    -}}
 </div>
-<?php else: ?>
-<?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php'); ?>
-<?php endif; ?>
+{% else %}
+    {{- include('MauticCoreBundle:Helper:noresults.html.twig') -}}
+{% endif %}

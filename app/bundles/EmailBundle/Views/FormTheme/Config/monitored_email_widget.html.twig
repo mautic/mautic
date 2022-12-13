@@ -15,8 +15,7 @@
             </h3>
         </div>
         <div class="panel-body">
-            {% set tooltip =  %}
-            <?php $tooltip = $view['translator']->hasId($child->vars['label'].'.tooltip') ? $view['translator']->trans($child->vars['label'].'.tooltip') : ''; ?>
+            {% set tooltip = translatorHasId(child.vars['label'] ~ '.tooltip') ? {{ child.vars['label'] ~ '.tooltip'|trans }} : '' %}
             {% if tooltip %}
                 <p>{{ tooltip }}</p>
             {% endif %}
