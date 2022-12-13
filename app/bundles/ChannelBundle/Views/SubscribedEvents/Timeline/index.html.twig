@@ -2,38 +2,11 @@
 {% set log = extra.log %}
 {% set eventType = log.type %}
 {% set eventSettings = extra.campaignEventSettings %}
-{% set messageSettings = eventSettings['action'][eventType]['timelineTemplateVars']['messageSettings'] %}
-<?php
-$extra            = $event['extra'];
-$log              = $extra['log'];
-$eventType        = $log['type'];
-$eventSettings    = $extra['campaignEventSettings'];
-$messageSettings  = $eventSettings['action'][$eventType]['timelineTemplateVars']['messageSettings'];
-$getChannelOutput = function ($channel) use ($view, $event, $log, $eventSettings) {
-    $log['metadata'] = $log['metadata'][$channel];
-
-    if (!empty($log['metadata']['dnc'])) {
-        switch ($log['metadata']['dnc']) {
-            case \Mautic\LeadBundle\Entity\DoNotContact::BOUNCED:
-                $msg = 'mautic.lead.event.donotcontact_bounced';
-                break;
-            case \Mautic\LeadBundle\Entity\DoNotContact::UNSUBSCRIBED:
-                $msg = 'mautic.lead.event.donotcontact_unsubscribed';
-                break;
-            case \Mautic\LeadBundle\Entity\DoNotContact::MANUAL:
-                $msg = 'mautic.lead.event.donotcontact_manual';
-                break;
-        }
-
-        return $view['translator']->trans($msg);
-}
-
+{% set messageSettings = eventSettings.action[eventType].timelineTemplateVars.messageSettings %}
 {% set template = 'MauticCampaignBundle:SubscribedEvents\Timeline:index.html.twig' %}
 {% set channelEvent = event %}
 {% set channelEvent = channelEvent|merge({extra: {log: log}}) %}
-{% set vars = {
-    'event' => channelEvent
-} %}
+{% set vars = {'event' => channelEvent} %}
 
 {# Successful send through this channel #}
 {% if messageSettings[channel]['campaignAction'] is not empty %}
@@ -53,12 +26,12 @@ $getChannelOutput = function ($channel) use ($view, $event, $log, $eventSettings
 {{- include(template, vars) -}}
 {% set counter = extra.log.metadata|length %}
 {% for channel, results in extra.log.metadata %}
-{% if messageSettings[channel] is defined %}
-<h4>{{ messageSettings[channel]['label'] }}</h4>
-{{ channelOutput(channel) }}
-{%  set counter = counter - 1 %}
-{% if counter > 0 %}
-<hr/>
-{% endif %}
-{% endif %}
+    {% if messageSettings[channel] is defined %}
+        <h4>{{ messageSettings[channel]['label'] }}</h4>
+        {{ channelOutput(channel) }}
+        {% set counter = counter - 1 %}
+        {% if counter > 0 %}
+            <hr/>
+        {% endif %}
+    {% endif %}
 {% endfor %}
