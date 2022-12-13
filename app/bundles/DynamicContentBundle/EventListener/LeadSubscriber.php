@@ -77,7 +77,7 @@ class LeadSubscriber implements EventSubscriberInterface
                     $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
-                            'eventId'    => $eventTypeKey . $stat['id'],
+                            'eventId'    => $eventTypeKey.$stat['id'],
                             'eventLabel' => [
                                 'label' => $stat['name'],
                                 'href'  => $this->router->generate(
