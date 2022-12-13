@@ -157,7 +157,7 @@
                                     <table class="table table-bordered table-striped mb-0">
                                         <tbody>
                                         {% if 'core' == group %}
-                                            {#{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': lead}) }#}
+                                          {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': lead}) }}
                                         {% endif %}
                                         {% for field in fields[group] %}
                                             {% if field.value %}
