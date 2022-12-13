@@ -32,15 +32,15 @@ class LeadCategoryRepository extends CommonRepository
     /**
      * @param string[] $types
      *
-     * @return array<int,array{'id': string, "title": string, "alias": string, "bundle": string}>
+     * @return array<int, int>
      */
-    public function getSubscribedAndNewCategories(Lead $lead, array $types): array
+    public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
     {
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
         // Fetch the records from categories.
         $parentQ = clone $qb;
-        $parentQ->select('c.id, c.title, c.alias, c.bundle');
+        $parentQ->select('c.id');
         $parentQ->from(MAUTIC_TABLE_PREFIX.'categories', 'c');
         $parentQ->where('c.is_published = 1');
         $parentQ->andWhere($qb->expr()->in('c.bundle', ':bundles'));
@@ -60,7 +60,16 @@ class LeadCategoryRepository extends CommonRepository
         // Add sub-query parameter.
         $parentQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
 
-        return $parentQ->execute()
+        $leadCategories = $parentQ->execute()
             ->fetchAllAssociative();
+
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $id = (int) $category['id'];
+
+            $leadCategoryList[$id] = $id;
+        }
+
+        return $leadCategoryList;
     }
 }

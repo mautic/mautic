@@ -134,7 +134,7 @@ trait FrequencyRuleTrait
 
         $data['global_categories'] = (isset($frequencyRules['global_categories']))
             ? $frequencyRules['global_categories']
-            : $model->getSubscribedAndNewCategories($lead, ['global', 'email']);
+            : $model->getSubscribedAndNewCategoryIds($lead, ['global', 'email']);
 
         $this->leadLists    = $model->getLists($lead, false, false, $isPublic, $isPreferenceCenter);
         $data['lead_lists'] = [];
