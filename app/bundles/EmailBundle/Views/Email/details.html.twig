@@ -241,7 +241,7 @@
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data']  %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
-            <div id="emailGraphStats" data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email->getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')) }}">
+            <div id="emailGraphStats" data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')) }}">
                 <div class="spinner">
                     <i class="fa fa-spin fa-spinner"></i>
                 </div>
