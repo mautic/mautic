@@ -81,6 +81,8 @@ class InactiveExecutioner implements ExecutionerInterface
      */
     private $helper;
 
+    protected ?\DateTime $now = null;
+
     /**
      * InactiveExecutioner constructor.
      */
@@ -231,7 +233,7 @@ class InactiveExecutioner implements ExecutionerInterface
     private function executeEvents()
     {
         // Use the same timestamp across all contacts processed
-        $now = new \DateTime();
+        $now = $this->now ?? new \DateTime();
 
         /** @var Event $decisionEvent */
         foreach ($this->decisions as $decisionEvent) {
