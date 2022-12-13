@@ -4,29 +4,59 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Functional\Entity;
 
+use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Model\CompanyModel;
+use PHPUnit\Framework\Assert;
+use ReflectionProperty;
+use Swift_Mailer;
 use Symfony\Component\HttpFoundation\Request;
 
 final class CompanyRepositoryTest extends MauticMysqlTestCase
 {
-    public function testEmailPreviewWithCompanyTokens(): void
+    private SmtpTransport $transport;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->setUpMailer();
+    }
+
+    protected function tearDown(): void
+    {
+        // Clear owners cache (to leave a clean environment for future tests):
+        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $this->setPrivateProperty($mailHelper, 'leadOwners', []);
+        parent::tearDown();
+    }
+
+    public function testEmailSendWithCompanyTokens(): void
     {
         $suffix   = random_int(10, 100);
         $companyA = $this->createCompany('ABC Co.'.$suffix, 'First Street'.$suffix);
         $contactA = $this->createContact('John'.$suffix, 'JohnDoe'.$suffix.'@email.com', $companyA);
         $companyB = $this->createCompany('XYZ Co.'.$suffix, 'Second Street'.$suffix);
         $this->editContact($contactA, $companyB, $companyA);
-        $emailId = $this->createEmail('EmailName'.$suffix, 'Subject'.$suffix, 'template');
-        $crawler = $this->client->request(
-            Request::METHOD_GET,
-            '/email/preview/'.$emailId.'/real?contactId='.$contactA->getId(),
-        );
-        self::assertStringContainsString('JohnDoe'.$suffix.'@email.com', $crawler->text());
-        self::assertStringContainsString('XYZ Co.'.$suffix, $crawler->text());
-        self::assertStringContainsString('Second Street'.$suffix, $crawler->text());
+        $segment = $this->createSegment('Segment A'.$suffix, 'segment-a-'.$suffix);
+        $this->addContactsToSegment([$contactA], $segment);
+        $emailId = $this->createEmail('EmailName'.$suffix, 'Subject'.$suffix, 'list', $segment->getId());
+        $this->sendEmailViaApi($emailId);
+        $testEmail = function () use ($suffix): void {
+            $message = $this->transport->sentMessage;
+            Assert::assertSame($message->getSubject(), 'Subject'.$suffix);
+            Assert::assertSame($message->getTo(), ['JohnDoe'.$suffix.'@email.com' => 'John'.$suffix]);
+            $messageBody = $message->getBody();
+            Assert::assertStringContainsString('JohnDoe'.$suffix.'@email.com', $messageBody);
+            Assert::assertStringContainsString('XYZ Co.'.$suffix, $messageBody);
+            Assert::assertStringContainsString('Second Street'.$suffix, $messageBody);
+        };
+        $testEmail();
     }
 
     private function createCompany(string $name, string $address1 = ''): Company
@@ -34,10 +64,7 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         /** @var CompanyModel $model */
         $model   = self::$container->get('mautic.lead.model.company');
         $company = new Company();
-        $company
-            ->setIsPublished(true)
-            ->setName($name)
-            ->setAddress1($address1);
+        $company->setIsPublished(true)->setName($name)->setAddress1($address1);
         $model->saveEntity($company);
 
         return $company;
@@ -82,6 +109,34 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $this->client->submit($form);
     }
 
+    private function createSegment(string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($name);
+        $segment->setAlias($alias);
+        $this->em->persist($segment);
+        $this->em->flush();
+
+        return $segment;
+    }
+
+    /**
+     * @param array<Lead> $contacts
+     */
+    private function addContactsToSegment(array $contacts, LeadList $segment): void
+    {
+        foreach ($contacts as $contact) {
+            $reference = new ListLead();
+            $reference->setLead($contact);
+            $reference->setList($segment);
+            $reference->setDateAdded(new DateTime());
+            $this->em->persist($reference);
+        }
+
+        $this->em->flush();
+    }
+
     private function createEmail(string $name, string $subject, string $emailType, int $segmentId = null): int
     {
         $payload = [
@@ -100,5 +155,41 @@ final class CompanyRepositoryTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         return $response['email']['id'];
+    }
+
+    private function setUpMailer(): void
+    {
+        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $transport  = new SmtpTransport();
+        $mailer     = new Swift_Mailer($transport);
+        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
+        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+        $this->transport = $transport;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function setPrivateProperty(MailHelper $object, string $property, $value): void
+    {
+        $reflector = new ReflectionProperty(get_class($object), $property);
+        $reflector->setAccessible(true);
+        $reflector->setValue($object, $value);
+    }
+
+    private function sendEmailViaApi(int $emailId): void
+    {
+        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $clientResponse = $this->client->getResponse();
+        Assert::assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        Assert::assertSame(
+            json_decode($clientResponse->getContent(), true, 512, JSON_THROW_ON_ERROR),
+            [
+                'success'          => 1,
+                'sentCount'        => 1,
+                'failedRecipients' => 0,
+            ],
+            $clientResponse->getContent()
+        );
     }
 }
