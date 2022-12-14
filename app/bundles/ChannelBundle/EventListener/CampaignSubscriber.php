@@ -106,8 +106,7 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     public function onCampaignTriggerAction(PendingEvent $pendingEvent)
     {
-        $this->pendingEvent = $pendingEvent;
-        $this->pseudoEvent  = clone $pendingEvent->getEvent();
+        $this->pseudoEvent = clone $pendingEvent->getEvent();
         $this->pseudoEvent->setCampaign($pendingEvent->getEvent()->getCampaign());
 
         $this->mmLogs    = $pendingEvent->getPending();
