@@ -1,13 +1,7 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+// Can be deleted and replaced with the prepared twig template after https://github.com/mautic/mautic/pull/11793 is merged as it needs the ChannelExtension::getChannelLabel()
+
 ?>
 
 <?php if ($item = ((isset($event['extra'])) ? $event['extra']['log'] : false)): ?>
