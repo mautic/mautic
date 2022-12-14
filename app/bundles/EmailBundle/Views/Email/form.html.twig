@@ -5,8 +5,6 @@
     @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 #}
 
-use Symfony\Component\Form\FormView;
-
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
 {% block mauticContent %}email{% endblock %}
@@ -223,30 +221,30 @@ use Symfony\Component\Form\FormView;
 {{ form_end(form) }}
 
 <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|escape }}"></div>
-<?php if ($filterBlockPrototype instanceof FormView) : ?>
-<div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|escape }}"></div>
-<?php endif; ?>
-<?php if ($filterSelectPrototype instanceof FormView) : ?>
-<div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|escape }}"></div>
-<?php endif; ?>
+{% if filterBlockPrototype instanceof FormView %}
+    <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|escape }}"></div>
+{% endif %}
+{% if filterSelectPrototype instanceof FormView %}
+    <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|escape }}"></div>
+{% endif %}
 
 <div class="hide" id="templates">
     {% for dataKey, template in templates %}
-        {% set attr = ('tags' == dataKey) ? ' data-placeholder="' ~ {{ 'mautic.lead.tags.select_or_create'|trans }} ~ '" data-no-results-text="' ~ {{ 'mautic.lead.tags.enter_to_create'|trans }} ~ '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : '' %}
+        {% set attr = ('tags' == dataKey) ? ' data-placeholder="' ~ 'mautic.lead.tags.select_or_create'|trans ~ '" data-no-results-text="' ~ 'mautic.lead.tags.enter_to_create'|trans ~ '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : '' %}
         <select class="form-control not-chosen {{ template }}" name="emailform[dynamicContent][__dynamicContentIndex__][filters][__dynamicContentFilterIndex__][filters][__name__][filter]" id="emailform_dynamicContent___dynamicContentIndex___filters___dynamicContentFilterIndex___filters___name___filter"{{ attr }}>
             {% if form.vars[dataKey] is defined %}
                 {% for value, label in form.vars[dataKey] %}
                     {% if label is iterable %}
-                        {{ "<optgroup label=\"$value\">\n" }}
+                        {{ "<optgroup label=\""~value~"\">\n" }}
                         {% for optionValue, optionLabel in label %}
-                            {{ "<option value=\"$optionValue\">$optionLabel</option>\n" }}
+                            {{ "<option value=\""~optionValue~"\">"~optionLabel~"</option>\n" }}
                         {% endfor %}
                         {{ "</optgroup>\n" }}
                     {% else %}
                         {% if 'lists' == dataKey and (currentListId is defined and (value == currentListId)) %}
                             {% continue %}
                         {% endif %}
-                        {{ "<option value="~value~">$label</option>\n" }}
+                        {{ "<option value="~value~">"~label~"</option>\n" }}
                     {% endif %}
                 {% endfor %}
             {% endif %}

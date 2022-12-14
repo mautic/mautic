@@ -25,8 +25,8 @@
                                         'confirmText'     : {{ 'mautic.email.send'|trans }},
                                         'confirmCallback' : 'submitSendForm',
                                         'iconClass'       : 'fa fa-send-o',
-                                        'btnText'         : {{ 'mautic.email.send'|trans }},
-                                        'btnClass'        : 'btn btn-primary btn-send'.((pending) ? '' : ' disabled')
+                                        'btnText'         : 'mautic.email.send'|trans,
+                                        'btnClass'        : 'btn btn-primary btn-send' ~ ((pending) ? '' : ' disabled')
                                     }) -}}
                                 </span>
                             </div>

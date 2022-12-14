@@ -24,6 +24,7 @@ class EmojiExtension extends AbstractExtension
     {
         return [
             new TwigFunction('toHtml', [$this, 'toHtml'], ['is_safe' => ['all']]),
+            new TwigFunction('instanceof', [$this, 'isInstanceof'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -31,12 +32,20 @@ class EmojiExtension extends AbstractExtension
      * Convert to html.
      *
      * @param $text
-     * @param string $from
      *
      * @return mixed
      */
     public function toHtml($text, string $from = 'emoji'): string
     {
         return $this->emojiHelper->toHtml($text, $from);
+    }
+
+    /**
+     * @param $var
+     * @param $instance
+     */
+    public function isInstanceof($var, $instance): bool
+    {
+        return $var instanceof $instance;
     }
 }
