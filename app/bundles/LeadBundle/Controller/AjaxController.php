@@ -57,9 +57,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function getLeadIdsByFieldValueAction(Request $request)
     {
-        $field     = InputHelper::clean($request->request->get('field'));
-        $value     = InputHelper::clean($request->request->get('value'));
-        $ignore    = (int) $request->request->get('ignore');
+        $field     = InputHelper::clean($request->query->get('field'));
+        $value     = InputHelper::clean($request->query->get('value'));
+        $ignore    = (int) $request->query->get('ignore');
         $dataArray = ['items' => []];
 
         if ($field && $value) {
@@ -656,7 +656,7 @@ class AjaxController extends CommonAjaxController
     protected function getEmailTemplateAction(Request $request)
     {
         $data    = ['success' => 1, 'body' => '', 'subject' => ''];
-        $emailId = $request->get('template');
+        $emailId = $request->query->get('template');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model = $this->getModel('email');
@@ -944,8 +944,8 @@ class AjaxController extends CommonAjaxController
 
     protected function getCampaignShareStatsAction(Request $request)
     {
-        $ids      = $request->get('ids');
-        $entityid = $request->get('entityId');
+        $ids      = $request->query->get('ids');
+        $entityid = $request->query->get('entityId');
         /** @var SegmentCampaignShare $segmentCampaignShareService */
         $segmentCampaignShareService = $this->get('mautic.lead.segment.stat.campaign.share');
 
