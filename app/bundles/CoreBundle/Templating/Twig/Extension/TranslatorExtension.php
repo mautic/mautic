@@ -22,6 +22,8 @@ class TranslatorExtension extends AbstractExtension
         return [
             new TwigFunction('translatorGetJsLang', [$this, 'getJsLang']),
             new TwigFunction('translatorHasId', [$this, 'translatorHasId']),
+            new TwigFunction('translatorConditional', [$this, 'translatorConditional']),
+            new TwigFunction('translatorGetHelper', [$this, 'getHelper']),
         ];
     }
 
@@ -33,5 +35,15 @@ class TranslatorExtension extends AbstractExtension
     public function translatorHasId(string $id, ?string $domain = null, ?string $locale = null): bool
     {
         return $this->translatorHelper->hasId($id, $domain, $locale);
+    }
+
+    public function translatorConditional($preferred, $alternative, $parameters = [], $domain = null, $locale = null)
+    {
+        return $this->translatorHelper->transConditional($preferred, $alternative, $parameters, $domain, $locale);
+    }
+
+    public function getHelper(): TranslatorHelper
+    {
+        return $this->translatorHelper;
     }
 }
