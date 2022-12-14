@@ -32,7 +32,7 @@ class FormatterExtension extends AbstractExtension
      *
      * @param mixed $val
      */
-    public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1): string
+    public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1)
     {
         return $this->formatterHelper->_($val, $type, $textOnly, $round);
     }
