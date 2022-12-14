@@ -23,15 +23,15 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
+                {{ rowIfExists(fields, 'mailer_from_name', template) }}
+                {{ rowIfExists(fields, 'mailer_from_email', template) }}
             </div>
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_reply_to_email', $template); ?>
+                {{ rowIfExists(fields, 'mailer_reply_to_email', template) }}
             </div>
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_is_owner', $template); ?>
+                {{ rowIfExists(fields, 'mailer_return_path', template) }}
+                {{ rowIfExists(fields, 'mailer_is_owner', template) }}
             </div>
 
             {% if fields['mailer_from_name'] is defined or fields['mailer_from_email'] is defined %}
@@ -58,39 +58,39 @@
             <?php endif; ?>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_other_region', $template); ?>
+                {{ rowIfExists(fields, 'mailer_amazon_region', template) }}
+                {{ rowIfExists(fields, 'mailer_amazon_other_region', template) }}
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_sparkpost_region', $template); ?>
+                {{ rowIfExists(fields, 'mailer_sparkpost_region', template) }}
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_host', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_port', $template); ?>
+                {{ rowIfExists(fields, 'mailer_host', template) }}
+                {{ rowIfExists(fields, 'mailer_port', template) }}
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_encryption', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_auth_mode', $template); ?>
+                {{ rowIfExists(fields, 'mailer_encryption', template) }}
+                {{ rowIfExists(fields, 'mailer_auth_mode', template) }}
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_user', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_password', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_api_key', $template); ?>
+                {{ rowIfExists(fields, 'mailer_user', template) }}
+                {{ rowIfExists(fields, 'mailer_password', template) }}
+                {{ rowIfExists(fields, 'mailer_api_key', template) }}
             </div>
 
             {% if fields['mailer_transport'] is defined %}
                 <div class="row">
-                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox', $template); ?>
-                    <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox_default_mail', $template); ?>
+                    {{ rowIfExists(fields, 'mailer_mailjet_sandbox', template) }}
+                    {{ rowIfExists(fields, 'mailer_mailjet_sandbox_default_mail', template) }}
                 </div>
             {% endif %}
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>
+                {{ rowIfExists(fields, 'mailer_custom_headers', template) }}
             </div>
 
             {% if fields['mailer_transport'] is defined %}
@@ -98,18 +98,18 @@
             {% endif %}
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_type', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_path', $template); ?>
+                {{ rowIfExists(fields, 'mailer_spool_type', template) }}
+                {{ rowIfExists(fields, 'mailer_spool_path', template) }}
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_msg_limit', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_time_limit', $template); ?>
+                {{ rowIfExists(fields, 'mailer_spool_msg_limit', template) }}
+                {{ rowIfExists(fields, 'mailer_spool_time_limit', template) }}
             </div>
 
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_recover_timeout', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'mailer_spool_clear_timeout', $template); ?>
+                {{ rowIfExists(fields, 'mailer_spool_recover_timeout', template) }}
+                {{ rowIfExists(fields, 'mailer_spool_clear_timeout', template) }}
             </div>
         </div>
     </div>
@@ -137,11 +137,11 @@
             <h3 class="panel-title">{{ 'mautic.email.config.header.monitored_email'|trans }}</h3>
         </div>
         <div class="panel-body">
-            <?php if (function_exists('imap_open')): ?>
-                <?php echo $view['form']->widget($form['monitored_email']); ?>
-            <?php else: ?>
+            {% if 'imap_open' %}
+                {% form_widget(form['monitored_email']) %}
+            {% else %}
                 <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans }}</div>
-            <?php endif; ?>
+            {% endif %}
         </div>
     </div>
 <?php endif; ?>
@@ -152,13 +152,13 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'webview_text', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
+            {{ rowIfExists(fields, 'webview_text', template) }}
+            {{ rowIfExists(fields, 'default_signature_text', template) }}
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'disable_trackable_urls', $template); ?>
+            {{ rowIfExists(fields, 'mailer_append_tracking_pixel', template) }}
+            {{ rowIfExists(fields, 'mailer_convert_embed_images', template) }}
+            {{ rowIfExists(fields, 'disable_trackable_urls', template) }}
         </div>
     </div>
 </div>
@@ -168,27 +168,27 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_text', $template); ?>
+            {{ rowIfExists(fields, 'unsubscribe_text', template) }}
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
+            {{ rowIfExists(fields, 'unsubscribe_message', template) }}
+            {{ rowIfExists(fields, 'resubscribe_message', template) }}
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'unsubscribe_message', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'resubscribe_message', $template); ?>
+            {{ rowIfExists(fields, 'unsubscribe_message', template) }}
+            {{ rowIfExists(fields, 'resubscribe_message', template) }}
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferences', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_segments', $template); ?>
+            {{ rowIfExists(fields, 'show_contact_preferences', template) }}
+            {{ rowIfExists(fields, 'show_contact_segments', template) }}
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_frequency', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_pause_dates', $template); ?>
+            {{ rowIfExists(fields, 'show_contact_frequency', template) }}
+            {{ rowIfExists(fields, 'show_contact_pause_dates', template) }}
         </div>
         <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_categories', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'show_contact_preferred_channels', $template); ?>
+            {{ rowIfExists(fields, 'show_contact_categories', template) }}
+            {{ rowIfExists(fields, 'show_contact_preferred_channels', template) }}
         </div>
     </div>
 </div>

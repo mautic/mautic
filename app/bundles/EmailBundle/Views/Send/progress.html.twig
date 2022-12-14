@@ -18,8 +18,7 @@
         <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
             <div class="panel-heading">
                 <h4 class="panel-title">
-                    <?php echo $view['translator']->trans('mautic.email.send.'.$status, ['%subject%' => \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short')]); ?>
-                    {{ 'mautic.email.send.' ~ status|trans ({'%subject%' : \Mautic\CoreBundle\Helper\EmojiHelper::toHtml(email.getSubject(), 'short')}) }}
+                    {{ 'mautic.email.send.' ~ status|trans ({'%subject%' : toHtml(email.getSubject(), 'short')}) }}
                 </h4>
             </div>
             <div class="panel-body">

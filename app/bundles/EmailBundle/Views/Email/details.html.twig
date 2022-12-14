@@ -86,23 +86,23 @@
         {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
             'item'            : email,
             'templateButtons' : {
-                'edit' : securityHasEntityAccess({
+                'edit' : securityHasEntityAccess(
                     permissions['email:emails:editown'],
                     permissions['email:emails:editother'],
                     email.getCreatedBy(),
-                }),
+                ),
                 'clone'  : permissions['email:emails:create'],
                 'abtest' : (allowAbTest and permissions['email:emails:create']),
-                'delete' : securityHasEntityAccess({
+                'delete' : securityHasEntityAccess(
                     permissions['email:emails:deleteown'],
                     permissions['email:emails:deleteother'],
                     email.getCreatedBy()
-                }),
-                'close' : securityHasEntityAccess({
+                ),
+                'close' : securityHasEntityAccess(
                     permissions['email:emails:viewown'],
                     permissions['email:emails:viewother'],
                     email.getCreatedBy()
-                }),
+                ),
             },
             'routeBase'     : 'email',
             'customButtons' : customButtons,
@@ -125,7 +125,7 @@
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div>
-                            <?php echo \Mautic\CoreBundle\Helper\EmojiHelper::toHtml($email->getSubject(), 'short'); ?>
+                            {{ toHtml(email.getSubject(), 'short') }}
                         </div>
                         {% if email.isVariant(true) %}
                         <div class="small">
