@@ -119,6 +119,8 @@ class MailHelper
      */
     protected $email;
 
+    protected ?string $emailType = null;
+
     /**
      * @var array
      */
@@ -1343,6 +1345,16 @@ class MailHelper
         $this->source = $source;
     }
 
+    public function getEmailType(): ?string
+    {
+        return $this->emailType;
+    }
+
+    public function setEmailType(?string $emailType): void
+    {
+        $this->emailType = $emailType;
+    }
+
     /**
      * @return Email|null
      */
@@ -1508,7 +1520,7 @@ class MailHelper
         // Personal and transactional emails do not contain unsubscribe header
         $email                = $this->getEmail();
         $addUnsubscribeHeader = $this->factory->getParameter('add_mass_mailing_header');
-        if (empty($email) || ('template' === $email->getEmailType() && !$addUnsubscribeHeader)) {
+        if (empty($email) || ('transactional' === $this->getEmailType() && !$addUnsubscribeHeader)) {
             return $headers;
         }
 
