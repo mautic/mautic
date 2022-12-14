@@ -1,6 +1,20 @@
-{% extends 'MauticDynamicContentBundle:DynamicContent:index.html.twig' %}
+{% if 'index' == tmpl %}
+    {% extends 'MauticDynamicContentBundle:DynamicContent:index.html.twig' %}
+{% endif %}
 
 {% block content %}
+{% if not request.isXmlHttpRequest() %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+{{- include(
+    'MauticCoreBundle:Helper:list_toolbar.html.twig', 
+    {
+        searchValue: searchValue,
+        searchHelp: 'mautic.page.help.searchcommands',
+        action: currentRoute,
+    })
+}}
+</div>
+{% endif %}
 {% if items|length > 0 %}
     <div class="table-responsive page-list">
         <table class="table table-hover table-striped table-bordered dwctable-list" id="dwcTable">

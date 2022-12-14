@@ -1,4 +1,4 @@
-{% if isEmbedded %}
+{% if isEmbedded is empty %}
     {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 {% endif %}
 
@@ -16,6 +16,47 @@
 ) %}
 
 {% set showTranslations = translationContent|trim is not empty %}
+{% set customButtons = [] %}
+
+{% block actions %}
+    {% if isEmbedded is empty %}
+        {{- include(
+            'MauticCoreBundle:Helper:page_actions.html.twig',
+            {
+                'item': entity,
+                'customButtons': customButtons is defined ? customButtons : [],
+                'templateButtons': {
+                    'edit': securityHasEntityAccess(
+                        permissions['dynamiccontent:dynamiccontents:editown'],
+                        permissions['dynamiccontent:dynamiccontents:editother'],
+                        entity.getCreatedBy()
+                    ),
+                    'clone': permissions['dynamiccontent:dynamiccontents:create'],
+                    'delete': securityHasEntityAccess(
+                        permissions['dynamiccontent:dynamiccontents:deleteown'],
+                        permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        entity.getCreatedBy()
+                    ),
+                    'close': securityHasEntityAccess(
+                        permissions['dynamiccontent:dynamiccontents:viewown'],
+                        permissions['dynamiccontent:dynamiccontents:viewother'],
+                        entity.getCreatedBy()
+                    ),
+                },
+                'routeBase':'dynamicContent',
+            }
+        )}}
+    {% endif %}
+{% endblock %}
+
+{% block publishStatus %}
+    {% if isEmbedded is empty %}
+        {{- include(
+            'MauticCoreBundle:Helper:publishstatus_badge.html.twig',
+            {'entity': entity}
+        )}}
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <!-- start: box layout -->
