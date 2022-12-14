@@ -15,12 +15,7 @@
 {% endblock %}
 
 {% block content %}
-{#<pre>{{dump(_context|keys)}}</pre>#}
-$fields       = $form->vars['fields'];
-$id           = $form->vars['data']->getId();
-$index        = count($form['filters']->vars['value']) ? max(array_keys($form['filters']->vars['value'])) : 0;
-$mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
-$filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text-danger"' : '';
+{% set index = form.filters.vars.value|length > 0 ? max(form.filters.vars.value) : 0 %}
 {{ form_start(form) }}
 <div class="box-layout">
     <div class="col-md-9 bg-white height-auto">
@@ -28,17 +23,19 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <div class="col-xs-12">
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active">
-                        <a href="#details" role="tab" data-toggle="tab"<?php echo $mainErrors; ?>>
+                        <a href="#details" role="tab" data-toggle="tab" class="{% if formContainsErrors(form, ['filters']) %}text-danger{% endif %}">
                             {{ 'mautic.core.details'|trans }}
-                            {% if formContainsErrors(form, ['filters']) %}<i class="fa fa-warning"></i>{% endif %}
+                            {% if formContainsErrors(form, ['filters']) %}
+                              <i class="fa fa-warning"></i>
+                            {% endif %}
                         </a>
                     </li>
-                    <li data-toggle="tooltip" title="" data-placement="top" data-original-title="<?php echo $view['translator']->trans('mautic.lead.lead.segment.add.help'); ?>">
-                        <a href="#filters" role="tab" data-toggle="tab"<?php echo $filterErrors; ?>>
-                            <?php echo $view['translator']->trans('mautic.core.filters'); ?>
-                            <?php if ($filterErrors): ?>
+                    <li data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ 'mautic.lead.lead.segment.add.help'|trans }}">
+                        <a href="#filters" role="tab" data-toggle="tab" class="{% if formContainsErrors(form.filters) %}text-danger{% endif %}">
+                            {{ 'mautic.core.filters'|trans }}
+                            {% if formContainsErrors(form.filters) %}
                                 <i class="fa fa-warning"></i>
-                            <?php endif; ?>
+                            {% endif %}
                         </a>
                     </li>
                 </ul>
@@ -48,61 +45,55 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                     <div class="tab-pane fade in active bdr-w-0" id="details">
                         <div class="row">
                             <div class="col-md-6">
-                                <?php echo $view['form']->row($form['name']); ?>
+                                {{ form_row(form.name) }}
                             </div>
                             <div class="col-md-6">
-                                <?php echo $view['form']->row($form['alias']); ?>
+                                {{ form_row(form.alias) }}
                             </div>
                             <div class="col-md-6">
-                                <?php echo $view['form']->row($form['publicName']); ?>
+                                {{ form_row(form.publicName) }}
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-xs-12">
-                                <?php echo $view['form']->row($form['description']); ?>
+                                {{ form_row(form.description) }}
                             </div>
                         </div>
                     </div>
                     <div class="tab-pane fade bdr-w-0" id="filters">
-                        <div class="alert alert-info"><p><?php echo $view['translator']->trans('mautic.lead.lead.segment.filter.info'); ?></p></div>
+                        <div class="alert alert-info"><p>{{ 'mautic.lead.lead.segment.filter.info'|trans }}</p></div>
                         <div class="form-group">
-                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="<?php echo $view->escape($view['form']->widget($form['filters']->vars['prototype'])); ?>" data-index="<?php echo $index + 1; ?>">
+                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype) }}" data-index="{{ index + 1 }}">
                                 <select class="chosen form-control" id="available_segment_filters">
                                     <option value=""></option>
-                                    <?php
-                                    foreach ($fields as $object => $field):
-                                        $header = $object;
-                                        $icon   = ('company' == $object) ? 'building' : 'user';
-                                        $header = $view['translator']->hasId($translationId = 'mautic.lead.'.$header)
-                                            ? $view['translator']->trans($translationId)
-                                            : $view['translator']->trans($header);
-                                    ?>
-                                    <optgroup label="<?php echo $header; ?>">
-                                        <?php foreach ($field as $value => $params):
-                                            $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
-                                            ?>
-                                            <option value="<?php echo $view->escape($value); ?>"
-                                                    id="available_<?php echo $object.'_'.$value; ?>"
-                                                    data-field-object="<?php echo $object; ?>"
-                                                    data-field-type="<?php echo $params['properties']['type']; ?>"
-                                                    data-field-operators="<?php echo $operators; ?>"
-                                                    class="segment-filter <?php echo $icon; ?>">
-                                                    <?php echo $view['translator']->trans($params['label']); ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </optgroup>
-                                    <?php endforeach; ?>
+                                    {% for object, field in form.vars.fields %}
+                                      {% set icon = 'company' == object ? 'building' : 'user' %}
+                                      {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
+                                      <optgroup label="{{ header }}">
+                                          {% for value, params in field %}
+                                              {% set operators = params.operators is not empty ? params.operators|json_encode(constant('JSON_PRETTY_PRINT')) : '{}' %}
+                                              <option value="{{ value|e }}"
+                                                      id="available_{{ object }}_{{ value }}"
+                                                      data-field-object="{{ object }}"
+                                                      data-field-type="{{ params.properties.type }}"
+                                                      data-field-operators="{{ operators|raw|e('js') }}"
+                                                      class="segment-filter {{ icon }}">
+                                                      {{ params.label|trans }}
+                                              </option>
+                                          {% endfor %}
+                                      </optgroup>
+                                    {% endfor %}
                                 </select>
                             </div>
                             <div class="clearfix"></div>
                         </div>
                         <div class="selected-filters" id="leadlist_filters">
-                            <?php if ($filterErrors): ?>
+                            {% if formContainsErrors(form.filters) %}
                                 <div class="alert alert-danger has-error">
-                                    <?php echo $view['form']->errors($form['filters']); ?>
+                                    {{ form_errors(form.filters) }}
                                 </div>
-                            <?php endif; ?>
-                            <?php echo $view['form']->widget($form['filters']); ?>
+                            {% endif %}
+                            {{ form_widget(form.filters) }}
                         </div>
                     </div>
                 </div>
@@ -111,10 +102,10 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
-            <?php echo $view['form']->row($form['category']); ?>
-            <?php echo $view['form']->row($form['isGlobal']); ?>
-            <?php echo $view['form']->row($form['isPreferenceCenter']); ?>
-            <?php echo $view['form']->row($form['isPublished']); ?>
+            {{ form_row(form.category) }}
+            {{ form_row(form.isGlobal) }}
+            {{ form_row(form.isPreferenceCenter) }}
+            {{ form_row(form.isPublished) }}
         </div>
     </div>
 </div>
