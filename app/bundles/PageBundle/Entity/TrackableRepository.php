@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 /**
- * Class TrackableRepository.
+ * @extends CommonRepository<Trackable>
  */
 class TrackableRepository extends CommonRepository
 {

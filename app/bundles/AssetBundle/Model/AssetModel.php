@@ -29,6 +29,9 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Asset>
+ */
 class AssetModel extends FormModel
 {
     /**
@@ -556,10 +559,10 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
+     * @param bool        $canViewOthers
      *
      * @return array
      */

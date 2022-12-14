@@ -62,7 +62,7 @@ class LeadSubscriberTest extends CommonMocks
     private $router;
 
     /**
-     * @var ModelFactory&MockObject
+     * @var ModelFactory<object>&MockObject
      */
     private $modelFacotry;
 

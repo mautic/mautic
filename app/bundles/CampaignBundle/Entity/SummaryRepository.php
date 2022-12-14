@@ -11,6 +11,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 use PDO;
 
+/**
+ * @extends CommonRepository<Summary>
+ */
 class SummaryRepository extends CommonRepository
 {
     use TimelineTrait;

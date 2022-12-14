@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class ReportModel.
+ * @extends FormModel<Report>
  */
 class ReportModel extends FormModel
 {
