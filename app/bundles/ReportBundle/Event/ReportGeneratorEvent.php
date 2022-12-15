@@ -73,11 +73,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function getQueryBuilder()
     {
-        if ($this->queryBuilder instanceof QueryBuilder) {
-            return $this->queryBuilder;
-        }
-
-        throw new \RuntimeException('QueryBuilder not set.');
+        return $this->queryBuilder;
     }
 
     /**

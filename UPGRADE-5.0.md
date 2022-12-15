@@ -14,6 +14,8 @@
 *   Other
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
+    * `Mautic\SmsBundle\Callback\ResponseInterface` removed - we don't use it
+    * `Mautic\CoreBundle\Controller\AbstractModalFormController` removed - we don't use it
     * `Mautic\CoreBundle\Templating\Helper\ExceptionHelper` removed - we don't use it
     * `Mautic\LeadBundle\Model\LeadModel::getContactFromRequest()` method removed. Use `Mautic\LeadBundle\Helper\ContactRequestHelper::getContactFromQuery()` instead.
     * `Mautic\LeadBundle\Model\LeadModel::mergeLeads()` method removed. Use `\Mautic\LeadBundle\Deduplicate\ContactMerger::merge()` directly.

@@ -12,6 +12,7 @@ use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\Deduplicate\CompanyDeduper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -26,7 +27,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CompanyModel.
+ * @extends CommonFormModel<Company>
+ * @implements AjaxLookupModelInterface<Company>
  */
 class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 {
@@ -110,14 +112,11 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         parent::saveEntities($entities, $unlock);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\LeadBundle\Entity\CompanyRepository
-     */
-    public function getRepository()
+    public function getRepository(): CompanyRepository
     {
-        $repo =  $this->em->getRepository('MauticLeadBundle:Company');
+        $repo = $this->em->getRepository(Company::class);
+        \assert($repo instanceof CompanyRepository);
+
         if (!$this->repoSetup) {
             $this->repoSetup = true;
             $repo->setDispatcher($this->dispatcher);
