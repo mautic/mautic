@@ -1,0 +1,184 @@
+{#
+  Variables
+    - form
+    - currentRoute
+#}
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block mauticContent %}leadField{% endblock %}
+
+{% block headerTitle %}
+  {%- if form.vars.data.id -%}
+    {{- 'mautic.lead.field.header.edit'|trans({'%name%': form.vars.data.label}) -}}
+  {%- else -%}
+    {{- 'mautic.lead.field.header.new'|trans -}}
+  {%- endif -%}
+{% endblock %}
+
+{% block content %}
+{{ form_start(form) }}
+<div class="box-layout">
+    <!-- container -->
+    <div class="col-md-8 bg-auto height-auto bdr-r">
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.label) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.alias) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.object) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.group) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.type) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.defaultValue) }}
+                </div>
+            </div>
+
+            {% set type = form.type.vars.data %}
+            {% set properties = form.properties.vars.data %}
+            {% set errors = form.properties.vars.errors|length %}
+            {% set feedbackClass = errors > 0 ? 'has-error' : '' %}
+            <div class="row">
+                <div class="form-group col-md-6 {{ feedbackClass }}">
+                    <div id="leadfield_properties">
+                        {% if 'boolean' == type %}
+                            {{ include('MauticLeadBundle:Field:properties_boolean.html.twig', {
+                                'yes':  properties.yes|default(''),
+                                'no':  properties.no|default(''),
+                            }) }}
+                        {% elseif 'number' == type %}
+                            {{ include('MauticLeadBundle:Field:properties_number.html.twig', {
+                                'roundMode': properties.roundmode|default(''),
+                                'scale': properties.scale|default(''),
+                            }) }}
+                        {% elseif 'select' == type or 'multiselect' == type %}
+                            {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+                                'form': form.properties,
+                                'selectTemplate': selectTemplate,
+                            }) }}
+                        {% elseif 'lookup' == type %}
+                            {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+                                'form': form.properties,
+                                'selectTemplate': lookupTemplate,
+                                'type': 'lookup',
+                            }) }}
+                        {% elseif 'textarea' == type %}
+                            {{ include('MauticLeadBundle:Field:properties_textarea.html.twig', {
+                                'form': form.properties,
+                                'textareaTemplate': textareaTemplate,
+                            }) }}
+                        {% endif %}
+                    </div>
+                    {{ form_errors(form.properties) }}
+                </div>
+            </div>
+            {#{ form.properties.setRendered() }#}
+        </div>
+    </div>
+    <div class="col-md-4 bg-white height-auto">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            <div class="row">
+                <div class="col-md-12">
+                    {{ form_row(form.order) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isPublished) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.isRequired) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isVisible) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.isShortVisible) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isListable) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_row(form.isPubliclyUpdatable) }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.isUniqueIdentifer) }}
+                </div>
+            </div>
+            <div class="row unique-identifier-warning" style="{% if not form.isUniqueIdentifer.vars.data %}display:none;{% endif %}">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">{{ 'mautic.lead.field.form.isuniqueidentifer.warning'|trans|purify }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if form.vars.data.id is empty %}
+<div id="field-templates" class="hide">
+    <div class="default_template_text">
+        {{ form_widget(form.default_template_text) }}
+    </div>
+    <div class="default_template_textarea">
+        {{ form_widget(form.default_template_textarea) }}
+    </div>
+    <div class="default_template_boolean">
+        {{ form_widget(form.default_template_boolean) }}
+    </div>
+    <div class="default_template_country">
+        {{ form_widget(form.default_template_country) }}
+    </div>
+    <div class="default_template_region">
+        {{ form_widget(form.default_template_region) }}
+    </div>
+    <div class="default_template_locale">
+        {{ form_widget(form.default_template_locale) }}
+    </div>
+    <div class="default_template_timezone">
+        {{ form_widget(form.default_template_timezone) }}
+    </div>
+    <div class="default_template_select">
+        {{ form_widget(form.default_template_select) }}
+    </div>
+    {{ include('MauticLeadBundle:Field:properties_number.html.twig') }}
+    {{ include('MauticLeadBundle:Field:properties_boolean.html.twig') }}
+    {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+        'selectTemplate': form_row(form.properties_select_template),
+        'type': 'select',
+    }) }}
+
+    {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+        'selectTemplate': form_row(form.properties_select_template),
+        'type': 'multiselect',
+    }) }}
+
+    {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+        'selectTemplate': form_row(form.properties_select_template),
+        'type': 'lookup',
+    }) }}
+
+    {{ include('MauticLeadBundle:Field:properties_textarea.html.twig', {
+        'textareaTemplate': form_row(form.properties_textarea_template),
+    }) }}
+</div>
+{% endif %}
+{{ form_end(form, {'render_rest': false}) }}
+{% endblock %}
