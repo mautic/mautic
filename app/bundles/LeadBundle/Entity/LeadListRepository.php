@@ -8,6 +8,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @extends CommonRepository<LeadList>
+ */
 class LeadListRepository extends CommonRepository
 {
     use OperatorListTrait; // @deprecated to be removed in Mautic 3. Not used inside this class.
@@ -524,7 +527,7 @@ class LeadListRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

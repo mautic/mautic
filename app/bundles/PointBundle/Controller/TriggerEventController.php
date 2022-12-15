@@ -5,6 +5,7 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
+use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -50,7 +51,10 @@ class TriggerEventController extends CommonFormController
         }
 
         //fire the builder event
-        $events = $this->getModel('point.trigger')->getEvents();
+        /** @var TriggerModel $pointTriggerModel */
+        $pointTriggerModel = $this->getModel('point.trigger');
+        \assert($pointTriggerModel instanceof TriggerModel);
+        $events = $pointTriggerModel->getEvents();
         $form   = $this->get('form.factory')->create(TriggerEventType::class, $triggerEvent, [
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', ['objectAction' => 'new']),
             'settings' => $events[$eventType],
@@ -152,8 +156,10 @@ class TriggerEventController extends CommonFormController
         $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
 
         if (null !== $triggerEvent) {
-            $eventType                = $triggerEvent['type'];
-            $events                   = $this->getModel('point.trigger')->getEvents();
+            $eventType         = $triggerEvent['type'];
+            $pointTriggerModel = $this->getModel('point.trigger');
+            \assert($pointTriggerModel instanceof TriggerModel);
+            $events                   = $pointTriggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
             //ajax only for form fields

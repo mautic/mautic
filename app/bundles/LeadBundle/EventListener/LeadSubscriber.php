@@ -71,6 +71,9 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $isTest;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -531,7 +534,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'event'      => $eventTypeKey,
                             'eventType'  => $eventTypeName,
                             'eventId'    => $eventTypeKey.$utmTag['id'],
-                            'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
+                            'eventLabel' => !empty($utmTag['utm_campaign']) ? $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'] : $eventTypeName,
                             'timestamp'  => $utmTag['date_added'],
                             'icon'       => $icon,
                             'extra'      => [

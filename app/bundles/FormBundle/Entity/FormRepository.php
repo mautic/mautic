@@ -6,7 +6,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FormRepository.
+ * @extends CommonRepository<Form>
  */
 class FormRepository extends CommonRepository
 {
