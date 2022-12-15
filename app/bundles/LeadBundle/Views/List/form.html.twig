@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block content %}
-{% set index = form.filters.vars.value|length > 0 ? max(form.filters.vars.value) : 0 %}
+{% set index = form.filters.vars.value|length > 0 ? max(form.filters.vars.value|keys) : 0 %}
 {{ form_start(form) }}
 <div class="box-layout">
     <div class="col-md-9 bg-white height-auto">
@@ -71,7 +71,7 @@
                                       {% set header = translatorHasId('mautic.lead.' ~ object) ? ('mautic.lead.' ~ object)|trans : object|trans %}
                                       <optgroup label="{{ header }}">
                                           {% for value, params in field %}
-                                              {% set operators = params.operators is not empty ? params.operators|json_encode(constant('JSON_PRETTY_PRINT')) : '{}' %}
+                                              {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
                                               <option value="{{ value|e }}"
                                                       id="available_{{ object }}_{{ value }}"
                                                       data-field-object="{{ object }}"
