@@ -1,7 +1,19 @@
-{% if tmpl %}
+{% if tmpl == 'index' %}
     {% extends 'MauticReportBundle:Report:index.html.twig' %}
 {% endif %}
 {% block content %}
+{% if tmpl == 'index' %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    {{- include(
+        'MauticCoreBundle:Helper:list_toolbar.html.twig',
+        {
+            'searchValue': searchValue,
+            'searchHelp': 'mautic.report.report.help.searchcommands',
+            'action': currentRoute,
+        }
+    )}}
+</div>
+{% endif %}
 {% if items|length %}
     <div class="table-responsive panel-collapse pull out page-list">
         <table class="table table-hover table-striped table-bordered report-list" id="reportTable">

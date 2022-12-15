@@ -35,13 +35,13 @@ class CommonEntity
      */
     public function __call($name, $arguments)
     {
-        if (0 === strpos($name, 'is') && method_exists($this, 'get'.ucfirst($name))) {
-            return $this->{'get'.ucfirst($name)}();
+        if (0 === strpos($name, 'is') && method_exists($this, 'get' . ucfirst($name))) {
+            return $this->{'get' . ucfirst($name)}();
         } elseif ('getName' == $name && method_exists($this, 'getTitle')) {
             return $this->getTitle();
         }
 
-        throw new \InvalidArgumentException('Method '.$name.' not exists');
+        // throw new \InvalidArgumentException('Method ' . $name . ' not exists');
     }
 
     /**
@@ -51,7 +51,7 @@ class CommonEntity
     {
         $string = get_called_class();
         if (method_exists($this, 'getId')) {
-            $string .= ' with ID #'.$this->getId();
+            $string .= ' with ID #' . $this->getId();
         }
 
         return $string;
@@ -63,7 +63,7 @@ class CommonEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = (method_exists($this, $prop)) ? $prop : 'get'.ucfirst($prop);
+        $getter  = (method_exists($this, $prop)) ? $prop : 'get' . ucfirst($prop);
         $current = $this->$getter();
         if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';

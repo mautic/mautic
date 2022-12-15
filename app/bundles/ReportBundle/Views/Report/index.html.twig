@@ -1,7 +1,9 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
-{% block headerTitle%}{% trans %}mautic.report.reports{% endtrans %}{% endblock %}
+{% block headerTitle%}
+{% if tmpl == 'index' %}{% trans %}mautic.report.reports{% endtrans %}{% endif %}{% endblock %}
 {% block mauticContent %}report{% endblock %}
 {% block actions %}
+{% if tmpl == 'index' %}
     {{- include(
         'MauticCoreBundle:Helper:page_actions.html.twig',
         {
@@ -12,19 +14,5 @@
             'langVar': 'report.report',
         }
     )}}
-{% endblock %}
-{% block content %}
-<div class="panel panel-default bdr-t-wdh-0 mb-0">
-    {{- include(
-        'MauticCoreBundle:Helper:list_toolbar.html.twig',
-        {
-            'searchValue': searchValue,
-            'searchHelp': 'mautic.report.report.help.searchcommands',
-            'action': currentRoute,
-        }
-    )}}
-    <div class="page-list">
-        {{ slot('_content') }}
-    </div>
-</div>
+{% endif %}
 {% endblock %}

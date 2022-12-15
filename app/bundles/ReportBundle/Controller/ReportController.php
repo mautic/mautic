@@ -133,7 +133,8 @@ class ReportController extends FormController
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->container->get('mautic.security')->isGranted('report:reports:create')
+            if (
+                !$this->container->get('mautic.security')->isGranted('report:reports:create')
                 || !$this->container->get('mautic.security')->hasEntityAccess(
                     'report:reports:viewown',
                     'report:reports:viewother',
@@ -255,8 +256,7 @@ class ReportController extends FormController
                     'report:reports:deleteown',
                     'report:reports:deleteother',
                     $entity->getCreatedBy()
-                )
-                ) {
+                )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'report', true);
@@ -388,8 +388,8 @@ class ReportController extends FormController
 
             if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 // Clear session items in case columns changed
-                $session->remove('mautic.report.'.$entity->getId().'.orderby');
-                $session->remove('mautic.report.'.$entity->getId().'.orderbydir');
+                $session->remove('mautic.report.' . $entity->getId() . '.orderby');
+                $session->remove('mautic.report.' . $entity->getId() . '.orderbydir');
 
                 return $this->postActionRedirect(
                     array_merge(
@@ -414,9 +414,9 @@ class ReportController extends FormController
             [
                 'viewParameters' => [
                     'report' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
+                    'form'   => $form->createView(), //$this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+                'contentTemplate' => 'MauticReportBundle:Report:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
@@ -518,9 +518,9 @@ class ReportController extends FormController
             [
                 'viewParameters' => [
                     'report' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
+                    'form'   => $form->createView() //$this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+                'contentTemplate' => 'MauticReportBundle:Report:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
@@ -615,7 +615,7 @@ class ReportController extends FormController
         // Setup dynamic filters
         $filterDefinitions = $model->getFilterList($entity->getSource());
         /** @var array $dynamicFilters */
-        $dynamicFilters = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $dynamicFilters = $session->get('mautic.report.' . $objectId . '.filters', []);
         $filterSettings = [];
 
         if (count($dynamicFilters) > 0 && count($entity->getFilters()) > 0) {
@@ -779,10 +779,10 @@ class ReportController extends FormController
         $toDate   = $session->get('mautic.report.date.to', (new \DateTime())->format('Y-m-d'));
 
         $date    = (new DateTimeHelper())->toLocalString();
-        $name    = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($entity->getName(), false, '-');
+        $name    = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($entity->getName(), false, '-');
         $options = ['dateFrom' => new \DateTime($fromDate), 'dateTo' => new \DateTime($toDate)];
 
-        $dynamicFilters            = $session->get('mautic.report.'.$objectId.'.filters', []);
+        $dynamicFilters            = $session->get('mautic.report.' . $objectId . '.filters', []);
         $options['dynamicFilters'] = $dynamicFilters;
 
         if ('csv' === $format) {
@@ -806,7 +806,7 @@ class ReportController extends FormController
                     fclose($handle);
                 }
             );
-            $fileName = $name.'.'.$format;
+            $fileName = $name . '.' . $format;
             ExportResponse::setResponseHeaders($response, $fileName);
         } else {
             if ('xlsx' === $format) {

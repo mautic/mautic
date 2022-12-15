@@ -315,7 +315,7 @@ class ButtonHelper extends Helper
 
         if (isset($button['confirm'])) {
             $button['confirm']['btnTextAttr'] = $this->generateTextAttributes($button);
-            $buttons .= $this->wrapOpeningTag.$this->templating->render('MauticCoreBundle:Helper:confirm.html.php', $button['confirm']).
+            $buttons .= $this->wrapOpeningTag . $this->templating->render('MauticCoreBundle:Helper:confirm.html.php', $button['confirm']) .
                 "{$this->wrapClosingTag}\n";
         } else {
             $attr = $this->menuLink;
@@ -328,12 +328,12 @@ class ButtonHelper extends Helper
             $tooltip     = $this->generateTooltipAttributes($button);
 
             foreach ($button['attr'] as $k => $v) {
-                $attr .= " $k=".'"'.$v.'"';
+                $attr .= " $k=" . '"' . $v . '"';
             }
 
-            $buttonContent = (isset($button['iconClass'])) ? '<i class="'.$button['iconClass'].'"></i> ' : '';
+            $buttonContent = (isset($button['iconClass'])) ? '<i class="' . $button['iconClass'] . '"></i> ' : '';
             if (!empty($button['btnText'])) {
-                $buttonContent .= '<span'.$btnTextAttr.'>'.$this->translator->trans($button['btnText']).'</span>';
+                $buttonContent .= '<span' . $btnTextAttr . '>' . $this->translator->trans($button['btnText']) . '</span>';
             }
             $buttons .= "{$this->wrapOpeningTag}<a{$attr}><span{$tooltip}>{$buttonContent}</span></a>{$this->wrapClosingTag}\n";
         }
@@ -441,12 +441,12 @@ class ButtonHelper extends Helper
         $btnTextAttr = '';
         if (isset($button['btnTextAttr'])) {
             foreach ($button['btnTextAttr'] as $k => $v) {
-                $btnTextAttr .= " $k=".'"'.$v.'"';
+                $btnTextAttr .= " $k=" . '"' . $v . '"';
             }
         }
 
         if (isset($button['btnTextClass'])) {
-            $btnTextAttr .= ' class="'.$button['btnTextClass'].'"';
+            $btnTextAttr .= ' class="' . $button['btnTextClass'] . '"';
             unset($button['btnTextClass']);
         }
 
@@ -468,10 +468,10 @@ class ButtonHelper extends Helper
                     if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
-                    $tooltip .= " $k=".'"'.$v.'"';
+                    $tooltip .= " $k=" . '"' . $v . '"';
                 }
             } else {
-                $tooltip .= ' title="'.$this->translator->trans($button['tooltip']).'" data-placement="left"';
+                $tooltip .= ' title="' . $this->translator->trans($button['tooltip']) . '" data-placement="left"';
             }
         }
 

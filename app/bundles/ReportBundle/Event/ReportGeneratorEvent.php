@@ -102,7 +102,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         // Default content template
-        return 'MauticReportBundle:Report:details_data.html.php';
+        return 'MauticReportBundle:Report:details_data.html.twig';
     }
 
     /**
@@ -186,7 +186,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     public function addCategoryLeftJoin(QueryBuilder $queryBuilder, $prefix, $categoryPrefix = self::CATEGORY_PREFIX)
     {
         if ($this->usesColumnWithPrefix($categoryPrefix)) {
-            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'categories', $categoryPrefix, $categoryPrefix.'.id = '.$prefix.'.category_id');
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'categories', $categoryPrefix, $categoryPrefix . '.id = ' . $prefix . '.category_id');
         }
 
         return $this;
@@ -202,13 +202,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function addLeadLeftJoin(QueryBuilder $queryBuilder, $prefix, $leadPrefix = self::CONTACT_PREFIX)
     {
-        if ($this->usesColumnWithPrefix($leadPrefix)
+        if (
+            $this->usesColumnWithPrefix($leadPrefix)
             || $this->usesColumnWithPrefix(self::IP_ADDRESS_PREFIX)
             || $this->usesColumnWithPrefix(self::COMPANY_PREFIX)
             || $this->usesColumn('cmp.name')
             || $this->usesColumn('clel.campaign_id')
         ) {
-            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'leads', $leadPrefix, $leadPrefix.'.id = '.$prefix.'.lead_id');
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'leads', $leadPrefix, $leadPrefix . '.id = ' . $prefix . '.lead_id');
         }
 
         return $this;
@@ -225,7 +226,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     public function addIpAddressLeftJoin(QueryBuilder $queryBuilder, $prefix, $ipPrefix = self::IP_ADDRESS_PREFIX)
     {
         if ($this->usesColumnWithPrefix($ipPrefix)) {
-            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'ip_addresses', $ipPrefix, $ipPrefix.'.id = '.$prefix.'.ip_id');
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'ip_addresses', $ipPrefix, $ipPrefix . '.id = ' . $prefix . '.ip_id');
         }
 
         return $this;
@@ -244,7 +245,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         if ($this->usesColumnWithPrefix($ipPrefix)) {
             $this->addIpAddressLeftJoin($queryBuilder, $ipXrefPrefix, $ipPrefix);
-            $queryBuilder->leftJoin($leadPrefix, MAUTIC_TABLE_PREFIX.'lead_ips_xref', $ipXrefPrefix, $ipXrefPrefix.'.lead_id = '.$leadPrefix.'.id');
+            $queryBuilder->leftJoin($leadPrefix, MAUTIC_TABLE_PREFIX . 'lead_ips_xref', $ipXrefPrefix, $ipXrefPrefix . '.lead_id = ' . $leadPrefix . '.id');
         }
 
         return $this;
@@ -264,8 +265,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         if ($this->usesColumn('cmp.name') || $this->usesColumn('clel.campaign_id')) {
             $condition = "clel.channel='{$channel}' AND {$prefix}.{$onColumn} = clel.channel_id AND clel.lead_id = {$leadPrefix}.id";
-            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'clel', $condition);
-            $queryBuilder->leftJoin('clel', MAUTIC_TABLE_PREFIX.'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
+            $queryBuilder->leftJoin($prefix, MAUTIC_TABLE_PREFIX . 'campaign_lead_event_log', 'clel', $condition);
+            $queryBuilder->leftJoin('clel', MAUTIC_TABLE_PREFIX . 'campaigns', 'cmp', 'cmp.id = clel.campaign_id');
         }
 
         return $this;
@@ -291,13 +292,13 @@ class ReportGeneratorEvent extends AbstractReportEvent
                 continue;
             }
 
-            $channelParameter = 'channelParameter'.$channel;
+            $channelParameter = 'channelParameter' . $channel;
 
             $queryBuilder->leftJoin(
                 $prefix,
-                MAUTIC_TABLE_PREFIX.$reportDetails['table'],
+                MAUTIC_TABLE_PREFIX . $reportDetails['table'],
                 $channel,
-                $prefix.'.channel_id = '.$channel.'.id AND '.$prefix.'.channel = :'.$channelParameter
+                $prefix . '.channel_id = ' . $channel . '.id AND ' . $prefix . '.channel = :' . $channelParameter
             );
 
             $queryBuilder->setParameter($channelParameter, $channel);
@@ -314,8 +315,8 @@ class ReportGeneratorEvent extends AbstractReportEvent
         $queryParts    =  $queryBuilder->getQueryParts();
         $alreadyJoined = isset($queryParts['join']['companies_lead']);
         if (!$alreadyJoined && $this->usesColumnWithPrefix($companyPrefix)) {
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
-            $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX . 'companies_leads', 'companies_lead', $contactPrefix . '.id = companies_lead.lead_id');
+            $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX . 'companies', $companyPrefix, 'companies_lead.company_id = ' . $companyPrefix . '.id');
         }
     }
 
@@ -346,11 +347,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if ($dateOnly) {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (DATE(%1$s) BETWEEN :dateFrom AND :dateTo)', $tablePrefix . $dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d'));
         } else {
-            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix.$dateColumn));
+            $queryBuilder->andWhere(sprintf('%1$s IS NULL OR (%1$s BETWEEN :dateFrom AND :dateTo)', $tablePrefix . $dateColumn));
             $queryBuilder->setParameter('dateFrom', $this->options['dateFrom']->format('Y-m-d H:i:s'));
             $queryBuilder->setParameter('dateTo', $this->options['dateTo']->format('Y-m-d H:i:s'));
         }
@@ -365,7 +366,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     {
         $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
         $tagSubQuery->select('DISTINCT lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
+            ->from(MAUTIC_TABLE_PREFIX . 'lead_tags_xref', 'ltx');
 
         if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
             $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
