@@ -63,7 +63,7 @@
                     <div class="tab-pane fade bdr-w-0" id="filters">
                         <div class="alert alert-info"><p>{{ 'mautic.lead.lead.segment.filter.info'|trans }}</p></div>
                         <div class="form-group">
-                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype) }}" data-index="{{ index + 1 }}">
+                            <div class="available-filters mb-md pl-0 col-md-4" data-prototype="{{ form_widget(form.filters.vars.prototype)|e }}" data-index="{{ index + 1 }}">
                                 <select class="chosen form-control" id="available_segment_filters">
                                     <option value=""></option>
                                     {% for object, field in form.vars.fields %}
@@ -76,7 +76,7 @@
                                                       id="available_{{ object }}_{{ value }}"
                                                       data-field-object="{{ object }}"
                                                       data-field-type="{{ params.properties.type }}"
-                                                      data-field-operators="{{ operators|raw|e('js') }}"
+                                                      data-field-operators="{{ operators|e }}"
                                                       class="segment-filter {{ icon }}">
                                                       {{ params.label|trans }}
                                               </option>
