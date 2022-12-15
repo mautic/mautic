@@ -37,4 +37,17 @@ class FileManagerController extends AjaxController
 
         return $this->sendJsonResponse(['success'=> true]);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function assetsAction()
+    {
+        /** @var FileManager $fileManager */
+        $fileManager = $this->get('grapesjsbuilder.helper.filemanager');
+
+        return $this->sendJsonResponse([
+            'data' => $fileManager->getImages(),
+        ]);
+    }
 }
