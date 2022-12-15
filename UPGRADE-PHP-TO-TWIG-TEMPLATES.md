@@ -92,3 +92,4 @@ Becomes
     {% set nameGetter = nameGetter|default('getName') %}
 
     ```
+- [Symfony Best Practices for Templates](https://symfony.com/doc/current/best_practices.html#templates)
