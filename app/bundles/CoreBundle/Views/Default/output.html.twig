@@ -1,7 +1,5 @@
 <div class="content-body">
-    {% if not request.isXmlHttpRequest() %}
-        {{ include('MauticCoreBundle:Default:pageheader.html.twig') }}
-    {% endif %}
+    {{ include('MauticCoreBundle:Default:pageheader.html.twig') }}
     {{ content|raw }}
 </div>
 {{ modal|raw }}

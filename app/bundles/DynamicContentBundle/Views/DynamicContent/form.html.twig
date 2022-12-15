@@ -32,7 +32,7 @@
 {% block content %}
 
 {% set mainErrors = form.vars.errors.form.getErrors(true) ? 'class="text-danger"' : '' %}
-{% set filterErrors = form.vars.errors.form.getErrors(true) ? 'class="text-danger"' : '' %}
+{% set filterErrors = form.vars.errors.form.filters.getErrors(true) ? 'class="text-danger"' : '' %}
 
 {{ form_start(form) }}
 <div class="box-layout">
@@ -78,7 +78,7 @@
                                 {{ form_errors(form.filters) }}
                             </div>
                         {% endif %}
-                        <div class="dwc-filter bdr-w-0" id="<?php echo $form->vars['id']; ?>">
+                        <div class="dwc-filter bdr-w-0" id="{{ form.vars.id }}">
                             <div class="row">
                                 <div class="col-xs-7">
                                     <label>{% trans %}Filters{% endtrans %}</label>
@@ -92,7 +92,7 @@
                                                 {% for object, field in fields %}
                                                     {% set header = object %}
                                                     {% set icon   = ('company' == object) ? 'building' : 'user' %}
-                                                    <optgroup label="{{ 'mautic.lead' ~ header|trans }}">
+                                                    <optgroup label="{{ "mautic.lead.#{ header }"|trans }}">
                                                         {% for value, params in field %}
                                                             {% set list = params.properties.list is defined ? params.properties.list : [] %}
                                                             {% set choices = 'boolean' == params.properties.type ? list|parseBooleanList|reverse : list|parseListForChoices %}

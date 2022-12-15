@@ -3,7 +3,7 @@
 {% endif %}
 
 {% block content %}
-{% if not request.isXmlHttpRequest() %}
+{% if tmpl == 'index' %}
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
 {{- include(
     'MauticCoreBundle:Helper:list_toolbar.html.twig', 

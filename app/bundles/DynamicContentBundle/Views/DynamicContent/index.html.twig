@@ -3,13 +3,13 @@
 
 {% block mauticContent %}dynamicContent{% endblock %}
 {% block headerTitle %}
-{% if not request.isXmlHttpRequest() %}
-{% trans %}mautic.dynamicContent.dynamicContents{% endtrans %}
+{% if tmpl == 'index' %}
+    {% trans %}mautic.dynamicContent.dynamicContents{% endtrans %}
 {% endif %}
 {% endblock %}
 
 {% block actions %}
-{% if not request.isXmlHttpRequest() %}
+{% if tmpl == 'index' %}
 {{- include(
     'MauticCoreBundle:Helper:page_actions.html.twig', 
     {
