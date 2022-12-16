@@ -24,28 +24,22 @@ class EmojiExtension extends AbstractExtension
     {
         return [
             new TwigFunction('toHtml', [$this, 'toHtml'], ['is_safe' => ['all']]),
-            new TwigFunction('instanceof', [$this, 'isInstanceof'], ['is_safe' => ['all']]),
+            new TwigFunction('instanceof', [$this, 'isInstanceof']),
         ];
     }
 
     /**
      * Convert to html.
-     *
-     * @param $text
-     *
-     * @return mixed
      */
-    public function toHtml($text, string $from = 'emoji'): string
+    public function toHtml(string $text, string $from = 'emoji'): string
     {
         return $this->emojiHelper->toHtml($text, $from);
     }
 
-    /**
-     * @param $var
-     * @param $instance
-     */
-    public function isInstanceof($var, $instance): bool
+    public function isInstanceOf(object $object, object $class): bool
     {
-        return $var instanceof $instance;
+        $reflectionClass = new \ReflectionClass($class);
+
+        return $reflectionClass->isInstance($object);
     }
 }
