@@ -6,7 +6,7 @@
 {% block headerTitle %}{{ entity.getName() }}{% endblock %}
 
 {% set translationContent = include(
-    'MauticCoreBundle:Translation:index.html.php',
+    'MauticCoreBundle:Translation:index.html.twig',
     {
         activeEntity: entity,
         translations: translations,

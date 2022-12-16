@@ -1,0 +1,38 @@
+{% if nameGetter is not defined %}
+    {% set nameGetter = 'getName' %}
+{% endif %}
+
+{% if translations.children|length or (translations.parent and translations.parent.getId() != activeEntity.getId() ) %}
+
+<ul class="list-group">
+    {% if translations.parent %}
+        {{ include(
+            'MauticCoreBundle:Translation:row.html.twig',
+            {
+                'translation': translations.parent,
+                'translations': translations,
+                'actionRoute': actionRoute,
+                'activeEntity': activeEntity,
+                'model': model,
+                'nameGetter': nameGetter,
+            }
+        )}}
+    {% endif %}
+
+    {% if translations.children|length %}
+        {% for translation in translations.children %}
+            {{ include(
+                'MauticCoreBundle:Translation:row.html.twig',
+                {
+                    'translation': translation,
+                    'translations': translations,
+                    'actionRoute': actionRoute,
+                    'activeEntity': activeEntity,
+                    'model': model,
+                    'nameGetter': nameGetter,
+                }
+            )}}
+        {% endfor %}
+    {% endif %}
+</ul>
+{% endif %}
