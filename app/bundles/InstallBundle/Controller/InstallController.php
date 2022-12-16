@@ -192,7 +192,7 @@ class InstallController extends CommonController
                             'tmpl'        => $tmpl,
                         ],
                         'returnUrl'         => $this->generateUrl('mautic_installer_final'),
-                        'contentTemplate'   => 'MauticInstallBundle:Install:final.html.twig',
+                        'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
                         'forwardController' => false,
                     ]
                 );
@@ -272,7 +272,7 @@ class InstallController extends CommonController
                     'version'     => MAUTIC_VERSION,
                     'tmpl'        => $tmpl,
                 ],
-                'contentTemplate' => 'MauticInstallBundle:Install:final.html.twig',
+                'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_installer_index',
                     'mauticContent' => 'installer',
