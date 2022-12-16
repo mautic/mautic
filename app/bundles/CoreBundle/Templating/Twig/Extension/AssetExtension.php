@@ -115,7 +115,10 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->addScriptDeclaration($script, $location);
     }
 
-    public function getCountryFlag($country, $urlOnly = true, $class = '')
+    /**
+     * @see Mautic\CoreBundle\Templating\Helper\AssetsHelper::getCountryFlag
+     */
+    public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string
     {
         return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class);
     }
