@@ -198,11 +198,9 @@
                                     {% set error = 'N/A' %}
                                     {% if row.properties.error is defined %}
                                         {% set error = row.properties.error %}
-                                        {# @todo
-                                        if (preg_match('/SQLSTATE\[\w+\]: (.*)/', $error, $matches)):
-                                            $error = $matches[1];
-                                        endif;
-                                        #}
+                                        {% if error matches '/^SQLSTATE\\[\\w+\\]: (.*)$/' %}
+                                          {% set error = error|split(': ')[1] %}
+                                        {% endif %}
                                     {% endif %}
                                     {{ error }}
                                 </td>
