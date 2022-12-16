@@ -37,7 +37,11 @@ class TranslatorExtension extends AbstractExtension
         return $this->translatorHelper->hasId($id, $domain, $locale);
     }
 
-    public function translatorConditional($preferred, $alternative, $parameters = [], $domain = null, $locale = null)
+    /**
+     * @see \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::transConditional
+     * @see \Mautic\CoreBundle\Translation\Translator::transConditional
+     */
+    public function translatorConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translatorHelper->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
