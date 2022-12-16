@@ -471,6 +471,43 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', $clientResponse->getContent());
     }
 
+    public function testQuickAddRendersErrorOnEmailDuplicate(): void
+    {
+        $email = 'duplicate@email.a';
+        $this->createContact($email);
+        $crawler = $this->client->request('GET', 's/contacts/quickAdd');
+        $form    = $crawler->filter('form[name="lead"]')->form([
+            'lead' => [
+                'email' => $email,
+            ],
+        ]);
+
+        $crawler = $this->client->submit($form);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
+        self::assertCount(1, $errorContainer);
+        self::assertSame('This field must be unique.', $errorContainer->text(null, true));
+    }
+
+    public function testEditRendersErrorOnEmailDuplicate(): void
+    {
+        $email = 'duplicate@email.a';
+        $this->createContact($email);
+        $crawler = $this->client->request('GET', 's/contacts/new');
+        $form    = $crawler->filter('form[name="lead"]')->form([
+            'lead' => [
+                'email' => $email,
+            ],
+        ]);
+
+        $this->client->submit($form);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertStringContainsString('email: This field must be unique.', $clientResponse->getContent());
+    }
+
     private function createCampaign(): Campaign
     {
         $campaign = new Campaign();
