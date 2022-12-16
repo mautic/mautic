@@ -70,7 +70,6 @@
             <!-- lead detail collapseable -->
             <div class="collapse" id="lead-details">
                 <ul class="pt-md nav nav-tabs pr-md pl-md" role="tablist">
-                    <?php $step = 0; ?>
                     {% for g in fields|keys %}
                         {% if fields[g] is not empty %}
                             <li class="{% if loop.first %}active{% endif %}">
@@ -93,7 +92,6 @@
                                                 <tr>
                                                     <td width="20%"><span class="fw-b">{{ field.label }}</span></td>
                                                     <td>
-                                                        <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)) : ?>
                                                         {% if 'core' == group and 'country' == field.alias and flag is defined %}
                                                           <img class="mr-sm" src="{{ flag }}" alt="" style="max-height: 24px;"/>
                                                           <span class="mt-1">{{ field.value }}</span>
