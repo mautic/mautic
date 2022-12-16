@@ -26,7 +26,7 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
 
-        self::$container->set('swiftmailer.mailer.default.transport.real', $this->transport = $this->createTransportFake());
+        //self::$container->set('swiftmailer.mailer.default.transport.real', $this->transport = $this->createTransportFake());
     }
 
     /**
