@@ -40,6 +40,8 @@ class TranslatorExtension extends AbstractExtension
     /**
      * @see \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::transConditional
      * @see \Mautic\CoreBundle\Translation\Translator::transConditional
+     *
+     * @param array<mixed> $parameters
      */
     public function translatorConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
