@@ -24,7 +24,7 @@
 {% endif %}
 
 {% set variantParent = email.getVariantParent() %}
-{% set isExisting    = email->getId() %}
+{% set isExisting    = email.getId() %}
 
 {% set subheader = (variantParent) ? '<div><span class="small">' ~ {{ 'mautic.core.variant_of'|trans ({'%name%' : email.getName(), '%parent%' : variantParent.getName()}) }} ~ '</span></div>' : '' %}
 
@@ -264,7 +264,7 @@
 }) -}}
 {{ form_errors() }}
 {% set type = email.getEmailType() %}
-{% if (updateSelect is empty and not isExisting and not form_errors(form) and not variantParent) or type is empty or forceTypeSelection is not empty  %}
+{% if (updateSelect is empty and not isExisting and not form_errors(form) and not variantParent) or (type is empty) or forceTypeSelection is not empty  %}
     {{- include('MauticCoreBundle:Helper:form_selecttype.html.twig', {
         'item'       : email,
         'mauticLang' : {

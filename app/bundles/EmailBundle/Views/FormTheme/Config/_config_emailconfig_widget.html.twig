@@ -23,15 +23,25 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_from_name', template) }}
-                {{ rowIfExists(fields, 'mailer_from_email', template) }}
+                {% if fields['mailer_from_name'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_from_name']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_from_email'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_from_email']~'</div>') }}
+                {% endif %}
             </div>
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_reply_to_email', template) }}
+                {% if fields['mailer_reply_to_email'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_reply_to_email']~'</div>') }}
+                {% endif %}
             </div>
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_return_path', template) }}
-                {{ rowIfExists(fields, 'mailer_is_owner', template) }}
+                {% if fields['mailer_return_path'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_return_path']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_is_owner'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_is_owner']~'</div>') }}
+                {% endif %}
             </div>
 
             {% if fields['mailer_from_name'] is defined or fields['mailer_from_email'] is defined %}
@@ -58,39 +68,65 @@
             <?php endif; ?>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_amazon_region', template) }}
-                {{ rowIfExists(fields, 'mailer_amazon_other_region', template) }}
+                {% if fields['mailer_amazon_region'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_amazon_region']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_amazon_other_region'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_amazon_other_region']~'</div>') }}
+                {% endif %}
             </div>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_sparkpost_region', template) }}
+                {% if fields['mailer_sparkpost_region'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_sparkpost_region']~'</div>') }}
+                {% endif %}
             </div>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_host', template) }}
-                {{ rowIfExists(fields, 'mailer_port', template) }}
+                {% if fields['mailer_host'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_host']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_port'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_port']~'</div>') }}
+                {% endif %}
             </div>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_encryption', template) }}
-                {{ rowIfExists(fields, 'mailer_auth_mode', template) }}
+                {% if fields['mailer_encryption'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_encryption']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_auth_mode'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_auth_mode']~'</div>') }}
+                {% endif %}
             </div>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_user', template) }}
-                {{ rowIfExists(fields, 'mailer_password', template) }}
-                {{ rowIfExists(fields, 'mailer_api_key', template) }}
+                {% if fields['mailer_user'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_user']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_password'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_password']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_api_key'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_api_key']~'</div>') }}
+                {% endif %}
             </div>
 
             {% if fields['mailer_transport'] is defined %}
                 <div class="row">
-                    {{ rowIfExists(fields, 'mailer_mailjet_sandbox', template) }}
-                    {{ rowIfExists(fields, 'mailer_mailjet_sandbox_default_mail', template) }}
+                    {% if fields['mailer_mailjet_sandbox'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_mailjet_sandbox']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_mailjet_sandbox_default_mail'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_mailjet_sandbox_default_mail']~'</div>') }}
+                    {% endif %}
                 </div>
             {% endif %}
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_custom_headers', template) }}
+                {% if fields['mailer_custom_headers'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_custom_headers']~'</div>') }}
+                {% endif %}
             </div>
 
             {% if fields['mailer_transport'] is defined %}
@@ -98,18 +134,30 @@
             {% endif %}
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_spool_type', template) }}
-                {{ rowIfExists(fields, 'mailer_spool_path', template) }}
+                {% if fields['mailer_spool_type'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_type']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_spool_path'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_path']~'</div>') }}
+                {% endif %}
             </div>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_spool_msg_limit', template) }}
-                {{ rowIfExists(fields, 'mailer_spool_time_limit', template) }}
+                {% if fields['mailer_spool_msg_limit'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_msg_limit']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_spool_time_limit'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_time_limit']~'</div>') }}
+                {% endif %}
             </div>
 
             <div class="row">
-                {{ rowIfExists(fields, 'mailer_spool_recover_timeout', template) }}
-                {{ rowIfExists(fields, 'mailer_spool_clear_timeout', template) }}
+                {% if fields['mailer_spool_recover_timeout'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_recover_timeout']~'</div>') }}
+                {% endif %}
+                {% if fields['mailer_spool_clear_timeout'] is defined %}
+                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_clear_timeout']~'</div>') }}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -152,13 +200,23 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            {{ rowIfExists(fields, 'webview_text', template) }}
-            {{ rowIfExists(fields, 'default_signature_text', template) }}
+            {% if fields['webview_text'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['webview_text']~'</div>') }}
+            {% endif %}
+            {% if fields['default_signature_text'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['default_signature_text']~'</div>') }}
+            {% endif %}
         </div>
         <div class="row">
-            {{ rowIfExists(fields, 'mailer_append_tracking_pixel', template) }}
-            {{ rowIfExists(fields, 'mailer_convert_embed_images', template) }}
-            {{ rowIfExists(fields, 'disable_trackable_urls', template) }}
+            {% if fields['mailer_append_tracking_pixel'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['mailer_append_tracking_pixel']~'</div>') }}
+            {% endif %}
+            {% if fields['mailer_convert_embed_images'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['mailer_convert_embed_images']~'</div>') }}
+            {% endif %}
+            {% if fields['disable_trackable_urls'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['disable_trackable_urls']~'</div>') }}
+            {% endif %}
         </div>
     </div>
 </div>
@@ -168,27 +226,49 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            {{ rowIfExists(fields, 'unsubscribe_text', template) }}
+            {% if fields['unsubscribe_text'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['unsubscribe_text']~'</div>') }}
+            {% endif %}
         </div>
         <div class="row">
-            {{ rowIfExists(fields, 'unsubscribe_message', template) }}
-            {{ rowIfExists(fields, 'resubscribe_message', template) }}
+            {% if fields['unsubscribe_message'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['unsubscribe_message']~'</div>') }}
+            {% endif %}
+            {% if fields['resubscribe_message'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['resubscribe_message']~'</div>') }}
+            {% endif %}
         </div>
         <div class="row">
-            {{ rowIfExists(fields, 'unsubscribe_message', template) }}
-            {{ rowIfExists(fields, 'resubscribe_message', template) }}
+            {% if fields['unsubscribe_message'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['unsubscribe_message']~'</div>') }}
+            {% endif %}
+            {% if fields['resubscribe_message'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['resubscribe_message']~'</div>') }}
+            {% endif %}
         </div>
         <div class="row">
-            {{ rowIfExists(fields, 'show_contact_preferences', template) }}
-            {{ rowIfExists(fields, 'show_contact_segments', template) }}
+            {% if fields['show_contact_preferences'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['show_contact_preferences']~'</div>') }}
+            {% endif %}
+            {% if fields['show_contact_segments'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['show_contact_segments']~'</div>') }}
+            {% endif %}
         </div>
         <div class="row">
-            {{ rowIfExists(fields, 'show_contact_frequency', template) }}
-            {{ rowIfExists(fields, 'show_contact_pause_dates', template) }}
+            {% if fields['show_contact_frequency'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['show_contact_frequency']~'</div>') }}
+            {% endif %}
+            {% if fields['show_contact_pause_dates'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['show_contact_pause_dates']~'</div>') }}
+            {% endif %}
         </div>
         <div class="row">
-            {{ rowIfExists(fields, 'show_contact_categories', template) }}
-            {{ rowIfExists(fields, 'show_contact_preferred_channels', template) }}
+            {% if fields['show_contact_categories'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['show_contact_categories']~'</div>') }}
+            {% endif %}
+            {% if fields['show_contact_preferred_channels'] is defined %}
+                {{ form_row('<div class="col-md-6">'~fields['show_contact_preferred_channels']~'</div>') }}
+            {% endif %}
         </div>
     </div>
 </div>

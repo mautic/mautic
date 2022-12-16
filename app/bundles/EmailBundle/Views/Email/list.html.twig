@@ -9,7 +9,10 @@
     {% extends 'MauticEmailBundle:Email:index.html.twig' %}
 {% endif %}
 
-{% if items|length %}
+{% block content %}
+
+{% if items|length > 0 %}
+
 <div class="table-responsive">
     <table class="table table-hover table-striped table-bordered email-list">
         <thead>
@@ -219,3 +222,5 @@
 {% else %}
     {{- include('MauticCoreBundle:Helper:noresults.html.twig') -}}
 {% endif %}
+{% endblock %}
+

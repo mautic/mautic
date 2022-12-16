@@ -12,12 +12,14 @@
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
         'templateButtons' : {
-            'new' : permissions['email:emails:create'],
-        }
+            'new' : permissions['email:emails:create']
+        },
         'routeBase' : 'email',
     })
     -}}
 {% endblock %}
+
+{% block list_toolbar %}
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
@@ -29,7 +31,8 @@
     -}}
 
     <div class="page-list">
-        {{ slot('_content') }}
+        {% block content %}{% endblock %}
     </div>
 </div>
+{% endblock %}
 
