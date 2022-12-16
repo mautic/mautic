@@ -71,7 +71,7 @@
                         {% elseif 'lookup' == type %}
                             {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
                                 'form': form.properties,
-                                'selectTemplate': lookupTemplate,
+                                'selectTemplate': form_row(form.properties_lookup_template),
                                 'type': 'lookup',
                             }) }}
                         {% elseif 'textarea' == type %}
