@@ -12,7 +12,7 @@
 #}
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
-{% block headerTitle %}{{ company.name|purify }}{% endblock %}
+{% block headerTitle %}{{ company.name }}{% endblock %}
 
 {% block actions %}
 {% set canEdit     = securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], company.permissionUser) %}
@@ -26,7 +26,7 @@
         'attr': {
             'data-toggle': 'ajaxmodal',
             'data-target': '#MauticSharedModal',
-            'data-header': 'mautic.lead.company.header.merge'|trans({'%name%': company.primaryIdentifier|purify}),
+            'data-header': 'mautic.lead.company.header.merge'|trans({'%name%': company.primaryIdentifier}),
             'href': path('mautic_company_action', {'objectId': company.id, 'objectAction': 'merge'}),
         },
         'btnText': 'mautic.lead.merge'|trans,
@@ -91,19 +91,19 @@
                                         {% for field in fields[group] %}
                                             {% if field.value is not empty %}
                                                 <tr>
-                                                    <td width="20%"><span class="fw-b">{{ field.label|purify }}</span></td>
+                                                    <td width="20%"><span class="fw-b">{{ field.label }}</span></td>
                                                     <td>
                                                         <?php if ('core' == $group && 'country' == $field['alias'] && !empty($flag)) : ?>
                                                         {% if 'core' == group and 'country' == field.alias and flag is defined %}
                                                           <img class="mr-sm" src="{{ flag }}" alt="" style="max-height: 24px;"/>
-                                                          <span class="mt-1">{{ field.value|purify }}</span>
+                                                          <span class="mt-1">{{ field.value }}</span>
                                                         {% else %}
                                                           {% if field.value is iterable and 'multiselect' == field.type %}
                                                               {{ field.value|join(', ') }}
                                                           {% elseif 'url' == field.type %}
-                                                              <a href="{{ field.value|purify }}" target="_blank">{{ field.value }}</a>
+                                                              <a href="{{ field.value }}" target="_blank">{{ field.value }}</a>
                                                           {% else %}
-                                                              {{ field.normalizedValue|purify }}
+                                                              {{ field.normalizedValue }}
                                                           {% endif %}
                                                         {% endif %}
                                                     </td>
@@ -197,27 +197,27 @@
             <div class="panel-body pt-sm">
                 {% if company.owner %}
                   <h6 class="fw-sb">{{ 'mautic.lead.company.field.owner'|trans }}</h6>
-                  <p class="text-muted">{{ company.owner.name|purify }}</p>
+                  <p class="text-muted">{{ company.owner.name }}</p>
                 {% endif %}
 
                 <h6 class="fw-sb">{{ 'mautic.lead.field.address'|trans }}</h6>
                 <address class="text-muted">
                     {% if company.address1 is not empty %}
-                        {{ company.address1|purify }}<br>
+                        {{ company.address1 }}<br>
                     {% endif %}
                     {% if company.address2 is not empty %}
-                        {{ company.address2|purify }}<br>
+                        {{ company.address2 }}<br>
                     {% endif %}
-                    {{ company.city|purify }} {{ company.zipcode|purify }}
+                    {{ company.city }} {{ company.zipcode }}
                     <br>
                 </address>
 
                 <h6 class="fw-sb">{{ 'mautic.core.type.email'|trans }}</h6>
-                <p class="text-muted">{{ company.email|purify }}</p>
+                <p class="text-muted">{{ company.email }}</p>
 
                 {% if company.phone is not empty %}
                   <h6 class="fw-sb">{{ 'mautic.company.phone'|trans }}</h6>
-                  <p class="text-muted">{{ company.phone|purify }}</p>
+                  <p class="text-muted">{{ company.phone }}</p>
                 {% endif %}
             </div>
         </div>
