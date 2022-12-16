@@ -296,7 +296,7 @@ class ReportModel extends FormModel
 
             // Add numeric suffix
             if ($existingAliases[$alias] > 0) {
-                $columns[$key]['alias'] = $alias.$existingAliases[$alias];
+                $columns[$key]['alias'] = $alias . $existingAliases[$alias];
             }
         }
 
@@ -396,12 +396,12 @@ class ReportModel extends FormModel
 
         // First sort
         foreach ($graphData as $key => $details) {
-            $return->choices[$key] = $this->translator->trans($key).' ('.$this->translator->trans('mautic.report.graph.'.$details['type']).')';
+            $return->choices[$key] = $this->translator->trans($key) . ' (' . $this->translator->trans('mautic.report.graph.' . $details['type']) . ')';
         }
         natsort($return->choices);
 
         foreach ($return->choices as $key => $value) {
-            $return->choiceHtml .= '<option value="'.$key.'">'.$value."</option>\n";
+            $return->choiceHtml .= '<option value="' . $key . '">' . $value . "</option>\n";
         }
 
         return $return;
@@ -421,7 +421,7 @@ class ReportModel extends FormModel
     public function exportResults($format, Report $report, array $reportData, $handle = null, $page = null)
     {
         $date = (new DateTimeHelper())->toLocalString();
-        $name = str_replace(' ', '_', $date).'_'.InputHelper::alphanum($report->getName(), false, '-');
+        $name = str_replace(' ', '_', $date) . '_' . InputHelper::alphanum($report->getName(), false, '-');
 
         switch ($format) {
             case 'csv':
@@ -442,14 +442,14 @@ class ReportModel extends FormModel
                     }
                 );
 
-                $fileName = $name.'.csv';
+                $fileName = $name . '.csv';
                 ExportResponse::setResponseHeaders($response, $fileName);
 
                 return $response;
 
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.php',
+                    'MauticReportBundle:Report:export.html.twig',
                     [
                         'reportData' => $reportData,
                         'data'       => $reportData['data'],
@@ -475,7 +475,7 @@ class ReportModel extends FormModel
                     }
                 );
 
-                $fileName = $name.'.xlsx';
+                $fileName = $name . '.xlsx';
                 ExportResponse::setResponseHeaders($response, $fileName);
 
                 return $response;
@@ -535,16 +535,16 @@ class ReportModel extends FormModel
         foreach ($aggregatorColumns as $aggregatorColumn) {
             $selectedColumns[] = $aggregatorColumn['column'];
             // add aggregator columns to dataColumns also
-            $dataColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']]           = $aggregatorColumn['column'];
-            $dataAggregatorColumns[$aggregatorColumn['function'].' '.$aggregatorColumn['column']] = $aggregatorColumn['column'];
+            $dataColumns[$aggregatorColumn['function'] . ' ' . $aggregatorColumn['column']]           = $aggregatorColumn['column'];
+            $dataAggregatorColumns[$aggregatorColumn['function'] . ' ' . $aggregatorColumn['column']] = $aggregatorColumn['column'];
         }
         // Build a reference for column to data column (without table prefix)
         foreach ($tableDetails['columns'] as $dbColumn => &$columnData) {
             $dataColumns[$columnData['alias']] = $dbColumn;
         }
 
-        $orderBy    = $this->session->get('mautic.report.'.$entity->getId().'.orderby', '');
-        $orderByDir = $this->session->get('mautic.report.'.$entity->getId().'.orderbydir', 'ASC');
+        $orderBy    = $this->session->get('mautic.report.' . $entity->getId() . '.orderby', '');
+        $orderByDir = $this->session->get('mautic.report.' . $entity->getId() . '.orderbydir', 'ASC');
 
         $dataOptions = [
             'order'          => (!empty($orderBy)) ? [$orderBy, $orderByDir] : false,
@@ -562,7 +562,7 @@ class ReportModel extends FormModel
         $contentTemplate = $reportGenerator->getContentTemplate();
 
         //set what page currently on so that we can return here after form submission/cancellation
-        $this->session->set('mautic.report.'.$entity->getId().'.page', $reportPage);
+        $this->session->set('mautic.report.' . $entity->getId() . '.page', $reportPage);
 
         // Reset the orderBy as it causes errors in graphs and the count query in table data
         $parts = $query->getQueryParts();
@@ -615,7 +615,7 @@ class ReportModel extends FormModel
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
             if ($paginate) {
                 // Build the options array to pass into the query
-                $limit = $this->session->get('mautic.report.'.$entity->getId().'.limit', $this->defaultPageLimit);
+                $limit = $this->session->get('mautic.report.' . $entity->getId() . '.limit', $this->defaultPageLimit);
                 if (!empty($options['limit'])) {
                     $limit      = $options['limit'];
                     $reportPage = $options['page'];
@@ -741,7 +741,7 @@ class ReportModel extends FormModel
         $countQb->resetQueryParts();
 
         $countQb->select('count(*)')
-            ->from('('.$qb->getSQL().')', 'c');
+            ->from('(' . $qb->getSQL() . ')', 'c');
 
         if ($this->isDebugMode()) {
             $debugData['count_query'] = $countQb->getSQL();
@@ -760,7 +760,7 @@ class ReportModel extends FormModel
         $search = 'lll.leadlist_id';
         $filter = [
             'force'  => [
-                ['column' => 'r.filters', 'expr' => 'LIKE', 'value'=>'%'.$search.'"%'],
+                ['column' => 'r.filters', 'expr' => 'LIKE', 'value' => '%' . $search . '"%'],
             ],
         ];
         $entities = $this->getEntities(

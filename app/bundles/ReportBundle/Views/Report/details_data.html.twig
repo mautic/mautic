@@ -14,33 +14,13 @@
 {% set groupByCount = groupBy|length %}
 {% set startCount = totalResults > limit ? reportPage * limit - limit + 1 : 1 %}
 
-function getTotal($a, $f, $t, $allrows, $ac)
-{
-    switch ($f) {
-        case 'COUNT':
-        case 'SUM':
-            return (int) $t + (int) $a;
-        case 'AVG':
-            return ($ac == $allrows) ? round(((int) $t + (int) $a) / (int) $allrows, 2) : (int) $t + (int) $a;
-        case 'MAX':
-            return ((int) $a >= (int) $t) ? (int) $a : (int) $t;
-        case 'MIN':
-            return ((int) $a <= (int) $t) ? (int) $a : (int) $t;
-        default:
-            return (int) $t;
-    }
-}
-
-{% set graphContent = include(
+{% if showGraphsAboveTable is not empty %}{{ include(
     'MauticReportBundle:Report:details_data_graphs.html.twig',
     {
         'graphOrder': graphOrder,
         'graphs': graphs,
         'report': report,
-    })
-%}
-
-{% if showGraphsAboveTable is not empty %}{{ graphContent }}{% endif%}
+    }) }}{% endif %}
 
 {% if columnOrder is not empty or aggregatorOrder is not empty %}
     <!-- table section -->
@@ -53,139 +33,126 @@ function getTotal($a, $f, $t, $allrows, $ac)
                             <tr>
                                 <th class="col-report-count"></th>
 
-                                <?php foreach ($columnOrder as $key) : ?>
-                                    <?php
-                                    if (isset($columns[$key])) :
-                                        // order by alias if exists, if not then by column name
-                                        $orderBy = $columns[$key]['alias'] ??
-                                            (0 === strpos($key, 'channel.') ? str_replace('.', '_', $key) : $key);
-                                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                                            'sessionVar' => 'report.' . $report->getId(),
-                                            'orderBy'    => $orderBy,
-                                            'text'       => $columns[$key]['label'],
-                                            'class'      => 'col-report-' . $columns[$key]['type'],
-                                            'dataToggle' => in_array($columns[$key]['type'], ['date', 'datetime']) ? 'date' : '',
-                                            'target'     => '.report-content',
-                                        ]);
-                                    else :
-                                        unset($columnOrder[$key]);
-                                    endif;
-                                    ?>
-                                <?php endforeach; ?>
-                                <?php
-                                if ($aggregatorCount) :
-                                    $index = 0;
-                                    foreach ($aggregatorOrder as $aggregator) : ?>
-                                        <?php
-                                        $columnName = isset($columns[$aggregator['column']]['alias']) ? $columns[$aggregator['column']]['label'] : '';
-                                        echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
-                                            'sessionVar' => 'report.' . $report->getId(),
-                                            'text'       => $aggregator['function'] . ' ' . $columnName,
-                                            'orderBy'    => '`' . $aggregator['function'] . ' ' . $aggregator['column'] . '`',
-                                            'dataToggle' => '',
-                                            'target'     => '.report-content',
-                                        ]);
-                                        ?>
-                                <?php
-                                        $total[$index] = 0;
-                                        ++$index;
-                                    endforeach;
-                                endif;
-                                ?>
+                                {% for key in columnOrder %}
+                                    {% if columns[key] is defined %}
+                                        
+                                        {% set orderBy = columns[key]['alias'] ?? (key in 'channel.') ? key|replace({'.': '_'}) : key %}
+                                        {{
+                                            include('MauticCoreBundle:Helper:tableheader.html.twig', 
+                                            {
+                                                'sessionVar': 'report.' ~ report.getId(),
+                                                'orderBy': orderBy,
+                                                'text': columns[key]['label'],
+                                                'class': 'col-report-' ~ columns[key]['type'],
+                                                'dataToggle': columns[key]['type'] in ['date', 'datetime'] ? 'date' : '',
+                                                'target': '.report-content',
+                                            })
+                                        }}
+                                    {% else %}
+                                        {{ columnOrder|unset(key) }}
+                                    {% endif %}
+                                {% endfor %}
+                    
+                                {% if aggregatorCount %}
+                                    {% set index = 0 %}
+                                    {% for aggregator in aggregatorOrder %}
+                                       
+                                        {% set columnName = columns[aggregator['column']]['alias'] is defined ? columns[aggregator['column']]['label'] : '' %}
+                                        {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                                            'sessionVar': 'report.' ~ report.getId(),
+                                            'text': aggregator['function'] ~ ' ' ~ columnName,
+                                            'orderBy': '`' ~ aggregator['function'] ~ ' ' ~ aggregator['column'] ~ '`',
+                                            'dataToggle': '',
+                                            'target': '.report-content',
+                                            })
+                                        }}
+                                
+                                        {% set total = total|merge({index: 0}) %}
+                                        {% set index = index + 1 %}
+                                    {% endfor %}
+                                {% endif %}
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if ($dataCount) :
-                                $avgCounter = 0;
-                            ?>
-                                <?php foreach ($data as $row) : ?>
+                            {% if dataCount %}
+                                {% set avgCounter = 0 %}
+                                {% for row in data %}
                                     <tr>
-                                        <td><?php echo $startCount; ?></td>
-                                        <?php foreach ($columnOrder as $key) : ?>
-                                            <?php if (isset($columns[$key])) : ?>
+                                        <td>{{ startCount }}</td>
+                                        {% for key in columnOrder %}
+                                            {% if columns[key] is defined %}
                                                 <td>
-                                                    <?php $closeLink = false; ?>
-                                                    <?php if (isset($columns[$key]['link']) && !empty($row[$columns[$key]['alias']])) : ?>
-                                                        <?php $closeLink = true; ?>
-                                                        <a href="<?php echo $view['router']->path($columns[$key]['link'], ['objectAction' => 'view', 'objectId' => $row[$columns[$key]['alias']]]); ?>" class="label label-success">
-                                                        <?php endif; ?>
-                                                        <?php
-                                                        $cellType = $columns[$key]['type'];
-                                                        $cellVal  = $row[$columns[$key]['alias']];
+                                                    {% set closeLink = false %}
+                                                    {% if columns[key]['link'] is defined and row[columns[key]['alias']] is not empty %}
+                                                        {% set closeLink = true %}
+                                                        <a href="{{ path(columns[key]['link'], {'objectAction': 'view', 'objectId': row[columns[key]['alias']]}) }}" class="label label-success">
+                                                    {% endif %}
+                                                        
+                                                    {% set cellType = columns[key]['type'] %}
+                                                    {% set cellVal  = row[columns[key]['alias']] %}
 
-                                                        // For grouping by datetime fields, so we don't get the timestamp on them
-                                                        if ('datetime' === $cellType && 10 === strlen($cellVal)) {
-                                                            $cellType = 'date';
-                                                        }
-                                                        ?>
-                                                        <?php
-                                                        switch ($cellType) {
-                                                            case 'datetime':
-                                                                echo $view['date']->toFullConcat($cellVal, 'UTC');
-                                                                break;
-                                                            case 'date':
-                                                                echo $view['date']->toShort($cellVal, 'UTC');
-                                                                break;
-                                                            default:
-                                                                echo $view['formatter']->_($cellVal, $cellType);
-                                                                break;
-                                                        }
-                                                        ?>
-                                                        <?php if ($closeLink) : ?></a><?php endif; ?>
+                                                        
+                                                    {% if 'datetime' == cellType and 10 == cellVal|length %}
+                                                        $cellType = 'date';
+                                                    {% endif %}
+                                    
+                                                    {% if cellType == 'datetime' %}
+                                                            echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                    {% elseif cellType == 'date' %}
+                                                            echo $view['date']->toShort($cellVal, 'UTC');
+                                                    {% else %}
+                                                            echo $view['formatter']->_($cellVal, $cellType);
+                                                    {% endif %}
+                                                      
+                                                    {% if closeLink %}</a>{% endif %}
                                                 </td>
-                                            <?php endif; ?>
-                                        <?php endforeach; ?>
-                                        <?php
-                                        if ($aggregatorCount) :
-                                            $index = 0;
-                                            ++$avgCounter;
-                                            foreach ($aggregatorOrder as $aggregator) : ?>
+                                            {% endif %}
+                                        {% endfor %}
+                                        
+                                        {% if aggregatorCount %}
+                                            {% set index = 0 %}
+                                            {% set avgCounter = avgCounter + 1%}
+                                            {% for aggregator in aggregatorOrder %}
                                                 <td>
-                                                    <?php
-                                                    if (isset($row[$aggregator['function'] . ' ' . $aggregator['column']])) {
-                                                        echo $view['formatter']->_($row[$aggregator['function'] . ' ' . $aggregator['column']], 'text');
-                                                        $total[$index] = getTotal($row[$aggregator['function'] . ' ' . $aggregator['column']], $aggregator['function'], (isset($total[$index])) ? $total[$index] : 0, $dataCount, $avgCounter);
-                                                    }
-                                                    ?>
+                                                    {% if row[aggregator['function'] ~ ' ' ~ aggregator['column']] is defined %}
+                                                        {# echo $view['formatter']->_($row[$aggregator['function'] . ' ' . $aggregator['column']], 'text'); #}
+                                                        {% set totalTemp = total[index]|getTotal(row[aggregator['function'] ~ ' ' ~ aggregator['column']], aggregator['function'], total[index] is defined ? total[index] : 0, dataCount, avgCounter) %}
+                                                        {% set total = total|merge({index: totalTemp }) %}
+                                                    {% endif %}
                                                 </td>
-                                        <?php
-                                                ++$index;
-                                            endforeach;
-                                        endif;
-                                        ?>
+                                                {% set index = index + 1 %}
+                                            {% endfor %}
+                                        {% endif %}
 
                                     </tr>
-                                    <?php ++$startCount; ?>
-                                <?php endforeach; ?>
-                            <?php else : ?>
+                                    {% set startCount = startCount + 1 %}
+                                {% endfor %}
+                            {% else %}
                                 <tr>
-                                    <td>&nbsp;</td>
-                                    <?php foreach ($columnOrder as $key) : ?>
+                                    <td>{{ '&nbsp;'|raw }}</td>
+                                    {% for key in columnOrder %}
                                         <td>&nbsp;</td>
-                                    <?php endforeach; ?>
+                                    {% endfor %}
                                 </tr>
-                            <?php endif; ?>
+                            {% endif %}
                             <tr class="cm-strong">
-                                <td><?php echo $view['translator']->trans('mautic.report.report.groupby.totals'); ?></td>
-                                <?php
-                                $index = 0;
-                                foreach ($columnOrder as $key) : ?>
+                                <td>{{ 'mautic.report.report.groupby.totals'|trans }}</td>
+                                
+                                {% set index = 0 %}
+                                {% for key in columnOrder %}
                                     <td>&nbsp;</td>
-                                    <?php endforeach;
-                                if ($aggregatorCount) :
-                                    foreach ($aggregatorOrder as $aggregator) : ?>
+                                {% endfor %}
+                                {% if aggregatorCount %}
+                                    {% for aggregator in aggregatorOrder %}
                                         <td>
-                                            <?php
-                                            if (isset($total[$index])) :
+                                            {% if total[index] is defined %}
                                                 echo $view['formatter']->_($total[$index], 'text');
-                                            endif;
-                                            ?>
+                                            {% endif %}
 
                                         </td>
-                                <?php
-                                        ++$index;
-                                    endforeach;
-                                endif; ?>
+                                        {% set index = index + 1 %}
+                                    {% endfor %}
+                                {% endif %}
                         </tbody>
                     </table>
                 </div>
@@ -209,7 +176,13 @@ function getTotal($a, $f, $t, $allrows, $ac)
     </div>
 {% endif %}
 
-{% if showGraphsAboveTable is empty %}{{ graphContent }}{% endif %}
+{% if showGraphsAboveTable is empty %}{{ include(
+    'MauticReportBundle:Report:details_data_graphs.html.twig',
+    {
+        'graphOrder': graphOrder,
+        'graphs': graphs,
+        'report': report,
+    }) }}{% endif %}
 
 <script>
     mQuery(document).ready(function() {

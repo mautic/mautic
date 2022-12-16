@@ -1,20 +1,12 @@
-<?php
+{% extends 'MauticCoreBundle:Default:slim.html.twig' %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+{% block headerTitle %}{{ report.getName() }}{% endblock %}
+{% block mauticContent %}report{% endblock %}
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-use Mautic\ReportBundle\Crate\ReportDataResult;
-
-$view->extend('MauticCoreBundle:Default:slim.html.php');
-$view['slots']->set('pageTitle', $pageTitle);
-$view['slots']->set('headerTitle', $report->getName());
-$view['slots']->set('mauticContent', 'report');
+{% set showGraphsAboveTable = report.getSettings.showGraphsAboveTable is not empty }
+{% set dataCount = data|length %}
+{% set columnOrder = report.getColumns() %}
+{% set graphOrder = report.getGraphs() %}
 
 $showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));
 $dataCount            = count($data);
