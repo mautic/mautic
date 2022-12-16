@@ -83,8 +83,8 @@ class DateExtension extends AbstractExtension
     /**
      * @see DateHelper::formatRange
      */
-    public function formatRange($range, $format = null)
+    public function formatRange(\DateInterval $range): string
     {
-        return $this->dateHelper->formatRange($range, $format);
+        return $this->dateHelper->formatRange($range);
     }
 }
