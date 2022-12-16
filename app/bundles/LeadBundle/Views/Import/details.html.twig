@@ -31,7 +31,6 @@
 {% endblock %}
 
 {% macro arrayToString(a) %}
-  {#<pre>{{dump(a)}}</pre>#}
   {% for k, v in a %}
     {{- k }}=
     {%- if v is iterable -%}
