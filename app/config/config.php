@@ -146,7 +146,7 @@ $dbalSettings = [
     'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
 
-if ($container->hasParameter('mautic.db_host_ro')) {
+if (!empty($localConfigParameterBag->get('db_host_ro'))) {
     $dbalSettings['wrapper_class'] = \Mautic\CoreBundle\Doctrine\Connection\ConnectionMasterSlaveWrapper::class;
     $dbalSettings['keep_slave']    = true;
     $dbalSettings['slaves']        = [
