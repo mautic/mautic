@@ -147,10 +147,9 @@ $dbalSettings = [
 ];
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
-    $dbalSettings['wrapper_class'] = \Mautic\CoreBundle\Doctrine\Connection\ConnectionMasterSlaveWrapper::class;
-    $dbalSettings['keep_slave']    = true;
-    $dbalSettings['slaves']        = [
-        'slave1' => [
+    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['replicas']        = [
+        'replica1' => [
             'host'                  => '%mautic.db_host_ro%',
             'port'                  => '%mautic.db_port%',
             'dbname'                => '%mautic.db_name%',
