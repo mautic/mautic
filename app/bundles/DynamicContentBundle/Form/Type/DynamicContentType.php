@@ -61,14 +61,14 @@ class DynamicContentType extends AbstractType
      */
     public function __construct(EntityManager $entityManager, ListModel $listModel, TranslatorInterface $translator, LeadModel $leadModel)
     {
-        $this->em = $entityManager;
-        $this->translator = $translator;
-        $this->leadModel = $leadModel;
-        $this->fieldChoices = $listModel->getChoiceFields();
+        $this->em              = $entityManager;
+        $this->translator      = $translator;
+        $this->leadModel       = $leadModel;
+        $this->fieldChoices    = $listModel->getChoiceFields();
         $this->timezoneChoices = FormFieldHelper::getTimezonesChoices();
-        $this->countryChoices = FormFieldHelper::getCountryChoices();
-        $this->regionChoices = FormFieldHelper::getRegionChoices();
-        $this->localeChoices = FormFieldHelper::getLocaleChoices();
+        $this->countryChoices  = FormFieldHelper::getCountryChoices();
+        $this->regionChoices   = FormFieldHelper::getRegionChoices();
+        $this->localeChoices   = FormFieldHelper::getLocaleChoices();
 
         $this->filterFieldChoices();
 
@@ -77,9 +77,9 @@ class DynamicContentType extends AbstractType
             $this->tagChoices[$tag['value']] = $tag['label'];
         }
 
-        $this->deviceTypesChoices = array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames());
+        $this->deviceTypesChoices  = array_combine(DeviceParser::getAvailableDeviceTypeNames(), DeviceParser::getAvailableDeviceTypeNames());
         $this->deviceBrandsChoices = DeviceParser::$deviceBrands;
-        $this->deviceOsChoices = array_combine(
+        $this->deviceOsChoices     = array_combine(
             array_keys(OperatingSystem::getAvailableOperatingSystemFamilies()),
             array_keys(OperatingSystem::getAvailableOperatingSystemFamilies())
         );
@@ -94,9 +94,9 @@ class DynamicContentType extends AbstractType
             'name',
             TextType::class,
             [
-                'label' => 'mautic.dynamicContent.form.internal.name',
+                'label'      => 'mautic.dynamicContent.form.internal.name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => ['class' => 'form-control'],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
@@ -104,10 +104,10 @@ class DynamicContentType extends AbstractType
             'slotName',
             TextType::class,
             [
-                'label' => 'mautic.dynamicContent.send.slot_name',
+                'label'      => 'mautic.dynamicContent.send.slot_name',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.dynamicContent.send.slot_name.tooltip',
                 ],
             ]
@@ -119,10 +119,10 @@ class DynamicContentType extends AbstractType
                 'description',
                 TextareaType::class,
                 [
-                    'label' => 'mautic.dynamicContent.description',
+                    'label'      => 'mautic.dynamicContent.description',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr' => ['class' => 'form-control'],
-                    'required' => false,
+                    'attr'       => ['class' => 'form-control'],
+                    'required'   => false,
                 ]
             )->addModelTransformer($emojiTransformer)
         );
@@ -134,9 +134,9 @@ class DynamicContentType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.dwc.form.is_campaign_based',
-                'data' => (bool) $options['data']->isCampaignBased(),
-                'attr' => [
-                    'tooltip' => 'mautic.dwc.form.is_campaign_based.tooltip',
+                'data'  => (bool) $options['data']->isCampaignBased(),
+                'attr'  => [
+                    'tooltip'  => 'mautic.dwc.form.is_campaign_based.tooltip',
                     'onchange' => 'Mautic.toggleDwcFilters()',
                 ],
             ]
@@ -146,9 +146,9 @@ class DynamicContentType extends AbstractType
             'language',
             LocaleType::class,
             [
-                'label' => 'mautic.core.language',
+                'label'      => 'mautic.core.language',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
+                'attr'       => [
                     'class' => 'form-control',
                 ],
                 'required' => false,
@@ -159,14 +159,14 @@ class DynamicContentType extends AbstractType
             'publishUp',
             DateTimeType::class,
             [
-                'widget' => 'single_text',
-                'label' => 'mautic.core.form.publishup',
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishup',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format' => 'yyyy-MM-dd HH:mm',
+                'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
             ]
         );
@@ -175,14 +175,14 @@ class DynamicContentType extends AbstractType
             'publishDown',
             DateTimeType::class,
             [
-                'widget' => 'single_text',
-                'label' => 'mautic.core.form.publishdown',
+                'widget'     => 'single_text',
+                'label'      => 'mautic.core.form.publishdown',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'       => 'form-control',
                     'data-toggle' => 'datetime',
                 ],
-                'format' => 'yyyy-MM-dd HH:mm',
+                'format'   => 'yyyy-MM-dd HH:mm',
                 'required' => false,
             ]
         );
@@ -191,14 +191,14 @@ class DynamicContentType extends AbstractType
             'content',
             TextareaType::class,
             [
-                'label' => 'mautic.dynamicContent.form.content',
+                'label'      => 'mautic.dynamicContent.form.content',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'tooltip' => 'mautic.dynamicContent.form.content.help',
-                    'class' => 'form-control editor editor-advanced editor-builder-tokens',
-                    'data-token-callback' => 'email:getBuilderTokens',
+                'attr'       => [
+                    'tooltip'              => 'mautic.dynamicContent.form.content.help',
+                    'class'                => 'form-control editor editor-advanced editor-builder-tokens',
+                    'data-token-callback'  => 'email:getBuilderTokens',
                     'data-token-activator' => '{',
-                    'rows' => '15',
+                    'rows'                 => '15',
                 ],
                 'required' => false,
             ]
@@ -207,10 +207,10 @@ class DynamicContentType extends AbstractType
             'utmTags',
             EmailUtmTagsType::class,
             [
-                'label' => 'mautic.email.utm_tags',
+                'label'      => 'mautic.email.utm_tags',
                 'label_attr' => ['class' => 'control-label'],
-                'attr' => [
-                    'class' => 'form-control',
+                'attr'       => [
+                    'class'   => 'form-control',
                     'tooltip' => 'mautic.email.utm_tags.tooltip',
                 ],
                 'required' => false,
@@ -223,17 +223,17 @@ class DynamicContentType extends AbstractType
                 'translationParent',
                 DynamicContentListType::class,
                 [
-                    'label' => 'mautic.core.form.translation_parent',
+                    'label'      => 'mautic.core.form.translation_parent',
                     'label_attr' => ['class' => 'control-label'],
-                    'attr' => [
-                        'class' => 'form-control',
+                    'attr'       => [
+                        'class'   => 'form-control',
                         'tooltip' => 'mautic.core.form.translation_parent.help',
                     ],
-                    'required' => false,
-                    'multiple' => false,
+                    'required'    => false,
+                    'multiple'    => false,
                     'placeholder' => 'mautic.core.form.translation_parent.empty',
-                    'top_level' => 'translation',
-                    'ignore_ids' => [(int) $options['data']->getId()],
+                    'top_level'   => 'translation',
+                    'ignore_ids'  => [(int) $options['data']->getId()],
                 ]
             )->addModelTransformer($transformer)
         );
@@ -255,7 +255,7 @@ class DynamicContentType extends AbstractType
                 'updateSelect',
                 HiddenType::class,
                 [
-                    'data' => $options['update_select'],
+                    'data'   => $options['update_select'],
                     'mapped' => false,
                 ]
             );
@@ -272,22 +272,22 @@ class DynamicContentType extends AbstractType
                 'filters',
                 CollectionType::class,
                 [
-                    'entry_type' => DwcEntryFiltersType::class,
+                    'entry_type'    => DwcEntryFiltersType::class,
                     'entry_options' => [
-                        'countries' => $this->countryChoices,
-                        'regions' => $this->regionChoices,
-                        'timezones' => $this->timezoneChoices,
-                        'locales' => $this->localeChoices,
-                        'fields' => $this->fieldChoices,
-                        'deviceTypes' => $this->deviceTypesChoices,
+                        'countries'    => $this->countryChoices,
+                        'regions'      => $this->regionChoices,
+                        'timezones'    => $this->timezoneChoices,
+                        'locales'      => $this->localeChoices,
+                        'fields'       => $this->fieldChoices,
+                        'deviceTypes'  => $this->deviceTypesChoices,
                         'deviceBrands' => $this->deviceBrandsChoices,
-                        'deviceOs' => $this->deviceOsChoices,
-                        'tags' => $this->tagChoices,
+                        'deviceOs'     => $this->deviceOsChoices,
+                        'tags'         => $this->tagChoices,
                     ],
                     'error_bubbling' => false,
-                    'mapped' => true,
-                    'allow_add' => true,
-                    'allow_delete' => true,
+                    'mapped'         => true,
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
                 ]
             )->addModelTransformer($filterModalTransformer)
         );
@@ -313,8 +313,8 @@ class DynamicContentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => DynamicContent::class,
-            'label' => false,
+            'data_class'     => DynamicContent::class,
+            'label'          => false,
             'error_bubbling' => false,
         ]);
 
@@ -326,21 +326,21 @@ class DynamicContentType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['fields'] = $this->fieldChoices;
-        $view->vars['countries'] = $this->countryChoices;
-        $view->vars['regions'] = $this->regionChoices;
-        $view->vars['timezones'] = $this->timezoneChoices;
-        $view->vars['deviceTypes'] = $this->deviceTypesChoices;
+        $view->vars['fields']       = $this->fieldChoices;
+        $view->vars['countries']    = $this->countryChoices;
+        $view->vars['regions']      = $this->regionChoices;
+        $view->vars['timezones']    = $this->timezoneChoices;
+        $view->vars['deviceTypes']  = $this->deviceTypesChoices;
         $view->vars['deviceBrands'] = $this->deviceBrandsChoices;
-        $view->vars['deviceOs'] = $this->deviceOsChoices;
-        $view->vars['tags'] = $this->tagChoices;
-        $view->vars['locales'] = $this->localeChoices;
+        $view->vars['deviceOs']     = $this->deviceOsChoices;
+        $view->vars['tags']         = $this->tagChoices;
+        $view->vars['locales']      = $this->localeChoices;
     }
 
     private function filterFieldChoices()
     {
         unset($this->fieldChoices['company']);
-        $customFields = $this->leadModel->getRepository()->getCustomFieldList('lead');
+        $customFields               = $this->leadModel->getRepository()->getCustomFieldList('lead');
         $this->fieldChoices['lead'] = array_filter($this->fieldChoices['lead'], function ($key) use ($customFields) {
             return in_array($key, array_merge(array_keys($customFields[0]), ['date_added', 'date_modified', 'device_brand', 'device_model', 'device_os', 'device_type', 'tags']), true);
         }, ARRAY_FILTER_USE_KEY);
@@ -353,5 +353,4 @@ class DynamicContentType extends AbstractType
     {
         return 'dwc';
     }
-
 }

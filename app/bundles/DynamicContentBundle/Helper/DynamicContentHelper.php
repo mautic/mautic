@@ -28,12 +28,11 @@ class DynamicContentHelper
         RealTimeExecutioner $realTimeExecutioner,
         EventDispatcherInterface $dispatcher,
         LeadModel $leadModel
-    )
-    {
+    ) {
         $this->dynamicContentModel = $dynamicContentModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
-        $this->dispatcher = $dispatcher;
-        $this->leadModel = $leadModel;
+        $this->dispatcher          = $dispatcher;
+        $this->leadModel           = $leadModel;
     }
 
     /**
@@ -54,7 +53,7 @@ class DynamicContentHelper
         $data = $this->dynamicContentModel->getSlotContentForLead($slot, $lead);
         if (!empty($data)) {
             $content = $data['content'];
-            $dwc = $this->dynamicContentModel->getEntity($data['id']);
+            $dwc     = $this->dynamicContentModel->getEntity($data['id']);
             if ($dwc instanceof DynamicContent) {
                 $content = $this->getRealDynamicContent($slot, $lead, $dwc);
             }
@@ -105,7 +104,7 @@ class DynamicContentHelper
         preg_match_all('/{(dynamiccontent)=(\w+)(?:\/}|}(?:([^{]*(?:{(?!\/\1})[^{]*)*){\/\1})?)/is', $content, $matches, PREG_SET_ORDER);
 
         foreach ($matches as $match) {
-            $slot = $match[2];
+            $slot           = $match[2];
             $defaultContent = $match[3];
 
             $dwcContent = $this->getDynamicContentForLead($slot, $lead);
@@ -145,7 +144,7 @@ class DynamicContentHelper
                     if ($dwc->getIsCampaignBased()) {
                         continue;
                     }
-                    $content = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
+                    $content                   = $lead ? $this->getRealDynamicContent($dwc->getSlotName(), $lead, $dwc) : '';
                     $tokens[$token]['content'] = $content;
                     $tokens[$token]['filters'] = $dwc->getFilters();
                 }
@@ -171,7 +170,7 @@ class DynamicContentHelper
         list($ignore, $translation) = $this->dynamicContentModel->getTranslatedEntity($dwc, $lead);
         if ($translation !== $dwc) {
             // Use translated version of content
-            $dwc = $translation;
+            $dwc     = $translation;
             $content = $dwc->getContent();
         }
         $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
@@ -195,24 +194,24 @@ class DynamicContentHelper
         $filter = [
             'where' => [
                 [
-                    'col' => 'e.slotName',
+                    'col'  => 'e.slotName',
                     'expr' => 'eq',
-                    'val' => $slotName,
+                    'val'  => $slotName,
                 ],
             ],
         ];
 
         if ($publishedOnly) {
             $filter['where'][] = [
-                'col' => 'e.isPublished',
+                'col'  => 'e.isPublished',
                 'expr' => 'eq',
-                'val' => 1,
+                'val'  => 1,
             ];
         }
 
         return $this->dynamicContentModel->getEntities(
             [
-                'filter' => $filter,
+                'filter'           => $filter,
                 'ignore_paginator' => true,
             ]
         );
@@ -264,6 +263,4 @@ class DynamicContentHelper
 
         return $this->matchFilterForLead($filters, $contactArray);
     }
-
-
 }

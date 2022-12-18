@@ -65,7 +65,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param mixed $entity
-     * @param bool   $unlock
+     * @param bool  $unlock
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -122,12 +122,12 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     {
         $qb = $this->em->getConnection()->createQueryBuilder();
 
-        $qb->insert(MAUTIC_TABLE_PREFIX . 'dynamic_content_lead_data')
+        $qb->insert(MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data')
             ->values([
-                'lead_id' => $lead->getId(),
+                'lead_id'            => $lead->getId(),
                 'dynamic_content_id' => $dwc->getId(),
-                'slot' => ':slot',
-                'date_added' => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
+                'slot'               => ':slot',
+                'date_added'         => $qb->expr()->literal((new \DateTime())->format('Y-m-d H:i:s')),
             ])->setParameter('slot', $slot);
 
         $qb->execute();
@@ -150,8 +150,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
         $id = $lead instanceof Lead ? $lead->getId() : $lead['id'];
 
         $qb->select('dc.id, dc.content')
-            ->from(MAUTIC_TABLE_PREFIX . 'dynamic_content', 'dc')
-            ->leftJoin('dc', MAUTIC_TABLE_PREFIX . 'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
+            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc')
+            ->leftJoin('dc', MAUTIC_TABLE_PREFIX.'dynamic_content_lead_data', 'dcld', 'dcld.dynamic_content_id = dc.id')
             ->andWhere($qb->expr()->eq('dcld.slot', ':slot'))
             ->andWhere($qb->expr()->eq('dcld.lead_id', ':lead_id'))
             ->andWhere($qb->expr()->eq('dc.is_published', 1))
@@ -248,7 +248,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
-        $q->join('t', MAUTIC_TABLE_PREFIX . 'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
+        $q->join('t', MAUTIC_TABLE_PREFIX.'dynamic_content', 'd', 'd.id = t.dynamic_content_id')
             ->andWhere('d.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
@@ -256,7 +256,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param mixed   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param mixed  $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers
@@ -317,7 +317,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                     $filter,
                     $limit,
                     $start,
-                    $this->security->isGranted($this->getPermissionBase() . ':viewother'),
+                    $this->security->isGranted($this->getPermissionBase().':viewother'),
                     isset($options['top_level']) ? $options['top_level'] : false,
                     isset($options['ignore_ids']) ? $options['ignore_ids'] : [],
                     isset($options['where']) ? $options['where'] : ''
@@ -335,18 +335,4 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 
         return $results;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

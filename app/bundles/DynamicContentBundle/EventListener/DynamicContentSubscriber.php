@@ -92,16 +92,16 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         CorePermissions $security,
         ContactTracker $contactTracker
     ) {
-        $this->trackableModel = $trackableModel;
-        $this->pageTokenHelper = $pageTokenHelper;
-        $this->assetTokenHelper = $assetTokenHelper;
-        $this->formTokenHelper = $formTokenHelper;
-        $this->focusTokenHelper = $focusTokenHelper;
-        $this->auditLogModel = $auditLogModel;
+        $this->trackableModel       = $trackableModel;
+        $this->pageTokenHelper      = $pageTokenHelper;
+        $this->assetTokenHelper     = $assetTokenHelper;
+        $this->formTokenHelper      = $formTokenHelper;
+        $this->focusTokenHelper     = $focusTokenHelper;
+        $this->auditLogModel        = $auditLogModel;
         $this->dynamicContentHelper = $dynamicContentHelper;
-        $this->dynamicContentModel = $dynamicContentModel;
-        $this->security = $security;
-        $this->contactTracker = $contactTracker;
+        $this->dynamicContentModel  = $dynamicContentModel;
+        $this->security             = $security;
+        $this->contactTracker       = $contactTracker;
     }
 
     /**
@@ -110,10 +110,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            DynamicContentEvents::POST_SAVE => ['onPostSave', 0],
-            DynamicContentEvents::POST_DELETE => ['onDelete', 0],
+            DynamicContentEvents::POST_SAVE         => ['onPostSave', 0],
+            DynamicContentEvents::POST_DELETE       => ['onDelete', 0],
             DynamicContentEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
-            PageEvents::PAGE_ON_DISPLAY => ['decodeTokens', 254],
+            PageEvents::PAGE_ON_DISPLAY             => ['decodeTokens', 254],
         ];
     }
 
@@ -125,11 +125,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $entity = $event->getDynamicContent();
         if ($details = $event->getChanges()) {
             $log = [
-                'bundle' => 'dynamicContent',
-                'object' => 'dynamicContent',
+                'bundle'   => 'dynamicContent',
+                'object'   => 'dynamicContent',
                 'objectId' => $entity->getId(),
-                'action' => ($event->isNew()) ? 'create' : 'update',
-                'details' => $details,
+                'action'   => ($event->isNew()) ? 'create' : 'update',
+                'details'  => $details,
             ];
             $this->auditLogModel->writeToLog($log);
         }
@@ -141,12 +141,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     public function onDelete(Events\DynamicContentEvent $event)
     {
         $entity = $event->getDynamicContent();
-        $log = [
-            'bundle' => 'dynamicContent',
-            'object' => 'dynamicContent',
+        $log    = [
+            'bundle'   => 'dynamicContent',
+            'object'   => 'dynamicContent',
             'objectId' => $entity->deletedId,
-            'action' => 'delete',
-            'details' => ['name' => $entity->getName()],
+            'action'   => 'delete',
+            'details'  => ['name' => $entity->getName()],
         ];
         $this->auditLogModel->writeToLog($log);
     }
@@ -154,8 +154,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     public function onTokenReplacement(MauticEvents\TokenReplacementEvent $event)
     {
         /** @var Lead $lead */
-        $lead = $event->getLead();
-        $content = $event->getContent();
+        $lead         = $event->getLead();
+        $content      = $event->getContent();
         $clickthrough = $event->getClickthrough();
 
         if ($content) {
@@ -174,7 +174,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $clickthrough['dynamic_content_id']
             );
 
-            $dwc = $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
+            $dwc     = $this->dynamicContentModel->getEntity($clickthrough['dynamic_content_id']);
             $utmTags = [];
             if ($dwc && $dwc instanceof DynamicContent) {
                 $utmTags = $dwc->getUtmTags();
@@ -206,9 +206,9 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens = $this->dynamicContentHelper->findDwcTokens($content, $lead);
+        $tokens    = $this->dynamicContentHelper->findDwcTokens($content, $lead);
         $leadArray = $this->dynamicContentHelper->convertLeadToArray($lead);
-        $result = [];
+        $result    = [];
         foreach ($tokens as $token => $dwc) {
             $result[$token] = '';
             if ($this->matchFilterForLead($dwc['filters'], $leadArray)) {
@@ -234,7 +234,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
             }
 
             $newnode = $dom->createDocumentFragment();
-            $newnode->appendXML('<![CDATA[' . mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8') . ']]>');
+            $newnode->appendXML('<![CDATA['.mb_convert_encoding($slotContent, 'HTML-ENTITIES', 'UTF-8').']]>');
             $slot->parentNode->replaceChild($newnode, $slot);
         }
 
