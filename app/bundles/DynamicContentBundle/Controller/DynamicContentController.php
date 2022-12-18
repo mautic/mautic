@@ -11,7 +11,6 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class DynamicContentController extends FormController
 {
@@ -89,7 +88,7 @@ class DynamicContentController extends FormController
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
 
         //retrieve a list of categories
-        $pageModel = $this->getModel('page');
+        $pageModel  = $this->getModel('page');
         \assert($pageModel instanceof PageModel);
         $categories = $pageModel->getLookupResults('category', '', 0);
 
@@ -138,7 +137,7 @@ class DynamicContentController extends FormController
         $updateSelect = 'POST' === $method
             ? ($dwc['updateSelect'] ?? false)
             : $this->request->get('updateSelect', false);
-        $form = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
+        $form         = $model->createForm($entity, $this->get('form.factory'), $action, ['update_select' => $updateSelect]);
 
         if (Request::METHOD_POST === $method) {
             $valid = false;
@@ -218,8 +217,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $form->createView(),
-                    //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form' => $form->createView(), //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
                 'passthroughVars' => $passthrough,
@@ -233,7 +231,7 @@ class DynamicContentController extends FormController
      * @param            $objectId
      * @param bool|false $ignorePost
      *
-     * @return array|JsonResponse|Response
+     * @return array|JsonResponse|RedirectResponse|Response
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -324,8 +322,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $form->createView(),
-                    //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form'          => $form->createView(), //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                     'currentListId' => $objectId,
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
@@ -377,13 +374,11 @@ class DynamicContentController extends FormController
                     ],
                 ]
             );
-        } elseif (
-            !$security->hasEntityAccess(
-                'dynamiccontent:dynamiccontents:viewown',
-                'dynamiccontent:dynamiccontents:viewother',
-                $entity->getCreatedBy()
-            )
-        ) {
+        } elseif (!$security->hasEntityAccess(
+            'dynamiccontent:dynamiccontents:viewown',
+            'dynamiccontent:dynamiccontents:viewother',
+            $entity->getCreatedBy()
+        )) {
             return $this->accessDenied();
         }
 
@@ -394,17 +389,17 @@ class DynamicContentController extends FormController
         // Audit Log
         $auditLogModel = $this->getModel('core.auditlog');
         \assert($auditLogModel instanceof AuditLogModel);
-        $logs = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
+        $logs          = $auditLogModel->getLogForObject('dynamicContent', $entity->getId(), $entity->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
         $entityViews     = $model->getHitsLineChartData(
-        null,
+            null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
-        null,
+            null,
             ['dynamic_content_id' => $entity->getId(), 'flag' => 'total_and_unique']
         );
 
@@ -443,7 +438,7 @@ class DynamicContentController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
     public function cloneAction($objectId)
     {
@@ -492,7 +487,7 @@ class DynamicContentController extends FormController
         ];
 
         if (Request::METHOD_POST === $this->request->getMethod()) {
-            $model = $this->getModel('dynamicContent');
+            $model  = $this->getModel('dynamicContent');
             \assert($model instanceof DynamicContentModel);
             $entity = $model->getEntity($objectId);
 
@@ -504,13 +499,11 @@ class DynamicContentController extends FormController
                 ];
 
                 return $this->postActionRedirect(array_merge($postActionVars, ['flashes' => $flashes]));
-            } elseif (
-                !$this->get('mautic.security')->hasEntityAccess(
-                    'dynamiccontent:dynamiccontents:deleteown',
-                    'dynamiccontent:dynamiccontents:deleteother',
-                    $entity->getCreatedBy()
-                )
-            ) {
+            } elseif (!$this->get('mautic.security')->hasEntityAccess(
+                'dynamiccontent:dynamiccontents:deleteown',
+                'dynamiccontent:dynamiccontents:deleteother',
+                $entity->getCreatedBy()
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'notification');
@@ -569,13 +562,11 @@ class DynamicContentController extends FormController
                         'msg'     => 'mautic.dynamicContent.error.notfound',
                         'msgVars' => ['%id%' => $objectId],
                     ];
-                } elseif (
-                    !$this->get('mautic.security')->hasEntityAccess(
-                        'dynamiccontent:dynamiccontents:viewown',
-                        'dynamiccontent:dynamiccontents:viewother',
-                        $entity->getCreatedBy()
-                    )
-                ) {
+                } elseif (!$this->get('mautic.security')->hasEntityAccess(
+                    'dynamiccontent:dynamiccontents:viewown',
+                    'dynamiccontent:dynamiccontents:viewother',
+                    $entity->getCreatedBy()
+                )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'dynamicContent', true);

@@ -54,7 +54,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\DynamicContentBundle\Entity\StatRepository
      */
     public function getStatRepository()
     {
@@ -64,8 +64,8 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param mixed $entity
-     * @param bool  $unlock
+     * @param object $entity
+     * @param bool   $unlock
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -137,7 +137,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param string     $slot
      * @param Lead|array $lead
      *
-     * @return mixed
+     * @return DynamicContent
      */
     public function getSlotContentForLead($slot, $lead)
     {
@@ -160,7 +160,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
-        return $qb->execute()->fetchOne();
+        return $qb->execute()->fetch();
     }
 
     /**
@@ -233,9 +233,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            // Note: the function is only having 1 arg
-            // $this->dispatcher->dispatch($event, $name);
-            $this->dispatcher->dispatch($event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -256,7 +254,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param mixed  $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
      * @param string $dateFormat
      * @param array  $filter
      * @param bool   $canViewOthers

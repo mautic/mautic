@@ -106,6 +106,8 @@ class Stat
 
     /**
      * Prepares the metadata for API usage.
+     *
+     * @param $metadata
      */
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
@@ -125,6 +127,9 @@ class Stat
             ->build();
     }
 
+    /**
+     * @param $details
+     */
     public function addSentDetails($details)
     {
         $this->sentDetails[] = $details;

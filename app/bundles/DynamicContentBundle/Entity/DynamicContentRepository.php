@@ -62,7 +62,7 @@ class DynamicContentRepository extends CommonRepository
                     $langUnique => $langValue,
                     $unique     => $filter->string,
                 ];
-                $expr = $q->expr()->or(
+                $expr = $q->expr()->orX(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
@@ -155,10 +155,10 @@ class DynamicContentRepository extends CommonRepository
             if (is_array($search)) {
                 $search = array_map('intval', $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
-                    ->setParameter('search', $search);
+                  ->setParameter('search', $search);
             } else {
                 $q->andWhere($q->expr()->like('e.name', ':search'))
-                    ->setParameter('search', "%{$search}%");
+                  ->setParameter('search', "%{$search}%");
             }
         }
 
@@ -210,7 +210,7 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAllAssociative();
+        $result = $qb->execute()->fetchAll();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

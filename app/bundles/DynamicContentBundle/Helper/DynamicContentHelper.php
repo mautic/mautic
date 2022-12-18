@@ -176,9 +176,7 @@ class DynamicContentHelper
         $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
         $tokenEvent = new TokenReplacementEvent($content, $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-        // Note: the function is onlu having 1 arg
-        // $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
-        $this->dispatcher->dispatch($tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
 
         return $tokenEvent->getContent();
     }
@@ -253,9 +251,7 @@ class DynamicContentHelper
             $contact = $this->leadModel->getEntity($contactArray['id']);
 
             $event = new ContactFiltersEvaluateEvent($filters, $contact);
-            // Note: the function is only having 1 arg
-            // $this->dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE);
-            $this->dispatcher->dispatch($event);
+            $this->dispatcher->dispatch($event, DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE);
             if ($event->isMatch()) {
                 return true;
             }
