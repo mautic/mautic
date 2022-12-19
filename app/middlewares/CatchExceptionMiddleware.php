@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CatchExceptionMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInterface
 {
-    const PRIORITY = 100;
+    public const PRIORITY = 100;
 
     /**
      * @var HttpKernelInterface

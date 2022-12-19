@@ -61,7 +61,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailBuild()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
         $event      = new EmailBuilderEvent($this->getMockTranslator());
         $subscriber->onEmailBuild($event);
 
@@ -73,7 +77,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailGenerate()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
         $event  = new EmailSendEvent($mailer);
@@ -92,7 +100,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailGenerateWithFakeOwner()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
         $event  = new EmailSendEvent($mailer);
@@ -106,7 +118,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailGenerateWithNoOwner()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
         $event  = new EmailSendEvent($mailer);
@@ -124,7 +140,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailDisplay()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
         $event  = new EmailSendEvent($mailer);
@@ -138,7 +158,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailDisplayWithFakeOwner()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
         $event  = new EmailSendEvent($mailer);
@@ -152,7 +176,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnEmailDisplayWithNoOwner()
     {
-        $subscriber = new OwnerSubscriber($this->getMockFactory()->getModel('lead'), $this->getMockTranslator());
+        $leadModel = $this->getMockFactory()->getModel('lead');
+        if (!$leadModel instanceof LeadModel) {
+            self::fail('The mock does not contain LeadModel.');
+        }
+        $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
         $event  = new EmailSendEvent($mailer);

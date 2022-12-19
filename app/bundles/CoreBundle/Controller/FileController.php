@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FileController extends AjaxController
 {
-    const EDITOR_FROALA   = 'froala';
-    const EDITOR_CKEDITOR = 'ckeditor';
+    public const EDITOR_FROALA   = 'froala';
+    public const EDITOR_CKEDITOR = 'ckeditor';
 
     protected $imageMimes = [
         'image/gif',

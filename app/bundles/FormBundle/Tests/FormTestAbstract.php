@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
@@ -23,6 +25,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -32,8 +35,8 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -139,14 +142,15 @@ class FormTestAbstract extends TestCase
         $contactTracker           = $this->createMock(ContactTracker::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $entityManager            = $this->createMock(EntityManager::class);
-        $formRepository           = $this->createMock(FormRepository::class);
+        $formRepository           = $this->createMock(SubmissionRepository::class);
         $leadRepository           = $this->createMock(LeadRepository::class);
-        $mockLogger               = $this->createMock(Logger::class);
+        $mockLogger               = $this->createMock(LoggerInterface::class);
         $uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
         $router                   = $this->createMock(RouterInterface::class);
+        $contactMerger            = $this->createMock(ContactMerger::class);
         $router->method('generate')->willReturn('absolute/path/somefile.jpg');
 
         $lead                     = new Lead();
@@ -184,8 +188,8 @@ class FormTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $leadRepository],
-                        ['MauticFormBundle:Submission', $formRepository],
+                        [Lead::class, $leadRepository],
+                        [Submission::class, $formRepository],
                     ]
                 )
             );
@@ -225,7 +229,8 @@ class FormTestAbstract extends TestCase
             $deviceTrackingService,
             new FieldValueTransformer($router),
             $dateHelper,
-            $contactTracker
+            $contactTracker,
+            $contactMerger
         );
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);

@@ -74,7 +74,7 @@ final class EmailOrEmailTokenListValidator extends ConstraintValidator
 
                     // Validate that the contact field exists and is type of email.
                     $this->customFieldValidator->validateFieldType($contactFieldToken->getFieldAlias(), 'email');
-                } catch (RecordException | InvalidValueException | InvalidContactFieldTokenException $tokenException) {
+                } catch (RecordException|InvalidValueException|InvalidContactFieldTokenException $tokenException) {
                     $this->context->addViolation(
                         'mautic.email.email_or_token.not_valid',
                         ['%value%' => $emailOrToken, '%details%' => $tokenException->getMessage()]

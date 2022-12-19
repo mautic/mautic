@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractStandardFormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -15,10 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FocusController extends AbstractStandardFormController
 {
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticFocusBundle:Focus';
     }
@@ -151,8 +149,10 @@ class FocusController extends AbstractStandardFormController
             $args['viewParameters']['stats']         = $stats;
             $args['viewParameters']['dateRangeForm'] = $dateRangeForm->createView();
 
-            if ('link' == $item->getType()) {
-                $args['viewParameters']['trackables'] = $this->getModel('page.trackable')->getTrackableList('focus', $item->getId());
+            if ('link' === $item->getType()) {
+                $trackableModel = $this->getModel('page.trackable');
+                \assert($trackableModel instanceof TrackableModel);
+                $args['viewParameters']['trackables'] = $trackableModel->getTrackableList('focus', $item->getId());
             }
         }
 

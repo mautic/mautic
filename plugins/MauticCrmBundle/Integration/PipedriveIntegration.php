@@ -22,15 +22,15 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PipedriveIntegration extends CrmAbstractIntegration
 {
-    const INTEGRATION_NAME         = 'Pipedrive';
-    const PERSON_ENTITY_TYPE       = 'person';
-    const LEAD_ENTITY_TYPE         = 'lead';
-    const ORGANIZATION_ENTITY_TYPE = 'organization';
-    const COMPANY_ENTITY_TYPE      = 'company';
+    public const INTEGRATION_NAME         = 'Pipedrive';
+    public const PERSON_ENTITY_TYPE       = 'person';
+    public const LEAD_ENTITY_TYPE         = 'lead';
+    public const ORGANIZATION_ENTITY_TYPE = 'organization';
+    public const COMPANY_ENTITY_TYPE      = 'company';
 
     /**
      * @var Transport

@@ -36,13 +36,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         return $leadCompany;
     }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     protected function beforeBeginTransaction(): void
     {
         $this->resetAutoincrement([
@@ -412,6 +405,22 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('firstname: This field is required.', $clientResponse->getContent());
     }
 
+    public function testAddContactsErrorMessageForEmailWithTwoDots(): void
+    {
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[email]' => 'john..doe@email.com',
+            ]
+        );
+
+        $this->client->submit($form);
+        $clientResponse = $this->client->getResponse();
+
+        $this->assertStringContainsString('email: john..doe@email.com is invalid.', $clientResponse->getContent());
+    }
+
     public function testCompanyIdSearchCommand(): void
     {
         $contactA = $this->createContact('contact@a.email');
@@ -460,6 +469,43 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->client->submit($form);
         $clientResponse = $this->client->getResponse();
         $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', $clientResponse->getContent());
+    }
+
+    public function testQuickAddRendersErrorOnEmailDuplicate(): void
+    {
+        $email = 'duplicate@email.a';
+        $this->createContact($email);
+        $crawler = $this->client->request('GET', 's/contacts/quickAdd');
+        $form    = $crawler->filter('form[name="lead"]')->form([
+            'lead' => [
+                'email' => $email,
+            ],
+        ]);
+
+        $crawler = $this->client->submit($form);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
+        self::assertCount(1, $errorContainer);
+        self::assertSame('This field must be unique.', $errorContainer->text(null, true));
+    }
+
+    public function testEditRendersErrorOnEmailDuplicate(): void
+    {
+        $email = 'duplicate@email.a';
+        $this->createContact($email);
+        $crawler = $this->client->request('GET', 's/contacts/new');
+        $form    = $crawler->filter('form[name="lead"]')->form([
+            'lead' => [
+                'email' => $email,
+            ],
+        ]);
+
+        $this->client->submit($form);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertStringContainsString('email: This field must be unique.', $clientResponse->getContent());
     }
 
     private function createCampaign(): Campaign

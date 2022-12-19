@@ -16,7 +16,7 @@ use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This class subscribes to events related to building and providing
@@ -83,8 +83,8 @@ class EmailSubscriber implements EventSubscriberInterface
 
         $mappedObjectTokens = new MappedIntegrationObjectTokenEvent();
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT,
-            $mappedObjectTokens
+            $mappedObjectTokens,
+            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT
         );
 
         foreach ($mappedObjectTokens->getTokens() as $integration => $t) {

@@ -5,6 +5,7 @@ namespace Mautic\ReportBundle\Tests\Model;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
@@ -13,7 +14,6 @@ use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\Translator;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,7 +40,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, ReportBuilderEvent $event) {
+                function (ReportBuilderEvent $event) {
                     $reportBuilderData = Fixtures::getReportBuilderEventData();
                     $event->addTable('assets', $reportBuilderData['all']['tables']['assets']);
                 }
@@ -58,7 +58,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function testGetColumnListWithContext()
+    public function testGetColumnListWithContext(): void
     {
         $properContextFormat = 'assets';
         $actual              = $this->reportModel->getColumnList($properContextFormat);

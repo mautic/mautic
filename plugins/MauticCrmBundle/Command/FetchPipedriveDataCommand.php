@@ -7,32 +7,41 @@ namespace MauticPlugin\MauticCrmBundle\Command;
 use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\AbstractImport;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\CompanyImport;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\LeadImport;
+use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\OwnerImport;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class FetchPipedriveDataCommand extends ContainerAwareCommand
+class FetchPipedriveDataCommand extends Command
 {
-    private SymfonyStyle $io;
     private IntegrationHelper $integrationHelper;
     private TranslatorHelper $translatorHelper;
+    private OwnerImport $ownerImport;
+    private CompanyImport $companyImport;
+    private LeadImport $leadImport;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        TranslatorHelper $translatorHelper
+        TranslatorHelper $translatorHelper,
+        OwnerImport $ownerImport,
+        CompanyImport $companyImport,
+        LeadImport $leadImport
     ) {
         $this->integrationHelper = $integrationHelper;
         $this->translatorHelper  = $translatorHelper;
+        $this->ownerImport       = $ownerImport;
+        $this->companyImport     = $companyImport;
+        $this->leadImport        = $leadImport;
 
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:integration:pipedrive:fetch')
@@ -47,22 +56,18 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $container = $this->getContainer();
-        $this->io  = new SymfonyStyle($input, $output);
+        $io = new SymfonyStyle($input, $output);
 
         /** @var PipedriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper
             ->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
 
         if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
-            $this->io->note('Pipedrive integration is disabled.');
+            $io->note('Pipedrive integration is disabled.');
 
-            return;
+            return 0;
         }
 
         $types = [
@@ -75,7 +80,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         }
 
         if ($input->getOption('restart')) {
-            $this->io->note(
+            $io->note(
                 $this->translatorHelper->trans(
                     'mautic.plugin.config.integration.restarted',
                     ['%integration%' => $integrationObject->getName()]
@@ -85,23 +90,17 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
         }
 
         foreach ($types as $type => $endPoint) {
-            $this->getData($type, $endPoint, $integrationObject);
+            $this->getData($type, $endPoint, $integrationObject, $io);
         }
 
-        $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+        $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+
+        return 0;
     }
 
-    /**
-     * @param                      $type
-     * @param                      $endPoint
-     * @param PipedriveIntegration $integrationObject
-     */
-    private function getData($type, $endPoint, $integrationObject)
+    private function getData(string $type, string $endPoint, PipedriveIntegration $integrationObject, SymfonyStyle $io)
     {
-        $container  = $this->getContainer();
-        $translator = $container->get('templating.helper.translator');
-
-        $this->io->title('Pulling '.$type);
+        $io->title('Pulling '.$type);
         $start = 0;
         $limit = 500;
 
@@ -110,7 +109,7 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
                 'start' => $start,
                 'limit' => $limit,
             ];
-            $service = $container->get('mautic_integration.pipedrive.import.'.$type);
+            $service = $this->getIntegrationService($type);
             $service->setIntegration($integrationObject);
 
             try {
@@ -119,15 +118,29 @@ class FetchPipedriveDataCommand extends ContainerAwareCommand
                 return;
             }
 
-            $this->io->text('Pulled '.$result['processed']);
-            $this->io->note('Using '.memory_get_peak_usage(true) / 1000000 .' megabytes of ram.');
+            $io->text('Pulled '.$result['processed']);
+            $io->note('Using '.memory_get_peak_usage(true) / 1000000 .' megabytes of ram.');
 
             if (!$result['more_items_in_collection']) {
                 return;
             }
 
             $start += $limit;
-            $this->io->text('Pulling more...');
+            $io->text('Pulling more...');
+        }
+    }
+
+    private function getIntegrationService(string $type): AbstractImport
+    {
+        switch ($type) {
+            case 'owner':
+                return $this->ownerImport;
+            case 'lead':
+                return $this->leadImport;
+            case 'company':
+                return $this->companyImport;
+            default:
+                throw new \Exception("Unknown type {$type}");
         }
     }
 }

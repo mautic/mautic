@@ -16,6 +16,7 @@ use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
 use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -23,11 +24,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class MailHelper
 {
-    const QUEUE_RESET_TO          = 'RESET_TO';
-    const QUEUE_FULL_RESET        = 'FULL_RESET';
-    const QUEUE_DO_NOTHING        = 'DO_NOTHING';
-    const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
-    const QUEUE_RETURN_ERRORS     = 'RETURN_ERRORS';
+    public const QUEUE_RESET_TO          = 'RESET_TO';
+    public const QUEUE_FULL_RESET        = 'FULL_RESET';
+    public const QUEUE_DO_NOTHING        = 'DO_NOTHING';
+    public const QUEUE_NOTHING_IF_FAILED = 'IF_FAILED';
+    public const QUEUE_RETURN_ERRORS     = 'RETURN_ERRORS';
     /**
      * @var MauticFactory
      */
@@ -58,7 +59,7 @@ class MailHelper
     public $message;
 
     /**
-     * @var null
+     * @var string|array<string, string>
      */
     protected $from;
 
@@ -411,6 +412,10 @@ class MailHelper
 
                     self::searchReplaceTokens($search, $replace, $this->message);
                 }
+            }
+
+            if (true === $this->factory->getParameter('mailer_convert_embed_images')) {
+                $this->convertEmbedImages();
             }
 
             // Attach assets
@@ -969,10 +974,6 @@ class MailHelper
      */
     public function setBody($content, $contentType = 'text/html', $charset = null, $ignoreTrackingPixel = false)
     {
-        if ($this->factory->getParameter('mailer_convert_embed_images')) {
-            $content = $this->convertEmbedImages($content);
-        }
-
         if (!$ignoreTrackingPixel && $this->factory->getParameter('mailer_append_tracking_pixel')) {
             // Append tracking pixel
             $trackingImg = '<img height="1" width="1" src="{tracking_pixel}" alt="" />';
@@ -993,25 +994,30 @@ class MailHelper
         ];
     }
 
-    /**
-     * @param string $content
-     *
-     * @return string
-     */
-    private function convertEmbedImages($content)
+    private function convertEmbedImages(): void
     {
+        $content = $this->message->getBody();
         $matches = [];
         $content = strtr($content, $this->embedImagesReplaces);
-        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches)) {
+        $tokens  = $this->getTokens();
+        if (preg_match_all('/<img.+?src=[\"\'](.+?)[\"\'].*?>/i', $content, $matches) > 0) {
             foreach ($matches[1] as $match) {
-                if (false === strpos($match, 'cid:') && false === strpos($match, '{tracking_pixel}') && !array_key_exists($match, $this->embedImagesReplaces)) {
-                    $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
+                // skip items that already embedded, or have token {tracking_pixel}
+                if (false !== strpos($match, 'cid:') || false !== strpos($match, '{tracking_pixel}') || array_key_exists($match, $this->embedImagesReplaces)) {
+                    continue;
                 }
+
+                // skip images with tracking pixel that are already replaced.
+                if (isset($tokens['{tracking_pixel}']) && $match === $tokens['{tracking_pixel}']) {
+                    continue;
+                }
+
+                $this->embedImagesReplaces[$match] = $this->message->embed(\Swift_Image::fromPath($match));
             }
             $content = strtr($content, $this->embedImagesReplaces);
         }
 
-        return $content;
+        $this->message->setBody($content);
     }
 
     /**
@@ -1628,7 +1634,7 @@ class MailHelper
 
         $event = new EmailSendEvent($this);
 
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_SEND, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_SEND);
 
         $this->eventTokens = array_merge($this->eventTokens, $event->getTokens(false));
 
@@ -2074,6 +2080,7 @@ class MailHelper
                     $contact['owner_id'] = 0;
                 } elseif (isset($contact['owner_id'])) {
                     $leadModel = $this->factory->getModel('lead');
+                    \assert($leadModel instanceof LeadModel);
                     if (isset(self::$leadOwners[$contact['owner_id']])) {
                         $owner = self::$leadOwners[$contact['owner_id']];
                     } elseif ($owner = $leadModel->getRepository()->getLeadOwner($contact['owner_id'])) {

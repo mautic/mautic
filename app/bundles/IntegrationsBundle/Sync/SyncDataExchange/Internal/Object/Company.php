@@ -8,8 +8,8 @@ use Mautic\LeadBundle\Entity\Company as CompanyEntity;
 
 final class Company implements ObjectInterface
 {
-    const NAME   = 'company';
-    const ENTITY = CompanyEntity::class;
+    public const NAME   = 'company';
+    public const ENTITY = CompanyEntity::class;
 
     /**
      * {@inheritdoc}

@@ -37,10 +37,10 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% set attr = form.vars.attr %}
 <div class="btn-group {{ buttonBlockClass }}" data-toggle="buttons">
     {% for child in form %}
-        {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or attr.readonly is not empty ? ' disabled' : '') %}
+        {% set class = (child.vars.checked is not empty ? ' active' : '') ~ (child.vars.disabled is not empty or (attribute(attr, 'readonly') is defined and attr.readonly is not empty) ? ' disabled' : '') %}
         <label class="btn btn-default{{ class }}">
             {{ form_widget(child, {'attr': attr}) }}
-            {% trans %}child.vars.label{% endtrans %}
+            {{ child.vars.label|trans }}
         </label>
     {% endfor %}
 </div>
@@ -58,7 +58,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endif %}
 <button type="{{ type is defined ? type|escape : 'button' }}"
     {{ block('button_attributes') }}>
-    {% if form.vars.attr.icon is not empty %}
+    {% if form.vars.attr.icon is defined and form.vars.attr.icon is not empty %}
     <i class="{{ form.vars.attr.icon }} "></i>
     {% endif %}
     {{ label|trans({}, translation_domain)|escape }}
@@ -495,11 +495,11 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 <div class="btn-group btn-block" data-toggle="buttons">
     {% for child in form %}
         {% set class = 
-            child.vars.checked is not empty ? ' active' : '' ~
-            (child.vars.disabled is not empty or attr.readonly is not empty) ? ' disabled' : '' ~
-            child.vars.name is same as '0' ? ' btn-no' : (child.vars.name is same as '1' ? ' btn-yes' : ' btn-extra') ~
-            (child.vars.name is same as '0' and child.vars.checked is not empty) ? ' btn-danger' : '' ~
-            (child.vars.name is same as '1' and child.vars.checked is not empty) ? ' btn-success' : ''
+            (child.vars.checked is not empty ? ' active' : '') ~
+            (((child.vars.disabled is defined and child.vars.disabled is not empty) or (attr.readonly is defined and attr.readonly is not empty)) ? ' disabled' : '' ) ~
+            (child.vars.name == '0' ? ' btn-no' : (child.vars.name == '1' ? ' btn-yes' : ' btn-extra')) ~
+            ((child.vars.name == '0' and child.vars.checked is not empty) ? ' btn-danger' : '') ~
+            ((child.vars.name == '1' and child.vars.checked is not empty) ? ' btn-success' : '')
         %}
         <label class="btn btn-default {{ class }}">
             {{ form_widget(child, {'attr': attr}) }}

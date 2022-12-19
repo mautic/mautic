@@ -21,13 +21,12 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [
-            'kernel.root_dir',
             'kernel.project_dir',
         ];
 
-        parent::setUp();
+        $this->configParams['locale'] = 'en_US';
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+        parent::setUp();
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
 
@@ -57,7 +56,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     public function testValuesAreEscapedProperly(): void
     {
         $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps        = "%ip1%\n%ip2%\n%kernel.root_dir%\n%kernel.project_dir%";
+        $trackIps        = "%ip1%\n%ip2%\n%kernel.project_dir%";
         $googleAnalytics = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
@@ -98,7 +97,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             [
                 $this->escape('%ip1%'),
                 $this->escape('%ip2%'),
-                '%kernel.root_dir%',
                 '%kernel.project_dir%',
             ],
             $configParameters['do_not_track_ips']
@@ -134,7 +132,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         return str_replace('%', '%%', $value);
     }
 
-    public function testConfigNotFoundPageConfiguration()
+    public function testConfigNotFoundPageConfiguration(): void
     {
         // insert published record
         $this->connection->insert($this->prefix.'pages', [
@@ -256,5 +254,62 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         Assert::assertEquals($campaign_notification_email_addresses, $form['config[notification_config][campaign_notification_email_addresses]']->getValue());
         Assert::assertEquals($send_notification_to_author, $form['config[notification_config][webhook_send_notification_to_author]']->getValue());
         Assert::assertEquals($webhook_notification_email_addresses, $form['config[notification_config][webhook_notification_email_addresses]']->getValue());
+    }
+
+    public function testUserAndSystemLocale(): void
+    {
+        // 1. Change user locale in account - should change _locale session
+        $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
+        $accountSaveButton = $accountCrawler->selectButton('user[buttons][save]');
+        $accountForm       = $accountSaveButton->form();
+        $accountForm->setValues(
+            [
+                'user[locale]' => 'en_US',
+            ]
+        );
+        $this->client->submit($accountForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+
+        // 2. Change system locale in configuration - should not change _locale session
+        $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][save]');
+        $configForm       = $configSaveButton->form();
+        $configForm->setValues(
+            [
+                'config[coreconfig][locale]'   => 'en_US',
+                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+            ]
+        );
+        $this->client->submit($configForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+
+        // 3. Change user locale to system default in account - should change _locale session to system default
+        $accountCrawler    = $this->client->request(Request::METHOD_GET, '/s/account');
+        $accountSaveButton = $accountCrawler->selectButton('user[buttons][save]');
+        $accountForm       = $accountSaveButton->form();
+        $accountForm->setValues(
+            [
+                'user[locale]' => '',
+            ]
+        );
+        $this->client->submit($accountForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
+
+        // 2. Change system locale in configuration to en_US - should change _locale session
+        $configCrawler    = $this->client->request(Request::METHOD_GET, '/s/config/edit');
+        $configSaveButton = $configCrawler->selectButton('config[buttons][save]');
+        $configForm       = $configSaveButton->form();
+        $configForm->setValues(
+            [
+                'config[coreconfig][locale]'   => 'en_US',
+                'config[coreconfig][site_url]' => 'https://mautic-cloud.local', // required
+            ]
+        );
+        $this->client->submit($configForm);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
     }
 }

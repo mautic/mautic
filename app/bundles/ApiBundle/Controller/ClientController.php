@@ -57,7 +57,7 @@ class ClientController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticApiBundle:Client:index',
+                    'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_client_index',
                         'mauticContent' => 'client',
@@ -108,8 +108,10 @@ class ClientController extends FormController
      */
     public function authorizedClientsAction()
     {
-        $me      = $this->get('security.token_storage')->getToken()->getUser();
-        $clients = $this->getModel('api.client')->getUserClients($me);
+        $apiClientModel = $this->getModel('api.client');
+        \assert($apiClientModel instanceof ClientModel);
+        $me             = $this->get('security.token_storage')->getToken()->getUser();
+        $clients        = $apiClientModel->getUserClients($me);
 
         return $this->render('MauticApiBundle:Client:authorized.html.php', ['clients' => $clients]);
     }
@@ -154,7 +156,7 @@ class ClientController extends FormController
         return $this->postActionRedirect(
             [
                 'returnUrl'       => $this->generateUrl('mautic_user_account'),
-                'contentTemplate' => 'MauticUserBundle:Profile:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                 'passthroughVars' => [
                     'success' => $success,
                 ],
@@ -228,11 +230,11 @@ class ClientController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'MauticApiBundle:Client:index',
+                        'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_client_index',
                             'mauticContent' => 'client',
@@ -281,7 +283,7 @@ class ClientController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'mauticContent' => 'client',
@@ -320,7 +322,7 @@ class ClientController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($client, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($client, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
                     $this->addFlash(
                         'mautic.core.notice.updated',
                         [
@@ -336,7 +338,7 @@ class ClientController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         return $this->postActionRedirect($postActionVars);
                     }
                 }
@@ -386,7 +388,7 @@ class ClientController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticApiBundle:Client:index',
+            'contentTemplate' => 'Mautic\ApiBundle\Controller\ClientController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_client_index',
                 'success'       => $success,
