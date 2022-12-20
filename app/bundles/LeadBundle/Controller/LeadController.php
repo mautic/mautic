@@ -260,6 +260,10 @@ class LeadController extends FormController
         $currentUser = $this->get('security.token_storage')->getToken()->getUser();
         $quickForm->get('owner')->setData($currentUser);
 
+        if ($this->request->isMethod(Request::METHOD_POST)) {
+            $quickForm->handleRequest($this->request);
+        }
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -537,6 +541,10 @@ class LeadController extends FormController
                         return $this->editAction($lead->getId(), true);
                     }
                 } else {
+                    if ($this->request->get('qf', false)) {
+                        return $this->quickAddAction();
+                    }
+
                     $formErrors = $this->getFormErrorMessages($form);
                     $this->addFlash(
                         $this->getFormErrorMessage($formErrors),
