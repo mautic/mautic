@@ -1176,6 +1176,14 @@ class LeadModel extends FormModel
             $this->removeFromCategories($deletedCategories);
         }
 
+        // Add non associated categories relations as removed.
+        $nonAssociatedCategories = $this->getLeadCategoryRepository()->getNonAssociatedCategoryIdsForAContact($lead, ['global', 'email']);
+
+        $unsubscribeNewCategories = array_diff($nonAssociatedCategories, $data['global_categories']);
+        if (!empty($unsubscribeNewCategories)) {
+            $this->addToCategory($lead, $unsubscribeNewCategories, false);
+        }
+
         // Delete channels that were removed
         $deleted = array_diff_key($frequencyRules, $entities);
         if (!empty($deleted)) {
@@ -1187,11 +1195,11 @@ class LeadModel extends FormModel
 
     /**
      * @param $categories
-     * @param bool $manuallyAdded
+     * @param bool $subscribedFlag
      *
      * @return array
      */
-    public function addToCategory(Lead $lead, $categories, $manuallyAdded = true)
+    public function addToCategory(Lead $lead, $categories, $subscribedFlag = true)
     {
         $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
 
@@ -1205,7 +1213,8 @@ class LeadModel extends FormModel
                 }
                 $newLeadCategory->setCategory($category);
                 $newLeadCategory->setDateAdded(new \DateTime());
-                $newLeadCategory->setManuallyAdded($manuallyAdded);
+                $newLeadCategory->setManuallyAdded($subscribedFlag);
+                $newLeadCategory->setManuallyRemoved(!$subscribedFlag);
                 $results[$category->getId()] = $newLeadCategory;
 
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {

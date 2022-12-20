@@ -72,4 +72,47 @@ class LeadCategoryRepository extends CommonRepository
 
         return $leadCategoryList;
     }
+
+    /**
+     * @param string[] $types
+     *
+     * @return array<int, int>
+     */
+    public function getNonAssociatedCategoryIdsForAContact(Lead $lead, array $types): array
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+
+        // Fetch the records from categories.
+        $parentQ = clone $qb;
+        $parentQ->select('c.id');
+        $parentQ->from(MAUTIC_TABLE_PREFIX.'categories', 'c');
+        $parentQ->where('c.is_published = 1');
+        $parentQ->andWhere($qb->expr()->in('c.bundle', ':bundles'));
+        $parentQ->setParameter('bundles', $types, Connection::PARAM_STR_ARRAY);
+
+        // Get the category ids for particular lead
+        $subQ = clone $qb;
+        $subQ->select('lc.category_id');
+        $subQ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc');
+        $subQ->where($qb->expr()->eq('lc.lead_id', ':leadId'));
+        $subQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
+
+        // Add sub-query
+        $parentQ->andWhere($qb->expr()->notIn('c.id', $subQ->getSQL()));
+
+        // Add sub-query parameter.
+        $parentQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
+
+        $leadCategories = $parentQ->execute()
+            ->fetchAllAssociative();
+
+        $leadCategoryList = [];
+        foreach ($leadCategories as $category) {
+            $id = (int) $category['id'];
+
+            $leadCategoryList[$id] = $id;
+        }
+
+        return $leadCategoryList;
+    }
 }
