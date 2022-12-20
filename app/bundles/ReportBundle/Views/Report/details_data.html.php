@@ -129,7 +129,7 @@ $graphContent = $view->render(
                                                 <?php
                                                 switch ($cellType) {
                                                     case 'datetime':
-                                                        echo $view['date']->toFullConcat($cellVal, 'UTC');
+                                                        echo empty($cellVal) ? '' : $view['date']->toFullConcat($cellVal, 'UTC');
                                                         break;
                                                     case 'date':
                                                         echo $view['date']->toShort($cellVal, 'UTC');
