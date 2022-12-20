@@ -330,6 +330,8 @@ return [
                     'mautic.campaign.scheduler',
                     'mautic.campaign.contact_finder.scheduled',
                 ],
+                'tag'          => 'kernel.reset',
+                'tagArguments' => ['method' => 'reset'],
             ],
             'mautic.campaign.executioner.realtime'     => [
                 'class'     => \Mautic\CampaignBundle\Executioner\RealTimeExecutioner::class,

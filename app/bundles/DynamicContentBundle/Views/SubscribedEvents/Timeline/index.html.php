@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$data = $event['extra']['log']['metadata'];
+$data = $event['extra']['stat']['sentDetails'];
 
 if (isset($data['failed']) || !isset($data['timeline'])) {
     return;

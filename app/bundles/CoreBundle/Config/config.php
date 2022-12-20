@@ -443,9 +443,6 @@ return [
                     '%kernel.environment%',
                 ],
             ],
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
-            ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
                 'class' => \Symfony\Component\Filesystem\Filesystem::class,
@@ -573,13 +570,6 @@ return [
                     'priority' => 255,
                 ],
             ],
-            'transifex.factory' => [
-                'class'     => \Mautic\CoreBundle\Factory\TransifexFactory::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
             // Helpers
             'mautic.helper.assetgeneration' => [
                 'class'     => \Mautic\CoreBundle\Helper\AssetGenerationHelper::class,
@@ -664,15 +654,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
-                ],
-            ],
-            'mautic.helper.language' => [
-                'class'     => \Mautic\CoreBundle\Helper\LanguageHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
                 ],
             ],
             'mautic.helper.url' => [
@@ -1010,8 +991,7 @@ return [
         'ip_lookup_auth'                  => '',
         'ip_lookup_config'                => [],
         'ip_lookup_create_organization'   => false,
-        'transifex_username'              => '',
-        'transifex_password'              => '',
+        'transifex_api_token'             => '',
         'update_stability'                => 'stable',
         'cookie_path'                     => '/',
         'cookie_domain'                   => '',

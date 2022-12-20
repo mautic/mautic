@@ -11,6 +11,7 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
@@ -20,15 +21,18 @@ use Mautic\CoreBundle\Form\Type\ContentPreviewSettingsType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -105,8 +109,10 @@ class EmailController extends FormController
         }
 
         //retrieve a list of Lead Lists
+        $leadListModel = $this->getModel('lead.list');
+        \assert($leadListModel instanceof ListModel);
         $listFilters['filters']['groups']['mautic.core.filter.lists'] = [
-            'options' => $this->getModel('lead.list')->getUserLists(),
+            'options' => $leadListModel->getUserLists(),
             'prefix'  => 'list',
         ];
 
@@ -365,7 +371,9 @@ class EmailController extends FormController
         [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('email', $email->getId(), $email->getDateAdded());
+        $auditLog = $this->getModel('core.auditlog');
+        \assert($auditLog instanceof AuditLogModel);
+        $logs = $auditLog->getLogForObject('email', $email->getId(), $email->getDateAdded());
 
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
@@ -458,6 +466,7 @@ class EmailController extends FormController
     public function newAction($entity = null)
     {
         $model = $this->getModel('email');
+        \assert($model instanceof EmailModel);
 
         if (!($entity instanceof Email)) {
             /** @var \Mautic\EmailBundle\Entity\Email $entity */
@@ -516,7 +525,7 @@ class EmailController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $entity->getId(),
@@ -555,7 +564,7 @@ class EmailController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -695,7 +704,7 @@ class EmailController extends FormController
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -739,7 +748,7 @@ class EmailController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -775,8 +784,10 @@ class EmailController extends FormController
             }
         }
 
-        $assets         = $form['assetAttachments']->getData();
-        $attachmentSize = $this->getModel('asset')->getTotalFilesize($assets);
+        $assets     = $form['assetAttachments']->getData();
+        $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
+        $attachmentSize = $assetModel->getTotalFilesize($assets);
 
         $slotTypes   = $model->getBuilderComponents($entity, 'slotTypes');
         $sections    = $model->getBuilderComponents($entity, 'sections');
@@ -888,8 +899,9 @@ class EmailController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model  = $this->getModel('email');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('email');
+            \assert($model instanceof EmailModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1063,8 +1075,9 @@ class EmailController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model  = $this->getModel('email');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('email');
+            \assert($model instanceof EmailModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1278,9 +1291,10 @@ class EmailController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             $model = $this->getModel('email');
-            $ids   = json_decode($this->request->query->get('ids', '{}'));
+            \assert($model instanceof EmailModel);
+            $ids = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 
@@ -1338,7 +1352,8 @@ class EmailController extends FormController
      */
     public function sendExampleAction($objectId)
     {
-        $model  = $this->getModel('email');
+        $model = $this->getModel('email');
+        \assert($model instanceof EmailModel);
         /** @var Email $entity */
         $entity = $model->getEntity($objectId);
 

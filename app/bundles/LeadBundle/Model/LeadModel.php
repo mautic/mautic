@@ -61,6 +61,9 @@ use Symfony\Component\Intl\Countries;
 use Symfony\Contracts\EventDispatcher\Event;
 use Tightenco\Collect\Support\Collection;
 
+/**
+ * @extends FormModel<Lead>
+ */
 class LeadModel extends FormModel
 {
     use DefaultValueTrait;
@@ -646,12 +649,12 @@ class LeadModel extends FormModel
             $form->submit($data);
 
             if ($form->getErrors()->count()) {
-                $this->logger->addDebug('LEAD: form validation failed with an error of '.$form->getErrors());
+                $this->logger->debug('LEAD: form validation failed with an error of '.$form->getErrors());
             }
             foreach ($form as $field => $formField) {
                 if (isset($data[$field])) {
                     if ($formField->getErrors()->count()) {
-                        $this->logger->addDebug('LEAD: '.$field.' failed form validation with an error of '.$formField->getErrors());
+                        $this->logger->debug('LEAD: '.$field.' failed form validation with an error of '.$formField->getErrors());
                         // Don't save bad data
                         unset($data[$field]);
                     } else {
@@ -955,7 +958,7 @@ class LeadModel extends FormModel
             $existingLeads = $this->getRepository()->getLeadsByUniqueFields($uniqueFieldData);
 
             if (!empty($existingLeads)) {
-                $this->logger->addDebug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
+                $this->logger->debug("LEAD: Existing contact ID# {$existingLeads[0]->getId()} found through query identifiers.");
                 $lead = $existingLeads[0];
             }
         }
@@ -994,7 +997,7 @@ class LeadModel extends FormModel
     /**
      * Add lead to lists.
      *
-     * @param array|Lead     $lead
+     * @param array|Lead|int $lead
      * @param array|LeadList $lists
      * @param bool           $manuallyAdded
      */
@@ -2378,7 +2381,7 @@ class LeadModel extends FormModel
         }
 
         if ($leadId = $lead->getId()) {
-            $this->logger->addDebug("LEAD: New lead created with ID# $leadId.");
+            $this->logger->debug("LEAD: New lead created with ID# $leadId.");
         }
 
         return $lead;

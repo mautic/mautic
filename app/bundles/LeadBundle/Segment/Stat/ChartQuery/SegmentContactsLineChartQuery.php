@@ -156,7 +156,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     {
         $subQuery = $this->connection->createQueryBuilder();
         $subQuery->select('el.date_added - INTERVAL 10 SECOND')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log el FORCE INDEX ('.MAUTIC_TABLE_PREFIX.'IDX_SEARCH)')
             ->where(
                 $subQuery->expr()->andX(
                     $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
