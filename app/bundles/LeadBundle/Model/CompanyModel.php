@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\CompanyEvent;
+use Mautic\LeadBundle\Event\CompanyMergeEvent;
 use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
@@ -695,8 +696,14 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         foreach ($secCompanyLeads as $lead) {
             $this->addLeadToCompany($mainCompany->getId(), $lead['lead_id']);
         }
+
+        $event = new CompanyMergeEvent($mainCompany, $secCompany);
+        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_PRE_MERGE);
+
         //save the updated company
         $this->saveEntity($mainCompany, false);
+
+        $this->dispatcher->dispatch($event, LeadEvents::COMPANY_POST_MERGE);
 
         //delete the old company
         $this->deleteEntity($secCompany);
