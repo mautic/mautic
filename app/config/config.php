@@ -148,6 +148,7 @@ $dbalSettings = [
 
 if (!empty($localConfigParameterBag->get('db_host_ro'))) {
     $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['keep_replica']    = true;
     $dbalSettings['replicas']        = [
         'replica1' => [
             'host'                  => '%mautic.db_host_ro%',
