@@ -371,23 +371,13 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @var string $type
+     * @param string $type
      *
      * @return ArrayCollection<int,Event>
      */
     public function getEventsByType($type): ArrayCollection
     {
-        return $this->getEventsByTypes([$type]);
-    }
-
-    /**
-     * @var string[] $types
-     *
-     * @return ArrayCollection<int,Event>
-     */
-    public function getEventsByTypes($types)
-    {
-        $criteria = Criteria::create()->where(Criteria::expr()->in('eventType', $types));
+        $criteria = Criteria::create()->where(Criteria::expr()->eq('eventType', $type));
         $events   = $this->getEvents()->matching($criteria);
 
         // Doctrine loses the indexBy mapping definition when using matching so we have to manually reset them.
