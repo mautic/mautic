@@ -2,8 +2,9 @@
 
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Types;
+use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -36,7 +37,10 @@ class LeadCategoryRepository extends CommonRepository
      */
     public function getSubscribedAndNewCategoryIds(Lead $lead, array $types): array
     {
-        return $this->getLeadCategoriesMapping($lead, $types, true);
+        $criteria = Criteria::create()
+            ->andWhere(Criteria::expr()->eq('manuallyRemoved', 1));
+
+        return $this->getLeadCategoriesMapping($lead, $types, $criteria);
     }
 
     /**
@@ -54,37 +58,34 @@ class LeadCategoryRepository extends CommonRepository
      *
      * @return array<int, int>
      */
-    private function getLeadCategoriesMapping(Lead $lead, array $types, bool $manuallyRemoved = false): array
+    private function getLeadCategoriesMapping(Lead $lead, array $types, Criteria $criteria = null): array
     {
-        $qb = $this->_em->getConnection()->createQueryBuilder();
-
-        // Fetch the records from categories.
-        $parentQ = clone $qb;
+        $parentQ = $this->getEntityManager()->getRepository(Category::class)->createQueryBuilder('c');
         $parentQ->select('c.id');
-        $parentQ->from(MAUTIC_TABLE_PREFIX.'categories', 'c');
-        $parentQ->where('c.is_published = 1');
-        $parentQ->andWhere($qb->expr()->in('c.bundle', ':bundles'));
+        $parentQ->where('c.isPublished = :isPublished');
+        $parentQ->setParameter('isPublished', 1);
+        $parentQ->andWhere($parentQ->expr()->in('c.bundle', ':bundles'));
         $parentQ->setParameter('bundles', $types, Connection::PARAM_STR_ARRAY);
 
         // Get the category ids for particular lead
-        $subQ = clone $qb;
-        $subQ->select('lc.category_id');
-        $subQ->from(MAUTIC_TABLE_PREFIX.'lead_categories', 'lc');
-        $subQ->where($qb->expr()->eq('lc.lead_id', ':leadId'));
-        $subQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
+        $subQ = $this->getEntityManager()->getRepository(LeadCategory::class)->createQueryBuilder('lc');
+        $subQ->select('IDENTITY(lc.category)');
+        $subQ->where($subQ->expr()->eq('lc.lead', ':leadId'));
+        $subQ->setParameter('leadId', $lead->getId());
 
-        if ($manuallyRemoved) {
-            $subQ->andWhere($qb->expr()->eq('lc.manually_removed', 1));
+        if ($criteria instanceof Criteria) {
+            $subQ->addCriteria($criteria);
         }
 
         // Add sub-query
-        $parentQ->andWhere($qb->expr()->notIn('c.id', $subQ->getSQL()));
+        $parentQ->andWhere($parentQ->expr()->notIn('c.id', $subQ->getDQL()));
 
         // Add sub-query parameter.
-        $parentQ->setParameter('leadId', $lead->getId(), Types::INTEGER);
+        foreach ($subQ->getParameters() as $parameter) {
+            $parentQ->setParameter($parameter->getName(), $parameter->getValue(), $parameter->getType());
+        }
 
-        $leadCategories = $parentQ->execute()
-            ->fetchAllAssociative();
+        $leadCategories = $parentQ->getQuery()->getResult();
 
         $leadCategoryList = [];
         foreach ($leadCategories as $category) {
