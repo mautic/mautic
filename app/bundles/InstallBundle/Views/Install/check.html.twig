@@ -11,6 +11,7 @@
     {% extends 'MauticInstallBundle:Install:content.html.twig' %}
 {% endif %}
 
+{% block content %}
 <div class="panel-heading">
     <h2 class="panel-title">
         {{ 'mautic.install.heading.check.environment'|trans }}
@@ -38,7 +39,7 @@
                         <li class="list-group-item">{{ 'mautic.install.directory.unwritable'|trans ({'%path%' : logDir}) }}</li>
                     {% elseif message == 'mautic.install.apc.version' %}
                         {% set minAPCverison = (constant('PHP_VERSION') >= '5.4.0') ? '3.1.13' : '3.0.17' %}
-                        <li class="list-group-item">{{ message|trans ({'%minapc%' : minAPCverison, '%currentapc%' : phpversion('apc')}) }}</li>
+                        <li class="list-group-item">{{ message|trans ({'%minapc%' : minAPCverison, '%currentapc%' : 'apc'|phpversion}) }}</li>
                     {% else %}
                         <li class="list-group-item">{{ message|trans }}</li>
                     {% endif %}
@@ -76,7 +77,7 @@
                          {% elseif message == 'mautic.install.php.version.has.only.security.support' %}
                              <li class="list-group-item">{{ message|trans ({'%phpversion%' : constant('PHP_VERSION')}) }}</li>
                          {% elseif message == 'mautic.install.memory.limit' %}
-                             <li class="list-group-item">{{ message|trans ({'%min_memory_limit%' : CheckStep::memory_limit}) }}</li>
+                             <li class="list-group-item">{{ message|trans ({'%min_memory_limit%' : constant('Mautic\InstallBundle\Configurator\Step\CheckStep::memory_limit')}) }}</li>
                          {% else %}
                              <li class="list-group-item">{{ message|trans }}</li>
                          {% endif %}
@@ -98,3 +99,4 @@
     {{ form_end(form) }}
     {% endif %}
 </div>
+{% endblock %}

@@ -9,6 +9,7 @@
     {% extends 'MauticInstallBundle:Install:content.html.twig' %}
 {% endif %}
 
+{% block content %}
 <div class="panel-heading">
     <h2 class="panel-title">
         {{ 'mautic.install.heading.email.configuration'|trans }}
@@ -111,3 +112,4 @@
         Mautic.initializeFormFieldVisibilitySwitcher('install_email_step');
     </script>
 </div>
+{% endblock %}

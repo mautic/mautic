@@ -9,6 +9,7 @@
     {% extends 'MauticInstallBundle:Install:content.html.twig' %}
 {% endif %}
 
+{% block content %}
 <div class="panel-heading">
     <h2 class="panel-title">
         {{ 'mautic.install.heading.final'|trans }}
@@ -24,3 +25,4 @@
         </a>
     {% endif %}
 </div>
+{% endblock %}

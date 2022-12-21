@@ -5,10 +5,14 @@
     @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 #}
 
-{% if not app.getRequest()->isXmlHttpRequest() and (false === slot('contentOnly', false)) %}
+{% if not app.getRequest().isXmlHttpRequest() and (false == slot('contentOnly', false)) %}
     {% extends 'MauticInstallBundle:Install:base.html.twig' %}
 {% endif %}
 
+{% block content %}
+
 {{- include('MauticCoreBundle:Notification:flashes.html.twig') -}}
 
-{% block %}_content{% endblock %}
+{{ parent() }}
+
+{% endblock %}

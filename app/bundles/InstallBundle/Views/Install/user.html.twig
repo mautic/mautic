@@ -9,6 +9,7 @@
     {% extends 'MauticInstallBundle:Install:content.html.twig' %}
 {% endif %}
 
+{% block content %}
 <div class="panel-heading">
     <h2 class="panel-title">
         {{ 'mautic.install.heading.user.configuration'|trans }}
@@ -17,7 +18,7 @@
 <div class="panel-body">
     {{ form_start(form) }}
     <div class="alert alert-mautic">
-        {% trans %}mautic.install.user.introtext{% trans %}
+        {% trans %}mautic.install.user.introtext{% endtrans %}
     </div>
     <div class="row">
         <div class="col-sm-6">
@@ -55,3 +56,4 @@
     </div>
     {{ form_end(form) }}
 </div>
+{% endblock %}
