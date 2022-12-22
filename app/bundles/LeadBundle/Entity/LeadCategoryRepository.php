@@ -102,7 +102,7 @@ class LeadCategoryRepository extends CommonRepository
         $subQ->where($subQ->expr()->eq('lc.lead', ':leadId'));
         $subQ->setParameter('leadId', $lead->getId());
 
-        if ($criteria instanceof Criteria) {
+        if ($criteria) {
             $subQ->addCriteria($criteria);
         }
 
