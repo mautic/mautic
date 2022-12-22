@@ -90,12 +90,12 @@ class Reply implements ProcessorInterface
         }
 
         // A stat has been found so let's compare to the From address for the contact to prevent false positives
-        $contactEmail = $this->cleanEmail($stat->getLead()->getEmail());
-        $fromEmail    = $this->cleanEmail($repliedEmail->getFromAddress());
+        $possibleFromEmails = $this->getPossibleContactEmails($stat->getLead()->getEmail());
+        $fromEmail          = $this->cleanEmail($repliedEmail->getFromAddress());
 
-        if ($contactEmail !== $fromEmail) {
+        if (!in_array($fromEmail, $possibleFromEmails)) {
             // We can't reliably assume this email was from the originating contact
-            $this->logger->debug('MONITORED EMAIL: '.$contactEmail.' != '.$fromEmail.' so cannot confirm match');
+            $this->logger->debug('MONITORED EMAIL: '.implode(', ', $possibleFromEmails).' != '.$fromEmail.' so cannot confirm match');
 
             return;
         }
@@ -162,7 +162,7 @@ class Reply implements ProcessorInterface
      */
     protected function cleanEmail($email)
     {
-        return strtolower(preg_replace("/[^a-z0-9\.@]/i", '', $email));
+        return strtolower(preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
     }
 
     private function dispatchEvent(Stat $stat)
@@ -174,5 +174,17 @@ class Reply implements ProcessorInterface
             $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_REPLY);
             unset($event);
         }
+    }
+
+    private function getPossibleContactEmails(string $email): array
+    {
+        $emails = [$email, $this->cleanEmail($email)];
+        // email without suffix
+        preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
+        if (!empty($parts)) {
+            $emails[] = $parts[1].'@'.$parts[3];
+        }
+
+        return $emails;
     }
 }
