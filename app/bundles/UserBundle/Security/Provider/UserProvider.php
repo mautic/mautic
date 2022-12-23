@@ -18,9 +18,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-/**
- * Class UserProvider.
- */
 class UserProvider implements UserProviderInterface
 {
     /**
@@ -117,8 +114,7 @@ class UserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $this->userRepository->getClassName() === $class
-        || is_subclass_of($class, $this->userRepository->getClassName());
+        return User::class === $class || is_subclass_of($class, User::class);
     }
 
     /**

@@ -30,7 +30,7 @@
                 <span class="label label-warning" data-toggle="tooltip" title="<?php echo $view->escape($doNotContact->getComments()); ?>">
                                 <?php echo $view['translator']->trans('mautic.lead.do.not.contact_bounced_channel', ['%channel%'=> strtoupper($doNotContact->getChannel())]); ?>
                                     <span data-toggle="tooltip" data-placement="bottom" title="<?php echo $view['translator']->trans('mautic.lead.remove_dnc_status'); ?>">
-                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>);"></i>
+                                    <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, <?php echo $doNotContact->getId(); ?>, '<?php echo $doNotContact->getChannel(); ?>');"></i>
                                 </span>
                             </span>
             <?php endif; ?>

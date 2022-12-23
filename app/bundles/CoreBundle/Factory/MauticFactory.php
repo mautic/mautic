@@ -38,7 +38,7 @@ class MauticFactory
      *
      * @param $modelNameKey
      *
-     * @return AbstractCommonModel
+     * @return AbstractCommonModel<object>
      *
      * @throws \InvalidArgumentException
      */

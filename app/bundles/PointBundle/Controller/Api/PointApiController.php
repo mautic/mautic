@@ -6,9 +6,14 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Point>
+ */
 class PointApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -19,13 +24,21 @@ class PointApiController extends CommonApiController
     protected $leadModel;
 
     /**
-     * {@inheritdoc}
+     * @var PointModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('point');
-        $this->leadModel        = $this->getModel('lead');
-        $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+
+        $pointModel = $this->getModel('point');
+        \assert($pointModel instanceof PointModel);
+
+        $this->model            = $pointModel;
+        $this->leadModel        = $leadModel;
+        $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
         $this->serializerGroups = ['pointDetails', 'categoryList', 'publishDetails'];
