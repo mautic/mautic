@@ -1,5 +1,5 @@
 {% set isCurrent = translation.getId() == activeEntity.getId() %}
-<li class="list-group-item bg-auto bg-<?php echo ($isCurrent) ? 'dark' : 'light'; ?>-xs">
+<li class="list-group-item bg-auto bg-{{ isCurrent ? 'dark' : 'light' }}-xs">
     <div class="box-layout">
         <div class="col-md-1 va-m">
             <h3>
@@ -8,15 +8,15 @@
                     {
                         'item': translation,
                         'model': model,
-                        'size'  => '',
-                        'query' => 'size=',
+                        'size': '',
+                        'query': 'size=',
                     }
                 )}}
             </h3>
         </div>
         <div class="col-md-7 va-m">
             <h5 class="fw-sb text-primary">
-                <a href="<?php echo $view['router']->path($actionRoute, ['objectAction' => 'view', 'objectId' => $translation->getId()]); ?>" data-toggle="ajax">
+                <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': translation.getId()}) }}" data-toggle="ajax">
                     <span>{{ translation[nameGetter]() }}</span>
                 </a>
                {% if isCurrent %}
