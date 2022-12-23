@@ -8,6 +8,9 @@ use Mautic\CampaignBundle\Entity\Result\CountResult;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Lead>
+ */
 class LeadRepository extends CommonRepository
 {
     use ContactLimiterTrait;
@@ -207,7 +210,7 @@ class LeadRepository extends CommonRepository
         );
 
         if ($parentDecisionId) {
-            // Limit to events that have no grandparent or whose grandparent has already been executed
+            // Limit to events  whose grandparent has already been executed
             $grandparentQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
             $grandparentQb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'grandparent_log')
@@ -220,6 +223,20 @@ class LeadRepository extends CommonRepository
 
             $q->andWhere(
                 sprintf('EXISTS (%s)', $grandparentQb->getSQL())
+            );
+        } else {
+            // Limit to events that have no grandparent and any of events was already executed by jump to event
+            $anyEventQb = $this->getSlaveConnection($limiter)->createQueryBuilder();
+            $anyEventQb->select('null')
+                ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'any_log')
+                ->where(
+                    $anyEventQb->expr()->eq('any_log.lead_id', 'l.lead_id'),
+                    $anyEventQb->expr()->eq('any_log.campaign_id', 'l.campaign_id'),
+                    $anyEventQb->expr()->eq('any_log.rotation', 'l.rotation')
+                );
+
+            $q->andWhere(
+                sprintf('NOT EXISTS (%s)', $anyEventQb->getSQL())
             );
         }
 

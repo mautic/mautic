@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use DateTime;
 
 /**
- * NotificationRepository.
+ * @extends CommonRepository<Notification>
  */
 class NotificationRepository extends CommonRepository
 {

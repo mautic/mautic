@@ -13,6 +13,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -84,6 +85,8 @@ class ContactObjectHelper implements ObjectHelperInterface
                 }
             }
 
+            $contact->setManipulator(new LeadManipulator('integrations', 'create'));
+
             // Create the contact before processing pseudo fields
             $this->model->saveEntity($contact);
 
@@ -151,6 +154,8 @@ class ContactObjectHelper implements ObjectHelperInterface
                     $pseudoFields[$field->getName()] = $field;
                 }
             }
+
+            $contact->setManipulator(new LeadManipulator('integrations', 'update'));
 
             // Create the contact before processing pseudo fields
             $this->model->saveEntity($contact);

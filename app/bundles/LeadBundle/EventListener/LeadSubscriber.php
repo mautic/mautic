@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -70,6 +71,9 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $isTest;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -78,6 +82,7 @@ class LeadSubscriber implements EventSubscriberInterface
         EntityManager $entityManager,
         TranslatorInterface $translator,
         RouterInterface $router,
+        ModelFactory $modelFactory,
         $isTest = false
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
@@ -88,6 +93,8 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->translator          = $translator;
         $this->router              = $router;
         $this->isTest              = $isTest;
+
+        $this->setModelFactory($modelFactory);
     }
 
     /**
@@ -527,7 +534,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'event'      => $eventTypeKey,
                             'eventType'  => $eventTypeName,
                             'eventId'    => $eventTypeKey.$utmTag['id'],
-                            'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
+                            'eventLabel' => !empty($utmTag['utm_campaign']) ? $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'] : $eventTypeName,
                             'timestamp'  => $utmTag['date_added'],
                             'icon'       => $icon,
                             'extra'      => [

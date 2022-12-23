@@ -9,17 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
-
 $roundMode = (isset($roundMode)) ? $roundMode : '';
 $scale     = (isset($scale)) ? $scale : '';
 
 $options = [
-    NumberToLocalizedStringTransformer::ROUND_UP        => 'mautic.lead.field.form.number.roundup',
-    NumberToLocalizedStringTransformer::ROUND_DOWN      => 'mautic.lead.field.form.number.rounddown',
-    NumberToLocalizedStringTransformer::ROUND_HALF_UP   => 'mautic.lead.field.form.number.roundhalfup',
-    NumberToLocalizedStringTransformer::ROUND_HALF_EVEN => 'mautic.lead.field.form.number.roundhalfeven',
-    NumberToLocalizedStringTransformer::ROUND_HALF_DOWN => 'mautic.lead.field.form.number.roundhalfdown',
+    \NumberFormatter::ROUND_UP       => 'mautic.lead.field.form.number.roundup',
+    \NumberFormatter::ROUND_DOWN     => 'mautic.lead.field.form.number.rounddown',
+    \NumberFormatter::ROUND_HALFUP   => 'mautic.lead.field.form.number.roundhalfup',
+    \NumberFormatter::ROUND_HALFEVEN => 'mautic.lead.field.form.number.roundhalfeven',
+    \NumberFormatter::ROUND_HALFDOWN => 'mautic.lead.field.form.number.roundhalfdown',
 ];
 ?>
 
