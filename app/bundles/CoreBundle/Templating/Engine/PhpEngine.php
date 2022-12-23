@@ -16,6 +16,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateNameParserInterface;
+use Twig\Environment;
 
 /**
  * PhpEngine is an engine able to render PHP templates.
@@ -54,6 +55,8 @@ class PhpEngine extends BasePhpEngine
      */
     private $request;
 
+    private Environment $twig;
+
     private $jsLoadMethodPrefix;
 
     /**
@@ -83,6 +86,11 @@ class PhpEngine extends BasePhpEngine
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->request = $requestStack->getCurrentRequest();
+    }
+
+    public function setTwig(Environment $twig)
+    {
+        $this->twig = $twig;
     }
 
     /**
@@ -116,7 +124,11 @@ class PhpEngine extends BasePhpEngine
             $e = $this->stopwatch->start(sprintf('template.php (%s)', $name), 'template');
         }
 
-        $content = parent::render($name, $parameters);
+        if (str_ends_with($name, '.twig') && $this->twig->getLoader()->exists($name)) {
+            $content = $this->twig->render($name, $parameters);
+        } else {
+            $content = parent::render($name, $parameters);
+        }
 
         if ($this->stopwatch) {
             $e->stop();
