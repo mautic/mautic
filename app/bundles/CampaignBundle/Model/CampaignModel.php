@@ -24,6 +24,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
+/**
+ * @extends CommonFormModel<Campaign>
+ */
 class CampaignModel extends CommonFormModel
 {
     /**

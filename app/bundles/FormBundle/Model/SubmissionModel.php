@@ -52,6 +52,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * @extends CommonFormModel<Submission>
+ */
 class SubmissionModel extends CommonFormModel
 {
     /**
@@ -174,14 +177,12 @@ class SubmissionModel extends CommonFormModel
         $this->contactMerger          = $contactMerger;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return SubmissionRepository
-     */
-    public function getRepository()
+    public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository('MauticFormBundle:Submission');
+        $result = $this->em->getRepository(Submission::class);
+        \assert($result instanceof SubmissionRepository);
+
+        return $result;
     }
 
     /**
@@ -809,15 +810,15 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
+     * @param bool        $canViewOthers
      *
      * @return array
      */
     public function getSubmissionsLineChartData(
-        $unit,
+        ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,

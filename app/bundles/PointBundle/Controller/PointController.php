@@ -5,7 +5,9 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class PointController extends AbstractFormController
@@ -42,7 +44,9 @@ class PointController extends AbstractFormController
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.point.orderby', 'p.name');
         $orderByDir = $this->get('session')->get('mautic.point.orderbydir', 'ASC');
-        $points     = $this->getModel('point')->getEntities([
+        $pointModel = $this->getModel('point');
+        \assert($pointModel instanceof PointModel);
+        $points     = $pointModel->getEntities([
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,
@@ -72,7 +76,7 @@ class PointController extends AbstractFormController
         $pageHelper->rememberPage($page);
 
         //get the list of actions
-        $actions = $this->getModel('point')->getPointActions();
+        $actions = $pointModel->getPointActions();
 
         return $this->delegateView([
             'viewParameters' => [
@@ -103,6 +107,7 @@ class PointController extends AbstractFormController
     public function newAction($entity = null)
     {
         $model = $this->getModel('point');
+        \assert($model instanceof PointModel);
 
         if (!($entity instanceof Point)) {
             /** @var \Mautic\PointBundle\Entity\Point $entity */
@@ -127,7 +132,7 @@ class PointController extends AbstractFormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ('POST' === $method) {
+        if (Request::METHOD_POST === $method) {
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
@@ -144,7 +149,7 @@ class PointController extends AbstractFormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
                         $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     } else {
@@ -157,7 +162,7 @@ class PointController extends AbstractFormController
                 $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParameters,
@@ -205,7 +210,8 @@ class PointController extends AbstractFormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model  = $this->getModel('point');
+        $model = $this->getModel('point');
+        \assert($model instanceof PointModel);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -264,7 +270,7 @@ class PointController extends AbstractFormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
@@ -275,7 +281,7 @@ class PointController extends AbstractFormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
                         $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     }
@@ -288,7 +294,7 @@ class PointController extends AbstractFormController
                 $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                         'returnUrl'       => $returnUrl,
@@ -374,8 +380,9 @@ class PointController extends AbstractFormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model  = $this->getModel('point');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('point');
+            \assert($model instanceof PointModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -431,8 +438,9 @@ class PointController extends AbstractFormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model     = $this->getModel('point');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('point');
+            \assert($model instanceof PointModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 class CommonRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var CommonRepository
+     * @var MockObject&CommonRepository<object>
      */
     private $repo;
 

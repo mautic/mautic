@@ -8,18 +8,14 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * UserRepository.
+ * @extends CommonRepository<User>
  */
 class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.
-     *
-     * @param $identifier
-     *
-     * @return array|null
      */
-    public function findByIdentifier($identifier)
+    public function findByIdentifier(string $identifier): ?User
     {
         $q = $this->createQueryBuilder('u')
             ->where('u.username = :identifier OR u.email = :identifier')
@@ -27,7 +23,7 @@ class UserRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return (null != $result) ? $result[0] : null;
+        return (null !== $result) ? $result[0] : null;
     }
 
     /**
