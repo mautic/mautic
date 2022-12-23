@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 namespace Mautic\ChannelBundle\Twig;
 
+use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class ChannelExtension extends AbstractExtension
 {
     private DncReasonHelper $dncReasonHelper;
-    private TranslatorInterface $translator;
+    private ChannelListHelper $channelListHelper;
 
-    public function __construct(DncReasonHelper $dncReasonHelper, TranslatorInterface $translator)
+    public function __construct(DncReasonHelper $dncReasonHelper, ChannelListHelper $channelListHelper)
     {
-        $this->dncReasonHelper = $dncReasonHelper;
-        $this->translator      = $translator;
+        $this->dncReasonHelper   = $dncReasonHelper;
+        $this->channelListHelper = $channelListHelper;
     }
 
     /**
@@ -27,14 +27,15 @@ class ChannelExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('channelOutput', [$this, 'channelOutput']),
+            new TwigFunction('getChannelDncText', [$this, 'getChannelDncText']),
+            new TwigFunction('getChannelLabel', [$this, 'getChannelLabel']),
         ];
     }
 
     /**
      * @param array<string, mixed> $log
      */
-    public function channelOutput(string $channel, array $log): string
+    public function getChannelDncText(string $channel, array $log): string
     {
         try {
             if (!empty($log['metadata'][$channel]['dnc'])) {
@@ -43,7 +44,10 @@ class ChannelExtension extends AbstractExtension
         } catch (UnknownDncReasonException $e) {
             return $e->getMessage();
         }
+    }
 
-        return $this->translator->trans('mautic.core.unknown');
+    public function getChannelLabel(string $channel): string
+    {
+        return $this->channelListHelper->getChannelLabel($channel);
     }
 }
