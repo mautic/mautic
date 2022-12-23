@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-91-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-98-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -192,6 +192,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://github.com/T0mTom"><img src="https://avatars.githubusercontent.com/u/9713824?v=4?s=100" width="100px;" alt="Tomazz Jurich"/><br /><sub><b>Tomazz Jurich</b></sub></a><br /><a href="#userTesting-T0mTom" title="User Testing">📓</a></td>
       <td align="center"><a href="https://github.com/putzwasser"><img src="https://avatars.githubusercontent.com/u/26040044?v=4?s=100" width="100px;" alt="putzwasser"/><br /><sub><b>putzwasser</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Aputzwasser" title="Bug reports">🐛</a></td>
       <td align="center"><a href="https://github.com/beetofly"><img src="https://avatars.githubusercontent.com/u/105105707?v=4?s=100" width="100px;" alt="erk"/><br /><sub><b>erk</b></sub></a><br /><a href="#userTesting-beetofly" title="User Testing">📓</a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://github.com/doppelD-LF"><img src="https://avatars.githubusercontent.com/u/77049101?v=4?s=100" width="100px;" alt="Daniel"/><br /><sub><b>Daniel</b></sub></a><br /><a href="#userTesting-doppelD-LF" title="User Testing">📓</a></td>
+      <td align="center"><a href="https://github.com/agencia904"><img src="https://avatars.githubusercontent.com/u/90470877?v=4?s=100" width="100px;" alt="agencia904"/><br /><sub><b>agencia904</b></sub></a><br /><a href="#userTesting-agencia904" title="User Testing">📓</a></td>
+      <td align="center"><a href="https://marceloflorentino.000webhostapp.com"><img src="https://avatars.githubusercontent.com/u/45359558?v=4?s=100" width="100px;" alt="mbfds"/><br /><sub><b>mbfds</b></sub></a><br /><a href="#userTesting-mbfds" title="User Testing">📓</a></td>
+      <td align="center"><a href="https://github.com/lucaslazarinii"><img src="https://avatars.githubusercontent.com/u/106190294?v=4?s=100" width="100px;" alt="Lucas Lazarini"/><br /><sub><b>Lucas Lazarini</b></sub></a><br /><a href="#userTesting-lucaslazarinii" title="User Testing">📓</a></td>
+      <td align="center"><a href="http://zoogon.net"><img src="https://avatars.githubusercontent.com/u/57393?v=4?s=100" width="100px;" alt="Gonzalo Cao Cabeza de Vaca"/><br /><sub><b>Gonzalo Cao Cabeza de Vaca</b></sub></a><br /><a href="#userTesting-gonzalo" title="User Testing">📓</a></td>
+      <td align="center"><a href="https://github.com/Robmobius"><img src="https://avatars.githubusercontent.com/u/16938630?v=4?s=100" width="100px;" alt="Robmobius"/><br /><sub><b>Robmobius</b></sub></a><br /><a href="#userTesting-Robmobius" title="User Testing">📓</a></td>
+      <td align="center"><a href="https://podtrics.com"><img src="https://avatars.githubusercontent.com/u/50760632?v=4?s=100" width="100px;" alt="Marc Beinder"/><br /><sub><b>Marc Beinder</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=onairmarc" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

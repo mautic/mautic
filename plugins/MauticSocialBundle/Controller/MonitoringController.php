@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
@@ -425,7 +426,9 @@ class MonitoringController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('monitoring', $objectId);
+        $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('monitoring', $objectId);
 
         $returnUrl = $this->generateUrl(
             'mautic_social_action',
@@ -654,6 +657,8 @@ class MonitoringController extends FormController
             'ipAddress' => $this->container->get('mautic.helper.ip_lookup')->getIpAddressFromRequest(),
         ];
 
-        $this->getModel('core.auditlog')->writeToLog($log);
+        $auditLog = $this->getModel('core.auditlog');
+        \assert($auditLog instanceof AuditLogModel);
+        $auditLog->writeToLog($log);
     }
 }

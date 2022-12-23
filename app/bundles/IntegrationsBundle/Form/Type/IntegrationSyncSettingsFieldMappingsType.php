@@ -43,11 +43,8 @@ class IntegrationSyncSettingsFieldMappingsType extends AbstractType
             throw new InvalidFormOptionException('objects must be an array');
         }
 
-        /** @var ConfigFormSyncInterface $integrationObject */
         $integrationObject = $options['integrationObject'];
-        if (!$integrationObject instanceof ConfigFormSyncInterface) {
-            throw new InvalidFormOptionException('integrationObject must be an instance of ConfigFormSyncInterface');
-        }
+        \assert($integrationObject instanceof ConfigFormSyncInterface);
 
         $fieldFilterHelper = new FieldFilterHelper($integrationObject);
 

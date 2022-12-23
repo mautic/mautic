@@ -105,13 +105,7 @@ final class AuthenticationListener
             $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
-        $response = $this->authenticationHandler->onAuthenticationFailure($request, $failed);
-
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
-        }
-
-        return $response;
+        return $this->authenticationHandler->onAuthenticationFailure($request, $failed);
     }
 
     private function onSuccess(Request $request, TokenInterface $token, Response $response = null): Response
@@ -130,10 +124,6 @@ final class AuthenticationListener
 
         if (null === $response) {
             $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
-
-            if (!$response instanceof Response) {
-                throw new \RuntimeException('Authentication Success Handler did not return a Response.');
-            }
         }
 
         return $response;

@@ -441,7 +441,7 @@ class FieldType extends AbstractType
                 // clean the data
                 $data = InputHelper::_($data, $masks);
 
-                if ('social' === $data['group'] || !empty($data['isUniqueIdentifer']) || $disableDefaultValue) {
+                if ((isset($data['group']) && 'social' === $data['group']) || !empty($data['isUniqueIdentifer']) || $disableDefaultValue) {
                     // Don't allow a default for social or unique identifiers
                     $data['defaultValue'] = null;
                 }

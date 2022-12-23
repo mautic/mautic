@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 use Mautic\InstallBundle\Configurator\Step\EmailStep;
@@ -24,9 +24,10 @@ class InstallCommand extends Command
     public const COMMAND = 'mautic:install';
 
     private InstallService $installer;
-    private Registry $doctrineRegistry;
 
-    public function __construct(InstallService $installer, Registry $doctrineRegistry)
+    private ManagerRegistry $doctrineRegistry;
+
+    public function __construct(InstallService $installer, ManagerRegistry $doctrineRegistry)
     {
         $this->installer        = $installer;
         $this->doctrineRegistry = $doctrineRegistry;
@@ -236,7 +237,15 @@ class InstallCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Spool path.',
                 null
+            )
+            ->addOption(
+                '--messenger_type',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Queue Enabled.',
+                null
             );
+
         parent::configure();
     }
 
@@ -271,7 +280,7 @@ class InstallCommand extends Command
          * We need to have some default database parameters, as it could be the case that the
          * user didn't set them both in local.php and the command line options.
          */
-        $dbParams   = [
+        $dbParams = [
             'driver'        => 'pdo_mysql',
             'host'          => null,
             'port'          => null,
@@ -287,7 +296,7 @@ class InstallCommand extends Command
             'lastname'  => 'Mautic',
             'username'  => 'admin',
         ];
-        $allParams  = $this->installer->localConfigParameters();
+        $allParams = $this->installer->localConfigParameters();
 
         // Initialize DB and admin params from local.php
         foreach ((array) $allParams as $opt => $value) {
@@ -327,6 +336,10 @@ class InstallCommand extends Command
 
         if (empty($allParams['mailer_from_email']) && isset($adminParam['email'])) {
             $allParams['mailer_from_email'] = $adminParam['email'];
+        }
+
+        if (empty($allParams['messenger_type'])) {
+            $allParams['messenger_type'] = 'sync';
         }
 
         $step = (float) $input->getArgument('step');

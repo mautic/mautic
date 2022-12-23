@@ -4,27 +4,31 @@ namespace Mautic\SmsBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\SmsBundle\Entity\Sms;
 use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Sms>
+ */
 class SmsApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
     /**
-     * @var SmsModel
+     * @var SmsModel|null
      */
-    protected $model;
+    protected $model = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function initialize(ControllerEvent $event)
     {
-        $this->model           = $this->getModel('sms');
-        $this->entityClass     = 'Mautic\SmsBundle\Entity\Sms';
+        $smsModel = $this->getModel('sms');
+        \assert($smsModel instanceof SmsModel);
+
+        $this->model           = $smsModel;
+        $this->entityClass     = Sms::class;
         $this->entityNameOne   = 'sms';
         $this->entityNameMulti = 'smses';
 

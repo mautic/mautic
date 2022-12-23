@@ -5,9 +5,12 @@ namespace Mautic\SmsBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\SmsBundle\Entity\Sms;
+use Mautic\SmsBundle\Model\SmsModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class SmsController extends FormController
@@ -174,7 +177,9 @@ class SmsController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
+        $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('sms', $sms->getId(), $sms->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
@@ -291,7 +296,7 @@ class SmsController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $entity->getId(),
@@ -330,7 +335,7 @@ class SmsController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -436,7 +441,7 @@ class SmsController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -482,7 +487,7 @@ class SmsController extends FormController
                 );
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -581,8 +586,9 @@ class SmsController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model  = $this->getModel('sms');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('sms');
+            \assert($model instanceof SmsModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -643,9 +649,10 @@ class SmsController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST == $this->request->getMethod()) {
             $model = $this->getModel('sms');
-            $ids   = json_decode($this->request->query->get('ids', '{}'));
+            \assert($model instanceof SmsModel);
+            $ids = json_decode($this->request->query->get('ids', '{}'));
 
             $deleteIds = [];
 

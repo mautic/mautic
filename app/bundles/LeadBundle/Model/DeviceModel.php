@@ -12,8 +12,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class DeviceModel
- * {@inheritdoc}
+ * @extends FormModel<LeadDevice>
  */
 class DeviceModel extends FormModel
 {

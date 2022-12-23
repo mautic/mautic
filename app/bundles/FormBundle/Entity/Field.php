@@ -88,7 +88,7 @@ class Field
     private $conditions = [];
 
     /**
-     * @var Form
+     * @var Form|null
      */
     private $form;
 
@@ -561,7 +561,7 @@ class Field
     /**
      * Get form.
      *
-     * @return Form
+     * @return Form|null
      */
     public function getForm()
     {
@@ -936,10 +936,10 @@ class Field
 
             if ('notIn' === $this->conditions['expr']) {
                 // value not matched
-                if ('' !== $value && !in_array(InputHelper::string($value), $this->conditions['values'])) {
+                if ('' !== $value && !in_array(InputHelper::clean($value), $this->conditions['values'])) {
                     return true;
                 }
-            } elseif (in_array(InputHelper::string($value), $this->conditions['values'])) {
+            } elseif (in_array(InputHelper::clean($value), $this->conditions['values'])) {
                 return true;
             }
         }
