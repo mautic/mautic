@@ -1,5 +1,4 @@
-
-{% set item = event.extra.log is not empty ? $event.extra.log : null %}
+{% set item = event.extra.log is not empty ? event.extra.log : null %}
 {% if item is not empty %}
     <table class="table table-striped table-sm table-condensed">
         <thead>
@@ -16,10 +15,10 @@
             <tr>
                 <th scope="row">{{ getChannelLabel(item.channelName) }}</th>
                 <td>{{ item.attempts }}</td>
-                <td>{% if item.dateAdded is not empty %}{{ toFullConcat(item.dateAdded, 'UTC') }}{% endif %}</td>
-                <td>{% if item.scheduledDate is not empty %}{{ toFullConcat(item.scheduledDate, 'UTC') }}{% endif %}</td>
+                <td>{% if item.dateAdded is not empty %}{{ dateToFullConcat(item.dateAdded, 'UTC') }}{% endif %}</td>
+                <td>{% if item.scheduledDate is not empty %}{{ dateToFullConcat(item.scheduledDate, 'UTC') }}{% endif %}</td>
                 <td id="queued-status-{{ item.id }}">
-                    {% trans from 'javascript' %}mautic.message.queue.status.{{ item.status }}{% endtrans %}
+                    {{ ('mautic.message.queue.status.' ~ item.status) | trans({},'javascript') }}
                 </td>
                 <td>
                     {% if ('pending' == item.status) %}
