@@ -219,13 +219,13 @@ class EmailRepository extends CommonRepository
             $q->expr()->andX(
                 $q->expr()->eq('stat.lead_id', 'l.id'),
                 $q->expr()->eq('stat.email_id', (int) $emailId),
-                $q->expr()->isNull('stat.lead_id')
+                $q->expr()->isNotNull('stat.lead_id')
             ))
             ->leftJoin('l', MAUTIC_TABLE_PREFIX.'message_queue', 'mq',
             $q->expr()->andX(
                 $q->expr()->eq('mq.lead_id', 'l.id'),
-                $q->expr()->eq('mq.status', 'sent'),
-                $q->expr()->eq('mq.channel', 'email'),
+                $q->expr()->eq('mq.status', "'sent'"),
+                $q->expr()->eq('mq.channel', "'email'"),
                 $q->expr()->eq('mq.channel_id', (int) $emailId),
             ));
             $q->where(
