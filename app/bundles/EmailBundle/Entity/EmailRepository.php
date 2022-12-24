@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\Entity;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
@@ -168,7 +170,7 @@ class EmailRepository extends CommonRepository
             $connection->connect('slave');
         }
 
-        /** @var QueryBuilder $queryBuilder */
+        /** @var QueryBuilder $q */
         $q = new QueryBuilder($connection);
         $q->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
