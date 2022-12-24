@@ -562,18 +562,26 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * @param $order
+     * @param bool $joinIpAddresses
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order)
+    public function getEntitiesOrmQueryBuilder($order, $joinIpAddresses = true)
     {
         $alias = $this->getTableAlias();
         $q     = $this->getEntityManager()->createQueryBuilder();
-        $q->select($alias.', u, i,'.$order)
+        if ($joinIpAddresses) {
+            $q->select($alias.', u, i,'.$order)
             ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
             ->leftJoin($alias.'.ipAddresses', 'i')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
+        } else {
+            $q->select($alias.', u, '.$order)
+            ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
+            ->leftJoin($alias.'.owner', 'u')
+            ->indexBy($alias, $alias.'.id');
+        }
 
         return $q;
     }
