@@ -1209,9 +1209,9 @@ class LeadModel extends FormModel
 
             $dispatchEvent = false;
 
-            /** @var LeadCategory $leadCategory */
+            /** @var ?LeadCategory $leadCategory */
             $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
-            if (!$leadCategory) {
+            if (is_null($leadCategory)) {
                 $dispatchEvent = true;
 
                 $newLeadCategory = new LeadCategory();
@@ -1226,7 +1226,7 @@ class LeadModel extends FormModel
 
                 $leadCategory->setManuallyAdded($subscribedFlag);
                 $leadCategory->setManuallyRemoved(!$subscribedFlag);
-                $newLeadCategory->setDateAdded(new \DateTime());
+                $leadCategory->setDateAdded(new \DateTime());
                 $results[$category->getId()] = $leadCategory;
             }
 
