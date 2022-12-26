@@ -10,6 +10,7 @@ use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Swift_Events_EventListener;
 use Swift_Mime_SimpleMessage;
@@ -18,15 +19,20 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
-    /** @phpstan-ignore-next-line */
-    private $transport;
+    private SmtpTransport $transport;
 
     protected function setUp(): void
     {
         $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
 
-        //self::$container->set('swiftmailer.mailer.default.transport.real', $this->transport = $this->createTransportFake());
+        //$mailHelper = self::$container->get('mautic.helper.mailer');
+        $this->transport  = new SmtpTransport();
+//        $mailer     = new Swift_Mailer($transport);
+//        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
+//        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+
+        self::$container->set('mautic.helper.mailer', $this->transport);
     }
 
     /**
