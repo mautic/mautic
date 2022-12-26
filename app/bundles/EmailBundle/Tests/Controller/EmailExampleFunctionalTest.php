@@ -10,7 +10,6 @@ use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Swift_Events_EventListener;
 use Swift_Mime_SimpleMessage;
@@ -20,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailExampleFunctionalTest extends MauticMysqlTestCase
 {
+    /**@phpstan-ignore-next-line*/
     private $transport;
 
     protected function setUp(): void
