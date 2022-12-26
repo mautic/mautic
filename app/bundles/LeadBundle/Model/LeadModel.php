@@ -1049,30 +1049,47 @@ class LeadModel extends FormModel
 
     /**
      * @param bool $subscribedFlag
+     *
+     * @return mixed[]
      */
     public function addToCategory(Lead $lead, $categories, $subscribedFlag = true): array
     {
-        $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
-
         $results = [];
         foreach ($categories as $category) {
-            if (!isset($leadCategories[$category])) {
+            if (!$category instanceof Category) {
+                $category = $this->categoryModel->getEntity($category);
+            }
+
+            $dispatchEvent = false;
+
+            /** @var LeadCategory $leadCategory */
+            $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
+            if (!$leadCategory) {
+                $dispatchEvent = true;
+
                 $newLeadCategory = new LeadCategory();
                 $newLeadCategory->setLead($lead);
-                if (!$category instanceof Category) {
-                    $category = $this->categoryModel->getEntity($category);
-                }
                 $newLeadCategory->setCategory($category);
                 $newLeadCategory->setDateAdded(new \DateTime());
                 $newLeadCategory->setManuallyAdded($subscribedFlag);
                 $newLeadCategory->setManuallyRemoved(!$subscribedFlag);
                 $results[$category->getId()] = $newLeadCategory;
+            } elseif (true === $leadCategory->getManuallyRemoved()) {
+                $dispatchEvent = true;
 
+                $leadCategory->setManuallyAdded($subscribedFlag);
+                $leadCategory->setManuallyRemoved(!$subscribedFlag);
+                $newLeadCategory->setDateAdded(new \DateTime());
+                $results[$category->getId()] = $leadCategory;
+            }
+
+            if ($dispatchEvent) {
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
                     $this->dispatcher->dispatch(new CategoryChangeEvent($lead, $category), LeadEvents::LEAD_CATEGORY_CHANGE);
                 }
             }
         }
+
         if (!empty($results)) {
             $this->getLeadCategoryRepository()->saveEntities($results);
         }
