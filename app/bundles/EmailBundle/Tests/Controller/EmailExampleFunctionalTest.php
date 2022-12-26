@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
 use Mautic\LeadBundle\Entity\Lead;
 use Swift_Events_EventListener;
 use Swift_Mime_SimpleMessage;
+use Swift_Mailer;
 use Swift_Transport;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -26,13 +27,12 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
         $this->configParams['mailer_spool_type'] = 'file';
         parent::setUp();
 
-        //$mailHelper = self::$container->get('mautic.helper.mailer');
-//        $this->transport  = new SmtpTransport();
-//        $mailer     = new Swift_Mailer($transport);
-//        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
-//        $this->setPrivateProperty($mailHelper, 'transport', $transport);
+        $mailHelper = self::$container->get('mautic.helper.mailer');
+        $mailer     = new Swift_Mailer($this->transport);
+        $this->setPrivateProperty($mailHelper, 'mailer', $mailer);
+        $this->setPrivateProperty($mailHelper, 'transport', $this->transport);
 
-        self::$container->set('mautic.helper.mailer', $this->transport);
+        //self::$container->set('mautic.helper.mailer', $this->transport);
     }
 
     /**
@@ -446,5 +446,15 @@ class EmailExampleFunctionalTest extends MauticMysqlTestCase
             {
             }
         };
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function setPrivateProperty(object $object, string $property, $value): void
+    {
+        $reflector = new \ReflectionProperty(get_class($object), $property);
+        $reflector->setAccessible(true);
+        $reflector->setValue($object, $value);
     }
 }
