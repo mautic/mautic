@@ -1197,36 +1197,76 @@ class LeadModel extends FormModel
      * @param $categories
      * @param bool $subscribedFlag
      *
-     * @return array
+     * @return mixed[]
      */
     public function addToCategory(Lead $lead, $categories, $subscribedFlag = true)
     {
-        $leadCategories = $this->getLeadCategoryRepository()->getLeadCategories($lead);
-
         $results = [];
         foreach ($categories as $category) {
-            if (!isset($leadCategories[$category])) {
+            if (!$category instanceof Category) {
+                $category = $this->categoryModel->getEntity($category);
+            }
+
+            $dispatchEvent = false;
+
+            /** @var LeadCategory $leadCategory */
+            $leadCategory = $this->getLeadCategoryRepository()->findOneBy(['lead' => $lead, 'category' => $category]);
+            if (!$leadCategory) {
+                $dispatchEvent = true;
+
                 $newLeadCategory = new LeadCategory();
                 $newLeadCategory->setLead($lead);
-                if (!$category instanceof Category) {
-                    $category = $this->categoryModel->getEntity($category);
-                }
                 $newLeadCategory->setCategory($category);
                 $newLeadCategory->setDateAdded(new \DateTime());
                 $newLeadCategory->setManuallyAdded($subscribedFlag);
                 $newLeadCategory->setManuallyRemoved(!$subscribedFlag);
                 $results[$category->getId()] = $newLeadCategory;
+            } elseif (true === $leadCategory->getManuallyRemoved()) {
+                $dispatchEvent = true;
 
+                $leadCategory->setManuallyAdded($subscribedFlag);
+                $leadCategory->setManuallyRemoved(!$subscribedFlag);
+                $newLeadCategory->setDateAdded(new \DateTime());
+                $results[$category->getId()] = $leadCategory;
+            }
+
+            if ($dispatchEvent) {
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
                     $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($lead, $category));
                 }
             }
         }
+
         if (!empty($results)) {
             $this->getLeadCategoryRepository()->saveEntities($results);
         }
 
         return $results;
+    }
+
+    /**
+     * @param mixed[] $categories
+     */
+    private function unsubscribeCategories(array $categories): void
+    {
+        $unsubscribedCats = [];
+        foreach ($categories as $key => $category) {
+            /** @var LeadCategory $category */
+            $category     = $this->getLeadCategoryRepository()->getEntity($key);
+            $category->setManuallyRemoved(true);
+            $category->setManuallyAdded(false);
+            $category->setDateAdded(new \DateTime());
+
+            $unsubscribedCats[] = $category;
+
+            if ($this->dispatcher->hasListeners(LeadEvents::LEAD_CATEGORY_CHANGE)) {
+                $this->dispatcher->dispatch(LeadEvents::LEAD_CATEGORY_CHANGE, new CategoryChangeEvent($category->getLead(), $category->getCategory(), false));
+            }
+        }
+
+        if (!empty($unsubscribedCats)) {
+            $this->getLeadCategoryRepository()->saveEntities($unsubscribedCats);
+        }
     }
 
     /**
