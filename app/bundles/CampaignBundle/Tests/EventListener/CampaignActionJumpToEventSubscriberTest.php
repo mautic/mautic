@@ -15,6 +15,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\ActionAccessor;
 use Mautic\CampaignBundle\EventListener\CampaignActionJumpToEventSubscriber;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Executioner\Result\Counter;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
@@ -48,6 +49,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 $this->campaign = $campaign;
             }
 
+            /**
+             * @return \Doctrine\ORM\Tools\Pagination\Paginator|mixed
+             */
             public function getEntities(array $args = [])
             {
                 Assert::assertSame(
@@ -100,11 +104,19 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
         };
+
+        $eventScheduler = new class() extends EventScheduler {
+            public function __construct()
+            {
+            }
+        };
+
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $eventRepository,
             $eventExecutioner,
             $translator,
-            $leadRepository
+            $leadRepository,
+            $eventScheduler
         );
 
         $event->setProperties(['jumpToEvent' => 123]);
@@ -157,6 +169,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 $this->campaign = $campaign;
             }
 
+            /**
+             * @return \Doctrine\ORM\Tools\Pagination\Paginator|mixed
+             */
             public function getEntities(array $args = [])
             {
                 Assert::assertSame(
@@ -196,6 +211,9 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
+            /**
+             * @return void
+             */
             public function executeForContacts(Event $event, ArrayCollection $contacts, ?Counter $counter = null, $isInactiveEvent = false)
             {
                 Assert::assertSame(222, $event->getId());
@@ -213,6 +231,11 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             {
             }
 
+            /**
+             * @param mixed[] $contactIds
+             *
+             * @return bool
+             */
             public function incrementCampaignRotationForContacts(array $contactIds, $campaignId)
             {
                 Assert::assertSame([789], $contactIds);
@@ -221,11 +244,32 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
                 return true;
             }
         };
+
+        $eventScheduler = new class() extends EventScheduler {
+            public function __construct()
+            {
+            }
+
+            /**
+             * @return \DateTime
+             */
+            public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+            {
+                return new \DateTime();
+            }
+
+            public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
+            {
+                return false;
+            }
+        };
+
         $subscriber = new CampaignActionJumpToEventSubscriber(
             $eventRepository,
             $eventExecutioner,
             $translator,
-            $leadRepository
+            $leadRepository,
+            $eventScheduler
         );
 
         $event->setProperties(['jumpToEvent' => 123]);

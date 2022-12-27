@@ -168,15 +168,16 @@ class Interval implements ScheduleModeInterface
         return Event::TRIGGER_MODE_INTERVAL === $event->getTriggerMode();
     }
 
-    private function isRestrictedToDailyScheduling(Event $event): bool
-    {
-        return !in_array($event->getTriggerIntervalUnit(), ['d', 'm', 'y']);
-    }
-
     private function hasTimeRelatedRestrictions(Event $event): bool
     {
         return null === $event->getTriggerHour() &&
             (null === $event->getTriggerRestrictedStartHour() || null === $event->getTriggerRestrictedStopHour()) &&
+            empty($event->getTriggerRestrictedDaysOfWeek());
+    }
+
+    private function isRestrictedToDailyScheduling(Event $event): bool
+    {
+        return !in_array($event->getTriggerIntervalUnit(), ['i', 'h', 'd', 'm', 'y']) &&
             empty($event->getTriggerRestrictedDaysOfWeek());
     }
 
