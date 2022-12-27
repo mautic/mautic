@@ -2,11 +2,10 @@
   Variables
     - item
 #}
-{% set lastBuiltDateDifference = null %}
+{% set now = dateTimeGetUtcDateTime() %}
+{% set hoursSinceLastBuilt = null %}
 {% if item.lastBuiltDate is not null %}
-    {% set lastBuiltDateDifferenceInterval = now.diff(item.lastBuiltDate) %}
-    {# Calculate difference between now and last_built_date in hours #}
-    {% set lastBuiltDateDifference = format((dateTimeGetUtcDateTime().setTimestamp(0).add(lastBuiltDateDifferenceInterval).timestamp / 3600)|abs, 'int') %}
+    {% set hoursSinceLastBuilt = now.diff(item.lastBuiltDate).format('%h') %}
 {% endif %}
 {% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
 <tr>
@@ -47,10 +46,10 @@
                 <span class="small">({{ item.createdByUser }})</span>
             {% endif %}
             {% if item.isGlobal %}<i class="fa fa-fw fa-globe"></i>{% endif %}
-            {% if lastBuiltDateDifference >= segmentRebuildWarningThreshold %}
+            {% if hoursSinceLastBuilt >= segmentRebuildWarningThreshold %}
                 <label class="control-label" data-toggle="tooltip"
                        data-container="body" data-placement="top" title=""
-                       data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': lastBuiltDateDifference}) }}">
+                       data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt}) }}">
                     <i class="fa text-danger fa-exclamation-circle"></i></label>
             {% endif %}
             {{ customContent('segment.name', mauticTemplateVars|default([])) }}
