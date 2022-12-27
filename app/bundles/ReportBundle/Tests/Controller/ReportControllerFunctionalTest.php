@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Mautic\ReportBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;

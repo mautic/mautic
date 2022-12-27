@@ -534,12 +534,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
 
     private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
     {
-        $joins = $query->getQueryParts()['join'];
-
+        $queryParts = $query->getQueryParts();
+        $joins      =   !empty($queryParts) && $queryParts['join'] ? $queryParts['join'] : null;
         if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { //@phpstan-ignore-line
             return false;
         }
-
         foreach ($joins[$fromAlias] as $join) {
             if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
                 return true;
