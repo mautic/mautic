@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -13,4 +14,9 @@ interface MauticController
      * @return mixed
      */
     public function initialize(ControllerEvent $event);
+
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function setModelFactory(ModelFactory $modelFactory): void;
 }

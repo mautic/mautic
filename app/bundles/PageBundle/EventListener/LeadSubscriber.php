@@ -39,6 +39,9 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         PageModel $pageModel,
         VideoModel $pageVideoModel,

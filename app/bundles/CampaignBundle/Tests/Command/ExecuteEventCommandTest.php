@@ -2,6 +2,8 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
     public function testEventsAreExecutedForInactiveEventWithSingleContact()
@@ -39,7 +41,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         $lastId = array_pop($logIds);
 
         // Wait 6 seconds to go past scheduled time
-        sleep(6);
+        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
 
         $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => implode(',', $logIds)]);
 

@@ -6,10 +6,14 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Report>
+ */
 class ReportApiController extends CommonApiController
 {
     /**
@@ -18,11 +22,16 @@ class ReportApiController extends CommonApiController
     private $formFactory;
 
     /**
-     * {@inheritdoc}
+     * @var ReportModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('report');
+        $reportModel = $this->getModel('report');
+        \assert($reportModel instanceof ReportModel);
+
+        $this->model            = $reportModel;
         $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
