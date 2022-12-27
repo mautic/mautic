@@ -420,6 +420,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
     {
         $segment = new LeadList();
         $segment->setName($name);
+        $segment->setPublicName($name);
         $segment->setAlias($alias);
         $this->em->persist($segment);
 
