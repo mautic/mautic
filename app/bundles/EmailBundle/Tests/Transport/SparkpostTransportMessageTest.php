@@ -14,6 +14,8 @@ class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
 {
     public function testCcAndBccFields()
     {
+        $emailId              = 1;
+        $internalEmailName    = '202211_シナリオメール②内視鏡機器提案のご案内';
         $translator           = $this->createMock(Translator::class);
         $transportCallback    = $this->createMock(TransportCallback::class);
         $sparkpostFactory     = $this->createMock(SparkpostFactoryInterface::class);
@@ -38,6 +40,8 @@ class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
                 'tokens' => [
                     '{formfield=first_name}' => '1',
                 ],
+                'emailId'   => $emailId,
+                'emailName' => $internalEmailName,
             ]
         );
 
@@ -53,7 +57,7 @@ class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
         $sparkpost = new SparkpostTransport('1234', $translator, $transportCallback, $sparkpostFactory, $logger, $coreParametersHelper);
 
         $sparkpostMessage = $sparkpost->getSparkPostMessage($message);
-
+        $this->assertSame(sprintf('%s:%s', $emailId, $internalEmailName), $sparkpostMessage['campaign_id']);
         $this->assertEquals('from@xx.xx', $sparkpostMessage['content']['from']);
         $this->assertEquals('Test subject', $sparkpostMessage['content']['subject']);
         $this->assertEquals('First Name: {{{ FORMFIELDFIRSTNAME }}}', $sparkpostMessage['content']['html']);
@@ -69,6 +73,10 @@ class SparkpostTransportMessageTest extends \PHPUnit\Framework\TestCase
                 ],
                 'substitution_data' => [
                     'FORMFIELDFIRSTNAME' => '1',
+                ],
+                'metadata' => [
+                    'emailId'   => $emailId,
+                    'emailName' => $internalEmailName,
                 ],
             ],
             [
