@@ -35,7 +35,7 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.allow_multiple_companies.tooltip',
                 ],
-                'data'=> isset($options['data']['contact_allow_multiple_companies']) ? (bool) $options['data']['contact_allow_multiple_companies'] : true,
+                'data' => (bool) ($options['data']['contact_allow_multiple_companies'] ?? true),
             ]
         );
 
