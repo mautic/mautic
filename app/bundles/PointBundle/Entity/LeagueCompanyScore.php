@@ -1,0 +1,57 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mautic\PointBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Entity\Company;
+
+class LeagueCompanyScore extends FormEntity
+{
+    private Company $company;
+    private League $league;
+
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    {
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('league_score')
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueCompanyScoreRepository');
+
+        $builder->createManyToOne('company', 'Mautic\LeadBundle\Entity\Company')
+            ->isPrimaryKey()
+            ->addJoinColumn('company_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->createManyToOne('league', 'Mautic\PointBundle\Entity\League')
+            ->isPrimaryKey()
+            ->addJoinColumn('league_id', 'id', true, false, 'CASCADE')
+            ->build();
+
+        $builder->createField('score', 'integer')
+            ->build();
+    }
+
+    public function getCompany(): Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(Company $company): void
+    {
+        $this->company = $company;
+    }
+
+    public function getLeague(): League
+    {
+        return $this->league;
+    }
+
+    public function setLeague(League $league): void
+    {
+        $this->league = $league;
+    }
+}
