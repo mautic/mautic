@@ -10,13 +10,15 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Intl\Locales;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @template T of object
+ */
 abstract class AbstractCommonModel implements MauticModelInterface
 {
     /**
@@ -50,7 +52,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     protected $userHelper;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -59,32 +61,32 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     protected $coreParametersHelper;
 
-    public function setEntityManager(EntityManager $em)
+    public function setEntityManager(EntityManager $em): void
     {
         $this->em = $em;
     }
 
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }
 
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
-    public function setRouter(Router $router)
+    public function setRouter(Router $router): void
     {
         $this->router = $router;
     }
 
-    public function setTranslator(Translator $translator)
+    public function setTranslator(Translator $translator): void
     {
         $this->translator = $translator;
     }
 
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
@@ -92,7 +94,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     /**
      * Initialize the user parameter for use in locking procedures.
      */
-    public function setUserHelper(UserHelper $userHelper)
+    public function setUserHelper(UserHelper $userHelper): void
     {
         $this->userHelper = $userHelper;
     }
@@ -100,7 +102,7 @@ abstract class AbstractCommonModel implements MauticModelInterface
     /**
      * Initialize the CoreParameters parameter.
      */
-    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
+    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper): void
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
@@ -124,13 +126,13 @@ abstract class AbstractCommonModel implements MauticModelInterface
     {
         $repo = $this->getRepository();
 
-        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : [];
+        return $repo->getSearchCommands();
     }
 
     /**
      * Retrieve the repository for an entity.
      *
-     * @return \Mautic\CoreBundle\Entity\CommonRepository|bool
+     * @return CommonRepository<T>
      */
     public function getRepository()
     {
@@ -165,14 +167,10 @@ abstract class AbstractCommonModel implements MauticModelInterface
         //set the translator
         $repo = $this->getRepository();
 
-        if ($repo instanceof CommonRepository) {
-            $repo->setTranslator($this->translator);
-            $repo->setCurrentUser($this->userHelper->getUser());
+        $repo->setTranslator($this->translator);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
-            return $repo->getEntities($args);
-        }
-
-        return [];
+        return $repo->getEntities($args);
     }
 
     /**
@@ -226,11 +224,10 @@ abstract class AbstractCommonModel implements MauticModelInterface
      * @param array $routeParams
      * @param bool  $absolute
      * @param array $clickthrough
-     * @param array $utmTags
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
         $url           = $this->router->generate($route, $routeParams, $referenceType);
@@ -316,5 +313,15 @@ abstract class AbstractCommonModel implements MauticModelInterface
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
+    }
+
+    /**
+     * @phpstan-param class-string<T> $class
+     *
+     * @return CommonRepository<T>
+     */
+    protected function getServiceRepository(string $class)
+    {
+        return $this->em->getRepository($class);
     }
 }

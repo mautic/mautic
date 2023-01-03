@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Entity\WidgetRepository;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Symfony\Component\Filesystem\Exception\IOException;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
- * Class DashboardModel.
+ * @extends FormModel<Widget>
  */
 class DashboardModel extends FormModel
 {
@@ -59,14 +60,12 @@ class DashboardModel extends FormModel
         $this->session = $session;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getRepository()
+    public function getRepository(): WidgetRepository
     {
-        return $this->em->getRepository('MauticDashboardBundle:Widget');
+        $result = $this->em->getRepository(Widget::class);
+        \assert($result instanceof WidgetRepository);
+
+        return $result;
     }
 
     /**

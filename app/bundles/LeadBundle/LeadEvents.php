@@ -581,6 +581,26 @@ final class LeadEvents
     public const COMPANY_POST_DELETE = 'mautic.company_post_delete';
 
     /**
+     * The mautic.company_pre_merge event is dispatched before two companies are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyMergeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_PRE_MERGE = 'mautic.company_pre_merge';
+
+    /**
+     * The mautic.company_post_merge event is dispatched after two companies are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyMergeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_POST_MERGE = 'mautic.company_post_merge';
+
+    /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
      *
      * The event listener receives a

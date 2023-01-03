@@ -535,7 +535,7 @@ class ImportController extends FormController
 
         if ($browserImportLimit && $this->getLineCount($object) < $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->get('save')->isClicked()) {
+        } elseif (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
             return true;
         }
 

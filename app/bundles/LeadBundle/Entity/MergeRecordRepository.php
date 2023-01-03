@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MergeRecordRepository.
+ * @extends CommonRepository<MergeRecord>
  */
 class MergeRecordRepository extends CommonRepository
 {
