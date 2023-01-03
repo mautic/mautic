@@ -32,6 +32,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
             new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('addAssetScript', [$this, 'addScript'], ['is_safe' => ['html']]),
             new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
             new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
             new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
@@ -92,6 +93,11 @@ class AssetExtension extends AbstractExtension
         $this->assetsHelper->outputHeadDeclarations();
 
         return ob_get_clean();
+    }
+
+    public function addScript(string $script, $location = 'head', $async = false, $name = null)
+    {
+        return $this->assetsHelper->addScript($script, $location, $async, $name);
     }
 
     public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string

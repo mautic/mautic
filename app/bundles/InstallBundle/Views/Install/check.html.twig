@@ -17,6 +17,7 @@
         {{ 'mautic.install.heading.check.environment'|trans }}
     </h2>
 </div>
+{% autoescape false %}
 <div class="panel-body">
     {% if majors|length %}
     <div class="panel-group" id="minors">
@@ -99,4 +100,5 @@
     {{ form_end(form) }}
     {% endif %}
 </div>
+{% endautoescape %}
 {% endblock %}

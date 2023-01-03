@@ -8,21 +8,22 @@
 {% set headerTitle = 'Install' %}
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
+    {% do addAssetScript('app/bundles/InstallBundle/Assets/install/install.js') %}
     {{- include('MauticCoreBundle:Default:head.html.twig') -}}
-    <script src="app/bundles/InstallBundle/Assets/install/install.js"></script>
     <body>
         <!-- start: app-wrapper -->
         <section id="app-wrapper">
             <div class="container">
                 <div class="row mt-20">
                     <div class="text-center">
-                        <img src="{{ asset('app/assets/images/mautic_logo_lb200.png') }}" height="50px" />
+                        <img src="{{ asset('app/assets/images/mautic_logo_lb200.png') }}" height="50px" alt="Mautic" />
                         <h5 class="semibold text-muted mt-5">{{ slot('header', '') }}</h5>
                     </div>
 
                     <div class="mt-20 col-lg-6 col-lg-offset-3">
                         <div id="app-content" class="panel panel-default">
+                            {{- include('MauticCoreBundle:Notification:flashes.html.twig') -}}
                             {{ block('content') }}
                         </div>
                     </div>
