@@ -281,6 +281,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
+        foreach ($uniqueFieldsWithData as $col => $val) {
+            $q->{$this->getUniqueIdentifiersWherePart()}("l.$col = :".$col)
+                ->setParameter($col, $val);
+        }
+
         // if we have a lead ID lets use it
         if ($leadId > 0) {
             // make sure that its not the id we already have
