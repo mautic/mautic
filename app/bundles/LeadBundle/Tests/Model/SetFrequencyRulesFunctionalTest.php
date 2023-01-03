@@ -48,14 +48,14 @@ final class SetFrequencyRulesFunctionalTest extends MauticMysqlTestCase
 
         /** @var LeadModel $model */
         $model = self::$container->get('mautic.lead.model.lead');
-        $model->setFrequencyRules($lead, $data);
+        $model->setFrequencyRules($lead, $data, [], []);
 
         $subscribedCategories   = $model->getLeadCategories($lead);
         $this->assertEmpty(array_diff($subscribedCategories, array_keys($categoriesToSubscribe)));
 
         // Unsubscribe categories.
         $data['global_categories'] = array_keys($categoriesToUnsubscribe);
-        $model->setFrequencyRules($lead, $data);
+        $model->setFrequencyRules($lead, $data, [], []);
 
         $unsubscribedCategories = $model->getUnsubscribedLeadCategoriesIds($lead);
         $this->assertEmpty(array_diff($unsubscribedCategories, array_keys($categoriesToSubscribe)));

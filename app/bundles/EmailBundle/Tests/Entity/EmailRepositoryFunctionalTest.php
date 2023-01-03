@@ -135,7 +135,7 @@ class EmailRepositoryFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
         $this->em->clear();
 
-        $result = $this->repository->getEmailPendingQuery($email->getId())
+        $result = $this->emailRepository->getEmailPendingQuery($email->getId())
             ->execute()
             ->fetchAll();
 
