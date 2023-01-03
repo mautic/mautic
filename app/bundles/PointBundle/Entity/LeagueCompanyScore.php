@@ -11,14 +11,17 @@ use Mautic\LeadBundle\Entity\Company;
 
 class LeagueCompanyScore extends FormEntity
 {
+    public const TABLE_NAME = 'league_company_score';
+
     private Company $company;
     private League $league;
+    private int $score;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('league_score')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueCompanyScoreRepository');
 
         $builder->createManyToOne('company', 'Mautic\LeadBundle\Entity\Company')
@@ -53,5 +56,15 @@ class LeagueCompanyScore extends FormEntity
     public function setLeague(League $league): void
     {
         $this->league = $league;
+    }
+
+    public function getScore(): int
+    {
+        return $this->score;
+    }
+
+    public function setScore(int $score): void
+    {
+        $this->score = $score;
     }
 }

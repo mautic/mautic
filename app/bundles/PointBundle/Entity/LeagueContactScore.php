@@ -9,17 +9,20 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeagueLeadScore extends FormEntity
+class LeagueContactScore extends FormEntity
 {
+    public const TABLE_NAME = 'league_contact_score';
+
     private Lead $contact;
     private League $league;
+    private int $score;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('league_score')
-            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueLeadScoreRepository');
+        $builder->setTable(self::TABLE_NAME)
+            ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueContactScoreRepository');
 
         $builder->addContact(false, 'CASCADE', true, 'league_score');
 
@@ -50,5 +53,15 @@ class LeagueLeadScore extends FormEntity
     public function setLeague(League $league): void
     {
         $this->league = $league;
+    }
+
+    public function getScore(): int
+    {
+        return $this->score;
+    }
+
+    public function setScore(int $score): void
+    {
+        $this->score = $score;
     }
 }

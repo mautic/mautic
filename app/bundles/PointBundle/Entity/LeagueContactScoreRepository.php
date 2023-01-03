@@ -6,6 +6,6 @@ namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class LeagueLeadScoreRepository extends CommonRepository
+class LeagueContactScoreRepository extends CommonRepository
 {
 }

@@ -10,6 +10,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class League extends FormEntity
 {
+    public const TABLE_NAME = 'leagues';
+
     /**
      * @var int
      */
@@ -36,7 +38,7 @@ class League extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('point_leagues')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass('Mautic\PointBundle\Entity\LeagueRepository');
 
         $builder->addIdColumns();
