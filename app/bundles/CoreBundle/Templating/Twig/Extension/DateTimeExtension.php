@@ -25,7 +25,10 @@ class DateTimeExtension extends AbstractExtension
         ];
     }
 
-    public function getUtcDateTime()
+    /**
+     * @see DateTimeHelper::getUtcDateTime
+     */
+    public function getUtcDateTime(): \DateTimeInterface
     {
         return $this->helper->getUtcDateTime();
     }
