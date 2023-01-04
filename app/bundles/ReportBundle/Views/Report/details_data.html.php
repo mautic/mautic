@@ -127,7 +127,7 @@ $graphContent = $view->render(
                                                 }
                                                 ?>
                                                 <?php
-                                                if ($cellVal) {
+                                                if ('' !== $cellVal && !is_null($cellVal)) {
                                                     switch ($cellType) {
                                                         case 'datetime':
                                                             echo $view['date']->toFullConcat($cellVal, 'UTC');
