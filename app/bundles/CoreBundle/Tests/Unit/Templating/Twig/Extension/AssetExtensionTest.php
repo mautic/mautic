@@ -4,45 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension;
+use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Asset\Packages;
 
-class AssetExtensionTest extends TestCase
+class AssetExtensionTest extends AbstractMauticTestCase
 {
-    /**
-     * @return MockObject|Packages
-     */
-    private function createPackagesMock()
-    {
-        $packagesMock = $this->getMockBuilder(Packages::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $packagesMock->method('getUrl')
-            ->will($this->returnCallback(function (string $path) {
-                return $path;
-            }));
-
-        return $packagesMock;
-    }
-
     public function testGetCountryFlag(): void
     {
-        $pathsHelper = $this->getMockBuilder(PathsHelper::class)
-             ->disableOriginalConstructor()
-             ->getMock();
-        $pathsHelper->method('getSystemPath')->willReturn('');
+        $assetExtension = self::$container->get(AssetExtension::class);
+        \assert($assetExtension instanceof AssetExtension);
 
-        $assetHelper = new AssetsHelper($this->createPackagesMock());
-        $assetHelper->setPathsHelper($pathsHelper);
-
-        $extension = new AssetExtension($assetHelper);
-
-        Assert::assertSame('', $extension->getCountryFlag('US'));
+        Assert::assertStringStartsWith('/media/images/flags/Belgium.png', $assetExtension->getCountryFlag('Belgium'));
     }
 }
