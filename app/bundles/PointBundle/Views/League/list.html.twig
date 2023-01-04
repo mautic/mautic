@@ -1,0 +1,122 @@
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+
+{% block mauticContent %}league{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.point.league.menu.root'|trans }}{% endblock %}
+
+{% block actions %}
+    {{- include(
+        'MauticCoreBundle:Helper:page_actions.html.twig',
+        {
+            'templateButtons': {
+            'new': permissions['point:league:create']
+        },
+            'routeBase': 'point.league',
+            'langVar': 'point.league'
+        }
+    ) -}}
+{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default bdr-t-wdh-0">
+        <div class="page-list">
+            {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+                'searchValue' : searchValue,
+                'searchHelp'  : 'mautic.lead.list.help.searchcommands',
+                'action'      : currentRoute,
+            }) -}}
+            {% if items is defined and items is not empty %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped table-bordered" id="leagueTable">
+                        <thead>
+                        <tr>
+                            {{ include(
+                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                {
+                                    'checkall': 'true',
+                                    'target': '#leagueTable',
+                                    'langVar': 'point.league',
+                                    'routeBase': 'point.league',
+                                    'templateButtons': {
+                                    'delete': permissions['point:league:delete'],
+                                }
+                                }) }}
+                            {{ include(
+                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                {
+                                    'sessionVar': 'point.league',
+                                    'orderBy'   : 'pl.name',
+                                    'text'      : 'mautic.core.name',
+                                    'class'     : 'col-league-name',
+                                    'default'   : true,
+                                }
+                            ) }}
+
+                            {{ include(
+                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                {
+                                    'sessionVar' : 'point.league',
+                                    'orderBy'    : 'pl.id',
+                                    'text'       : 'mautic.core.id',
+                                    'class'      : 'visible-md visible-lg col-league-id',
+                                }
+                            ) }}
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in items %}
+                            <tr>
+                                <td>
+                                    {{- include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                                        item: item,
+                                        templateButtons: {
+                                            edit: permissions['point:league:edit'],
+                                            delete: permissions['point:league:delete'],
+                                        },
+                                        routeBase: 'point.league',
+                                        langVar: 'point.league',
+                                    }) -}}
+                                </td>
+                                <td>
+                                    <div>
+                                        {% if permissions['point:league:edit'] %}
+                                            <a href="{{ path('mautic_point.league_action', {
+                                                objectAction: 'view',
+                                                objectId: item.getId()
+                                            }) }}" data-toggle="ajax">
+                                                {{ item.getName() }}
+                                            </a>
+                                        {% else %}
+                                            {{ item.getTag() }}
+                                        {% endif %}
+                                    </div>
+                                    {% set description = item.getDescription() %}
+                                    {% if description %}
+                                        <div class="text-muted mt-4">
+                                            <small>{{ description|purify }}</small>
+                                        </div>
+                                    {% endif %}
+                                </td>
+                                <td class="visible-md visible-lg">{{ item.getId() }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="panel-footer">
+                        {{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+                            'totalItems' : items|length,
+                            'page'       : page,
+                            'limit'      : limit,
+                            'baseUrl'    : path('mautic_point.league_index'),
+                            'sessionVar' : 'point.league',
+                        }) -}}
+                    </div>
+                </div>
+            {% else %}
+                {{ include('MauticCoreBundle:Helper:noresults.html.twig') }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

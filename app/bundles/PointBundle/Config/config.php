@@ -15,6 +15,14 @@ return [
                 'path'       => '/points/triggers/{objectAction}/{objectId}',
                 'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
             ],
+            'mautic_point.league_index' => [
+                'path'       => '/points/leagues/{page}',
+                'controller' => 'Mautic\PointBundle\Controller\LeagueController::indexAction',
+            ],
+            'mautic_point.league_action' => [
+                'path'       => '/points/leagues/{objectAction}/{objectId}',
+                'controller' => 'Mautic\PointBundle\Controller\LeagueController::executeAction',
+            ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
                 'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
@@ -74,6 +82,10 @@ return [
                         'route'  => 'mautic_pointtrigger_index',
                         'access' => 'point:triggers:view',
                     ],
+                    'mautic.point.league.menu.index' => [
+                        'route'  => 'mautic_point.league_index',
+                        'access' => 'point:leagues:view',
+                    ],
                 ],
             ],
         ],
@@ -91,6 +103,16 @@ return [
                     'session',
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
+                    'mautic.factory',
+                    'mautic.tracker.contact',
+                ],
+            ],
+            'mautic.point.model.league' => [
+                'class'     => \Mautic\PointBundle\Model\LeagueModel::class,
+                'arguments' => [
+                    'mautic.helper.ip_lookup',
+                    'mautic.lead.model.lead',
+                    'mautic.point.model.triggerevent',
                     'mautic.factory',
                     'mautic.tracker.contact',
                 ],

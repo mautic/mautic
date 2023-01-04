@@ -8,4 +8,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 
 class LeagueRepository extends CommonRepository
 {
+    public function getTableAlias()
+    {
+        return 'pl';
+    }
 }
