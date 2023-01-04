@@ -27,7 +27,7 @@ if ($item = ((isset($event['extra'])) ? $event['extra']['stat'] : false)): ?>
                 'mautic.email.timeline.event.'.$event['extra']['type'],
                 [
                     '%date%'     => $view['date']->toFull($event['timestamp']),
-                    '%interval%' => $view['date']->formatRange($event['timestamp']),
+                    '%interval%' => $view['date']->formatRange($event['timestamp']->diff($item['dateSent'])),
                     '%sent%'     => $view['date']->toFull($item['dateSent']),
                 ]
             ); ?>

@@ -193,16 +193,15 @@ class DateHelper extends Helper
      */
     public function formatRange(\DateInterval $range): string
     {
-        //if ($range instanceof \DateInterval) {
         $formated  = [];
         $timeUnits = ['y' => 'year', 'm' => 'month', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second'];
 
         foreach ($timeUnits as $key => $unit) {
             if ($range->{$key}) {
                 $formated[] = $this->translator->trans(
-                        'mautic.core.date.'.$unit,
-                        ['%count%' => $range->{$key}]
-                    );
+                    'mautic.core.date.'.$unit,
+                    ['%count%' => $range->{$key}]
+                );
             }
         }
 
@@ -211,9 +210,6 @@ class DateHelper extends Helper
         }
 
         return implode(' ', $formated);
-        //}
-
-        //return '';
     }
 
     /**
