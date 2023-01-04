@@ -41,7 +41,7 @@
                     </a>
                 </span>
             </div>
-            <?php endif; ?>
+            {% endif %}
             <div class="panel">
                 <div class="panel-body box-layout">
                     <div class="col-xs-4 va-m">
@@ -61,17 +61,17 @@
                 <div class="row">
                     <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
                         {{- include('MauticCoreBundle:Helper:chart.html.twig', {
-                            'chartData' => stats,
-                            'chartType' => type,
-                            'chartHeight' => 300
+                            'chartData' : stats,
+                            'chartType' : type,
+                            'chartHeight' : 300
                         })
                         -}}
                     </div>
                     <div class="pt-0 pl-15 pb-10 pr-15 col-xs-6">
                         {{- include('MauticCoreBundle:Helper:chart.html.twig', {
-                            'chartData' => statsDevices,
-                            'chartType' => 'horizontal-bar',
-                            'chartHeight' => 300
+                            'chartData' : statsDevices,
+                            'chartType' : 'horizontal-bar',
+                            'chartHeight' : 300
                         })
                         -}}
                     </div>

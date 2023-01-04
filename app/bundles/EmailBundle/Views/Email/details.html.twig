@@ -137,7 +137,7 @@
                         {% if email.isTranslation(true) %}
                         <div class="small">
                             <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations['parent']->getId()}) }}" data-toggle="ajax">
-                                {{ 'mautic.core.translation_of'|trans ({'%parent%' : $translations['parent'].getName()}) }}
+                                {{ 'mautic.core.translation_of'|trans({'%parent%' : translations['parent'].getName()}) }}
                             </a>
                         </div>
                         {% endif %}
@@ -241,7 +241,7 @@
             {% set dateFrom = dateRangeForm.children['date_from'].vars['data']  %}
             {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
-            <div id="emailGraphStats" data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')) }}">
+            <div id="emailGraphStats" data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                 <div class="spinner">
                     <i class="fa fa-spin fa-spinner"></i>
                 </div>

@@ -17,150 +17,152 @@
 } %}
 
 {% if (fieldKeys|filter((key) => key in arr_mail))|length %}
-    <div class="panel panel-primary">
-        <div class="panel-heading">
-            <h3 class="panel-title">{{ 'mautic.email.config.header.mail'|trans }}</h3>
-        </div>
-        <div class="panel-body">
-            <div class="row">
-                {% if fields['mailer_from_name'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_from_name']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_from_email'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_from_email']~'</div>') }}
-                {% endif %}
+    {% block emailconfig %}
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">{{ 'mautic.email.config.header.mail'|trans }}</h3>
             </div>
-            <div class="row">
-                {% if fields['mailer_reply_to_email'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_reply_to_email']~'</div>') }}
-                {% endif %}
-            </div>
-            <div class="row">
-                {% if fields['mailer_return_path'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_return_path']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_is_owner'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_is_owner']~'</div>') }}
-                {% endif %}
-            </div>
-
-            {% if fields['mailer_from_name'] is defined or fields['mailer_from_email'] is defined %}
-                <hr class="text-muted" />
-            {% endif %}
-
-            {% if fields['mailer_transport'] is defined %}
+            <div class="panel-body">
                 <div class="row">
-                    <div class="col-sm-6">
-                        {{ form_row(fields['mailer_transport']) }}
-                    </div>
-                    <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer" data-hide-on='{"config_emailconfig_mailer_transport":["sendmail","mail"]}'>
-                        <div class="button_container">
-                            {{ form_widget(fields['mailer_test_connection_button']) }}
-                            {{ form_widget(fields['mailer_test_send_button']) }}
-                            <span class="fa fa-spinner fa-spin hide"></span>
-                        </div>
-                        <div class="col-md-9 help-block">
-                            <div class="status-msg"></div>
-                            <div class="save-config-msg hide text-danger">{{ 'mautic.email.config.save_to_test'|trans }}</div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <div class="row">
-                {% if fields['mailer_amazon_region'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_amazon_region']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_amazon_other_region'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_amazon_other_region']~'</div>') }}
-                {% endif %}
-            </div>
-
-            <div class="row">
-                {% if fields['mailer_sparkpost_region'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_sparkpost_region']~'</div>') }}
-                {% endif %}
-            </div>
-
-            <div class="row">
-                {% if fields['mailer_host'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_host']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_port'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_port']~'</div>') }}
-                {% endif %}
-            </div>
-
-            <div class="row">
-                {% if fields['mailer_encryption'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_encryption']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_auth_mode'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_auth_mode']~'</div>') }}
-                {% endif %}
-            </div>
-
-            <div class="row">
-                {% if fields['mailer_user'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_user']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_password'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_password']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_api_key'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_api_key']~'</div>') }}
-                {% endif %}
-            </div>
-
-            {% if fields['mailer_transport'] is defined %}
-                <div class="row">
-                    {% if fields['mailer_mailjet_sandbox'] is defined %}
-                        {{ form_row('<div class="col-md-6">'~fields['mailer_mailjet_sandbox']~'</div>') }}
+                    {% if fields['mailer_from_name'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_from_name']~'</div>') }}
                     {% endif %}
-                    {% if fields['mailer_mailjet_sandbox_default_mail'] is defined %}
-                        {{ form_row('<div class="col-md-6">'~fields['mailer_mailjet_sandbox_default_mail']~'</div>') }}
+                    {% if fields['mailer_from_email'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_from_email']~'</div>') }}
                     {% endif %}
                 </div>
-            {% endif %}
+                <div class="row">
+                    {% if fields['mailer_reply_to_email'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_reply_to_email']~'</div>') }}
+                    {% endif %}
+                </div>
+                <div class="row">
+                    {% if fields['mailer_return_path'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_return_path']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_is_owner'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_is_owner']~'</div>') }}
+                    {% endif %}
+                </div>
 
-            <div class="row">
-                {% if fields['mailer_custom_headers'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_custom_headers']~'</div>') }}
+                {% if fields['mailer_from_name'] is defined or fields['mailer_from_email'] is defined %}
+                    <hr class="text-muted" />
                 {% endif %}
-            </div>
 
-            {% if fields['mailer_transport'] is defined %}
-                <hr class="text-muted" />
-            {% endif %}
+                {% if fields['mailer_transport'] is defined %}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            {{ form_row(fields['mailer_transport']) }}
+                        </div>
+                        <div class="col-sm-6 pt-lg mt-3" id="mailerTestButtonContainer" data-hide-on='{"config_emailconfig_mailer_transport":["sendmail","mail"]}'>
+                            <div class="button_container">
+                                {{ form_widget(fields['mailer_test_connection_button']) }}
+                                {{ form_widget(fields['mailer_test_send_button']) }}
+                                <span class="fa fa-spinner fa-spin hide"></span>
+                            </div>
+                            <div class="col-md-9 help-block">
+                                <div class="status-msg"></div>
+                                <div class="save-config-msg hide text-danger">{{ 'mautic.email.config.save_to_test'|trans }}</div>
+                            </div>
+                        </div>
+                    </div>
+                <?php endif; ?>
 
-            <div class="row">
-                {% if fields['mailer_spool_type'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_type']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_spool_path'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_path']~'</div>') }}
-                {% endif %}
-            </div>
+                <div class="row">
+                    {% if fields['mailer_amazon_region'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_amazon_region']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_amazon_other_region'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_amazon_other_region']~'</div>') }}
+                    {% endif %}
+                </div>
 
-            <div class="row">
-                {% if fields['mailer_spool_msg_limit'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_msg_limit']~'</div>') }}
-                {% endif %}
-                {% if fields['mailer_spool_time_limit'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_time_limit']~'</div>') }}
-                {% endif %}
-            </div>
+                <div class="row">
+                    {% if fields['mailer_sparkpost_region'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_sparkpost_region']~'</div>') }}
+                    {% endif %}
+                </div>
 
-            <div class="row">
-                {% if fields['mailer_spool_recover_timeout'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_recover_timeout']~'</div>') }}
+                <div class="row">
+                    {% if fields['mailer_host'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_host']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_port'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_port']~'</div>') }}
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    {% if fields['mailer_encryption'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_encryption']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_auth_mode'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_auth_mode']~'</div>') }}
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    {% if fields['mailer_user'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_user']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_password'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_password']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_api_key'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_api_key']~'</div>') }}
+                    {% endif %}
+                </div>
+
+                {% if fields['mailer_transport'] is defined %}
+                    <div class="row">
+                        {% if fields['mailer_mailjet_sandbox'] is defined %}
+                            {{ form_row('<div class="col-md-6">'~fields['mailer_mailjet_sandbox']~'</div>') }}
+                        {% endif %}
+                        {% if fields['mailer_mailjet_sandbox_default_mail'] is defined %}
+                            {{ form_row('<div class="col-md-6">'~fields['mailer_mailjet_sandbox_default_mail']~'</div>') }}
+                        {% endif %}
+                    </div>
                 {% endif %}
-                {% if fields['mailer_spool_clear_timeout'] is defined %}
-                    {{ form_row('<div class="col-md-6">'~fields['mailer_spool_clear_timeout']~'</div>') }}
+
+                <div class="row">
+                    {% if fields['mailer_custom_headers'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_custom_headers']~'</div>') }}
+                    {% endif %}
+                </div>
+
+                {% if fields['mailer_transport'] is defined %}
+                    <hr class="text-muted" />
                 {% endif %}
+
+                <div class="row">
+                    {% if fields['mailer_spool_type'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_spool_type']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_spool_path'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_spool_path']~'</div>') }}
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    {% if fields['mailer_spool_msg_limit'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_spool_msg_limit']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_spool_time_limit'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_spool_time_limit']~'</div>') }}
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    {% if fields['mailer_spool_recover_timeout'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_spool_recover_timeout']~'</div>') }}
+                    {% endif %}
+                    {% if fields['mailer_spool_clear_timeout'] is defined %}
+                        {{ form_row('<div class="col-md-6">'~fields['mailer_spool_clear_timeout']~'</div>') }}
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endblock %}
 {% endif %}
 
 <div class="panel panel-primary">

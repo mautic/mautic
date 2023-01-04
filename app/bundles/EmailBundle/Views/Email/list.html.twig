@@ -77,7 +77,7 @@
         {% set hasVariants  = item.isVariant() %}
         {% set hasTranslations  = item.isTranslation() %}
         {% set type = item.getEmailType() %}
-        {% set mauticTemplateVars = mauticTemplateVars|merge({'item' : item}) %}
+        {% set mauticTemplateVars = mauticTemplateVars|default([])|merge({'item' : item}) %}
         <tr>
             <td>
                 {% set edit = securityHasEntityAccess(

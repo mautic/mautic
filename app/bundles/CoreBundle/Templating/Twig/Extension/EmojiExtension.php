@@ -40,6 +40,6 @@ class EmojiExtension extends AbstractExtension
     {
         $reflectionClass = new \ReflectionClass($class);
 
-        return $reflectionClass->isInstance($object);
+        return $object instanceof $class;
     }
 }
