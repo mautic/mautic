@@ -599,6 +599,10 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             ->method('getManipulator')
             ->willReturn($manipulator);
 
+        $contact->expects($this->exactly(2))
+            ->method('getUpdatedFields')
+            ->willReturn([]);
+
         $contact->expects($this->once())
             ->method('addEventLog')
             ->with($this->callback(function (LeadEventLog $leadEventLog) use ($contact) {
