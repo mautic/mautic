@@ -537,7 +537,7 @@ class SparkpostTransport extends AbstractTokenArrayTransport implements \Swift_T
             $id = $metadataSet['emailId'];
         }
 
-        return mb_substr($id, 0, 64);
+        return mb_strcut($id, 0, 64);
     }
 
     /**
