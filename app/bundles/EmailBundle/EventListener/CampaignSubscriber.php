@@ -307,8 +307,27 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
 
         if ('marketing' == $type) {
+			
+            // Prepare a list of email IDs that we are going to check in contact's history, including the translations.
+            $emailIdsToCheck = [$emailId];
+            // Add translations of this email to the ID list to be checked in history
+            list($parentTranslation, $childrenTranslations) = $email->getTranslations();
+            if ($parentTranslation) {
+                /** @var $parentTranslation Email */
+                $emailIdsToCheck[] = $parentTranslation->getId();
+            }
+
+            if ($childrenTranslations) {
+                /** @var $childrenTranslations Email[] */
+                foreach ($childrenTranslations as $childrenTranslation) {
+                    $emailIdsToCheck[] = $childrenTranslation->getId();
+                }
+            }
+
+            $emailIdsToCheck = array_unique($emailIdsToCheck);
+			
             // Determine if this lead has received the email before and if so, don't send it again
-            $stats = $this->emailModel->getStatRepository()->getSentCountForContacts($contactIds, $emailId);
+            $stats = $this->emailModel->getStatRepository()->getSentCountForContacts($contactIds, $emailIdsToCheck);
 
             foreach ($stats as $contactId => $sentCount) {
                 /** @var LeadEventLog $log */
