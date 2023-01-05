@@ -1,6 +1,6 @@
 {% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
 {{ customContent('details.top', mauticTemplateVars) }}
-{% if attribute(entity, 'getCategory') is defined %}
+{% if attribute(entity, 'getCategory') is defined and method_exists(entity, 'getCategory') %}
 <tr>
     <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.category{% endtrans %}</span></td>
     <td>{{ entity.getCategory() is object ? entity.getCategory().getTitle() : 'mautic.core.form.uncategorized'|trans }}</td>
@@ -32,7 +32,7 @@
     </tr>
 {% endif %}
 {% endif %}
-{% if attribute(entity, 'getPublishUp') is defined %}
+{% if attribute(entity, 'getPublishUp') is defined and method_exists(entity, 'getPublishUp') %}
 <tr>
     <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.page.publish.up{% endtrans %}</span></td>
     <td>{{ entity.getPublishUp() is not null ? dateToFull(entity.getPublishUp()) : dateToFull(entity.getDateAdded()) }}</td>

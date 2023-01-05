@@ -52,7 +52,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->resetAutoincrement(['categories']);
     }
 
-    public function testSingleEmailWorkflow()
+    public function testSingleEmailWorkflow(): void
     {
         // Create a couple of segments first:
         $payload = [
@@ -178,7 +178,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    public function testReplyActionIfNotFound()
+    public function testReplyActionIfNotFound(): void
     {
         $trackingHash = 'tracking_hash_123';
 
@@ -383,5 +383,66 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $reflector = new \ReflectionProperty(get_class($object), $property);
         $reflector->setAccessible(true);
         $reflector->setValue($object, $value);
+    }
+
+    public function testGetEmails(): void
+    {
+        $segment1 = $this->createSegment('Segment A', 'segment-a');
+        $segment2 = $this->createSegment('Segment B', 'segment-b');
+        $segment3 = $this->createSegment('Segment C', 'segment-c');
+        $segment4 = $this->createSegment('Segment D', 'segment-d');
+        $this->em->flush();
+        $segments = [
+            $segment1->getId() => $segment1,
+            $segment2->getId() => $segment2,
+            $segment3->getId() => $segment3,
+            $segment4->getId() => $segment4,
+        ];
+        $email1   = $this->createEmail('Email A', 'Email A Subject', 'list', 'beefree-empty', 'Test html', $segments);
+        $email2   = $this->createEmail('Email B', 'Email B Subject', 'list', 'beefree-empty', 'Test html', $segments);
+        $email3   = $this->createEmail('Email C', 'Email C Subject', 'list', 'beefree-empty', 'Test html', $segments);
+        $this->em->flush();
+
+        $this->client->request('get', '/api/emails?limit=2');
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertCount(2, $responseData['emails']);
+        $this->assertSame([$email1->getId(), $email2->getId()], array_keys($responseData['emails']));
+
+        $this->client->request('get', '/api/emails?limit=3');
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+        $this->assertCount(3, $responseData['emails']);
+        $this->assertSame([$email1->getId(), $email2->getId(), $email3->getId()], array_keys($responseData['emails']));
+    }
+
+    private function createSegment(string $name, string $alias): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setName($name);
+        $segment->setPublicName($name);
+        $segment->setAlias($alias);
+        $this->em->persist($segment);
+
+        return $segment;
+    }
+
+    /**
+     * @param array<integer, mixed> $segments
+     *
+     * @throws \Doctrine\ORM\ORMException
+     */
+    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
+    {
+        $email = new Email();
+        $email->setName($name);
+        $email->setSubject($subject);
+        $email->setEmailType($emailType);
+        $email->setTemplate($template);
+        $email->setCustomHtml($customHtml);
+        $email->setLists($segments);
+        $this->em->persist($email);
+
+        return $email;
     }
 }
