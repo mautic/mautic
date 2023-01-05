@@ -27,17 +27,22 @@ final class Version20230103074925 extends AbstractMauticMigration
 
     public function up(Schema $schema): void
     {
-        $leagueTableName       = $this->generateTableName(League::TABLE_NAME);
-        $contactScoreTableName = $this->generateTableName(LeagueContactScore::TABLE_NAME);
-        $companyScoreTableName = $this->generateTableName(LeagueCompanyScore::TABLE_NAME);
-        $contactTableName      = $this->generateTableName('leads');
-        $companyTableName      = $this->generateTableName('companies');
+        $leagueTableName             = $this->generateTableName(League::TABLE_NAME);
+        $contactScoreTableName       = $this->generateTableName(LeagueContactScore::TABLE_NAME);
+        $companyScoreTableName       = $this->generateTableName(LeagueCompanyScore::TABLE_NAME);
+        $contactTableName            = $this->generateTableName('leads');
+        $companyTableName            = $this->generateTableName('companies');
+        $pointsTableName             = $this->generateTableName('points');
+        $pointTriggersTableName      = $this->generateTableName('point_triggers');
 
         $contactScoreContactFk = $this->generatePropertyName($contactScoreTableName, 'fk', ['contact_id']);
         $contactScoreLeagueFk  = $this->generatePropertyName($contactScoreTableName, 'fk', ['league_id']);
 
         $companyScoreCompanyFk = $this->generatePropertyName($companyScoreTableName, 'fk', ['company_id']);
         $companyScoreLeagueFk  = $this->generatePropertyName($companyScoreTableName, 'fk', ['league_id']);
+
+        $pointsLeagueFk        = $this->generatePropertyName($pointsTableName, 'fk', ['league_id']);
+        $pointTriggersLeagueFk = $this->generatePropertyName($pointTriggersTableName, 'fk', ['league_id']);
 
         $this->addSql("CREATE TABLE `{$leagueTableName}`
 (
@@ -102,11 +107,17 @@ final class Version20230103074925 extends AbstractMauticMigration
   ENGINE = InnoDB
   ROW_FORMAT = DYNAMIC;");
 
+        $this->addSql("ALTER TABLE `{$pointsTableName}` ADD league_id INT UNSIGNED DEFAULT NULL");
+        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` ADD league_id INT UNSIGNED DEFAULT NULL");
+
         $this->addSql("ALTER TABLE `{$contactScoreTableName}` ADD CONSTRAINT `{$contactScoreContactFk}` FOREIGN KEY (`contact_id`) REFERENCES `{$contactTableName}` (`id`) ON DELETE CASCADE");
         $this->addSql("ALTER TABLE `{$contactScoreTableName}` ADD CONSTRAINT `{$contactScoreLeagueFk}` FOREIGN KEY (`league_id`) REFERENCES `{$leagueTableName}` (`id`) ON DELETE CASCADE");
 
         $this->addSql("ALTER TABLE `{$companyScoreTableName}` ADD CONSTRAINT `{$companyScoreCompanyFk}` FOREIGN KEY (`company_id`) REFERENCES `{$companyTableName}` (`id`) ON DELETE CASCADE");
         $this->addSql("ALTER TABLE `{$companyScoreTableName}` ADD CONSTRAINT `{$companyScoreLeagueFk}` FOREIGN KEY (`league_id`) REFERENCES `{$leagueTableName}` (`id`) ON DELETE CASCADE");
+
+        $this->addSql("ALTER TABLE `{$pointsTableName}` ADD CONSTRAINT `{$pointsLeagueFk}` FOREIGN KEY (`league_id`) REFERENCES `{$leagueTableName}` (`id`) ON DELETE CASCADE");
+        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` ADD CONSTRAINT `{$pointTriggersLeagueFk}` FOREIGN KEY (`league_id`) REFERENCES `{$leagueTableName}` (`id`) ON DELETE CASCADE");
     }
 
     public function down(Schema $schema): void

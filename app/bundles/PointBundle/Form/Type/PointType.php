@@ -101,6 +101,11 @@ class PointType extends AbstractType
             );
         }
 
+        $builder->add(
+            'league',
+            LeagueListType::class
+        );
+
         if (!empty($options['data']) && $options['data'] instanceof Point) {
             $readonly = !$this->security->hasEntityAccess(
                 'point:points:publishown',

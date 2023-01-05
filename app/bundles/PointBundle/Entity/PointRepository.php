@@ -18,7 +18,8 @@ class PointRepository extends CommonRepository
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
             ->from('MauticPointBundle:Point', $this->getTableAlias())
-            ->leftJoin($this->getTableAlias().'.category', 'cat');
+            ->leftJoin($this->getTableAlias().'.category', 'cat')
+            ->leftJoin($this->getTableAlias().'.league', 'pl');
 
         $args['qb'] = $q;
 

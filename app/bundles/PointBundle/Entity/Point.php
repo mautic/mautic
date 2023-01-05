@@ -69,6 +69,11 @@ class Point extends FormEntity
      **/
     private $category;
 
+    /**
+     * @var League
+     */
+    private $league;
+
     public function __clone()
     {
         $this->id = null;
@@ -112,6 +117,10 @@ class Point extends FormEntity
             ->build();
 
         $builder->addCategory();
+
+        $builder->createManyToOne('league', League::class)
+            ->addJoinColumn('league_id', 'id', true, false, 'CASCADE')
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -380,5 +389,18 @@ class Point extends FormEntity
     public function getRepeatable()
     {
         return $this->repeatable;
+    }
+
+    /**
+     * @return League
+     */
+    public function getLeague()
+    {
+        return $this->league;
+    }
+
+    public function setLeague(League $league)
+    {
+        $this->league = $league;
     }
 }

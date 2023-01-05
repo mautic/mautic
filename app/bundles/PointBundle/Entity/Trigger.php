@@ -62,6 +62,11 @@ class Trigger extends FormEntity
      */
     private $events;
 
+    /**
+     * @var League
+     */
+    private $league;
+
     public function __clone()
     {
         $this->id = null;
@@ -106,6 +111,10 @@ class Trigger extends FormEntity
             ->mappedBy('trigger')
             ->cascadeAll()
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToOne('league', League::class)
+            ->addJoinColumn('league_id', 'id', true, false, 'CASCADE')
             ->build();
     }
 
@@ -367,5 +376,18 @@ class Trigger extends FormEntity
     public function setCategory($category)
     {
         $this->category = $category;
+    }
+
+    /**
+     * @return League
+     */
+    public function getLeague()
+    {
+        return $this->league;
+    }
+
+    public function setLeague(League $league)
+    {
+        $this->league = $league;
     }
 }

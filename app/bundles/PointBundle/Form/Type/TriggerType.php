@@ -101,6 +101,11 @@ class TriggerType extends AbstractType
         );
 
         $builder->add(
+            'league',
+            LeagueListType::class
+        );
+
+        $builder->add(
             'triggerExistingLeads',
             YesNoButtonGroupType::class,
             [

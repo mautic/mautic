@@ -56,6 +56,16 @@ if ('index' == $tmpl) {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'point',
+                        'orderBy'    => 'pl.name',
+                        'text'       => 'mautic.point.thead.league',
+                        'class'      => 'visible-md visible-lg col-point-league',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'point',
                         'orderBy'    => 'p.delta',
                         'text'       => 'mautic.point.thead.delta',
                         'class'      => 'visible-md visible-lg col-point-delta',
@@ -129,6 +139,15 @@ if ('index' == $tmpl) {
                         <?php $color = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                         <span style="white-space: nowrap;"><span class="label label-default pa-4"
                                                                  style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        <?php $league      = $item->getLeague(); ?>
+                        <?php $leagueName  = ($league)
+                            ? $league->getName()
+                            : $view['translator']->trans(
+                                'mautic.point.league.form.noleague'
+                            ); ?>
+                        <?php echo $leagueName; ?>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getDelta(); ?></td>
                     <?php

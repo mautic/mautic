@@ -43,6 +43,7 @@ echo $view['form']->start($form);
                         endif;
                         ?>
 					</div>
+                    <?php echo $view['form']->row($form['league']); ?>
 				</div>
 			</div>
 		</div>
