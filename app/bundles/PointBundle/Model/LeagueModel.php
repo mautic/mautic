@@ -22,7 +22,7 @@ class LeagueModel extends CommonFormModel
 
     public function getPermissionBase(): string
     {
-        return 'point:league';
+        return 'point:leagues';
     }
 
     /**

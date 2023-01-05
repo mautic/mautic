@@ -19,6 +19,7 @@ class PointPermissions extends AbstractPermissions
 
         $this->addStandardPermissions('points');
         $this->addStandardPermissions('triggers');
+        $this->addStandardPermissions('leagues');
         $this->addStandardPermissions('categories');
     }
 
@@ -38,5 +39,6 @@ class PointPermissions extends AbstractPermissions
         $this->addStandardFormFields('point', 'categories', $builder, $data);
         $this->addStandardFormFields('point', 'points', $builder, $data);
         $this->addStandardFormFields('point', 'triggers', $builder, $data);
+        $this->addStandardFormFields('point', 'leagues', $builder, $data);
     }
 }

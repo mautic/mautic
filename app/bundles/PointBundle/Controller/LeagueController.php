@@ -65,18 +65,6 @@ class LeagueController extends AbstractStandardFormController
     }
 
     /**
-     * Clone an entity.
-     *
-     * @param int $objectId
-     *
-     * @return JsonResponse|RedirectResponse|Response
-     */
-    public function cloneAction($objectId)
-    {
-        return parent::cloneStandard($objectId);
-    }
-
-    /**
      * Deletes the entity.
      *
      * @param int $objectId

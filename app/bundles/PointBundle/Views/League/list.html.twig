@@ -4,14 +4,14 @@
 
 {% block mauticContent %}league{% endblock %}
 
-{% block headerTitle %}{{ 'mautic.point.league.menu.root'|trans }}{% endblock %}
+{% block headerTitle %}{{ 'mautic.point.league.header.index'|trans }}{% endblock %}
 
 {% block actions %}
     {{- include(
         'MauticCoreBundle:Helper:page_actions.html.twig',
         {
             'templateButtons': {
-            'new': permissions['point:league:create']
+            'new': permissions['point:leagues:create']
         },
             'routeBase': 'point.league',
             'langVar': 'point.league'
@@ -40,7 +40,7 @@
                                     'langVar': 'point.league',
                                     'routeBase': 'point.league',
                                     'templateButtons': {
-                                    'delete': permissions['point:league:delete'],
+                                    'delete': permissions['point:leagues:delete'],
                                 }
                                 }) }}
                             {{ include(
@@ -72,8 +72,8 @@
                                     {{- include('MauticCoreBundle:Helper:list_actions.html.twig', {
                                         item: item,
                                         templateButtons: {
-                                            edit: permissions['point:league:edit'],
-                                            delete: permissions['point:league:delete'],
+                                            edit: permissions['point:leagues:edit'],
+                                            delete: permissions['point:leagues:delete'],
                                         },
                                         routeBase: 'point.league',
                                         langVar: 'point.league',
@@ -81,15 +81,22 @@
                                 </td>
                                 <td>
                                     <div>
-                                        {% if permissions['point:league:edit'] %}
+                                        {{- include(
+                                            'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
+                                            {
+                                                'item': item, 'model': 'point.league'
+                                            }
+                                        )}}
+
+                                        {% if permissions['point:leagues:edit'] %}
                                             <a href="{{ path('mautic_point.league_action', {
-                                                objectAction: 'view',
+                                                objectAction: 'edit',
                                                 objectId: item.getId()
                                             }) }}" data-toggle="ajax">
                                                 {{ item.getName() }}
                                             </a>
                                         {% else %}
-                                            {{ item.getTag() }}
+                                            {{ item.getName() }}
                                         {% endif %}
                                     </div>
                                     {% set description = item.getDescription() %}

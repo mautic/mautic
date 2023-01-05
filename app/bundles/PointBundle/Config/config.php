@@ -71,7 +71,7 @@ return [
             'mautic.points.menu.root' => [
                 'id'        => 'mautic_points_root',
                 'iconClass' => 'fa-calculator',
-                'access'    => ['point:points:view', 'point:triggers:view'],
+                'access'    => ['point:points:view', 'point:triggers:view', 'point:leagues:view'],
                 'priority'  => 30,
                 'children'  => [
                     'mautic.point.menu.index' => [
