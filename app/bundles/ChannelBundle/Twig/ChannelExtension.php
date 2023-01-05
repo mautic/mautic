@@ -32,15 +32,10 @@ class ChannelExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param array<string, mixed> $log
-     */
-    public function getChannelDncText(string $channel, array $log): string
+    public function getChannelDncText(int $reasonId): string
     {
         try {
-            if (!empty($log['metadata'][$channel]['dnc'])) {
-                return $this->dncReasonHelper->toText((int) $log['metadata'][$channel]['dnc']);
-            }
+            return $this->dncReasonHelper->toText($reasonId);
         } catch (UnknownDncReasonException $e) {
             return $e->getMessage();
         }
