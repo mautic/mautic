@@ -88,7 +88,7 @@ class PhpEngine extends BasePhpEngine
         $this->request = $requestStack->getCurrentRequest();
     }
 
-    public function setTwig(Environment $twig)
+    public function setTwig(Environment $twig): void
     {
         $this->twig = $twig;
     }
