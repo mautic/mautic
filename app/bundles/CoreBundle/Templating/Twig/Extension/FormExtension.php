@@ -31,17 +31,17 @@ class FormExtension extends AbstractExtension
     }
 
     /**
-     * check if form contains errors.
+     * Checks to see if the form and its children has an error.
      *
-     * @param array<string> $exluding
+     * @param array<string> $excluding
      */
-    public function containsErrors(FormView $form, array $exluding = []): bool
+    public function containsErrors(FormView $form, array $excluding = []): bool
     {
         if (count($form->vars['errors'])) {
             return true;
         }
         foreach ($form->children as $key => $child) {
-            if (in_array($key, $exluding)) {
+            if (in_array($key, $excluding)) {
                 continue;
             }
 
