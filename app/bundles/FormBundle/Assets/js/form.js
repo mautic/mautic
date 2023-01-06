@@ -97,6 +97,11 @@ Mautic.formOnLoad = function (container) {
 
     Mautic.initHideItemButton('#mauticforms_fields');
     Mautic.initHideItemButton('#mauticforms_actions');
+
+    // Load the contacts tab using the Segment detail lazy loader
+    if (typeof Mautic.lazyLoadContactListOnSegmentDetail === 'function') {
+        Mautic.lazyLoadContactListOnSegmentDetail();
+    }
 };
 
 Mautic.formBuilderNewComponentInit = function () {

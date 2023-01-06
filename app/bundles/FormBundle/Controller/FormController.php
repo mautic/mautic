@@ -10,11 +10,14 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonFormController
 {
+    use EntityContactsTrait;
+
     /**
      * @param int $page
      *
@@ -244,6 +247,25 @@ class FormController extends CommonFormController
                     'route'         => $action,
                 ],
             ]
+        );
+    }
+
+    /**
+     * @param int $objectId
+     * @param int $page
+     *
+     * @return mixed
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'form:forms:view',
+            'form',
+            'form_submissions',
+            null,
+            'form_id'
         );
     }
 

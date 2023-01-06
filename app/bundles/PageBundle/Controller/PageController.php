@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -27,6 +28,7 @@ class PageController extends FormController
 {
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
+    use EntityContactsTrait;
 
     /**
      * @param int $page
@@ -338,6 +340,31 @@ class PageController extends FormController
                 'mauticContent' => 'page',
             ],
         ]);
+    }
+
+    /**
+     * Generates a "Contacts Grid" containing only identified leads.
+     *
+     * @param int $objectId
+     * @param int $page
+     *
+     * @return mixed
+     */
+    public function contactsAction($objectId, $page = 1)
+    {
+        return $this->generateContactsGrid(
+            $objectId,
+            $page,
+            'page:pages:view',
+            'page',
+            'page_hits',
+            null,
+            'page_id',
+            [[
+                'col'  => 'l.date_identified',
+                'expr' => 'isNotNull',
+            ]]
+        );
     }
 
     /**

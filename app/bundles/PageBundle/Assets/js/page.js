@@ -28,6 +28,11 @@ Mautic.pageOnLoad = function (container, response) {
         Mautic.launchBuilder('page');
         Mautic.processBuilderErrors(response);
     }
+
+    // Load the contacts tab using the Segment detail lazy loader
+    if (typeof Mautic.lazyLoadContactListOnSegmentDetail === 'function') {
+        Mautic.lazyLoadContactListOnSegmentDetail();
+    }
 };
 
 Mautic.getPageAbTestWinnerForm = function(abKey) {
