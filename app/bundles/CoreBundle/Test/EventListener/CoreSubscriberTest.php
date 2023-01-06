@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -90,6 +91,11 @@ class CoreSubscriberTest extends TestCase
     private $factory;
 
     /**
+     * @var ModelFactory<object>&MockObject
+     */
+    private $modelFactory;
+
+    /**
      * @var FlashBag|MockObject
      */
     private $flashBag;
@@ -114,6 +120,7 @@ class CoreSubscriberTest extends TestCase
 
         $this->formRepository = $this->createMock(FormRepository::class);
         $this->factory        = $this->createMock(MauticFactory::class);
+        $this->modelFactory   = $this->createMock(ModelFactory::class);
         $this->flashBag       = $this->createMock(FlashBag::class);
 
         $this->subscriber = new CoreSubscriber(
@@ -129,6 +136,7 @@ class CoreSubscriberTest extends TestCase
             $this->requestStack,
             $this->formRepository,
             $this->factory,
+            $this->modelFactory,
             $this->flashBag
         );
 
@@ -180,6 +188,9 @@ class CoreSubscriberTest extends TestCase
         $controller->expects(self::once())
             ->method('setFactory')
             ->with($this->factory);
+        $controller->expects(self::once())
+            ->method('setModelFactory')
+            ->with($this->modelFactory);
         $controller->expects(self::once())
             ->method('setUser')
             ->with($user);

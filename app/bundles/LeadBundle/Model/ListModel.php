@@ -38,6 +38,9 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<LeadList>
+ */
 class ListModel extends FormModel
 {
     use OperatorListTrait;
@@ -565,7 +568,7 @@ class ListModel extends FormModel
     /**
      * Add lead to lists.
      *
-     * @param array|Lead     $lead
+     * @param array|int|Lead $lead
      * @param array|LeadList $lists
      * @param bool           $manuallyAdded
      * @param bool           $batchProcess

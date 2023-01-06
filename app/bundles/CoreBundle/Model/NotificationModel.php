@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\Model;
 
 use DateTime;
-use Debril\RssAtomBundle\Protocol\Parser\Item;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -14,6 +13,9 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * @extends FormModel<Notification>
+ */
 class NotificationModel extends FormModel
 {
     /**

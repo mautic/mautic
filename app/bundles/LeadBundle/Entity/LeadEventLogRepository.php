@@ -6,6 +6,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<LeadEventLog>
+ */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
