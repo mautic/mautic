@@ -81,7 +81,7 @@ class DashboardController extends AbstractFormController
                     'version'    => PhpVersionHelper::getCurrentSemver(),
                 ],
             ],
-            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
+            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dashboard_index',
                 'mauticContent' => 'dashboard',
@@ -109,7 +109,7 @@ class DashboardController extends AbstractFormController
         }
 
         $response = $this->render(
-            'MauticDashboardBundle:Dashboard:widget.html.php',
+            'MauticDashboardBundle:Dashboard:widget.html.twig',
             ['widget' => $widget]
         );
 
@@ -167,7 +167,7 @@ class DashboardController extends AbstractFormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
-                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', [
+                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.twig', [
                     'widget' => $widget,
                 ]);
                 $passthroughVars['widgetId']     = $widget->getId();
@@ -181,7 +181,7 @@ class DashboardController extends AbstractFormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
+                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.twig',
             ]);
         }
     }
@@ -230,7 +230,7 @@ class DashboardController extends AbstractFormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
-                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', [
+                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.twig', [
                     'widget' => $widget,
                 ]);
                 $passthroughVars['widgetId']     = $widget->getId();
@@ -244,7 +244,7 @@ class DashboardController extends AbstractFormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
+                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.twig',
             ]);
         }
     }
@@ -554,7 +554,7 @@ class DashboardController extends AbstractFormController
                     'widgets'    => $widgets,
                     'preview'    => $preview,
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.php',
+                'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dashboard_index',
                     'mauticContent' => 'dashboardImport',
