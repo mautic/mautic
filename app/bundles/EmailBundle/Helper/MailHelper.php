@@ -1520,7 +1520,7 @@ class MailHelper
     private function getUnsubscribeHeader()
     {
         if ($this->idHash) {
-            $url = $this->factory->getRouter()->generate('mautic_email_unsubscribe', ['idHash' => $this->idHash], UrlGeneratorInterface::ABSOLUTE_URL);
+            $url = $this->factory->getRouter()->generate('mautic_email_dnc', ['idHash' => $this->idHash, 'channel' => 'email'], UrlGeneratorInterface::ABSOLUTE_URL);
 
             return "<$url>";
         }

@@ -64,8 +64,11 @@ return [
                 'controller' => 'MauticEmailBundle:Public:unsubscribe',
             ],
             'mautic_email_dnc' => [
-                'path'       => '/email/dnc/{idHash}',
-                'controller' => 'MauticEmailBundle:Public:doNotContact',
+                'path'         => '/email/dnc/{idHash}/{channel}',
+                'controller'   => 'MauticEmailBundle:Public:doNotContact',
+                'defaults'     => [
+                    'channel' => null,
+                ],
             ],
             'mautic_email_resubscribe' => [
                 'path'       => '/email/resubscribe/{idHash}',

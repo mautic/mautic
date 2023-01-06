@@ -340,7 +340,7 @@ class PublicController extends CommonFormController
      * @throws \Exception
      * @throws \Mautic\CoreBundle\Exception\FileNotFoundException
      */
-    public function doNotContactAction($idHash)
+    public function doNotContactAction($idHash, $channel = null)
     {
         //find the email
         $model             = $this->getModel('email');
@@ -361,7 +361,14 @@ class PublicController extends CommonFormController
                     $this->translator->setLocale($lead->getPreferredLocale());
                 }
             }
-            foreach (array_keys($messageModel->getChannels()) as $channel) {
+
+            if (null !== $channel) {
+                $channels = [$channel];
+            } else {
+                $channels = array_keys($messageModel->getChannels());
+            }
+
+            foreach ($channels as $channel) {
                 $channel = $email->getId() && 'email' === $channel ? [$channel => $email->getId()] : $channel;
                 $doNotContactModel->addDncForContact($lead->getId(), $channel, DoNotContact::UNSUBSCRIBED, $this->translator->trans('mautic.email.dnc.unsubscribed'));
             }
