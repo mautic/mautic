@@ -125,8 +125,7 @@ trait CustomFieldRepositoryTrait
 
                 //ORM - generates lead entities
                 /** @var \Doctrine\ORM\QueryBuilder $q */
-                $joinIpAddresses = isset($args['joinIpAddresses']) ? $args['joinIpAddresses'] : true;
-                $q               = $this->getEntitiesOrmQueryBuilder($order, $joinIpAddresses);
+                $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                 $this->buildSelectClause($dq, $args);
 
                 //only pull the leads as filtered via DBAL

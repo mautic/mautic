@@ -562,26 +562,25 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
 
     /**
      * @param $order
-     * @param bool $joinIpAddresses
+     * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order, $joinIpAddresses = true)
+    public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
-        $alias = $this->getTableAlias();
-        $q     = $this->getEntityManager()->createQueryBuilder();
-        if ($joinIpAddresses) {
-            $q->select($alias.', u, i,'.$order)
-            ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
-            ->leftJoin($alias.'.ipAddresses', 'i')
-            ->leftJoin($alias.'.owner', 'u')
-            ->indexBy($alias, $alias.'.id');
-        } else {
-            $q->select($alias.', u, '.$order)
-            ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
-            ->leftJoin($alias.'.owner', 'u')
-            ->indexBy($alias, $alias.'.id');
+        $alias  = $this->getTableAlias();
+        $select = [$alias, 'u', $order];
+        $q      = $this->getEntityManager()->createQueryBuilder();
+
+        if (!empty($args['joinIpAddresses'])) {
+            $select[] = 'i';
+            $q->leftJoin($alias.'.ipAddresses', 'i');
         }
+
+        $q->select($select)
+            ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
+            ->leftJoin($alias.'.owner', 'u')
+            ->indexBy($alias, $alias.'.id');
 
         return $q;
     }
