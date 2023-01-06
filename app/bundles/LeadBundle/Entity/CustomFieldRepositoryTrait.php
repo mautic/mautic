@@ -429,10 +429,15 @@ trait CustomFieldRepositoryTrait
 
     public function getUniqueIdentifiersWherePart(): string
     {
-        if (CompositeExpression::TYPE_AND === $this->uniqueIdentifiersOperator) {
+        if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return 'andWhere';
         }
 
         return 'orWhere';
+    }
+
+    private function uniqueIdentifiersOperatorIs(string $operator): bool
+    {
+        return $this->uniqueIdentifiersOperator === $operator;
     }
 }
