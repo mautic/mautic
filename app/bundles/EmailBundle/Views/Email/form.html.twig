@@ -23,7 +23,7 @@
 
 {% set header = isExisting ? 'mautic.email.header.edit'|trans({'%name%' : email.getName()}) : 'mautic.email.header.new'|trans %}
 
-{% block headerTitle %}header ~ subheader{% endblock %}
+{% block headerTitle %}{{ header ~ subheader }}{% endblock %}
 
 {% set emailType = form.emailType.vars.data %}
 
@@ -40,14 +40,16 @@
     'locales'   : 'locale-template',
 } %}
 
-{% set attr = from.vars.attr %}
+{% set attr = form.vars.attr %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 
 {% if previewUrl is not defined %}
     {% set previewUrl = '' %}
 {% endif %}
 
-{% block emailContent %}
+{% set mauticTemplateVars = mauticTemplateVars|default([]) %}
+
+{% block content %}
     {{ form_start(form, {'attr' : attr}) }}
     <div class="box-layout">
         <div class="col-md-9 height-auto bg-white">
