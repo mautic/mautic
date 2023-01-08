@@ -109,7 +109,7 @@ class DateDayYesterdayTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper(DateDayYesterday::MIDNIGHT_YESTERDAY);
+        $date = new DateTimeHelper(DateDayYesterday::MIDNIGHT_YESTERDAY, null, 'Europe/Paris');
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
