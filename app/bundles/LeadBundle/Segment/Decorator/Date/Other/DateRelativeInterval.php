@@ -1,121 +1,86 @@
 <?php
 
+
 namespace Mautic\LeadBundle\Segment\Decorator\Date\Other;
 
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\DateDecorator;
-use Mautic\LeadBundle\Segment\Decorator\FilterDecoratorInterface;
 
-class DateRelativeInterval implements FilterDecoratorInterface
+class DateRelativeInterval extends DateOptionAbstract
 {
-    /**
-     * @var DateDecorator
-     */
-    private $dateDecorator;
+    private string $originalValue;
 
-    /**
-     * @var string
-     */
-    private $originalValue;
-
-    /**
-     * @var DateOptionParameters
-     */
-    private $dateOptionParameters;
-
-    /**
-     * @param string $originalValue
-     */
-    public function __construct(
-        DateDecorator $dateDecorator,
-        $originalValue,
-        DateOptionParameters $dateOptionParameters
-    ) {
-        $this->dateDecorator        = $dateDecorator;
-        $this->originalValue        = $originalValue;
-        $this->dateOptionParameters = $dateOptionParameters;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    public function __construct(DateDecorator $dateDecorator, string $originalValue, DateOptionParameters $dateOptionParameters)
     {
-        return $this->dateDecorator->getField($contactSegmentFilterCrate);
+        parent::__construct($dateDecorator, $dateOptionParameters);
+        $this->originalValue = $originalValue;
     }
 
     /**
      * @return string
      */
-    public function getTable(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    protected function getModifierForBetweenRange()
     {
-        return $this->dateDecorator->getTable($contactSegmentFilterCrate);
+        return $this->originalValue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
+    {
     }
 
     /**
      * @return string
      */
-    public function getOperator(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        if ('=' === $contactSegmentFilterCrate->getOperator()) {
-            return 'like';
-        }
-        if ('!=' === $contactSegmentFilterCrate->getOperator()) {
-            return 'notLike';
-        }
-
-        return $this->dateDecorator->getOperator($contactSegmentFilterCrate);
-    }
-
-    /**
-     * @param array|string $argument
-     *
-     * @return array|string
-     */
-    public function getParameterHolder(ContactSegmentFilterCrate $contactSegmentFilterCrate, $argument)
-    {
-        return $this->dateDecorator->getParameterHolder($contactSegmentFilterCrate, $argument);
-    }
 
     /**
      * @return array|bool|float|string|null
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate)
     {
-        $date = $this->dateOptionParameters->getDefaultDate();
-        $date->modify($this->originalValue);
+        $dateTimeHelper = $this->dateOptionParameters->getDefaultDate();
 
-        $operator = $this->getOperator($contactSegmentFilterCrate);
-        $format   = 'Y-m-d';
-        if ('like' === $operator || 'notLike' === $operator) {
-            $format .= '%';
+        $this->modifyBaseDate($dateTimeHelper);
+
+        if ($this->dateOptionParameters->isBetweenRequired() && $this->dateOptionParameters->hasTimePart()) {
+            return $this->getValueForBetweenRange($dateTimeHelper);
         }
 
-        return $date->toLocalString($format);
+        $dateTimeHelper->modify($this->originalValue);
+
+        if (!$this->dateOptionParameters->hasTimePart()) {
+            return $dateTimeHelper->getString('Y-m-d%');
+        }
+
+        return $dateTimeHelper->toUtcString('Y-m-d H:i:s');
+    }
+
+    protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper): array
+    {
+        $dateFormat = 'Y-m-d H:i:s';
+        $startWith  = $dateTimeHelper->toUtcString($dateFormat);
+
+        $modifier = $this->getModifierForBetweenRange().' -1 second';
+        $dateTimeHelper->modify($modifier);
+        $endWith = $dateTimeHelper->toUtcString($dateFormat);
+
+        return [$startWith, $endWith];
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
-    public function getQueryType(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    protected function getOperatorForBetweenRange(ContactSegmentFilterCrate $leadSegmentFilterCrate): string
     {
-        return $this->dateDecorator->getQueryType($contactSegmentFilterCrate);
-    }
+        if ($this->dateOptionParameters->hasTimePart()) {
+            return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notBetween' : 'between';
+        }
 
-    /**
-     * @return bool|string
-     */
-    public function getAggregateFunc(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        return $this->dateDecorator->getAggregateFunc($contactSegmentFilterCrate);
-    }
-
-    /**
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string|null
-     */
-    public function getWhere(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        return $this->dateDecorator->getWhere($contactSegmentFilterCrate);
+        return '!=' === $leadSegmentFilterCrate->getOperator() ? 'notLike' : 'like';
     }
 }

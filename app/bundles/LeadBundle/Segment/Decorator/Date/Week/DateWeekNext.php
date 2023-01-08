@@ -11,6 +11,6 @@ class DateWeekNext extends DateWeekAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime('midnight monday next week', null);
+        $dateTimeHelper->setDateTime('midnight monday next week', null, $this->dateOptionParameters->getDefaultTimezone());
     }
 }

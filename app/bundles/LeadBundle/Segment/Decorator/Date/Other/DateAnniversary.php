@@ -72,7 +72,7 @@ class DateAnniversary implements FilterDecoratorInterface
             $date->modify($relativeFilter);
         }
 
-        return $date->toLocalString('%-m-d');
+        return $date->getString('%-m-d');
     }
 
     /**
