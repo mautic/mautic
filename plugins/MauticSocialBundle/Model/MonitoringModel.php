@@ -1,36 +1,40 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Model;
 
+use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event as Events;
+use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
+use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class MonitoringModel
- * {@inheritdoc}
+ * @extends FormModel<Monitoring>
  */
 class MonitoringModel extends FormModel
 {
+    private $networkTypes = [
+        'twitter_handle' => [
+            'label' => 'mautic.social.monitoring.type.list.twitter.handle',
+            'form'  => TwitterMentionType::class,
+        ],
+        'twitter_hashtag' => [
+            'label' => 'mautic.social.monitoring.type.list.twitter.hashtag',
+            'form'  => TwitterHashtagType::class,
+        ],
+    ];
+
     /**
-     * {@inheritdoc}
-     *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param object               $entity
+     * @param FormFactoryInterface $formFactory
+     * @param string|null          $action
+     * @param mixed[]              $options
      *
      * @return mixed
      *
@@ -46,7 +50,7 @@ class MonitoringModel extends FormModel
             $params['action'] = $action;
         }
 
-        return $formFactory->create('monitoring', $entity, $params);
+        return $formFactory->create(MonitoringType::class, $entity, $params);
     }
 
     /**
@@ -54,17 +58,11 @@ class MonitoringModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return Monitoring|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
-            $entity = new Monitoring();
-        } else {
-            $entity = parent::getEntity($id);
-        }
-
-        return $entity;
+        return $id ? parent::getEntity($id) : new Monitoring();
     }
 
     /**
@@ -105,7 +103,7 @@ class MonitoringModel extends FormModel
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -114,9 +112,8 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @var \MauticPlugin\MauticSocialBundle\Entity\Monitoring
+     * @param Monitoring $monitoringEntity
+     * @param bool       $unlock
      */
     public function saveEntity($monitoringEntity, $unlock = true)
     {
@@ -136,11 +133,11 @@ class MonitoringModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
+     * @return EntityRepository<Monitoring>
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSocialBundle:Monitoring');
+        return $this->em->getRepository(Monitoring::class);
     }
 
     /**
@@ -148,19 +145,29 @@ class MonitoringModel extends FormModel
      */
     public function getPermissionBase()
     {
-        return 'plugin:mauticSocial:monitoring';
+        return 'mauticSocial:monitoring';
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getNetworkTypes()
     {
-        $types = [
-            'twitter_handle'  => 'mautic.social.monitoring.type.list.twitter.handle',
-            'twitter_hashtag' => 'mautic.social.monitoring.type.list.twitter.hashtag',
-        ];
+        $types = [];
+        foreach ($this->networkTypes as $type => $data) {
+            $types[$type] = $data['label'];
+        }
 
         return $types;
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return string|null
+     */
+    public function getFormByType($type)
+    {
+        return array_key_exists($type, $this->networkTypes) ? $this->networkTypes[$type]['form'] : null;
     }
 }

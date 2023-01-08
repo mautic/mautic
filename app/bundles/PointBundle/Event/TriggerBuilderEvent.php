@@ -1,23 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class TriggerBuilderEvent.
- */
 class TriggerBuilderEvent extends Event
 {
     /**
@@ -30,9 +18,6 @@ class TriggerBuilderEvent extends Event
      */
     private $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
@@ -65,10 +50,16 @@ class TriggerBuilderEvent extends Event
 
         //check for required keys and that given functions are callable
         $this->verifyComponent(
-            ['group', 'label', 'callback'],
+            ['group', 'label'],
             ['callback'],
             $event
         );
+
+        //Support for old way with callback and new event based system
+        //Could be removed after all events will be refactored to events. The key 'eventName' will be mandatory and 'callback' will be removed.
+        if (!array_key_exists('callback', $event) && !array_key_exists('eventName', $event)) {
+            throw new InvalidArgumentException("One of the 'callback' or 'eventName' has to be provided. Use 'eventName' for new code");
+        }
 
         $event['label']       = $this->translator->trans($event['label']);
         $event['group']       = $this->translator->trans($event['group']);
@@ -78,8 +69,6 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
-     * Get events.
-     *
      * @return array
      */
     public function getEvents()
@@ -93,10 +82,6 @@ class TriggerBuilderEvent extends Event
     }
 
     /**
-     * @param array $keys
-     * @param array $methods
-     * @param array $component
-     *
      * @throws InvalidArgumentException
      */
     private function verifyComponent(array $keys, array $methods, array $component)

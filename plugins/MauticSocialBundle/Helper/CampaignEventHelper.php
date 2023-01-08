@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Helper;
 
 use Mautic\AssetBundle\Helper\TokenHelper as AssetTokenHelper;
@@ -57,12 +48,6 @@ class CampaignEventHelper
 
     /**
      * CampaignEventHelper constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     * @param TrackableModel    $trackableModel
-     * @param PageTokenHelper   $pageTokenHelper
-     * @param AssetTokenHelper  $assetTokenHelper
-     * @param TweetModel        $tweetModel
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
@@ -79,9 +64,6 @@ class CampaignEventHelper
     }
 
     /**
-     * @param Lead  $lead
-     * @param array $event
-     *
      * @return array|false
      */
     public function sendTweetAction(Lead $lead, array $event)
@@ -146,7 +128,7 @@ class CampaignEventHelper
     {
         $tweetHandle = $lead['twitter'];
         $tokens      = [
-            '{twitter_handle}' => (strpos($tweetHandle, '@') !== false) ? $tweetHandle : "@$tweetHandle",
+            '{twitter_handle}' => (false !== strpos($tweetHandle, '@')) ? $tweetHandle : "@$tweetHandle",
         ];
 
         $tokens = array_merge(

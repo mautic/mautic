@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -26,7 +18,7 @@ class FormFieldCaptchaType extends AbstractType
     {
         $builder->add(
             'captcha',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captcha',
                 'label_attr' => ['class' => 'control-label'],
@@ -41,7 +33,7 @@ class FormFieldCaptchaType extends AbstractType
 
         $builder->add(
             'placeholder',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_placeholder',
                 'label_attr' => ['class' => 'control-label'],
@@ -52,7 +44,7 @@ class FormFieldCaptchaType extends AbstractType
 
         $builder->add(
             'errorMessage',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.form.field.form.property_captchaerror',
                 'label_attr' => ['class' => 'control-label'],
@@ -65,7 +57,7 @@ class FormFieldCaptchaType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'formfield_captcha';
     }

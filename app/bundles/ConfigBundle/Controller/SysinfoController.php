@@ -1,45 +1,37 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Controller;
 
+use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
-/**
- * Class SysinfoController.
- */
 class SysinfoController extends FormController
 {
+    private SysinfoModel $sysinfoModel;
+
+    public function __construct(SysinfoModel $sysinfoModel)
+    {
+        $this->sysinfoModel = $sysinfoModel;
+    }
+
     /**
-     * @param int $page
-     *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction($page = 1)
+    public function indexAction()
     {
-        if (!$this->user->isAdmin() || $this->coreParametersHelper->getParameter('sysinfo_disabled')) {
+        if (!$this->user->isAdmin() || $this->coreParametersHelper->get('sysinfo_disabled')) {
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
-        $model   = $this->getModel('config.sysinfo');
-        $phpInfo = $model->getPhpInfo();
-        $folders = $model->getFolders();
-        $log     = $model->getLogTail(40);
-
         return $this->delegateView([
             'viewParameters' => [
-                'phpInfo' => $phpInfo,
-                'folders' => $folders,
-                'log'     => $log,
+                'phpInfo'         => $this->sysinfoModel->getPhpInfo(),
+                'requirements'    => $this->sysinfoModel->getRequirements(),
+                'recommendations' => $this->sysinfoModel->getRecommendations(),
+                'folders'         => $this->sysinfoModel->getFolders(),
+                'log'             => $this->sysinfoModel->getLogTail(200),
+                'dbInfo'          => $this->sysinfoModel->getDbInfo(),
             ],
             'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
             'passthroughVars' => [

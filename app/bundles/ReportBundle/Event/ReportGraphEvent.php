@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -31,9 +22,6 @@ class ReportGraphEvent extends AbstractReportEvent
 
     /**
      * Constructor.
-     *
-     * @param Report $report
-     * @param array  $graphs
      */
     public function __construct(Report $report, array $graphs, QueryBuilder $queryBuilder)
     {
@@ -123,5 +111,10 @@ class ReportGraphEvent extends AbstractReportEvent
     public function getQueryBuilder()
     {
         return $this->queryBuilder;
+    }
+
+    public function setQueryBuilder(QueryBuilder $queryBuilder)
+    {
+        $this->queryBuilder = $queryBuilder;
     }
 }

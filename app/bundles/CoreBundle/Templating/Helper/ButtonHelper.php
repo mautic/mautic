@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -17,57 +8,54 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ButtonHelper.
- */
 class ButtonHelper extends Helper
 {
     /**
      * List dropdown actions.
      */
-    const LOCATION_LIST_ACTIONS = 'list_actions';
+    public const LOCATION_LIST_ACTIONS = 'list_actions';
 
     /**
      * Toolbar actions.
      */
-    const LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
+    public const LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
 
     /**
      * Page actions.
      */
-    const LOCATION_PAGE_ACTIONS = 'page_actions';
+    public const LOCATION_PAGE_ACTIONS = 'page_actions';
 
     /**
      * Navbar actions.
      */
-    const LOCATION_NAVBAR = 'navbar_actions';
+    public const LOCATION_NAVBAR = 'navbar_actions';
 
     /**
      * Bulk actions.
      */
-    const LOCATION_BULK_ACTIONS = 'bulk_actions';
+    public const LOCATION_BULK_ACTIONS = 'bulk_actions';
 
     /**
      * Buttons are displayed in group and/or dropdown depending on button count.
      */
-    const TYPE_BUTTON_DROPDOWN = 'button-dropdown';
+    public const TYPE_BUTTON_DROPDOWN = 'button-dropdown';
 
     /**
      * Buttons are displayed in dropdown depending on button count.
      */
-    const TYPE_DROPDOWN = 'dropdown';
+    public const TYPE_DROPDOWN = 'dropdown';
 
     /**
      * Buttons are grouped together.
      */
-    const TYPE_GROUP = 'group';
+    public const TYPE_GROUP = 'group';
 
     /**
      * Location of the buttons.
      *
-     * @var
+     * @var string
      */
     private $location;
 
@@ -77,7 +65,7 @@ class ButtonHelper extends Helper
     private $templating;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -87,27 +75,27 @@ class ButtonHelper extends Helper
     private $dispatcher;
 
     /**
-     * @var
+     * @var string|null
      */
     private $wrapOpeningTag;
 
     /**
-     * @var
+     * @var string|null
      */
     private $wrapClosingTag;
 
     /**
-     * @var
+     * @var string
      */
     private $groupType = self::TYPE_GROUP;
 
     /**
-     * @var
+     * @var string|null
      */
     private $menuLink;
 
     /**
-     * @var array
+     * @var array<array<string,mixed>>
      */
     private $buttons = [];
 
@@ -126,23 +114,13 @@ class ButtonHelper extends Helper
      */
     private $request;
 
-    /**
-     * @var
-     */
     private $item;
 
     /**
-     * @var
+     * @var int
      */
     private $listMarker = 3;
 
-    /**
-     * ButtonHelper constructor.
-     *
-     * @param EngineInterface          $templating
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
-     */
     public function __construct(EngineInterface $templating, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
         $this->templating = $templating;
@@ -151,8 +129,6 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param array $buttons
-     *
      * @return $this
      */
     public function addButtons(array $buttons)
@@ -164,7 +140,7 @@ class ButtonHelper extends Helper
     }
 
     /**
-     * @param array $button
+     * @param array<string,mixed> $button
      *
      * @return $this
      */
@@ -244,7 +220,7 @@ class ButtonHelper extends Helper
                 $content .= $this->buildButton($button, $buttonCount);
 
                 $nextButton = $buttonCount + 1;
-                if ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
+                if (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $nextButton === $this->listMarker && $buttonCount !== $this->buttonCount) {
                     $content .= $dropdownHtml;
                     $dropdownHtmlAppended = true;
                 }
@@ -281,10 +257,9 @@ class ButtonHelper extends Helper
     /**
      * Reset the buttons.
      *
-     * @param         $buttonCount
-     * @param Request $request
-     * @param string  $groupType
-     * @param null    $item
+     * @param        $buttonCount
+     * @param string $groupType
+     * @param null   $item
      *
      * @return $this
      */
@@ -323,7 +298,7 @@ class ButtonHelper extends Helper
         $buttons = '';
 
         //Wrap links in a tag
-        if ($this->groupType == self::TYPE_DROPDOWN || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount >= $this->listMarker)) {
+        if (self::TYPE_DROPDOWN == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount >= $this->listMarker)) {
             $this->wrapOpeningTag = "<li>\n";
             $this->wrapClosingTag = "</li>\n";
         }
@@ -332,7 +307,7 @@ class ButtonHelper extends Helper
             $button['attr'] = [];
         }
 
-        if ($this->groupType == self::TYPE_GROUP || ($this->groupType == self::TYPE_BUTTON_DROPDOWN && $buttonCount < $this->listMarker)) {
+        if (self::TYPE_GROUP == $this->groupType || (self::TYPE_BUTTON_DROPDOWN == $this->groupType && $buttonCount < $this->listMarker)) {
             $this->addButtonClasses($button);
         } elseif (in_array($this->groupType, [self::TYPE_BUTTON_DROPDOWN, self::TYPE_DROPDOWN])) {
             $this->removeButtonClasses($button);
@@ -373,8 +348,8 @@ class ButtonHelper extends Helper
     {
         if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
             $event = $this->dispatcher->dispatch(
-                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS,
-                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item)
+                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item),
+                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS
             );
             $this->buttonsFetched = true;
             $this->buttons        = $event->getButtons();
@@ -490,7 +465,7 @@ class ButtonHelper extends Helper
             $tooltip .= ' data-toggle="tooltip"';
             if (is_array($button['tooltip'])) {
                 foreach ($button['tooltip'] as $k => $v) {
-                    if ($k == 'title') {
+                    if ('title' == $k) {
                         $v = $this->translator->trans($v);
                     }
                     $tooltip .= " $k=".'"'.$v.'"';
@@ -575,57 +550,5 @@ class ButtonHelper extends Helper
         ];
 
         $removeFrom['attr']['class'] = str_replace($search, '', $removeFrom['attr']['class']);
-    }
-
-    /**
-     * @param       $preCustomButtons
-     * @param array $postCustomButtons
-     *
-     * @deprecated 2.3 to be removed 3.0; use renderButtons() instead
-     *
-     * @return $this
-     */
-    public function setCustomButtons($preCustomButtons, $postCustomButtons = [])
-    {
-        // Give preCustomButtons high priority
-        foreach ($preCustomButtons as $key => $button) {
-            $preCustomButtons[$key]['priority'] = 199;
-            $this->buttons[]                    = $preCustomButtons[$key];
-            ++$this->buttonCount;
-        }
-
-        foreach ($postCustomButtons as $key => $button) {
-            $postCustomButtons[$key]['priority'] = 0;
-            $this->buttons[]                     = $postCustomButtons[$key];
-            ++$this->buttonCount;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param        $buttonCount
-     * @param string $dropdownHtml
-     *
-     * @deprecated 2.3 to be removed 3.0; use renderButtons() instead
-     *
-     * @return string
-     */
-    public function renderPreCustomButtons(&$buttonCount, $dropdownHtml = '')
-    {
-        return $this->renderButtons($dropdownHtml);
-    }
-
-    /**
-     * @param        $buttonCount
-     * @param string $dropdownHtml
-     *
-     * @deprecated 2.3; to be removed 3.0
-     *
-     * @return string
-     */
-    public function renderPostCustomButtons(&$buttonCount, $dropdownHtml = '')
-    {
-        return '';
     }
 }

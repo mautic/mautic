@@ -10,7 +10,7 @@
  */
 
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.campaign.campaigns'));
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticCoreBundle:Standard:index.html.php');
 }
 
@@ -28,7 +28,8 @@ if ($tmpl == 'index') {
                         'target'          => '#campaignTable',
                         'routeBase'       => 'campaign',
                         'templateButtons' => [
-                            'delete' => $permissions['campaign:campaigns:delete'],
+                            'delete' => $permissions['campaign:campaigns:deleteown']
+                            || $permissions['campaign:campaigns:deleteother'],
                         ],
                     ]
                 );
@@ -40,7 +41,6 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'c.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-campaign-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -51,6 +51,37 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'cat.title',
                         'text'       => 'mautic.core.category',
                         'class'      => 'visible-md visible-lg col-campaign-category',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'campaign',
+                        'orderBy'    => 'c.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-campaign-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'campaign',
+                        'orderBy'    => 'c.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-campaign-dateModified',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'campaign',
+                        'orderBy'    => 'c.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-campaign-createdByUser',
                     ]
                 );
 
@@ -77,9 +108,18 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $permissions['campaign:campaigns:edit'],
+                                    'edit'   => $view['security']->hasEntityAccess(
+                                        $permissions['campaign:campaigns:editown'],
+                                        $permissions['campaign:campaigns:editother'],
+                                        $item->getCreatedBy()
+                                    ),
                                     'clone'  => $permissions['campaign:campaigns:create'],
-                                    'delete' => $permissions['campaign:campaigns:delete'],
+
+                                    'delete'   => $view['security']->hasEntityAccess(
+                                        $permissions['campaign:campaigns:deleteown'],
+                                        $permissions['campaign:campaigns:deleteother'],
+                                        $item->getCreatedBy()
+                                    ),
                                 ],
                                 'routeBase' => 'campaign',
                             ]
@@ -91,8 +131,11 @@ if ($tmpl == 'index') {
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
-                                    'item'  => $item,
-                                    'model' => 'campaign',
+                                    'item'          => $item,
+                                    'model'         => 'campaign',
+                                    'onclick'       => $item->getOnclickMethod(),
+                                    'attributes'    => $item->getDataAttributes(),
+                                    'transKeys'     => $item->getTranslationKeysDataAttributes(),
                                 ]
                             ); ?>
                             <a href="<?php echo $view['router']->path(
@@ -115,6 +158,13 @@ if ($tmpl == 'index') {
                         <?php $color    = ($category) ? '#'.$category->getColor() : 'inherit'; ?>
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateAdded() ? $view['date']->toFullConcat($item->getDateAdded()) : ''; ?>">
+                        <?php echo $item->getDateAdded() ? $view['date']->toDate($item->getDateAdded()) : ''; ?>
+                    </td>
+                    <td class="visible-lg" title="<?php echo $item->getDateModified() ? $view['date']->toFullConcat($item->getDateModified()) : ''; ?>">
+                        <?php echo $item->getDateModified() ? $view['date']->toDate($item->getDateModified()) : ''; ?>
+                    </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -54,9 +45,6 @@ class CompanyChangeLog
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -221,11 +209,9 @@ class CompanyChangeLog
     /**
      * Set lead.
      *
-     * @param \Mautic\LeadBundle\Entity\Lead $lead
-     *
      * @return CompanyChangeLog
      */
-    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
+    public function setLead(Lead $lead)
     {
         $this->lead = $lead;
 

@@ -1,21 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- * Modified from
- *
- * @see    https://github.com/barbushin/php-imap
- *
- * @author Barbushin Sergey http://linkedin.com/in/barbushin
- * @copyright BSD (three-clause)
- */
-
 namespace Mautic\EmailBundle\MonitoredEmail;
 
 class Message
@@ -29,8 +13,11 @@ class Message
 
     public $to = [];
     public $toString;
-    public $cc      = [];
-    public $replyTo = [];
+    public $cc         = [];
+    public $replyTo    = [];
+    public $inReplyTo  = false;
+    public $returnPath = false;
+    public $references = [];
 
     public $textPlain;
     public $textHtml;
@@ -43,9 +30,6 @@ class Message
     /** @var Attachment[] */
     protected $attachments = [];
 
-    /**
-     * @param Attachment $attachment
-     */
     public function addAttachment(Attachment $attachment)
     {
         $this->attachments[$attachment->id] = $attachment;

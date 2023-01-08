@@ -45,9 +45,9 @@ if (empty($emailType)) {
 
 $customButtons = [];
 if (!$isEmbedded) {
-    if ($emailType == 'list') {
-        $customButtons[] = [
-            'attr' => [
+    if ('list' == $emailType) {
+        $sendButton             = [
+            'attr'      => [
                 'data-toggle' => 'ajax',
                 'href'        => $view['router']->path(
                     'mautic_email_action',
@@ -58,6 +58,14 @@ if (!$isEmbedded) {
             'btnText'   => 'mautic.email.send',
             'primary'   => true,
         ];
+
+        if ($email->isBackgroundSending()) {
+            $sendButton['attr']['href']     = 'javascript:void(0);';
+            $sendButton['attr']['disabled'] = true;
+            $sendButton['tooltip']          = 'mautic.email.send.disabled';
+        }
+
+        $customButtons[] = $sendButton;
     }
 
     $customButtons[] = [
@@ -193,6 +201,29 @@ if (!$isEmbedded) {
                                     <td><?php echo $bccAddress; ?></td>
                                 </tr>
                             <?php endif; ?>
+
+                            <?php if ($headers = $email->getHeaders()): ?>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.custom_headers'); ?></span>
+                                    </td>
+                                    <td><?php echo $view['formatter']->simpleArrayToHtml($headers); ?></td>
+                                </tr>
+                            <?php endif; ?>
+
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.sent'); ?></span>
+                                </td>
+                                <td><?php echo $email->getSentCount(); ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.read'); ?></span>
+                                </td>
+                                <td><?php echo $email->getReadCount(); ?></td>
+                            </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -213,24 +244,29 @@ if (!$isEmbedded) {
             </div>
             <!--/ email detail collapseable toggler -->
 
-            <?php echo $view->render(
-                'MauticEmailBundle:Email:graph.html.php',
-                [
-                    'stats'         => $stats,
-                    'statsDevices'  => $statsDevices,
-                    'emailType'     => $emailType,
-                    'email'         => $email,
-                    'isVariant'     => ($showTranslations || $showVariants),
-                    'showAllStats'  => $showAllStats,
-                    'dateRangeForm' => $dateRangeForm,
-                ]
-            ); ?>
+            <?php
+            $isVariant = $showTranslations || $showVariants ?: 0;
+            $dateFrom  = new \DateTime($dateRangeForm->children['date_from']->vars['data']);
+            $dateTo    = new \DateTime($dateRangeForm->children['date_to']->vars['data']);
+            ?>
+            <div id="emailGraphStats" data-graph-url="<?php echo $view['router']->path('mautic_email_graph_stats', ['objectId' => $email->getId(), 'isVariant' => $isVariant, 'dateFrom' => $dateFrom->format('Y-m-d'), 'dateTo' => $dateTo->format('Y-m-d')]); ?>">
+                <div class="spinner">
+                    <i class="fa fa-spin fa-spinner"></i>
+                </div>
+            </div>
+
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
                     <a href="#clicks-container" role="tab" data-toggle="tab">
                         <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
+                    </a>
+                </li>
+                <li>
+                    <a href="#contacts-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('mautic.email.associated.contacts'); ?>
                     </a>
                 </li>
                 <?php if ($showVariants): ?>
@@ -254,7 +290,15 @@ if (!$isEmbedded) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', ['trackables' => $trackables]); ?>
+                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', [
+                    'trackables'  => $trackables,
+                    'entity'      => $email,
+                    'channel'     => 'email',
+                ]); ?>
+            </div>
+
+            <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
+                <?php echo $contacts; ?>
             </div>
 
             <?php if ($showVariants): ?>
@@ -281,13 +325,14 @@ if (!$isEmbedded) {
         <!-- preview URL -->
         <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
             <div class="panel-heading">
-                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.urlvariant'); ?></div>
+                <div class="panel-title"><?php echo $view['translator']->trans('mautic.email.preview.url'); ?></div>
             </div>
             <div class="panel-body pt-xs">
                 <div class="input-group">
+                    <div class="input-group-addon"><?php echo $view->render('MauticCoreBundle:Helper:publishstatus_icon.html.php', ['item' => $email, 'model' => 'email', 'query' => 'customToggle=publicPreview']); ?></div>
                     <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                            readonly
-                           value="<?php echo $previewUrl; ?>"/>
+                           value="<?php echo $view->escape($previewUrl); ?>"/>
                     <span class="input-group-btn">
                         <button class="btn btn-default btn-nospin" onclick="window.open('<?php echo $previewUrl; ?>', '_blank');">
                             <i class="fa fa-external-link"></i>
@@ -301,5 +346,5 @@ if (!$isEmbedded) {
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $email->getId(); ?>"/>
+    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($email->getId()); ?>"/>
 </div>

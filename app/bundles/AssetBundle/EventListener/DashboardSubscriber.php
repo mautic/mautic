@@ -1,23 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
+use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Class DashboardSubscriber.
- */
 class DashboardSubscriber extends MainDashboardSubscriber
 {
     /**
@@ -55,26 +44,25 @@ class DashboardSubscriber extends MainDashboardSubscriber
     protected $assetModel;
 
     /**
-     * DashboardSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var RouterInterface
      */
-    public function __construct(AssetModel $assetModel)
+    protected $router;
+
+    public function __construct(AssetModel $assetModel, RouterInterface $router)
     {
         $this->assetModel = $assetModel;
+        $this->router     = $router;
     }
 
     /**
      * Set a widget detail when needed.
-     *
-     * @param WidgetDetailEvent $event
      */
     public function onWidgetDetailGenerate(WidgetDetailEvent $event)
     {
         $this->checkPermissions($event);
         $canViewOthers = $event->hasPermission('asset:assets:viewother');
 
-        if ($event->getType() == 'asset.downloads.in.time') {
+        if ('asset.downloads.in.time' == $event->getType()) {
             $widget = $event->getWidget();
             $params = $widget->getParams();
 
@@ -92,14 +80,13 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'unique.vs.repetitive.downloads') {
+        if ('unique.vs.repetitive.downloads' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
-                $model  = $this->factory->getModel('asset');
                 $event->setTemplateData([
                     'chartType'   => 'pie',
                     'chartHeight' => $event->getWidget()->getHeight() - 80,
@@ -107,11 +94,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'popular.assets') {
+        if ('popular.assets' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -145,19 +132,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
-                        $event->getTranslator()->trans('mautic.dashboard.label.downloads'),
+                        'mautic.dashboard.label.title',
+                        'mautic.dashboard.label.downloads',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $assets,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
 
-        if ($event->getType() == 'created.assets') {
+        if ('created.assets' == $event->getType()) {
             if (!$event->isCached()) {
                 $params = $event->getWidget()->getParams();
 
@@ -188,14 +175,14 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
                 $event->setTemplateData([
                     'headItems' => [
-                        $event->getTranslator()->trans('mautic.dashboard.label.title'),
+                        'mautic.dashboard.label.title',
                     ],
                     'bodyItems' => $items,
                     'raw'       => $assets,
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
     }

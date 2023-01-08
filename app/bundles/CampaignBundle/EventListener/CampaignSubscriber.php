@@ -1,47 +1,48 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event as Events;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Service\Campaign as CampaignService;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Service\FlashBag;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class CampaignSubscriber.
- */
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
     /**
-     * CampaignSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
+     * @var CampaignService
      */
-    public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
-    {
-        $this->ipLookupHelper = $ipLookupHelper;
-        $this->auditLogModel  = $auditLogModel;
+    private $campaignService;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    public function __construct(
+        IpLookupHelper $ipLookupHelper,
+        AuditLogModel $auditLogModel,
+        CampaignService $campaignService,
+        FlashBag $flashBag
+    ) {
+        $this->ipLookupHelper   = $ipLookupHelper;
+        $this->auditLogModel    = $auditLogModel;
+        $this->campaignService  = $campaignService;
+        $this->flashBag         = $flashBag;
     }
 
     /**
@@ -50,21 +51,22 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents()
     {
         return [
-            CampaignEvents::CAMPAIGN_POST_SAVE   => ['onCampaignPostSave', 0],
-            CampaignEvents::CAMPAIGN_POST_DELETE => ['onCampaignDelete', 0],
-            CampaignEvents::CAMPAIGN_ON_BUILD    => ['onCampaignBuild', 0],
+            CampaignEvents::CAMPAIGN_POST_SAVE     => ['onCampaignPostSave', 0],
+            CampaignEvents::CAMPAIGN_POST_DELETE   => ['onCampaignDelete', 0],
         ];
     }
 
     /**
      * Add an entry to the audit log.
-     *
-     * @param Events\CampaignEvent $event
      */
     public function onCampaignPostSave(Events\CampaignEvent $event)
     {
         $campaign = $event->getCampaign();
         $details  = $event->getChanges();
+
+        if ($campaign->isPublished() && $this->campaignService->hasUnpublishedEmail($campaign->getId())) {
+            $this->setUnpublishedMailFlashMessage($campaign);
+        }
 
         //don't set leads
         unset($details['leads']);
@@ -84,8 +86,6 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param Events\CampaignEvent $event
      */
     public function onCampaignDelete(Events\CampaignEvent $event)
     {
@@ -101,23 +101,13 @@ class CampaignSubscriber extends CommonSubscriber
         $this->auditLogModel->writeToLog($log);
     }
 
-    /**
-     * Add event triggers and actions.
-     *
-     * @param Events\CampaignBuilderEvent $event
-     */
-    public function onCampaignBuild(Events\CampaignBuilderEvent $event)
+    private function setUnpublishedMailFlashMessage(Campaign $campaign)
     {
-        //Add action to actually add/remove lead to a specific lists
-        $addRemoveLeadAction = [
-            'label'           => 'mautic.campaign.event.addremovelead',
-            'description'     => 'mautic.campaign.event.addremovelead_descr',
-            'formType'        => 'campaignevent_addremovelead',
-            'formTypeOptions' => [
-                'include_this' => true,
-            ],
-            'callback' => '\Mautic\CampaignBundle\Helper\CampaignEventHelper::addRemoveLead',
-        ];
-        $event->addAction('campaign.addremovelead', $addRemoveLeadAction);
+        $this->flashBag->add(
+            'mautic.core.notice.campaign.unpublished.email',
+            [
+                '%name%' => $campaign->getName(),
+            ]
+        );
     }
 }

@@ -9,12 +9,11 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$scriptSrc = $view['assets']->getUrl('media/js/'.($app->getEnvironment() == 'dev' ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true);
+$scriptSrc = $view['assets']->getUrl('media/js/'.('dev' == $app->getEnvironment() ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true);
 $scriptSrc = str_replace('/index_dev.php', '', $scriptSrc);
 ?>
 
 <script type="text/javascript">
-
     /** This section is only needed once per page if manually copying **/
     if (typeof MauticSDKLoaded == 'undefined') {
         var MauticSDKLoaded = true;
@@ -30,5 +29,7 @@ $scriptSrc = str_replace('/index_dev.php', '', $scriptSrc);
         var MauticLang   = {
             'submittingMessage': "<?php echo $view['translator']->trans('mautic.form.submission.pleasewait'); ?>"
         }
+    }else if (typeof MauticSDK != 'undefined') {
+        MauticSDK.onLoad();
     }
 </script>

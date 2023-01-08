@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\Routing\RouterInterface;
 
 trait BuilderControllerTrait
 {
@@ -23,10 +14,9 @@ trait BuilderControllerTrait
     {
         /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->get('templating.helper.assets');
-        /** @var \Symfony\Bundle\FrameworkBundle\Templating\Helper\RouterHelper $routerHelper */
-        $routerHelper = $this->get('templating.helper.router');
+        /** @var RouterInterface $routerHelper */
+        $routerHelper = $this->get('router');
         $translator   = $this->get('templating.helper.translator');
-
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';")

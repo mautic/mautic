@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication;
 
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -40,10 +31,6 @@ class LogoutHandler implements LogoutHandlerInterface
 
     /**
      * LogoutHandler constructor.
-     *
-     * @param UserModel                $userModel
-     * @param EventDispatcherInterface $dispatcher
-     * @param UserHelper               $userHelper
      */
     public function __construct(UserModel $userModel, EventDispatcherInterface $dispatcher, UserHelper $userHelper)
     {
@@ -55,17 +42,13 @@ class LogoutHandler implements LogoutHandlerInterface
     /**
      * {@inheritdoc}
      *
-     * @param Request $request
-     *
      * @return Response never null
      */
     public function logout(Request $request, Response $response, TokenInterface $token)
     {
-        $this->userModel->setOnlineStatus('offline');
-
         if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
             $event = new LogoutEvent($this->user, $request);
-            $this->dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_LOGOUT);
         }
 
         // Clear session

@@ -1,25 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class StageController.
- */
-class StageController extends FormController
+class StageController extends AbstractFormController
 {
     /**
      * @param int $page
@@ -44,28 +35,21 @@ class StageController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get(
-            'mautic.stage.limit',
-            $this->coreParametersHelper->getParameter('default_pagelimit')
-        );
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.stage', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
-        $this->get('session')->set('mautic.stage.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.stage.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.stage.orderby', 's.name');
         $orderByDir = $this->get('session')->get('mautic.stage.orderbydir', 'ASC');
-
-        $stages = $this->getModel('stage')->getEntities(
+        $stageModel = $this->getModel('stage');
+        \assert($stageModel instanceof StageModel);
+        $stages = $stageModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -75,17 +59,19 @@ class StageController extends FormController
             ]
         );
 
+        $this->get('session')->set('mautic.stage.filter', $search);
+
         $count = count($stages);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.stage.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_stage_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect(
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticStageBundle:Stage:index',
+                    'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_stage_index',
                         'mauticContent' => 'stage',
@@ -94,13 +80,10 @@ class StageController extends FormController
             );
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.stage.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         //get the list of actions
-        $actions = $this->getModel('stage')->getStageActions();
+        $actions = $stageModel->getStageActions();
 
         return $this->delegateView(
             [
@@ -111,9 +94,9 @@ class StageController extends FormController
                     'page'        => $page,
                     'limit'       => $limit,
                     'permissions' => $permissions,
-                    'tmpl'        => $tmpl,
+                    'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:list.html.php',
+                'contentTemplate' => 'MauticStageBundle:Stage:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -133,6 +116,7 @@ class StageController extends FormController
     public function newAction($entity = null)
     {
         $model = $this->getModel('stage');
+        \assert($model instanceof StageModel);
 
         if (!($entity instanceof Stage)) {
             /** @var \Mautic\StageBundle\Entity\Stage $entity */
@@ -144,14 +128,13 @@ class StageController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.stage.page', 1);
-
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('stage[type]', '', true)
-            : '';
-
-        $action  = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
-        $actions = $model->getStageActions();
-        $form    = $model->createForm(
+        $page       = $this->get('session')->get('mautic.stage.page', 1);
+        $method     = $this->request->getMethod();
+        $stage      = $this->request->request->get('stage', []);
+        $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
+        $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
+        $actions    = $model->getStageActions();
+        $form       = $model->createForm(
             $entity,
             $this->get('form.factory'),
             $action,
@@ -163,8 +146,9 @@ class StageController extends FormController
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (Request::METHOD_POST === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -185,9 +169,9 @@ class StageController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                        $template  = 'MauticStageBundle:Stage:index';
+                        $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -195,10 +179,10 @@ class StageController extends FormController
                 }
             } else {
                 $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                $template  = 'MauticStageBundle:Stage:index';
+                $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -221,12 +205,12 @@ class StageController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticStageBundle:Stage:form.html.php', $themes),
-                    'actions' => $actions['actions'],
+                    'tmpl'      => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'entity'    => $entity,
+                    'form'      => $form->createView(),
+                    'actions'   => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.php',
+                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -252,7 +236,8 @@ class StageController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model  = $this->getModel('stage');
+        $model = $this->getModel('stage');
+        \assert($model instanceof StageModel);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -266,7 +251,7 @@ class StageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticStageBundle:Stage:index',
+            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
@@ -274,7 +259,7 @@ class StageController extends FormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge(
                     $postActionVars,
@@ -311,12 +296,12 @@ class StageController extends FormController
         );
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash(
                         'mautic.core.notice.updated',
@@ -333,9 +318,9 @@ class StageController extends FormController
                         ]
                     );
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                        $template  = 'MauticStageBundle:Stage:index';
+                        $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
                     }
                 }
             } else {
@@ -343,10 +328,10 @@ class StageController extends FormController
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_stage_index', $viewParameters);
-                $template  = 'MauticStageBundle:Stage:index';
+                $template  = 'Mautic\StageBundle\Controller\StageController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge(
                         $postActionVars,
@@ -373,10 +358,10 @@ class StageController extends FormController
                 'viewParameters' => [
                     'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'entity'  => $entity,
-                    'form'    => $this->setFormTheme($form, 'MauticStageBundle:Stage:form.html.php', $themes),
+                    'form'    => $form->createView(),
                     'actions' => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.php',
+                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -404,7 +389,7 @@ class StageController extends FormController
         $model  = $this->getModel('stage');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('stage:stages:create')) {
                 return $this->accessDenied();
             }
@@ -432,18 +417,19 @@ class StageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticStageBundle:Stage:index',
+            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model  = $this->getModel('stage');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('stage');
+            \assert($model instanceof StageModel);
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.stage.error.notfound',
@@ -492,15 +478,16 @@ class StageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticStageBundle:Stage:index',
+            'contentTemplate' => 'Mautic\StageBundle\Controller\StageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_stage_index',
                 'mauticContent' => 'stage',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model     = $this->getModel('stage');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('stage');
+            \assert($model instanceof StageModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -508,7 +495,7 @@ class StageController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.stage.error.notfound',

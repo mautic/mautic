@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -19,6 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FileController extends AjaxController
 {
+    public const EDITOR_FROALA   = 'froala';
+    public const EDITOR_CKEDITOR = 'ckeditor';
+
     protected $imageMimes = [
         'image/gif',
         'image/jpeg',
@@ -40,15 +34,16 @@ class FileController extends AjaxController
      */
     public function uploadAction()
     {
+        $editor   = $this->request->get('editor', 'froala');
         $mediaDir = $this->getMediaAbsolutePath();
         if (!isset($this->response['error'])) {
             foreach ($this->request->files as $file) {
                 if (in_array($file->getMimeType(), $this->imageMimes)) {
                     $fileName = md5(uniqid()).'.'.$file->guessExtension();
                     $file->move($mediaDir, $fileName);
-                    $this->response['link'] = $this->getMediaUrl().'/'.$fileName;
+                    $this->successfulResponse($fileName, $editor);
                 } else {
-                    $this->response['error'] = 'The uploaded image does not have an allowed mime type';
+                    $this->failureResponse($editor);
                 }
             }
         }
@@ -118,12 +113,12 @@ class FileController extends AjaxController
     {
         $mediaDir = realpath($this->get('mautic.helper.paths')->getSystemPath('images', true));
 
-        if ($mediaDir === false) {
+        if (false === $mediaDir) {
             $this->response['error'] = 'Media dir does not exist';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
 
-        if (is_writable($mediaDir) === false) {
+        if (false === is_writable($mediaDir)) {
             $this->response['error'] = 'Media dir is not writable';
             $this->statusCode        = Response::HTTP_INTERNAL_SERVER_ERROR;
         }
@@ -141,6 +136,28 @@ class FileController extends AjaxController
         return $this->request->getScheme().'://'
             .$this->request->getHttpHost()
             .$this->request->getBasePath().'/'
-            .$this->coreParametersHelper->getParameter('image_path');
+            .$this->coreParametersHelper->get('image_path');
+    }
+
+    private function successfulResponse(string $fileName, string $editor): void
+    {
+        $filePath = $this->getMediaUrl().'/'.$fileName;
+        if (self::EDITOR_CKEDITOR === $editor) {
+            $this->response['uploaded'] = true;
+            $this->response['url']      = $filePath;
+        } else {
+            $this->response['link'] = $filePath;
+        }
+    }
+
+    private function failureResponse(string $editor): void
+    {
+        $errorMsg = 'The uploaded image does not have an allowed mime type';
+        if (self::EDITOR_CKEDITOR === $editor) {
+            $this->response['uploaded']         = false;
+            $this->response['error']['message'] = $errorMsg;
+        } else {
+            $this->response['error'] = $errorMsg;
+        }
     }
 }

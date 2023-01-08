@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -69,9 +60,6 @@ class AuditLog
      */
     protected $ipAddress;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -82,7 +70,7 @@ class AuditLog
             ->addIndex(['bundle', 'object', 'action', 'object_id'], 'timeline_search')
             ->addIndex(['date_added'], 'date_added_index');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('userId', 'integer')
             ->columnName('user_id')
@@ -100,9 +88,7 @@ class AuditLog
             ->length(50)
             ->build();
 
-        $builder->createField('objectId', 'integer')
-            ->columnName('object_id')
-            ->build();
+        $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder->createField('action', 'string')
             ->length(50)
@@ -229,11 +215,9 @@ class AuditLog
     /**
      * Set details.
      *
-     * @param string $details
-     *
      * @return AuditLog
      */
-    public function setDetails($details)
+    public function setDetails(array $details)
     {
         $this->details = $details;
 
@@ -243,7 +227,7 @@ class AuditLog
     /**
      * Get details.
      *
-     * @return string
+     * @return array
      */
     public function getDetails()
     {

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Integration;
 
 use Mautic\PluginBundle\Entity\Integration;
@@ -29,14 +20,11 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         return [];
     }
 
-    /**
-     * @param Integration $settings
-     */
     public function setIntegrationSettings(Integration $settings)
     {
         //make sure URL does not have ending /
         $keys = $this->getDecryptedApiKeys($settings);
-        if (array_key_exists('url', $keys) && substr($keys['url'], -1) === '/') {
+        if (array_key_exists('url', $keys) && '/' === substr($keys['url'], -1)) {
             $keys['url'] = substr($keys['url'], 0, -1);
             $this->encryptAndSetApiKeys($keys, $settings);
         }
@@ -62,8 +50,9 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     public function getRequiredKeyFields()
     {
         return [
-            'app_name'  => 'mautic.citrix.form.appname',
-            'client_id' => 'mautic.citrix.form.consumerkey',
+            'app_name'      => 'mautic.citrix.form.appname',
+            'client_id'     => 'mautic.citrix.form.clientid',
+            'client_secret' => 'mautic.citrix.form.clientsecret',
         ];
     }
 
@@ -92,17 +81,6 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     }
 
     /**
-     * @return array
-     */
-    public function getFormSettings()
-    {
-        return [
-            'requires_callback'      => true,
-            'requires_authorization' => true,
-        ];
-    }
-
-    /**
      * @return string
      */
     public function getApiUrl()
@@ -117,7 +95,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAccessTokenUrl()
     {
-        return $this->getApiUrl().'/oauth/access_token';
+        return $this->getApiUrl().'/oauth/v2/token';
     }
 
     /**
@@ -127,19 +105,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
      */
     public function getAuthenticationUrl()
     {
-        return $this->getApiUrl().'/oauth/authorize';
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return bool
-     */
-    public function isAuthorized()
-    {
-        $keys = $this->getKeys();
-
-        return isset($keys[$this->getAuthTokenKey()]);
+        return $this->getApiUrl().'/oauth/v2/authorize';
     }
 
     /**
@@ -153,6 +119,20 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     }
 
     /**
+     * @param bool $inAuthorization
+     *
+     * @return string|null
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        if (!$inAuthorization && isset($this->keys[$this->getAuthTokenKey()])) {
+            return $this->keys[$this->getAuthTokenKey()];
+        }
+
+        return null;
+    }
+
+    /**
      * @return string
      */
     public function getOrganizerKey()
@@ -160,5 +140,29 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
         $keys = $this->getKeys();
 
         return $keys['organizer_key'];
+    }
+
+    /**
+     * Get the keys for the refresh token and expiry.
+     *
+     * @return array
+     */
+    public function getRefreshTokenKeys()
+    {
+        return ['refresh_token', 'expires'];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param $data
+     */
+    public function prepareResponseForExtraction($data)
+    {
+        if (is_array($data) && isset($data['expires_in'])) {
+            $data['expires'] = $data['expires_in'] + time();
+        }
+
+        return $data;
     }
 }

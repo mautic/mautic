@@ -1,23 +1,14 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class FileApiController.
+ * @extends CommonApiController<object>
  */
 class FileApiController extends CommonApiController
 {
@@ -28,14 +19,11 @@ class FileApiController extends CommonApiController
      */
     protected $allowedExtensions = [];
 
-    /**
-     * @param FilterControllerEvent $event
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
-        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->getParameter('allowed_extensions');
+        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->get('allowed_extensions');
 
         parent::initialize($event);
     }
@@ -43,7 +31,7 @@ class FileApiController extends CommonApiController
     /**
      * Uploads a file.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function createAction($dir)
     {
@@ -61,7 +49,7 @@ class FileApiController extends CommonApiController
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
-                    if (substr($dir, 0, 6) === 'images') {
+                    if ('images' === substr($dir, 0, 6)) {
                         $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
                     }
 
@@ -82,7 +70,7 @@ class FileApiController extends CommonApiController
     /**
      * List the files in /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function listAction($dir)
     {
@@ -97,12 +85,12 @@ class FileApiController extends CommonApiController
         if (is_array($fnames)) {
             foreach ($fnames as $key => $name) {
                 // remove hidden files
-                if (substr($name, 0, 1) === '.') {
+                if ('.' === substr($name, 0, 1)) {
                     unset($fnames[$key]);
                 }
             }
         } else {
-            return $this->returnError(ucfirst($dir).' dir is not readable', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError(ucfirst($dir).' dir is not readable');
         }
 
         $view = $this->view([$this->entityNameMulti => $fnames]);
@@ -113,7 +101,7 @@ class FileApiController extends CommonApiController
     /**
      * Delete a file from /media directory.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function deleteAction($dir, $file)
     {
@@ -128,7 +116,7 @@ class FileApiController extends CommonApiController
         if (!file_exists($filePath)) {
             return $this->returnError('File does not exist', Response::HTTP_NOT_FOUND);
         } elseif (!is_writable($filePath)) {
-            return $this->returnError('File is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->returnError('File is not writable');
         } else {
             unlink($filePath);
             $response['success'] = true;
@@ -155,7 +143,7 @@ class FileApiController extends CommonApiController
             $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['/']));
 
             // Dots in the dir name are slashes
-            if (strpos($dir, '.') !== false && !$subdir) {
+            if (false !== strpos($dir, '.') && !$subdir) {
                 $dirs = explode('.', $dir);
                 $dir  = $dirs[0];
                 unset($dirs[0]);
@@ -166,17 +154,17 @@ class FileApiController extends CommonApiController
                 throw new \InvalidArgumentException($dir.' not found. Only '.implode(' or ', $possibleDirs).' options are possible.');
             }
 
-            if ($dir === 'images') {
+            if ('images' === $dir) {
                 $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
-            } elseif ($dir === 'assets') {
-                $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->getParameter('upload_dir'));
+            } elseif ('assets' === $dir) {
+                $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->get('upload_dir'));
             }
 
-            if ($absoluteDir === false) {
+            if (false === $absoluteDir) {
                 throw new \InvalidArgumentException($dir.' dir does not exist', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
-            if (is_writable($absoluteDir) === false) {
+            if (false === is_writable($absoluteDir)) {
                 throw new \InvalidArgumentException($dir.' dir is not writable', Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
@@ -184,11 +172,8 @@ class FileApiController extends CommonApiController
 
             if (!file_exists($path)) {
                 if ($createDir) {
-                    if (mkdir($path) === false) {
-                        throw new \InvalidArgumentException(
-                            $dir.'/'.$subdir.' subdirectory could not be created.',
-                            Response::HTTP_INTERNAL_SERVER_ERROR
-                        );
+                    if (false === mkdir($path)) {
+                        throw new \InvalidArgumentException($dir.'/'.$subdir.' subdirectory could not be created.', Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
                 } else {
                     throw new \InvalidArgumentException($subdir.' doesn\'t exist in the '.$dir.' dir.');
@@ -214,6 +199,6 @@ class FileApiController extends CommonApiController
             .$this->request->getHttpHost()
             .':'.$this->request->getPort()
             .$this->request->getBasePath().'/'
-            .$this->get('mautic.helper.core_parameters')->getParameter('image_path');
+            .$this->get('mautic.helper.core_parameters')->get('image_path');
     }
 }

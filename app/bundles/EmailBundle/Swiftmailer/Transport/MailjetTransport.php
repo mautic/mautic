@@ -1,47 +1,60 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\EmailBundle\Model\TransportCallback;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class MailjetlTransport.
  */
-class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallbackTransport
+class MailjetTransport extends \Swift_SmtpTransport implements CallbackTransportInterface
 {
+    /**
+     * @var bool
+     */
     private $sandboxMode;
 
+    /**
+     * @var string
+     */
     private $sandboxMail;
+
+    /**
+     * @var TransportCallback
+     */
+    private $transportCallback;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct($host = 'localhost', $port = 25, $security = null, $sandboxMode = false, $sandboxMail = '')
+    public function __construct(TransportCallback $transportCallback, $sandboxMode = false, $sandboxMail = '')
     {
         parent::__construct('in-v3.mailjet.com', 587, 'tls');
         $this->setAuthMode('login');
 
         $this->setSandboxMode($sandboxMode);
         $this->setSandboxMail($sandboxMail);
+
+        $this->transportCallback = $transportCallback;
     }
 
-    public function send(\Swift_Mime_Message $message, &$failedRecipients = null)
+    /**
+     * @param null $failedRecipients
+     *
+     * @return int|void
+     *
+     * @throws \Exception
+     */
+    public function send(\Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
-
         // add leadIdHash to track this email
         if (isset($message->leadIdHash)) {
             // contact leadidHeash and email to be sure not applying email stat to bcc
+
+            $message->getHeaders()->removeAll('X-MJ-CUSTOMID');
+
             $message->getHeaders()->addTextHeader('X-MJ-CUSTOMID', $message->leadIdHash.'-'.key($message->getTo()));
         }
 
@@ -50,7 +63,7 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
             $message->setTo($this->getSandboxMail());
         }
 
-        parent::send($message, $failedRecipients);
+        return parent::send($message, $failedRecipients);
     }
 
     /**
@@ -66,24 +79,11 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
     /**
      * Handle response.
      *
-     * @param Request       $request
-     * @param MauticFactory $factory
-     *
      * @return mixed
      */
-    public function handleCallbackResponse(Request $request, MauticFactory $factory)
+    public function processCallbackRequest(Request $request)
     {
         $postData = json_decode($request->getContent(), true);
-        $rows     = [
-            DoNotContact::BOUNCED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-            DoNotContact::UNSUBSCRIBED => [
-                'hashIds' => [],
-                'emails'  => [],
-            ],
-        ];
 
         if (is_array($postData) && isset($postData['event'])) {
             // Mailjet API callback V1
@@ -99,34 +99,34 @@ class MailjetTransport extends \Swift_SmtpTransport implements InterfaceCallback
         }
 
         foreach ($events as $event) {
-            if (in_array($event['event'], [
-                'bounce',
-                'blocked',
-                'spam',
-                'unsub',
-            ])) {
-                if ($event['event'] === 'bounce' || $event['event'] === 'blocked') {
-                    $reason = $event['error_related_to'].' : '.$event['error'];
-                    $type   = DoNotContact::BOUNCED;
-                } elseif ($event['event'] === 'spam') {
-                    $reason = 'User reported email as spam, source :'.$event['source'];
-                    $type   = DoNotContact::BOUNCED;
-                } elseif ($event['event'] === 'unsub') {
-                    $reason = 'User unsubscribed';
-                    $type   = DoNotContact::UNSUBSCRIBED;
+            if (!in_array($event['event'], ['bounce', 'blocked', 'spam', 'unsub'])) {
+                continue;
+            }
+
+            if ('bounce' === $event['event'] || 'blocked' === $event['event']) {
+                $reason = $event['error_related_to'].': '.$event['error'];
+                $type   = DoNotContact::BOUNCED;
+            } elseif ('spam' === $event['event']) {
+                $reason = 'User reported email as spam, source: '.$event['source'];
+                $type   = DoNotContact::UNSUBSCRIBED;
+            } elseif ('unsub' === $event['event']) {
+                $reason = 'User unsubscribed';
+                $type   = DoNotContact::UNSUBSCRIBED;
+            } else {
+                continue;
+            }
+
+            if (isset($event['CustomID']) && '' !== $event['CustomID'] && false !== strpos($event['CustomID'], '-', 0)) {
+                $fistDashPos = strpos($event['CustomID'], '-', 0);
+                $leadIdHash  = substr($event['CustomID'], 0, $fistDashPos);
+                $leadEmail   = substr($event['CustomID'], $fistDashPos + 1, strlen($event['CustomID']));
+                if ($event['email'] == $leadEmail) {
+                    $this->transportCallback->addFailureByHashId($leadIdHash, $reason, $type);
                 }
-                if (isset($event['CustomID']) && $event['CustomID'] !== '' && strpos($event['CustomID'], '-', 0) !== false) {
-                    list($leadIdHash, $leadEmail) = explode('-', $event['CustomID']);
-                    if ($event['email'] == $leadEmail) {
-                        $rows[$type]['hashIds'][$leadIdHash] = $reason;
-                    }
-                } else {
-                    $rows[$type]['emails'][$event['email']] = $reason;
-                }
+            } else {
+                $this->transportCallback->addFailureByAddress($event['email'], $reason, $type);
             }
         }
-
-        return $rows;
     }
 
     /**

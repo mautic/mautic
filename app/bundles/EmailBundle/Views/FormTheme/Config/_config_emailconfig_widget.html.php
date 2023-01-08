@@ -13,7 +13,7 @@ $fieldKeys = array_keys($fields);
 $template  = '<div class="col-md-6">{content}</div>';
 ?>
 
-<?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_transport', 'mailer_spool_type']))): ?>
+<?php if (count(array_intersect($fieldKeys, ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_transport', 'mailer_spool_type']))): ?>
     <div class="panel panel-primary">
         <div class="panel-heading">
             <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.email.config.header.mail'); ?></h3>
@@ -22,6 +22,9 @@ $template  = '<div class="col-md-6">{content}</div>';
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_from_name', $template); ?>
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_from_email', $template); ?>
+            </div>
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_reply_to_email', $template); ?>
             </div>
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_return_path', $template); ?>
@@ -43,12 +46,21 @@ $template  = '<div class="col-md-6">{content}</div>';
                             <?php echo $view['form']->widget($fields['mailer_test_send_button']); ?>
                             <span class="fa fa-spinner fa-spin hide"></span>
                         </div>
-                        <div class="col-md-9 help-block"></div>
+                        <div class="col-md-9 help-block">
+                            <div class="status-msg"></div>
+                            <div class="save-config-msg hide text-danger"><?php echo $view['translator']->trans('mautic.email.config.save_to_test'); ?></div>
+                        </div>
                     </div>
                 </div>
             <?php endif; ?>
+
             <div class="row">
                 <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_region', $template); ?>
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_amazon_other_region', $template); ?>
+            </div>
+
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_sparkpost_region', $template); ?>
             </div>
 
             <div class="row">
@@ -73,6 +85,10 @@ $template  = '<div class="col-md-6">{content}</div>';
                     <?php echo $view['form']->rowIfExists($fields, 'mailer_mailjet_sandbox_default_mail', $template); ?>
                 </div>
             <?php endif; ?>
+
+            <div class="row">
+                <?php echo $view['form']->rowIfExists($fields, 'mailer_custom_headers', $template); ?>
+            </div>
 
             <?php if (isset($fields['mailer_transport'])): ?>
                 <hr class="text-muted" />
@@ -134,14 +150,12 @@ $template  = '<div class="col-md-6">{content}</div>';
     <div class="panel-body">
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'webview_text', $template); ?>
-        </div>
-
-        <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'default_signature_text', $template); ?>
         </div>
         <div class="row">
             <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, 'disable_trackable_urls', $template); ?>
         </div>
     </div>
 </div>

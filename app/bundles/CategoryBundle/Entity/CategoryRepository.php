@@ -1,28 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CategoryRepository.
+ * @extends CommonRepository<Category>
  */
 class CategoryRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -78,9 +67,7 @@ class CategoryRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        $results = $q->getQuery()->getArrayResult();
-
-        return $results;
+        return $q->getQuery()->getArrayResult();
     }
 
     /**
@@ -146,7 +133,7 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

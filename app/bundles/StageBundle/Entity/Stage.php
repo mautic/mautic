@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -79,9 +70,6 @@ class Stage extends FormEntity
         $this->log = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -105,9 +93,6 @@ class Stage extends FormEntity
         $builder->addCategory();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -153,8 +138,6 @@ class Stage extends FormEntity
 
     /**
      * Set weight.
-     *
-     * @param int $weight
      *
      * @return int
      */
@@ -236,8 +219,6 @@ class Stage extends FormEntity
     /**
      * Add log.
      *
-     * @param LeadStageLog $log
-     *
      * @return Log
      */
     public function addLog(LeadStageLog $log)
@@ -249,8 +230,6 @@ class Stage extends FormEntity
 
     /**
      * Remove log.
-     *
-     * @param LeadStageLog $log
      */
     public function removeLog(LeadStageLog $log)
     {

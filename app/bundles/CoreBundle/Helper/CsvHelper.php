@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 /**
@@ -30,8 +21,8 @@ class CsvHelper
 
         $header = null;
         $data   = [];
-        if (($handle = fopen($filename, 'r')) !== false) {
-            while (($row = fgetcsv($handle, 1000, $delimiter)) !== false) {
+        if (false !== ($handle = fopen($filename, 'r'))) {
+            while (false !== ($row = fgetcsv($handle, 1000, $delimiter))) {
                 if (!$header) {
                     $header = $row;
                 } else {
@@ -42,5 +33,34 @@ class CsvHelper
         }
 
         return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public static function sanitizeHeaders(array $headers)
+    {
+        return array_map('trim', $headers);
+    }
+
+    /**
+     * @return array
+     */
+    public static function convertHeadersIntoFields(array $headers)
+    {
+        sort($headers);
+
+        $importedFields = [];
+
+        foreach ($headers as $header) {
+            $fieldName = strtolower(InputHelper::alphanum($header, false, '_'));
+
+            // Skip columns with empty names as they cannot be mapped.
+            if (!empty($fieldName)) {
+                $importedFields[$fieldName] = $header;
+            }
+        }
+
+        return $importedFields;
     }
 }

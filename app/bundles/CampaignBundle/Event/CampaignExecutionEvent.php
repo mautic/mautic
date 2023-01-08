@@ -1,26 +1,21 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CampaignExecutionEvent.
+ * @deprecated 2.13.0; to be removed in 3.0
  */
 class CampaignExecutionEvent extends Event
 {
+    use EventArrayTrait;
+    use ContextTrait;
+
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var Lead
      */
     protected $lead;
 
@@ -28,11 +23,6 @@ class CampaignExecutionEvent extends Event
      * @var array
      */
     protected $event;
-
-    /**
-     * @var array
-     */
-    protected $config;
 
     /**
      * @var array
@@ -45,7 +35,7 @@ class CampaignExecutionEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var bool
+     * @var bool|mixed[]|string|null
      */
     protected $result;
 
@@ -65,27 +55,22 @@ class CampaignExecutionEvent extends Event
     protected $logUpdatedByListener = false;
 
     /**
-     * @var
+     * @var string
      */
     protected $channel;
 
     /**
-     * @var
+     * @var int
      */
     protected $channelId;
 
     /**
-     * CampaignExecutionEvent constructor.
-     *
-     * @param                   $args
-     * @param                   $result
-     * @param LeadEventLog|null $log
+     * @param bool|mixed[]|string|null $result
      */
-    public function __construct($args, $result, LeadEventLog $log = null)
+    public function __construct(array $args, $result, LeadEventLog $log = null)
     {
         $this->lead            = $args['lead'];
         $this->event           = $args['event'];
-        $this->config          = $args['event']['properties'];
         $this->eventDetails    = $args['eventDetails'];
         $this->systemTriggered = $args['systemTriggered'];
         $this->eventSettings   = $args['eventSettings'];
@@ -94,7 +79,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return \Mautic\LeadBundle\Entity\Lead
+     * @return Lead
      */
     public function getLead()
     {
@@ -102,11 +87,32 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
+     * Returns array with lead fields and owner ID if exist.
+     *
+     * @return array
+     */
+    public function getLeadFields()
+    {
+        $lead         = $this->getLead();
+        $isLeadEntity = ($lead instanceof Lead);
+
+        // In case Lead is a scalar value:
+        if (!$isLeadEntity && !is_array($lead)) {
+            $lead = [];
+        }
+
+        $leadFields             = $isLeadEntity ? $lead->getProfileFields() : $lead;
+        $leadFields['owner_id'] = $isLeadEntity && ($owner = $lead->getOwner()) ? $owner->getId() : 0;
+
+        return $leadFields;
+    }
+
+    /**
      * @return array
      */
     public function getEvent()
     {
-        return $this->event;
+        return ($this->event instanceof \Mautic\CampaignBundle\Entity\Event) ? $this->getEventArray($this->event) : $this->event;
     }
 
     /**
@@ -114,7 +120,7 @@ class CampaignExecutionEvent extends Event
      */
     public function getConfig()
     {
-        return $this->config;
+        return $this->getEvent()['properties'];
     }
 
     /**
@@ -134,7 +140,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @return bool
+     * @return bool|mixed[]|string|null
      */
     public function getResult()
     {
@@ -142,7 +148,7 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * @param $result
+     * @param bool|mixed[]|string|null $result
      *
      * @return $this
      */
@@ -156,7 +162,7 @@ class CampaignExecutionEvent extends Event
     /**
      * Set the result to failed.
      *
-     * @param null $reason
+     * @param string|null $reason
      *
      * @return $this
      */
@@ -180,8 +186,6 @@ class CampaignExecutionEvent extends Event
 
     /**
      * Set a custom log entry to override auto-handling of the log entry.
-     *
-     * @param LeadEventLog $log
      *
      * @return $this
      */
@@ -212,18 +216,8 @@ class CampaignExecutionEvent extends Event
     }
 
     /**
-     * Check if an event is applicable.
-     *
-     * @param $eventType
-     */
-    public function checkContext($eventType)
-    {
-        return strtolower($eventType) == strtolower($this->event['type']);
-    }
-
-    /**
-     * @param      $channel
-     * @param null $channelId
+     * @param string          $channel
+     * @param string|int|null $channelId
      *
      * @return $this
      */

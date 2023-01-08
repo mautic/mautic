@@ -1,35 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class WebhookRepository.
+ * @extends CommonRepository<Webhook>
  */
 class WebhookRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @param array $args
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
-    {
-        return parent::getEntities($args);
-    }
-
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
      * @param                                                              $filter
@@ -61,7 +40,7 @@ class WebhookRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

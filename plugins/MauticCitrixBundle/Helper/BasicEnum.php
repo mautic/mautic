@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Helper;
 
 use ReflectionClass;
@@ -19,7 +10,7 @@ abstract class BasicEnum
 
     private static function getConstants()
     {
-        if (self::$constCacheArray === null) {
+        if (null === self::$constCacheArray) {
             self::$constCacheArray = [];
         }
         $calledClass = get_called_class();

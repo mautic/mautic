@@ -1,36 +1,15 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MonitoringRepository.
+ * @extends CommonRepository<Monitoring>
  */
 class MonitoringRepository extends CommonRepository
 {
-    /**
-     * Get a list of entities.
-     *
-     * @param array $args
-     *
-     * @return Paginator
-     */
-    public function getEntities(array $args = [])
-    {
-        return parent::getEntities($args);
-    }
-
     /**
      * @param array $args
      *

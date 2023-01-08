@@ -1,48 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SysinfoModel.
- */
-class SysinfoModel extends AbstractCommonModel
+class SysinfoModel
 {
+    /**
+     * @var string|null
+     */
     protected $phpInfo;
+
+    /**
+     * @var array<string,bool>|null
+     */
     protected $folders;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
+    protected PathsHelper $pathsHelper;
+    protected CoreParametersHelper $coreParametersHelper;
+    protected Connection $connection;
+    private TranslatorInterface $translator;
+    private InstallService $installService;
+    private CheckStep $checkStep;
 
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * SysinfoModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param CoreParametersHelper $coreParametersHelper
-     */
-    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper,
+        TranslatorInterface $translator,
+        Connection $connection,
+        InstallService $installService,
+        CheckStep $checkStep
+    ) {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
+        $this->connection           = $connection;
+        $this->installService       = $installService;
+        $this->checkStep            = $checkStep;
     }
 
     /**
@@ -56,7 +55,7 @@ class SysinfoModel extends AbstractCommonModel
             return $this->phpInfo;
         }
 
-        if (function_exists('phpinfo')) {
+        if (function_exists('phpinfo') && 'cli' !== php_sapi_name()) {
             ob_start();
             $currentTz = date_default_timezone_get();
             date_default_timezone_set('UTC');
@@ -84,6 +83,22 @@ class SysinfoModel extends AbstractCommonModel
     }
 
     /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->installService->checkOptionalSettings($this->checkStep);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
+    }
+
+    /**
      * Method to get important folders with a writable flag.
      *
      * @return array
@@ -96,16 +111,16 @@ class SysinfoModel extends AbstractCommonModel
 
         $importantFolders = [
             $this->pathsHelper->getSystemPath('local_config'),
-            $this->coreParametersHelper->getParameter('cache_path'),
-            $this->coreParametersHelper->getParameter('log_path'),
-            $this->coreParametersHelper->getParameter('upload_dir'),
+            $this->coreParametersHelper->get('cache_path'),
+            $this->coreParametersHelper->get('log_path'),
+            $this->coreParametersHelper->get('upload_dir'),
             $this->pathsHelper->getSystemPath('images', true),
             $this->pathsHelper->getSystemPath('translations', true),
         ];
 
         // Show the spool folder only if the email queue is configured
-        if ($this->coreParametersHelper->getParameter('mailer_spool_type') == 'file') {
-            $importantFolders[] = $this->coreParametersHelper->getParameter('mailer_spool_path');
+        if ('file' == $this->coreParametersHelper->get('mailer_spool_type')) {
+            $importantFolders[] = $this->coreParametersHelper->get('mailer_spool_path');
         }
 
         foreach ($importantFolders as $folder) {
@@ -124,17 +139,26 @@ class SysinfoModel extends AbstractCommonModel
      *
      * @param int $lines
      *
-     * @return array|null
+     * @return string
      */
     public function getLogTail($lines = 10)
     {
-        $log = $this->coreParametersHelper->getParameter('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
+        $log = $this->coreParametersHelper->get('log_path').'/mautic_'.MAUTIC_ENV.'-'.date('Y-m-d').'.php';
 
         if (!file_exists($log)) {
             return null;
         }
 
         return $this->tail($log, $lines);
+    }
+
+    public function getDbInfo(): array
+    {
+        return [
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
+            'driver'   => $this->connection->getDriver()->getName(),
+            'platform' => get_class($this->connection->getDatabasePlatform()),
+        ];
     }
 
     /**
@@ -150,12 +174,11 @@ class SysinfoModel extends AbstractCommonModel
     {
         $f      = fopen($filename, 'rb');
         $output = '';
-        $chunk  = '';
 
         fseek($f, -1, SEEK_END);
 
-        if (fread($f, 1) != "\n") {
-            $lines -= 1;
+        if ("\n" != fread($f, 1)) {
+            --$lines;
         }
 
         while (ftell($f) > 0 && $lines >= 0) {

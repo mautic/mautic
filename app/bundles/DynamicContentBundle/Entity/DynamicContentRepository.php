@@ -1,28 +1,18 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Serializer;
 
 /**
- * DynamicContentRepository.
+ * @extends CommonRepository<DynamicContent>
  */
 class DynamicContentRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -111,7 +101,7 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {
@@ -152,10 +142,11 @@ class DynamicContentRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param array  $ignoreIds
+     * @param string $where
      *
      * @return array
      */
-    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
+    public function getDynamicContentList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $where = null)
     {
         $q = $this->createQueryBuilder('e');
         $q->select('partial e.{id, name, language}');
@@ -176,16 +167,20 @@ class DynamicContentRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevel == 'translation') {
+        if ('translation' == $topLevel) {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('e.translationParent'));
-        } elseif ($topLevel == 'variant') {
+        } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('e.variantParent'));
         }
 
         if (!empty($ignoreIds)) {
             $q->andWhere($q->expr()->notIn('e.id', ':dwc_ids'))
                 ->setParameter('dwc_ids', $ignoreIds);
+        }
+
+        if ($where) {
+            $q->andWhere($where);
         }
 
         $q->orderBy('e.name');
@@ -201,7 +196,7 @@ class DynamicContentRepository extends CommonRepository
     /**
      * @param $slot
      *
-     * @return bool|null|object
+     * @return bool|object|null
      */
     public function getDynamicContentForSlotFromCampaign($slot)
     {
@@ -218,7 +213,7 @@ class DynamicContentRepository extends CommonRepository
         $result = $qb->execute()->fetchAll();
 
         foreach ($result as $item) {
-            $properties = unserialize($item['properties']);
+            $properties = Serializer::decode($item['properties']);
 
             if (isset($properties['dynamicContent'])) {
                 $dwc = $this->getEntity($properties['dynamicContent']);

@@ -1,95 +1,101 @@
 <?php
 
-namespace Mautic\LeadBundle\Tests;
+namespace Mautic\LeadBundle\Tests\Model;
 
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Assert;
 
-class ListModelFunctionalTest extends MauticWebTestCase
+class ListModelFunctionalTest extends MauticMysqlTestCase
 {
-    public function testSegmentCountIsCorrect()
-    {
-        $repo            = $this->em->getRepository(LeadList::class);
-        $segmentTest1Ref = $this->fixtures->getReference('segment-test-1');
-        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
-        $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
-
-        $segmentContacts = $repo->getLeadsByList([
-            $segmentTest1Ref->getId(),
-            $segmentTest2Ref->getId(),
-            $segmentTest3Ref->getId(),
-        ], ['countOnly' => true]);
-
-        $this->assertEquals(
-            1,
-            $segmentContacts[$segmentTest1Ref->getId()]['count'],
-            'There should be 1 contacts in the segment-test-1 segment.'
-        );
-
-        $this->assertEquals(
-            4,
-            $segmentContacts[$segmentTest2Ref->getId()]['count'],
-            'There should be 4 contacts in the segment-test-2 segment.'
-        );
-
-        $this->assertEquals(
-            0,
-            $segmentContacts[$segmentTest3Ref->getId()]['count'],
-            'There should be 0 contacts in the segment-test-3 segment because the segment has not been built yet.'
-        );
-    }
-
     public function testPublicSegmentsInContactPreferences()
     {
-        $repo = $this->em->getRepository(LeadList::class);
+        $user           = $this->em->getRepository(User::class)->findBy([], [], 1)[0];
+        $firstLeadList  = $this->createLeadList($user, 'First', true);
+        $secondLeadList = $this->createLeadList($user, 'Second', false);
+        $thirdLeadList  = $this->createLeadList($user, 'Third', true);
+        $this->em->flush();
 
+        /** @var LeadListRepository $repo */
+        $repo  = $this->em->getRepository(LeadList::class);
         $lists = $repo->getGlobalLists();
 
-        $segmentTest2Ref = $this->fixtures->getReference('segment-test-2');
-
-        $this->assertArrayNotHasKey(
-            $segmentTest2Ref->getId(),
+        Assert::assertCount(2, $lists);
+        Assert::assertArrayHasKey($firstLeadList->getId(), $lists);
+        Assert::assertArrayHasKey($thirdLeadList->getId(), $lists);
+        Assert::assertArrayNotHasKey(
+            $secondLeadList->getId(),
             $lists,
-            'Non-public lists should not be returned by the `getGlobalLists()` method.'
+            'Non-global lists should not be returned by the `getGlobalLists()` method.'
         );
     }
 
-    public function testSegmentRebuildCommand()
+    private function createLeadList(User $user, string $name, bool $isGlobal): LeadList
     {
-        $repo            = $this->em->getRepository(LeadList::class);
-        $segmentTest3Ref = $this->fixtures->getReference('segment-test-3');
+        $leadList = new LeadList();
+        $leadList->setName($name);
+        $leadList->setPublicName('Public'.$name);
+        $leadList->setAlias(mb_strtolower($name));
+        $leadList->setCreatedBy($user);
+        $leadList->setIsGlobal($isGlobal);
+        $this->em->persist($leadList);
 
-        $this->runCommand('mautic:segments:update', [
-            '-i'    => $segmentTest3Ref->getId(),
-            '--env' => 'test',
-        ]);
+        return $leadList;
+    }
 
-        $segmentContacts = $repo->getLeadsByList([
-            $segmentTest3Ref->getId(),
-        ], ['countOnly' => true]);
+    public function testSegmentLineChartData(): void
+    {
+        /** @var ListModel $segmentModel */
+        $segmentModel = self::$container->get('mautic.lead.model.list');
 
-        $this->assertEquals(
-            24,
-            $segmentContacts[$segmentTest3Ref->getId()]['count'],
-            'There should be 24 contacts in the segment-test-3 segment after rebuilding from the command line.'
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        $segment = new LeadList();
+        $segment->setName('Segment A');
+
+        $segmentModel->saveEntity($segment);
+
+        $contacts = [new Lead(), new Lead(), new Lead(), new Lead()];
+
+        $contactRepository->saveEntities($contacts);
+
+        $segmentModel->addLead($contacts[0], $segment); // Emulating adding by a filter.
+        $segmentModel->addLead($contacts[1], $segment); // Emulating adding by a filter.
+        $segmentModel->addLead($contacts[2], $segment, true); // Manually added.
+        $segmentModel->addLead($contacts[3], $segment, true); // Manually added.
+
+        $data = $segmentModel->getSegmentContactsLineChartData(
+            'd',
+            new \DateTime('1 month ago', new \DateTimeZone('UTC')),
+            new \DateTime('now', new \DateTimeZone('UTC')),
+            null,
+            ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
 
-        // Remove the title from all contacts, rebuild the list, and check that list is updated
-        $this->em->getConnection()->query(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
+        Assert::assertSame(4, end($data['datasets'][0]['data'])); // Added for today.
+        Assert::assertSame(0, end($data['datasets'][1]['data'])); // Removed for today.
+        Assert::assertSame(4, end($data['datasets'][2]['data'])); // Total for today.
 
-        $this->runCommand('mautic:segments:update', [
-            '-i'    => $segmentTest3Ref->getId(),
-            '--env' => 'test',
-        ]);
+        // To make this interesting, lets' remove some contacts to see what happens.
+        $segmentModel->removeLead($contacts[1], $segment); // Emulating removing by a filter.
+        $segmentModel->removeLead($contacts[2], $segment, true); // Manually removed.
 
-        $segmentContacts = $repo->getLeadsByList([
-            $segmentTest3Ref->getId(),
-        ], ['countOnly' => true]);
-
-        $this->assertEquals(
-            0,
-            $segmentContacts[$segmentTest3Ref->getId()]['count'],
-            'There should be no contacts in the segment-test-3 segment after removing contact titles and rebuilding from the command line.'
+        $data = $segmentModel->getSegmentContactsLineChartData(
+            'd',
+            new \DateTime('1 month ago', new \DateTimeZone('UTC')),
+            new \DateTime('now', new \DateTimeZone('UTC')),
+            null,
+            ['leadlist_id' => ['value' => $segment->getId(), 'list_column_name' => 't.lead_id']]
         );
+
+        Assert::assertSame(4, end($data['datasets'][0]['data'])); // Added for today.
+        Assert::assertSame('2', end($data['datasets'][1]['data'])); // Removed for today.
+        Assert::assertSame(2, end($data['datasets'][2]['data'])); // Total for today.
     }
 }

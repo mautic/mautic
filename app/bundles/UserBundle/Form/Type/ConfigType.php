@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Form\Type;
 
 use Mautic\ConfigBundle\Form\Type\ConfigFileType;
@@ -20,10 +11,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -32,19 +21,16 @@ class ConfigType extends AbstractType
     protected $parameters;
 
     /**
-     * ConfigType constructor.
-     *
-     * @param CoreParametersHelper $parametersHelper
+     * @var TranslatorInterface
      */
-    public function __construct(CoreParametersHelper $parametersHelper)
+    protected $translator;
+
+    public function __construct(CoreParametersHelper $parametersHelper, TranslatorInterface $translator)
     {
         $this->parameters = $parametersHelper;
+        $this->translator = $translator;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -182,33 +168,30 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'saml_idp_default_role',
-            'role_list',
+            RoleListType::class,
             [
                 'label'      => 'mautic.user.config.form.saml.idp.default_role',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'            => 'form-control',
+                    'data-placeholder' => $this->translator->trans('mautic.user.config.form.saml.idp.disable_creation'),
+                    'tooltip'          => 'mautic.user.config.form.saml.idp.default_role.tooltip',
                 ],
-                'required'    => true,
-                'empty_value' => false,
+                'required'    => false,
+                'placeholder' => '',
             ]
         );
     }
 
-    /**
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
-     */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['entityId'] = $this->parameters->getParameter('mautic.saml_idp_entity_id');
+        $view->vars['entityId'] = $this->parameters->get('mautic.saml_idp_entity_id');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'userconfig';
     }

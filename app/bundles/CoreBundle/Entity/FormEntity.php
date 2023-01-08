@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -17,9 +8,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class FormEntity.
- */
 class FormEntity extends CommonEntity
 {
     /**
@@ -28,22 +16,22 @@ class FormEntity extends CommonEntity
     private $isPublished = true;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
-    private $dateAdded = null;
+    private $dateAdded;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $createdBy;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $createdByUser;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $dateModified;
 
@@ -53,22 +41,22 @@ class FormEntity extends CommonEntity
     private $modifiedBy;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $modifiedByUser;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $checkedOut;
 
     /**
-     * @var null|int
+     * @var int|null
      */
     private $checkedOutBy;
 
     /**
-     * @var null|string
+     * @var string|null
      */
     private $checkedOutByUser;
 
@@ -83,13 +71,10 @@ class FormEntity extends CommonEntity
     protected $new = false;
 
     /**
-     * @var
+     * @var int|null
      */
     public $deletedId;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -176,9 +161,10 @@ class FormEntity extends CommonEntity
     public function __clone()
     {
         $this->dateAdded    = null;
-        $this->dateModified = null;
+        $this->dateModified = new \DateTime();
         $this->checkedOut   = null;
         $this->isPublished  = false;
+        $this->createdBy    = null;
         $this->changes      = [];
     }
 
@@ -194,17 +180,17 @@ class FormEntity extends CommonEntity
     {
         if ($checkPublishStatus && method_exists($this, 'getPublishUp')) {
             $status = $this->getPublishStatus();
-            if ($status == 'published') {
+            if ('published' == $status) {
                 //check to see if there is a category to check
                 if ($checkCategoryStatus && method_exists($this, 'getCategory')) {
                     $category = $this->getCategory();
-                    if ($category !== null && !$category->isPublished()) {
+                    if (null !== $category && !$category->isPublished()) {
                         return false;
                     }
                 }
             }
 
-            return ($status == 'published') ? true : false;
+            return ('published' == $status) ? true : false;
         }
 
         return $this->getIsPublished();
@@ -243,6 +229,7 @@ class FormEntity extends CommonEntity
      */
     public function setDateModified($dateModified)
     {
+        $this->isChanged('dateModified', $dateModified);
         $this->dateModified = $dateModified;
 
         return $this;
@@ -283,19 +270,17 @@ class FormEntity extends CommonEntity
     }
 
     /**
-     * Set createdBy.
-     *
-     * @param User $createdBy
+     * @param User|int|null $createdBy
      *
      * @return $this
      */
     public function setCreatedBy($createdBy = null)
     {
-        if ($createdBy != null && !$createdBy instanceof User) {
+        if (null != $createdBy && !$createdBy instanceof User) {
             $this->createdBy = $createdBy;
         } else {
-            $this->createdBy = ($createdBy != null) ? $createdBy->getId() : null;
-            if ($createdBy != null) {
+            $this->createdBy = (null != $createdBy) ? $createdBy->getId() : null;
+            if (null != $createdBy) {
                 $this->createdByUser = $createdBy->getName();
             }
         }
@@ -322,12 +307,12 @@ class FormEntity extends CommonEntity
      */
     public function setModifiedBy($modifiedBy = null)
     {
-        if ($modifiedBy != null && !$modifiedBy instanceof User) {
+        if (null != $modifiedBy && !$modifiedBy instanceof User) {
             $this->modifiedBy = $modifiedBy;
         } else {
-            $this->modifiedBy = ($modifiedBy != null) ? $modifiedBy->getId() : null;
+            $this->modifiedBy = (null != $modifiedBy) ? $modifiedBy->getId() : null;
 
-            if ($modifiedBy != null) {
+            if (null != $modifiedBy) {
                 $this->modifiedByUser = $modifiedBy->getName();
             }
         }
@@ -354,12 +339,12 @@ class FormEntity extends CommonEntity
      */
     public function setCheckedOutBy($checkedOutBy = null)
     {
-        if ($checkedOutBy != null && !$checkedOutBy instanceof User) {
+        if (null != $checkedOutBy && !$checkedOutBy instanceof User) {
             $this->checkedOutBy = $checkedOutBy;
         } else {
-            $this->checkedOutBy = ($checkedOutBy != null) ? $checkedOutBy->getId() : null;
+            $this->checkedOutBy = (null != $checkedOutBy) ? $checkedOutBy->getId() : null;
 
-            if ($checkedOutBy != null) {
+            if (null != $checkedOutBy) {
                 $this->checkedOutByUser = $checkedOutBy->getName();
             }
         }
@@ -386,9 +371,9 @@ class FormEntity extends CommonEntity
      */
     public function setIsPublished($isPublished)
     {
-        $this->isChanged('isPublished', $isPublished);
+        $this->isChanged('isPublished', (bool) $isPublished);
 
-        $this->isPublished = $isPublished;
+        $this->isPublished = (bool) $isPublished;
 
         return $this;
     }
@@ -444,9 +429,11 @@ class FormEntity extends CommonEntity
             return true;
         }
 
-        $id = $this->getId();
+        if (!method_exists($this, 'getId')) {
+            return true;
+        }
 
-        return (empty($id)) ? true : false;
+        return !$this->getId();
     }
 
     /**
@@ -483,25 +470,37 @@ class FormEntity extends CommonEntity
 
     /**
      * @param mixed $createdByUser
+     *
+     * @return $this
      */
     public function setCreatedByUser($createdByUser)
     {
         $this->createdByUser = $createdByUser;
+
+        return $this;
     }
 
     /**
      * @param mixed $modifiedByUser
+     *
+     * @return $this
      */
     public function setModifiedByUser($modifiedByUser)
     {
         $this->modifiedByUser = $modifiedByUser;
+
+        return $this;
     }
 
     /**
      * @param mixed $checkedOutByUser
+     *
+     * @return $this
      */
     public function setCheckedOutByUser($checkedOutByUser)
     {
         $this->checkedOutByUser = $checkedOutByUser;
+
+        return $this;
     }
 }

@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Entity\DynamicContentEntityTrait;
+use Mautic\EmailBundle\Entity\Email;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -25,11 +16,11 @@ trait DynamicContentTrait
             'dynamicContent',
             CollectionType::class,
             [
-                'entry_type'   => DynamicContentFilterType::class,
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'label'        => false,
-                'options'      => [
+                'entry_type'         => DynamicContentFilterType::class,
+                'allow_add'          => true,
+                'allow_delete'       => true,
+                'label'              => false,
+                'entry_options'      => [
                     'label' => false,
                 ],
             ]
@@ -39,14 +30,21 @@ trait DynamicContentTrait
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
                 $data = $event->getData();
-                /** @var DynamicContentEntityTrait $entity */
+                /** @var Email $entity */
                 $entity = $event->getForm()->getData();
 
                 if (empty($data['dynamicContent'])) {
                     $data['dynamicContent'] = $entity->getDefaultDynamicContent();
                     unset($data['dynamicContent'][0]['filters']['filter']);
-                    $event->setData($data);
                 }
+
+                foreach ($data['dynamicContent'] as $key => $dc) {
+                    if (empty($dc['filters'])) {
+                        $data['dynamicContent'][$key]['filters'] = $entity->getDefaultDynamicContent()[0]['filters'];
+                    }
+                }
+
+                $event->setData($data);
             }
         );
     }

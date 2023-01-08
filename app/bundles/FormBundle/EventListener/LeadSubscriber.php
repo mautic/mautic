@@ -1,48 +1,56 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var FormModel
      */
-    protected $formModel;
+    private $formModel;
 
     /**
      * @var PageModel
      */
-    protected $pageModel;
+    private $pageModel;
 
     /**
-     * LeadSubscriber constructor.
-     *
-     * @param FormModel $formModel
-     * @param PageModel $pageModel
+     * @var SubmissionRepository
      */
-    public function __construct(FormModel $formModel, PageModel $pageModel)
-    {
-        $this->formModel = $formModel;
-        $this->pageModel = $pageModel;
+    private $submissionRepository;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(
+        FormModel $formModel,
+        PageModel $pageModel,
+        SubmissionRepository $submissionRepository,
+        TranslatorInterface $translator,
+        RouterInterface $router
+    ) {
+        $this->formModel            = $formModel;
+        $this->pageModel            = $pageModel;
+        $this->submissionRepository = $submissionRepository;
+        $this->translator           = $translator;
+        $this->router               = $router;
     }
 
     /**
@@ -58,8 +66,6 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
@@ -67,14 +73,13 @@ class LeadSubscriber extends CommonSubscriber
         $eventTypeKey  = 'form.submitted';
         $eventTypeName = $this->translator->trans('mautic.form.event.submitted');
         $event->addEventType($eventTypeKey, $eventTypeName);
+        $event->addSerializerGroup(['formList', 'submissionEventDetails']);
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        /** @var \Mautic\FormBundle\Entity\SubmissionRepository $submissionRepository */
-        $submissionRepository = $this->em->getRepository('MauticFormBundle:Submission');
-        $rows                 = $submissionRepository->getSubmissions($event->getQueryOptions());
+        $rows = $this->submissionRepository->getSubmissions($event->getQueryOptions());
 
         // Add total to counter
         $event->addToCounter($eventTypeKey, $rows);
@@ -84,11 +89,12 @@ class LeadSubscriber extends CommonSubscriber
             foreach ($rows['results'] as $row) {
                 // Convert to local from UTC
                 $form       = $this->formModel->getEntity($row['form_id']);
-                $submission = $submissionRepository->getEntity($row['id']);
+                $submission = $this->submissionRepository->getEntity($row['id']);
 
                 $event->addEvent(
                     [
                         'event'      => $eventTypeKey,
+                        'eventId'    => $eventTypeKey.$row['id'],
                         'eventLabel' => [
                             'label' => $form->getName(),
                             'href'  => $this->router->generate('mautic_form_action', ['objectAction' => 'view', 'objectId' => $form->getId()]),
@@ -102,17 +108,15 @@ class LeadSubscriber extends CommonSubscriber
                         ],
                         'contentTemplate' => 'MauticFormBundle:SubscribedEvents\Timeline:index.html.php',
                         'icon'            => 'fa-pencil-square-o',
+                        'contactId'       => $row['lead_id'],
                     ]
                 );
             }
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticFormBundle:Submission')->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
+        $this->submissionRepository->updateLead($event->getLoser()->getId(), $event->getVictor()->getId());
     }
 }

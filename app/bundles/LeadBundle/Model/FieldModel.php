@@ -1,29 +1,35 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\DriverException;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Exception\NoListenerException;
+use Mautic\LeadBundle\Field\CustomFieldColumn;
+use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
+use Mautic\LeadBundle\Field\FieldList;
+use Mautic\LeadBundle\Field\FieldsWithUniqueIdentifier;
+use Mautic\LeadBundle\Field\LeadFieldSaver;
+use Mautic\LeadBundle\Field\SchemaDefinition;
+use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class FieldModel
- * {@inheritdoc}
+ * @extends FormModel<LeadField>
  */
 class FieldModel extends FormModel
 {
@@ -31,34 +37,46 @@ class FieldModel extends FormModel
         // Listed according to $order for installation
         'title' => [
             'type'       => 'lookup',
-            'properties' => ['list' => 'Mr|Mrs|Miss'],
+            'properties' => [
+                'list' => [
+                    'Mr',
+                    'Mrs',
+                    'Miss',
+                ],
+            ],
             'fixed'      => true,
+            'listable'   => true,
             'object'     => 'lead',
         ],
         'firstname' => [
-            'fixed'  => true,
-            'short'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'lastname' => [
-            'fixed'  => true,
-            'short'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'company' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'position' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'email' => [
-            'type'   => 'email',
-            'unique' => true,
-            'fixed'  => true,
-            'short'  => true,
-            'object' => 'lead',
+            'type'     => 'email',
+            'unique'   => true,
+            'fixed'    => true,
+            'short'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'mobile' => [
             'type'     => 'tel',
@@ -71,6 +89,13 @@ class FieldModel extends FormModel
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
+        ],
+        'points' => [
+            'type'     => 'number',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+            'default'  => 0,
         ],
         'fax' => [
             'type'     => 'tel',
@@ -88,25 +113,41 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'city' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'state' => [
-            'type'   => 'region',
-            'fixed'  => true,
-            'object' => 'lead',
+            'type'     => 'region',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'zipcode' => [
-            'fixed'  => true,
-            'object' => 'lead',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'country' => [
-            'type'   => 'country',
-            'fixed'  => true,
-            'object' => 'lead',
+            'type'     => 'country',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
         ],
         'preferred_locale' => [
             'type'     => 'locale',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
+        'timezone' => [
+            'type'     => 'timezone',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'lead',
+        ],
+        'last_active' => [
+            'type'     => 'datetime',
             'fixed'    => true,
             'listable' => true,
             'object'   => 'lead',
@@ -119,7 +160,7 @@ class FieldModel extends FormModel
         ],
         'attribution' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'properties' => ['roundmode' => 4, 'scale' => 2],
             'fixed'      => true,
             'listable'   => true,
             'object'     => 'lead',
@@ -135,11 +176,6 @@ class FieldModel extends FormModel
             'object'   => 'lead',
         ],
         'foursquare' => [
-            'listable' => true,
-            'group'    => 'social',
-            'object'   => 'lead',
-        ],
-        'googleplus' => [
             'listable' => true,
             'group'    => 'social',
             'object'   => 'lead',
@@ -179,10 +215,10 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companyemail' => [
-            'type'   => 'email',
-            'unique' => true,
-            'fixed'  => true,
-            'object' => 'company',
+            'type'     => 'email',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companyphone' => [
             'type'     => 'tel',
@@ -196,9 +232,10 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companystate' => [
-            'type'   => 'region',
-            'fixed'  => true,
-            'object' => 'company',
+            'type'     => 'region',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companyzipcode' => [
             'fixed'    => true,
@@ -206,13 +243,16 @@ class FieldModel extends FormModel
             'object'   => 'company',
         ],
         'companycountry' => [
-            'type'   => 'country',
-            'fixed'  => true,
-            'object' => 'company',
+            'type'     => 'country',
+            'fixed'    => true,
+            'listable' => true,
+            'object'   => 'company',
         ],
         'companyname' => [
             'fixed'    => true,
             'required' => true,
+            'listable' => true,
+            'unique'   => true,
             'object'   => 'company',
         ],
         'companywebsite' => [
@@ -223,8 +263,9 @@ class FieldModel extends FormModel
         ],
         'companynumber_of_employees' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 0],
+            'properties' => ['roundmode' => 4, 'scale' => 0],
             'group'      => 'professional',
+            'listable'   => true,
             'object'     => 'company',
         ],
         'companyfax' => [
@@ -235,7 +276,7 @@ class FieldModel extends FormModel
         ],
         'companyannual_revenue' => [
             'type'       => 'number',
-            'properties' => ['roundmode' => 4, 'precision' => 2],
+            'properties' => ['roundmode' => 4, 'scale' => 2],
             'listable'   => true,
             'group'      => 'professional',
             'object'     => 'company',
@@ -243,38 +284,212 @@ class FieldModel extends FormModel
         'companyindustry' => [
             'type'       => 'select',
             'group'      => 'professional',
-            'properties' => ['list' => 'Agriculture|Apparel|Banking|Biotechnology|Chemicals|Communications|Construction|Education|Electronics|Energy|Engineering|Entertainment|Environmental|Finance|Food & Beverage|Government|Healthcare|Hospitality|Insurance|Machinery|Manufacturing|Media|Not for Profit|Recreation|Retail|Shipping|Technology|Telecommunications|Transportation|Utilities|Other'],
+            'properties' => [
+                'list' => [
+                    [
+                        'label' => 'Agriculture',
+                        'value' => 'Agriculture',
+                    ],
+                    [
+                        'label' => 'Apparel',
+                        'value' => 'Apparel',
+                    ],
+                    [
+                        'label' => 'Banking',
+                        'value' => 'Banking',
+                    ],
+                    [
+                        'label' => 'Biotechnology',
+                        'value' => 'Biotechnology',
+                    ],
+                    [
+                        'label' => 'Chemicals',
+                        'value' => 'Chemicals',
+                    ],
+                    [
+                        'label' => 'Communications',
+                        'value' => 'Communications',
+                    ],
+                    [
+                        'label' => 'Construction',
+                        'value' => 'Construction',
+                    ],
+                    [
+                        'label' => 'Education',
+                        'value' => 'Education',
+                    ],
+                    [
+                        'label' => 'Electronics',
+                        'value' => 'Electronics',
+                    ],
+                    [
+                        'label' => 'Energy',
+                        'value' => 'Energy',
+                    ],
+                    [
+                        'label' => 'Engineering',
+                        'value' => 'Engineering',
+                    ],
+                    [
+                        'label' => 'Entertainment',
+                        'value' => 'Entertainment',
+                    ],
+                    [
+                        'label' => 'Environmental',
+                        'value' => 'Environmental',
+                    ],
+                    [
+                        'label' => 'Finance',
+                        'value' => 'Finance',
+                    ],
+                    [
+                        'label' => 'Food & Beverage',
+                        'value' => 'Food & Beverage',
+                    ],
+                    [
+                        'label' => 'Government',
+                        'value' => 'Government',
+                    ],
+                    [
+                        'label' => 'Healthcare',
+                        'value' => 'Healthcare',
+                    ],
+                    [
+                        'label' => 'Hospitality',
+                        'value' => 'Hospitality',
+                    ],
+                    [
+                        'label' => 'Insurance',
+                        'value' => 'Insurance',
+                    ],
+                    [
+                        'label' => 'Machinery',
+                        'value' => 'Machinery',
+                    ],
+                    [
+                        'label' => 'Manufacturing',
+                        'value' => 'Manufacturing',
+                    ],
+                    [
+                        'label' => 'Media',
+                        'value' => 'Media',
+                    ],
+                    [
+                        'label' => 'Not for Profit',
+                        'value' => 'Not for Profit',
+                    ],
+                    [
+                        'label' => 'Recreation',
+                        'value' => 'Recreation',
+                    ],
+                    [
+                        'label' => 'Retail',
+                        'value' => 'Retail',
+                    ],
+                    [
+                        'label' => 'Shipping',
+                        'value' => 'Shipping',
+                    ],
+                    [
+                        'label' => 'Technology',
+                        'value' => 'Technology',
+                    ],
+                    [
+                        'label' => 'Telecommunications',
+                        'value' => 'Telecommunications',
+                    ],
+                    [
+                        'label' => 'Transportation',
+                        'value' => 'Transportation',
+                    ],
+                    [
+                        'label' => 'Utilities',
+                        'value' => 'Utilities',
+                    ],
+                    [
+                        'label' => 'Other',
+                        'value' => 'Other',
+                    ],
+                ],
+            ],
             'fixed'      => true,
+            'listable'   => true,
             'object'     => 'company',
         ],
         'companydescription' => [
-            'fixed'  => true,
-            'group'  => 'professional',
-            'object' => 'company',
+            'fixed'    => true,
+            'group'    => 'professional',
+            'listable' => true,
+            'object'   => 'company',
         ],
     ];
 
     /**
-     * @var SchemaHelperFactory
+     * @var ColumnSchemaHelper
      */
-    protected $schemaHelperFactory;
+    private $columnSchemaHelper;
 
     /**
-     * FieldModel constructor.
-     *
-     * @param SchemaHelperFactory $schemaHelperFactory
+     * @var CustomFieldColumn
      */
-    public function __construct(SchemaHelperFactory $schemaHelperFactory)
-    {
-        $this->schemaHelperFactory = $schemaHelperFactory;
+    private $customFieldColumn;
+
+    /**
+     * @var FieldSaveDispatcher
+     */
+    private $fieldSaveDispatcher;
+
+    /**
+     * @var LeadFieldRepository
+     */
+    private $leadFieldRepository;
+
+    /**
+     * @var ListModel
+     */
+    private $leadListModel;
+
+    /**
+     * @var FieldsWithUniqueIdentifier
+     */
+    private $fieldsWithUniqueIdentifier;
+
+    /**
+     * @var FieldList
+     */
+    private $fieldList;
+
+    /**
+     * @var LeadFieldSaver
+     */
+    private $leadFieldSaver;
+
+    public function __construct(
+        ColumnSchemaHelper $columnSchemaHelper,
+        ListModel $leadListModel,
+        CustomFieldColumn $customFieldColumn,
+        FieldSaveDispatcher $fieldSaveDispatcher,
+        LeadFieldRepository $leadFieldRepository,
+        FieldsWithUniqueIdentifier $fieldsWithUniqueIdentifier,
+        FieldList $fieldList,
+        LeadFieldSaver $leadFieldSaver
+    ) {
+        $this->columnSchemaHelper         = $columnSchemaHelper;
+        $this->leadListModel              = $leadListModel;
+        $this->customFieldColumn          = $customFieldColumn;
+        $this->fieldSaveDispatcher        = $fieldSaveDispatcher;
+        $this->leadFieldRepository        = $leadFieldRepository;
+        $this->fieldsWithUniqueIdentifier = $fieldsWithUniqueIdentifier;
+        $this->fieldList                  = $fieldList;
+        $this->leadFieldSaver             = $leadFieldSaver;
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository
+     * @return LeadFieldRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadField');
+        return $this->leadFieldRepository;
     }
 
     /**
@@ -292,17 +507,15 @@ class FieldModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return LeadField|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadField();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -314,14 +527,54 @@ class FieldModel extends FormModel
      */
     public function getEntities(array $args = [])
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadField')->getEntities($args);
+        return $this->em->getRepository(LeadField::class)->getEntities($args);
     }
 
     /**
-     * @param   $entity
-     * @param   $unlock
+     * @return array
+     */
+    public function getLeadFields()
+    {
+        return $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'lead',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCompanyFields()
+    {
+        return $this->getEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'f.object',
+                        'expr'   => 'like',
+                        'value'  => 'company',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @param LeadField $entity
+     * @param bool      $unlock
      *
-     * @return mixed
+     * @throws AbortColumnCreateException
+     * @throws DBALException
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -329,115 +582,67 @@ class FieldModel extends FormModel
             throw new MethodNotAllowedHttpException(['LeadEntity']);
         }
 
-        $isNew = ($entity->getId()) ? false : true;
+        $this->setTimestamps($entity, $entity->isNew(), $unlock);
 
-        //set some defaults
-        $this->setTimestamps($entity, $isNew, $unlock);
-        $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $alias   = $entity->getAlias();
-        $object  = $objects[$entity->getObject()];
-
-        if ($isNew) {
-            if (empty($alias)) {
-                $alias = $entity->getName();
-            }
-
-            if (empty($object)) {
-                $object = $objects[$entity->getObject()];
-            }
-
-            // clean the alias
-            $alias = $this->cleanAlias($alias, 'f_', 25);
-
-            // make sure alias is not already taken
-            $repo      = $this->getRepository();
-            $testAlias = $alias;
-            $aliases   = $repo->getAliases($entity->getId(), false, true, $entity->getObject());
-            $count     = (int) in_array($testAlias, $aliases);
-            $aliasTag  = $count;
-
-            while ($count) {
-                $testAlias = $alias.$aliasTag;
-                $count     = (int) in_array($testAlias, $aliases);
-                ++$aliasTag;
-            }
-
-            if ($testAlias != $alias) {
-                $alias = $testAlias;
-            }
-            $entity->setAlias($alias);
-        }
-
-        $type = $entity->getType();
-        if ($type == 'time') {
+        if ('time' === $entity->getType()) {
             //time does not work well with list filters
             $entity->setIsListable(false);
         }
 
-        $event = $this->dispatchEvent('pre_save', $entity, $isNew);
-        $this->getRepository()->saveEntity($entity);
-        $this->dispatchEvent('post_save', $entity, $isNew, $event);
-
-        $isUnique = $entity->getIsUniqueIdentifier();
-
-        if ($entity->getId()) {
-            //create the field as its own column in the leads table
-            $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
-            if ($isNew || (!$isNew && !$leadsSchema->checkColumnExists($alias))) {
-                $schemaDefinition = self::getSchemaDefinition($alias, $entity->getType(), $isUnique);
-                $leadsSchema->addColumn(
-                    $schemaDefinition
-                );
-                $leadsSchema->executeChanges();
-
-                // Update the unique_identifier_search index and add an index for this field
-                /** @var \Mautic\CoreBundle\Doctrine\Helper\IndexSchemaHelper $modifySchema */
-                $modifySchema = $this->schemaHelperFactory->getSchemaHelper('index', $object);
-                if ('string' == $schemaDefinition['type']) {
-                    try {
-                        $modifySchema->addIndex([$alias], $alias.'_search');
-                        $modifySchema->allowColumn($alias);
-                        if ($isUnique) {
-                            // Get list of current uniques
-                            $uniqueIdentifierFields = $this->getUniqueIdentifierFields();
-
-                            // Always use email
-                            $indexColumns   = ['email'];
-                            $indexColumns   = array_merge($indexColumns, array_keys($uniqueIdentifierFields));
-                            $indexColumns[] = $alias;
-
-                            // Only use three to prevent max key length errors
-                            $indexColumns = array_slice($indexColumns, 0, 3);
-                            $modifySchema->addIndex($indexColumns, 'unique_identifier_search');
-                        }
-                        $modifySchema->executeChanges();
-                    } catch (\Exception $e) {
-                        $this->logger->addWarning($e->getMessage());
-                    }
-                }
-            }
+        // Save the entity now if it's an existing entity
+        if (!$entity->isNew()) {
+            $this->leadFieldSaver->saveLeadFieldEntity($entity, false);
         }
 
-        //update order of other fields
+        try {
+            $this->customFieldColumn->createLeadColumn($entity);
+        } catch (CustomFieldLimitException $e) {
+            // Convert to original Exception not to cause BC
+            throw new DBALException($this->translator->trans($e->getMessage()));
+        }
+
+        // Update order of the other fields.
         $this->reorderFieldsByEntity($entity);
     }
 
     /**
-     * {@inheritdoc}
+     * Build schema for each entity.
      *
-     * @param  $entity
+     * @param array $entities
+     * @param bool  $unlock
+     *
+     * @return array|void
+     *
+     * @throws AbortColumnCreateException
+     * @throws DBALException
+     * @throws DriverException
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
+     */
+    public function saveEntities($entities, $unlock = true)
+    {
+        foreach ($entities as $entity) {
+            $this->saveEntity($entity, $unlock);
+        }
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function deleteEntity($entity)
     {
         parent::deleteEntity($entity);
 
-        $objects = ['lead' => 'leads', 'company' => 'companies'];
-        $object  = $objects[$entity->getObject()];
-
-        //remove the column from the leads table
-        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', $object);
-        $leadsSchema->dropColumn($entity->getAlias());
-        $leadsSchema->executeChanges();
+        switch ($entity->getObject()) {
+            case 'lead':
+                $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
+                break;
+            case 'company':
+                $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
+                break;
+        }
     }
 
     /**
@@ -446,17 +651,58 @@ class FieldModel extends FormModel
      * @param array $ids
      *
      * @return array
+     *
+     * @throws \Mautic\CoreBundle\Exception\SchemaException
      */
     public function deleteEntities($ids)
     {
         $entities = parent::deleteEntities($ids);
 
-        //remove the column from the leads table
-        $leadsSchema = $this->schemaHelperFactory->getSchemaHelper('column', 'leads');
-        foreach ($entities as $e) {
-            $leadsSchema->dropColumn($e->getAlias());
+        /** @var LeadField $entity */
+        foreach ($entities as $entity) {
+            switch ($entity->getObject()) {
+                case 'lead':
+                    $this->columnSchemaHelper->setName('leads')->dropColumn($entity->getAlias())->executeChanges();
+                    break;
+                case 'company':
+                    $this->columnSchemaHelper->setName('companies')->dropColumn($entity->getAlias())->executeChanges();
+                    break;
+            }
         }
-        $leadsSchema->executeChanges();
+
+        return $entities;
+    }
+
+    /**
+     * Is field used in segment filter?
+     *
+     * @return bool
+     */
+    public function isUsedField(LeadField $field)
+    {
+        return $this->leadListModel->isFieldUsed($field);
+    }
+
+    /**
+     * Returns list of all segments that use $field.
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     */
+    public function getFieldSegments(LeadField $field)
+    {
+        return $this->leadListModel->getFieldSegments($field);
+    }
+
+    /**
+     * Filter used field ids.
+     *
+     * @return array
+     */
+    public function filterUsedFieldIds(array $ids)
+    {
+        return array_filter($ids, function ($id) {
+            return false === $this->isUsedField($this->getEntity($id));
+        });
     }
 
     /**
@@ -498,8 +744,7 @@ class FieldModel extends FormModel
     /**
      * Reorders fields by a list of field ids.
      *
-     * @param array $list
-     * @param int   $start Number to start the order by (used for paginated reordering)
+     * @param int $start Number to start the order by (used for paginated reordering)
      */
     public function reorderFieldsByList(array $list, $start = 1)
     {
@@ -517,15 +762,18 @@ class FieldModel extends FormModel
     /**
      * Get list of custom field values for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
+     * @param string $type
+     * @param string $filter
+     * @param int    $limit
      *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead')->getValueList($type, $filter, $limit);
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        return $contactRepository->getValueList($type, $filter, $limit);
     }
 
     /**
@@ -538,7 +786,7 @@ class FieldModel extends FormModel
      *
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     * @throws MethodNotAllowedHttpException
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
@@ -550,21 +798,16 @@ class FieldModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leadfield', $entity, $options);
+        return $formFactory->create(FieldType::class, $entity, $options);
     }
 
     /**
-     * @param $entity
-     * @param properties
+     * @param $properties
      *
      * @return bool
      */
-    public function setFieldProperties(&$entity, $properties)
+    public function setFieldProperties(LeadField $entity, array $properties)
     {
-        if (!$entity instanceof LeadField) {
-            throw new MethodNotAllowedHttpException(['LeadEntity']);
-        }
-
         if (!empty($properties) && is_array($properties)) {
             $properties = InputHelper::clean($properties);
         } else {
@@ -578,9 +821,9 @@ class FieldModel extends FormModel
             $entity->setProperties($properties);
 
             return true;
-        } else {
-            return $result[1];
         }
+
+        return $result[1];
     }
 
     /**
@@ -595,42 +838,39 @@ class FieldModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
+        switch ($action) {
+            case 'pre_save':
+                $action = LeadEvents::FIELD_PRE_SAVE;
+                break;
+            case 'post_save':
+                $action = LeadEvents::FIELD_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $action = LeadEvents::FIELD_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $action = LeadEvents::FIELD_POST_DELETE;
+                break;
+        }
+
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::FIELD_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::FIELD_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::FIELD_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::FIELD_POST_DELETE;
-                break;
-            default:
-                return null;
+        if (null !== $event && !$event instanceof LeadFieldEvent) {
+            throw new RuntimeException('Event should be LeadFieldEvent|null.');
         }
 
-        if ($this->dispatcher->hasListeners($name)) {
-            if (empty($event)) {
-                $event = new LeadFieldEvent($entity, $isNew);
-                $event->setEntityManager($this->em);
-            }
-
-            $this->dispatcher->dispatch($name, $event);
-
+        try {
+            return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
+        } catch (NoListenerException $exception) {
             return $event;
-        } else {
-            return null;
         }
     }
 
     /**
+     * @deprecated Use FieldList::getFieldList method instead
+     *
      * @param bool|true $byGroup
      * @param bool|true $alphabetical
      * @param array     $filters
@@ -639,47 +879,7 @@ class FieldModel extends FormModel
      */
     public function getFieldList($byGroup = true, $alphabetical = true, $filters = ['isPublished' => true, 'object' => 'lead'])
     {
-        $forceFilters = [];
-        foreach ($filters as $col => $val) {
-            $forceFilters[] = [
-                'column' => "f.{$col}",
-                'expr'   => 'eq',
-                'value'  => $val,
-            ];
-        }
-        // Get a list of custom form fields
-        $fields = $this->getEntities([
-            'filter' => [
-                'force' => $forceFilters,
-            ],
-            'orderBy'    => 'f.order',
-            'orderByDir' => 'asc',
-        ]);
-
-        $leadFields = [];
-
-        foreach ($fields as $f) {
-            if ($byGroup) {
-                $fieldName                              = $this->translator->trans('mautic.lead.field.group.'.$f->getGroup());
-                $leadFields[$fieldName][$f->getAlias()] = $f->getLabel();
-            } else {
-                $leadFields[$f->getAlias()] = $f->getLabel();
-            }
-        }
-
-        if ($alphabetical) {
-            // Sort the groups
-            uksort($leadFields, 'strnatcmp');
-
-            if ($byGroup) {
-                // Sort each group by translation
-                foreach ($leadFields as $group => &$fieldGroup) {
-                    uasort($fieldGroup, 'strnatcmp');
-                }
-            }
-        }
-
-        return $leadFields;
+        return $this->fieldList->getFieldList($byGroup, $alphabetical, $filters);
     }
 
     /**
@@ -742,6 +942,7 @@ class FieldModel extends FormModel
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
+                'isPublished'  => $contactField['isPublished'],
             ];
         }
 
@@ -799,29 +1000,29 @@ class FieldModel extends FormModel
      */
     public function getUniqueIdentiferFields($filters = [])
     {
-        $filters['isPublished']       = isset($filters['isPublished']) ? $filters['isPublished'] : true;
-        $filters['isUniqueIdentifer'] = isset($filters['isUniqueIdentifer']) ? $filters['isUniqueIdentifer'] : true;
-        $filters['object']            = isset($filters['object']) ? $filters['object'] : 'lead';
-
-        $fields = $this->getFieldList(false, true, $filters);
-
-        return $fields;
+        return $this->getUniqueIdentifierFields($filters);
     }
 
     /**
-     * Wrapper for misspelled getUniqueIdentiferFields.
+     * Retrieves a list of published fields that are unique identifers.
      *
-     * @return array
+     * @deprecated Use FieldsWithUniqueIdentifier::getFieldsWithUniqueIdentifier method instead
+     *
+     * @param array $filters
+     *
+     * @return mixed
      */
     public function getUniqueIdentifierFields($filters = [])
     {
-        return $this->getUniqueIdentiferFields($filters);
+        return $this->fieldsWithUniqueIdentifier->getFieldsWithUniqueIdentifier($filters);
     }
 
     /**
      * Get the MySQL database type based on the field type
      * Use a static function so that it's accessible from DoctrineSubscriber
      * without causing a circular service injection error.
+     *
+     * @deprecated Use SchemaDefinition::getSchemaDefinition method instead
      *
      * @param      $alias
      * @param      $type
@@ -831,49 +1032,14 @@ class FieldModel extends FormModel
      */
     public static function getSchemaDefinition($alias, $type, $isUnique = false)
     {
-        // Unique is always a string in order to control index length
-        if ($isUnique) {
-            return [
-                'name'    => $alias,
-                'type'    => 'string',
-                'options' => [
-                    'notnull' => false,
-                ],
-            ];
-        }
+        return SchemaDefinition::getSchemaDefinition($alias, $type, $isUnique);
+    }
 
-        switch ($type) {
-            case 'datetime':
-            case 'date':
-            case 'time':
-            case 'boolean':
-                $schemaType = $type;
-                break;
-            case 'number':
-                $schemaType = 'float';
-                break;
-            case 'timezone':
-            case 'locale':
-            case 'country':
-            case 'email':
-            case 'lookup':
-            case 'select':
-            case 'multiselect':
-            case 'region':
-            case 'tel':
-                $schemaType = 'string';
-                break;
-            case 'text':
-                $schemaType = (strpos($alias, 'description') !== false) ? 'text' : 'string';
-                break;
-            default:
-                $schemaType = 'text';
-        }
-
-        return [
-            'name'    => $alias,
-            'type'    => $schemaType,
-            'options' => ['notnull' => false],
-        ];
+    /**
+     * {@inheritdoc}
+     */
+    public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
+    {
+        return $this->getRepository()->findOneByAlias($alias);
     }
 }

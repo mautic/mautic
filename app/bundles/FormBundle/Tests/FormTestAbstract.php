@@ -1,136 +1,93 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
-use Mautic\CoreBundle\Doctrine\Helper\SchemaHelperFactory;
+use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
+use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
+use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
+use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Templating\EngineInterface;
 
-class FormTestAbstract extends WebTestCase
+class FormTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
-    protected $container;
+    protected $formRepository;
+    protected $leadFieldModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        self::bootKernel();
-        $this->mockTrackingId = hash('sha1', uniqid(mt_rand()));
-        $this->container      = self::$kernel->getContainer();
+        $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
     }
 
     /**
-     * @return CampaignModel
+     * @return FormModel
      */
     protected function getFormModel()
     {
-        $requestStack = $this
-            ->getMockBuilder(RequestStack::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $requestStack         = $this->createMock(RequestStack::class);
+        $templatingHelperMock = $this->createMock(TemplatingHelper::class);
+        $themeHelper          = $this->createMock(ThemeHelperInterface::class);
+        $formActionModel      = $this->createMock(ActionModel::class);
+        $formFieldModel       = $this->createMock(FieldModel::class);
+        $fieldHelper          = $this->createMock(FormFieldHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcher::class);
+        $translator           = $this->createMock(Translator::class);
+        $entityManager        = $this->createMock(EntityManager::class);
+        $formUploaderMock     = $this->createMock(FormUploader::class);
+        $contactTracker       = $this->createMock(ContactTracker::class);
+        $this->leadFieldModel = $this->createMock(LeadFieldModel::class);
+        $this->formRepository = $this->createMock(FormRepository::class);
+        $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
 
-        $templatingHelperMock = $this
-            ->getMockBuilder(TemplatingHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $themeHelper = $this
-            ->getMockBuilder(ThemeHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $schemaHelperFactory = $this
-            ->getMockBuilder(SchemaHelperFactory::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $formActionModel = $this
-            ->getMockBuilder(ActionModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $formFieldModel = $this
-            ->getMockBuilder(FieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadModel = $this
-            ->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $fieldHelper = $this
-            ->getMockBuilder(FormFieldHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadFieldModel = $this
-            ->getMockBuilder(LeadFieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dispatcher = $this
-            ->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this
-            ->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadModel->expects($this
+        $contactTracker->expects($this
             ->any())
-            ->method('getCurrentLead')
+            ->method('getContact')
             ->willReturn($this
-                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName]));
+                ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
+            );
 
         $templatingHelperMock->expects($this
             ->any())
             ->method('getTemplating')
-            ->willReturn($this->container->get('templating'));
-
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $formRepository = $this
-            ->getMockBuilder(FormRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->willReturn($this->createMock(EngineInterface::class));
 
         $entityManager->expects($this
             ->any())
@@ -138,7 +95,7 @@ class FormTestAbstract extends WebTestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticFormBundle:Form', $formRepository],
+                        ['MauticFormBundle:Form', $this->formRepository],
                     ]
                 )
             );
@@ -147,12 +104,14 @@ class FormTestAbstract extends WebTestCase
             $requestStack,
             $templatingHelperMock,
             $themeHelper,
-            $schemaHelperFactory,
             $formActionModel,
             $formFieldModel,
-            $leadModel,
             $fieldHelper,
-            $leadFieldModel
+            $this->leadFieldModel,
+            $formUploaderMock,
+            $contactTracker,
+            $columnSchemaHelper,
+            $tableSchemaHelper
         );
 
         $formModel->setDispatcher($dispatcher);
@@ -167,80 +126,46 @@ class FormTestAbstract extends WebTestCase
      */
     protected function getSubmissionModel()
     {
-        $ipLookupHelper = $this
-            ->getMockBuilder(IpLookupHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $ipLookupHelper           = $this->createMock(IpLookupHelper::class);
+        $templatingHelperMock     = $this->createMock(TemplatingHelper::class);
+        $formModel                = $this->createMock(FormModel::class);
+        $pageModel                = $this->createMock(PageModel::class);
+        $leadModel                = $this->createMock(LeadModel::class);
+        $campaignModel            = $this->createMock(CampaignModel::class);
+        $membershipManager        = $this->createMock(MembershipManager::class);
+        $leadFieldModel           = $this->createMock(LeadFieldModel::class);
+        $companyModel             = $this->createMock(CompanyModel::class);
+        $fieldHelper              = $this->createMock(FormFieldHelper::class);
+        $dispatcher               = $this->createMock(EventDispatcher::class);
+        $translator               = $this->createMock(Translator::class);
+        $dateHelper               = $this->createMock(DateHelper::class);
+        $contactTracker           = $this->createMock(ContactTracker::class);
+        $userHelper               = $this->createMock(UserHelper::class);
+        $entityManager            = $this->createMock(EntityManager::class);
+        $formRepository           = $this->createMock(SubmissionRepository::class);
+        $leadRepository           = $this->createMock(LeadRepository::class);
+        $mockLogger               = $this->createMock(LoggerInterface::class);
+        $uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
+        $formUploaderMock         = $this->createMock(FormUploader::class);
+        $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
+        $file1Mock                = $this->createMock(UploadedFile::class);
+        $router                   = $this->createMock(RouterInterface::class);
+        $contactMerger            = $this->createMock(ContactMerger::class);
+        $router->method('generate')->willReturn('absolute/path/somefile.jpg');
 
-        $templatingHelperMock = $this
-            ->getMockBuilder(TemplatingHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $lead                     = new Lead();
+        $lead->setId(123);
 
-        $formModel = $this
-            ->getMockBuilder(FormModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $leadFieldModel->expects($this->any())
+            ->method('getUniqueIdentifierFields')
+            ->willReturn(['eyJpc1B1Ymxpc2hlZCI6dHJ1ZSwiaXNVbmlxdWVJZGVudGlmZXIiOnRydWUsIm9iamVjdCI6ImxlYWQifQ==' => ['email' => 'Email']]);
 
-        $pageModel = $this
-            ->getMockBuilder(PageModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadModel = $this
-            ->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $campaignModel = $this
-            ->getMockBuilder(CampaignModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadFieldModel = $this
-            ->getMockBuilder(LeadFieldModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $companyModel = $this
-            ->getMockBuilder(CompanyModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $fieldHelper = $this
-            ->getMockBuilder(FormFieldHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $dispatcher = $this->getMockBuilder(EventDispatcher::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $translator = $this
-            ->getMockBuilder(Translator::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadModel->expects($this
-            ->any())->method('getTrackingCookie')
-            ->willReturn([$this->mockTrackingId, true]);
-
-        $leadModel->expects($this
+        $contactTracker->expects($this
             ->any())
-            ->method('getCurrentLead')
-            ->with($this->logicalOr(
-                false,
-                true
-            ))
-            ->will($this->returnCallback([$this, 'getCurrentLead']));
+            ->method('getContact')
+            ->willReturn($lead);
 
-        $userHelper = $this
-            ->getMockBuilder(UserHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $userHelper->expects($this
-            ->any())
+        $userHelper->expects($this->any())
             ->method('getUser')
             ->willReturn(new User());
 
@@ -254,35 +179,17 @@ class FormTestAbstract extends WebTestCase
                 'properties'   => [],
             ];
 
-        $leadFieldModel->expects($this
-            ->any())
+        $leadFieldModel->expects($this->any())
             ->method('getFieldListWithProperties')
             ->willReturn($mockLeadField);
-
-        $leadFieldModel->expects($this
-            ->any())->method('getUniqueIdentiferFields')
-            ->willReturn($mockLeadField);
-
-        $entityManager = $this
-            ->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $formRepository = $this->getMockBuilder(FormRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $leadRepository = $this->getMockBuilder(LeadRepository::class)
-            ->disableOriginalConstructor()
-            ->getMock();
 
         $entityManager->expects($this->any())
             ->method('getRepository')
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $leadRepository],
-                        ['MauticFormBundle:Submission', $formRepository],
+                        [Lead::class, $leadRepository],
+                        [Submission::class, $formRepository],
                     ]
                 )
             );
@@ -290,18 +197,22 @@ class FormTestAbstract extends WebTestCase
         $leadRepository->expects($this->any())
             ->method('getLeadsByUniqueFields')
             ->willReturn(null);
-        $ipAddress = new IpAddress();
-        $ipLookupHelper
-            ->expects($this
-                ->any())
+
+        $file1Mock->expects($this->any())
+            ->method('getClientOriginalName')
+            ->willReturn('test.jpg');
+
+        $uploadFieldValidatorMock->expects($this->any())
+            ->method('processFileValidation')
+            ->willReturn($file1Mock);
+
+        $ipLookupHelper->expects($this->any())
             ->method('getIpAddress')
-            ->willReturn($ipAddress);
+            ->willReturn(new IpAddress());
 
-        $mockLogger = $this
-            ->getMockBuilder(Logger::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $companyModel->expects($this->any())
+            ->method('fetchCompanyFields')
+            ->willReturn([]);
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
             $templatingHelperMock,
@@ -309,11 +220,18 @@ class FormTestAbstract extends WebTestCase
             $pageModel,
             $leadModel,
             $campaignModel,
+            $membershipManager,
             $leadFieldModel,
             $companyModel,
-            $fieldHelper
+            $fieldHelper,
+            $uploadFieldValidatorMock,
+            $formUploaderMock,
+            $deviceTrackingService,
+            new FieldValueTransformer($router),
+            $dateHelper,
+            $contactTracker,
+            $contactMerger
         );
-
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);
         $submissionModel->setEntityManager($entityManager);
@@ -323,26 +241,68 @@ class FormTestAbstract extends WebTestCase
         return $submissionModel;
     }
 
-    public function getTestFormFields()
+    /**
+     * @return array<string,array<string,mixed>>
+     */
+    public function getTestFormFields(): array
     {
-        $fieldSession          = 'mautic_'.sha1(uniqid(mt_rand(), true));
-        $fields[$fieldSession] =
-            [
-                'label'        => 'Email',
-                'showLabel'    => 1,
-                'saveResult'   => 1,
-                'defaultValue' => false,
-                'alias'        => 'email',
-                'type'         => 'email',
-                'leadField'    => 'email',
-                'id'           => $fieldSession,
-            ];
+        $fieldSession          = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fieldSession2         = 'mautic_'.sha1(uniqid((string) mt_rand(), true));
+        $fields[$fieldSession] = [
+            'label'        => 'Email',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'email',
+            'type'         => 'email',
+            'leadField'    => 'email',
+            'id'           => $fieldSession,
+        ];
+
+        $fields['file'] = [
+            'label'                   => 'File',
+            'showLabel'               => 1,
+            'saveResult'              => 1,
+            'defaultValue'            => false,
+            'alias'                   => 'file',
+            'type'                    => 'file',
+            'id'                      => 'file',
+            'allowed_file_size'       => 1,
+            'allowed_file_extensions' => ['jpg', 'gif'],
+        ];
+
+        $fields['123'] = [
+            'label'        => 'Parent Field',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'parent',
+            'type'         => 'select',
+            'id'           => '123',
+        ];
+
+        $fields['456'] = [
+            'label'        => 'Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'child',
+            'type'         => 'text',
+            'id'           => '456',
+            'parent'       => '123',
+        ];
+
+        $fields[$fieldSession2] = [
+            'label'        => 'New Child',
+            'showLabel'    => 1,
+            'saveResult'   => 1,
+            'defaultValue' => false,
+            'alias'        => 'new_child',
+            'type'         => 'text',
+            'id'           => $fieldSession2,
+            'parent'       => '123',
+        ];
 
         return $fields;
-    }
-
-    public function getCurrentLead($tracking)
-    {
-        return $tracking ? [new Lead(), $this->mockTrackingId, true] : new Lead();
     }
 }

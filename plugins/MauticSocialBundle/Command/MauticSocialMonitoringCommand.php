@@ -1,59 +1,31 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
+use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class MauticSocialMonitoringCommand extends ContainerAwareCommand
+class MauticSocialMonitoringCommand extends Command
 {
-    protected $batchSize;
+    private MonitoringModel $monitoringModel;
 
-    /**
-     * @var \MauticPlugin\MauticSocialBundle\Entity\MonitoringRepository;
-     */
-    protected $monitorRepo;
+    public function __construct(MonitoringModel $monitoringModel)
+    {
+        $this->monitoringModel = $monitoringModel;
 
-    /**
-     * @var
-     */
-    protected $maxPerIterations;
+        parent::__construct();
+    }
 
-    /**
-     * @var
-     */
-    protected $output;
-
-    /**
-     * @var
-     */
-    protected $input;
-
-    /**
-     * Configure the command.
-     */
     protected function configure()
     {
         $this->setName('mautic:social:monitoring')
             ->setDescription('Looks at the records of monitors and iterates through them. ')
-            ->setHelp(
-                <<<'EOT'
-                I'm not sure what to put here yet
-EOT
-            )
-            ->addOption('mid', null, InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
+            ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
             ->addOption(
                 'batch-size',
                 null,
@@ -63,27 +35,10 @@ EOT
             ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100);
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->input  = $input;
-        $this->output = $output;
-
-        /** @var \MauticPlugin\MauticSocialBundle\Model\MonitoringModel $model */
-        $model = $this->getContainer()
-            ->get('mautic.social.model.monitoring');
-
-        // set the repository
-        $this->monitorRepo = $model->getRepository();
-
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->getParameter('mautic.locale'));
-
         // get the mid from the cli
-        $this->batchSize = $this->input->getOption('batch-size');
+        $batchSize = $input->getOption('batch-size');
 
         // monitor record
         $monitorId   = $input->getOption('mid');
@@ -91,18 +46,18 @@ EOT
 
         // no mid found, quit now
         if (!$monitorList->count()) {
-            $this->output->writeln('No published monitors found. Make sure the id you supplied is published');
+            $output->writeln('No published monitors found. Make sure the id you supplied is published');
 
-            return;
+            return 0;
         }
 
         // max iterations
-        $this->maxPerIterations = ceil($this->batchSize / count($monitorList));
+        $maxPerIterations = ceil($batchSize / count($monitorList));
 
         foreach ($monitorList as $monitor) {
-            $this->output->writeln('Executing Monitor Item '.$monitor->getId());
-            $resultCode = $this->processMonitorListItem($monitor);
-            $this->output->writeln('Result Code: '.$resultCode);
+            $output->writeln('Executing Monitor Item '.$monitor->getId());
+            $resultCode = $this->processMonitorListItem($monitor, $maxPerIterations, $input, $output);
+            $output->writeln('Result Code: '.$resultCode);
         }
 
         return 0;
@@ -120,11 +75,14 @@ EOT
             'limit' => 100,
         ];
 
-        if ($id !== null) {
+        /** @var MonitoringRepository $repository */
+        $repository = $this->monitoringModel->getRepository();
+
+        if (null !== $id) {
             $filter['filter'] = [
                 'force' => [
                     [
-                        'column' => $this->monitorRepo->getTableAlias().'.id',
+                        'column' => $repository->getTableAlias().'.id',
                         'expr'   => 'eq',
                         'value'  => (int) $id,
                     ],
@@ -132,9 +90,7 @@ EOT
             ];
         }
 
-        $monitorList = $this->monitorRepo->getPublishedEntities($filter);
-
-        return $monitorList;
+        return $repository->getPublishedEntities($filter);
     }
 
     /**
@@ -144,7 +100,7 @@ EOT
      *
      * @throws \Exception
      */
-    protected function processMonitorListItem($listItem)
+    protected function processMonitorListItem($listItem, float $maxPerIterations, InputInterface $input, OutputInterface $output)
     {
         // @todo set this up to use the command type per-monitor record.
         $networkType = $listItem->getNetworkType();
@@ -152,17 +108,17 @@ EOT
         $commandName = '';
 
         // hashtag command
-        if ($networkType == 'twitter_hashtag') {
+        if ('twitter_hashtag' == $networkType) {
             $commandName = 'social:monitor:twitter:hashtags';
         }
 
         // mention command
-        if ($networkType == 'twitter_handle') {
+        if ('twitter_handle' == $networkType) {
             $commandName = 'social:monitor:twitter:mentions';
         }
 
-        if ($commandName == '') {
-            $this->output->writeln('Matching command not found.');
+        if ('' == $commandName) {
+            $output->writeln('Matching command not found.');
 
             return 1;
         }
@@ -174,15 +130,12 @@ EOT
         $cliArgs = [
             'command'       => $commandName,
             '--mid'         => $listItem->getId(),
-            '--max-runs'    => $this->maxPerIterations,
-            '--query-count' => $this->input->getOption('query-count'),
+            '--max-runs'    => $maxPerIterations,
+            '--query-count' => $input->getOption('query-count'),
         ];
 
-        // create an input array
-        $input = new ArrayInput($cliArgs);
-
         // execute the command
-        $returnCode = $command->run($input, $this->output);
+        $returnCode = $command->run(new ArrayInput($cliArgs), $output);
 
         return $returnCode;
     }

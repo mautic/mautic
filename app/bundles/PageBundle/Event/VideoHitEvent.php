@@ -1,40 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Event;
 
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\PageBundle\Entity\VideoHit;
 
-/**
- * Class PageHitEvent.
- */
 class VideoHitEvent extends CommonEvent
 {
-    /**
-     * @var
-     */
     protected $request;
 
-    /**
-     * @var
-     */
     protected $code;
 
     /**
-     * PageHitEvent constructor.
-     *
-     * @param VideoHit $hit
-     * @param          $request
-     * @param          $code
+     * @param $request
+     * @param $code
      */
     public function __construct(VideoHit $hit, $request, $code)
     {

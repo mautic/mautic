@@ -15,5 +15,5 @@
     <div class="alert alert-warning">
         <?php echo $view['translator']->trans('mautic.plugin.outlook.public_info'); ?>
     </div>
-    <input type="text" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $mauticUrl?>" class="form-control">
+    <input type="text" readonly="readonly" onclick="this.setSelectionRange(0, this.value.length);" value="<?php echo $mauticUrl; ?>" class="form-control">
 </div>

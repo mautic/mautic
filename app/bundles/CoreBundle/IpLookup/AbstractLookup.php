@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
-use Joomla\Http\Http;
+use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 
 abstract class AbstractLookup
@@ -27,6 +18,8 @@ abstract class AbstractLookup
     public $timezone     = '';
     public $extra        = '';
 
+    protected ?Client $client;
+
     /**
      * @var string IP Address
      */
@@ -34,20 +27,11 @@ abstract class AbstractLookup
 
     /**
      * Authorization for lookup service.
-     *
-     * @var
      */
     protected $auth;
 
-    /**
-     * @var string
-     */
-    protected $cacheDir;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected ?string $cacheDir;
+    protected ?LoggerInterface $logger;
 
     /**
      * @var mixed
@@ -69,19 +53,17 @@ abstract class AbstractLookup
     /**
      * AbstractLookup constructor.
      *
-     * @param null                 $auth
-     * @param null                 $ipLookupConfig
-     * @param null                 $cacheDir
-     * @param LoggerInterface|null $logger
-     * @param Http|null            $httpConnector
+     * @param null $auth
+     * @param null $ipLookupConfig
+     * @param null $cacheDir
      */
-    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, LoggerInterface $logger = null, Http $httpConnector = null)
+    public function __construct($auth = null, $ipLookupConfig = null, $cacheDir = null, ?LoggerInterface $logger = null, ?Client $client = null)
     {
         $this->cacheDir  = $cacheDir;
         $this->logger    = $logger;
         $this->auth      = $auth;
         $this->config    = $ipLookupConfig;
-        $this->connector = $httpConnector;
+        $this->client    = $client;
     }
 
     /**
@@ -106,14 +88,17 @@ abstract class AbstractLookup
      */
     public function getDetails()
     {
-        $reflect = new \ReflectionClass($this);
-        $props   = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
-
-        $details = [];
-        foreach ($props as $prop) {
-            $details[$prop->getName()] = $prop->getValue($this);
-        }
-
-        return $details;
+        return [
+            'city'         => $this->city,
+            'region'       => $this->region,
+            'zipcode'      => $this->zipcode,
+            'country'      => $this->country,
+            'latitude'     => $this->latitude,
+            'longitude'    => $this->longitude,
+            'isp'          => $this->isp,
+            'organization' => $this->organization,
+            'timezone'     => $this->timezone,
+            'extra'        => $this->extra,
+        ];
     }
 }

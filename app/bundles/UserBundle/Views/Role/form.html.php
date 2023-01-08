@@ -69,7 +69,7 @@ $view['slots']->set('headerTitle', $header);
 								<ul class="list-group list-group-tabs" role="tablist">
 									<?php $i = 0; ?>
 									<?php foreach ($permissionsConfig['config'] as $bundle => $config) : ?>
-										<li role="presentation" class="list-group-item <?php echo $i === 0 ? 'in active' : ''; ?>">
+										<li role="presentation" class="list-group-item <?php echo 0 === $i ? 'in active' : ''; ?>">
 											<a href="#<?php echo $bundle; ?>PermissionTab" aria-controls="<?php echo $bundle; ?>PermissionTab" role="tab" data-toggle="tab" class="steps">
 												<span><?php echo $config['label']; ?></span>
 												<span class="permission-ratio"> (<span class="<?php echo $bundle; ?>_granted"><?php echo $config['ratio'][0]; ?></span> / <span class="<?php echo $bundle; ?>_total"><?php echo $config['ratio'][1]; ?></span>)</span>
@@ -88,11 +88,11 @@ $view['slots']->set('headerTitle', $header);
                                 $permissions = $form['permissions']->children;
                                 $i           = 0;
                                 foreach ($permissions as $child):
-                                    if ($child->vars['value'] == 'newbundle'):
+                                    if ('newbundle' == $child->vars['value']):
                                         if ($i > 0): // Close tab panel
                                             echo "</div>\n</div>\n";
                                         endif;
-                                        echo '<div role="tabpanel" class="tab-pane fade'.($i === 0 ? ' in active' : '').' bdr-w-0" id="'.$child->vars['name'].'PermissionTab">'."\n";
+                                        echo '<div role="tabpanel" class="tab-pane fade'.(0 === $i ? ' in active' : '').' bdr-w-0" id="'.$child->vars['name'].'PermissionTab">'."\n";
                                         echo '<div class="pt-md pr-md pl-md pb-md">'."\n";
                                         $child->setRendered();
                                     else:

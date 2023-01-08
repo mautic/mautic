@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -45,11 +36,6 @@ class MenuBuilder
 
     /**
      * MenuBuilder constructor.
-     *
-     * @param FactoryInterface         $knpFactory
-     * @param MatcherInterface         $matcher
-     * @param EventDispatcherInterface $dispatcher
-     * @param MenuHelper               $menuHelper
      */
     public function __construct(FactoryInterface $knpFactory, MatcherInterface $matcher, EventDispatcherInterface $dispatcher, MenuHelper $menuHelper)
     {
@@ -86,10 +72,10 @@ class MenuBuilder
         try {
             /** @var \Knp\Menu\ItemInterface $item */
             foreach ($menu as $item) {
-                if ($forRouteUri == 'current' && $this->matcher->isCurrent($item)) {
+                if ('current' == $forRouteUri && $this->matcher->isCurrent($item)) {
                     //current match
                     return $item;
-                } elseif ($forRouteUri != 'current' && $item->getUri() == $forRouteUri) {
+                } elseif ('current' != $forRouteUri && $item->getUri() == $forRouteUri) {
                     //route uri match
                     return $item;
                 } elseif (!empty($forRouteName) && $forRouteName == $item->getExtra('routeName')) {
@@ -122,9 +108,14 @@ class MenuBuilder
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
             $menuItems    = $event->getMenuItems();
+
+            // KNP Menu explicitly requires a menu name since v3
+            if (empty($menuItems['name'])) {
+                $menuItems['name'] = $name;
+            }
             $menus[$name] = $loader->load($menuItems);
         }
 

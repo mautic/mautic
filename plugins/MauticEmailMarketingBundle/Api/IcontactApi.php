@@ -1,22 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticEmailMarketingBundle\Api;
 
 use Mautic\PluginBundle\Exception\ApiErrorException;
 
 class IcontactApi extends EmailMarketingApi
 {
-    private $version = '2.2';
-
     protected function request($endpoint, $parameters = [], $method = 'GET')
     {
         $url = sprintf('%s/%s/c/%s/%s', $this->integration->getApiUrl(), $this->keys['accountId'], $this->keys['clientFolderId'], $endpoint);

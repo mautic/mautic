@@ -1,24 +1,17 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticClearbitBundle\Integration\ClearbitIntegration;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ButtonSubscriber extends CommonSubscriber
+class ButtonSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IntegrationHelper
@@ -26,13 +19,20 @@ class ButtonSubscriber extends CommonSubscriber
     private $helper;
 
     /**
-     * ButtonSubscriber constructor.
-     *
-     * @param IntegrationHelper $helper
+     * @var TranslatorInterface
      */
-    public function __construct(IntegrationHelper $helper)
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    public function __construct(IntegrationHelper $helper, TranslatorInterface $translator, RouterInterface $router)
     {
-        $this->helper = $helper;
+        $this->helper     = $helper;
+        $this->translator = $translator;
+        $this->router     = $router;
     }
 
     public static function getSubscribedEvents()
@@ -42,9 +42,6 @@ class ButtonSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectViewButtons(CustomButtonEvent $event)
     {
         /** @var ClearbitIntegration $myIntegration */
@@ -93,17 +90,17 @@ class ButtonSubscriber extends CommonSubscriber
                     'iconClass' => 'fa fa-search',
                 ];
 
-                $event
-                    ->addButton(
-                        $lookupContactButton,
-                        ButtonHelper::LOCATION_PAGE_ACTIONS,
-                        ['mautic_contact_action', ['objectAction' => 'view']]
-                    )
-                    ->addButton(
-                        $lookupContactButton,
-                        ButtonHelper::LOCATION_LIST_ACTIONS,
-                        'mautic_contact_index'
-                    );
+                $event->addButton(
+                    $lookupContactButton,
+                    ButtonHelper::LOCATION_PAGE_ACTIONS,
+                    ['mautic_contact_action', ['objectAction' => 'view']]
+                );
+
+                $event->addButton(
+                    $lookupContactButton,
+                    ButtonHelper::LOCATION_LIST_ACTIONS,
+                    'mautic_contact_index'
+                );
             }
         } else {
             if (0 === strpos($event->getRoute(), 'mautic_company_')) {
@@ -147,12 +144,11 @@ class ButtonSubscriber extends CommonSubscriber
                         'iconClass' => 'fa fa-search',
                     ];
 
-                    $event
-                        ->addButton(
-                            $lookupCompanyButton,
-                            ButtonHelper::LOCATION_LIST_ACTIONS,
-                            'mautic_company_index'
-                        );
+                    $event->addButton(
+                        $lookupCompanyButton,
+                        ButtonHelper::LOCATION_LIST_ACTIONS,
+                        'mautic_company_index'
+                    );
                 }
             }
         }

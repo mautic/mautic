@@ -11,12 +11,15 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'update');
 $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.update.index'));
+
+/** @var bool $isComposerEnabled */
+$isComposerEnabled = $isComposerEnabled;
 ?>
 
 <div class="panel panel-default mnb-5 bdr-t-wdh-0">
     <div id="update-panel" class="panel-body">
         <div class="col-sm-offset-2 col-sm-8">
-            <?php if ($updateData['error'] || $updateData['message'] == 'mautic.core.updater.running.latest.version') : ?>
+            <?php if ($updateData['error'] || 'mautic.core.updater.running.latest.version' == $updateData['message']) : ?>
                 <div class="alert alert-mautic">
                     <?php echo $view['translator']->trans($updateData['message']); ?>
                 </div>
@@ -46,9 +49,18 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.core.updat
                             </tr>
                             </tbody>
                         </table>
+                        <?php if ($isComposerEnabled): ?>
+                        <div class="alert alert-warning text-center">
+                            <strong><?php echo $view['translator']->trans('mautic.core.update.composer'); ?></strong>
+                        </div>
+                        <?php else: ?>
+                        <div class="alert alert-warning text-center">
+                            <strong><?php echo $view['translator']->trans('mautic.core.update.ui.deprecated'); ?></strong>
+                        </div>
                         <div class="text-right">
                             <button class="btn btn-primary" onclick="Mautic.processUpdate('update-panel', 1, '<?php echo base64_encode(json_encode([])); ?>');"><?php echo $view['translator']->trans('mautic.core.update.now'); ?></button>
                         </div>
+                        <?php endif; ?>
                     </div>
                 </div>
                 <?php endif; ?>

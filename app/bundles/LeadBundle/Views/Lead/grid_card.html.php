@@ -30,8 +30,8 @@ $img = $view['lead_avatar']->getAvatar($contact);
             </div>
             <div class="col-xs-8 va-t">
                 <div class="panel-body">
-                    <?php if (in_array($contact->getId(), $noContactList)) : ?>
-                    <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
+                    <?php if (in_array($contact->getId(), array_keys($noContactList)))  : ?>
+                        <div class="pull-right label label-danger"><i class="fa fa-ban"> </i></div>
                     <?php endif; ?>
                     <h4 class="fw-sb mb-xs ellipsis">
                         <a href="<?php echo $view['router']->path('mautic_contact_action',
@@ -41,7 +41,7 @@ $img = $view['lead_avatar']->getAvatar($contact);
                         </a>
                     </h4>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw fa-building mr-xs"></i><?php echo $fields['core']['company']['value']; ?>
+                        <i class="fa fa-fw fa-building mr-xs"></i><?php echo (!empty($fields['core']['company'])) ? $fields['core']['company']['value'] : ''; ?>
                     </div>
                     <div class="text-muted mb-1 ellipsis">
                         <i class="fa fa-fw fa-map-marker mr-xs"></i><?php
@@ -58,7 +58,7 @@ $img = $view['lead_avatar']->getAvatar($contact);
                         ?>
                     </div>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw fa-globe mr-xs"></i><?php echo $fields['core']['country']['value']; ?>
+                        <i class="fa fa-fw fa-globe mr-xs"></i><?php echo (!empty($fields['core']['country'])) ? $fields['core']['country']['value'] : ''; ?>
                     </div>
                     <?php $flag = (!empty($fields['core']['country'])) ? $view['assets']->getCountryFlag($fields['core']['country']['value']) : ''; ?>
 
@@ -67,6 +67,8 @@ $img = $view['lead_avatar']->getAvatar($contact);
                             <img src="<?php echo $flag; ?>" style="max-height: 24px;" class="ml-sm" />
                         </div>
                     <?php endif; ?>
+
+                    <?php echo $view['content']->getCustomContent('lead.grid', $mauticTemplateVars); ?>
 
                 </div>
             </div>

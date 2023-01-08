@@ -1,48 +1,48 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateHelper extends Helper
 {
     /**
-     * @var array
+     * @var string[]
      */
     protected $formats;
 
     /**
-     * @var \Mautic\CoreBundle\Helper\DateTimeHelper
+     * @var DateTimeHelper
      */
     protected $helper;
 
     /**
-     * @var
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * DateHelper constructor.
-     *
-     * @param                     $dateFullFormat
-     * @param                     $dateShortFormat
-     * @param                     $dateOnlyFormat
-     * @param                     $timeOnlyFormat
-     * @param TranslatorInterface $translator
+     * @var CoreParametersHelper
      */
-    public function __construct($dateFullFormat, $dateShortFormat, $dateOnlyFormat, $timeOnlyFormat, TranslatorInterface $translator)
-    {
+    private $coreParametersHelper;
+
+    /**
+     * @param string $dateFullFormat
+     * @param string $dateShortFormat
+     * @param string $dateOnlyFormat
+     * @param string $timeOnlyFormat
+     */
+    public function __construct(
+        $dateFullFormat,
+        $dateShortFormat,
+        $dateOnlyFormat,
+        $timeOnlyFormat,
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper
+    ) {
         $this->formats = [
             'datetime' => $dateFullFormat,
             'short'    => $dateShortFormat,
@@ -50,8 +50,9 @@ class DateHelper extends Helper
             'time'     => $timeOnlyFormat,
         ];
 
-        $this->helper     = new DateTimeHelper(null, null, 'local');
-        $this->translator = $translator;
+        $this->helper               = new DateTimeHelper(null, null, 'local');
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -171,7 +172,7 @@ class DateHelper extends Helper
         $dt       = $this->helper->getLocalDateTime();
 
         if ($textDate) {
-            return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format('g:i a')]);
+            return $this->translator->trans('mautic.core.date.'.$textDate, ['%time%' => $dt->format($this->coreParametersHelper->get('date_format_timeonly'))]);
         } else {
             $interval = $this->helper->getDiff('now', null, true);
 
@@ -203,11 +204,15 @@ class DateHelper extends Helper
 
             foreach ($timeUnits as $key => $unit) {
                 if ($range->{$key}) {
-                    $formated[] = $this->translator->transChoice(
+                    $formated[] = $this->translator->trans(
                         'mautic.core.date.'.$unit,
-                        $range->{$key},
-                        ['%count%' => $range->{$key}]);
+                        ['%count%' => $range->{$key}]
+                    );
                 }
+            }
+
+            if (empty($formated)) {
+                return $this->translator->trans('mautic.core.date.less.than.second');
             }
 
             return implode(' ', $formated);

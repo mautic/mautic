@@ -1,36 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_pointtriggerevent_action' => [
                 'path'       => '/points/triggers/events/{objectAction}/{objectId}',
-                'controller' => 'MauticPointBundle:TriggerEvent:execute',
+                'controller' => 'Mautic\PointBundle\Controller\TriggerEventController::executeAction',
             ],
             'mautic_pointtrigger_index' => [
                 'path'       => '/points/triggers/{page}',
-                'controller' => 'MauticPointBundle:Trigger:index',
+                'controller' => 'Mautic\PointBundle\Controller\TriggerController::indexAction',
             ],
             'mautic_pointtrigger_action' => [
                 'path'       => '/points/triggers/{objectAction}/{objectId}',
-                'controller' => 'MauticPointBundle:Trigger:execute',
+                'controller' => 'Mautic\PointBundle\Controller\TriggerController::executeAction',
             ],
             'mautic_point_index' => [
                 'path'       => '/points/{page}',
-                'controller' => 'MauticPointBundle:Point:index',
+                'controller' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             ],
             'mautic_point_action' => [
                 'path'       => '/points/{objectAction}/{objectId}',
-                'controller' => 'MauticPointBundle:Point:execute',
+                'controller' => 'Mautic\PointBundle\Controller\PointController::executeAction',
             ],
         ],
         'api' => [
@@ -38,30 +29,30 @@ return [
                 'standard_entity' => true,
                 'name'            => 'points',
                 'path'            => '/points',
-                'controller'      => 'MauticPointBundle:Api\PointApi',
+                'controller'      => 'Mautic\PointBundle\Controller\Api\PointApiController',
             ],
             'mautic_api_getpointactiontypes' => [
                 'path'       => '/points/actions/types',
-                'controller' => 'MauticPointBundle:Api\PointApi:getPointActionTypes',
+                'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::getPointActionTypesAction',
             ],
             'mautic_api_pointtriggersstandard' => [
                 'standard_entity' => true,
                 'name'            => 'triggers',
                 'path'            => '/points/triggers',
-                'controller'      => 'MauticPointBundle:Api\TriggerApi',
+                'controller'      => 'Mautic\PointBundle\Controller\Api\TriggerApiController',
             ],
             'mautic_api_getpointtriggereventtypes' => [
                 'path'       => '/points/triggers/events/types',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:getPointTriggerEventTypes',
+                'controller' => 'Mautic\PointBundle\Controller\Api\TriggerApiController::getPointTriggerEventTypesAction',
             ],
             'mautic_api_pointtriggerdeleteevents' => [
                 'path'       => '/points/triggers/{triggerId}/events/delete',
-                'controller' => 'MauticPointBundle:Api\TriggerApi:deletePointTriggerEvents',
+                'controller' => 'Mautic\PointBundle\Controller\Api\TriggerApiController::deletePointTriggerEventsAction',
                 'method'     => 'DELETE',
             ],
             'mautic_api_adjustcontactpoints' => [
                 'path'       => '/contacts/{leadId}/points/{operator}/{delta}',
-                'controller' => 'MauticPointBundle:Api\PointApi:adjustPoints',
+                'controller' => 'Mautic\PointBundle\Controller\Api\PointApiController::adjustPointsAction',
                 'method'     => 'POST',
             ],
         ],
@@ -93,82 +84,44 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.point.subscriber' => [
-                'class'     => 'Mautic\PointBundle\EventListener\PointSubscriber',
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.point.leadbundle.subscriber' => [
-                'class'     => 'Mautic\PointBundle\EventListener\LeadSubscriber',
-                'arguments' => [
-                    'mautic.point.model.trigger',
-                ],
-            ],
-            'mautic.point.search.subscriber' => [
-                'class'     => 'Mautic\PointBundle\EventListener\SearchSubscriber',
-                'arguments' => [
-                    'mautic.point.model.point',
-                    'mautic.point.model.trigger',
-                ],
-            ],
-            'mautic.point.dashboard.subscriber' => [
-                'class'     => 'Mautic\PointBundle\EventListener\DashboardSubscriber',
-                'arguments' => [
-                    'mautic.point.model.point',
-                ],
-            ],
-            'mautic.point.stats.subscriber' => [
-                'class'     => \Mautic\PointBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.point.type.form' => [
-                'class'     => 'Mautic\PointBundle\Form\Type\PointType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'point',
-            ],
-            'mautic.point.type.action' => [
-                'class' => 'Mautic\PointBundle\Form\Type\PointActionType',
-                'alias' => 'pointaction',
-            ],
-            'mautic.pointtrigger.type.form' => [
-                'class'     => 'Mautic\PointBundle\Form\Type\TriggerType',
-                'arguments' => 'mautic.factory',
-                'alias'     => 'pointtrigger',
-            ],
-            'mautic.pointtrigger.type.action' => [
-                'class' => 'Mautic\PointBundle\Form\Type\TriggerEventType',
-                'alias' => 'pointtriggerevent',
-            ],
-            'mautic.point.type.genericpoint_settings' => [
-                'class' => 'Mautic\PointBundle\Form\Type\GenericPointSettingsType',
-                'alias' => 'genericpoint_settings',
-            ],
-        ],
         'models' => [
             'mautic.point.model.point' => [
-                'class'     => 'Mautic\PointBundle\Model\PointModel',
+                'class'     => \Mautic\PointBundle\Model\PointModel::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
+                    'mautic.factory',
+                    'mautic.tracker.contact',
                 ],
             ],
             'mautic.point.model.triggerevent' => [
-                'class' => 'Mautic\PointBundle\Model\TriggerEventModel',
+                'class' => \Mautic\PointBundle\Model\TriggerEventModel::class,
             ],
             'mautic.point.model.trigger' => [
-                'class'     => 'Mautic\PointBundle\Model\TriggerModel',
+                'class'     => \Mautic\PointBundle\Model\TriggerModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
                     'mautic.lead.model.lead',
                     'mautic.point.model.triggerevent',
+                    'mautic.factory',
+                    'mautic.tracker.contact',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.point.repository.lead_point_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PointBundle\Entity\LeadPointLog::class,
+                ],
+            ],
+            'mautic.point.repository.lead_trigger_log' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\PointBundle\Entity\LeadTriggerLog::class,
                 ],
             ],
         ],

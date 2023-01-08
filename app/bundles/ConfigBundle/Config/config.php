@@ -1,24 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_config_action' => [
                 'path'       => '/config/{objectAction}/{objectId}',
-                'controller' => 'MauticConfigBundle:Config:execute',
+                'controller' => 'Mautic\ConfigBundle\Controller\ConfigController::executeAction',
             ],
             'mautic_sysinfo_index' => [
                 'path'       => '/sysinfo',
-                'controller' => 'MauticConfigBundle:Sysinfo:index',
+                'controller' => 'Mautic\ConfigBundle\Controller\SysinfoController::indexAction',
             ],
         ],
     ],
@@ -38,42 +29,18 @@ return [
                 'id'        => 'mautic_sysinfo_index',
                 'access'    => 'admin',
                 'checks'    => [
-                   'parameters' => [
-                       'sysinfo_disabled' => false,
-                   ],
+                    'parameters' => [
+                        'sysinfo_disabled' => false,
+                    ],
                 ],
             ],
         ],
     ],
 
-    'services' => [
-        'events' => [
-            'mautic.config.subscriber' => [
-                'class'     => 'Mautic\ConfigBundle\EventListener\ConfigSubscriber',
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-        ],
-
-        'forms' => [
-            'mautic.form.type.config' => [
-                'class'     => 'Mautic\ConfigBundle\Form\Type\ConfigType',
-                'arguments' => 'translator',
-                'alias'     => 'config',
-            ],
-        ],
-        'models' => [
-            'mautic.config.model.config' => [
-                'class' => 'Mautic\ConfigBundle\Model\ConfigModel',
-            ],
-            'mautic.config.model.sysinfo' => [
-                'class'     => 'Mautic\ConfigBundle\Model\SysinfoModel',
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
+    'parameters' => [
+        'config_allowed_parameters' => [
+            'kernel.project_dir',
+            'kernel.logs_dir',
         ],
     ],
 ];

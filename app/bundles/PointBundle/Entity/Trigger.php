@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,9 +10,6 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Trigger.
- */
 class Trigger extends FormEntity
 {
     /**
@@ -89,9 +77,6 @@ class Trigger extends FormEntity
         $this->events = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -124,9 +109,6 @@ class Trigger extends FormEntity
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -169,13 +151,11 @@ class Trigger extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ($prop == 'events') {
+        if ('events' == $prop) {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
@@ -242,8 +222,7 @@ class Trigger extends FormEntity
     /**
      * Add events.
      *
-     * @param              $key
-     * @param TriggerEvent $event
+     * @param $key
      *
      * @return Point
      */
@@ -259,8 +238,6 @@ class Trigger extends FormEntity
 
     /**
      * Remove events.
-     *
-     * @param TriggerEvent $event
      */
     public function removeTriggerEvent(TriggerEvent $event)
     {

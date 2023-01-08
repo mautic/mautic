@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-trulypersonal",
+  "description": "Mautic Truly Personal Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "trulypersonal"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

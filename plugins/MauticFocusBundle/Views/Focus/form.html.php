@@ -52,6 +52,14 @@ echo $view['form']->start($form);
                 echo $view['form']->row($form['publishUp']);
                 echo $view['form']->row($form['publishDown']);
                 ?>
+                <hr />
+                <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
+                <br />
+                <?php
+                foreach ($form['utmTags'] as $i => $utmTag):
+                    echo $view['form']->row($utmTag);
+                endforeach;
+                ?>
             </div>
         </div>
     </div>
@@ -59,6 +67,7 @@ echo $view['form']->start($form);
     <div class="hide builder focus-builder">
         <div class="builder-content">
             <div class="website-preview">
+<!--                Form to get preview URL-->
                 <div class="website-placeholder hide well well-lg col-md-6 col-md-offset-3 mt-lg">
                     <div class="row">
                         <div class="mautibot-image col-xs-3 text-center">
@@ -73,31 +82,34 @@ echo $view['form']->start($form);
                                 <?php echo $view['translator']->trans('mautic.focus.website_placeholder'); ?>
                             </p>
                             <div class="input-group">
-                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="http..."/>
+                                <input id="websiteUrlPlaceholderInput" disabled type="text" class="form-control" placeholder="https://example.com">
                                 <span class="input-group-btn">
-                                <button class="btn btn-default btn-fetch" type="button"><?php echo $view['translator']->trans(
-                                        'mautic.focus.fetch_snapshot'
-                                    ); ?></button>
-                            </span>
+                                    <button class="btn btn-default btn-fetch" type="button"><?php echo $view['translator']->trans(
+                                            'mautic.focus.fetch_snapshot'
+                                        ); ?></button>
+                                </span>
                             </div>
+                            <div class="help-block hide"></div>
                         </div>
                     </div>
                 </div>
+<!--                Viewport switcher-->
                 <div class="viewport-switcher text-center bdr-t-sm bdr-b-sm bdr-r-sm">
                     <div class="btn btn-sm btn-success btn-nospin btn-viewport" data-viewport="desktop">
                         <i class="fa fa-mobile-phone fa-3x"></i>
                     </div>
                 </div>
-                <figure id="websiteScreenshot">
+<!--                Website preview block-->
+                <div id="websiteScreenshot">
                     <div class="screenshot-container text-center">
-                        <div class="preview-body text-left"></div>
-                        <canvas id="websiteCanvas">
-                            Your browser does not support the canvas element.
-                        </canvas>
+                        <div class="preview-body center"></div>
+                        <div id="websiteCanvas"></div>
                     </div>
-                </figure>
+                </div>
             </div>
         </div>
+
+<!--        Builder-->
         <div class="builder-panel builder-panel-focus">
             <div class="builder-panel-top">
                 <p>
@@ -329,6 +341,7 @@ echo $view['form']->start($form);
                             <div class="hidden-focus-type-notice">
 
                                 <div class="row">
+
                                     <div class="form-group col-xs-12 ">
                                         <?php echo $view['form']->label($form['properties']['colors']['button']); ?>
                                         <div class="input-group">
@@ -372,6 +385,9 @@ echo $view['form']->start($form);
                     </div>
                     <div id="focusContentPanel" class="panel-collapse collapse" role="tabpanel">
                         <div class="panel-body pa-xs">
+                            <?php echo $view['form']->row($form['html_mode']); ?>
+                            <?php echo $view['form']->row($form['editor']); ?>
+                            <?php echo $view['form']->row($form['html']); ?>
                             <?php echo $view['form']->row($form['properties']['content']['headline']); ?>
                             <div class="hidden-focus-style-bar">
                                 <?php echo $view['form']->row($form['properties']['content']['tagline']); ?>
@@ -380,6 +396,11 @@ echo $view['form']->start($form);
 
                             <!-- form type properties -->
                             <div class="focus-hide visible-focus-type-form">
+                                <div class="col-sm-12" id="focusFormAlert" data-hide-on='{"focus_html_mode_0":"checked"}'>
+                                    <div class="alert alert-info">
+                                        <?php echo $view['translator']->trans('mautic.focus.form_token.instructions'); ?>
+                                    </div>
+                                </div>
                                 <?php echo $view['form']->row($form['form']); ?>
                             </div>
 
@@ -389,6 +410,8 @@ echo $view['form']->start($form);
                                 <?php echo $view['form']->row($form['properties']['content']['link_url']); ?>
                                 <?php echo $view['form']->row($form['properties']['content']['link_new_window']); ?>
                             </div>
+
+                            <?php echo $view['form']->row($form['properties']['content']['css']); ?>
                         </div>
                     </div>
                 </div>

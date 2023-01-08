@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -21,25 +12,42 @@ use MauticPlugin\MauticCitrixBundle\Event\TokenGenerateEvent;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class EmailSubscriber.
- */
-class EmailSubscriber extends CommonSubscriber
+class EmailSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CitrixModel
      */
-    protected $citrixModel;
+    private $citrixModel;
 
     /**
-     * FormSubscriber constructor.
-     *
-     * @param CitrixModel $citrixModel
+     * @var TranslatorInterface
      */
-    public function __construct(CitrixModel $citrixModel)
-    {
+    private $translator;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        CitrixModel $citrixModel,
+        TranslatorInterface $translator,
+        EventDispatcherInterface $dispatcher,
+        TemplatingHelper $templating
+    ) {
         $this->citrixModel = $citrixModel;
+        $this->translator  = $translator;
+        $this->dispatcher  = $dispatcher;
+        $this->templating  = $templating;
     }
 
     /**
@@ -56,8 +64,6 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param TokenGenerateEvent $event
-     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -89,8 +95,6 @@ class EmailSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param EmailBuilderEvent $event
-     *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
@@ -123,8 +127,6 @@ class EmailSubscriber extends CommonSubscriber
     /**
      * Search and replace tokens with content.
      *
-     * @param EmailSendEvent $event
-     *
      * @throws \RuntimeException
      */
     public function decodeTokensDisplay(EmailSendEvent $event)
@@ -134,8 +136,6 @@ class EmailSubscriber extends CommonSubscriber
 
     /**
      * Search and replace tokens with content.
-     *
-     * @param EmailSendEvent $event
      *
      * @throws \RuntimeException
      */
@@ -147,8 +147,7 @@ class EmailSubscriber extends CommonSubscriber
     /**
      * Search and replace tokens with content.
      *
-     * @param EmailSendEvent $event
-     * @param bool           $triggerEvent
+     * @param bool $triggerEvent
      *
      * @throws \RuntimeException
      */
@@ -179,12 +178,12 @@ class EmailSubscriber extends CommonSubscriber
                 if ($triggerEvent && $this->dispatcher->hasListeners(CitrixEvents::ON_CITRIX_TOKEN_GENERATE)) {
                     $params['lead'] = $event->getLead();
                     $tokenEvent     = new TokenGenerateEvent($params);
-                    $this->dispatcher->dispatch(CitrixEvents::ON_CITRIX_TOKEN_GENERATE, $tokenEvent);
+                    $this->dispatcher->dispatch($tokenEvent, CitrixEvents::ON_CITRIX_TOKEN_GENERATE);
                     $params = $tokenEvent->getParams();
                     unset($tokenEvent);
                 }
 
-                $button = $this->templating->render(
+                $button = $this->templating->getTemplating()->render(
                     'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
                     $params
                 );

@@ -1,23 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Field;
+use Mautic\FormBundle\Event\FormFieldEvent;
+use Mautic\FormBundle\Form\Type\FieldType;
+use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class FieldModel.
+ * @extends CommonFormModel<Field>
  */
 class FieldModel extends CommonFormModel
 {
@@ -31,44 +27,28 @@ class FieldModel extends CommonFormModel
      */
     protected $leadFieldModel;
 
-    /**
-     * FieldModel constructor.
-     *
-     * @param LeadFieldModel $leadFieldModel
-     */
     public function __construct(LeadFieldModel $leadFieldModel)
     {
         $this->leadFieldModel = $leadFieldModel;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
     }
 
     /**
-     * @param object                              $entity
+     * @param object|array<mixed>                 $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
+     * @param string|null                         $action
      * @param array                               $options
      *
      * @return \Symfony\Component\Form\FormInterface
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        $fields  = $this->leadFieldModel->getFieldListWithProperties();
-        $choices = [];
-
-        foreach ($fields as $alias => $field) {
-            if (!isset($choices[$field['group_label']])) {
-                $choices[$field['group_label']] = [];
-            }
-
-            $choices[$field['group_label']][$alias] = $field['label'];
-        }
+        list($fields, $choices)               = $this->getObjectFields('lead');
+        list($companyFields, $companyChoices) = $this->getObjectFields('company');
 
         // Only show the lead fields not already used
         $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
@@ -82,14 +62,35 @@ class FieldModel extends CommonFormModel
             $group = array_diff_key($group, $testLeadFields);
         }
 
-        $options['leadFields']          = $choices;
-        $options['leadFieldProperties'] = $fields;
+        $options['leadFields']['lead']          = $choices;
+        $options['leadFieldProperties']['lead'] = $fields;
+
+        $options['leadFields']['company']          = $companyChoices;
+        $options['leadFieldProperties']['company'] = $companyFields;
 
         if ($action) {
             $options['action'] = $action;
         }
 
-        return $formFactory->create('formfield', $entity, $options);
+        return $formFactory->create(FieldType::class, $entity, $options);
+    }
+
+    public function getObjectFields($object = 'lead')
+    {
+        $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
+        $choices = [];
+
+        foreach ($fields as $alias => $field) {
+            if (empty($field['isPublished'])) {
+                continue;
+            }
+            if (!isset($choices[$field['group_label']])) {
+                $choices[$field['group_label']] = [];
+            }
+            $choices[$field['group_label']][$field['label']] = $alias;
+        }
+
+        return [$fields, $choices];
     }
 
     /**
@@ -115,7 +116,7 @@ class FieldModel extends CommonFormModel
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Field();
         }
 
@@ -168,5 +169,46 @@ class FieldModel extends CommonFormModel
         $aliases[] = $testAlias;
 
         return $testAlias;
+    }
+
+    /**
+     * @return FormFieldEvent|Event|void|null
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
+    {
+        if (!$entity instanceof Field) {
+            throw new MethodNotAllowedHttpException(['Form']);
+        }
+
+        switch ($action) {
+            case 'pre_save':
+                $name = FormEvents::FIELD_PRE_SAVE;
+                break;
+            case 'post_save':
+                $name = FormEvents::FIELD_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $name = FormEvents::FIELD_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $name = FormEvents::FIELD_POST_DELETE;
+                break;
+            default:
+                return null;
+        }
+
+        if ($this->dispatcher->hasListeners($name)) {
+            if (empty($event)) {
+                $event = new FormFieldEvent($entity, $isNew);
+            }
+
+            $this->dispatcher->dispatch($event, $name);
+
+            return $event;
+        } else {
+            return null;
+        }
     }
 }

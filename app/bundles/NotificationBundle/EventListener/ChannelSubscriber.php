@@ -1,38 +1,22 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\NotificationBundle\Form\Type\NotificationListType;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IntegrationHelper
      */
-    protected $integrationHelper;
+    private $integrationHelper;
 
-    /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
     public function __construct(IntegrationHelper $integrationHelper)
     {
         $this->integrationHelper = $integrationHelper;
@@ -48,9 +32,6 @@ class ChannelSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
         $integration = $this->integrationHelper->getIntegrationObject('OneSignal');
@@ -66,7 +47,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'notification_list',
+                        'lookupFormType' => NotificationListType::class,
                         'repository'     => 'MauticNotificationBundle:Notification',
                         'lookupOptions'  => [
                             'mobile'  => false,
@@ -78,30 +59,30 @@ class ChannelSubscriber extends CommonSubscriber
                     ],
                 ]
             );
-        }
 
-        $supportedFeatures = $integration->getSupportedFeatures();
+            $supportedFeatures = $integration->getSupportedFeatures();
 
-        if (in_array('mobile', $supportedFeatures)) {
-            $event->addChannel(
-                'mobile_notification',
-                [
-                    MessageModel::CHANNEL_FEATURE => [
-                        'campaignAction'             => 'notification.send_mobile_notification',
-                        'campaignDecisionsSupported' => [
-                            'page.pagehit',
-                            'asset.download',
-                            'form.submit',
+            if (in_array('mobile', $supportedFeatures)) {
+                $event->addChannel(
+                    'mobile_notification',
+                    [
+                        MessageModel::CHANNEL_FEATURE => [
+                            'campaignAction'             => 'notification.send_mobile_notification',
+                            'campaignDecisionsSupported' => [
+                                'page.pagehit',
+                                'asset.download',
+                                'form.submit',
+                            ],
+                            'lookupFormType'             => NotificationListType::class,
+                            'repository'                 => 'MauticNotificationBundle:Notification',
+                            'lookupOptions'              => [
+                                'mobile'  => true,
+                                'desktop' => false,
+                            ],
                         ],
-                        'lookupFormType' => 'notification_list',
-                        'repository'     => 'MauticNotificationBundle:Notification',
-                        'lookupOptions'  => [
-                            'mobile'  => true,
-                            'desktop' => false,
-                        ],
-                    ],
-                ]
-            );
+                    ]
+                );
+            }
         }
     }
 }

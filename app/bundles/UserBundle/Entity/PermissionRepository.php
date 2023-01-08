@@ -1,28 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * PermissionRepository.
+ * @extends CommonRepository<Permission>
  */
 class PermissionRepository extends CommonRepository
 {
     /**
      * Delete all permissions for a specific role.
-     *
-     * @param Role $role
      */
     public function purgeRolePermissions(Role $role)
     {
@@ -38,7 +27,6 @@ class PermissionRepository extends CommonRepository
     /**
      * Retrieves array of permissions for a set role.  If $forForm, then the array will contain.
      *
-     * @param Role $role
      * @param bool $forForm
      *
      * @return array

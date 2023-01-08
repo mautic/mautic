@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
@@ -85,7 +76,6 @@ class PublicController extends FormController
 
                 foreach ([
                              'facebook' => 'http://www.facebook.com/',
-                             'googleplus' => 'http://plus.google.com/',
                              'linkedin' => 'http://www.linkedin.com/',
                              'twitter' => 'http://www.twitter.com/',
                          ] as $p => $u) {
@@ -175,7 +165,6 @@ class PublicController extends FormController
                     }
                 }
             } else {
-
                 /******************  COMPANY STUFF  *********************/
 
                 if ('company' === $this->request->request->get('type', [], true)) {
@@ -237,10 +226,6 @@ class PublicController extends FormController
 
                     if (array_key_exists('country', $loc) && empty($currFields['companycountry']['value'])) {
                         $data['companycountry'] = $loc['country'];
-                    }
-
-                    if (array_key_exists('postalCode', $loc) && empty($currFields['companyzipcode']['value'])) {
-                        $loc['postalCode'];
                     }
 
                     if (array_key_exists('state', $loc) && empty($currFields['companystate']['value'])) {

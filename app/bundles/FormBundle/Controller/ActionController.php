@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\FormBundle\Entity\Action;
+use Mautic\FormBundle\Form\Type\ActionType;
+use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -32,7 +25,7 @@ class ActionController extends CommonFormController
         $method  = $this->request->getMethod();
         $session = $this->get('session');
 
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             $formAction = $this->request->request->get('formaction');
             $actionType = $formAction['type'];
             $formId     = $formAction['formId'];
@@ -54,8 +47,10 @@ class ActionController extends CommonFormController
         }
 
         //fire the form builder event
-        $customComponents = $this->getModel('form.form')->getCustomComponents();
-        $form             = $this->get('form.factory')->create('formaction', $formAction, [
+        $formModel = $this->getModel('form.form');
+        \assert($formModel instanceof FormModel);
+        $customComponents = $formModel->getCustomComponents();
+        $form             = $this->get('form.factory')->create(ActionType::class, $formAction, [
             'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'new']),
             'settings' => $customComponents['actions'][$actionType],
             'formId'   => $formId,
@@ -64,7 +59,7 @@ class ActionController extends CommonFormController
         $formAction['settings'] = $customComponents['actions'][$actionType];
 
         //Check for a submitted form and process it
-        if ($method == 'POST') {
+        if ('POST' == $method) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
@@ -127,9 +122,8 @@ class ActionController extends CommonFormController
         if ($closeModal) {
             //just close the modal
             $passthroughVars['closeModal'] = 1;
-            $response                      = new JsonResponse($passthroughVars);
 
-            return $response;
+            return new JsonResponse($passthroughVars);
         }
 
         return $this->ajaxAction([
@@ -150,15 +144,18 @@ class ActionController extends CommonFormController
     {
         $session    = $this->get('session');
         $method     = $this->request->getMethod();
-        $formId     = ($method == 'POST') ? $this->request->request->get('formaction[formId]', '', true) : $this->request->query->get('formId');
+        $formaction = $this->request->request->get('formaction', []);
+        $formId     = 'POST' === $method ? ($formaction['formId'] ?? '') : $this->request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;
         $valid      = $cancelled      = false;
-        $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
+        $formAction = array_key_exists($objectId, $actions) ? $actions[$objectId] : null;
 
-        if ($formAction !== null) {
+        if (null !== $formAction) {
+            $formModel = $this->getModel('form.form');
+            \assert($formModel instanceof FormModel);
             $actionType             = $formAction['type'];
-            $customComponents       = $this->getModel('form.form')->getCustomComponents();
+            $customComponents       = $formModel->getCustomComponents();
             $formAction['settings'] = $customComponents['actions'][$actionType];
 
             //ajax only for form fields
@@ -169,7 +166,7 @@ class ActionController extends CommonFormController
                 return $this->modalAccessDenied();
             }
 
-            $form = $this->get('form.factory')->create('formaction', $formAction, [
+            $form = $this->get('form.factory')->create(ActionType::class, $formAction, [
                 'action'   => $this->generateUrl('mautic_formaction_action', ['objectAction' => 'edit', 'objectId' => $objectId]),
                 'settings' => $formAction['settings'],
                 'formId'   => $formId,
@@ -177,7 +174,7 @@ class ActionController extends CommonFormController
             $form->get('formId')->setData($formId);
 
             //Check for a submitted form and process it
-            if ($method == 'POST') {
+            if ('POST' == $method) {
                 if (!$cancelled = $this->isFormCancelled($form)) {
                     if ($valid = $this->isFormValid($form)) {
                         $success = 1;
@@ -201,13 +198,13 @@ class ActionController extends CommonFormController
                         $keyId = $objectId;
 
                         //take note if this is a submit button or not
-                        if ($actionType == 'button') {
+                        if ('button' == $actionType) {
                             $submits = $session->get('mautic.formactions.submits', []);
-                            if ($formAction['properties']['type'] == 'submit' && !in_array($keyId, $submits)) {
+                            if ('submit' == $formAction['properties']['type'] && !in_array($keyId, $submits)) {
                                 //button type updated to submit
                                 $submits[] = $keyId;
                                 $session->set('mautic.formactions.submits', $submits);
-                            } elseif ($formAction['properties']['type'] != 'submit' && in_array($keyId, $submits)) {
+                            } elseif ('submit' != $formAction['properties']['type'] && in_array($keyId, $submits)) {
                                 //button type updated to something other than submit
                                 $key = array_search($keyId, $submits);
                                 unset($submits[$key]);
@@ -254,9 +251,8 @@ class ActionController extends CommonFormController
             if ($closeModal) {
                 //just close the modal
                 $passthroughVars['closeModal'] = 1;
-                $response                      = new JsonResponse($passthroughVars);
 
-                return $response;
+                return new JsonResponse($passthroughVars);
             }
 
             return $this->ajaxAction([
@@ -266,9 +262,7 @@ class ActionController extends CommonFormController
             ]);
         }
 
-        $response = new JsonResponse(['success' => 0]);
-
-        return $response;
+        return new JsonResponse(['success' => 0]);
     }
 
     /**
@@ -293,7 +287,7 @@ class ActionController extends CommonFormController
         }
 
         $formAction = (array_key_exists($objectId, $actions)) ? $actions[$objectId] : null;
-        if ($this->request->getMethod() == 'POST' && $formAction !== null) {
+        if ('POST' == $this->request->getMethod() && null !== $formAction) {
             //add the field to the delete list
             if (!in_array($objectId, $delete)) {
                 $delete[] = $objectId;
@@ -301,10 +295,10 @@ class ActionController extends CommonFormController
             }
 
             //take note if this is a submit button or not
-            if ($formAction['type'] == 'button') {
+            if ('button' == $formAction['type']) {
                 $submits    = $session->get('mautic.formactions.submits', []);
                 $properties = $formAction['properties'];
-                if ($properties['type'] == 'submit' && in_array($objectId, $submits)) {
+                if ('submit' == $properties['type'] && in_array($objectId, $submits)) {
                     $key = array_search($objectId, $submits);
                     unset($submits[$key]);
                     $session->set('mautic.formactions.submits', $submits);

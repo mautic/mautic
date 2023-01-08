@@ -1,39 +1,36 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Event as Events;
 use Mautic\PageBundle\PageEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Class PageSubscriber.
- */
-class PageSubscriber extends CommonSubscriber
+class PageSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EmailModel
      */
-    protected $emailModel;
+    private $emailModel;
 
     /**
-     * PageSubscriber constructor.
-     *
-     * @param EmailModel $emailModel
+     * @var RealTimeExecutioner
      */
-    public function __construct(EmailModel $emailModel)
+    private $realTimeExecutioner;
+
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    public function __construct(EmailModel $emailModel, RealTimeExecutioner $realTimeExecutioner, RequestStack $requestStack)
     {
-        $this->emailModel = $emailModel;
+        $this->emailModel          = $emailModel;
+        $this->realTimeExecutioner = $realTimeExecutioner;
+        $this->requestStack        = $requestStack;
     }
 
     /**
@@ -48,8 +45,6 @@ class PageSubscriber extends CommonSubscriber
 
     /**
      * Trigger point actions for page hits.
-     *
-     * @param Events\PageHitEvent $event
      */
     public function onPageHit(Events\PageHitEvent $event)
     {
@@ -57,6 +52,8 @@ class PageSubscriber extends CommonSubscriber
         $redirect = $hit->getRedirect();
 
         if ($redirect && $email = $hit->getEmail()) {
+            //click trigger condition
+            $this->realTimeExecutioner->execute('email.click', $hit, 'email', $email->getId());
             // Check for an email stat
             $clickthrough = $event->getClickthroughData();
 
@@ -78,7 +75,7 @@ class PageSubscriber extends CommonSubscriber
                 // Check to see if it has been marked as opened
                 if (!$stat->isRead()) {
                     // Mark it as read
-                    $this->emailModel->hitEmail($stat, $this->request);
+                    $this->emailModel->hitEmail($stat, $this->requestStack->getCurrentRequest() ?: $event->getRequest());
                 }
             }
         }

@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\DashboardBundle\Entity\Widget;
+use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,8 +15,6 @@ class AjaxController extends CommonAjaxController
 {
     /**
      * Count how many visitors are currently viewing a page.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -43,8 +34,6 @@ class AjaxController extends CommonAjaxController
     /**
      * Returns HTML of a new widget based on its values.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateWidgetFormAction(Request $request)
@@ -58,9 +47,9 @@ class AjaxController extends CommonAjaxController
         }
 
         $widget   = new Widget();
-        $form     = $this->get('form.factory')->create('widget', $widget);
-        $formHtml = $this->render('MauticDashboardBundle::Widget\\form.html.php',
-            ['form' => $form->bind($data)->createView()]
+        $form     = $this->get('form.factory')->create(WidgetType::class, $widget);
+        $formHtml = $this->render('MauticDashboardBundle::Widget\\form.html.twig',
+            ['form' => $form->submit($data)->createView()]
         )->getContent();
 
         $dataArray['formHtml'] = $formHtml;
@@ -72,14 +61,14 @@ class AjaxController extends CommonAjaxController
     /**
      * Saves the new ordering of dashboard widgets.
      *
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateWidgetOrderingAction(Request $request)
     {
-        $data = $request->request->get('ordering');
-        $repo = $this->getModel('dashboard')->getRepository();
+        $data           = $request->request->get('ordering');
+        $dashboardModel = $this->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
+        $repo = $dashboardModel->getRepository();
         $repo->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 
@@ -88,8 +77,6 @@ class AjaxController extends CommonAjaxController
 
     /**
      * Deletes the entity.
-     *
-     * @param Request $request
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */

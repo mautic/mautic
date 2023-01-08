@@ -1,37 +1,44 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class FieldApiController.
+ * @extends CommonApiController<LeadField>
  */
 class FieldApiController extends CommonApiController
 {
+    /**
+     * Can have value of 'contact' or 'company'.
+     *
+     * @var string
+     */
     protected $fieldObject;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var FieldModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
+        $fieldModel = $this->getModel('lead.field');
+        \assert($fieldModel instanceof FieldModel);
+
+        $this->model           = $fieldModel;
         $this->fieldObject     = $this->request->get('object');
-        $this->model           = $this->getModel('lead.field');
         $this->entityClass     = LeadField::class;
         $this->entityNameOne   = 'field';
         $this->entityNameMulti = 'fields';
         $this->routeParams     = ['object' => $this->fieldObject];
 
-        if ($this->fieldObject === 'contact') {
+        if ('contact' === $this->fieldObject) {
             $this->fieldObject = 'lead';
         }
 
@@ -44,6 +51,34 @@ class FieldApiController extends CommonApiController
         ];
 
         parent::initialize($event);
+    }
+
+    protected function saveEntity($entity, int $statusCode): int
+    {
+        try {
+            return parent::saveEntity($entity, $statusCode);
+        } catch (AbortColumnCreateException $exception) {
+            // Field has been queued
+            return Response::HTTP_ACCEPTED;
+        }
+    }
+
+    /**
+     * Sanitizes and returns an array of where statements from the request.
+     *
+     * @return array
+     */
+    protected function getWhereFromRequest()
+    {
+        $where = parent::getWhereFromRequest();
+
+        $where[] = [
+            'col'  => 'object',
+            'expr' => 'eq',
+            'val'  => $this->fieldObject,
+        ];
+
+        return $where;
     }
 
     /**
@@ -67,18 +102,18 @@ class FieldApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param LeadField &$entity
+     * @param           $parameters
+     * @param           $form
+     * @param string    $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         if (isset($parameters['properties'])) {
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);
 
-            if ($result !== true) {
-                return $this->returnError($this->get('translator')->trans($result, [], 'validators'), Codes::HTTP_BAD_REQUEST);
+            if (true !== $result) {
+                return $this->returnError($this->get('translator')->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
             }
         }
     }

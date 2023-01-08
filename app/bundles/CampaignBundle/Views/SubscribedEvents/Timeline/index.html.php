@@ -15,6 +15,8 @@ if (!empty($item['metadata']['errors'])) {
 } elseif (!empty($item['metadata']['failed'])) {
     $errors = (!empty($item['metadata']['reason'])) ? $item['metadata']['reason'] : 'mautic.campaign.event.failed.timeline';
     $errors = $view['translator']->trans($errors);
+} elseif (!empty($item['fail_reason'])) {
+    $errors = $item['fail_reason'];
 }
 
 $cancelled = (empty($item['isScheduled']) && empty($item['dateTriggered']));
@@ -24,6 +26,7 @@ if ($cancelled) {
     // Note is scheduled
     $item['isScheduled'] = true;
 }
+
 ?>
 <div class="mt-10">
 <?php if ($item['isScheduled']): ?>
@@ -45,7 +48,10 @@ if ($cancelled) {
         </span>
         <?php if ($lead && $view['security']->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())): ?>
         <span class="form-buttons btn-group btn-group-xs mb-3" role="group" aria-label="Field options">
-            <button type="button" class="btn btn-default btn-edit btn-nospin" onclick="Mautic.updateScheduledCampaignEvent(<?php echo $item['event_id']; ?>, <?php echo $lead->getId(); ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.event.reschedule'); ?>">
+            <button type="button" id="timeline-campaign-event-save-<?php echo $item['event_id']; ?>" class="btn btn-default btn-nospin" onmousedown="return false;" onclick="Mautic.saveScheduledCampaignEvent(<?php echo $item['event_id']; ?>, <?php echo $lead->getId(); ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.event.save'); ?>" style="display:none">
+                <i class="fa fa-floppy-o text-primary"></i>
+            </button>
+            <button type="button" class="btn btn-default btn-nospin btn-reschedule" onclick="Mautic.updateScheduledCampaignEvent(<?php echo $item['event_id']; ?>, <?php echo $lead->getId(); ?>)" data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.campaign.event.reschedule'); ?>">
                 <i class="fa fa-clock-o text-primary"></i>
             </button>
             <button type="button" class="btn btn-default btn-nospin"<?php if ($cancelled) {

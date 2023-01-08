@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -73,16 +64,13 @@ class LeadDevice
     /**
      * @var string
      */
-    private $deviceFingerprint;
+    private $trackingId;
 
     /**
      * @var \DateTime
      */
     private $dateAdded;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -96,10 +84,9 @@ class LeadDevice
             ->addIndex(['device_os_version'], 'device_os_version_search')
             ->addIndex(['device_os_platform'], 'device_os_platform_search')
             ->addIndex(['device_brand'], 'device_brand_search')
-            ->addIndex(['device_model'], 'device_model_search')
-            ->addIndex(['device_fingerprint'], 'device_fingerprint_search');
+            ->addIndex(['device_model'], 'device_model_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->addLead(false, 'CASCADE', false);
 
@@ -142,8 +129,9 @@ class LeadDevice
             ->nullable()
             ->build();
 
-        $builder->createField('deviceFingerprint', 'string')
-            ->columnName('device_fingerprint')
+        $builder->createField('trackingId', 'string')
+            ->columnName('tracking_id')
+            ->unique()
             ->nullable()
             ->build();
     }
@@ -179,6 +167,14 @@ class LeadDevice
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSignature()
+    {
+        return md5(json_encode($this->clientInfo).$this->device.$this->deviceOsName.$this->deviceOsPlatform.$this->deviceBrand.$this->deviceModel);
     }
 
     /**
@@ -221,9 +217,6 @@ class LeadDevice
         return $this->deviceBrand;
     }
 
-    /**
-     * @param mixed $isFailed
-     */
     public function setDeviceBrand($brand)
     {
         $this->deviceBrand = $brand;
@@ -334,7 +327,7 @@ class LeadDevice
     }
 
     /**
-     * @param mixed $deviceOs
+     * @param array $deviceOs
      */
     public function setDeviceOs($deviceOs)
     {
@@ -353,19 +346,23 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getDeviceFingerprint()
+    public function getTrackingId()
     {
-        return $this->deviceFingerprint;
+        return $this->trackingId;
     }
 
     /**
-     * @param string $deviceFingerprint
+     * @param string $trackingId
+     *
+     * @return self
      */
-    public function setDeviceFingerprint($deviceFingerprint)
+    public function setTrackingId($trackingId)
     {
-        $this->deviceFingerprint = $deviceFingerprint;
+        $this->trackingId = $trackingId;
+
+        return $this;
     }
 
     /**
@@ -377,8 +374,6 @@ class LeadDevice
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return $this
      */
     public function setLead(Lead $lead)
@@ -402,25 +397,5 @@ class LeadDevice
     public function setDateAdded($dateAdded)
     {
         $this->dateAdded = $dateAdded;
-    }
-
-    /**
-     * @return mixed
-     *
-     * @deprecated 2.4.0 to be removed 3.0; use getDateAdded instead
-     */
-    public function getDateOpen()
-    {
-        return $this->getDateAdded();
-    }
-
-    /**
-     * @param mixed $dateOpen
-     *
-     * @deprecated 2.4.0 to be removed 3.0; use setDateAdded instead
-     */
-    public function setDateOpen($dateOpen)
-    {
-        $this->setDateAdded($dateOpen);
     }
 }

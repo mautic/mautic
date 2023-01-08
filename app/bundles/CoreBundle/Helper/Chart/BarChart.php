@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper\Chart;
 
 /**
@@ -18,8 +9,6 @@ class BarChart extends AbstractChart implements ChartInterface
 {
     /**
      * Defines the basic chart values, generates the time axe labels from it.
-     *
-     * @param array $labels
      */
     public function __construct(array $labels)
     {
@@ -43,7 +32,6 @@ class BarChart extends AbstractChart implements ChartInterface
      * Define a dataset by name and data. Method will add the rest.
      *
      * @param string $label
-     * @param array  $data
      * @param int    $order
      *
      * @return $this
@@ -57,7 +45,7 @@ class BarChart extends AbstractChart implements ChartInterface
             'data'  => $data,
         ];
 
-        if ($order === null) {
+        if (null === $order) {
             $order = count($this->datasets);
         }
 

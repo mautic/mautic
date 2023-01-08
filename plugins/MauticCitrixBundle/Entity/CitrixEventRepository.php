@@ -1,21 +1,18 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCitrixBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\TimelineTrait;
 
+/**
+ * @extends CommonRepository<CitrixEvent>
+ */
 class CitrixEventRepository extends CommonRepository
 {
+    use TimelineTrait;
+
     /**
      * Fetch the base event data from the database.
      *
@@ -51,6 +48,49 @@ class CitrixEventRepository extends CommonRepository
     }
 
     /**
+     * @param      $product
+     * @param null $leadId
+     *
+     * @return array
+     */
+    public function getEventsForTimeline($product, $leadId = null, array $options = [])
+    {
+        $eventType = null;
+        if (is_array($product)) {
+            list($product, $eventType) = $product;
+        }
+
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->from(MAUTIC_TABLE_PREFIX.'plugin_citrix_events', 'c')
+            ->select('c.*');
+
+        $query->where(
+            $query->expr()->eq('c.product', ':product')
+        )
+            ->setParameter('product', $product);
+
+        if ($eventType) {
+            $query->andWhere(
+                $query->expr()->eq('c.event_type', ':type')
+            )
+                ->setParameter('type', $eventType);
+        }
+
+        if ($leadId) {
+            $query->andWhere('c.lead_id = '.(int) $leadId);
+        }
+
+        if (isset($options['search']) && $options['search']) {
+            $query->andWhere($query->expr()->orX(
+                $query->expr()->like('c.event_name', $query->expr()->literal('%'.$options['search'].'%')),
+                $query->expr()->like('c.product', $query->expr()->literal('%'.$options['search'].'%'))
+            ));
+        }
+
+        return $this->getTimelineResults($query, $options, 'c.event_name', 'c.event_date', [], ['event_date']);
+    }
+
+    /**
      * @param string $product
      * @param string $email
      *
@@ -68,8 +108,6 @@ class CitrixEventRepository extends CommonRepository
 
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -118,7 +156,7 @@ class CitrixEventRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

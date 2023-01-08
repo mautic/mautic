@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\MauticClearbitBundle\Form\Type\BatchLookupType;
+use MauticPlugin\MauticClearbitBundle\Form\Type\LookupType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,7 +61,7 @@ class ClearbitController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'clearbit_lookup',
+                            LookupType::class,
                             [
                                 'objectId' => $objectId,
                             ],
@@ -93,7 +86,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -217,7 +209,7 @@ class ClearbitController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'clearbit_batch_lookup',
+                            BatchLookupType::class,
                             [],
                             [
                                 'action' => $route,
@@ -255,7 +247,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                             'mautic.lead.batch_leads_affected',
                             [
-                                'pluralCount' => $count,
                                 '%count%'     => $count,
                             ]
                         );
@@ -323,7 +314,7 @@ class ClearbitController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'clearbit_lookup',
+                            LookupType::class,
                             [
                                 'objectId' => $objectId,
                             ],
@@ -348,7 +339,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -471,7 +461,7 @@ class ClearbitController extends FormController
                 [
                     'viewParameters' => [
                         'form' => $this->createForm(
-                            'clearbit_batch_lookup',
+                            BatchLookupType::class,
                             [],
                             [
                                 'action' => $route,
@@ -509,7 +499,6 @@ class ClearbitController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
                     );

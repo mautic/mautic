@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -55,9 +46,6 @@ class Lead
      */
     private $rotation = 1;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -99,22 +87,22 @@ class Lead
     public static function loadApiMetadata(ApiMetadataDriver $metadata)
     {
         $metadata->setGroupPrefix('campaignLead')
-                 ->addListProperties(
-                     [
-                         'dateAdded',
-                         'manuallyRemoved',
-                         'manuallyAdded',
-                         'rotation',
-                         'dateLastExited',
-                     ]
-                 )
-                ->addProperties(
-                    [
-                        'lead',
-                        'campaign',
-                    ]
-                )
-                 ->build();
+            ->addListProperties(
+                [
+                    'dateAdded',
+                    'manuallyRemoved',
+                    'manuallyAdded',
+                    'rotation',
+                    'dateLastExited',
+                ]
+            )
+            ->addProperties(
+                [
+                    'lead',
+                    'campaign',
+                ]
+            )
+            ->build();
     }
 
     /**
@@ -134,17 +122,14 @@ class Lead
     }
 
     /**
-     * @return mixed
+     * @return \Mautic\LeadBundle\Entity\Lead
      */
     public function getLead()
     {
         return $this->lead;
     }
 
-    /**
-     * @param mixed $lead
-     */
-    public function setLead($lead)
+    public function setLead(\Mautic\LeadBundle\Entity\Lead $lead)
     {
         $this->lead = $lead;
     }
@@ -157,10 +142,7 @@ class Lead
         return $this->campaign;
     }
 
-    /**
-     * @param Campaign $campaign
-     */
-    public function setCampaign($campaign)
+    public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
     }
@@ -234,6 +216,17 @@ class Lead
     }
 
     /**
+     * @return $this
+     */
+    public function startNewRotation()
+    {
+        ++$this->rotation;
+        $this->dateAdded = new \DateTime();
+
+        return $this;
+    }
+
+    /**
      * @return \DateTime
      */
     public function getDateLastExited()
@@ -242,11 +235,9 @@ class Lead
     }
 
     /**
-     * @param \DateTime $dateLastExited
-     *
      * @return Lead
      */
-    public function setDateLastExited(\DateTime $dateLastExited)
+    public function setDateLastExited(\DateTime $dateLastExited = null)
     {
         $this->dateLastExited = $dateLastExited;
 

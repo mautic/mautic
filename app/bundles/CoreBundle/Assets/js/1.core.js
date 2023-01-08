@@ -16,8 +16,7 @@ MauticVars.activeRequests = 0;
 mQuery.ajaxSetup({
     beforeSend: function (request, settings) {
         if (settings.showLoadingBar) {
-            mQuery('.loading-bar').addClass('active');
-            MauticVars.activeRequests++;
+            Mautic.startPageLoadingBar();
         }
 
         if (typeof IdleTimer != 'undefined') {
@@ -35,10 +34,22 @@ mQuery.ajaxSetup({
             settings.url = settings.url + queryGlue + 'mauticLastNotificationId=' + mQuery('#mauticLastNotificationId').val();
         }
 
+        // Set CSRF token to each AJAX POST request
+        if (settings.type == 'POST') {
+            request.setRequestHeader('X-CSRF-Token', mauticAjaxCsrf);
+        }
+
         return true;
     },
 
     cache: false
+});
+
+mQuery( document ).ajaxComplete(function(event, xhr, settings) {
+    Mautic.stopPageLoadingBar();
+    if (xhr.responseJSON && xhr.responseJSON.flashes) {
+        Mautic.setFlashes(xhr.responseJSON.flashes);
+    }
 });
 
 // Force stop the page loading bar when no more requests are being in progress
@@ -52,14 +63,6 @@ mQuery( document ).ready(function() {
     if (typeof mauticContent !== 'undefined') {
         mQuery("html").Core({
             console: false
-        });
-    }
-
-    if (typeof IdleTimer != 'undefined') {
-        IdleTimer.init({
-            idleTimeout: 60000, //1 min
-            awayTimeout: 900000, //15 min
-            statusChangeUrl: mauticAjaxUrl + '?action=updateUserStatus'
         });
     }
 
@@ -139,6 +142,18 @@ var Mautic = {
 
         Mautic.addKeyboardShortcut('shift+s', 'Global Search', function (e) {
             mQuery('#globalSearchContainer .search-button').click();
+        });
+
+        Mautic.addKeyboardShortcut('mod+z', 'Undo change', function (e) {
+            if (mQuery('.btn-undo').length) {
+                mQuery('.btn-undo').click();
+            }
+        });
+
+        Mautic.addKeyboardShortcut('mod+shift+z', 'Redo change', function (e) {
+            if (mQuery('.btn-redo').length) {
+                mQuery('.btn-redo').click();
+            }
         });
 
         Mousetrap.bind('?', function (e) {
@@ -275,6 +290,28 @@ var Mautic = {
     /**
      * Activate label loading spinner
      *
+     * @param button (jQuery element)
+     */
+    activateButtonLoadingIndicator: function (button) {
+        button.prop('disabled', true);
+        if (!button.find('.fa-spinner.fa-spin').length) {
+            button.append(mQuery('<i class="fa fa-fw fa-spinner fa-spin"></i>'));
+        }
+    },
+
+    /**
+     * Remove the spinner from label
+     *
+     * @param button (jQuery element)
+     */
+    removeButtonLoadingIndicator: function (button) {
+        button.prop('disabled', false);
+        button.find('.fa-spinner').remove();
+    },
+
+    /**
+     * Activate label loading spinner
+     *
      * @param el
      */
     activateLabelLoadingIndicator: function (el) {
@@ -298,8 +335,13 @@ var Mautic = {
         if (options.windowUrl) {
             Mautic.startModalLoadingBar();
 
+            var popupName = 'mauticpopup';
+            if (options.popupName) {
+                popupName = options.popupName;
+            }
+
             setTimeout(function () {
-                var opener = window.open(options.windowUrl, 'mauticpopup', 'height=600,width=1100');
+                var opener = window.open(options.windowUrl, popupName, 'height=600,width=1100');
 
                 if (!opener || opener.closed || typeof opener.closed == 'undefined') {
                     alert(mauticLang.popupBlockerMessage);
@@ -547,7 +589,7 @@ var Mautic = {
 
         if (typeof request.responseJSON !== 'undefined') {
             response = request.responseJSON;
-        } else {
+        } else if (typeof(request.responseText) !== 'undefined') {
             //Symfony may have added some excess buffer if an exception was hit during a sub rendering and because
             //it uses ob_start, PHP dumps the buffer upon hitting the exception.  So let's filter that out.
             var errorStart = request.responseText.indexOf('{"newContent');
@@ -555,7 +597,7 @@ var Mautic = {
 
             if (jsonString) {
                 try {
-                    var response = mQuery.parseJSON(jsonString);
+                    var response = JSON.parse(jsonString);
                     if (inDevMode) {
                         console.log(response);
                     }
@@ -726,7 +768,7 @@ var Mautic = {
      * Marks notifications as read and clears unread indicators
      */
     showNotifications: function () {
-        mQuery("#notificationsDropdown").unbind('hide.bs.dropdown');
+        mQuery("#notificationsDropdown").off('hide.bs.dropdown');
         mQuery('#notificationsDropdown').on('hidden.bs.dropdown', function () {
             if (!mQuery('#newNotificationIndicator').hasClass('hide')) {
                 mQuery('#notifications .is-unread').remove();
@@ -775,13 +817,28 @@ var Mautic = {
      * @param data
      * @param successClosure
      * @param showLoadingBar
+     * @param queue
+     * @param method
      */
-    ajaxActionRequest: function (action, data, successClosure, showLoadingBar) {
+    ajaxActionRequest: function (action, data, successClosure, showLoadingBar, queue, method = "POST") {
+        if (typeof Mautic.ajaxActionXhrQueue == 'undefined') {
+            Mautic.ajaxActionXhrQueue = {};
+        }
         if (typeof Mautic.ajaxActionXhr == 'undefined') {
             Mautic.ajaxActionXhr = {};
         } else if (typeof Mautic.ajaxActionXhr[action] != 'undefined') {
-            Mautic.removeLabelLoadingIndicator();
-            Mautic.ajaxActionXhr[action].abort();
+            if (queue) {
+                if (typeof Mautic.ajaxActionXhrQueue[action] == 'undefined') {
+                    Mautic.ajaxActionXhrQueue[action] = [];
+                }
+
+                Mautic.ajaxActionXhrQueue[action].push({action: action, data: data, successClosure: successClosure, showLoadingBar: showLoadingBar, method: method});
+
+                return;
+            } else {
+                Mautic.removeLabelLoadingIndicator();
+                Mautic.ajaxActionXhr[action].abort();
+            }
         }
 
         if (typeof showLoadingBar == 'undefined') {
@@ -790,7 +847,7 @@ var Mautic = {
 
         Mautic.ajaxActionXhr[action] = mQuery.ajax({
             url: mauticAjaxUrl + '?action=' + action,
-            type: 'POST',
+            type: method,
             data: data,
             showLoadingBar: showLoadingBar,
             success: function (response) {
@@ -803,7 +860,30 @@ var Mautic = {
             },
             complete: function () {
                 delete Mautic.ajaxActionXhr[action];
+
+                if (typeof Mautic.ajaxActionXhrQueue[action] !== 'undefined' && Mautic.ajaxActionXhrQueue[action].length) {
+                    var next = Mautic.ajaxActionXhrQueue[action].shift();
+
+                    Mautic.ajaxActionRequest(next.action, next.data, next.successClosure, next.showLoadingBar, false, next.method);
+                }
             }
         });
+    },
+
+    /**
+     * Check if the browser supports local storage
+     *
+     * @returns {boolean}
+     */
+    isLocalStorageSupported: function() {
+        try {
+            // Check if localStorage is supported
+            localStorage.setItem('mautic.test', 'mautic');
+            localStorage.removeItem('mautic.test');
+
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 };

@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 
 /**
@@ -19,15 +12,11 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ConfigType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'cat_in_page_url',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.page.config.form.cat.in.url',
                 'data'  => (bool) $options['data']['cat_in_page_url'],
@@ -39,7 +28,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'google_analytics',
-            'textarea',
+            TextareaType::class,
             [
                 'label'      => 'mautic.page.config.form.google.analytics',
                 'label_attr' => ['class' => 'control-label'],
@@ -51,32 +40,12 @@ class ConfigType extends AbstractType
                 'required' => false,
             ]
         );
-
-        $builder->add(
-            'track_contact_by_ip',
-            'yesno_button_group',
-            [
-                'label' => 'mautic.page.config.form.track_contact_by_ip',
-                'data'  => (bool) $options['data']['track_contact_by_ip'],
-                'attr'  => [
-                    'tooltip' => 'mautic.page.config.form.track_contact_by_ip.tooltip',
-                ],
-            ]
-        );
-
-        $builder->add('track_by_fingerprint', 'yesno_button_group', [
-            'label' => 'mautic.page.config.form.track.by.fingerprint',
-            'data'  => (bool) $options['data']['track_by_fingerprint'],
-            'attr'  => [
-                'tooltip' => 'mautic.page.config.form.track.by.fingerprint.tooltip',
-            ],
-        ]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'pageconfig';
     }

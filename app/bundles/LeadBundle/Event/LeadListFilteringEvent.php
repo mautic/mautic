@@ -1,24 +1,13 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Event\CommonEvent;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 /**
- * Class LeadListFilteringEvent.
- *
- * Please refer to LeadListRepository.php, inside getListFilterExpr method, for examples
+ * Please refer to LeadListRepository.php, inside getListFilterExprCombined method, for examples.
  */
 class LeadListFilteringEvent extends CommonEvent
 {
@@ -57,22 +46,17 @@ class LeadListFilteringEvent extends CommonEvent
      */
     protected $func;
 
+    private string $leadsTableAlias;
+
     /**
-     * @param array         $details
-     * @param int           $leadId
-     * @param string        $alias
-     * @param string        $func
-     * @param QueryBuilder  $queryBuilder
-     * @param EntityManager $entityManager
+     * @param array        $details
+     * @param int          $leadId
+     * @param string       $alias
+     * @param string       $func
+     * @param QueryBuilder $queryBuilder
      */
-    public function __construct(
-        $details,
-        $leadId,
-        $alias,
-        $func,
-        QueryBuilder $queryBuilder,
-        EntityManager $entityManager
-    ) {
+    public function __construct($details, $leadId, $alias, $func, $queryBuilder, EntityManager $entityManager)
+    {
         $this->details         = $details;
         $this->leadId          = $leadId;
         $this->alias           = $alias;
@@ -81,6 +65,7 @@ class LeadListFilteringEvent extends CommonEvent
         $this->em              = $entityManager;
         $this->isFilteringDone = false;
         $this->subQuery        = '';
+        $this->leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
     }
 
     /**
@@ -132,7 +117,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @param bool
+     * @param bool $status
      */
     public function setFilteringStatus($status)
     {
@@ -140,7 +125,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @param string
+     * @param string $query
      */
     public function setSubQuery($query)
     {
@@ -150,7 +135,7 @@ class LeadListFilteringEvent extends CommonEvent
     }
 
     /**
-     * @return array
+     * @return bool
      */
     public function isFilteringDone()
     {
@@ -163,5 +148,18 @@ class LeadListFilteringEvent extends CommonEvent
     public function getSubQuery()
     {
         return $this->subQuery;
+    }
+
+    /**
+     * @param array $details
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+    }
+
+    public function getLeadsTableAlias(): string
+    {
+        return $this->leadsTableAlias;
     }
 }

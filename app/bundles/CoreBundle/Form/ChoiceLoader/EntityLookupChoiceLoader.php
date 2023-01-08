@@ -1,36 +1,23 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\ChoiceLoader;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class EntityLookupChoiceLoader.
- */
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
     /**
      * @var array
      */
-    protected $selected;
+    protected $selected = [];
 
     /**
      * @var array
@@ -43,12 +30,12 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $options;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     protected $modelFactory;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -58,12 +45,8 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * EntityLookupChoiceLoader constructor.
-     *
-     * @param ModelFactory        $modelFactory
-     * @param TranslatorInterface $translator
-     * @param Connection          $connection
-     * @param array               $options
+     * @param ModelFactory<object> $modelFactory
+     * @param array                $options
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
     {
@@ -96,8 +79,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
      *
      * Convert to other data types to strings - we're already working with IDs so just return $values
      *
-     * @param array $values
-     * @param null  $value
+     * @param null $value
      *
      * @return array
      */
@@ -109,8 +91,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     /**
      * Convert to other data types to strings - we're already working with IDs so just return $choices.
      *
-     * @param array $choices
-     * @param null  $value
+     * @param null $value
      *
      * @return array
      */
@@ -121,23 +102,21 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 
     /**
      * Take note of the selected values for loadChoiceList.
-     *
-     * @param FormEvent $event
      */
     public function onFormPostSetData(FormEvent $event)
     {
-        $this->selected = $event->getData();
+        $this->selected = (array) $event->getData();
     }
 
     /**
-     * @param null $data
-     * @param bool $includeNew
+     * @param array|null $data
+     * @param bool       $includeNew
      *
      * @return array
      */
     protected function getChoices($data = null, $includeNew = false)
     {
-        if (null == $data) {
+        if (null === $data) {
             $data = $this->selected;
         }
 
@@ -190,9 +169,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // must be [$label => $id]
-        $prepped = $this->prepareChoices($this->choices[$modelName]);
+        $prepped      = $this->prepareChoices($this->choices[$modelName]);
+        $prepped_keys = array_keys($prepped);
 
-        array_multisort(array_keys($prepped), SORT_NATURAL | SORT_FLAG_CASE, $prepped);
+        array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);
@@ -210,7 +190,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     {
         $prepped   = $choices;
         $isGrouped = false;
-        foreach ($prepped as $key => &$choice) {
+        foreach ($prepped as &$choice) {
             if (is_array($choice)) {
                 $isGrouped = true;
                 $choice    = $this->prepareChoices($choice);
@@ -218,6 +198,8 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         if (!$isGrouped) {
+            // fix for array_count_values error when there are null values
+            $prepped = array_replace($prepped, array_fill_keys(array_keys($prepped, null), ''));
             // Same labels will cause options to be merged with Symfony 2.8+ so ensure labels are unique
             $counts     = array_count_values($prepped);
             $duplicates = array_filter(
@@ -293,9 +275,6 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         return $choices;
     }
 
-    /**
-     * @param array $choices
-     */
     protected function formatChoices(array &$choices)
     {
         // Get the first key

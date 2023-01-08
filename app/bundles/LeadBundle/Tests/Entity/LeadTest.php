@@ -1,22 +1,17 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+namespace Mautic\LeadBundle\Tests\Entity;
 
-namespace Mautic\LeadBundle\Tests;
-
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\FrequencyRule;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeadTest extends \PHPUnit_Framework_TestCase
+class LeadTest extends \PHPUnit\Framework\TestCase
 {
+    use RequestTrait;
+
     public function testPreferredChannels()
     {
         $frequencyRules = [
@@ -104,10 +99,201 @@ class LeadTest extends \PHPUnit_Framework_TestCase
         $this->adjustPointsTest(10, $this->getLeadChangedArray(150, 15), $lead, 'divide');
     }
 
+    public function testCustomFieldGetterSetters()
+    {
+        $lead = new Lead();
+
+        $fields = [
+            'core' => [
+                'notes' => [
+                    'alias' => 'notes',
+                    'label' => 'Notes',
+                    'type'  => 'textarea',
+                    'value' => 'Blah blah blah',
+                ],
+                'test' => [
+                    'alias' => 'test',
+                    'label' => 'Test',
+                    'type'  => 'textarea',
+                    'value' => 'Test blah',
+                ],
+            ],
+        ];
+
+        $lead->setFields($fields);
+
+        // This should not killover with a segmentation fault due to a loop
+        $lead->setNotes('hello');
+
+        // Not using getNotes because it conflicts with an existing method and not sure what to do about that yet
+        $lead->setTest('hello');
+        $this->assertEquals('hello', $lead->getTest());
+    }
+
+    public function testDataIsCleanedCorrectly()
+    {
+        $fields = [
+            'core' => [
+                'boolean' => [
+                    'alias' => 'boolean',
+                    'label' => 'Boolean',
+                    'type'  => 'boolean',
+                    'value' => false,
+                ],
+                'dateField' => [
+                    'alias' => 'dateField',
+                    'label' => 'Date Time',
+                    'type'  => 'datetime',
+                    'value' => '12-12-2017 23:00:00',
+                ],
+                'multiselect' => [
+                    'alias' => 'multi',
+                    'label' => 'Multi Select',
+                    'type'  => 'multiselect',
+                    'value' => ['a', 'b', 'c'],
+                ],
+            ],
+        ];
+        $data = [
+            'boolean'   => 'yes',
+            'dateField' => '12-12-2017 22:03:59',
+            'multi'     => 'a|b',
+        ];
+
+        $this->cleanFields($data, $fields['core']['boolean']);
+
+        $this->cleanFields($data, $fields['core']['dateField']);
+
+        $this->cleanFields($data, $fields['core']['multiselect']);
+
+        $testDateObject = new \DateTime('12-12-2017 22:03:59');
+
+        $this->assertEquals($testDateObject->format('Y-m-d H:i:s'), $data['dateField']);
+        $this->assertEquals((int) true, $data['boolean']);
+        $this->assertEquals(['a', 'b'], $data['multi']);
+    }
+
+    public function testCleanBooleanAndNumberAsNullAreNotConverted()
+    {
+        $fields = [
+            'core' => [
+                'boolean' => [
+                    'alias' => 'boolean',
+                    'label' => 'Boolean',
+                    'type'  => 'boolean',
+                    'value' => false,
+                ],
+                'number' => [
+                    'alias' => 'number',
+                    'label' => 'Number',
+                    'type'  => 'number',
+                    'value' => '1234',
+                ],
+            ],
+        ];
+        $data = [
+            'boolean' => null,
+            'number'  => null,
+        ];
+
+        $this->cleanFields($data, $fields['core']['boolean']);
+        $this->cleanFields($data, $fields['core']['number']);
+
+        $this->assertEquals(null, $data['boolean']);
+        $this->assertEquals(null, $data['number']);
+    }
+
+    public function testAttributionDateIsAdded()
+    {
+        $lead = new Lead();
+        $lead->addUpdatedField('attribution', 100);
+        $lead->checkAttributionDate();
+        $this->assertEquals((new \Datetime())->format('Y-m-d'), $lead->getFieldValue('attribution_date'));
+        $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsRemoved()
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                    'attribution_date' => [
+                        'type'  => 'date',
+                        'value' => '2017-09-09',
+                    ],
+                    'attribution' => [
+                        'type'  => 'int',
+                        'value' => 100,
+                    ],
+                ],
+            ]
+        );
+
+        $lead->addUpdatedField('attribution', 0);
+        $lead->checkAttributionDate();
+        $this->assertNull($lead->getFieldValue('attribution_date'));
+        $this->assertNotEmpty($lead->getChanges());
+    }
+
+    public function testAttributionDateIsNotChangedWhen0ChangedToNull()
+    {
+        $lead = new Lead();
+        $lead->setFields(
+            [
+                'core' => [
+                        'attribution_date' => [
+                            'type'  => 'date',
+                            'value' => 0,
+                        ],
+                        'attribution' => [
+                            'type'  => 'int',
+                            'value' => 0,
+                        ],
+                    ],
+            ]
+        );
+
+        $lead->checkAttributionDate();
+        $this->assertEmpty($lead->getChanges());
+    }
+
+    public function testChangingPropertiesHydratesFieldChanges()
+    {
+        $email = 'foo@bar.com';
+        $lead  = new Lead();
+        $lead->addUpdatedField('email', $email);
+        $changes = $lead->getChanges();
+
+        $this->assertFalse(empty($changes['email']));
+        $this->assertFalse(empty($changes['fields']['email']));
+
+        $this->assertEquals($email, $changes['email'][1]);
+        $this->assertEquals($email, $changes['fields']['email'][1]);
+    }
+
+    public function testIpAddressChanges()
+    {
+        $ip1 = (new IpAddress())->setIpAddress('1.2.3.4');
+        $ip2 = (new IpAddress())->setIpAddress('1.2.3.5');
+
+        $contact = new Lead();
+
+        $this->assertCount(0, $contact->getChanges());
+
+        $contact->addIpAddress($ip1);
+        $changes = $contact->getChanges();
+
+        $this->assertSame(['1.2.3.4' => $ip1], $contact->getChanges()['ipAddressList']);
+
+        $contact->addIpAddress($ip2);
+
+        $this->assertSame(['1.2.3.4' => $ip1, '1.2.3.5' => $ip2], $contact->getChanges()['ipAddressList']);
+    }
+
     /**
-     * @param $points
-     * @param $expected
-     * @param Lead $lead
+     * @param      $points
+     * @param      $expected
      * @param bool $operator
      */
     private function adjustPointsTest($points, $expected, Lead $lead, $operator = false)

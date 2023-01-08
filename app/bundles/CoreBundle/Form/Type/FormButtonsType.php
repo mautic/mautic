@@ -1,21 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class FormButtonsType.
@@ -28,7 +21,7 @@ class FormButtonsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         foreach ($options['pre_extra_buttons'] as $btn) {
-            $type = (empty($btn['type'])) ? 'button' : 'submit';
+            $type = (empty($btn['type'])) ? ButtonType::class : SubmitType::class;
             $builder->add(
                 $btn['name'],
                 $type,
@@ -39,18 +32,18 @@ class FormButtonsType extends AbstractType
             );
         }
 
-        if (!empty($options['cancel_text'])) {
+        if (!empty($options['apply_text'])) {
             $builder->add(
-                'cancel',
-                $options['cancel_type'],
+                'apply',
+                $options['apply_type'],
                 [
-                    'label' => $options['cancel_text'],
+                    'label' => $options['apply_text'],
                     'attr'  => array_merge(
-                        $options['cancel_attr'],
+                        $options['apply_attr'],
                         [
-                            'class'   => $options['cancel_class'],
-                            'icon'    => $options['cancel_icon'],
-                            'onclick' => $options['cancel_onclick'],
+                            'class'   => $options['apply_class'],
+                            'icon'    => $options['apply_icon'],
+                            'onclick' => $options['apply_onclick'],
                         ]
                     ),
                 ]
@@ -75,18 +68,18 @@ class FormButtonsType extends AbstractType
             );
         }
 
-        if (!empty($options['apply_text'])) {
+        if (!empty($options['cancel_text'])) {
             $builder->add(
-                'apply',
-                $options['apply_type'],
+                'cancel',
+                $options['cancel_type'],
                 [
-                    'label' => $options['apply_text'],
+                    'label' => $options['cancel_text'],
                     'attr'  => array_merge(
-                        $options['apply_attr'],
+                        $options['cancel_attr'],
                         [
-                            'class'   => $options['apply_class'],
-                            'icon'    => $options['apply_icon'],
-                            'onclick' => $options['apply_onclick'],
+                            'class'   => $options['cancel_class'],
+                            'icon'    => $options['cancel_icon'],
+                            'onclick' => $options['cancel_onclick'],
                         ]
                     ),
                 ]
@@ -94,7 +87,7 @@ class FormButtonsType extends AbstractType
         }
 
         foreach ($options['post_extra_buttons'] as $btn) {
-            $type = (empty($btn['type'])) ? 'button' : 'submit';
+            $type = (empty($btn['type'])) ? ButtonType::class : SubmitType::class;
             $builder->add(
                 $btn['name'],
                 $type,
@@ -109,42 +102,36 @@ class FormButtonsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'apply_text'         => 'mautic.core.form.apply',
-            'apply_icon'         => 'fa fa-check text-success',
-            'apply_class'        => 'btn btn-default btn-apply',
-            'apply_onclick'      => false,
-            'apply_attr'         => [],
-            'apply_type'         => 'submit',
-            'save_text'          => 'mautic.core.form.saveandclose',
-            'save_icon'          => 'fa fa-save',
-            'save_class'         => 'btn btn-default btn-save',
-            'save_onclick'       => false,
-            'save_attr'          => [],
-            'save_type'          => 'submit',
-            'cancel_text'        => 'mautic.core.form.cancel',
-            'cancel_icon'        => 'fa fa-times text-danger',
-            'cancel_class'       => 'btn btn-default btn-cancel',
-            'cancel_onclick'     => false,
-            'cancel_attr'        => [],
-            'cancel_type'        => 'submit',
-            'mapped'             => false,
-            'label'              => false,
-            'required'           => false,
-            'pre_extra_buttons'  => [],
-            'post_extra_buttons' => [],
-            'container_class'    => 'bottom-form-buttons',
-        ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return 'form_buttons';
+        $resolver->setDefaults(
+            [
+                'apply_text'         => 'mautic.core.form.apply',
+                'apply_icon'         => 'fa fa-check text-success',
+                'apply_class'        => 'btn btn-default btn-apply',
+                'apply_onclick'      => false,
+                'apply_attr'         => [],
+                'apply_type'         => SubmitType::class,
+                'save_text'          => 'mautic.core.form.saveandclose',
+                'save_icon'          => 'fa fa-save text-success',
+                'save_class'         => 'btn btn-default btn-save',
+                'save_onclick'       => false,
+                'save_attr'          => [],
+                'save_type'          => SubmitType::class,
+                'cancel_text'        => 'mautic.core.form.cancel',
+                'cancel_icon'        => 'fa fa-times text-danger',
+                'cancel_class'       => 'btn btn-default btn-cancel',
+                'cancel_onclick'     => false,
+                'cancel_attr'        => [],
+                'cancel_type'        => SubmitType::class,
+                'mapped'             => false,
+                'label'              => false,
+                'required'           => false,
+                'pre_extra_buttons'  => [],
+                'post_extra_buttons' => [],
+                'container_class'    => 'bottom-form-buttons',
+            ]
+        );
     }
 
     /**

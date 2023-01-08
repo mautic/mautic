@@ -1,29 +1,30 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\AssetBundle\Entity\Asset;
+use Mautic\AssetBundle\Model\AssetModel;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class AssetApiController.
+ * @extends CommonApiController<Asset>
  */
 class AssetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var AssetModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('asset');
-        $this->entityClass      = 'Mautic\AssetBundle\Entity\Asset';
+        $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
+
+        $this->model            = $assetModel;
+        $this->entityClass      = Asset::class;
         $this->entityNameOne    = 'asset';
         $this->entityNameMulti  = 'assets';
         $this->serializerGroups = ['assetDetails', 'categoryList', 'publishDetails'];
@@ -33,13 +34,8 @@ class AssetApiController extends CommonApiController
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
-     *
-     * @param        $entity
-     * @param string $action
-     *
-     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         $entity->setDownloadUrl(
             $this->model->generateUrl($entity, true)
@@ -57,26 +53,29 @@ class AssetApiController extends CommonApiController
      */
     protected function prepareParametersForBinding($parameters, $entity, $action)
     {
-        $assetDir = $this->get('mautic.helper.core_parameters')->getParameter('upload_dir');
+        $assetDir = $this->get('mautic.helper.core_parameters')->get('upload_dir');
         $entity->setUploadDir($assetDir);
 
         if (isset($parameters['file'])) {
-            if ($parameters['storageLocation'] === 'local') {
+            if ('local' === $parameters['storageLocation']) {
                 $entity->setPath($parameters['file']);
                 $entity->setFileInfoFromFile();
 
-                if ($entity->loadFile() === null) {
-                    return $this->returnError('File '.$parameters['file'].' was not found in the asset directory.', Codes::HTTP_BAD_REQUEST);
+                if (null === $entity->loadFile()) {
+                    return $this->returnError('File '.$parameters['file'].' was not found in the asset directory.', Response::HTTP_BAD_REQUEST);
                 }
-            } elseif ($parameters['storageLocation'] === 'remote') {
+            } elseif ('remote' === $parameters['storageLocation']) {
                 $parameters['remotePath'] = $parameters['file'];
-                $entity->setFileInfoFromFile();
-                $entity->setFileNameFromRemote();
+                $entity->setTitle($parameters['title']);
+                $entity->setStorageLocation('remote');
+                $entity->setRemotePath($parameters['remotePath']);
+                $entity->preUpload();
+                $entity->upload();
             }
 
             unset($parameters['file']);
-        } elseif ($action === 'new') {
-            return $this->returnError('File of the asset is required.', Codes::HTTP_BAD_REQUEST);
+        } elseif ('new' === $action) {
+            return $this->returnError('File of the asset is required.', Response::HTTP_BAD_REQUEST);
         }
 
         return $parameters;

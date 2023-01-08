@@ -1,43 +1,24 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
-
-use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * Class BundleHelper.
  */
 class BundleHelper
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var Kernel
-     */
-    protected $kernel;
+    private $coreBundles   = [];
+    private $pluginBundles = [];
+    private $allBundles    = [];
 
     /**
      * BundleHelper constructor.
-     *
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param Kernel               $kernel
      */
-    public function __construct(CoreParametersHelper $coreParametersHelper, Kernel $kernel)
+    public function __construct(array $coreBundles, array $pluginBundles)
     {
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->kernel               = $kernel;
+        $this->coreBundles   = $coreBundles;
+        $this->pluginBundles = $pluginBundles;
+        $this->allBundles    = array_merge($coreBundles, $pluginBundles);
     }
 
     /**
@@ -47,14 +28,7 @@ class BundleHelper
      */
     public function getMauticBundles($includePlugins = true)
     {
-        $bundles = $this->coreParametersHelper->getParameter('mautic.bundles');
-
-        if ($includePlugins) {
-            $plugins = $this->coreParametersHelper->getParameter('mautic.plugin.bundles');
-            $bundles = array_merge($bundles, $plugins);
-        }
-
-        return $bundles;
+        return $includePlugins ? $this->allBundles : $this->coreBundles;
     }
 
     /**
@@ -64,7 +38,7 @@ class BundleHelper
      */
     public function getPluginBundles()
     {
-        return $this->kernel->getPluginBundles();
+        return $this->pluginBundles;
     }
 
     /**

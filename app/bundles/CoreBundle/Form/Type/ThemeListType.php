@@ -1,74 +1,57 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class ThemeListType.
  */
 class ThemeListType extends AbstractType
 {
-    private $factory;
+    /**
+     * @var ThemeHelperInterface
+     */
+    private $themeHelper;
 
     /**
-     * @param MauticFactory $factory
+     * ThemeListType constructor.
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(ThemeHelperInterface $helper)
     {
-        $this->factory = $factory;
+        $this->themeHelper = $helper;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $factory = $this->factory;
-        $resolver->setDefaults([
-            'choices' => function (Options $options) use ($factory) {
-                $themes = $factory->getInstalledThemes($options['feature']);
-                $themes['mautic_code_mode'] = 'Code Mode';
+        $resolver->setDefaults(
+            [
+                'choices'           => function (Options $options) {
+                    $themes                     = $this->themeHelper->getInstalledThemes($options['feature']);
+                    $themes['mautic_code_mode'] = 'Code Mode';
 
-                return $themes;
-            },
-            'expanded'    => false,
-            'multiple'    => false,
-            'label'       => 'mautic.core.form.theme',
-            'label_attr'  => ['class' => 'control-label'],
-            'empty_value' => false,
-            'required'    => false,
-            'attr'        => [
-                'class' => 'form-control',
-            ],
-            'feature' => 'all',
-        ]);
-
-        $resolver->setOptional(['feature']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'theme_list';
+                    return array_flip($themes);
+                },
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.core.form.theme',
+                'label_attr'        => ['class' => 'control-label'],
+                'placeholder'       => false,
+                'required'          => false,
+                'attr'              => [
+                    'class' => 'form-control',
+                ],
+                'feature'           => 'all',
+            ]
+        );
     }
 
     public function getParent()
     {
-        return 'choice';
+        return ChoiceType::class;
     }
 }

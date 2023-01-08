@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * StagesChangeLogRepository.
+ * @extends CommonRepository<StagesChangeLog>
  */
 class StagesChangeLogRepository extends CommonRepository
 {
@@ -23,17 +14,19 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Get a lead's stage log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
      */
-    public function getLeadTimelineEvents($leadId, array $options = [])
+    public function getLeadTimelineEvents($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'ls')
-            ->select('ls.stage_id as reference, ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded')
-            ->where('ls.lead_id = '.(int) $leadId);
+            ->select('ls.id, ls.stage_id as reference, ls.event_name as eventName, ls.action_name as actionName, ls.date_added as dateAdded, ls.lead_id');
+
+        if ($leadId) {
+            $query->where('ls.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere($query->expr()->orX(
@@ -46,73 +39,10 @@ class StagesChangeLogRepository extends CommonRepository
     }
 
     /**
-     * Get table stat data from stage log table.
-     *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getMostStages($query, $limit = 10, $offset = 0)
-    {
-        $query->setMaxResults($limit)
-            ->setFirstResult($offset);
-
-        $results = $query->execute()->fetchAll();
-
-        return $results;
-    }
-
-    /**
-     * Get table stat data from lead table.
-     *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function getMostLeads($query, $limit = 10, $offset = 0)
-    {
-        $query->setMaxResults($limit)
-            ->setFirstResult($offset);
-
-        $results = $query->execute()->fetchAll();
-
-        return $results;
-    }
-
-    /**
-     * Count a value in a column.
-     *
-     * @param QueryBuilder $query
-     *
-     * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
-     */
-    public function countValue($query, $column, $value)
-    {
-        $query->select('count('.$column.') as quantity')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->leftJoin('l', MAUTIC_TABLE_PREFIX.'lead_stages_change_log', 'lp', 'lp.lead_id = l.id')
-            ->andwhere($query->expr()->eq($column, ':value'))
-            ->setParameter('value', $value);
-
-        $result = $query->execute()->fetch();
-
-        return $result['quantity'];
-    }
-
-    /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -126,7 +56,7 @@ class StagesChangeLogRepository extends CommonRepository
     /**
      * Get the current stage assigned to a lead.
      *
-     * @param $leadId
+     * @param int $leadId
      *
      * @return mixed
      */
@@ -142,6 +72,6 @@ class StagesChangeLogRepository extends CommonRepository
 
         $result = $query->execute()->fetch();
 
-        return (isset($result['stage'])) ? $result['stage'] : null;
+        return (isset($result['stage'])) ? (int) $result['stage'] : null;
     }
 }

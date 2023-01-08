@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-/** @var $exception \Symfony\Component\HttpKernel\Exception\FlattenException */
+/** @var $exception \Symfony\Component\ErrorHandler\Exception\FlattenException */
 /** @var $logger \Symfony\Component\HttpKernel\Log\DebugLoggerInterface */
 $message            = $view['slots']->get('message', 'mautic.core.error.generic');
 $previousExceptions = $exception->getAllPrevious();

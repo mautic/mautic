@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-fresh-left",
+  "description": "Mautic Fresh Left Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "fresh-left"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

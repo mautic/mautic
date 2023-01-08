@@ -5,8 +5,8 @@
 
 var IdleTimer = (function($) {
     var activityHelper = {
-        _idleTimeout: 30000,	// 30 seconds
-        _awayTimeout: 600000,	// 10 minutes
+        _idleTimeout: 30000,    // 30 seconds
+        _awayTimeout: 600000,   // 10 minutes
         _idleNow: false,
         _idleTimestamp: null,
         _idleTimer: null,
@@ -18,6 +18,8 @@ var IdleTimer = (function($) {
         _onBackCallback: null,
         _debug: false,
         _lastActive: new Date().getTime(),
+        _sessionKeepAliveInterval: null,
+        _keepSessionAlive: null,
 
         _makeIdle: function () {
             var t = new Date().getTime();
@@ -45,12 +47,18 @@ var IdleTimer = (function($) {
             if (this._debug) console.log('** AWAY **');
             this._awayNow = true;
 
+            if (this._keepSessionAlive){
+                this._sessionKeepAliveInterval = setInterval(function(){
+                    activityHelper._keepSessionAlive();
+                }, this._awayTimeout);
+            }
+
             try {
                 if (this._onAwayCallback) this._onAwayCallback();
             } catch (err) {
             }
         },
-
+        
         _active: function (timer) {
             var t = new Date().getTime();
 
@@ -64,6 +72,7 @@ var IdleTimer = (function($) {
             }
 
             if (this._awayNow) {
+                clearTimeout(this._sessionKeepAliveInterval);
                 timer.setAwayTimeout(this._awayTimeout);
             }
 
@@ -143,6 +152,10 @@ var IdleTimer = (function($) {
                     activityHelper._onBackCallback = function() {
                         activityHelper._onStatusChange(options.statusChangeUrl, 'back');
                     };
+
+                    activityHelper._keepSessionAlive = function() {
+                        activityHelper._onStatusChange(options.statusChangeUrl, 'keepalive');
+                    };
                 }
 
                 if (options.idleTimeout) {
@@ -168,21 +181,21 @@ var IdleTimer = (function($) {
 
             var doc = $(document);
             var me = this;
-            doc.mousemove(function() {activityHelper._active(me)});
+            doc.on('mousemove', function() {activityHelper._active(me)});
             try {
-                doc.mouseenter(function() {activityHelper._active(me)});
+                doc.on('mouseenter', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.scroll(function() {activityHelper._active(me)});
+                doc.on('scroll', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.keydown(function() {activityHelper._active(me)});
+                doc.on( 'keydown', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.click(function() {activityHelper._active(me)});
+                doc.on('click', function() {activityHelper._active(me)});
             } catch (err) {}
             try {
-                doc.dblclick(function() {activityHelper._active(me)});
+                doc.on('dblclick', function() {activityHelper._active(me)});
             } catch (err) {}
         }
     };

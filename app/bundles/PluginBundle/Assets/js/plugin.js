@@ -1,7 +1,26 @@
 /* PluginBundle */
 Mautic.matchedFields = function (index, object, integration) {
+    var compoundMauticFields = ['mauticContactId','mauticContactTimelineLink'];
+
+    if (mQuery('#integration_details_featureSettings_updateDncByDate_0').is(':checked')) {
+        compoundMauticFields.push('mauticContactIsContactableByEmail');
+    }
     var integrationField = mQuery('#integration_details_featureSettings_'+object+'Fields_i_' + index).attr('data-value');
     var mauticField = mQuery('#integration_details_featureSettings_'+object+'Fields_m_' + index + ' option:selected').val();
+
+    if(mQuery('.btn-arrow' + index).parent().attr('data-force-direction') != 1) {
+        if (mQuery.inArray(mauticField, compoundMauticFields) >= 0) {
+            mQuery('.btn-arrow' + index).removeClass('active');
+            mQuery('#integration_details_featureSettings_' + object + 'Fields_update_mautic' + index + '_0').attr('checked', 'checked');
+            mQuery('input[name="integration_details[featureSettings][' + object + 'Fields][update_mautic' + index + ']"]').prop('disabled', true).trigger("chosen:updated");
+            mQuery('.btn-arrow' + index).addClass('disabled');
+        }
+        else {
+            mQuery('input[name="integration_details[featureSettings][' + object + 'Fields][update_mautic' + index + ']"]').prop('disabled', false).trigger("chosen:updated");
+            mQuery('.btn-arrow' + index).removeClass('disabled');
+        }
+    }
+
     if (object == 'lead') {
         var updateMauticField = mQuery('input[name="integration_details[featureSettings]['+object+'Fields][update_mautic' + index + ']"]:checked').val();
     } else {
@@ -121,27 +140,48 @@ Mautic.filterIntegrations = function(update) {
     }
 
     //activate shuffles
-    if (mQuery('.shuffle-integrations').length) {
-        var grid = mQuery(".shuffle-integrations");
-
+    if (mQuery('.native-integrations').length) {
         //give a slight delay in order for images to load so that shuffle starts out with correct dimensions
         setTimeout(function () {
-            grid.shuffle('shuffle', function($el, shuffle) {
+            var Shuffle = window.Shuffle,
+                element = document.querySelector('.native-integrations'),
+                shuffleOptions = {
+                    itemSelector: '.shuffle-item'
+                };
+
+            // Using global variable to make it available outside of the scope of this function
+            window.nativeIntegrationsShuffleInstance = new Shuffle(element, shuffleOptions);
+
+            window.nativeIntegrationsShuffleInstance.filter(function($el) {
                 if (filter) {
-                    return $el.hasClass('plugin' + filter);
+                    return mQuery($el).hasClass('plugin' + filter);
                 } else {
+                    // Shuffle.js has a bug. It hides the first item when we reset the filter.
+                    // This fixes it.
+                    mQuery(shuffleOptions.itemSelector).first().css('transform', '');
                     return true;
                 }
             });
 
             // Update shuffle on sidebar minimize/maximize
             mQuery("html")
-                .on("fa.sidebar.minimize", function () {
-                    grid.shuffle("update");
+                .on("fa.sidebar.minimize", function() {
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 })
-                .on("fa.sidebar.maximize", function () {
-                    grid.shuffle("update");
+                .on("fa.sidebar.maximize", function() {
+                    setTimeout(function() {
+                        window.nativeIntegrationsShuffleInstance.update();
+                    }, 1000);
                 });
+
+            // This delay is needed so that the tab has time to render and the sizes are correctly calculated
+            mQuery('#plugin-nav-tabs a').click(function () {
+                setTimeout(function() {
+                    window.nativeIntegrationsShuffleInstance.update();
+                }, 500);
+            });
         }, 500);
     }
 };
@@ -171,10 +211,16 @@ Mautic.getIntegrationFields = function(settings, page, el) {
     var object    = settings.object ? settings.object : 'lead';
     var fieldsTab = ('lead' === object) ? '#fields-tab' : '#'+object+'-fields-container';
 
-    if (el) {
+    if (el && mQuery(el).is('input')) {
         Mautic.activateLabelLoadingIndicator(mQuery(el).attr('id'));
-    }
 
+        var namePrefix = mQuery(el).attr('name').split('[')[0];
+        if ('integration_details' !== namePrefix) {
+            var nameParts = mQuery(el).attr('name').match(/\[.*?\]+/g);
+            nameParts = nameParts.slice(0, -1);
+            settings.prefix = namePrefix + nameParts.join('') + "[" + object + "Fields]";
+        }
+    }
     var fieldsContainer = '#'+object+'FieldsContainer';
 
     var inModal = mQuery(fieldsContainer).closest('.modal');
@@ -210,7 +256,10 @@ Mautic.getIntegrationFields = function(settings, page, el) {
             if (inModal) {
                 Mautic.stopModalLoadingBar(modalId);
             }
-        }
+        },
+        false,
+        false,
+        "GET"
     );
 };
 
@@ -235,7 +284,10 @@ Mautic.getIntegrationConfig = function (el, settings) {
 
             Mautic.integrationConfigOnLoad('.integration-config-container');
             Mautic.removeLabelLoadingIndicator();
-        }
+        },
+        false,
+        false,
+        "GET"
     );
 
 
@@ -246,11 +298,13 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
     if (typeof settings == 'undefined') {
         settings = {};
     }
-    settings.name = mQuery('#campaignevent_properties_integration').attr('name');
-    var data = {integration:mQuery('#campaignevent_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
-    if(typeof mQuery('#campaignevent_properties_integration').val() == 'undefined') {
-        data = {integration:mQuery('#formaction_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
-    }
+
+    // Extract the name and ID prefixes
+    var prefix = mQuery(el).attr('name').split("[")[0];
+
+    settings.name = mQuery('#'+prefix+'_properties_integration').attr('name');
+    var data = {integration:mQuery('#'+prefix+'_properties_integration').val(),campaign: mQuery(el).val(), settings: settings};
+
     mQuery('.integration-campaigns-status').html('');
     mQuery('.integration-campaigns-status').removeClass('hide');
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaignStatus', data,
@@ -263,7 +317,10 @@ Mautic.getIntegrationCampaignStatus = function (el, settings) {
 
             Mautic.integrationConfigOnLoad('.integration-campaigns-status');
             Mautic.removeLabelLoadingIndicator();
-        }
+        },
+        false,
+        false,
+        "GET"
     );
 };
 
@@ -277,13 +334,15 @@ Mautic.getIntegrationCampaigns = function (el, settings) {
     Mautic.ajaxActionRequest('plugin:getIntegrationCampaigns', data,
         function (response) {
             if (response.success) {
-                console.log(response.html);
                 mQuery('.integration-campaigns').html(response.html);
                 Mautic.onPageLoad('.integration-campaigns', response);
             }
 
             Mautic.integrationConfigOnLoad('.integration-campaigns');
             Mautic.removeLabelLoadingIndicator();
-        }
+        },
+        false,
+        false,
+        "GET"
     );
 };

@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,7 +23,7 @@ class AppCallbackController extends CommonController
         /** @var Lead $contact */
         $contact = $contactRepo->findOneBy($matchData);
 
-        if ($contact === null) {
+        if (null === $contact) {
             $contact = new Lead();
             $contact->setEmail($requestBody['email']);
             $contact->setLastActive(new \DateTime());
@@ -52,9 +44,11 @@ class AppCallbackController extends CommonController
             $notificationRepo = $em->getRepository(Notification::class);
             $notification     = $notificationRepo->getEntity($stat['notification_id']);
 
-            if ($notification !== null) {
-                $statCreated = true;
-                $this->getModel('notification')->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
+            if (null !== $notification) {
+                $statCreated       = true;
+                $notificationModel = $this->getModel('notification');
+                \assert($notificationModel instanceof NotificationModel);
+                $notificationModel->createStatEntry($notification, $contact, $stat['source'], $stat['source_id']);
             }
         }
 

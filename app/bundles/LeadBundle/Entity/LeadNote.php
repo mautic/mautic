@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -48,9 +39,6 @@ class LeadNote extends FormEntity
      */
     private $dateTime;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -157,8 +145,6 @@ class LeadNote extends FormEntity
 
     /**
      * Form validation rules.
-     *
-     * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
@@ -175,9 +161,6 @@ class LeadNote extends FormEntity
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\LeadBundle\Entity\Lead;
@@ -26,7 +17,7 @@ trait LeadAccessTrait
      * @param bool   $isPlugin
      * @param string $intgegration
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Lead
      */
     protected function checkLeadAccess($leadId, $action, $isPlugin = false, $integration = '')
     {
@@ -39,7 +30,7 @@ trait LeadAccessTrait
             $leadId = $lead->getId();
         }
 
-        if ($lead === null || !$lead->getId()) {
+        if (null === $lead || !$lead->getId()) {
             if (method_exists($this, 'postActionRedirect')) {
                 //set the return URL
                 $page      = $this->get('session')->get($isPlugin ? 'mautic.'.$integration.'.page' : 'mautic.lead.page', 1);
@@ -49,7 +40,7 @@ trait LeadAccessTrait
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $page],
-                        'contentTemplate' => $isPlugin ? 'MauticLeadBundle:Lead:pluginIndex' : 'MauticLeadBundle:Lead:index',
+                        'contentTemplate' => $isPlugin ? 'Mautic\LeadBundle\Controller\LeadController::pluginIndexAction' : 'Mautic\LeadBundle\Controller\LeadController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => $isPlugin ? '#mautic_plugin_timeline_index' : '#mautic_contact_index',
                             'mauticContent' => 'leadTimeline',
@@ -110,7 +101,7 @@ trait LeadAccessTrait
                 'hydration_mode' => 'HYDRATE_ARRAY',
             ]);
 
-        if ($leads === null) {
+        if (null === $leads) {
             return $this->accessDenied();
         }
 

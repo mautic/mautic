@@ -10,7 +10,7 @@
  */
 
 //Check to see if the entire page should be displayed or just main content
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticUserBundle:User:index.html.php');
 endif;
 ?>

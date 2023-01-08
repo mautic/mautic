@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if (!$app->getRequest()->isXmlHttpRequest() && $view['slots']->get('contentOnly', false) === false) :
+if (!$app->getRequest()->isXmlHttpRequest() && false === $view['slots']->get('contentOnly', false)) :
     //load base template
     $view->extend('MauticInstallBundle:Install:base.html.php');
 endif;

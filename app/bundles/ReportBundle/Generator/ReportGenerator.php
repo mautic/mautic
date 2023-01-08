@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Generator;
 
 use Doctrine\DBAL\Connection;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Form\Type\ReportType;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -61,12 +53,6 @@ class ReportGenerator
 
     /**
      * ReportGenerator constructor.
-     *
-     * @param EventDispatcherInterface  $dispatcher
-     * @param Connection                $db
-     * @param Report                    $entity
-     * @param ChannelListHelper         $channelListHelper
-     * @param FormFactoryInterface|null $formFactory
      */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper, FormFactoryInterface $formFactory = null)
     {
@@ -98,14 +84,14 @@ class ReportGenerator
     /**
      * Gets form.
      *
-     * @param \Mautic\ReportBundle\Entity\Report $entity  Report Entity
-     * @param array                              $options Parameters set by the caller
+     * @param Report $entity  Report Entity
+     * @param array  $options Parameters set by the caller
      *
-     * @return \Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\FormInterface
      */
     public function getForm(Report $entity, $options)
     {
-        return $this->formFactory->createBuilder('report', $entity, $options)->getForm();
+        return $this->formFactory->createBuilder(ReportType::class, $entity, $options)->getForm();
     }
 
     /**
@@ -136,9 +122,7 @@ class ReportGenerator
         $reflection = new \ReflectionClass($className);
 
         if (!$reflection->implementsInterface($this->validInterface)) {
-            throw new RuntimeException(
-                sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className)
-            );
+            throw new RuntimeException(sprintf("ReportBuilders have to implement %s, and %s doesn't implement it", $this->validInterface, $className));
         }
 
         return $reflection->newInstanceArgs([$this->dispatcher, $this->db, $this->entity, $this->channelListHelper]);

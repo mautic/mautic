@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,9 +7,6 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 
-/**
- * Class VideoHit.
- */
 class VideoHit
 {
     /**
@@ -96,14 +84,8 @@ class VideoHit
      */
     private $code;
 
-    /**
-     * @var
-     */
     private $referer;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -122,7 +104,7 @@ class VideoHit
     private $pageLanguage;
 
     /**
-     * @var string
+     * @var array<string>
      */
     private $browserLanguages = [];
 
@@ -141,9 +123,6 @@ class VideoHit
      */
     private $query = [];
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -578,8 +557,6 @@ class VideoHit
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return VideoHit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -626,7 +603,7 @@ class VideoHit
     /**
      * Set browserLanguages.
      *
-     * @param string $browserLanguages
+     * @param array<string> $browserLanguages
      *
      * @return VideoHit
      */
@@ -640,7 +617,7 @@ class VideoHit
     /**
      * Get browserLanguages.
      *
-     * @return string
+     * @return array<string>
      */
     public function getBrowserLanguages()
     {
@@ -656,8 +633,6 @@ class VideoHit
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return VideoHit
      */
     public function setLead(Lead $lead)
@@ -716,8 +691,6 @@ class VideoHit
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return VideoHit
      */
     public function setRedirect(Redirect $redirect)

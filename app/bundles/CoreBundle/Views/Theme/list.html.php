@@ -107,10 +107,10 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                                         <div class="modal-header">
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $item['name']; ?></h4>
+                                            <h4 class="modal-title" id="<?php echo $k; ?>"><?php echo $view->escape($item['name']); ?></h4>
                                         </div>
                                         <div class="modal-body">
-                                            <div style="background-image: url(<?php echo $thumbnailUrl ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
+                                            <div style="background-image: url(<?php echo $thumbnailUrl; ?>);background-repeat:no-repeat;background-size:contain; background-position:center; width: 100%; height: 600px"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -119,26 +119,34 @@ $view->extend('MauticCoreBundle:Theme:index.html.php');
                     </td>
                     <td>
                         <div>
-                            <?php echo $item['name']; ?> (<?php echo $item['key']; ?>)
+                            <?php echo $view->escape($item['name']); ?> (<?php echo $view->escape($item['key']); ?>)
                         </div>
                     </td>
                     <td>
                         <div>
                             <?php if (isset($item['config']['authorUrl'])) : ?>
-                                <a href="<?php echo $item['config']['authorUrl']; ?>" target="_blank">
-                                    <?php echo $item['config']['author']; ?>
+                                <a href="<?php echo \Mautic\CoreBundle\Helper\InputHelper::url($item['config']['authorUrl']); ?>" target="_blank">
+                                    <?php echo $view->escape($item['config']['author']); ?>
                                 </a>
                             <?php elseif (isset($item['config']['author'])) : ?>
-                                <?php echo $item['config']['author']; ?>
+                                <?php echo $view->escape($item['config']['author']); ?>
                             <?php endif; ?>
                         </div>
                     </td>
                     <td class="visible-md visible-lg">
-                        <?php if (!empty($item['config']['features'])) : ?>
+                        <?php
+                        foreach ($item['config']['builder'] as $builder) {
+                            ?>
+                            <span style="white-space: nowrap;">
+                                <span class="label label-primary pa-4"><?php echo $builder; ?></span>
+                            </span>
+                            <?php
+                        }
+                        if (!empty($item['config']['features'])) : ?>
                             <?php foreach ($item['config']['features'] as $feature) : ?>
                                 <span style="white-space: nowrap;">
                                     <span class="label label-default pa-4">
-                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.$feature); ?>
+                                        <?php echo $view['translator']->trans('mautic.core.theme.feature.'.$view->escape($feature)); ?>
                                     </span>
                                 </span>
                             <?php endforeach; ?>

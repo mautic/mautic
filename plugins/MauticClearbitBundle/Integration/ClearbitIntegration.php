@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Integration;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -54,10 +46,10 @@ class ClearbitIntegration extends AbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        if ($formArea === 'keys') {
+        if ('keys' === $formArea) {
             $builder->add(
                 'auto_update',
-                'yesno_button_group',
+                YesNoButtonGroupType::class,
                 [
                     'label' => 'mautic.plugin.clearbit.auto_update',
                     'data'  => (isset($data['auto_update'])) ? (bool) $data['auto_update'] : false,

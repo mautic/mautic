@@ -1,0 +1,68 @@
+{
+  "v": 1,
+  "matches_filters": null,
+  "meta": {
+    "v": 1,
+    "action": "updated",
+    "object": "user",
+    "id": "2499712",
+    "company_id": 1734032,
+    "user_id": 2499712,
+    "host": "test.pipedrive.com",
+    "timestamp": 1495003938,
+    "timestamp_micro": 1495003938839600,
+    "permitted_user_ids": [
+      "*"
+    ],
+    "trans_pending": false,
+    "is_bulk_update": false
+  },
+  "retry": 0,
+  "current": [
+    {
+      "id": 2499712,
+      "name": "Mateusz Janiszewski",
+      "default_currency": "PLN",
+      "locale": "en_US",
+      "lang": 1,
+      "email": "test123@test.com",
+      "phone": null,
+      "activated": true,
+      "last_login": "2017-05-15 07:27:48",
+      "created": "2017-05-05 07:54:51",
+      "modified": "2017-05-15 07:27:48",
+      "signup_flow_variation": "short_form",
+      "has_created_company": true,
+      "is_admin": 1,
+      "role_id": "1",
+      "timezone_name": "Europe/Berlin",
+      "active_flag": true,
+      "icon_url": null,
+      "is_you": true
+    }
+  ],
+  "previous": [
+    {
+      "id": 2499712,
+      "name": "Mateusz",
+      "default_currency": "PLN",
+      "locale": "en_US",
+      "lang": 1,
+      "email": "test123@test.pl",
+      "phone": null,
+      "activated": true,
+      "last_login": "2017-05-15 07:27:48",
+      "created": "2017-05-05 07:54:51",
+      "modified": "2017-05-15 07:27:48",
+      "signup_flow_variation": "short_form",
+      "has_created_company": true,
+      "is_admin": 1,
+      "role_id": "1",
+      "timezone_name": "Europe/Berlin",
+      "active_flag": true,
+      "icon_url": null,
+      "is_you": true
+    }
+  ],
+  "event": "updated.user"
+}

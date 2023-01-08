@@ -1,26 +1,18 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class PointApiController.
+ * @extends CommonApiController<Point>
  */
 class PointApiController extends CommonApiController
 {
@@ -32,13 +24,21 @@ class PointApiController extends CommonApiController
     protected $leadModel;
 
     /**
-     * {@inheritdoc}
+     * @var PointModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('point');
-        $this->leadModel        = $this->getModel('lead');
-        $this->entityClass      = 'Mautic\PointBundle\Entity\Point';
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+
+        $pointModel = $this->getModel('point');
+        \assert($pointModel instanceof PointModel);
+
+        $this->model            = $pointModel;
+        $this->leadModel        = $leadModel;
+        $this->entityClass      = Point::class;
         $this->entityNameOne    = 'point';
         $this->entityNameMulti  = 'points';
         $this->serializerGroups = ['pointDetails', 'categoryList', 'publishDetails'];
@@ -80,10 +80,10 @@ class PointApiController extends CommonApiController
         try {
             $this->logApiPointChange($lead, $delta, $operator);
         } catch (\Exception $e) {
-            return $this->returnError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+            return $this->returnError($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->handleView($this->view(['success' => 1], Codes::HTTP_OK));
+        return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
 
     /**

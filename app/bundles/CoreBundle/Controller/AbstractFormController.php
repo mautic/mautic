@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
-/**
- * Class AbstractFormController.
- */
 abstract class AbstractFormController extends CommonController
 {
     use FormThemeTrait;
@@ -35,7 +25,7 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase = $model->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            if ($entity !== null && $entity->getCheckedOutBy() !== null) {
+            if (null !== $entity && null !== $entity->getCheckedOutBy()) {
                 $model->unlockEntity($entity);
             }
             $returnUrl = urldecode($this->request->get('returnUrl'));
@@ -68,17 +58,14 @@ abstract class AbstractFormController extends CommonController
      */
     protected function isLocked($postActionVars, $entity, $model, $batch = false)
     {
-        $date      = $entity->getCheckedOut();
-        $returnUrl = !empty($postActionVars['returnUrl'])
-            ?
-            urlencode($postActionVars['returnUrl'])
-            :
-            urlencode($this->generateUrl('mautic_dashboard_index'));
-        $override = '';
+        $date                   = $entity->getCheckedOut();
+        $postActionVars         = $this->refererPostActionVars($postActionVars);
+        $returnUrl              = $postActionVars['returnUrl'];
+        $override               = '';
 
-        $modelClass           = $this->getModel($model);
-        $nameFunction         = $modelClass->getNameGetter();
-        $this->permissionBase = $modelClass->getPermissionBase();
+        $modelClass             = $this->getModel($model);
+        $nameFunction           = $modelClass->getNameGetter();
+        $this->permissionBase   = $modelClass->getPermissionBase();
 
         if ($this->canEdit($entity)) {
             $override = $this->get('translator')->trans(
@@ -115,9 +102,9 @@ abstract class AbstractFormController extends CommonController
                         'returnUrl'    => $returnUrl,
                     ]
                 ),
-                '%date%'     => $date->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
-                '%time%'     => $date->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
-                '%datetime%' => $date->format($this->coreParametersHelper->getParameter('date_format_full')),
+                '%date%'     => $date->format($this->coreParametersHelper->get('date_format_dateonly')),
+                '%time%'     => $date->format($this->coreParametersHelper->get('date_format_timeonly')),
+                '%datetime%' => $date->format($this->coreParametersHelper->get('date_format_full')),
                 '%override%' => $override,
             ],
         ];
@@ -139,44 +126,40 @@ abstract class AbstractFormController extends CommonController
     /**
      * Checks to see if the form was cancelled.
      *
-     * @param Form $form
-     *
-     * @return int
+     * @return bool
      */
     protected function isFormCancelled(Form $form)
     {
-        $name = $form->getName();
+        $formData = $this->request->request->get($form->getName());
 
-        return $this->request->request->get($name.'[buttons][cancel]', false, true) !== false;
+        return is_array($formData) && array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
     }
 
     /**
      * Checks to see if the form was applied or saved.
      *
-     * @param $form
-     *
      * @return bool
      */
-    protected function isFormApplied($form)
+    protected function isFormApplied(Form $form)
     {
-        $name = $form->getName();
+        $formData = $this->request->request->get($form->getName());
 
-        return $this->request->request->get($name.'[buttons][apply]', false, true) !== false;
+        return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
     }
 
     /**
      * Binds form data, checks validity, and determines cancel request.
      *
-     * @param Form $form
+     * @param array $data
      *
-     * @return int
+     * @return bool
      */
-    protected function isFormValid(Form $form)
+    protected function isFormValid(Form $form, array $data = null)
     {
         //bind request to the form
         $form->handleRequest($this->request);
 
-        return $form->isValid();
+        return $form->isSubmitted() && $form->isValid();
     }
 
     /**
@@ -214,10 +197,6 @@ abstract class AbstractFormController extends CommonController
         return $this->get('mautic.helper.user')->getUser()->isAdmin();
     }
 
-    /**
-     * @param Form $copyFrom
-     * @param Form $copyTo
-     */
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
     {
         /** @var $error FormError */
@@ -231,5 +210,47 @@ abstract class AbstractFormController extends CommonController
                 $this->copyErrorsRecursively($child, $childTo);
             }
         }
+    }
+
+    /**
+     * generate $postActionVars with respect to available referer.
+     *
+     * @return array $postActionVars
+     */
+    protected function refererPostActionVars($vars)
+    {
+        if (empty($this->request->server->get('HTTP_REFERER'))) {
+            return $vars;
+        }
+
+        $returnUrl         = !empty($this->request->server->get('HTTP_REFERER')) ? $this->request->server->get('HTTP_REFERER') : '';
+        $vars['returnUrl'] = $returnUrl;
+
+        $urlMatcher  = explode('/s/', $returnUrl);
+        $actionRoute = $this->get('router')->match('/s/'.$urlMatcher[1]);
+        $objAction   = isset($actionRoute['objectAction']) ? $actionRoute['objectAction'] : 'index';
+        $routeCtrlr  = explode('\\', $actionRoute['_controller']);
+
+        $defaultContentTemplate  = $routeCtrlr[0].$routeCtrlr[1].':'.ucfirst(str_replace('Bundle', '', $routeCtrlr[1])).':'.$objAction;
+        $vars['contentTemplate'] = isset($vars['contentTemplate']) ? $vars['contentTemplate'] : $defaultContentTemplate;
+
+        $vars['passthroughVars']['activeLink'] = '#'.str_replace('_action', '_'.$objAction, $actionRoute['_route']);
+
+        if (isset($actionRoute['objectId']) && $actionRoute['objectId'] > 0) {
+            $vars['viewParameters']['objectId'] = $actionRoute['objectId'];
+        }
+
+        return $vars;
+    }
+
+    protected function getFormButton(FormInterface $form, array $elements): ClickableInterface
+    {
+        foreach ($elements as $element) {
+            $form = $form->get($element);
+        }
+
+        \assert($form instanceof ClickableInterface);
+
+        return $form;
     }
 }

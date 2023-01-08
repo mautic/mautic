@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -25,7 +16,7 @@ class IndexSchemaHelper
     protected $db;
 
     /**
-     * @var
+     * @var string
      */
     protected $prefix;
 
@@ -65,8 +56,7 @@ class IndexSchemaHelper
     protected $dropIndexes = [];
 
     /**
-     * @param Connection $db
-     * @param            $prefix
+     * @param string $prefix
      */
     public function __construct(Connection $db, $prefix)
     {
@@ -78,6 +68,8 @@ class IndexSchemaHelper
     /**
      * @param $name
      *
+     * @return $this
+     *
      * @throws SchemaException
      */
     public function setName($name)
@@ -87,6 +79,8 @@ class IndexSchemaHelper
         }
 
         $this->table = $this->sm->listTableDetails($this->prefix.$name);
+
+        return $this;
     }
 
     /**
@@ -98,15 +92,97 @@ class IndexSchemaHelper
     }
 
     /**
-     * Add or update an index to the table.
-     *
      * @param       $columns
      * @param       $name
      * @param array $options
      *
-     * @throws SchemaException
+     * @return $this
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     public function addIndex($columns, $name, $options = [])
+    {
+        $columns = $this->getTextColumns($columns);
+
+        if (!empty($columns)) {
+            $index = new Index($this->prefix.$name, $columns, false, false, $options);
+
+            if ($this->table->hasIndex($this->prefix.$name)) {
+                $this->changedIndexes[] = $index;
+            } else {
+                $this->addedIndexes[] = $index;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param mixed  $columns
+     * @param string $name
+     * @param array  $options
+     *
+     * @return self
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function dropIndex($columns, $name, $options = [])
+    {
+        $textColumns = $this->getTextColumns($columns);
+
+        $index = new Index($name, $textColumns, false, false, $options);
+        if ($this->table->hasIndex($name)) {
+            $this->dropIndexes[] = $index;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Execute changes.
+     */
+    public function executeChanges()
+    {
+        $platform = $this->sm->getDatabasePlatform();
+
+        $sql = [];
+        if (count($this->changedIndexes)) {
+            foreach ($this->changedIndexes as $index) {
+                $sql[] = $platform->getDropIndexSQL($index, $this->table);
+                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
+            }
+        }
+
+        if (count($this->dropIndexes)) {
+            foreach ($this->dropIndexes as $index) {
+                $sql[] = $platform->getDropIndexSQL($index, $this->table);
+            }
+        }
+
+        if (count($this->addedIndexes)) {
+            foreach ($this->addedIndexes as $index) {
+                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
+            }
+        }
+
+        if (count($sql)) {
+            foreach ($sql as $query) {
+                $this->db->executeUpdate($query);
+            }
+            $this->changedIndexes = [];
+            $this->dropIndexes    = [];
+            $this->addedIndexes   = [];
+        }
+    }
+
+    /**
+     * @param $columns
+     *
+     * @return array
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    private function getTextColumns($columns)
     {
         if (!is_array($columns)) {
             $columns = [$columns];
@@ -125,51 +201,6 @@ class IndexSchemaHelper
         // Indexes are only allowed on columns that are string
         $columns = array_intersect($columns, $this->allowedColumns);
 
-        if (!empty($columns)) {
-            $index = new Index($this->prefix.$name, $columns, false, false, $options);
-
-            if ($this->table->hasIndex($this->prefix.$name)) {
-                $this->changedIndexes[] = $index;
-            } else {
-                $this->addedIndexes[] = $index;
-            }
-        }
-    }
-
-    /**
-     * Execute changes.
-     */
-    public function executeChanges()
-    {
-        $platform = $this->sm->getDatabasePlatform();
-
-        $sql = [];
-        if (count($this->changedIndexes)) {
-            foreach ($this->changedIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index);
-                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
-            }
-        }
-
-        if (count($this->dropIndexes)) {
-            foreach ($this->dropIndexes as $index) {
-                $sql[] = $platform->getDropIndexSQL($index);
-            }
-        }
-
-        if (count($this->addedIndexes)) {
-            foreach ($this->addedIndexes as $index) {
-                $sql[] = $platform->getCreateIndexSQL($index, $this->table);
-            }
-        }
-
-        if (count($sql)) {
-            foreach ($sql as $query) {
-                $this->db->executeUpdate($query);
-            }
-            $this->changedIndexes = [];
-            $this->dropIndexes    = [];
-            $this->addedIndexes   = [];
-        }
+        return $columns;
     }
 }

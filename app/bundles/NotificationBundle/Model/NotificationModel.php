@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -20,14 +11,17 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\NotificationBundle\Entity\Notification;
 use Mautic\NotificationBundle\Entity\Stat;
 use Mautic\NotificationBundle\Event\NotificationEvent;
+use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
+use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NotificationModel
- * {@inheritdoc}
+ * @extends FormModel<Notification>
+ * @implements AjaxLookupModelInterface<Notification>
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -38,8 +32,6 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * NotificationModel constructor.
-     *
-     * @param TrackableModel $pageTrackableModel
      */
     public function __construct(TrackableModel $pageTrackableModel)
     {
@@ -75,8 +67,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */
@@ -84,7 +76,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     {
         //iterate over the results so the events are dispatched on each delete
         $batchSize = 20;
-        foreach ($entities as $k => $entity) {
+        $i         = 0;
+        foreach ($entities as $entity) {
             $isNew = ($entity->getId()) ? false : true;
 
             //set some defaults
@@ -100,7 +93,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $this->dispatchEvent('post_save', $entity, $isNew, $event);
             }
 
-            if ((($k + 1) % $batchSize) === 0) {
+            if (0 === ++$i % $batchSize) {
                 $this->em->flush();
             }
         }
@@ -110,10 +103,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Notification|null $entity
+     * @param FormFactory       $formFactory
+     * @param string|null       $action
+     * @param array             $options
      *
      * @return mixed
      *
@@ -129,7 +122,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
             $options['action'] = $action;
         }
 
-        $type = strpos($action, 'mobile_') !== false ? 'mobile_notification' : 'notification';
+        $type = false !== strpos($action, 'mobile_') ? MobileNotificationType::class : NotificationType::class;
 
         return $formFactory->create($type, $entity, $options);
     }
@@ -139,11 +132,11 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
      *
      * @param $id
      *
-     * @return null|Notification
+     * @return Notification|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             $entity = new Notification();
         } else {
             $entity = parent::getEntity($id);
@@ -153,10 +146,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param Notification $notification
-     * @param Lead         $lead
-     * @param string       $source
-     * @param int          $sourceId
+     * @param string $source
+     * @param int    $sourceId
      */
     public function createStatEntry(Notification $notification, Lead $lead, $source = null, $sourceId = null)
     {
@@ -200,7 +191,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $name = NotificationEvents::NOTIFICATION_POST_DELETE;
                 break;
             default:
-                return;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -209,18 +200,16 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**
      * Joins the page table and limits created_by to currently logged in user.
-     *
-     * @param QueryBuilder $q
      */
     public function limitQueryToCreator(QueryBuilder &$q)
     {
@@ -232,12 +221,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Get line chart data of hits.
      *
-     * @param char      $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
-     * @param array     $filter
-     * @param bool      $canViewOthers
+     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string $dateFormat
+     * @param array  $filter
+     * @param bool   $canViewOthers
      *
      * @return array
      */
@@ -253,7 +240,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
         $chart = new LineChart($unit, $dateFrom, $dateTo, $dateFormat);
         $query = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
 
-        if (!$flag || $flag === 'total_and_unique') {
+        if (!$flag || 'total_and_unique' === $flag) {
             $q = $query->prepareTimeDataQuery('push_notification_stats', 'date_sent', $filter);
 
             if (!$canViewOthers) {

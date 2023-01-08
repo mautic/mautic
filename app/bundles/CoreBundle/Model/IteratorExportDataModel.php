@@ -1,21 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 
-/**
- * Class IteratorExportDataModel.
- */
 class IteratorExportDataModel implements \Iterator
 {
     private $position;
@@ -24,20 +12,20 @@ class IteratorExportDataModel implements \Iterator
     private $callback;
     private $total;
     private $data;
-    private $page;
     private $totalResult;
 
     /**
-     * IteratorExportDataModel constructor.
+     * @param AbstractCommonModel<T> $model
+     * @param array<mixed>           $args
+     * @template T of object
      */
-    public function __construct(AbstractCommonModel $model, $args, callable $callback)
+    public function __construct(AbstractCommonModel $model, array $args, callable $callback)
     {
         $this->model       = $model;
         $this->args        = $args;
         $this->callback    = $callback;
         $this->position    = 0;
         $this->total       = 0;
-        $this->page        = 1;
         $this->totalResult = 0;
         $this->data        = 0;
     }
@@ -45,7 +33,7 @@ class IteratorExportDataModel implements \Iterator
     /**
      * Return the current element.
      *
-     * @link http://php.net/manual/en/iterator.current.php
+     * @see http://php.net/manual/en/iterator.current.php
      *
      * @return mixed Can return any type
      *
@@ -59,7 +47,7 @@ class IteratorExportDataModel implements \Iterator
     /**
      * Move forward to next element.
      *
-     * @link http://php.net/manual/en/iterator.next.php
+     * @see http://php.net/manual/en/iterator.next.php
      * @since 5.0.0
      */
     public function next()
@@ -68,17 +56,16 @@ class IteratorExportDataModel implements \Iterator
         if ($this->position === $this->totalResult) {
             $data              = new DataExporterHelper();
             $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
-            $this->total       = $this->total + count($this->data);
-            $this->totalResult = count($this->data);
+            $this->totalResult = $this->data ? count($this->data) : 0;
+            $this->total       = $this->total + $this->totalResult;
             $this->position    = 0;
-            ++$this->page;
         }
     }
 
     /**
      * Return the key of the current element.
      *
-     * @link http://php.net/manual/en/iterator.key.php
+     * @see http://php.net/manual/en/iterator.key.php
      *
      * @return mixed scalar on success, or null on failure
      *
@@ -92,7 +79,7 @@ class IteratorExportDataModel implements \Iterator
     /**
      * Checks if current position is valid.
      *
-     * @link http://php.net/manual/en/iterator.valid.php
+     * @see http://php.net/manual/en/iterator.valid.php
      *
      * @return bool The return value will be casted to boolean and then evaluated.
      *              Returns true on success or false on failure
@@ -111,15 +98,15 @@ class IteratorExportDataModel implements \Iterator
     /**
      * Rewind the Iterator to the first element.
      *
-     * @link http://php.net/manual/en/iterator.rewind.php
+     * @see http://php.net/manual/en/iterator.rewind.php
      * @since 5.0.0
      */
     public function rewind()
     {
         $data              = new DataExporterHelper();
         $this->data        = $data->getDataForExport($this->total, $this->model, $this->args, $this->callback);
-        $this->total       = $this->total + count($this->data);
-        $this->totalResult = count($this->data);
+        $this->totalResult = $this->data ? count($this->data) : 0;
+        $this->total       = $this->total + $this->totalResult;
         $this->position    = 0;
     }
 }

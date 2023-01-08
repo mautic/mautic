@@ -8,7 +8,6 @@ class GototrainingApi extends CitrixApi
 {
     /**
      * @param string $operation
-     * @param array  $parameters
      * @param string $method
      * @param string $route
      *
@@ -25,13 +24,6 @@ class GototrainingApi extends CitrixApi
         ];
 
         if (preg_match('/start$/', $operation)) {
-            $settings['requestSettings'] = [
-                'auth_type' => 'none',
-                'headers'   => [
-                    'Authorization' => 'OAuth oauth_token='.$this->integration->getApiKey(),
-                ],
-            ];
-
             return parent::_request($operation, $settings, $route);
         }
 

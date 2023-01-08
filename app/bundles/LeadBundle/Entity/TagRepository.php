@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class TagRepository.
+ * @extends CommonRepository<Tag>
  */
 class TagRepository extends CommonRepository
 {
@@ -48,20 +39,16 @@ class TagRepository extends CommonRepository
     /**
      * Get tag entities by name.
      *
-     * @param $tags
-     *
      * @return array
      */
-    public function getTagsByName($tags)
+    public function getTagsByName(array $tags)
     {
         if (empty($tags)) {
             return [];
         }
 
-        array_walk($tags, create_function('&$val', 'if (strpos($val, "-") === 0) $val = substr($val, 1);'));
-        $qb = $this->_em->createQueryBuilder()
-            ->select('t')
-            ->from('MauticLeadBundle:Tag', 't', 't.tag');
+        $tags = $this->removeMinusFromTags($tags);
+        $qb   = $this->createQueryBuilder('t', 't.tag');
 
         if ($tags) {
             $qb->where(
@@ -70,8 +57,68 @@ class TagRepository extends CommonRepository
                 ->setParameter('tags', $tags);
         }
 
-        $results = $qb->getQuery()->getResult();
+        return $qb->getQuery()->getResult();
+    }
 
-        return $results;
+    /**
+     * Goes through each element in the array expecting it to be a tag label and removes the '-' character infront of it.
+     * The minus character is used to identify that the tag should be removed.
+     *
+     * @return array
+     */
+    public function removeMinusFromTags(array $tags)
+    {
+        return array_map(function ($val) {
+            return (0 === strpos($val, '-')) ? substr($val, 1) : $val;
+        }, $tags);
+    }
+
+    /**
+     * Check Lead tags by Ids.
+     *
+     * @param $tags
+     *
+     * @return bool
+     */
+    public function checkLeadByTags(Lead $lead, $tags)
+    {
+        if (empty($tags)) {
+            return false;
+        }
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->select('l.id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
+            ->join('l', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('t.tag', ':tags'),
+                    $q->expr()->eq('l.id', ':leadId')
+                )
+            )
+            ->setParameter('tags', $tags, \Doctrine\DBAL\Connection::PARAM_STR_ARRAY)
+            ->setParameter('leadId', $lead->getId());
+
+        return (bool) $q->execute()->fetchColumn();
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Tag
+     */
+    public function getTagByNameOrCreateNewOne($name)
+    {
+        $tag = new Tag($name, true);
+
+        /** @var Tag|null $existingTag */
+        $existingTag = $this->findOneBy(
+            [
+                'tag' => $tag->getTag(),
+            ]
+        );
+
+        return $existingTag ?? $tag;
     }
 }

@@ -1,38 +1,43 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
+use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Event\LeadDeviceEvent;
+use Mautic\LeadBundle\Form\Type\DeviceType;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class DeviceModel
- * {@inheritdoc}
+ * @extends FormModel<LeadDevice>
  */
 class DeviceModel extends FormModel
 {
     /**
+     * @var LeadDeviceRepository
+     */
+    private $leadDeviceRepository;
+
+    /**
+     * DeviceModel constructor.
+     */
+    public function __construct(
+        LeadDeviceRepository $leadDeviceRepository
+    ) {
+        $this->leadDeviceRepository = $leadDeviceRepository;
+    }
+
+    /**
      * {@inheritdoc}
      *
-     * @return string
+     * @return LeadDeviceRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadDevice');
+        return $this->leadDeviceRepository;
     }
 
     /**
@@ -50,11 +55,11 @@ class DeviceModel extends FormModel
      *
      * @param $id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new LeadDevice();
         }
 
@@ -83,7 +88,7 @@ class DeviceModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('leaddevice', $entity, $options);
+        return $formFactory->create(DeviceType::class, $entity, $options);
     }
 
     /**
@@ -125,7 +130,7 @@ class DeviceModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

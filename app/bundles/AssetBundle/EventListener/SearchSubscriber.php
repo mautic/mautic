@@ -1,39 +1,43 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param AssetModel $assetModel
+     * @var CorePermissions
      */
-    public function __construct(AssetModel $assetModel)
+    private $security;
+
+    /**
+     * @var UserHelper
+     */
+    private $userHelper;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(AssetModel $assetModel, CorePermissions $security, UserHelper $userHelper, TemplatingHelper $templating)
     {
         $this->assetModel = $assetModel;
+        $this->security   = $security;
+        $this->userHelper = $userHelper;
+        $this->templating = $templating;
     }
 
     /**
@@ -47,9 +51,6 @@ class SearchSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MauticEvents\GlobalSearchEvent $event
-     */
     public function onGlobalSearch(MauticEvents\GlobalSearchEvent $event)
     {
         $str = $event->getSearchString();
@@ -68,7 +69,7 @@ class SearchSubscriber extends CommonSubscriber
                 $filter['force'][] = [
                     'column' => 'IDENTITY(a.createdBy)',
                     'expr'   => 'eq',
-                    'value'  => $this->factory->getUser()->getId(),
+                    'value'  => $this->userHelper->getUser()->getId(),
                 ];
             }
 
@@ -82,14 +83,14 @@ class SearchSubscriber extends CommonSubscriber
                 $assetResults = [];
 
                 foreach ($assets as $asset) {
-                    $assetResults[] = $this->templating->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                    $assetResults[] = $this->templating->getTemplating()->renderResponse(
+                        'MauticAssetBundle:SubscribedEvents\Search:global.html.twig',
                         ['asset' => $asset]
                     )->getContent();
                 }
                 if (count($assets) > 5) {
-                    $assetResults[] = $this->templating->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                    $assetResults[] = $this->templating->getTemplating()->renderResponse(
+                        'MauticAssetBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -103,9 +104,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted(['asset:assets:viewown', 'asset:assets:viewother'], 'MATCH_ONE')) {

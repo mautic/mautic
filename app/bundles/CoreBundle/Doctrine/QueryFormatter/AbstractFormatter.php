@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\QueryFormatter;
 
 use Doctrine\DBAL\Connection;
@@ -25,8 +16,6 @@ abstract class AbstractFormatter
     protected $name;
 
     /**
-     * @param Connection $db
-     *
      * @return AbstractFormatter
      */
     public static function createFormatter(Connection $db)
@@ -37,9 +26,6 @@ abstract class AbstractFormatter
         return new $class($db);
     }
 
-    /**
-     * @param Connection $db
-     */
     public function __construct(Connection $db)
     {
         $this->db       = $db;

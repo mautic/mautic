@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticFormBundle:Result:index.html.php');
 endif;
 
@@ -35,9 +35,17 @@ $formId = $form->getId();
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
                     'sessionVar' => 'formresult.'.$formId,
                     'orderBy'    => 's.id',
-                    'text'       => 'mautic.core.id',
+                    'text'       => 'mautic.form.report.submission.id',
                     'class'      => 'col-formresult-id',
                     'filterBy'   => 's.id',
+                ]);
+
+                echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
+                    'sessionVar' => 'formresult.'.$formId,
+                    'orderBy'    => 's.lead_id',
+                    'text'       => 'mautic.lead.report.contact_id',
+                    'class'      => 'col-formresult-lead-id',
+                    'filterBy'   => 's.lead_id',
                 ]);
 
                 echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
@@ -61,7 +69,7 @@ $formId = $form->getId();
                 $fields     = $form->getFields();
                 $fieldCount = ($canDelete) ? 4 : 3;
                 foreach ($fields as $f):
-                    if (in_array($f->getType(), $viewOnlyFields) || $f->getSaveResult() === false) {
+                    if (in_array($f->getType(), $viewOnlyFields) || false === $f->getSaveResult()) {
                         continue;
                     }
                     echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', [
@@ -100,24 +108,27 @@ $formId = $form->getId();
                 </td>
                 <?php endif; ?>
 
-                <td><?php echo $item['id']; ?></td>
+                <td><?php echo $view->escape($item['id']); ?></td>
                 <td>
-                    <?php if (!empty($item['lead']['id'])): ?>
-                    <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item['lead']['id']]); ?>" data-toggle="ajax">
-                        <?php echo $view['date']->toFull($item['dateSubmitted']); ?>
+                    <?php if (!empty($item['leadId'])): ?>
+                    <a href="<?php echo $view['router']->path('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $item['leadId']]); ?>" data-toggle="ajax">
+                        <?php echo $view->escape($item['leadId']); ?>
                     </a>
-                    <?php else: ?>
-                    <?php echo $view['date']->toFull($item['dateSubmitted']); ?>
                     <?php endif; ?>
                 </td>
-                <td><?php echo $item['ipAddress']['ipAddress']; ?></td>
-                <?php foreach ($item['results'] as $r): ?>
-                    <?php $isTextarea = $r['type'] === 'textarea'; ?>
+                <td><?php echo $view['date']->toFull($item['dateSubmitted'], 'UTC'); ?></td>
+                <td><?php echo $view->escape($item['ipAddress']); ?></td>
+                <?php foreach ($item['results'] as $key => $r): ?>
+                    <?php $isTextarea = 'textarea' === $r['type']; ?>
                     <td <?php echo $isTextarea ? 'class="long-text"' : ''; ?>>
                         <?php if ($isTextarea) : ?>
-                            <?php echo nl2br($r['value']); ?>
+                            <?php echo $view->escape(nl2br($r['value'])); ?>
+                        <?php elseif ('file' === $r['type']) : ?>
+                            <a href="<?php echo $view['router']->path('mautic_form_file_download', ['submissionId' => $item['id'], 'field' => $key]); ?>">
+                                <?php echo $view->escape($r['value']); ?>
+                            </a>
                         <?php else : ?>
-                            <?php echo $r['value']; ?>
+                            <?php echo $view->escape($r['value']); ?>
                         <?php endif; ?>
                     </td>
                 <?php endforeach; ?>

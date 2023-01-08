@@ -1,23 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class VideoHitRepository.
+ * @extends CommonRepository<VideoHit>
  */
 class VideoHitRepository extends CommonRepository
 {
@@ -26,18 +16,20 @@ class VideoHitRepository extends CommonRepository
     /**
      * Get video hit info for lead timeline.
      *
-     * @param       $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
      */
-    public function getTimelineStats($leadId, array $options = [])
+    public function getTimelineStats($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->select('h.id, h.url, h.date_hit, h.time_watched, h.duration, h.referer, h.user_agent')
-            ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h')
-            ->where($query->expr()->eq('h.lead_id', (int) $leadId));
+            ->from(MAUTIC_TABLE_PREFIX.'video_hits', 'h');
+
+        if ($leadId) {
+            $query->where($query->expr()->eq('h.lead_id', (int) $leadId));
+        }
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
@@ -49,7 +41,6 @@ class VideoHitRepository extends CommonRepository
     }
 
     /**
-     * @param Lead   $lead
      * @param string $guid
      *
      * @return VideoHit
@@ -64,8 +55,7 @@ class VideoHitRepository extends CommonRepository
     /**
      * Get a lead's page hits.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int $leadId
      *
      * @return array
      *

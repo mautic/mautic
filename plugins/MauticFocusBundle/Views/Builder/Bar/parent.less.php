@@ -13,7 +13,7 @@
 
 .mf-bar-iframe {
     width: 100%;
-    position: fixed;
+    position: static;
     z-index: 20000;
     left: 0;
     right: 0;

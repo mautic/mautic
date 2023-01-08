@@ -13,13 +13,13 @@ if (!$isEmbedded) {
 
     $view['slots']->set('mauticContent', 'monitoring');
     $view['slots']->set('headerTitle', $activeMonitoring->getTitle());
-// @todo finish ACL here
+    // @todo finish ACL here
     $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
         'item'            => $activeMonitoring,
         'templateButtons' => [
-            'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-            'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
-            'close'  => $view['security']->isGranted('plugin:mauticSocial:monitoring:view'),
+            'edit'   => $view['security']->isGranted('mauticSocial:monitoring:edit'),
+            'delete' => $view['security']->isGranted('mauticSocial:monitoring:delete'),
+            'close'  => $view['security']->isGranted('mauticSocial:monitoring:view'),
         ],
         'routeBase'  => 'social',
         'langVar'    => 'monitoring',
@@ -85,6 +85,8 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
                 </div>
             </div>
             <!--/ stats -->
+
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">

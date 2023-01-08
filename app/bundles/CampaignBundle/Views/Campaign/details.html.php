@@ -7,6 +7,7 @@
  * @link        http://mautic.org
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+
  */
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
@@ -19,10 +20,22 @@ $view['slots']->set(
         [
             'item'            => $campaign,
             'templateButtons' => [
-                'edit'   => $permissions['campaign:campaigns:edit'],
-                'clone'  => $permissions['campaign:campaigns:create'],
-                'delete' => $permissions['campaign:campaigns:delete'],
-                'close'  => $permissions['campaign:campaigns:view'],
+                'edit'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:editown'],
+                    $permissions['campaign:campaigns:editother'],
+                    $campaign->getCreatedBy()
+                ),
+                'clone'    => $permissions['campaign:campaigns:create'],
+                'delete'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:deleteown'],
+                    $permissions['campaign:campaigns:deleteother'],
+                    $campaign->getCreatedBy()
+                ),
+                'close'   => $view['security']->hasEntityAccess(
+                    $permissions['campaign:campaigns:viewown'],
+                    $permissions['campaign:campaigns:viewother'],
+                    $campaign->getCreatedBy()
+                ),
             ],
             'routeBase' => 'campaign',
         ]
@@ -32,11 +45,26 @@ $view['slots']->set(
     'publishStatus',
     $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $campaign])
 );
+
+$campaignId = $campaign->getId();
+
+$preview = trim($view->render('MauticCampaignBundle:Campaign:preview.html.php', [
+    'campaignId'      => $campaignId,
+    'campaign'        => $campaign,
+    'campaignEvents'  => $campaignEvents,
+    'campaignSources' => $campaignSources,
+    'eventSettings'   => $eventSettings,
+    'canvasSettings'  => $campaign->getCanvasSettings(),
+]));
+
 $decisions  = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['decision']]));
 $actions    = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['action']]));
 $conditions = trim($view->render('MauticCampaignBundle:Campaign:events.html.php', ['events' => $events['condition']]));
 
 switch (true) {
+    case !empty($preview):
+        $firstTab = 'preview';
+        break;
     case !empty($decisions):
         $firstTab = 'decision';
         break;
@@ -77,7 +105,7 @@ switch (true) {
                             <?php foreach ($sources as $sourceType => $typeNames): ?>
                             <?php if (!empty($typeNames)): ?>
                             <tr>
-                                <td width="20%"><span class="fw-b">
+                                <td width="20%"><span class="fw-b textTitle">
                                     <?php echo $view['translator']->trans('mautic.campaign.leadsource.'.$sourceType); ?>
                                 </td>
                                 <td>
@@ -137,8 +165,17 @@ switch (true) {
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
+                <?php if ($preview): ?>
+                     <li class="<?php if ('preview' == $firstTab): echo 'active'; endif; ?>">
+                        <a href="#preview-container" role="tab" data-toggle="tab">
+                            <?php echo $view['translator']->trans('mautic.campaign.preview.header'); ?>
+                        </a>
+                    </li>
+                <?php endif; ?>
                 <?php if ($decisions): ?>
                     <li class="<?php if ('decision' == $firstTab): echo 'active'; endif; ?>">
                         <a href="#decisions-container" role="tab" data-toggle="tab">
@@ -173,24 +210,34 @@ switch (true) {
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <!-- #events-container -->
+            <?php if ($preview): ?>
+                <div class="<?php if ('preview' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="preview-container">
+                   <?php echo $preview; ?>
+                </div>
+            <?php endif; ?>
             <?php if ($decisions): ?>
-                <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="decisions-container">
+                <div class="<?php if ('decision' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="decisions-container">
                     <?php echo $decisions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($actions): ?>
-                <div class="<?php if ('action' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="actions-container">
+                <div class="<?php if ('action' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="actions-container">
                     <?php echo $actions; ?>
                 </div>
             <?php endif; ?>
             <?php if ($conditions): ?>
-                <div class="<?php if ('condition' == $firstTab): echo 'active '; endif; ?>tab-pane fade in bdr-w-0" id="conditions-container">
+                <div class="<?php if ('condition' == $firstTab): echo 'active '; endif; ?> tab-pane fade in bdr-w-0" id="conditions-container">
                     <?php echo $conditions; ?>
                 </div>
             <?php endif; ?>
             <!--/ #events-container -->
-            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container">
-                <?php echo $campaignLeads; ?>
+            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container" data-target-url="<?php
+                    echo $view['router']->url(
+                        'mautic_campaign_contacts',
+                        ['objectId' => $campaign->getId(), 'page' => $app->getSession()->get('mautic.campaign.contact.page', 1)]
+                    );
+                ?>">
+                <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>
             <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>

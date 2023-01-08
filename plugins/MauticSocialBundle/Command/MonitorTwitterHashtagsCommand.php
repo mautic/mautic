@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
+
+use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
 class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
 {
-    /*
+    /**
      * Configure the command, set name and options.
      */
     protected function configure()
@@ -27,18 +20,14 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
     /**
      * Search for tweets by hashtag.
      *
-     * @param $monitor
+     * @param Monitoring $monitor
      *
-     * @return bool
+     * @return bool|array False if missing the hashtag, otherwise the array response from Twitter
      */
     protected function getTweets($monitor)
     {
         $params = $monitor->getProperties();
-
-        $stats = $monitor->getStats();
-
-        // build hashtag search url
-        $searchUrl = $this->twitter->getApiUrl('search/tweets');
+        $stats  = $monitor->getStats();
 
         if (!array_key_exists('hashtag', $params)) {
             $this->output->writeln('No hashtag was found!');
@@ -46,15 +35,9 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
             return false;
         }
 
-        $query = $this->buildTwitterSearchQuery(
-            [
-                '#'.$params['hashtag'],
-            ]
-        );
-
-        // @todo set up count to be configurable
+        $searchUrl    = $this->twitter->getApiUrl('search/tweets');
         $requestQuery = [
-            'q'     => $query,
+            'q'     => '#'.$params['hashtag'],
             'count' => $this->queryCount,
         ];
 
@@ -63,9 +46,7 @@ class MonitorTwitterHashtagsCommand extends MonitorTwitterBaseCommand
             $requestQuery['since_id'] = $stats['max_id_str'];
         }
 
-        $results = $this->twitter->makeRequest($searchUrl, $requestQuery);
-
-        return $results;
+        return $this->twitter->makeRequest($searchUrl, $requestQuery);
     }
 
     public function getNetworkName()

@@ -1,23 +1,15 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Controller;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Event\CategoryTypesEvent;
 use Mautic\CategoryBundle\Model\CategoryModel;
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
-class CategoryController extends FormController
+class CategoryController extends AbstractFormController
 {
     /**
      * @param        $bundle
@@ -46,22 +38,24 @@ class CategoryController extends FormController
     {
         $session = $this->get('session');
 
-        $search = $this->request->get('search', $session->get('mautic.category.filter', ''));
-        $bundle = $this->request->get('bundle', $session->get('mautic.category.type', ''));
+        $search = $this->request->query->get('search', $session->get('mautic.category.filter', ''));
+        $bundle = $this->request->query->get('bundle', $session->get('mautic.category.type', $bundle));
 
         if ($bundle) {
             $session->set('mautic.category.type', $bundle);
         }
 
         // hack to make pagination work for default list view
-        if ($bundle == 'all') {
+        if ('all' == $bundle) {
             $bundle = 'category';
         }
 
         $session->set('mautic.category.filter', $search);
 
         //set some permissions
-        $permissionBase = $this->getModel('category')->getPermissionBase($bundle);
+        $categoryModel  = $this->getModel('category');
+        \assert($categoryModel instanceof CategoryModel);
+        $permissionBase = $categoryModel->getPermissionBase($bundle);
         $permissions    = $this->get('mautic.security')->isGranted(
             [
                 $permissionBase.':view',
@@ -76,9 +70,7 @@ class CategoryController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $viewParams = [
             'page'   => $page,
@@ -86,15 +78,15 @@ class CategoryController extends FormController
         ];
 
         //set limits
-        $limit = $session->get('mautic.category.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $limit = $session->get('mautic.category.limit', $this->coreParametersHelper->get('default_pagelimit'));
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
         $filter = ['string' => $search];
 
-        if ($bundle != 'category') {
+        if ('category' != $bundle) {
             $filter['force'] = [
                 [
                     'column' => 'c.bundle',
@@ -107,7 +99,7 @@ class CategoryController extends FormController
         $orderBy    = $this->get('session')->get('mautic.category.orderby', 'c.title');
         $orderByDir = $this->get('session')->get('mautic.category.orderbydir', 'DESC');
 
-        $entities = $this->getModel('category')->getEntities(
+        $entities = $categoryModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -120,7 +112,7 @@ class CategoryController extends FormController
         $count = count($entities);
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
+            if (1 === $count) {
                 $lastPage = 1;
             } else {
                 $lastPage = (ceil($count / $limit)) ?: 1;
@@ -133,7 +125,7 @@ class CategoryController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_'.$bundle.'category_index',
                         'mauticContent' => 'category',
@@ -147,7 +139,7 @@ class CategoryController extends FormController
         $dispatcher = $this->dispatcher;
         if ($dispatcher->hasListeners(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD)) {
             $event = new CategoryTypesEvent();
-            $dispatcher->dispatch(CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD, $event);
+            $dispatcher->dispatch($event, CategoryEvents::CATEGORY_ON_BUNDLE_LIST_BUILD);
             $categoryTypes = array_merge($categoryTypes, $event->getCategoryTypes());
         }
 
@@ -170,7 +162,7 @@ class CategoryController extends FormController
                     'tmpl'           => $tmpl,
                     'categoryTypes'  => $categoryTypes,
                 ],
-                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
+                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_'.$bundle.'category_index',
                     'mauticContent' => 'category',
@@ -187,13 +179,14 @@ class CategoryController extends FormController
      */
     public function newAction($bundle)
     {
+        $model = $this->getModel('category');
+        \assert($model instanceof CategoryModel);
         $session    = $this->get('session');
-        $model      = $this->getModel('category');
         $entity     = $model->getEntity();
-        $success    = $closeModal    = 0;
+        $success    = 0;
         $cancelled  = $valid  = false;
         $method     = $this->request->getMethod();
-        $inForm     = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $inForm     = $this->getInFormValue($method);
         $showSelect = $this->request->get('show_bundle_select', false);
 
         //not found
@@ -208,17 +201,17 @@ class CategoryController extends FormController
         $form = $model->createForm($entity, $this->get('form.factory'), $action, ['bundle' => $bundle, 'show_bundle_select' => $showSelect]);
         $form['inForm']->setData($inForm);
         ///Check for a submitted form and process it
-        if ($method == 'POST') {
+        if (Request::METHOD_POST === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.category.notice.created', [
-                        '%name%' => $entity->getName(),
+                        '%name%' => $entity->getTitle(),
                     ]);
                 }
             } else {
@@ -226,7 +219,7 @@ class CategoryController extends FormController
             }
         }
 
-        $closeModal = ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+        $closeModal = ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
 
         if ($closeModal) {
             if ($inForm) {
@@ -234,7 +227,7 @@ class CategoryController extends FormController
                     'mauticContent' => 'category',
                     'closeModal'    => 1,
                     'inForm'        => 1,
-                    'categoryName'  => $entity->getName(),
+                    'categoryName'  => $entity->getTitle(),
                     'categoryId'    => $entity->getId(),
                 ]);
             }
@@ -247,7 +240,7 @@ class CategoryController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_'.$bundle.'category_index',
                     'mauticContent' => 'category',
@@ -255,12 +248,11 @@ class CategoryController extends FormController
                 ],
             ]);
         } elseif (!empty($valid)) {
-
             //return edit view to prevent duplicates
             return $this->editAction($bundle, $entity->getId(), true);
         } else {
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
+                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.twig',
                 'viewParameters'  => [
                     'form'           => $form->createView(),
                     'activeCategory' => $entity,
@@ -283,15 +275,15 @@ class CategoryController extends FormController
     public function editAction($bundle, $objectId, $ignorePost = false)
     {
         $session = $this->get('session');
-        /** @var CategoryModel $model */
-        $model     = $this->getModel('category');
+        $model   = $this->getModel('category');
+        \assert($model instanceof CategoryModel);
         $entity    = $model->getEntity($objectId);
         $success   = $closeModal   = 0;
         $cancelled = $valid = false;
         $method    = $this->request->getMethod();
-        $inForm    = ($method == 'POST') ? $this->request->request->get('category_form[inForm]', 0, true) : $this->request->get('inForm', 0);
+        $inForm    = $this->getInFormValue($method);
         //not found
-        if ($entity === null) {
+        if (null === $entity) {
             $closeModal = true;
         } elseif (!$this->get('mautic.security')->isGranted($model->getPermissionBase($bundle).':view')) {
             return $this->modalAccessDenied();
@@ -312,14 +304,14 @@ class CategoryController extends FormController
         $form['inForm']->setData($inForm);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $method == 'POST') {
+        if (!$ignorePost && 'POST' == $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $success = 1;
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash(
                         'mautic.category.notice.updated',
@@ -352,7 +344,7 @@ class CategoryController extends FormController
             $model->lockEntity($entity);
         }
 
-        $closeModal = ($closeModal || $cancelled || ($valid && $form->get('buttons')->get('save')->isClicked()));
+        $closeModal = ($closeModal || $cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked()));
 
         if ($closeModal) {
             if ($inForm) {
@@ -376,7 +368,7 @@ class CategoryController extends FormController
                 [
                     'returnUrl'       => $this->generateUrl('mautic_category_index', $viewParameters),
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
+                    'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_'.$bundle.'category_index',
                         'mauticContent' => 'category',
@@ -387,7 +379,7 @@ class CategoryController extends FormController
         } else {
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCategoryBundle:Category:form.html.php',
+                    'contentTemplate' => 'MauticCategoryBundle:Category:form.html.twig',
                     'viewParameters'  => [
                         'form'           => $form->createView(),
                         'activeCategory' => $entity,
@@ -406,7 +398,7 @@ class CategoryController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -424,18 +416,19 @@ class CategoryController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParams,
-            'contentTemplate' => 'MauticCategoryBundle:Category:index',
+            'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_'.$bundle.'category_index',
                 'mauticContent' => 'category',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             $model  = $this->getModel('category');
+            \assert($model instanceof CategoryModel);
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.category.error.notfound',
@@ -487,15 +480,16 @@ class CategoryController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParams,
-            'contentTemplate' => 'MauticCategoryBundle:Category:index',
+            'contentTemplate' => 'Mautic\CategoryBundle\Controller\CategoryController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_'.$bundle.'category_index',
                 'mauticContent' => 'category',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model     = $this->getModel('category');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('category');
+            \assert($model instanceof CategoryModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -503,7 +497,7 @@ class CategoryController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.category.error.notfound',
@@ -537,5 +531,16 @@ class CategoryController extends FormController
                 'flashes' => $flashes,
             ])
         );
+    }
+
+    private function getInFormValue(string $method): int
+    {
+        $inForm = $this->request->get('inForm', 0);
+        if (Request::METHOD_POST == $method) {
+            $category_form = $this->request->request->get('category_form');
+            $inForm        = $category_form['inForm'] ?? 0;
+        }
+
+        return (int) $inForm;
     }
 }

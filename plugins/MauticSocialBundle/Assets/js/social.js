@@ -73,7 +73,7 @@ Mautic.composeSocialWatcher = function() {
  * gets the count of the text area and returns (140 - count)
  */
 Mautic.getCharacterCount = function() {
-    var tweetLenght = 140;
+    var tweetLenght = 280;
 
     var currentLength = mQuery('textarea#twitter_tweet_text');
 

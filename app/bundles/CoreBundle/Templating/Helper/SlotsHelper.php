@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Symfony\Component\Templating\Helper\SlotsHelper as BaseSlotsHelper;
@@ -49,11 +40,6 @@ class SlotsHelper extends BaseSlotsHelper
      */
     public function hasContent($names)
     {
-        // @deprecated Kept for BC in PHP templates. Remove in 2.0
-        if (isset($this->slots['public'])) {
-            return true;
-        }
-
         // If we're in the builder, return true so all slots show.
         if ($this->inBuilder) {
             return true;

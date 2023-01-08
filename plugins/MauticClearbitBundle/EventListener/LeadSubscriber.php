@@ -1,34 +1,20 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Event\CompanyEvent;
 use Mautic\LeadBundle\Event\LeadEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\MauticClearbitBundle\Helper\LookupHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var LookupHelper
      */
-    protected $lookupHelper;
+    private $lookupHelper;
 
-    /**
-     * LeadSubscriber constructor.
-     *
-     * @param LookupHelper $lookupHelper
-     */
     public function __construct(LookupHelper $lookupHelper)
     {
         $this->lookupHelper = $lookupHelper;
@@ -45,17 +31,11 @@ class LeadSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param LeadEvent $event
-     */
     public function leadPostSave(LeadEvent $event)
     {
         $this->lookupHelper->lookupContact($event->getLead(), true, true);
     }
 
-    /**
-     * @param CompanyEvent $event
-     */
     public function companyPostSave(CompanyEvent $event)
     {
         $this->lookupHelper->lookupCompany($event->getCompany(), true, true);

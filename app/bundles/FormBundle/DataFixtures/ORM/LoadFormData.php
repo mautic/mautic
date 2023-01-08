@@ -1,140 +1,214 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\DataFixtures\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
+use Mautic\CoreBundle\Doctrine\Common\DataFixtures\Event\PreExecuteEvent;
 use Mautic\CoreBundle\Helper\CsvHelper;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Mautic\FormBundle\Model\ActionModel;
+use Mautic\FormBundle\Model\FieldModel;
+use Mautic\FormBundle\Model\FormModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Class LoadFormData.
- */
-class LoadFormData extends AbstractFixture implements OrderedFixtureInterface, ContainerAwareInterface
+class LoadFormData extends AbstractFixture implements OrderedFixtureInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    public const FORM_PREFIX = 'form-';
 
     /**
-     * {@inheritdoc}
+     * @var FormModel
      */
-    public function setContainer(ContainerInterface $container = null)
+    private $formModel;
+
+    /**
+     * @var FieldModel
+     */
+    private $formFieldModel;
+
+    /**
+     * @var ActionModel
+     */
+    private $actionModel;
+
+    /**
+     * @var array<int, Form>
+     */
+    private array $formEntities = [];
+
+    /**
+     * @var array<int, Field>
+     */
+    private array $fieldEntities = [];
+
+    /**
+     * @var array<int, Action>
+     */
+    private array $actionEntities = [];
+
+    public function __construct(FormModel $formModel, FieldModel $formFieldModel, ActionModel $actionModel, EventDispatcherInterface $eventDispatcher)
     {
-        $this->container = $container;
+        $this->formModel      = $formModel;
+        $this->formFieldModel = $formFieldModel;
+        $this->actionModel    = $actionModel;
+
+        // this will load the data before fixtures are loaded
+        $eventDispatcher->addListener(PreExecuteEvent::class, function (PreExecuteEvent $event) {
+            $formEntities = $this->getFormEntities();
+            $this->getFieldEntities();
+            $this->getActionEntities();
+            $firstId = 0;
+
+            // create the tables passed in LoadFormData fixture.
+            foreach ($formEntities as $key => $form) {
+                $this->formModel->generateHtml($form);
+
+                if ($form->getId() < 1) {
+                    // Method above saves the form entity. If this exception is thrown all you need to do is to save an entity.
+                    throw new \RuntimeException('Form must have an ID set.');
+                }
+
+                if (0 === $firstId) {
+                    $firstId = $form->getId();
+                }
+
+                $this->formModel->createTableSchema($form, true, true);
+            }
+
+            if ($event->isTruncate()) {
+                return;
+            }
+
+            // need to delete created form entities, because executor will wrap DELETE query into transaction and
+            // will insert form entries with new autoincrement.
+            foreach ($formEntities as $formEntity) {
+                $this->formModel->deleteEntity($formEntity);
+            }
+
+            // because form table data will be deleted we must have same autoincrement as before the insertion
+            // to have the form_results table to match the form id in table name e.g. form_results_69_kaleidosco
+            $formTableName = $this->formModel->getRepository()->getTableName();
+            $event->getEntityManager()->getConnection()->executeStatement(
+                'ALTER TABLE '.$formTableName.' AUTO_INCREMENT='.$firstId
+            );
+        });
+    }
+
+    public function load(ObjectManager $manager): void
+    {
+        $this->getFormEntities();
+        $this->getFieldEntities();
+        $this->getActionEntities();
+
+        foreach ($this->formEntities as $key => $formEntity) {
+            $this->formModel->getRepository()->saveEntity($formEntity);
+            $this->setReference(self::FORM_PREFIX.$key, $formEntity);
+        }
+
+        foreach ($this->fieldEntities as $field) {
+            $this->formFieldModel->getRepository()->saveEntity($field);
+        }
+
+        foreach ($this->actionEntities as $action) {
+            $this->actionModel->getRepository()->saveEntity($action);
+        }
+    }
+
+    public function getOrder(): int
+    {
+        return 8;
     }
 
     /**
-     * @param ObjectManager $manager
+     * @return array<int, Form>
      */
-    public function load(ObjectManager $manager)
+    private function getFormEntities(): array
     {
-        $model        = $this->container->get('mautic.form.model.form');
-        $repo         = $model->getRepository();
-        $forms        = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');
-        $formEntities = [];
+        $forms              = CsvHelper::csv_to_array(__DIR__.'/fakeformdata.csv');
+        $this->formEntities = [];
         foreach ($forms as $count => $rows) {
             $form = new Form();
             $key  = $count + 1;
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' !== $val) {
                     $setter = 'set'.ucfirst($col);
 
-                    if (in_array($col, ['dateAdded'])) {
-                        $form->$setter(new \DateTime($val));
-                    } elseif (in_array($col, ['cachedHtml'])) {
+                    if ('dateAdded' === $col) {
+                        $form->setDateAdded(new \DateTime($val));
+                    } elseif ('cachedHtml' === $col) {
                         $val = stripslashes($val);
-                        $form->$setter($val);
+                        $form->setCachedHtml($val);
                     } else {
                         $form->$setter($val);
                     }
                 }
             }
-            $repo->saveEntity($form);
-            $formEntities[] = $form;
-            $this->setReference('form-'.$key, $form);
+            $this->formEntities[$key] = $form;
         }
 
-        //import fields
-        $fields = CsvHelper::csv_to_array(__DIR__.'/fakefielddata.csv');
-        $repo   = $this->container->get('mautic.form.model.field')->getRepository();
+        return $this->formEntities;
+    }
+
+    private function getFieldEntities(): void
+    {
+        if (0 === count($this->formEntities)) {
+            throw new \RuntimeException('This method must be called after getFormEntities.');
+        }
+
+        $this->fieldEntities = [];
+        $fields              = CsvHelper::csv_to_array(__DIR__.'/fakefielddata.csv');
         foreach ($fields as $count => $rows) {
             $field = new Field();
             foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
+                if ('NULL' !== $val) {
                     $setter = 'set'.ucfirst($col);
 
-                    if (in_array($col, ['form'])) {
-                        $form = $this->getReference('form-'.$val);
-                        $field->$setter($form);
+                    if ('form' === $col) {
+                        $form = $this->formEntities[$val];
+                        $field->setForm($form);
                         $form->addField($count, $field);
-                    } elseif (in_array($col, ['customParameters', 'properties'])) {
-                        $val = unserialize(stripslashes($val));
+                    } elseif (in_array($col, ['customParameters', 'properties'], true)) {
+                        $val = Serializer::decode(stripslashes($val));
                         $field->$setter($val);
                     } else {
                         $field->$setter($val);
                     }
                 }
             }
-            $repo->saveEntity($field);
-        }
-
-        //import actions
-        $actions = CsvHelper::csv_to_array(__DIR__.'/fakeactiondata.csv');
-        $repo    = $this->container->get('mautic.form.model.action')->getRepository();
-        foreach ($actions as $count => $rows) {
-            $action = new Action();
-            foreach ($rows as $col => $val) {
-                if ($val != 'NULL') {
-                    $setter = 'set'.ucfirst($col);
-
-                    if (in_array($col, ['form'])) {
-                        $action->$setter($this->getReference('form-'.$val));
-                    } elseif (in_array($col, ['properties'])) {
-                        $val = unserialize(stripslashes($val));
-                        if ($col == 'settings') {
-                            $val['callback'] = stripslashes($val['callback']);
-                        }
-
-                        $action->$setter($val);
-                    } else {
-                        $action->$setter($val);
-                    }
-                }
-            }
-            $repo->saveEntity($action);
-        }
-
-        //create the tables
-        foreach ($formEntities as $form) {
-            //create the HTML
-            $model->generateHtml($form);
-
-            //create the schema
-            $model->createTableSchema($form, true, true);
+            $this->fieldEntities[$count] = $field;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getOrder()
+    private function getActionEntities(): void
     {
-        return 8;
+        if (0 === count($this->formEntities)) {
+            throw new \RuntimeException('This method must be called after getFormEntities.');
+        }
+
+        $this->actionEntities = [];
+        $actions              = CsvHelper::csv_to_array(__DIR__.'/fakeactiondata.csv');
+        foreach ($actions as $rows) {
+            $action = new Action();
+            foreach ($rows as $col => $val) {
+                if ('NULL' !== $val) {
+                    $setter = 'set'.ucfirst($col);
+
+                    if ('form' === $col) {
+                        $action->setForm($this->formEntities[$val]);
+                    } elseif ('properties' === $col) {
+                        $val = Serializer::decode(stripslashes($val));
+                        $action->setProperties($val);
+                    } else {
+                        $action->$setter($val);
+                    }
+                }
+            }
+
+            $this->actionEntities[] = $action;
+        }
     }
 }

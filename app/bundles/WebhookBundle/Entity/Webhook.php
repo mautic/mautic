@@ -1,18 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -20,11 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Webhook.
- */
 class Webhook extends FormEntity
 {
+    public const LOGS_DISPLAY_LIMIT = 100;
     /**
      * @var int
      */
@@ -46,6 +39,11 @@ class Webhook extends FormEntity
     private $webhookUrl;
 
     /**
+     * @var string
+     */
+    private $secret;
+
+    /**
      * @var \Mautic\CategoryBundle\Entity\Category
      **/
     private $category;
@@ -58,11 +56,6 @@ class Webhook extends FormEntity
     /**
      * @var ArrayCollection
      */
-    private $queues;
-
-    /**
-     * @var ArrayCollection
-     */
     private $logs;
 
     /**
@@ -71,62 +64,87 @@ class Webhook extends FormEntity
     private $removedEvents = [];
 
     /**
-     * @var
+     * @var array
      */
     private $payload;
 
-    /*
-     * Constructor
+    /**
+     * Holds a simplified array of events, just an array of event types.
+     * It's used for API serializaiton.
+     *
+     * @var array
      */
+    private $triggers = [];
+
+    /**
+     * ASC or DESC order for fetching order of the events when queue mode is on.
+     * Null means use the global default.
+     *
+     * @var string
+     */
+    private $eventsOrderbyDir;
+
     public function __construct()
     {
         $this->events = new ArrayCollection();
-        $this->queues = new ArrayCollection();
         $this->logs   = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhooks')
-            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\WebhookRepository');
-        // id columns
+            ->setCustomRepositoryClass(WebhookRepository::class);
+
         $builder->addIdColumns();
-        // categories
+
         $builder->addCategory();
-        // 1:M for events
+
         $builder->createOneToMany('events', 'Event')
             ->orphanRemoval()
             ->setIndexBy('event_type')
             ->mappedBy('webhook')
             ->cascadePersist()
-            ->build();
-        // 1:M for queues
-        $builder->createOneToMany('queues', 'WebhookQueue')
-            ->mappedBy('webhook')
-            ->fetchExtraLazy()
-            ->cascadePersist()
-            ->build();
-        // 1:M for logs
-        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => 'DESC'])
-            ->fetchExtraLazy()
-            ->mappedBy('webhook')
-            ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
 
-        // status code
-        $builder->createField('webhookUrl', 'string')
-            ->columnName('webhook_url')
-            ->length(255)
+        $builder->createOneToMany('logs', 'Log')->setOrderBy(['dateAdded' => Criteria::DESC])
+            ->fetchExtraLazy()
+            ->mappedBy('webhook')
+            ->cascadePersist()
+            ->cascadeMerge()
+            ->cascadeDetach()
             ->build();
+
+        $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
+        $builder->addField('secret', Types::STRING);
+        $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
     }
 
     /**
-     * @param ClassMetadata $metadata
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
      */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('hook')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                    'description',
+                    'webhookUrl',
+                    'secret',
+                    'eventsOrderbyDir',
+                    'category',
+                    'triggers',
+                ]
+            )
+            ->build();
+    }
+
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint(
@@ -155,11 +173,20 @@ class Webhook extends FormEntity
                 ]
             )
         );
+
+        $metadata->addPropertyConstraint(
+            'eventsOrderbyDir',
+            new Assert\Choice(
+                [
+                    null,
+                    Criteria::ASC,
+                    Criteria::DESC,
+                ]
+            )
+        );
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -168,8 +195,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set name.
-     *
      * @param string $name
      *
      * @return Webhook
@@ -183,8 +208,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get name.
-     *
      * @return string
      */
     public function getName()
@@ -193,8 +216,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set description.
-     *
      * @param string $description
      *
      * @return Webhook
@@ -208,8 +229,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get description.
-     *
      * @return string
      */
     public function getDescription()
@@ -218,8 +237,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set webhookUrl.
-     *
      * @param string $webhookUrl
      *
      * @return Webhook
@@ -233,8 +250,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get webhookUrl.
-     *
      * @return string
      */
     public function getWebhookUrl()
@@ -243,10 +258,27 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Set category.
+     * @param string $secret
      *
-     * @param Category $category
-     *
+     * @return Webhook
+     */
+    public function setSecret($secret)
+    {
+        $this->isChanged('secret', $secret);
+        $this->secret = $secret;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecret()
+    {
+        return $this->secret;
+    }
+
+    /**
      * @return Webhook
      */
     public function setCategory(Category $category = null)
@@ -258,8 +290,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * Get category.
-     *
      * @return Category
      */
     public function getCategory()
@@ -294,8 +324,67 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param \Mautic\WebhookBundle\Entity\Event $event
+     * This builds a simple array with subscribed events.
      *
+     * @return array
+     */
+    public function buildTriggers()
+    {
+        foreach ($this->events as $event) {
+            $this->triggers[] = $event->getEventType();
+        }
+    }
+
+    /**
+     * Takes the array of triggers and builds events from them if they don't exist already.
+     */
+    public function setTriggers(array $triggers)
+    {
+        foreach ($triggers as $key) {
+            $this->addTrigger($key);
+        }
+    }
+
+    /**
+     * Takes a trigger (event type) and builds the Event object form it if it doesn't exist already.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function addTrigger($key)
+    {
+        if ($this->eventExists($key)) {
+            return false;
+        }
+
+        $event = new Event();
+        $event->setEventType($key);
+        $event->setWebhook($this);
+        $this->addEvent($event);
+
+        return true;
+    }
+
+    /**
+     * Check if an event exists comared to its type.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function eventExists($key)
+    {
+        foreach ($this->events as $event) {
+            if ($event->getEventType() === $key) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return $this
      */
     public function addEvent(Event $event)
@@ -308,8 +397,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param \Mautic\WebhookBundle\Entity\Event $event
-     *
      * @return $this
      */
     public function removeEvent(Event $event)
@@ -322,52 +409,22 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return ArrayCollection
+     * @param string $eventsOrderbyDir
      */
-    public function getQueues()
+    public function setEventsOrderbyDir($eventsOrderbyDir)
     {
-        return $this->queues;
-    }
-
-    /**
-     * @param $queues
-     *
-     * @return $this
-     */
-    public function addQueues($queues)
-    {
-        $this->queues = $queues;
-
-        /** @var \Mautic\WebhookBundle\Entity\WebhookQueue $queue */
-        foreach ($queues as $queue) {
-            $queue->setWebhook($this);
-        }
+        $this->isChanged('eventsOrderbyDir', $eventsOrderbyDir);
+        $this->eventsOrderbyDir = $eventsOrderbyDir;
 
         return $this;
     }
 
     /**
-     * @param WebhookQueue $queue
-     *
-     * @return $this
+     * @return string
      */
-    public function addQueue(WebhookQueue $queue)
+    public function getEventsOrderbyDir()
     {
-        $this->queues[] = $queue;
-
-        return $this;
-    }
-
-    /**
-     * @param WebhookQueue $queue
-     *
-     * @return $this
-     */
-    public function removeQueue(WebhookQueue $queue)
-    {
-        $this->queues->removeElement($queue);
-
-        return $this;
+        return $this->eventsOrderbyDir;
     }
 
     /**
@@ -381,8 +438,17 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param $logs
-     *
+     * @return Collection<int,self>
+     */
+    public function getLimitedLogs(): Collection
+    {
+        $criteria = Criteria::create()
+            ->setMaxResults(self::LOGS_DISPLAY_LIMIT);
+
+        return $this->logs->matching($criteria);
+    }
+
+    /**
      * @return $this
      */
     public function addLogs($logs)
@@ -398,8 +464,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param Log $log
-     *
      * @return $this
      */
     public function addLog(Log $log)
@@ -410,8 +474,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param Log $log
-     *
      * @return $this
      */
     public function removeLog(Log $log)
@@ -430,8 +492,6 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @param mixed $payload
-     *
      * @return Webhook
      */
     public function setPayload($payload)
@@ -441,24 +501,42 @@ class Webhook extends FormEntity
         return $this;
     }
 
+    public function wasModifiedRecently()
+    {
+        $dateModified = $this->getDateModified();
+
+        if (null === $dateModified) {
+            return false;
+        }
+
+        $aWhileBack = (new \DateTime())->modify('-2 days');
+
+        if ($dateModified < $aWhileBack) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @param string $prop
-     * @param mixed  $val
      */
     protected function isChanged($prop, $val)
     {
         $getter  = 'get'.ucfirst($prop);
         $current = $this->$getter();
-        if ($prop == 'category') {
+        if ('category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
             $newId     = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }
-        } elseif ($prop == 'events') {
+        } elseif ('events' == $prop) {
             $this->changes[$prop] = [];
         } elseif ($current != $val) {
             $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 }

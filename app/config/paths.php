@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $paths = [
     //customizable
     'themes'       => 'themes',
@@ -15,7 +7,7 @@ $paths = [
     'asset_prefix' => '',
     'plugins'      => 'plugins',
     'translations' => 'translations',
-    'local_config' => '%kernel.root_dir%/config/local.php',
+    'local_config' => '%kernel.project_dir%/app/config/local.php',
 ];
 
 //allow easy overrides of the above

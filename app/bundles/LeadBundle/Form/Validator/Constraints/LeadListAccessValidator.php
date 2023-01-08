@@ -1,42 +1,30 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Validator\Constraints;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class LeadListAccessValidator extends ConstraintValidator
 {
     /**
-     * @var MauticFactory
+     * @var ListModel
      */
-    private $factory;
+    private $segmentModel;
 
-    public function __construct(MauticFactory $factory)
+    public function __construct(ListModel $segmentModel)
     {
-        $this->factory = $factory;
+        $this->segmentModel = $segmentModel;
     }
 
     /**
-     * @param mixed      $value
-     * @param Constraint $constraint
+     * @param mixed $value
      */
     public function validate($value, Constraint $constraint)
     {
-        $listModel = $this->factory->getModel('lead.list');
-        $lists     = $listModel->getUserLists();
-
         if (count($value)) {
+            $lists = $this->segmentModel->getUserLists();
             foreach ($value as $l) {
                 if (!isset($lists[$l->getId()])) {
                     $this->context->addViolation(

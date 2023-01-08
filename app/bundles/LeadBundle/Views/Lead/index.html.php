@@ -27,13 +27,25 @@ if ($permissions['lead:leads:create']) {
         'primary'   => true,
     ];
 
-    $pageButtons[] = [
-        'attr' => [
-            'href' => $view['router']->path('mautic_contact_action', ['objectAction' => 'import']),
-        ],
-        'iconClass' => 'fa fa-upload',
-        'btnText'   => 'mautic.lead.lead.import',
-    ];
+    if ($permissions['lead:imports:create']) {
+        $pageButtons[] = [
+            'attr' => [
+                'href' => $view['router']->path('mautic_import_action', ['object' => 'contacts', 'objectAction' => 'new']),
+            ],
+            'iconClass' => 'fa fa-upload',
+            'btnText'   => 'mautic.lead.lead.import',
+        ];
+    }
+
+    if ($permissions['lead:imports:view']) {
+        $pageButtons[] = [
+            'attr' => [
+                'href' => $view['router']->path('mautic_import_index', ['object' => 'contacts']),
+            ],
+            'iconClass' => 'fa fa-history',
+            'btnText'   => 'mautic.lead.lead.import.index',
+        ];
+    }
 }
 
 // Only show toggle buttons for accessibility
@@ -79,7 +91,7 @@ $toolbarButtons = [
     ],
 ];
 
-if ($indexMode == 'list') {
+if ('list' == $indexMode) {
     $toolbarButtons[] = [
         'attr' => [
             'class'          => 'hidden-xs btn btn-default btn-sm btn-nospin'.(($anonymousShowing) ? ' btn-primary' : ''),

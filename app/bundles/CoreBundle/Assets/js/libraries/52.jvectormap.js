@@ -116,11 +116,11 @@
 
     $.fn.extend({
         mousewheel: function(fn) {
-            return fn ? this.bind('mousewheel', fn) : this.trigger('mousewheel');
+            return fn ? this.on('mousewheel', fn) : this.trigger('mousewheel');
         },
 
         unmousewheel: function(fn) {
-            return this.unbind('mousewheel', fn);
+            return this.off('mousewheel', fn);
         }
     });
 
@@ -343,9 +343,9 @@ var jvm = {
     var deferred = new jvm.$.Deferred(),
         img = jvm.$('<img/>');
 
-    img.error(function(){
+    img.on("error", function(){
       deferred.reject();
-    }).load(function(){
+    }).on("load", function(){
       deferred.resolve(img);
     });
     img.attr('src', url);
@@ -2188,7 +2188,7 @@ jvm.Map = function(params) {
 
   for (e in jvm.Map.apiEvents) {
     if (this.params[e]) {
-      this.container.bind(jvm.Map.apiEvents[e]+'.jvectormap', this.params[e]);
+      this.container.on(jvm.Map.apiEvents[e]+'.jvectormap', this.params[e]);
     }
   }
 
@@ -2461,8 +2461,8 @@ jvm.Map.prototype = {
           lastTouchesLength = touches.length;
         };
 
-    jvm.$(this.container).bind('touchstart', handleTouchEvent);
-    jvm.$(this.container).bind('touchmove', handleTouchEvent);
+    jvm.$(this.container).on('touchstart', handleTouchEvent);
+    jvm.$(this.container).on('touchmove', handleTouchEvent);
   },
 
   bindElementEvents: function(){
@@ -2475,7 +2475,7 @@ jvm.Map.prototype = {
 
     /* Can not use common class selectors here because of the bug in jQuery
        SVG handling, use with caution. */
-    this.container.delegate("[class~='jvectormap-element']", 'mouseover mouseout', function(e){
+    this.container.on('mouseover mouseout', "[class~='jvectormap-element']", function(e){
       var baseVal = jvm.$(this).attr('class').baseVal || jvm.$(this).attr('class'),
           type = baseVal.indexOf('jvectormap-region') === -1 ? 'marker' : 'region',
           code = type == 'region' ? jvm.$(this).attr('data-code') : jvm.$(this).attr('data-index'),
@@ -2506,13 +2506,13 @@ jvm.Map.prototype = {
 
     /* Can not use common class selectors here because of the bug in jQuery
        SVG handling, use with caution. */
-    this.container.delegate("[class~='jvectormap-element']", 'mousedown', function(){
+    this.container.on('mousedown', "[class~='jvectormap-element']", function(){
       mouseMoved = false;
     });
 
     /* Can not use common class selectors here because of the bug in jQuery
        SVG handling, use with caution. */
-    this.container.delegate("[class~='jvectormap-element']", 'mouseup', function(){
+    this.container.on('mouseup', "[class~='jvectormap-element']", function(){
       var baseVal = jvm.$(this).attr('class').baseVal ? jvm.$(this).attr('class').baseVal : jvm.$(this).attr('class'),
           type = baseVal.indexOf('jvectormap-region') === -1 ? 'marker' : 'region',
           code = type == 'region' ? jvm.$(this).attr('data-code') : jvm.$(this).attr('data-index'),
@@ -2826,7 +2826,7 @@ jvm.Map.prototype = {
         label: this.canvas.mode != 'vml' ? (this.params.labels && this.params.labels.regions) : null
       });
 
-      jvm.$(region.shape).bind('selected', function(e, isSelected){
+      jvm.$(region.shape).on('selected', function(e, isSelected){
         map.container.trigger('regionSelected.jvectormap', [jvm.$(this.node).attr('data-code'), isSelected, map.getSelectedRegions()]);
       });
       this.regions[key] = {
@@ -2873,7 +2873,7 @@ jvm.Map.prototype = {
           label: this.canvas.mode != 'vml' ? (this.params.labels && this.params.labels.markers) : null
         });
 
-        jvm.$(marker.shape).bind('selected', function(e, isSelected){
+        jvm.$(marker.shape).on('selected', function(e, isSelected){
           map.container.trigger('markerSelected.jvectormap', [jvm.$(this.node).attr('data-index'), isSelected, map.getSelectedMarkers()]);
         });
         if (this.markers[i]) {
@@ -3092,8 +3092,8 @@ jvm.Map.prototype = {
   remove: function(){
     this.tip.remove();
     this.container.remove();
-    jvm.$(window).unbind('resize', this.onResize);
-    jvm.$('body').unbind('mouseup', this.onContainerMouseUp);
+    jvm.$(window).off('resize', this.onResize);
+    jvm.$('body').off('mouseup', this.onContainerMouseUp);
   }
 };
 

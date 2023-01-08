@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
-use Debril\RssAtomBundle\Protocol\FeedReader;
-use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
-use Debril\RssAtomBundle\Protocol\Parser\Item;
+use DateTime;
 use Mautic\CoreBundle\Entity\Notification;
+use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -24,7 +14,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Class NotificationModel.
+ * @extends FormModel<Notification>
  */
 class NotificationModel extends FormModel
 {
@@ -49,45 +39,27 @@ class NotificationModel extends FormModel
     protected $updateHelper;
 
     /**
-     * @var FeedReader
-     */
-    protected $rssReader;
-
-    /**
      * @var CoreParametersHelper
      */
     protected $coreParametersHelper;
 
-    /**
-     * NotificationModel constructor.
-     *
-     * @param PathsHelper          $pathsHelper
-     * @param UpdateHelper         $updateHelper
-     * @param FeedReader           $rssReader
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         UpdateHelper $updateHelper,
-        FeedReader $rssReader,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->pathsHelper          = $pathsHelper;
         $this->updateHelper         = $updateHelper;
-        $this->rssReader            = $rssReader;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    /**
-     * @param Session $session
-     */
     public function setSession(Session $session)
     {
         $this->session = $session;
     }
 
     /**
-     * @param $disableUpdates
+     * @param bool $disableUpdates
      */
     public function setDisableUpdates($disableUpdates)
     {
@@ -95,25 +67,26 @@ class NotificationModel extends FormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CoreBundle\Entity\NotificationRepository
+     * @return NotificationRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCoreBundle:Notification');
+        return $this->em->getRepository(Notification::class);
     }
 
     /**
      * Write a notification.
      *
-     * @param string    $message   Message of the notification
-     * @param string    $type      Optional $type to ID the source of the notification
-     * @param bool|true $isRead    Add unread indicator
-     * @param string    $header    Header for message
-     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
-     * @param \DateTime $datetime  Date the item was created
-     * @param User|null $user      User object; defaults to current user
+     * @param string        $message                 Message of the notification
+     * @param string|null   $type                    Optional $type to ID the source of the notification
+     * @param bool|true     $isRead                  Add unread indicator
+     * @param string|null   $header                  Header for message
+     * @param string|null   $iconClass               Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param DateTime|null $datetime                Date the item was created
+     * @param User|null     $user                    User object; defaults to current user
+     * @param string|null   $deduplicateValue        When supplied, notification will not be added if another notification with tha same $deduplicateValue exists within last 24 hours
+     * @param DateTime|null $deduplicateDateTimeFrom This argument is applied only when $deduplicateValue is supplied. If default deduplication time span (last 24 hours) does not fit your needs you can change it here.
+     *                                               E.g. $deduplicateDateTimeFrom = new DateTime('-3 hours') means that the notification is considered duplicate only if there is a notification with the same $deduplicateValue and is not older than 3 hours.
      */
     public function addNotification(
         $message,
@@ -121,30 +94,41 @@ class NotificationModel extends FormModel
         $isRead = false,
         $header = null,
         $iconClass = null,
-        \DateTime $datetime = null,
-        User $user = null
+        DateTime $datetime = null,
+        User $user = null,
+        string $deduplicateValue = null,
+        DateTime $deduplicateDateTimeFrom = null
     ) {
-        if ($user === null) {
+        if (null === $user) {
             $user = $this->userHelper->getUser();
         }
 
-        if ($user === null || !$user->getId()) {
+        if (null === $user || !$user->getId()) {
             //ensure notifications aren't written for non users
             return;
+        }
+
+        if (null !== $deduplicateValue) {
+            $deduplicateValue = md5($deduplicateValue);
+
+            if ($this->isDuplicate($user->getId(), $deduplicateValue, $deduplicateDateTimeFrom)) {
+                return;
+            }
         }
 
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
-        $notification->setHeader(EmojiHelper::toHtml(InputHelper::html($header)));
-        $notification->setMessage(EmojiHelper::toHtml(InputHelper::html($message)));
+        $notification->setHeader(EmojiHelper::toHtml(InputHelper::strict_html($header)));
+        $notification->setMessage(EmojiHelper::toHtml(InputHelper::strict_html($message)));
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
-        if ($datetime == null) {
-            $datetime = new \DateTime();
+        if (null == $datetime) {
+            $datetime = new DateTime();
         }
         $notification->setDateAdded($datetime);
-        $this->saveEntity($notification);
+        $notification->setDeduplicate($deduplicateValue);
+        $this->saveAndDetachEntity($notification);
     }
 
     /**
@@ -177,11 +161,9 @@ class NotificationModel extends FormModel
      */
     public function getNotificationContent($afterId = null, $includeRead = false, $limit = null)
     {
-        if ($this->userHelper->getUser()->isGuest) {
+        if ($this->userHelper->getUser()->isGuest()) {
             return [[], false, ''];
         }
-
-        $this->updateUpstreamNotifications();
 
         $showNewIndicator = false;
         $userId           = ($this->userHelper->getUser()) ? $this->userHelper->getUser()->getId() : 0;
@@ -239,44 +221,8 @@ class NotificationModel extends FormModel
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
     }
 
-    /**
-     * Fetch upstream notifications via RSS.
-     */
-    public function updateUpstreamNotifications()
+    private function isDuplicate(int $userId, string $deduplicate, DateTime $from = null): bool
     {
-        $url = $this->coreParametersHelper->getParameter('rss_notification_url');
-
-        if (empty($url)) {
-            return;
-        }
-
-        //check to see when we last checked for an update
-        $lastChecked = $this->session->get('mautic.upstream.checked', 0);
-
-        if (time() - $lastChecked > 3600) {
-            $this->session->set('mautic.upstream.checked', time());
-            $lastDate = $this->getRepository()->getUpstreamLastDate();
-
-            try {
-                /** @var FeedContent $feed */
-                $feed = $this->rssReader->getFeedContent($url, $lastDate);
-
-                /** @var Item $item */
-                foreach ($feed->getItems() as $item) {
-                    $description = $item->getDescription();
-                    if (mb_strlen(strip_tags($description)) > 300) {
-                        $description = mb_substr(strip_tags($description), 0, 300);
-                        $description .= '... <a href="'.$item->getLink().'" target="_blank">'.$this->translator->trans(
-                                'mautic.core.notification.read_more'
-                            ).'</a>';
-                    }
-                    $header = $item->getTitle();
-
-                    $this->addNotification($description, 'upstream', false, ($header) ? $header : null, 'fa-bullhorn');
-                }
-            } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
-            }
-        }
+        return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new DateTime('-1 day'));
     }
 }

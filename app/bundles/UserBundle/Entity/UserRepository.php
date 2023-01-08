@@ -1,33 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * UserRepository.
+ * @extends CommonRepository<User>
  */
 class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.
-     *
-     * @param $identifier
-     *
-     * @return array|null
      */
-    public function findByIdentifier($identifier)
+    public function findByIdentifier(string $identifier): ?User
     {
         $q = $this->createQueryBuilder('u')
             ->where('u.username = :identifier OR u.email = :identifier')
@@ -35,7 +23,7 @@ class UserRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return ($result != null) ? $result[0] : null;
+        return (null !== $result) ? $result[0] : null;
     }
 
     /**
@@ -60,35 +48,6 @@ class UserRepository extends CommonRepository
         $now  = new DateTimeHelper();
         $conn = $this->_em->getConnection();
         $conn->update(MAUTIC_TABLE_PREFIX.'users', ['last_active' => $now->toUtcString()], ['id' => (int) $user->getId()]);
-    }
-
-    /**
-     * @param $userId
-     * @param $status
-     */
-    public function setOnlineStatus($userId, $status)
-    {
-        $conn = $this->_em->getConnection();
-        $conn->update(MAUTIC_TABLE_PREFIX.'users', ['online_status' => $status], ['id' => (int) $userId]);
-    }
-
-    /**
-     * Last active updates every 2 minutes. If it didn't get updated, it means the user closed their browser and are thus
-     * now offline.
-     */
-    public function updateOnlineStatuses()
-    {
-        $dt           = new DateTimeHelper();
-        $offlineDelay = $dt->getUtcDateTime();
-        $offlineDelay->setTimestamp(strtotime('15 minutes ago'));
-
-        $q = $this->_em->createQueryBuilder()
-            ->update('MauticUserBundle:User', 'u')
-            ->set('u.onlineStatus', ':status')
-            ->where('u.lastActive <= :delay')
-            ->setParameter('delay', $offlineDelay)
-            ->setParameter('status', 'offline');
-        $q->getQuery()->execute();
     }
 
     /**
@@ -117,8 +76,6 @@ class UserRepository extends CommonRepository
 
     /**
      * Get a list of users.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -200,6 +157,31 @@ class UserRepository extends CommonRepository
         }
 
         return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * Return list of Users for formType Choice.
+     *
+     * @return array
+     */
+    public function getOwnerListChoices()
+    {
+        $q = $this->createQueryBuilder('u');
+
+        $q->select('partial u.{id, firstName, lastName}');
+
+        $q->andWhere('u.isPublished = true')
+            ->orderBy('u.firstName, u.lastName');
+
+        $users = $q->getQuery()->getResult();
+
+        $result = [];
+        /** @var User $user */
+        foreach ($users as $user) {
+            $result[$user->getName(true)] = $user->getId();
+        }
+
+        return $result;
     }
 
     /**
@@ -300,11 +282,19 @@ class UserRepository extends CommonRepository
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->like('u.firstName', ':'.$unique),
-                    $q->expr()->like('u.lastName', ':'.$unique)
-                );
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                // This if/else can be removed once we upgrade to Dotrine 2.11 as both builders have the or() method there.
+                if ($q instanceof QueryBuilder) {
+                    $expr = $q->expr()->or(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                } else {
+                    $expr = $q->expr()->orX(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                }
                 $returnParameter = true;
                 break;
         }

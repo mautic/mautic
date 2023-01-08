@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,12 +12,13 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class MessageQueue
 {
-    const STATUS_RESCHEDULED = 'rescheduled';
-    const STATUS_PENDING     = 'pending';
-    const STATUS_SENT        = 'sent';
+    public const STATUS_RESCHEDULED = 'rescheduled';
+    public const STATUS_PENDING     = 'pending';
+    public const STATUS_SENT        = 'sent';
+    public const STATUS_CANCELLED   = 'cancelled';
 
-    const PRIORITY_NORMAL = 2;
-    const PRIORITY_HIGH   = 1;
+    public const PRIORITY_NORMAL = 2;
+    public const PRIORITY_HIGH   = 1;
 
     /**
      * @var int
@@ -38,9 +30,6 @@ class MessageQueue
      */
     private $channel;
 
-    /**
-     * @var
-     */
     private $channelId;
 
     /**
@@ -84,23 +73,20 @@ class MessageQueue
     private $datePublished;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $scheduledDate;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $lastAttempt;
 
     /**
-     * @var null|\DateTime
+     * @var \DateTime|null
      */
     private $dateSent;
 
-    /**
-     * @var array()
-     */
     private $options = [];
 
     /**
@@ -122,9 +108,6 @@ class MessageQueue
      */
     private $metadataUpdated = false;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -138,7 +121,7 @@ class MessageQueue
             ->addIndex(['success'], 'message_success')
             ->addIndex(['channel', 'channel_id'], 'message_channel_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->addField('channel', 'string');
         $builder->addNamedField('channelId', 'integer', 'channel_id');
@@ -279,8 +262,6 @@ class MessageQueue
     }
 
     /**
-     * @param Event $event
-     *
      * @return MessageQueue
      */
     public function setEvent(Event $event)
@@ -346,9 +327,6 @@ class MessageQueue
         return $this->lead;
     }
 
-    /**
-     * @param Lead $lead
-     */
     public function setLead(Lead $lead)
     {
         $this->lead = $lead;
@@ -490,9 +468,6 @@ class MessageQueue
         return (isset($this->options['metadata'])) ? $this->options['metadata'] : [];
     }
 
-    /**
-     * @param array $metadata
-     */
     public function setMetadata(array $metadata = [])
     {
         $this->metadataUpdated     = true;

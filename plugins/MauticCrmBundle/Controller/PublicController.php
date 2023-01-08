@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -19,9 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class PublicController extends CommonController
 {
-    public function contactDataAction()
+    public function contactDataAction(\Symfony\Component\HttpFoundation\Request $request)
     {
-        $content = $this->get('request')->getContent();
+        $content = $request->getContent();
         if (!empty($content)) {
             $data = json_decode($content, true); // 2nd param to get as array
         } else {

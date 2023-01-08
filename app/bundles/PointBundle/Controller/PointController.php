@@ -1,25 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PointBundle\Controller;
 
-use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\PointBundle\Entity\Point;
+use Mautic\PointBundle\Model\PointModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Class PointController.
- */
-class PointController extends FormController
+class PointController extends AbstractFormController
 {
     /**
      * @param int $page
@@ -41,25 +32,21 @@ class PointController extends FormController
             return $this->accessDenied();
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
-        //set limits
-        $limit = $this->get('session')->get('mautic.point.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
+        /** @var PageHelperFactoryInterface $pageHelperFacotry */
+        $pageHelperFacotry = $this->get('mautic.page.helper.factory');
+        $pageHelper        = $pageHelperFacotry->make('mautic.point', $page);
 
-        $search = $this->request->get('search', $this->get('session')->get('mautic.point.filter', ''));
-        $this->get('session')->set('mautic.point.filter', $search);
-
+        $limit      = $pageHelper->getLimit();
+        $start      = $pageHelper->getStart();
+        $search     = $this->request->get('search', $this->get('session')->get('mautic.point.filter', ''));
         $filter     = ['string' => $search, 'force' => []];
         $orderBy    = $this->get('session')->get('mautic.point.orderby', 'p.name');
         $orderByDir = $this->get('session')->get('mautic.point.orderbydir', 'ASC');
-
-        $points = $this->getModel('point')->getEntities([
+        $pointModel = $this->getModel('point');
+        \assert($pointModel instanceof PointModel);
+        $points     = $pointModel->getEntities([
             'start'      => $start,
             'limit'      => $limit,
             'filter'     => $filter,
@@ -67,16 +54,18 @@ class PointController extends FormController
             'orderByDir' => $orderByDir,
         ]);
 
+        $this->get('session')->set('mautic.point.filter', $search);
+
         $count = count($points);
         if ($count && $count < ($start + 1)) {
-            $lastPage = ($count === 1) ? 1 : (ceil($count / $limit)) ?: 1;
-            $this->get('session')->set('mautic.point.page', $lastPage);
+            $lastPage  = $pageHelper->countPage($count);
             $returnUrl = $this->generateUrl('mautic_point_index', ['page' => $lastPage]);
+            $pageHelper->rememberPage($lastPage);
 
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPointBundle:Point:index',
+                'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_point_index',
                     'mauticContent' => 'point',
@@ -84,13 +73,10 @@ class PointController extends FormController
             ]);
         }
 
-        //set what page currently on so that we can return here after form submission/cancellation
-        $this->get('session')->set('mautic.point.page', $page);
-
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $pageHelper->rememberPage($page);
 
         //get the list of actions
-        $actions = $this->getModel('point')->getPointActions();
+        $actions = $pointModel->getPointActions();
 
         return $this->delegateView([
             'viewParameters' => [
@@ -100,7 +86,7 @@ class PointController extends FormController
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
-                'tmpl'        => $tmpl,
+                'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
             'contentTemplate' => 'MauticPointBundle:Point:list.html.php',
             'passthroughVars' => [
@@ -121,6 +107,7 @@ class PointController extends FormController
     public function newAction($entity = null)
     {
         $model = $this->getModel('point');
+        \assert($model instanceof PointModel);
 
         if (!($entity instanceof Point)) {
             /** @var \Mautic\PointBundle\Entity\Point $entity */
@@ -132,21 +119,22 @@ class PointController extends FormController
         }
 
         //set the page we came from
-        $page = $this->get('session')->get('mautic.point.page', 1);
-
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : '';
-
-        $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
-        $actions = $model->getPointActions();
-        $form    = $model->createForm($entity, $this->get('form.factory'), $action, [
+        $page       = $this->get('session')->get('mautic.point.page', 1);
+        $method     = $this->request->getMethod();
+        $point      = $this->request->request->get('point', []);
+        $actionType = 'POST' === $method ? ($point['type'] ?? '') : '';
+        $action     = $this->generateUrl('mautic_point_action', ['objectAction' => 'new']);
+        $actions    = $model->getPointActions();
+        $form       = $model->createForm($entity, $this->get('form.factory'), $action, [
             'pointActions' => $actions,
             'actionType'   => $actionType,
         ]);
         $viewParameters = ['page' => $page];
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (Request::METHOD_POST === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -161,9 +149,9 @@ class PointController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                        $template  = 'MauticPointBundle:Point:index';
+                        $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -171,10 +159,10 @@ class PointController extends FormController
                 }
             } else {
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                $template  = 'MauticPointBundle:Point:index';
+                $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParameters,
@@ -222,7 +210,8 @@ class PointController extends FormController
      */
     public function editAction($objectId, $ignorePost = false)
     {
-        $model  = $this->getModel('point');
+        $model = $this->getModel('point');
+        \assert($model instanceof PointModel);
         $entity = $model->getEntity($objectId);
 
         //set the page we came from
@@ -236,7 +225,7 @@ class PointController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => $viewParameters,
-            'contentTemplate' => 'MauticPointBundle:Point:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -244,7 +233,7 @@ class PointController extends FormController
         ];
 
         //form not found
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->postActionRedirect(
                 array_merge($postActionVars, [
                     'flashes' => [
@@ -263,7 +252,9 @@ class PointController extends FormController
             return $this->isLocked($postActionVars, $entity, 'point');
         }
 
-        $actionType = ($this->request->getMethod() == 'POST') ? $this->request->request->get('point[type]', '', true) : $entity->getType();
+        $method     = $this->request->getMethod();
+        $point      = $this->request->request->get('point', []);
+        $actionType = 'POST' === $method ? ($point['type'] ?? '') : $entity->getType();
 
         $action  = $this->generateUrl('mautic_point_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $actions = $model->getPointActions();
@@ -273,12 +264,13 @@ class PointController extends FormController
         ]);
 
         ///Check for a submitted form and process it
-        if (!$ignorePost && $this->request->getMethod() == 'POST') {
+        if (!$ignorePost && 'POST' === $method) {
             $valid = false;
+
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
@@ -289,9 +281,9 @@ class PointController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                        $template  = 'MauticPointBundle:Point:index';
+                        $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
                     }
                 }
             } else {
@@ -299,10 +291,10 @@ class PointController extends FormController
                 $model->unlockEntity($entity);
 
                 $returnUrl = $this->generateUrl('mautic_point_index', $viewParameters);
-                $template  = 'MauticPointBundle:Point:index';
+                $template  = 'Mautic\PointBundle\Controller\PointController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                         'returnUrl'       => $returnUrl,
@@ -353,7 +345,7 @@ class PointController extends FormController
         $model  = $this->getModel('point');
         $entity = $model->getEntity($objectId);
 
-        if ($entity != null) {
+        if (null != $entity) {
             if (!$this->get('mautic.security')->isGranted('point:points:create')) {
                 return $this->accessDenied();
             }
@@ -381,18 +373,19 @@ class PointController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Point:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model  = $this->getModel('point');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('point');
+            \assert($model instanceof PointModel);
             $entity = $model->getEntity($objectId);
 
-            if ($entity === null) {
+            if (null === $entity) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.point.error.notfound',
@@ -438,15 +431,16 @@ class PointController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPointBundle:Point:index',
+            'contentTemplate' => 'Mautic\PointBundle\Controller\PointController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
             ],
         ];
 
-        if ($this->request->getMethod() == 'POST') {
-            $model     = $this->getModel('point');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('point');
+            \assert($model instanceof PointModel);
             $ids       = json_decode($this->request->query->get('ids', '{}'));
             $deleteIds = [];
 
@@ -454,7 +448,7 @@ class PointController extends FormController
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
 
-                if ($entity === null) {
+                if (null === $entity) {
                     $flashes[] = [
                         'type'    => 'error',
                         'msg'     => 'mautic.point.error.notfound',

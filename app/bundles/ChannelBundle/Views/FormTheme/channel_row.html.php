@@ -44,5 +44,5 @@ $propsCol       = ($channelContent) ? '' : 'col-md-10';
     <div class="col-md-6">
         <?php echo $channelContent; ?>
     </div>
-    <?php endif ?>
+    <?php endif; ?>
 </div>

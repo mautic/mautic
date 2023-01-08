@@ -1,53 +1,78 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ConfigBundle\Tests\EventListener;
 
+use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\EventListener\ConfigSubscriber;
+use Mautic\ConfigBundle\Service\ConfigChangeLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
+class ConfigSubscriberTest extends TestCase
 {
-    public function testEscapePercentCharacters()
+    /**
+     * @var ConfigChangeLogger|MockObject
+     */
+    private $logger;
+
+    /**
+     * @var ConfigSubscriber
+     */
+    private $subscriber;
+
+    protected function setUp(): void
     {
-        $config = [
-            'regularValue'             => 'Nothing to do here',
-            'single percent'           => 'Still nothing % to do here',
-            'simple escape'            => 'This will be %escaped%',
-            'do not escape valid vars' => 'this is cool var %kernel.root_dir%',
-            'escape complex string'    => "
-                trk_tit = trk_tit.replace(/\\%u00a0/g, '');
-                trk_tit = trk_tit.replace(/\\%u2122/g, '');
-                trk_tit = trk_tit.replace(/\\%u[0-9][0-9][0-9][0-9]/g, '');
-            ",
-        ];
-        $configEscaped = [
-            'regularValue'             => 'Nothing to do here',
-            'single percent'           => 'Still nothing % to do here',
-            'simple escape'            => 'This will be %%escaped%%',
-            'do not escape valid vars' => 'this is cool var %kernel.root_dir%',
-            'escape complex string'    => "
-                trk_tit = trk_tit.replace(/\\%%u00a0/g, '');
-                trk_tit = trk_tit.replace(/\\%%u2122/g, '');
-                trk_tit = trk_tit.replace(/\\%u[0-9][0-9][0-9][0-9]/g, '');
-            ",
-        ];
+        $this->logger     = $this->createMock(ConfigChangeLogger::class);
+        $this->subscriber = new ConfigSubscriber($this->logger);
+    }
 
-        $event       = new ConfigEvent($config, $this->getMockBuilder('\Symfony\Component\HttpFoundation\ParameterBag')->getMock());
-        $paramHelper = $this->getMockBuilder('\Mautic\CoreBundle\Helper\CoreParametersHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $paramHelper->method('getParameter')->will($this->returnCallback(function ($param) {
-            if ($param === 'kernel.root_dir') {
-                return '/some/path';
-            }
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            [
+                ConfigEvents::CONFIG_POST_SAVE => ['onConfigPostSave', 0],
+            ],
+            $this->subscriber->getSubscribedEvents()
+        );
+    }
 
-            return null;
-        }));
+    public function testNothingToLogOnConfigPostSave()
+    {
+        // Test nothing to log
+        $this->logger->expects($this->never())
+            ->method('log');
+        $event = $this->createMock(ConfigEvent::class);
+        $event->expects($this->once())
+            ->method('getOriginalNormData')
+            ->willReturn(null);
 
-        $configSubscriber = new ConfigSubscriber($paramHelper);
+        $this->subscriber->onConfigPostSave($event);
+    }
 
-        $configSubscriber->escapePercentCharacters($event);
+    public function testSomethingToLogOnConfigPostSave()
+    {
+        // Test something to log
+        $originalNormData = ['orig'];
+        $normData         = ['norm'];
 
-        $this->assertEquals($configEscaped, $event->getConfig());
+        $event = $this->createMock(ConfigEvent::class);
+        $event->expects($this->once())
+            ->method('getOriginalNormData')
+            ->willReturn($originalNormData);
+        $event->expects($this->once())
+            ->method('getNormData')
+            ->willReturn($normData);
+        $this->logger->expects($this->once())
+            ->method('setOriginalNormData')
+            ->with($originalNormData)
+            ->willReturn($this->logger);
+        $this->logger->expects($this->once())
+            ->method('log')
+            ->with($normData);
+
+        $this->subscriber->onConfigPostSave($event);
     }
 }

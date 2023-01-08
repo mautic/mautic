@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use FOS\OAuthServerBundle\Event\OAuthEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OAuthEventListener
 {
@@ -30,16 +21,12 @@ class OAuthEventListener
     private $mauticSecurity;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
     /**
      * OAuthEventListener constructor.
-     *
-     * @param EntityManager       $entityManager
-     * @param CorePermissions     $corePermissions
-     * @param TranslatorInterface $translator
      */
     public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
     {
@@ -49,8 +36,6 @@ class OAuthEventListener
     }
 
     /**
-     * @param OAuthEvent $event
-     *
      * @throws AccessDeniedException
      */
     public function onPreAuthorizationProcess(OAuthEvent $event)
@@ -67,9 +52,6 @@ class OAuthEventListener
         }
     }
 
-    /**
-     * @param OAuthEvent $event
-     */
     public function onPostAuthorizationProcess(OAuthEvent $event)
     {
         if ($event->isAuthorizedClient()) {
@@ -83,8 +65,6 @@ class OAuthEventListener
     }
 
     /**
-     * @param OAuthEvent $event
-     *
      * @return mixed
      */
     protected function getUser(OAuthEvent $event)

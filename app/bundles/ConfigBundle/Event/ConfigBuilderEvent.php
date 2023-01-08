@@ -1,72 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Event;
 
 use Mautic\CoreBundle\Helper\BundleHelper;
-use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
-/**
- * Class ConfigEvent.
- */
 class ConfigBuilderEvent extends Event
 {
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $forms = [];
+    private array $forms = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $formThemes = [
+    private array $formThemes = [
         'MauticConfigBundle:FormTheme',
     ];
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private BundleHelper $bundleHelper;
 
     /**
-     * @var BundleHelper
+     * @var string[]
      */
-    private $bundleHelper;
+    protected array $encodedFields = [];
 
     /**
-     * @var array
+     * @var array<string> Array of field names which are not exist in local.php but are needed for generation other field
      */
-    protected $encodedFields = [];
+    protected array $temporaryFields = [];
 
-    /**
-     * ConfigBuilderEvent constructor.
-     *
-     * @param PathsHelper  $pathsHelper
-     * @param BundleHelper $bundleHelper
-     */
-    public function __construct(PathsHelper $pathsHelper, BundleHelper $bundleHelper)
+    public function __construct(BundleHelper $bundleHelper)
     {
-        $this->pathsHelper  = $pathsHelper;
         $this->bundleHelper = $bundleHelper;
     }
 
     /**
      * Set new form to the forms array.
      *
-     * @param $form
-     *
      * @return $this
      */
-    public function addForm($form)
+    public function addForm(array $form)
     {
         if (isset($form['formTheme'])) {
             $this->formThemes[] = $form['formTheme'];
@@ -75,6 +50,24 @@ class ConfigBuilderEvent extends Event
         $this->forms[$form['formAlias']] = $form;
 
         return $this;
+    }
+
+    /**
+     * Remove a form to the forms array.
+     *
+     * @param string $formAlias
+     *
+     * @return bool
+     */
+    public function removeForm($formAlias)
+    {
+        if (isset($this->forms[$formAlias])) {
+            unset($this->forms[$formAlias]);
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -98,37 +91,8 @@ class ConfigBuilderEvent extends Event
     }
 
     /**
-     * Helper method can load $parameters array from a config file.
+     * Get default parameters from config defined in bundles.
      *
-     * @param string $path (relative from the root dir)
-     *
-     * @return array
-     */
-    public function getParameters($path = null)
-    {
-        $paramsFile = $this->pathsHelper->getSystemPath('app').$path;
-
-        if (file_exists($paramsFile)) {
-            // Import the bundle configuration, $parameters is defined in this file
-            include $paramsFile;
-        }
-
-        if (!isset($parameters)) {
-            $parameters = [];
-        }
-
-        $fields     = $this->getBase64EncodedFields();
-        $checkThese = array_intersect(array_keys($parameters), $fields);
-        foreach ($checkThese as $checkMe) {
-            if (!empty($parameters[$checkMe])) {
-                $parameters[$checkMe] = base64_decode($parameters[$checkMe]);
-            }
-        }
-
-        return $parameters;
-    }
-
-    /**
      * @param $bundle
      *
      * @return array
@@ -166,5 +130,25 @@ class ConfigBuilderEvent extends Event
     public function getFileFields()
     {
         return $this->encodedFields;
+    }
+
+    /**
+     * Adds temporary fields for config.
+     *
+     * @param array<string> $fields
+     */
+    public function addTemporaryFields(array $fields): void
+    {
+        $this->temporaryFields = array_merge($this->temporaryFields, $fields);
+    }
+
+    /**
+     * Return a list of temporary fields.
+     *
+     * @return array<string>
+     */
+    public function getTemporaryFields(): array
+    {
+        return $this->temporaryFields;
     }
 }

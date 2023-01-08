@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -16,6 +7,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadDevice;
 
 /**
  * Class Hit.
@@ -92,14 +84,8 @@ class Hit
      */
     private $code;
 
-    /**
-     * @var
-     */
     private $referer;
 
-    /**
-     * @var
-     */
     private $url;
 
     /**
@@ -123,7 +109,7 @@ class Hit
     private $pageLanguage;
 
     /**
-     * @var string
+     * @var array<string>
      */
     private $browserLanguages = [];
 
@@ -147,13 +133,10 @@ class Hit
      */
     private $query = [];
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadDevice
+     * @var LeadDevice
      */
     private $device;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -163,10 +146,10 @@ class Hit
             ->addIndex(['tracking_id'], 'page_hit_tracking_search')
             ->addIndex(['code'], 'page_hit_code_search')
             ->addIndex(['source', 'source_id'], 'page_hit_source_search')
-            ->addIndex(['date_hit'], 'page_date_hit')
-            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index');
+            ->addIndex(['date_hit', 'date_left'], 'date_hit_left_index')
+            ->addIndexWithOptions(['url'], 'page_hit_url', ['lengths' => [0 => 128]]);
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createField('dateHit', 'datetime')
             ->columnName('date_hit')
@@ -279,6 +262,7 @@ class Hit
         $metadata->setGroupPrefix('hit')
             ->addProperties(
                 [
+                    'id',
                     'dateHit',
                     'dateLeft',
                     'page',
@@ -563,6 +547,7 @@ class Hit
      */
     public function setUrlTitle($urlTitle)
     {
+        $urlTitle       = mb_strlen($urlTitle) <= 191 ? $urlTitle : mb_substr($urlTitle, 0, 191);
         $this->urlTitle = $urlTitle;
 
         return $this;
@@ -653,8 +638,6 @@ class Hit
     /**
      * Set ipAddress.
      *
-     * @param \Mautic\CoreBundle\Entity\IpAddress $ipAddress
-     *
      * @return Hit
      */
     public function setIpAddress(\Mautic\CoreBundle\Entity\IpAddress $ipAddress)
@@ -675,9 +658,7 @@ class Hit
     }
 
     /**
-     * Set trackingId.
-     *
-     * @param int $trackingId
+     * @param string $trackingId
      *
      * @return Page
      */
@@ -689,9 +670,7 @@ class Hit
     }
 
     /**
-     * Get trackingId.
-     *
-     * @return int
+     * @return string
      */
     public function getTrackingId()
     {
@@ -725,7 +704,7 @@ class Hit
     /**
      * Set browserLanguages.
      *
-     * @param string $browserLanguages
+     * @param array<string> $browserLanguages
      *
      * @return Hit
      */
@@ -739,7 +718,7 @@ class Hit
     /**
      * Get browserLanguages.
      *
-     * @return string
+     * @return array<string>
      */
     public function getBrowserLanguages()
     {
@@ -755,8 +734,6 @@ class Hit
     }
 
     /**
-     * @param Lead $lead
-     *
      * @return Hit
      */
     public function setLead(Lead $lead)
@@ -815,8 +792,6 @@ class Hit
     }
 
     /**
-     * @param Redirect $redirect
-     *
      * @return Hit
      */
     public function setRedirect(Redirect $redirect)
@@ -863,19 +838,17 @@ class Hit
     }
 
     /**
-     * @return array
+     * @return LeadDevice
      */
     public function getDeviceStat()
     {
-        return $this->deviceStat;
+        return $this->device;
     }
 
     /**
-     * @param array $device
-     *
      * @return Hit
      */
-    public function setDeviceStat($device)
+    public function setDeviceStat(LeadDevice $device)
     {
         $this->device = $device;
 

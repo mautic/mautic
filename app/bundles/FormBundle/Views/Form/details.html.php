@@ -100,6 +100,14 @@ $showActions = count($activeFormActions);
                                 'MauticCoreBundle:Helper:details.html.php',
                                 ['entity' => $activeForm]
                             ); ?>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.form.stats.submission_counts'); ?></span>
+                                </td>
+                                <td>
+                                    <?php echo $submissionCounts['unique'].' / '.$submissionCounts['total']; ?>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -152,6 +160,8 @@ $showActions = count($activeFormActions);
             </div>
             <!--/ stats -->
 
+            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <?php if ($showActions): ?>
@@ -195,7 +205,7 @@ $showActions = count($activeFormActions);
                                             default:
                                                 $icon = '';
                                         } ?>
-                                        <?php if ($icon != ''): ?>
+                                        <?php if ('' != $icon): ?>
                                             <div class="col-md-1 va-m">
                                                 <h3><span class="fa <?php echo $icon; ?> text-white dark-xs"></span>
                                                 </h3>
@@ -223,36 +233,32 @@ $showActions = count($activeFormActions);
             <div class="tab-pane fade<?php if (!$showActions) {
                                             echo ' active in';
                                         } ?> bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs">Form Field</h5>
+                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('mautic.form.field'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var \Mautic\FormBundle\Entity\Field $field */
                     foreach ($activeFormFields as $field) : ?>
-                        <li class="list-group-item bg-auto bg-light-xs">
-                            <div class="box-layout">
-                                <div class="col-md-1 va-m">
-                                    <?php $requiredTitle = $field->getIsRequired() ? 'mautic.core.required'
-                                        : 'mautic.core.not_required'; ?>
-                                    <h3><span class="fa fa-<?php echo $field->getIsRequired() ? 'check'
-                                            : 'times'; ?> text-white dark-xs" data-toggle="tooltip"
-                                              data-placement="left"
-                                              title="<?php echo $view['translator']->trans($requiredTitle); ?>"></span>
-                                    </h3>
-                                </div>
-                                <div class="col-md-7 va-m">
-                                    <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
-                                    <h6 class="text-white dark-md"><?php echo $view['translator']->trans(
-                                            'mautic.form.details.field_type',
-                                            ['%type%' => $field->getType()]
-                                        ); ?></h6>
-                                </div>
-                                <div class="col-md-4 va-m text-right">
-                                    <em class="text-white dark-sm"><?php echo $view['translator']->trans(
-                                            'mautic.form.details.field_order',
-                                            ['%order%' => $field->getOrder()]
-                                        ); ?></em>
-                                </div>
-                            </div>
-                        </li>
+                    <?php if (!$field->getParent()): ?>
+                    <li class="list-group-item bg-auto bg-light-xs mt-10">
+                        <?php echo $view->render(
+                            'MauticFormBundle:Form:details-fields-list.html.php',
+                            ['field' => $field]
+                        ); ?>
+                    </li>
+                    <?php endif; ?>
+                    <?php /** @var \Mautic\FormBundle\Entity\Field $field */
+                        foreach ($activeFormFields as $fieldChild) : ?>
+                            <?php if ((int) $fieldChild->getParent() === $field->getId()): ?>
+                                <li class="list-group-item bg-auto bg-light-xs ml-20">
+
+                                    <?php echo $view->render(
+                                        'MauticFormBundle:Form:details-fields-list.html.php',
+                                        [
+                                            'field' => $fieldChild,
+                                        ]
+                                    ); ?>
+                                </li>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
                     <?php endforeach; ?>
                 </ul>
             </div>
@@ -374,4 +380,4 @@ $showActions = count($activeFormActions);
 </div>
 <!--/ end: box layout -->
 
-<input type="hidden" name="entityId" id="entityId" value="<?php echo $activeForm->getId(); ?>"/>
+<input type="hidden" name="entityId" id="entityId" value="<?php echo $view->escape($activeForm->getId()); ?>"/>

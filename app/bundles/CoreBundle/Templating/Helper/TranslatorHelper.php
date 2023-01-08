@@ -1,20 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper as BaseHelper;
 
 /**
  * Extended TranslatorHelper.
+ *
+ * @property Translator $translator
  */
 class TranslatorHelper extends BaseHelper
 {
@@ -54,9 +48,8 @@ class TranslatorHelper extends BaseHelper
      */
     public function getJsLang()
     {
-        $this->translator->addResource('mautic', null, $this->translator->getLocale(), 'javascript');
-
-        $messages = $this->translator->getMessages();
+        $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');
+        $messages        = $this->translator->getCatalogue()->all('javascript');
 
         $oldKeys = [
             'chosenChooseOne'     => $this->trans('mautic.core.form.chooseone'),
@@ -65,8 +58,7 @@ class TranslatorHelper extends BaseHelper
             'pleaseWait'          => $this->trans('mautic.core.wait'),
             'popupBlockerMessage' => $this->trans('mautic.core.popupblocked'),
         ];
-
-        $jsLang = array_merge($messages['javascript'], $oldKeys);
+        $jsLang = array_merge($defaultMessages, $messages, $oldKeys);
 
         return json_encode($jsLang, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
     }

@@ -1,26 +1,42 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\DynamicContentBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class LeadSubscriber.
- */
-class LeadSubscriber extends CommonSubscriber
+class LeadSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var StatRepository
+     */
+    private $statRepository;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        RouterInterface $router,
+        StatRepository $statRepository
+    ) {
+        $this->translator     = $translator;
+        $this->router         = $router;
+        $this->statRepository = $statRepository;
+    }
+
     /**
      * @return array
      */
@@ -34,37 +50,34 @@ class LeadSubscriber extends CommonSubscriber
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
         // Set available event types
         $eventTypeKey      = 'dynamic.content.sent';
-        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
+        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.triggered');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
+        $event->addSerializerGroup('dwcList');
 
         if (!$event->isApplicable($eventTypeKey)) {
             return;
         }
 
-        $lead = $event->getLead();
-
-        /** @var \Mautic\DynamicContentBundle\Entity\StatRepository $statRepository */
-        $statRepository = $this->em->getRepository('MauticDynamicContentBundle:Stat');
-        $stats          = $statRepository->getLeadStats($lead->getId(), $event->getQueryOptions());
+        $stats = $this->statRepository->getLeadStats($event->getLeadId(), $event->getQueryOptions());
 
         // Add total number to counter
         $event->addToCounter($eventTypeKey, $stats);
 
         if (!$event->isEngagementCount()) {
-
             // Add the events to the event array
             foreach ($stats['results'] as $stat) {
+                $contactId = $stat['lead_id'];
+                unset($stat['lead_id']);
                 if ($stat['dateSent']) {
                     $event->addEvent(
                         [
                             'event'      => $eventTypeKey,
+                            'eventId'    => $eventTypeKey.$stat['id'],
                             'eventLabel' => [
                                 'label' => $stat['name'],
                                 'href'  => $this->router->generate(
@@ -79,7 +92,8 @@ class LeadSubscriber extends CommonSubscriber
                                 'type' => 'sent',
                             ],
                             'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                            'icon'            => 'fa-envelope',
+                            'icon'            => 'fa-puzzle-piece',
+                            'contactId'       => $contactId,
                         ]
                     );
                 }
@@ -87,12 +101,9 @@ class LeadSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param LeadMergeEvent $event
-     */
     public function onLeadMerge(LeadMergeEvent $event)
     {
-        $this->em->getRepository('MauticDynamicContentBundle:Stat')->updateLead(
+        $this->statRepository->updateLead(
             $event->getLoser()->getId(),
             $event->getVictor()->getId()
         );

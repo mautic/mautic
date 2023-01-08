@@ -1,20 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class NoteController extends FormController
@@ -39,18 +32,16 @@ class NoteController extends FormController
             return $lead;
         }
 
-        if ($this->request->getMethod() == 'POST') {
-            $this->setListFilters();
-        }
+        $this->setListFilters();
 
         $session = $this->get('session');
 
         //set limits
         $limit = $session->get(
             'mautic.lead.'.$lead->getId().'.note.limit',
-            $this->get('mautic.helper.core_parameters')->getParameter('default_pagelimit')
+            $this->get('mautic.helper.core_parameters')->get('default_pagelimit')
         );
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start = (1 === $page) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
@@ -73,7 +64,7 @@ class NoteController extends FormController
 
         $tmpl     = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $noteType = InputHelper::clean($this->request->request->get('noteTypes', [], true));
-        if (empty($noteType) && $tmpl == 'index') {
+        if (empty($noteType) && 'index' == $tmpl) {
             $noteType = $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []);
         }
         $session->set('mautic.lead.'.$lead->getId().'.notetype.filter', $noteType);
@@ -153,7 +144,8 @@ class NoteController extends FormController
         $note = new LeadNote();
         $note->setLead($lead);
 
-        $model  = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -166,7 +158,7 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -205,9 +197,7 @@ class NoteController extends FormController
                 $passthroughVars['noteId'] = $note->getId();
             }
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView(
                 [
@@ -237,12 +227,13 @@ class NoteController extends FormController
             return $lead;
         }
 
-        $model      = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $note       = $model->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
 
-        if ($note === null || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
+        if (null === $note || !$this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getPermissionUser())) {
             return $this->accessDenied();
         }
 
@@ -257,7 +248,7 @@ class NoteController extends FormController
         $form = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ($this->request->getMethod() == 'POST') {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -293,9 +284,7 @@ class NoteController extends FormController
 
             $passthroughVars['mauticContent'] = 'leadNote';
 
-            $response = new JsonResponse($passthroughVars);
-
-            return $response;
+            return new JsonResponse($passthroughVars);
         } else {
             return $this->delegateView(
                 [
@@ -313,7 +302,7 @@ class NoteController extends FormController
     /**
      * Deletes the entity.
      *
-     * @param   $objectId
+     * @param $objectId
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
@@ -323,11 +312,11 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-
         $model = $this->getModel('lead.note');
-        $note  = $model->getEntity($objectId);
+        \assert($model instanceof NoteModel);
+        $note = $model->getEntity($objectId);
 
-        if ($note === null) {
+        if (null === $note) {
             return $this->notFound();
         }
 
@@ -340,15 +329,13 @@ class NoteController extends FormController
 
         $model->deleteEntity($note);
 
-        $response = new JsonResponse(
+        return new JsonResponse(
             [
                 'deleteId'      => $objectId,
                 'mauticContent' => 'leadNote',
                 'downNoteCount' => 1,
             ]
         );
-
-        return $response;
     }
 
     /**

@@ -29,7 +29,7 @@ $props = $focus['properties'];
 
         <?php if (isset($props['colors'])): ?>
 
-        .mf-content a.mf-link, .mf-content .mauticform-button {
+        .mf-content a.mf-link, .mf-content .mauticform-button, .mf-content .mauticform-pagebreak {
             background-color: #<?php echo $props['colors']['button']; ?>;
             color: #<?php echo $props['colors']['button_text']; ?>;
         }
@@ -44,6 +44,7 @@ $props = $focus['properties'];
             echo $view->render('MauticFocusBundle:Builder:style.less.php',
                 [
                     'preview' => true,
+                    'focus'   => $focus,
                 ]
             );
         endif;
@@ -53,12 +54,23 @@ $props = $focus['properties'];
         $templateBase,
         [
             'focus'    => $focus,
-            'form'     => $form,
             'preview'  => $preview,
             'clickUrl' => $clickUrl,
+            'htmlMode' => $htmlMode,
         ]
     );
 
+    ?>
+    <style scoped>
+    <?php
+
+    if (isset($focus['properties']['content']['css'])) {
+        echo $focus['properties']['content']['css'];
+    }
+
+    ?>
+    </style>
+    <?php
     // Add view tracking image
     if (!$preview): ?>
 

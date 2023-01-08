@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -47,9 +38,6 @@ class StatDevice
      */
     private $dateOpened;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -58,7 +46,7 @@ class StatDevice
             ->setCustomRepositoryClass('Mautic\EmailBundle\Entity\StatDeviceRepository')
             ->addIndex(['date_opened'], 'date_opened_search');
 
-        $builder->addId();
+        $builder->addBigIntIdField();
 
         $builder->createManyToOne('device', 'Mautic\LeadBundle\Entity\LeadDevice')
             ->addJoinColumn('device_id', 'id', true, false, 'CASCADE')

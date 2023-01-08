@@ -1,28 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Entity;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ReportRepository.
+ * @extends CommonRepository<Report>
  */
 class ReportRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -126,9 +115,6 @@ class ReportRepository extends CommonRepository
         return 'r';
     }
 
-    /**
-     * @param $viewOther
-     */
     public function findReportsWithGraphs($ownedBy = null)
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();

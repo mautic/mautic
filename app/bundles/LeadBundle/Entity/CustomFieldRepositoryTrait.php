@@ -1,35 +1,33 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Controller\ListController;
+use Mautic\LeadBundle\Helper\CustomFieldHelper;
 
-/**
- * Class CustomFieldRepositoryTrait.
- */
 trait CustomFieldRepositoryTrait
 {
     protected $useDistinctCount = false;
 
     /**
-     * @param      $object
-     * @param      $args
-     * @param null $resultsCallback
-     *
-     * @return array
+     * @var array
+     */
+    protected $customFieldList = [];
+
+    /**
+     * @var string
+     */
+    protected $uniqueIdentifiersOperator;
+
+    /**
+     * @param string $object
+     * @param array  $args
      */
     public function getEntitiesWithCustomFields($object, $args, $resultsCallback = null)
     {
-        list($fields, $fixedFields) = $this->getCustomFieldList($object);
+        [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
         //Fix arguments if necessary
         $args = $this->convertOrmProperties($this->getClassName(), $args);
@@ -42,23 +40,27 @@ trait CustomFieldRepositoryTrait
         $this->useDistinctCount = false;
         $this->buildWhereClause($dq, $args);
 
-        // Distinct is required here to get the correct count when group by is used due to applied filters
-        $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
-        $dq->select($countSelect.' as count');
+        if (!empty($args['withTotalCount']) || !isset($args['count'])) {
+            // Distinct is required here to get the correct count when group by is used due to applied filters
+            $countSelect = ($this->useDistinctCount) ? 'COUNT(DISTINCT('.$this->getTableAlias().'.id))' : 'COUNT('.$this->getTableAlias().'.id)';
+            $dq->select($countSelect.' as count');
 
-        // Advanced search filters may have set a group by and if so, let's remove it for the count.
-        if ($groupBy = $dq->getQueryPart('groupBy')) {
-            $dq->resetQueryPart('groupBy');
+            // Advanced search filters may have set a group by and if so, let's remove it for the count.
+            if ($groupBy = $dq->getQueryPart('groupBy')) {
+                $dq->resetQueryPart('groupBy');
+            }
+
+            //get a total count
+            $result = $dq->execute()->fetchAllAssociative();
+            $total  = ($result) ? $result[0]['count'] : 0;
+        } else {
+            $total = $args['count'];
         }
 
-        //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = ($result) ? $result[0]['count'] : 0;
-
-        if (!$total) {
+        if (!$total && !empty($args['withTotalCount'])) {
             $results = [];
         } else {
-            if ($groupBy) {
+            if (isset($groupBy) && $groupBy) {
                 $dq->groupBy($groupBy);
             }
             //now get the actual paginated results
@@ -69,7 +71,10 @@ trait CustomFieldRepositoryTrait
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 
-            $results = $dq->execute()->fetchAll();
+            $results = $dq->execute()->fetchAllAssociative();
+            if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
+                unset($args['select']); //Our purpose of getting list of ids has already accomplished. We no longer need this.
+            }
 
             //loop over results to put fields in something that can be assigned to the entities
             $fieldValues = [];
@@ -108,6 +113,9 @@ trait CustomFieldRepositoryTrait
                 //since we have to be cross-platform; it's way ugly
 
                 //We should probably totally ditch orm for leads
+
+                // This "hack" is in place to allow for custom ordering in the API.
+                // See https://github.com/mautic/mautic/pull/7494#issuecomment-600970208
                 $order = '(CASE';
                 foreach ($ids as $count => $id) {
                     $order .= ' WHEN '.$this->getTableAlias().'.id = '.$id.' THEN '.$count;
@@ -116,6 +124,7 @@ trait CustomFieldRepositoryTrait
                 $order .= ' ELSE '.$count.' END) AS HIDDEN ORD';
 
                 //ORM - generates lead entities
+                /** @var \Doctrine\ORM\QueryBuilder $q */
                 $q = $this->getEntitiesOrmQueryBuilder($order);
                 $this->buildSelectClause($dq, $args);
 
@@ -127,9 +136,11 @@ trait CustomFieldRepositoryTrait
                 $q->orderBy('ORD', 'ASC');
 
                 $results = $q->getQuery()
-                             ->getResult();
+                    ->useQueryCache(false) // the query contains ID's, so there is no use in caching it
+                    ->getResult();
 
                 //assign fields
+                /** @var Lead $r */
                 foreach ($results as $r) {
                     $id = $r->getId();
                     $r->setFields($fieldValues[$id]);
@@ -159,8 +170,6 @@ trait CustomFieldRepositoryTrait
      */
     public function getFieldValues($id, $byGroup = true, $object = 'lead')
     {
-        list($fields, $fixedFields) = $this->getCustomFieldList($object);
-
         //use DBAL to get entity fields
         $q = $this->getEntitiesDbalQueryBuilder();
 
@@ -173,37 +182,8 @@ trait CustomFieldRepositoryTrait
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
         $values = $q->execute()->fetch();
-        $this->removeNonFieldColumns($values, $fixedFields);
 
-        // Reorder leadValues based on field order
-        $values = array_merge(array_flip(array_keys($fields)), $values);
-
-        $fieldValues = [];
-
-        //loop over results to put fields in something that can be assigned to the entities
-        foreach ($values as $k => $r) {
-            if (isset($fields[$k])) {
-                if ($byGroup) {
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['group']][$fields[$k]['alias']]['value'] = $r;
-                } else {
-                    $fieldValues[$fields[$k]['alias']]          = $fields[$k];
-                    $fieldValues[$fields[$k]['alias']]['value'] = $r;
-                }
-            }
-        }
-
-        if ($byGroup) {
-            //make sure each group key is present
-            $groups = $this->getFieldGroups();
-            foreach ($groups as $g) {
-                if (!isset($fieldValues[$g])) {
-                    $fieldValues[$g] = [];
-                }
-            }
-        }
-
-        return $fieldValues;
+        return $this->formatFieldValues($values, $byGroup, $object);
     }
 
     /**
@@ -222,8 +202,8 @@ trait CustomFieldRepositoryTrait
         $table = $this->getEntityManager()->getClassMetadata($this->getClassName())->getTableName();
         $col   = $this->getTableAlias().'.'.$field;
         $q     = $this->getEntityManager()->getConnection()->createQueryBuilder()
-                      ->select("DISTINCT $col")
-                      ->from($table, 'l');
+            ->select("DISTINCT $col")
+            ->from($table, 'l');
 
         $q->where(
             $q->expr()->andX(
@@ -234,19 +214,17 @@ trait CustomFieldRepositoryTrait
 
         if (!empty($search)) {
             $q->andWhere("$col LIKE :search")
-              ->setParameter('search', "{$search}%");
+                ->setParameter('search', "{$search}%");
         }
 
         $q->orderBy($col);
 
         if (!empty($limit)) {
             $q->setFirstResult($start)
-              ->setMaxResults($limit);
+                ->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAll();
-
-        return $results;
+        return $q->execute()->fetchAll();
     }
 
     /**
@@ -256,7 +234,7 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntities($entities)
     {
-        foreach ($entities as $k => $entity) {
+        foreach ($entities as $entity) {
             // Leads cannot be batched due to requiring the ID to update the fields
             $this->saveEntity($entity);
         }
@@ -270,6 +248,8 @@ trait CustomFieldRepositoryTrait
      */
     public function saveEntity($entity, $flush = true)
     {
+        $this->preSaveEntity($entity);
+
         $this->getEntityManager()->persist($entity);
 
         if ($flush) {
@@ -286,15 +266,18 @@ trait CustomFieldRepositoryTrait
             $fields = array_diff_key($fields, $changes);
         }
 
+        $this->prepareDbalFieldsForSave($fields);
+
         if (!empty($fields)) {
             $this->getEntityManager()->getConnection()->update($table, $fields, ['id' => $entity->getId()]);
         }
+
+        $this->postSaveEntity($entity);
     }
 
     /**
      * Function to remove non custom field columns from an arrayed lead row.
      *
-     * @param       $r
      * @param array $fixedFields
      */
     protected function removeNonFieldColumns(&$r, $fixedFields = [])
@@ -309,33 +292,152 @@ trait CustomFieldRepositoryTrait
     }
 
     /**
-     * @param $object
+     * @param array  $values
+     * @param bool   $byGroup
+     * @param string $object
      *
-     * @return array [$fields, $fixedFields]
+     * @return array
      */
-    private function getCustomFieldList($object)
+    protected function formatFieldValues($values, $byGroup = true, $object = 'lead')
     {
-        //Get the list of custom fields
-        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed')
-           ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
-           ->where('f.is_published = :published')
-           ->andWhere($fq->expr()->eq('object', ':object'))
-           ->setParameter('published', true, 'boolean')
-           ->setParameter('object', $object);
-        $results = $fq->execute()->fetchAll();
+        [$fields, $fixedFields] = $this->getCustomFieldList($object);
 
-        $fields      = [];
-        $fixedFields = [];
-        foreach ($results as $r) {
-            $fields[$r['alias']] = $r;
-            if ($r['is_fixed']) {
-                $fixedFields[$r['alias']] = $r['alias'];
+        $this->removeNonFieldColumns($values, $fixedFields);
+
+        // Reorder leadValues based on field order
+        $values = array_merge(array_flip(array_keys($fields)), $values);
+
+        $fieldValues = [];
+
+        //loop over results to put fields in something that can be assigned to the entities
+        foreach ($values as $k => $r) {
+            if (isset($fields[$k])) {
+                $r = CustomFieldHelper::fixValueType($fields[$k]['type'], $r);
+
+                if (!is_null($r)) {
+                    switch ($fields[$k]['type']) {
+                        case 'number':
+                            $r = (float) $r;
+                            break;
+                        case 'boolean':
+                            $r = (int) $r;
+                            break;
+                    }
+                }
+
+                $alias = $fields[$k]['alias'];
+
+                if ($byGroup) {
+                    $group                                = $fields[$k]['group'];
+                    $fieldValues[$group][$alias]          = $fields[$k];
+                    $fieldValues[$group][$alias]['value'] = $r;
+                } else {
+                    $fieldValues[$alias]          = $fields[$k];
+                    $fieldValues[$alias]['value'] = $r;
+                }
+
+                unset($fields[$k]);
             }
         }
 
-        unset($results);
+        if ($byGroup) {
+            //make sure each group key is present
+            $groups = $this->getFieldGroups();
+            foreach ($groups as $g) {
+                if (!isset($fieldValues[$g])) {
+                    $fieldValues[$g] = [];
+                }
+            }
+        }
 
-        return [$fields, $fixedFields];
+        return $fieldValues;
+    }
+
+    /**
+     * @param string $object
+     *
+     * @return array [$fields, $fixedFields]
+     */
+    public function getCustomFieldList($object)
+    {
+        if (empty($this->customFieldList)) {
+            //Get the list of custom fields
+            $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+            $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+                ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+                ->where('f.is_published = :published')
+                ->andWhere($fq->expr()->eq('object', ':object'))
+                ->setParameter('published', true, 'boolean')
+                ->setParameter('object', $object)
+                ->addOrderBy('f.field_order', 'asc');
+            $results = $fq->execute()->fetchAll();
+
+            $fields      = [];
+            $fixedFields = [];
+            foreach ($results as $r) {
+                $fields[$r['alias']] = $r;
+                if ($r['is_fixed']) {
+                    $fixedFields[$r['alias']] = $r['alias'];
+                }
+            }
+
+            unset($results);
+
+            $this->customFieldList = [$fields, $fixedFields];
+        }
+
+        return $this->customFieldList;
+    }
+
+    /**
+     * @param $fields
+     */
+    protected function prepareDbalFieldsForSave(&$fields)
+    {
+        // Ensure booleans are integers
+        foreach ($fields as $field => &$value) {
+            if (is_bool($value)) {
+                $fields[$field] = (int) $value;
+            }
+        }
+    }
+
+    /**
+     * Inherit and use in class if required to do something to the entity prior to persisting.
+     *
+     * @param $entity
+     */
+    protected function preSaveEntity($entity)
+    {
+        // Inherit and use if required
+    }
+
+    /**
+     * Inherit and use in class if required to do something with the entity after persisting.
+     *
+     * @param $entity
+     */
+    protected function postSaveEntity($entity)
+    {
+        // Inherit and use if required
+    }
+
+    public function setUniqueIdentifiersOperator(string $uniqueIdentifiersOperator): void
+    {
+        $this->uniqueIdentifiersOperator = $uniqueIdentifiersOperator;
+    }
+
+    public function getUniqueIdentifiersWherePart(): string
+    {
+        if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
+            return 'andWhere';
+        }
+
+        return 'orWhere';
+    }
+
+    private function uniqueIdentifiersOperatorIs(string $operator): bool
+    {
+        return $this->uniqueIdentifiersOperator === $operator;
     }
 }

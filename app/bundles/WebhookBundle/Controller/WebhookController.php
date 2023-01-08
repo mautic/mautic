@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -35,7 +26,7 @@ class WebhookController extends FormController
     /**
      * @param int $page
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function indexAction($page = 1)
     {
@@ -45,7 +36,7 @@ class WebhookController extends FormController
     /**
      * Generates new form and processes post data.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function newAction()
     {
@@ -58,7 +49,7 @@ class WebhookController extends FormController
      * @param int  $objectId
      * @param bool $ignorePost
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     public function editAction($objectId, $ignorePost = false)
     {
@@ -70,11 +61,11 @@ class WebhookController extends FormController
      *
      * @param $objectId
      *
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function viewAction($objectId)
     {
-        return parent::viewStandard($objectId, 'webhook', 'webhook');
+        return parent::viewStandard($objectId, 'webhook', 'webhook', null, 'item');
     }
 
     /**
@@ -82,7 +73,7 @@ class WebhookController extends FormController
      *
      * @param int $objectId
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
     public function cloneAction($objectId)
     {

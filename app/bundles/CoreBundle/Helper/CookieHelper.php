@@ -1,88 +1,105 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Helper;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
- * Class CookieHelper.
- */
-class CookieHelper
+class CookieHelper implements EventSubscriberInterface
 {
-    private $path     = null;
-    private $domain   = null;
-    private $secure   = false;
-    private $httponly = false;
+    private ?string $path;
+    private ?string $domain;
+    private bool $secure;
+    private bool $httponly;
+    private RequestStack $requestStack;
+    private ?Request $request = null;
 
     /**
-     * CookieHelper constructor.
-     *
-     * @param              $cookiePath
-     * @param              $cookieDomain
-     * @param              $cookieSecure
-     * @param              $cookieHttp
-     * @param RequestStack $requestStack
+     * @var array<string, Cookie>
      */
-    public function __construct($cookiePath, $cookieDomain, $cookieSecure, $cookieHttp, RequestStack $requestStack)
-    {
-        $this->path     = $cookiePath;
-        $this->domain   = $cookieDomain;
-        $this->secure   = $cookieSecure;
-        $this->httponly = $cookieHttp;
+    private array $cookies = [];
 
-        $this->request = $requestStack->getCurrentRequest();
-        if (('' === $this->secure || null === $this->secure) && $this->request) {
-            $this->secure = filter_var($requestStack->getCurrentRequest()->server->get('HTTPS', false), FILTER_VALIDATE_BOOLEAN);
-        }
+    public function __construct(string $cookiePath, ?string $cookieDomain, bool $cookieSecure, bool $cookieHttp, RequestStack $requestStack)
+    {
+        $this->path         = $cookiePath;
+        $this->domain       = $cookieDomain;
+        $this->secure       = $cookieSecure;
+        $this->httponly     = $cookieHttp;
+        $this->requestStack = $requestStack;
     }
 
     /**
-     * @param      $name
-     * @param      $value
-     * @param int  $expire
-     * @param null $path
-     * @param null $domain
-     * @param null $secure
-     * @param bool $httponly
+     * @param mixed $default
+     *
+     * @return mixed
      */
-    public function setCookie($name, $value, $expire = 1800, $path = null, $domain = null, $secure = null, $httponly = null)
+    public function getCookie(string $key, $default = null)
     {
-        if ($this->request == null || (defined('MAUTIC_TEST_ENV') && MAUTIC_TEST_ENV)) {
-            return true;
+        if (null === $this->getRequest()) {
+            return $default;
         }
 
-        setcookie(
+        return $this->getRequest()->cookies->get($key, $default);
+    }
+
+    /**
+     * @param int|string|float|bool|object|null $value
+     */
+    public function setCookie(string $name, $value, ?int $expire = 1800, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): void
+    {
+        if (null !== $value) {
+            $value = (string) $value;
+        }
+
+        $cookie = Cookie::create(
             $name,
             $value,
-            ($expire) ? time() + $expire : null,
-            ($path == null) ? $this->path : $path,
-            ($domain == null) ? $this->domain : $domain,
-            ($secure == null) ? $this->secure : $secure,
-            ($httponly == null) ? $this->httponly : $httponly
+            null !== $expire ? time() + $expire : 0,
+            $path ?? $this->path,
+            $domain ?? $this->domain,
+            $secure ?? $this->secure,
+            $httponly ?? $this->httponly,
+            false,
+            ($secure ?? $this->secure) ? Cookie::SAMESITE_LAX : null
         );
+
+        $this->cookies[$name] = $cookie;
     }
 
     /**
      * Deletes a cookie by expiring it.
-     *
-     * @param           $name
-     * @param null      $path
-     * @param null      $domain
-     * @param null      $secure
-     * @param bool|true $httponly
      */
-    public function deleteCookie($name, $path = null, $domain = null, $secure = null, $httponly = null)
+    public function deleteCookie(string $name, ?string $path = null, ?string $domain = null, ?bool $secure = null, ?bool $httponly = null): void
     {
-        $this->setCookie($name, '', time() - 3600, $path, $domain, $secure, $httponly);
+        $this->setCookie($name, '', -86400, $path, $domain, $secure, $httponly);
+    }
+
+    public function onResponse(ResponseEvent $event): void
+    {
+        foreach ($this->cookies as $cookie) {
+            $event->getResponse()->headers->setCookie($cookie);
+        }
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::RESPONSE => 'onResponse',
+        ];
+    }
+
+    private function getRequest(): ?Request
+    {
+        if (null !== $this->request) {
+            return $this->request;
+        }
+
+        return $this->request = $this->requestStack->getMasterRequest();
     }
 }

@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Sam
- * Date: 05/04/2017
- * Time: 16:58.
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
@@ -18,10 +11,9 @@ class DataExporterHelper
      *
      * Overwrite in your controller if required.
      *
-     * @param AbstractCommonModel $model
-     * @param array               $args
-     * @param callable|null       $resultsCallback
-     * @param int|null            $start
+     * @param int|null               $start
+     * @param AbstractCommonModel<T> $model
+     * @template T of object
      *
      * @return array
      */
@@ -32,7 +24,7 @@ class DataExporterHelper
 
         $results = $model->getEntities($args);
         $items   = $results['results'];
-        if (count($items) === 0) {
+        if (0 === count($items)) {
             return null;
         }
         unset($results);
@@ -43,16 +35,34 @@ class DataExporterHelper
 
         if (is_callable($resultsCallback)) {
             foreach ($items as $item) {
-                $toExport[] = $resultsCallback($item);
+                $row = array_map(function ($itemEncode) {
+                    return html_entity_decode($itemEncode, ENT_QUOTES);
+                }, $resultsCallback($item));
+
+                $toExport[] = $this->secureAgainstCsvInjection($row);
             }
         } else {
             foreach ($items as $item) {
-                $toExport[] = (array) $item;
+                $toExport[] = $this->secureAgainstCsvInjection((array) $item);
             }
         }
 
         $model->getRepository()->clear();
 
         return $toExport;
+    }
+
+    /**
+     * @return array
+     */
+    private function secureAgainstCsvInjection(array $row)
+    {
+        foreach ($row as $colNum => $colVal) {
+            if ($colVal && in_array(substr($colVal, 0, 1), ['+', '-', '=', '@'])) {
+                $row[$colNum] = ' '.$colVal;
+            }
+        }
+
+        return $row;
     }
 }

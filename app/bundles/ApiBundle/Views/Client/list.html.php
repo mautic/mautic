@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 //Check to see if the entire page should be displayed or just main content
-if ($tmpl == 'index'):
+if ('index' == $tmpl):
     $view->extend('MauticApiBundle:Client:index.html.php');
 endif;
 ?>
@@ -80,12 +80,10 @@ endif;
                     <?php echo $item->getName(); ?>
                 </td>
                 <td class="visible-md visible-lg">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $item->getPublicId(
-                    ); ?>"/>
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $view->escape($item->getPublicId()); ?>"/>
                 </td>
                 <td class="visible-md visible-lg">
-                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $item->getSecret(
-                    ); ?>"/>
+                    <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control" readonly value="<?php echo $view->escape($item->getSecret()); ?>"/>
                 </td>
                 <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
             </tr>

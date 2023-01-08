@@ -1,57 +1,39 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Exception\FileInvalidException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Validator\FileUploadValidator;
 use Oneup\UploaderBundle\Event\PostUploadEvent;
 use Oneup\UploaderBundle\Event\ValidationEvent;
 use Oneup\UploaderBundle\Uploader\Exception\ValidationException;
 use Oneup\UploaderBundle\UploadEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class UploadSubscriber.
- */
-class UploadSubscriber extends CommonSubscriber
+class UploadSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CoreParametersHelper
      */
-    protected $coreParametersHelper;
+    private $coreParametersHelper;
 
     /**
      * @var AssetModel
      */
-    protected $assetModel;
+    private $assetModel;
 
     /**
-     * @param TranslatorInterface $translator
+     * @var FileUploadValidator
      */
-    protected $translator;
+    private $fileUploadValidator;
 
-    /**
-     * UploadSubscriber constructor.
-     *
-     * @param TranslatorInterface  $translator
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param AssetModel           $assetModel
-     */
-    public function __construct(TranslatorInterface $translator, CoreParametersHelper $coreParametersHelper, AssetModel $assetModel)
+    public function __construct(CoreParametersHelper $coreParametersHelper, AssetModel $assetModel, FileUploadValidator $fileUploadValidator)
     {
-        $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->assetModel           = $assetModel;
+        $this->fileUploadValidator  = $fileUploadValidator;
     }
 
     /**
@@ -68,8 +50,6 @@ class UploadSubscriber extends CommonSubscriber
     /**
      * Moves upladed file to temporary directory where it can be found later
      * and all uploaded files in there cleared. Also sets file name to the response.
-     *
-     * @param PostUploadEvent $event
      */
     public function onPostUpload(PostUploadEvent $event)
     {
@@ -92,30 +72,28 @@ class UploadSubscriber extends CommonSubscriber
     /**
      * Validates file before upload.
      *
-     * @param ValidationEvent $event
+     * @throws ValidationException
      */
     public function onUploadValidation(ValidationEvent $event)
     {
         $file       = $event->getFile();
-        $extensions = $this->coreParametersHelper->getParameter('allowed_extensions');
+        $extensions = $this->coreParametersHelper->get('allowed_extensions');
         $maxSize    = $this->assetModel->getMaxUploadSize('B');
 
-        if ($file !== null) {
-            if ($file->getSize() > $maxSize) {
-                $message = $this->translator->trans('mautic.asset.asset.error.file.size', [
-                    '%fileSize%' => round($file->getSize() / 1048576, 2),
-                    '%maxSize%'  => round($maxSize / 1048576, 2),
-                ], 'validators');
-                throw new ValidationException($message);
-            }
+        if (null === $file) {
+            return;
+        }
 
-            if (!in_array(strtolower($file->getExtension()), array_map('strtolower', $extensions))) {
-                $message = $this->translator->trans('mautic.asset.asset.error.file.extension', [
-                    '%fileExtension%' => $file->getExtension(),
-                    '%extensions%'    => implode(', ', $extensions),
-                ], 'validators');
-                throw new ValidationException($message);
-            }
+        try {
+            $this->fileUploadValidator->checkFileSize($file->getSize(), $maxSize, 'mautic.asset.asset.error.file.size');
+        } catch (FileInvalidException $e) {
+            throw new ValidationException($e->getMessage());
+        }
+
+        try {
+            $this->fileUploadValidator->checkExtension($file->getExtension(), $extensions, 'mautic.asset.asset.error.file.extension');
+        } catch (FileInvalidException $e) {
+            throw new ValidationException($e->getMessage());
         }
     }
 }

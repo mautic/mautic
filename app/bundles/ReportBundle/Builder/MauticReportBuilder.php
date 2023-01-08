@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
@@ -21,26 +12,26 @@ use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * Mautic Report Builder class.
- */
 final class MauticReportBuilder implements ReportBuilderInterface
 {
     /**
      * @var array
      */
-    const OPERATORS = [
+    public const OPERATORS = [
         'default' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'gt'       => 'mautic.core.operator.greaterthan',
-            'gte'      => 'mautic.core.operator.greaterthanequals',
-            'lt'       => 'mautic.core.operator.lessthan',
-            'lte'      => 'mautic.core.operator.lessthanequals',
-            'neq'      => 'mautic.core.operator.notequals',
-            'like'     => 'mautic.core.operator.islike',
-            'notLike'  => 'mautic.core.operator.isnotlike',
-            'empty'    => 'mautic.core.operator.isempty',
-            'notEmpty' => 'mautic.core.operator.isnotempty',
+            'eq'         => 'mautic.core.operator.equals',
+            'gt'         => 'mautic.core.operator.greaterthan',
+            'gte'        => 'mautic.core.operator.greaterthanequals',
+            'lt'         => 'mautic.core.operator.lessthan',
+            'lte'        => 'mautic.core.operator.lessthanequals',
+            'neq'        => 'mautic.core.operator.notequals',
+            'like'       => 'mautic.core.operator.islike',
+            'notLike'    => 'mautic.core.operator.isnotlike',
+            'empty'      => 'mautic.core.operator.isempty',
+            'notEmpty'   => 'mautic.core.operator.isnotempty',
+            'contains'   => 'mautic.core.operator.contains',
+            'startsWith' => 'mautic.core.operator.starts.with',
+            'endsWith'   => 'mautic.core.operator.ends.with',
         ],
         'bool' => [
             'eq'  => 'mautic.core.operator.equals',
@@ -63,24 +54,27 @@ final class MauticReportBuilder implements ReportBuilderInterface
             'neq' => 'mautic.core.operator.notequals',
         ],
         'text' => [
-            'eq'       => 'mautic.core.operator.equals',
-            'neq'      => 'mautic.core.operator.notequals',
-            'empty'    => 'mautic.core.operator.isempty',
-            'notEmpty' => 'mautic.core.operator.isnotempty',
-            'like'     => 'mautic.core.operator.islike',
-            'notLike'  => 'mautic.core.operator.isnotlike',
+            'eq'         => 'mautic.core.operator.equals',
+            'neq'        => 'mautic.core.operator.notequals',
+            'empty'      => 'mautic.core.operator.isempty',
+            'notEmpty'   => 'mautic.core.operator.isnotempty',
+            'like'       => 'mautic.core.operator.islike',
+            'notLike'    => 'mautic.core.operator.isnotlike',
+            'contains'   => 'mautic.core.operator.contains',
+            'startsWith' => 'mautic.core.operator.starts.with',
+            'endsWith'   => 'mautic.core.operator.ends.with',
         ],
     ];
 
     /**
      * Standard Channel Columns.
      */
-    const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
-    const CHANNEL_COLUMN_NAME            = 'channel.name';
-    const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
-    const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
-    const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
-    const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
+    public const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+    public const CHANNEL_COLUMN_NAME            = 'channel.name';
+    public const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+    public const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+    public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
     /**
      * @var Connection
@@ -88,7 +82,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     private $db;
 
     /**
-     * @var \Mautic\ReportBundle\Entity\Report
+     * @var Report
      */
     private $entity;
 
@@ -107,14 +101,6 @@ final class MauticReportBuilder implements ReportBuilderInterface
      */
     private $channelListHelper;
 
-    /**
-     * MauticReportBuilder constructor.
-     *
-     * @param EventDispatcherInterface $dispatcher
-     * @param Connection               $db
-     * @param Report                   $entity
-     * @param ChannelListHelper        $channelListHelper
-     */
     public function __construct(EventDispatcherInterface $dispatcher, Connection $db, Report $entity, ChannelListHelper $channelListHelper)
     {
         $this->entity            = $entity;
@@ -124,7 +110,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @return QueryBuilder
      *
      * @throws InvalidReportQueryException
      */
@@ -132,7 +118,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $queryBuilder = $this->configureBuilder($options);
 
-        if ($queryBuilder->getType() !== QueryBuilder::SELECT) {
+        if (QueryBuilder::SELECT !== $queryBuilder->getType()) {
             throw new InvalidReportQueryException('Only SELECT statements are valid');
         }
 
@@ -150,38 +136,67 @@ final class MauticReportBuilder implements ReportBuilderInterface
     }
 
     /**
-     * Configures builder.
-     *
      * This method configures the ReportBuilder. It has to return a configured Doctrine DBAL QueryBuilder.
      *
      * @param array $options Options array
      *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
+     * @return QueryBuilder
      */
-    protected function configureBuilder(array $options)
+    private function configureBuilder(array $options)
     {
+        $event = new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper);
+
         // Trigger the REPORT_ON_GENERATE event to initialize the QueryBuilder
-        /** @var ReportGeneratorEvent $event */
-        $event = $this->dispatcher->dispatch(
-            ReportEvents::REPORT_ON_GENERATE,
-            new ReportGeneratorEvent($this->entity, $options, $this->db->createQueryBuilder(), $this->channelListHelper)
-        );
+        $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_GENERATE);
 
         // Build the QUERY
         $queryBuilder = $event->getQueryBuilder();
 
         // Set Content Template
         $this->contentTemplate = $event->getContentTemplate();
+        $standardFilters       = $this->entity->getFilters();
 
-        // Build WHERE clause
-        $filtersApplied = false;
+        // Setup filters
         if (isset($options['dynamicFilters'])) {
-            $filtersApplied = $this->applyFilters($options['dynamicFilters'], $queryBuilder, $options['filters']);
+            $dynamicFilters = $options['dynamicFilters'];
+
+            foreach ($dynamicFilters as $key => $dynamicFilter) {
+                foreach ($standardFilters as $i => $filter) {
+                    if ($filter['column'] === $key && $filter['dynamic']) {
+                        $value     = $dynamicFilter['value'];
+                        $condition = $filter['condition'];
+
+                        switch ($condition) {
+                            case 'startsWith':
+                                $value = $value.'%';
+                                break;
+                            case 'endsWith':
+                                $value = '%'.$value;
+                                break;
+                            case 'like':
+                            case 'notLike':
+                            case 'contains':
+                                if ('notLike' === $condition) {
+                                    $dynamicFilter['expr'] = 'notLike';
+                                }
+
+                                $value = '%'.$value.'%';
+                                break;
+                        }
+
+                        $dynamicFilter['value'] = $value;
+
+                        // Overwrite the standard filter with the dynamic
+                        $standardFilters[$i] = array_merge($filter, $dynamicFilter);
+                    }
+                }
+            }
         }
 
-        if (!$filtersApplied) {
+        // Build WHERE clause
+        if (!empty($standardFilters)) {
             if (!$filterExpr = $event->getFilterExpression()) {
-                $this->applyFilters($this->entity->getFilters(), $queryBuilder, $options['filters']);
+                $this->applyFilters($standardFilters, $queryBuilder, $options['filters'], $event);
             } else {
                 $queryBuilder->andWhere($filterExpr);
             }
@@ -190,7 +205,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
         // Build ORDER BY clause
         if (!empty($options['order'])) {
             if (is_array($options['order'])) {
-                if (isset($o['column'])) {
+                if (isset($options['order']['column'])) {
                     $queryBuilder->orderBy($options['order']['column'], $options['order']['direction']);
                 } elseif (!empty($options['order'][0][1])) {
                     list($column, $dir) = $options['order'];
@@ -205,7 +220,9 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         } elseif ($order = $this->entity->getTableOrder()) {
             foreach ($order as $o) {
-                if (!empty($o['column'])) {
+                if (!empty($options['columns'][$o['column']]['formula'])) {
+                    $queryBuilder->orderBy($options['columns'][$o['column']]['formula'], $o['direction']);
+                } elseif (!empty($o['column'])) {
                     $queryBuilder->orderBy($o['column'], $o['direction']);
                 }
             }
@@ -213,23 +230,27 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
         // Build GROUP BY
         if ($groupByOptions = $this->entity->getGroupBy()) {
+            $groupByColumns = [];
+
             foreach ($groupByOptions as $groupBy) {
                 if (isset($options['columns'][$groupBy])) {
                     $fieldOptions = $options['columns'][$groupBy];
-                    $columns[]    = (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $groupBy;
+
+                    if (isset($fieldOptions['groupByFormula'])) {
+                        $groupByColumns[] = $fieldOptions['groupByFormula'];
+                    } elseif (isset($fieldOptions['formula'])) {
+                        $groupByColumns[] = $fieldOptions['formula'];
+                    } else {
+                        $groupByColumns[] = $groupBy;
+                    }
                 }
             }
-            $groupByColumns = implode(',', $columns);
+
             $queryBuilder->addGroupBy($groupByColumns);
         } elseif (!empty($options['groupby']) && empty($groupByOptions)) {
-            if (is_array($options['groupby'])) {
-                foreach ($options['groupby'] as $groupBy) {
-                    $queryBuilder->addGroupBy($groupBy);
-                }
-            } else {
-                $queryBuilder->groupBy($options['groupby']);
-            }
+            $queryBuilder->addGroupBy($options['groupby']);
         }
+
         // Build LIMIT clause
         if (!empty($options['limit'])) {
             $queryBuilder->setFirstResult($options['start'])
@@ -246,57 +267,80 @@ final class MauticReportBuilder implements ReportBuilderInterface
             }
         }
 
-        // Generate a count query in case a formula needs total number
-        $countQuery = clone $queryBuilder;
-        $countQuery->select('COUNT(*) as count');
-        $countSql = sprintf('(%s)', $countQuery->getSQL());
+        $selectColumns = [];
 
         // Build SELECT clause
-        if (!$selectColumns = $event->getSelectColumns()) {
-            $fields = $this->entity->getColumns();
+        if (!$event->getSelectColumns()) {
+            $fields             = $this->entity->getColumns();
+            $groupByColumns     = $queryBuilder->getQueryPart('groupBy');
+            $groupByColumnsKeys = array_flip($groupByColumns);
+
             foreach ($fields as $field) {
                 if (isset($options['columns'][$field])) {
                     $fieldOptions = $options['columns'][$field];
-                    $select       = '';
 
                     if (array_key_exists('channelData', $fieldOptions)) {
-                        $select .= $this->buildCaseSelect($fieldOptions['channelData']);
+                        $selectText = $this->buildCaseSelect($fieldOptions['channelData']);
                     } else {
-                        $select .= (isset($fieldOptions['formula'])) ? $fieldOptions['formula'] : $field;
+                        // If there is a group by, and this field has groupByFormula
+                        if (isset($fieldOptions['groupByFormula']) && isset($groupByColumnsKeys[$fieldOptions['groupByFormula']])) {
+                            $selectText = $fieldOptions['groupByFormula'];
+                        } elseif (isset($fieldOptions['formula'])) {
+                            $selectText = $fieldOptions['formula'];
+                        } else {
+                            $selectText = $this->sanitizeColumnName($field);
+                        }
                     }
 
-                    if (strpos($select, '{{count}}')) {
-                        $select = str_replace('{{count}}', $countSql, $select);
+                    // support for prefix and suffix to value in query
+                    $prefix     = isset($fieldOptions['prefix']) ? $fieldOptions['prefix'] : '';
+                    $suffix     = isset($fieldOptions['suffix']) ? $fieldOptions['suffix'] : '';
+                    if ($prefix || $suffix) {
+                        $selectText = 'CONCAT(\''.$prefix.'\', '.$selectText.',\''.$suffix.'\')';
                     }
 
                     if (isset($fieldOptions['alias'])) {
-                        $select .= ' AS '.$fieldOptions['alias'];
+                        $selectText .= ' AS '.$fieldOptions['alias'];
                     }
 
-                    $selectColumns[] = $select;
+                    $selectColumns[] = $selectText;
                 }
             }
         }
 
-        $queryBuilder->addSelect(implode(', ', $selectColumns));
+        // Generate a count query in case a formula needs total number
+        $countQuery = clone $queryBuilder;
+        $countQuery->select('COUNT(*) as count');
+
+        $countSql = sprintf('(%s)', $countQuery->getSQL());
+
+        // Replace {{count}} with the count query
+        array_walk($selectColumns, function (&$columnValue, $columnIndex) use ($countSql) {
+            if (false !== strpos($columnValue, '{{count}}')) {
+                $columnValue = str_replace('{{count}}', $countSql, $columnValue);
+            }
+        });
+
+        $queryBuilder->addSelect($selectColumns);
+
         // Add Aggregators
-        $aggregators = $this->entity->getAggregators();
+        $aggregators      = $this->entity->getAggregators();
+        $aggregatorSelect = [];
+
         if ($aggregators && $groupByOptions) {
             foreach ($aggregators as $aggregator) {
-                $column = '';
-                if (isset($options['columns'][$aggregator['column']])) {
-                    $fieldOptions = $options['columns'][$aggregator['column']];
-                    if ($aggregator['function'] == 'AVG') {
-                        $field = (isset($fieldOptions['formula'])) ? 'ROUND('.$aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].'))' : 'ROUND('.$aggregator['function'].'(DISTINCT '.$aggregator['column'].'))';
-                    } else {
-                        $field = (isset($fieldOptions['formula'])) ? $aggregator['function'].'(DISTINCT '.$fieldOptions['formula'].')' : $aggregator['function'].'(DISTINCT '.$aggregator['column'].')';
-                    }
-                    $column .= $field;
+                if (isset($options['columns'][$aggregator['column']]) && isset($options['columns'][$aggregator['column']]['formula'])) {
+                    $columnSelect = $options['columns'][$aggregator['column']]['formula'];
+                } else {
+                    $columnSelect = $aggregator['column'];
                 }
 
-                $formula = $column." as '".$aggregator['function'].' '.$aggregator['column']."'";
-                $queryBuilder->addSelect($formula);
+                $selectText = sprintf('%s(%s)', $aggregator['function'], $columnSelect);
+
+                $aggregatorSelect[] = sprintf("%s AS '%s %s'", $selectText, $aggregator['function'], $aggregator['column']);
             }
+
+            $queryBuilder->addSelect($aggregatorSelect);
         }
 
         return $queryBuilder;
@@ -313,50 +357,77 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $case = 'CASE';
 
-        foreach ($channelData as $channel => $data) {
+        foreach ($channelData as $data) {
             $case .= ' WHEN '.$data['column'].' IS NOT NULL THEN '.$data['column'];
         }
 
-        $case .= ' ELSE NULL END ';
-
-        return $case;
+        return $case.' ELSE NULL END ';
     }
 
     /**
-     * @param array        $filters
-     * @param QueryBuilder $queryBuilder
-     * @param array        $filterDefinitions
-     *
      * @return bool
      */
-    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions)
+    private function applyFilters(array $filters, QueryBuilder $queryBuilder, array $filterDefinitions, ReportGeneratorEvent $event)
     {
-        $expr       = $queryBuilder->expr();
-        $filterExpr = $expr->andX();
+        $expr      = $queryBuilder->expr();
+        $groups    = [];
+        $groupExpr = $queryBuilder->expr()->andX();
 
         if (count($filters)) {
-            foreach ($filters as $filter) {
+            foreach ($filters as $i => $filter) {
                 $exprFunction = isset($filter['expr']) ? $filter['expr'] : $filter['condition'];
-                $paramName    = InputHelper::alphanum($filter['column']);
+                $paramName    = sprintf('i%dc%s', $i, InputHelper::alphanum($filter['column']));
+
+                if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
+                    if ($groupExpr->count()) {
+                        $groups[]  = $groupExpr;
+                        $groupExpr = $queryBuilder->expr()->andX();
+                    }
+                }
+
+                if ('tag' === $filter['column']) {
+                    $event->applyTagFilter($groupExpr, $filter);
+                    continue;
+                }
+
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $filterExpr->add(
+                        $groupExpr->add(
                             $expr->isNotNull($filter['column'])
                         );
-                        $filterExpr->add(
-                            $expr->neq($filter['column'], $expr->literal(''))
-                        );
+                        if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
+                            $groupExpr->add(
+                                $expr->neq($filter['column'], $expr->literal(''))
+                            );
+                        }
                         break;
                     case 'empty':
-                        $filterExpr->add(
-                            $expr->isNull($filter['column'])
+                        $expression = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column'])
                         );
-                        $filterExpr->add(
-                            $expr->eq($filter['column'], $expr->literal(''))
+                        if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
+                            $expression->add(
+                                $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
+                            );
+                        }
+
+                        $groupExpr->add(
+                            $expression
+                        );
+                        break;
+                    case 'neq':
+                        $columnValue = ":$paramName";
+                        $expression  = $queryBuilder->expr()->orX(
+                            $queryBuilder->expr()->isNull($filter['column']),
+                            $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
+                        );
+                        $queryBuilder->setParameter($paramName, $filter['value']);
+                        $groupExpr->add(
+                            $expression
                         );
                         break;
                     default:
-                        if (trim($filter['value']) == '') {
+                        if ('' == trim($filter['value'])) {
                             // Ignore empty
                             break;
                         }
@@ -372,7 +443,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             case 'boolean':
                                 if ((int) $filter['value'] > 1) {
                                     // Ignore the "reset" value of "2"
-                                    break;
+                                    break 2;
                                 }
 
                                 $queryBuilder->setParameter($paramName, $filter['value'], 'boolean');
@@ -387,15 +458,54 @@ final class MauticReportBuilder implements ReportBuilderInterface
                                 $columnValue = (int) $filter['value'];
                                 break;
 
+                            case 'string':
+                            case 'email':
+                            case 'url':
+                                switch ($exprFunction) {
+                                    case 'startsWith':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = $filter['value'].'%';
+                                        break;
+                                    case 'endsWith':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = '%'.$filter['value'];
+                                        break;
+                                    case 'contains':
+                                        $exprFunction    = 'like';
+                                        $filter['value'] = '%'.$filter['value'].'%';
+                                        break;
+                                }
+
+                                $queryBuilder->setParameter($paramName, $filter['value']);
+                                break;
+
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-
-                    $filterExpr->add(
-                        $expr->{$exprFunction}($filter['column'], $columnValue)
-                    );
+                        $groupExpr->add(
+                            $expr->{$exprFunction}($filter['column'], $columnValue)
+                        );
                 }
             }
+        }
+
+        // Get the last of the filters
+        if ($groupExpr->count()) {
+            $groups[] = $groupExpr;
+        }
+
+        if (1 === count($groups)) {
+            // Only one andX expression
+            $filterExpr = $groups[0];
+        } elseif (count($groups) > 1) {
+            // Sets of expressions grouped by OR
+            $orX = $queryBuilder->expr()->orX();
+            $orX->addMultiple($groups);
+
+            // Wrap in a andX for other functions to append
+            $filterExpr = $queryBuilder->expr()->andX($orX);
+        } else {
+            $filterExpr = $groupExpr;
         }
 
         if ($filterExpr->count()) {
@@ -405,5 +515,28 @@ final class MauticReportBuilder implements ReportBuilderInterface
         }
 
         return false;
+    }
+
+    /**
+     * We must sanitize the table aliases as they might be auto generated.
+     * Aliases like "8e296a06" makes MySql to think it is a number.
+     * Expects param in format "table_alias.column_name".
+     */
+    private function sanitizeColumnName(string $fullColumnName): string
+    {
+        [$tableAlias, $columnName] = explode('.', $fullColumnName);
+
+        return "`{$tableAlias}`.`{$columnName}`";
+    }
+
+    /**
+     * @param mixed[] $filter
+     * @param mixed[] $filterDefinitions
+     */
+    private function doesColumnSupportEmptyValue(array $filter, array $filterDefinitions): bool
+    {
+        $type = $filterDefinitions[$filter['column']]['type'] ?? null;
+
+        return !in_array($type, ['date', 'datetime'], true);
     }
 }

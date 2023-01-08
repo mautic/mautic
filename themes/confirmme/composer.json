@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-confirmme",
+  "description": "Mautic Confirmme Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "confirmme"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

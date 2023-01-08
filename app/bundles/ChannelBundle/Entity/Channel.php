@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -53,9 +44,6 @@ class Channel extends CommonEntity
      */
     private $isEnabled = false;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -187,8 +175,6 @@ class Channel extends CommonEntity
     }
 
     /**
-     * @param Message $message
-     *
      * @return Channel
      */
     public function setMessage(Message $message)
@@ -207,8 +193,6 @@ class Channel extends CommonEntity
     }
 
     /**
-     * @param array $properties
-     *
      * @return Channel
      */
     public function setProperties(array $properties)

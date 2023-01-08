@@ -1,67 +1,47 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Model;
 
-use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Mautic\CampaignBundle\Event\CampaignScheduledEvent;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Executioner\Scheduler\EventScheduler;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\LeadBundle\Entity\Lead;
 
 /**
- * Class EventLogModel.
+ * @extends AbstractCommonModel<LeadEventLog>
  */
 class EventLogModel extends AbstractCommonModel
 {
-    /**
-     * @var EventModel
-     */
-    protected $eventModel;
+    protected EventModel $eventModel;
 
-    /**
-     * @var CampaignModel
-     */
-    protected $campaignModel;
+    protected CampaignModel $campaignModel;
 
-    /**
-     * @var IpLookupHelper
-     */
-    protected $ipLookupHelper;
+    protected IpLookupHelper $ipLookupHelper;
 
-    /**
-     * EventLogModel constructor.
-     *
-     * @param EventModel     $eventModel
-     * @param CampaignModel  $campaignModel
-     * @param IpLookupHelper $ipLookupHelper
-     */
-    public function __construct(EventModel $eventModel, CampaignModel $campaignModel, IpLookupHelper $ipLookupHelper)
-    {
+    protected EventScheduler $eventScheduler;
+
+    public function __construct(
+        EventModel $eventModel,
+        CampaignModel $campaignModel,
+        IpLookupHelper $ipLookupHelper,
+        EventScheduler $eventScheduler
+    ) {
         $this->eventModel     = $eventModel;
         $this->campaignModel  = $campaignModel;
         $this->ipLookupHelper = $ipLookupHelper;
+        $this->eventScheduler = $eventScheduler;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\CampaignBundle\Entity\LeadEventLogRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadEventLogRepository
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        $result = $this->em->getRepository(LeadEventLog::class);
+        \assert($result instanceof LeadEventLogRepository);
+
+        return $result;
     }
 
     /**
@@ -74,9 +54,6 @@ class EventLogModel extends AbstractCommonModel
         return 'campaign:campaigns';
     }
 
-    /**
-     * @param array $args
-     */
     public function getEntities(array $args = [])
     {
         /** @var LeadEventLog[] $logs */
@@ -105,10 +82,6 @@ class EventLogModel extends AbstractCommonModel
     }
 
     /**
-     * @param Event $event
-     * @param Lead  $contact
-     * @param array $parameters
-     *
      * @return string|LeadEventLog
      */
     public function updateContactEvent(Event $event, Lead $contact, array $parameters)
@@ -117,14 +90,22 @@ class EventLogModel extends AbstractCommonModel
 
         // Check that contact is part of the campaign
         $membership = $campaign->getContactMembership($contact);
-        if (count($membership) === 0) {
-            return 'mautic.campaign.error.contact_not_in_campaign';
+        if (0 === count($membership)) {
+            return $this->translator->trans(
+                'mautic.campaign.error.contact_not_in_campaign',
+                ['%campaign%' => $campaign->getId(), '%contact%' => $contact->getId()],
+                'flashes'
+            );
         }
 
         /** @var \Mautic\CampaignBundle\Entity\Lead $m */
         foreach ($membership as $m) {
             if ($m->getManuallyRemoved()) {
-                return 'mautic.campaign.error.contact_not_in_campaign';
+                return $this->translator->trans(
+                    'mautic.campaign.error.contact_not_in_campaign',
+                    ['%campaign%' => $campaign->getId(), '%contact%' => $contact->getId()],
+                    'flashes'
+                );
             }
         }
 
@@ -134,11 +115,28 @@ class EventLogModel extends AbstractCommonModel
         if (count($logs)) {
             $log = $logs[0];
             if ($log->getDateTriggered()) {
-                return 'mautic.campaign.error.event_already_executed';
+                return $this->translator->trans(
+                    'mautic.campaign.error.event_already_executed',
+                    [
+                        '%campaign%'      => $campaign->getId(),
+                        '%event%'         => $event->getId(),
+                        '%contact%'       => $contact->getId(),
+                        '%dateTriggered%' => $log->getDateTriggered()->format(\DateTimeInterface::ATOM),
+                    ],
+                    'flashes'
+                );
             }
         } else {
             if (!isset($parameters['triggerDate']) && !isset($parameters['dateTriggered'])) {
-                return 'mautic.campaign.error.event_must_be_scheduled';
+                return $this->translator->trans(
+                    'mautic.campaign.error.event_must_be_scheduled',
+                    [
+                        '%campaign%' => $campaign->getId(),
+                        '%event%'    => $event->getId(),
+                        '%contact%'  => $contact->getId(),
+                    ],
+                    'flashes'
+                );
             }
 
             $log = (new LeadEventLog())
@@ -156,16 +154,26 @@ class EventLogModel extends AbstractCommonModel
                     break;
                 case 'triggerDate':
                     if (Event::TYPE_DECISION === $event->getEventType()) {
-                        return 'mautic.campaign.error.decision_cannot_be_scheduled';
+                        return $this->translator->trans(
+                            'mautic.campaign.error.decision_cannot_be_scheduled',
+                            [
+                                '%campaign%' => $campaign->getId(),
+                                '%event%'    => $event->getId(),
+                                '%contact%'  => $contact->getId(),
+                            ],
+                            'flashes'
+                        );
                     }
                     $log->setTriggerDate(
                         new \DateTime($value)
                     );
                     break;
                 case 'ipAddress':
-                    $log->setIpAddress(
-                        $this->ipLookupHelper->getIpAddress($value)
-                    );
+                    if (!defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED')) {
+                        $log->setIpAddress(
+                            $this->ipLookupHelper->getIpAddress($value)
+                        );
+                    }
                     break;
                 case 'metadata':
                     $metadata = $log->getMetadata();
@@ -197,27 +205,14 @@ class EventLogModel extends AbstractCommonModel
         return [$log, $created];
     }
 
-    /**
-     * @param $entity
-     */
     public function saveEntity(LeadEventLog $entity)
     {
-        $eventSettings = $this->campaignModel->getEvents();
-        if ($this->dispatcher->hasListeners(CampaignEvents::ON_EVENT_SCHEDULED)) {
-            $event = $entity->getEvent();
-            $args  = [
-                'eventSettings'   => $eventSettings[$event->getEventType()][$event->getType()],
-                'eventDetails'    => null,
-                'event'           => $event->convertToArray(),
-                'lead'            => $entity->getLead(),
-                'systemTriggered' => false,
-                'dateScheduled'   => $entity->getTriggerDate(),
-            ];
-
-            $scheduledEvent = new CampaignScheduledEvent($args, $entity);
-            $this->dispatcher->dispatch(CampaignEvents::ON_EVENT_SCHEDULED, $scheduledEvent);
+        $triggerDate = $entity->getTriggerDate();
+        if (null === $triggerDate) {
+            // Reschedule for now
+            $triggerDate = new \DateTime();
         }
 
-        $this->getRepository()->saveEntity($entity);
+        $this->eventScheduler->reschedule($entity, $triggerDate);
     }
 }

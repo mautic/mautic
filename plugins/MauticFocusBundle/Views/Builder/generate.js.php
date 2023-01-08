@@ -11,18 +11,18 @@
 $style          = $focus['style'];
 $props          = $focus['properties'];
 $useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
-$useUnloadEvent = ($props['when'] == 'leave');
+$useUnloadEvent = ('leave' == $props['when']);
 $useTimeout     = (int) $props['timeout'];
-if ($props['when'] == '5seconds') {
+if ('5seconds' == $props['when']) {
     $useTimeout = 5;
-} elseif ($props['when'] == 'minute') {
+} elseif ('minute' == $props['when']) {
     $useTimeout = 60;
 }
 if ($useTimeout) {
     $timeout = $useTimeout * 1000;
 }
 
-$debug          = ($app->getEnvironment() == 'dev') ? 'true' : 'false';
+$debug          = ('dev' == $app->getEnvironment()) ? 'true' : 'false';
 $animate        = (!isset($props['animate']) || !empty($props['animate']));
 $linkActivation = (!isset($props['link_activation']) || !empty($props['link_activation']));
 
@@ -38,6 +38,7 @@ $cssContent = $view->render(
     'MauticFocusBundle:Builder:style.less.php',
     [
         'preview' => $preview,
+        'focus'   => $focus,
     ]
 );
 $cssContent = $view->escape($cssContent, 'js');
@@ -69,7 +70,6 @@ switch ($style) {
         break;
 }
 ?>
-
 (function (window) {
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;
@@ -79,7 +79,7 @@ switch ($style) {
         var Focus = {
             debug: <?php echo $debug; ?>,
             modalsDismissed: {},
-            ignoreConverted: <?php echo ($focus['type'] !== 'notification' && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
+            ignoreConverted: <?php echo ('notification' !== $focus['type'] && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
 
             // Initialize the focus
             initialize: function () {
@@ -95,22 +95,39 @@ switch ($style) {
 
             // Register click events for toggling bar, closing windows, etc
             registerClickEvents: function () {
-                <?php if ($style == 'bar'): ?>
+                <?php if ('bar' == $style): ?>
+                var isTop = Focus.hasClass(Focus.iframeFocus, 'mf-bar-top');
+                Focus.setDefaultBarPosition(isTop);
+
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
 
-                collapser[0].addEventListener('click', function () {
-                    Focus.toggleBarCollapse(collapser[0], false);
-                });
+                if (collapser[0]) {
+                    collapser[0].addEventListener('click', function () {
+                        Focus.toggleBarCollapse(collapser[0], false);
+                    });
+                }
 
                 <?php else: ?>
                 var closer = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>-close');
                 var aTag = closer[0].getElementsByTagName('a');
+                var container = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>');
+
+                container.onclick = function(e) {
+                    if (e) { e.stopPropagation(); }
+                    else { window.event.cancelBubble = true; }
+                };
+                document.onclick = function() {
+                    aTag[0].click();
+                };
+
                 aTag[0].addEventListener('click', function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
                     Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
 
                     // Remove iframe
-                    Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    if (Focus.iframe.parentNode) {
+                        Focus.iframe.parentNode.removeChild(Focus.iframe);
+                    }
 
                     var overlays = document.getElementsByClassName('mf-modal-overlay-<?php echo $focus['id']; ?>');
                     if (overlays.length) {
@@ -119,14 +136,14 @@ switch ($style) {
                 });
                 <?php endif; ?>
 
-                <?php if ($focus['type'] == 'click'): ?>
+                <?php if ('link' == $focus['type']): ?>
                 var links = Focus.iframeDoc.getElementsByClassName('mf-link');
                 if (links.length) {
                     links[0].addEventListener('click', function (event) {
                         Focus.convertVisitor();
                     });
                 }
-                <?php elseif ($focus['type'] == 'form'): ?>
+                <?php elseif ('form' == $focus['type']): ?>
                 var buttons = Focus.iframeDoc.getElementsByClassName('mauticform-button');
                 if (buttons.length) {
                     buttons[0].addEventListener('click', function (event) {
@@ -135,7 +152,13 @@ switch ($style) {
                 }
                 <?php endif; ?>
             },
-
+            setDefaultBarPosition: function (isTop) {
+                if (isTop) {
+                    Focus.iframe.style.marginTop = 0;
+                }else {
+                    Focus.iframe.style.marginBottom = 0;
+                }
+            },
             toggleBarCollapse: function (collapser, useCookie) {
                 var svg = collapser.getElementsByTagName('svg');
                 var g = svg[0].getElementsByTagName('g');
@@ -166,12 +189,7 @@ switch ($style) {
                 var isTop = Focus.hasClass(Focus.iframeFocus, 'mf-bar-top');
                 if ((!isTop && newDirection == 90) || (isTop && newDirection == -90)) {
                     // Open it up
-                    if (isTop) {
-                        Focus.iframe.style.marginTop = 0;
-                    } else {
-                        Focus.iframe.style.marginBottom = 0;
-                    }
-
+                    Focus.setDefaultBarPosition(isTop);
                     Focus.removeClass(collapser, 'mf-bar-collapsed');
                     Focus.enableIframeResizer();
 
@@ -201,37 +219,37 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('scroll event registered');
 
-                    <?php if ($useTimeout): ?>
-                    if (Focus.debug)
-                        console.log('timeout event registered');
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
 
-                    setTimeout(function () {
-                        window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
-                    }, <?php echo $timeout; ?>);
+                setTimeout(function () {
+                    window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+                }, <?php echo $timeout; ?>);
 
-                    <?php else: ?>
+                <?php else: ?>
 
-                     window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
+                window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
 
-                   <?php endif; ?>
+                <?php endif; ?>
 
                 <?php elseif ($useUnloadEvent): ?>
                 if (Focus.debug)
                     console.log('show when visitor leaves');
 
-                    <?php if ($useTimeout): ?>
-                    if (Focus.debug)
-                        console.log('timeout event registered');
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
 
-                    setTimeout(function () {
-                        document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
-                    }, <?php echo $timeout; ?>);
-
-                    <?php else: ?>
-
+                setTimeout(function () {
                     document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+                }, <?php echo $timeout; ?>);
 
-                    <?php endif; ?>
+                <?php else: ?>
+
+                document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
+
+                <?php endif; ?>
 
                 // Add a listener to every link
                 <?php if ($linkActivation): ?>
@@ -256,21 +274,21 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('show immediately');
 
-                    <?php if ($useTimeout): ?>
-                    if (Focus.debug)
-                        console.log('timeout event registered');
+                <?php if ($useTimeout): ?>
+                if (Focus.debug)
+                    console.log('timeout event registered');
 
-                    setTimeout(function () {
-                        // Give a slight delay to allow browser to process style injection into header
-                        Focus.engageVisitor();
-                    }, <?php echo $timeout; ?>);
-
-                    <?php else: ?>
-
+                setTimeout(function () {
                     // Give a slight delay to allow browser to process style injection into header
                     Focus.engageVisitor();
+                }, <?php echo $timeout; ?>);
 
-                    <?php endif; ?>
+                <?php else: ?>
+
+                // Give a slight delay to allow browser to process style injection into header
+                Focus.engageVisitor();
+
+                <?php endif; ?>
 
                 <?php endif; ?>
             },
@@ -420,25 +438,31 @@ switch ($style) {
 
                 // Inject content into iframe
                 Focus.iframeDoc.open();
-                <?php
-                $content = $view->render(
-                    'MauticFocusBundle:Builder:content.html.php',
-                    [
-                        'focus'    => $focus,
-                        'form'     => $form,
-                        'clickUrl' => $clickUrl,
-                    ]
-                );
-
-                if (empty($ignoreMinify)) {
-                    $content = \Minify_HTML::minify($content);
-                }
-
-                $content = $view->escape($content, 'js');
-                ?>
-
-                Focus.iframeDoc.write("<?php echo $content; ?>");
+                Focus.iframeDoc.write("{focus_content}");
                 Focus.iframeDoc.close();
+
+                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
+
+                Focus.iframe.onload = function() {
+                    if (Focus.debug)
+                        console.log('iframe loaded for '+Focus.iframe.getAttribute('src'));
+
+                    // Resize iframe
+                    if (Focus.enableIframeResizer()) {
+                        // Give iframe chance to resize
+                        setTimeout(function () {
+                            if (animate) {
+                                Focus.addClass(Focus.iframe, "mf-animate");
+                            }
+                            Focus.addClass(Focus.iframe, "mf-loaded");
+                        }, 35);
+                    } else {
+                        if (animate) {
+                            Focus.addClass(Focus.iframe, "mf-animate");
+                        }
+                        Focus.addClass(Focus.iframe, "mf-loaded");
+                    }
+                }
 
                 // Set body margin to 0
                 Focus.iframeDoc.getElementsByTagName('body')[0].style.margin = 0;
@@ -447,6 +471,7 @@ switch ($style) {
                 var move = Focus.iframeDoc.getElementsByClassName('mf-move-to-parent');
                 for (var i = 0; i < move.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
+                    Focus.addClass(move[i], 'mf-moved-<?php echo $focus['id']; ?>');
                     bodyFirstChild.parentNode.insertBefore(move[i], Focus.iframe);
                 }
 
@@ -455,6 +480,7 @@ switch ($style) {
                 for (var i = 0; i < copy.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
                     var clone = copy[i].cloneNode(true);
+                    Focus.addClass(clone, 'mf-moved-<?php echo $focus['id']; ?>');
                     bodyFirstChild.parentNode.insertBefore(clone, Focus.iframe);
                 }
 
@@ -468,24 +494,7 @@ switch ($style) {
                 // Register events
                 Focus.registerClickEvents();
 
-                // Resize iframe
-                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
-                if (Focus.enableIframeResizer()) {
-                    // Give iframe chance to resize
-                    setTimeout(function () {
-                        if (animate) {
-                            Focus.addClass(Focus.iframe, "mf-animate");
-                        }
-                        Focus.addClass(Focus.iframe, "mf-loaded");
-                    }, 35);
-                } else {
-                    if (animate) {
-                        Focus.addClass(Focus.iframe, "mf-animate");
-                    }
-                    Focus.addClass(Focus.iframe, "mf-loaded");
-                }
-
-                <?php if ($props['when'] == 'leave'): ?>
+                <?php if ('leave' == $props['when']): ?>
                 // Ensure user can leave
                 document.documentElement.removeEventListener('mouseleave', Focus.engageVisitor);
                 <?php endif; ?>
@@ -495,9 +504,9 @@ switch ($style) {
                     console.log('mautic_focus_<?php echo $focus['id']; ?> cookie set for ' + now);
 
                 Focus.cookies.removeItem('mautic_focus_<?php echo $focus['id']; ?>');
-                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity);
+                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity, '/');
 
-                <?php if ($style == 'bar'): ?>
+                <?php if ('bar' == $style): ?>
                 var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
 
                 if (animate) {
@@ -515,6 +524,10 @@ switch ($style) {
 
             // Enable iframe resizer
             enableIframeResizer: function () {
+                if (typeof Focus.iframeResizerEnabled !== 'undefined') {
+                    return true;
+                }
+
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
                 Focus.iframeHeight = 0;
                 Focus.iframeWidth = 0;
@@ -526,13 +539,12 @@ switch ($style) {
                         useHeight += 10;
                         useHeight = useHeight + 'px';
 
-
                         if (Focus.debug) {
                             console.log('window inner height = ' + window.innerHeight);
                             console.log('iframe offset height = ' + Focus.iframeFocus.offsetHeight);
                             console.log('iframe height set to ' + useHeight)
                         }
-                        ;
+
                         Focus.iframe.style.height = useHeight;
                         Focus.iframeHeight = useHeight;
                     }
@@ -541,10 +553,10 @@ switch ($style) {
                     if (Focus.iframeWidth !== Focus.iframe.style.width) {
                         if (Focus.debug) {
                             console.log('window inner width = ' + window.innerWidth);
-                            console.log('iframe offset width = ' + Focus.iframeFocus.offsetWidth);
+                            console.log('iframe offset width = ' +  Focus.iframeFocus.offsetWidth);
                         }
 
-                        if (window.innerWidth < Focus.iframeFocus.offsetWidth) {
+                        if (window.innerWidth <  Focus.iframeFocus.offsetWidth) {
                             // Responsive iframe
                             Focus.addClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.addClass(Focus.iframe, 'mf-responsive');
@@ -554,8 +566,8 @@ switch ($style) {
                                 console.log('iframe set to responsive width: ');
 
                         } else {
-                            Focus.iframe.style.width = Focus.iframeFocus.offsetWidth + 'px';
-                            Focus.iframe.width = Focus.iframeFocus.offsetWidth + 'px';
+                            Focus.iframe.style.width =  Focus.iframeFocus.offsetWidth + 'px';
+                            Focus.iframe.width =  Focus.iframeFocus.offsetWidth + 'px';
                             Focus.removeClass(Focus.iframeFocus, 'mf-responsive');
                             Focus.removeClass(Focus.iframe, 'mf-responsive');
 
@@ -568,14 +580,21 @@ switch ($style) {
                     <?php endif; ?>
                 }, 35);
 
+                Focus.iframeResizerEnabled = true;
+
                 return true;
-                <?php endif; ?>
+                <?php else: ?>
 
                 return false;
+                <?php endif; ?>
             },
 
             // Disable iframe resizer
             disableIFrameResizer: function () {
+                if (typeof Focus.iframeResizerEnabled !== 'undefined') {
+                    delete(Focus.iframeResizerEnabled);
+                }
+
                 <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
                 clearInterval(Focus.iframeResizeInterval);
                 <?php endif; ?>
@@ -641,7 +660,7 @@ switch ($style) {
                     if (Focus.debug)
                         console.log('Visitor converted');
 
-                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity);
+                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity, '/');
                 } else if (Focus.debug) {
                     console.log('Visitor converted but ignoreConverted not enabled');
                 }
@@ -677,7 +696,7 @@ switch ($style) {
                     }
                     return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
                 },
-                setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
+                setItem: function (sKey, sValue, vEnd, sPath, sDomain) {
                     if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) {
                         return false;
                     }
@@ -698,7 +717,7 @@ switch ($style) {
                                 break;
                         }
                     }
-                    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + (bSecure ? "; secure" : "");
+                    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + sExpires + (sDomain ? "; domain=" + sDomain : "") + (sPath ? "; path=" + sPath : "") + "; secure";
                     return true;
                 },
                 removeItem: function (sKey, sPath, sDomain) {

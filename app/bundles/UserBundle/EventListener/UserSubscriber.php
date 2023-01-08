@@ -1,43 +1,25 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\UserBundle\Event as Events;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class UserSubscriber.
- */
-class UserSubscriber extends CommonSubscriber
+class UserSubscriber implements EventSubscriberInterface
 {
     /**
      * @var IpLookupHelper
      */
-    protected $ipLookupHelper;
+    private $ipLookupHelper;
 
     /**
      * @var AuditLogModel
      */
-    protected $auditLogModel;
+    private $auditLogModel;
 
-    /**
-     * UserSubscriber constructor.
-     *
-     * @param IpLookupHelper $ipLookupHelper
-     * @param AuditLogModel  $auditLogModel
-     */
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {
         $this->ipLookupHelper = $ipLookupHelper;
@@ -59,8 +41,6 @@ class UserSubscriber extends CommonSubscriber
 
     /**
      * Add a user entry to the audit log.
-     *
-     * @param Events\UserEvent $event
      */
     public function onUserPostSave(Events\UserEvent $event)
     {
@@ -81,8 +61,6 @@ class UserSubscriber extends CommonSubscriber
 
     /**
      * Add a user delete entry to the audit log.
-     *
-     * @param Events\UserEvent $event
      */
     public function onUserDelete(Events\UserEvent $event)
     {
@@ -100,8 +78,6 @@ class UserSubscriber extends CommonSubscriber
 
     /**
      * Add a role entry to the audit log.
-     *
-     * @param Events\RoleEvent $event
      */
     public function onRolePostSave(Events\RoleEvent $event)
     {
@@ -121,8 +97,6 @@ class UserSubscriber extends CommonSubscriber
 
     /**
      * Add a role delete entry to the audit log.
-     *
-     * @param Events\RoleEvent $event
      */
     public function onRoleDelete(Events\RoleEvent $event)
     {

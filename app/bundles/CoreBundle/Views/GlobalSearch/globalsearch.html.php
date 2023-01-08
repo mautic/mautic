@@ -33,6 +33,6 @@
         <a href="javascript: void(0);" class="search-button">
             <i class="fa fa-search fs-16"></i>
         </a>
-        <input type="search" value="<?php echo $searchString; ?>" class="form-control search" id="globalSearchInput" name="global_search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.everything.placeholder'); ?>" value="" autocomplete="false" data-toggle="livesearch" data-target="#globalSearchResults" data-action="<?php echo $view['router']->path('mautic_core_ajax', ['action' => 'globalSearch']); ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
+        <input type="search" value="<?php echo $view->escape($searchString); ?>" class="form-control search" id="globalSearchInput" name="global_search" placeholder="<?php echo $view['translator']->trans('mautic.core.search.everything.placeholder'); ?>" value="" autocomplete="false" data-toggle="livesearch" data-target="#globalSearchResults" data-action="<?php echo $view['router']->path('mautic_core_ajax', ['action' => 'globalSearch']); ?>" data-overlay="true" data-overlay-text="<?php echo $view['translator']->trans('mautic.core.search.livesearch'); ?>" />
     </div>
 </li>

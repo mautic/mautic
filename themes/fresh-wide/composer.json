@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-fresh-wide",
+  "description": "Mautic Fresh Wide Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "fresh-wide"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

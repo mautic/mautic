@@ -1,13 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 $containerType     = (isset($type)) ? $type : 'text';
 $defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
 
@@ -23,7 +15,7 @@ $help = (empty($field['helpMessage'])) ? '' : <<<HTML
                 <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
 HTML;
 
-if ($containerType == 'textarea'):
+if ('textarea' == $containerType):
 $textInput = <<<HTML
 
                 <textarea $inputAttr>{$field['defaultValue']}</textarea>

@@ -1,36 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'public' => [
             'mautic_installer_home' => [
                 'path'       => '/installer',
-                'controller' => 'MauticInstallBundle:Install:step',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
             ],
             'mautic_installer_remove_slash' => [
                 'path'       => '/installer/',
-                'controller' => 'MauticCoreBundle:Common:removeTrailingSlash',
+                'controller' => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
             ],
             'mautic_installer_step' => [
                 'path'       => '/installer/step/{index}',
-                'controller' => 'MauticInstallBundle:Install:step',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
             ],
             'mautic_installer_final' => [
                 'path'       => '/installer/final',
-                'controller' => 'MauticInstallBundle:Install:final',
+                'controller' => 'Mautic\InstallBundle\Controller\InstallController::finalAction',
             ],
             'mautic_installer_catchcall' => [
                 'path'         => '/installer/{noerror}',
-                'controller'   => 'MauticInstallBundle:Install:step',
+                'controller'   => 'Mautic\InstallBundle\Controller\InstallController::stepAction',
                 'requirements' => [
                     'noerror' => '^(?).+',
                 ],
@@ -39,13 +30,36 @@ return [
     ],
 
     'services' => [
+        'fixtures' => [
+            'mautic.install.fixture.lead_field' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['translator'],
+            ],
+            'mautic.install.fixture.role' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => ['translator'],
+            ],
+            'mautic.install.fixture.report_data' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+            'mautic.install.fixture.grape_js' => [
+                'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\GrapesJsData::class,
+                'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
+                'arguments' => [],
+            ],
+        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\CheckStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
-                    '%kernel.root_dir%',
+                    '%kernel.project_dir%',
                     'request_stack',
+                    'mautic.cipher.openssl',
                 ],
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
@@ -53,7 +67,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.doctrine' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\DoctrineStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\DoctrineStep::class,
                 'arguments' => [
                     'mautic.configurator',
                 ],
@@ -63,7 +77,7 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.email' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\EmailStep',
+                'class'     => \Mautic\InstallBundle\Configurator\Step\EmailStep::class,
                 'arguments' => [
                     'session',
                 ],
@@ -73,14 +87,30 @@ return [
                 ],
             ],
             'mautic.install.configurator.step.user' => [
-                'class'     => 'Mautic\InstallBundle\Configurator\Step\UserStep',
-                'arguments' => [
-                    'session',
-                ],
+                'class'        => \Mautic\InstallBundle\Configurator\Step\UserStep::class,
                 'tag'          => 'mautic.configurator.step',
                 'tagArguments' => [
                     'priority' => 2,
                 ],
+            ],
+            'mautic.install.service' => [
+                'class'     => \Mautic\InstallBundle\Install\InstallService::class,
+                'arguments' => [
+                    'mautic.configurator',
+                    'mautic.helper.cache',
+                    'mautic.helper.paths',
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'kernel',
+                    'validator',
+                    'security.password_encoder',
+                    'mautic.doctrine.loader.mautic_fixtures_loader',
+                ],
+            ],
+            'mautic.install.leadcolumns' => [
+                'class'     => \Mautic\InstallBundle\EventListener\DoctrineEventSubscriber::class,
+                'tag'       => 'doctrine.event_subscriber',
+                'arguments' => [],
             ],
         ],
     ],

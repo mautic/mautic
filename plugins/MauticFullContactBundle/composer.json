@@ -1,0 +1,17 @@
+{
+    "name": "mautic/plugin-fullcontact",
+    "description": "Full Contact Plugin",
+    "type": "mautic-plugin",
+    "keywords": [
+        "mautic",
+        "plugin",
+        "integration"
+    ],
+    "extra": {
+        "install-directory-name": "MauticFullContactBundle"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "mautic/core-lib": "^5.0"
+    }
+}

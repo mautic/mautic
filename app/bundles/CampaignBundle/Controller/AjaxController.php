@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,8 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 class AjaxController extends CommonAjaxController
 {
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function updateConnectionsAction(Request $request)
@@ -44,9 +32,6 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    /**
-     * @param Request $request
-     */
     protected function updateScheduledCampaignEventAction(Request $request)
     {
         $eventId      = (int) $request->request->get('eventId');
@@ -82,8 +67,6 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @param Request $request
-     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     protected function cancelScheduledCampaignEventAction(Request $request)
@@ -97,8 +80,14 @@ class AjaxController extends CommonAjaxController
                 $log->setIsScheduled(false);
 
                 /** @var EventLogModel $logModel */
-                $logModel = $this->getModel('campaign.event_log');
-                $logModel->saveEntity($log);
+                $logModel           = $this->getModel('campaign.event_log');
+                $metadata           = $log->getMetadata();
+                $metadata['errors'] = $this->translator->trans(
+                    'mautic.campaign.event.cancelled.time',
+                    ['%date%' => $log->getTriggerDate()->format('Y-m-d H:i:s')]
+                );
+                $log->setMetadata($metadata);
+                $logModel->getRepository()->saveEntity($log);
 
                 $dataArray = ['success' => 1];
             }
@@ -130,7 +119,7 @@ class AjaxController extends CommonAjaxController
                                     ]
                                 );
 
-                if ($log && !$log->getDateTriggered()) {
+                if ($log && ($log->getTriggerDate() > new \DateTime())) {
                     return $log;
                 }
             }

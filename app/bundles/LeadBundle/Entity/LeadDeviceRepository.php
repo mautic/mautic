@@ -1,27 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class LeadDeviceRepository.
+ * @extends CommonRepository<LeadDevice>
  */
 class LeadDeviceRepository extends CommonRepository
 {
     /**
      * {@inhertidoc}.
-     *
-     * @param array $args
      *
      * @return Paginator
      */
@@ -47,48 +37,73 @@ class LeadDeviceRepository extends CommonRepository
 
     /**
      * @param      $lead
-     * @param null $deviceName
-     * @param null $deviceBrand
-     * @param null $deviceModel
+     * @param null $deviceNames
+     * @param null $deviceBrands
+     * @param null $deviceModels
+     * @param null $deviceId
      *
      * @return array
      */
-    public function getDevice($lead, $deviceName = null, $deviceBrand = null, $deviceModel = null)
+    public function getDevice($lead, $deviceNames = null, $deviceBrands = null, $deviceModels = null, $deviceOss = null, $deviceId = null)
     {
         $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.device as device, es.device_fingerprint')
+        $sq->select('es.id as id, es.device as device')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
-        if (!empty($statIds)) {
-            $inIds = (!is_array($statIds)) ? [(int) $statIds] : $statIds;
 
-            $sq->where(
-                $sq->expr()->in('es.id', $inIds)
+        if (null !== $deviceNames) {
+            if (!is_array($deviceNames)) {
+                $deviceNames = [$deviceNames];
+            }
+            foreach ($deviceNames as $key => $deviceName) {
+                $sq->andWhere(
+                    $sq->expr()->eq('es.device', ':device'.$key)
+                )
+                    ->setParameter('device'.$key, $deviceName);
+            }
+        }
+
+        if (null !== $deviceBrands) {
+            if (!is_array($deviceBrands)) {
+                $deviceBrands = [$deviceBrands];
+            }
+            foreach ($deviceBrands as $key => $deviceBrand) {
+                $sq->andWhere(
+                    $sq->expr()->eq('es.device_brand', ':deviceBrand'.$key)
+                )
+                    ->setParameter('deviceBrand'.$key, $deviceBrand);
+            }
+        }
+
+        if (null !== $deviceModels) {
+            if (!is_array($deviceModels)) {
+                $deviceModels = [$deviceModels];
+            }
+            foreach ($deviceModels as $key => $deviceModel) {
+                $sq->andWhere(
+                    $sq->expr()->eq('es.device_model', ':deviceModel'.$key)
+                )
+                    ->setParameter('deviceModel'.$key, $deviceModel);
+            }
+        }
+
+        if (null !== $deviceOss) {
+            if (!is_array($deviceOss)) {
+                $deviceOss = [$deviceOss];
+            }
+            foreach ($deviceOss as $key => $deviceOs) {
+                $sq->andWhere(
+                    $sq->expr()->eq('es.device_os_name', ':deviceOs'.$key)
+                )
+                    ->setParameter('deviceOs'.$key, $deviceOs);
+            }
+        }
+
+        if (null !== $deviceId) {
+            $sq->andWhere(
+                $sq->expr()->eq('es.id', $deviceId)
             );
-        }
-
-        if ($deviceName !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device', ':device')
-            )
-                ->setParameter('device', $deviceName);
-        }
-
-        if ($deviceBrand !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device_brand', ':deviceBrand')
-            )
-                ->setParameter('deviceBrand', $deviceBrand);
-        }
-
-        if ($deviceModel !== null) {
-            $sq->where(
-                $sq->expr()->eq('es.device_model', ':deviceModel')
-            )
-                ->setParameter('deviceModel', $deviceModel);
-        }
-
-        if ($lead !== null) {
-            $sq->where(
+        } elseif (null !== $lead) {
+            $sq->andWhere(
                 $sq->expr()->eq('es.lead_id', $lead->getId())
             );
         }
@@ -100,28 +115,70 @@ class LeadDeviceRepository extends CommonRepository
     }
 
     /**
-     * @param string $fingerprint
+     * @param string $trackingId
      *
-     * @return LeadDevice
+     * @return LeadDevice|null
      */
-    public function getDeviceByFingerprint($fingerprint)
+    public function getByTrackingId($trackingId)
     {
-        if (!$fingerprint) {
-            return null;
-        }
+        /** @var LeadDevice $leadDevice */
+        $leadDevice = $this->findOneBy([
+            'trackingId' => $trackingId,
+        ]);
 
-        $sq = $this->_em->getConnection()->createQueryBuilder();
-        $sq->select('es.id as id, es.lead_id as lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es');
+        return $leadDevice;
+    }
 
-        $sq->where(
-            $sq->expr()->eq('es.device_fingerprint', ':fingerprint')
+    /**
+     * Check if there is at least one device with filled tracking code assigned to Lead.
+     *
+     * @return bool
+     */
+    public function isAnyLeadDeviceTracked(Lead $lead)
+    {
+        $alias = $this->getTableAlias();
+        $qb    = $this->createQueryBuilder($alias);
+        $qb->where(
+            $qb->expr()->andX(
+                $qb->expr()->eq($alias.'.lead', ':lead'),
+                $qb->expr()->isNotNull($alias.'.trackingId')
+            )
         )
-            ->setParameter('fingerprint', $fingerprint);
+            ->setParameter('lead', $lead);
 
-        //get the first match
-        $device = $sq->execute()->fetch();
+        $devices = $qb->getQuery()->getResult();
 
-        return $device ? $device : null;
+        return !empty($devices);
+    }
+
+    /**
+     * @return array
+     */
+    public function getLeadDevices(Lead $lead)
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        return $qb->select('*')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
+            ->where('lead_id = :leadId')
+            ->setParameter('leadId', (int) $lead->getId())
+            ->orderBy('date_added', 'desc')
+            ->execute()
+            ->fetchAll();
+    }
+
+    /**
+     * Updates lead ID (e.g. after a lead merge).
+     *
+     * @param $fromLeadId
+     * @param $toLeadId
+     */
+    public function updateLead($fromLeadId, $toLeadId)
+    {
+        $q = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $q->update(MAUTIC_TABLE_PREFIX.'lead_devices')
+            ->set('lead_id', (int) $toLeadId)
+            ->where('lead_id = '.(int) $fromLeadId)
+            ->execute();
     }
 }

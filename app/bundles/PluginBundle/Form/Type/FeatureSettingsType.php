@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Form\Type;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -19,16 +10,13 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FeatureSettingsType.
- */
 class FeatureSettingsType extends AbstractType
 {
     /**
-     * @var Session
+     * @var SessionInterface
      */
     protected $session;
 
@@ -42,14 +30,8 @@ class FeatureSettingsType extends AbstractType
      */
     protected $logger;
 
-    /**
-     * FeatureSettingsType constructor.
-     *
-     * @param Session              $session
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(
-        Session $session,
+        SessionInterface $session,
         CoreParametersHelper $coreParametersHelper,
         LoggerInterface $logger
     ) {
@@ -58,10 +40,6 @@ class FeatureSettingsType extends AbstractType
         $this->logger               = $logger;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $integrationObject = $options['integration_object'];
@@ -70,14 +48,13 @@ class FeatureSettingsType extends AbstractType
         $integrationObject->appendToForm($builder, $options['data'], 'features');
         $leadFields    = $options['lead_fields'];
         $companyFields = $options['company_fields'];
-        $formSettings  = $options['integration_object']->getFormDisplaySettings();
 
-        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields, $formSettings) {
+        $formModifier = function (FormInterface $form, $data, $method = 'get') use ($integrationObject, $leadFields, $companyFields) {
             $integrationName = $integrationObject->getName();
             $session         = $this->session;
             $limit           = $session->get(
                 'mautic.plugin.'.$integrationName.'.lead.limit',
-                $this->coreParametersHelper->getParameter('default_pagelimit')
+                $this->coreParametersHelper->get('default_pagelimit')
             );
             $page        = $session->get('mautic.plugin.'.$integrationName.'.lead.page', 1);
             $companyPage = $session->get('mautic.plugin.'.$integrationName.'.company.page', 1);
@@ -85,14 +62,13 @@ class FeatureSettingsType extends AbstractType
             $settings = [
                 'silence_exceptions' => false,
                 'feature_settings'   => $data,
-                'ignore_field_cache' => ($page == 1 && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
+                'ignore_field_cache' => (1 == $page && 'POST' !== $_SERVER['REQUEST_METHOD']) ? true : false,
             ];
 
             try {
                 if (empty($fields)) {
                     $fields = $integrationObject->getFormLeadFields($settings);
                     $fields = (isset($fields[0])) ? $fields[0] : $fields;
-                    unset($fields['company']);
                 }
 
                 if (isset($settings['feature_settings']['objects']) and in_array('company', $settings['feature_settings']['objects'])) {
@@ -121,7 +97,7 @@ class FeatureSettingsType extends AbstractType
 
             $form->add(
                 'leadFields',
-                'integration_fields',
+                FieldsType::class,
                 [
                     'label'                => 'mautic.integration.leadfield_matches',
                     'required'             => true,
@@ -139,13 +115,11 @@ class FeatureSettingsType extends AbstractType
             );
 
             if (!empty($integrationCompanyFields)) {
-                list($specialInstructions, $alertType) = $integrationObject->getFormNotes('leadfield_match');
-
                 $form->add(
                     'companyFields',
-                    'integration_company_fields',
+                    CompanyFieldsType::class,
                     [
-                        'label'                => 'mautic.integration.comapanyfield_matches',
+                        'label'                => 'mautic.integration.companyfield_matches',
                         'required'             => true,
                         'mautic_fields'        => $companyFields,
                         'data'                 => $data,
@@ -160,7 +134,7 @@ class FeatureSettingsType extends AbstractType
                     ]
                 );
             }
-            if ($method == 'get' && $error) {
+            if ('get' == $method && $error) {
                 $form->addError(new FormError($error));
             }
         };
@@ -193,7 +167,7 @@ class FeatureSettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'integration_featuresettings';
     }

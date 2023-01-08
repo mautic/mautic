@@ -1,35 +1,20 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/**
- * Class CompanyMergeType.
- */
 class CompanyMergeType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
             'company_to_merge',
-            'company_list',
+            CompanyListType::class,
             [
                 'multiple'    => false,
                 'label'       => 'mautic.company.to.merge.into',
@@ -45,7 +30,7 @@ class CompanyMergeType extends AbstractType
         );
         $builder->add(
             'buttons',
-            'form_buttons',
+            FormButtonsType::class,
             [
                 'apply_text' => false,
                 'save_text'  => 'mautic.lead.merge',
@@ -58,18 +43,10 @@ class CompanyMergeType extends AbstractType
         }
     }
 
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setOptional(
+        $resolver->setDefined(
             ['main_entity']
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return 'company_merge';
     }
 }

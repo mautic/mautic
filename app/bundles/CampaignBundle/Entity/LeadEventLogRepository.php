@@ -1,26 +1,24 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
+use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Cache\QueryCacheProfile;
+use Doctrine\DBAL\Types\Type;
+use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * LeadEventLogRepository.
+ * @extends CommonRepository<LeadEventLog>
  */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
+    use ContactLimiterTrait;
+    use SlaveConnectionTrait;
 
     public function getEntities(array $args = [])
     {
@@ -60,20 +58,17 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * Get a lead's page event log.
      *
-     * @param int   $leadId
-     * @param array $options
+     * @param int|null $leadId
      *
      * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function getLeadLogs($leadId, array $options = [])
+    public function getLeadLogs($leadId = null, array $options = [])
     {
         $query = $this->getEntityManager()
                       ->getConnection()
                       ->createQueryBuilder()
-                      ->select('ll.event_id,
+                      ->select('ll.id as log_id,
+                    ll.event_id,
                     ll.campaign_id,
                     ll.date_triggered as dateTriggered,
                     e.name AS event_name,
@@ -85,15 +80,21 @@ class LeadEventLogRepository extends CommonRepository
                     ll.is_scheduled as isScheduled,
                     ll.trigger_date as triggerDate,
                     ll.channel,
-                    ll.channel_id as channel_id
+                    ll.channel_id as channel_id,
+                    ll.lead_id,
+                    fl.reason as fail_reason
                     '
                       )
-                      ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
-                      ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
-                      ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
-                      ->where('ll.lead_id = '.(int) $leadId)
-                      ->andWhere('e.event_type != :eventType')
-                      ->setParameter('eventType', 'decision');
+                        ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
+                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'll.event_id = e.id')
+                        ->join('ll', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'll.campaign_id = c.id')
+                        ->leftJoin('ll', MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fl', 'fl.log_id = ll.id')
+                        ->andWhere('e.event_type != :eventType')
+                        ->setParameter('eventType', 'decision');
+
+        if ($leadId) {
+            $query->where('ll.lead_id = '.(int) $leadId);
+        }
 
         if (isset($options['scheduledState'])) {
             if ($options['scheduledState']) {
@@ -135,9 +136,6 @@ class LeadEventLogRepository extends CommonRepository
      * @param array $options
      *
      * @return array
-     *
-     * @throws \Doctrine\ORM\NoResultException
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function getUpcomingEvents(array $options = null)
     {
@@ -194,11 +192,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $query->orderBy('ll.trigger_date');
 
-        if (!empty($ipIds)) {
-            $query->orWhere('ll.ip_address IN ('.implode(',', $ipIds).')');
-        }
-
-        if (!empty($options['canViewOthers']) && isset($this->currentUser)) {
+        if (empty($options['canViewOthers']) && isset($this->currentUser)) {
             $query->andWhere('c.created_by = :userId')
                 ->setParameter('userId', $this->currentUser->getId());
         }
@@ -207,25 +201,42 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param      $campaignId
+     * @param int  $campaignId
      * @param bool $excludeScheduled
+     * @param bool $excludeNegative
+     * @param bool $all
      *
-     * @return array
+     * @throws \Doctrine\DBAL\Cache\CacheException
      */
-    public function getCampaignLogCounts($campaignId, $excludeScheduled = false, $excludeNegative = true)
-    {
-        $q = $this->_em->getConnection()->createQueryBuilder()
-                       ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o')
-                       ->innerJoin(
-                           'o',
-                           MAUTIC_TABLE_PREFIX.'campaign_leads',
-                           'l',
-                           'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
-                       );
+    public function getCampaignLogCounts(
+        $campaignId,
+        $excludeScheduled = false,
+        $excludeNegative = true,
+        $all = false,
+        DateTimeInterface $dateFrom = null,
+        DateTimeInterface $dateTo = null,
+        int $eventId = null
+    ): array {
+        $join = $all ? 'leftJoin' : 'innerJoin';
+
+        $q = $this->_em->getConnection()->createQueryBuilder();
+        $q->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'o');
+        $q->$join(
+            'o',
+            MAUTIC_TABLE_PREFIX.'campaign_leads',
+            'l',
+            'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
+        );
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
         );
+
+        if ($eventId) {
+            $expr->add(
+                $q->expr()->eq('o.event_id', $eventId)
+            );
+        }
 
         $groupBy = 'o.event_id';
         if ($excludeNegative) {
@@ -248,12 +259,17 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         // Exclude failed events
-        $failedSq = $this->_em->getConnection()->createQueryBuilder();
+        $failedSq = $this->getSlaveConnection()->createQueryBuilder();
         $failedSq->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_failed_log', 'fe')
             ->where(
                 $failedSq->expr()->eq('fe.log_id', 'o.id')
             );
+        if ($dateFrom && $dateTo) {
+            $failedSq->andWhere('fe.date_added BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
         $expr->add(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
@@ -262,7 +278,22 @@ class LeadEventLogRepository extends CommonRepository
           ->setParameter('false', false, 'boolean')
           ->groupBy($groupBy);
 
-        $results = $q->execute()->fetchAll();
+        if ($dateFrom && $dateTo) {
+            $q->andWhere('o.date_triggered BETWEEN FROM_UNIXTIME(:dateFrom) AND FROM_UNIXTIME(:dateTo)')
+                ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
+                ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
+        }
+
+        if ($q->getConnection()->getConfiguration()->getResultCacheImpl()) {
+            $results = $q->getConnection()->executeCacheQuery(
+                $q->getSQL(),
+                $q->getParameters(),
+                $q->getParameterTypes(),
+                new QueryCacheProfile(600, __METHOD__)
+            )->fetchAll();
+        } else {
+            $results = $q->execute()->fetchAll();
+        }
 
         $return = [];
 
@@ -284,20 +315,6 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         return $return;
-    }
-
-    /**
-     * @param $campaignId
-     * @param $leadId
-     */
-    public function removeScheduledEvents($campaignId, $leadId)
-    {
-        $conn = $this->_em->getConnection();
-        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
-            'lead_id'      => (int) $leadId,
-            'campaign_id'  => (int) $campaignId,
-            'is_scheduled' => 1,
-        ]);
     }
 
     /**
@@ -347,10 +364,10 @@ class LeadEventLogRepository extends CommonRepository
      */
     public function getChartQuery($options)
     {
-        $chartQuery = new ChartQuery($this->getEntityManager()->getConnection(), $options['dateFrom'], $options['dateTo']);
+        $chartQuery = new ChartQuery($this->getSlaveConnection(), $options['dateFrom'], $options['dateTo']);
 
         // Load points for selected period
-        $query = $this->_em->getConnection()->createQueryBuilder();
+        $query = $this->getSlaveConnection()->createQueryBuilder();
         $query->select('ll.id, ll.date_triggered')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'll')
             ->join('ll', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'e.id = ll.event_id');
@@ -382,5 +399,256 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         return $chartQuery->fetchTimeData('('.$query.')', 'date_triggered');
+    }
+
+    /**
+     * @param int $eventId
+     *
+     * @return ArrayCollection
+     *
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    public function getScheduled($eventId, \DateTime $now, ContactLimiter $limiter)
+    {
+        if ($limiter->hasCampaignLimit() && 0 === $limiter->getCampaignLimitRemaining()) {
+            return new ArrayCollection();
+        }
+
+        $this->getSlaveConnection($limiter);
+
+        $q = $this->createQueryBuilder('o');
+
+        $q->select('o, e, c')
+            ->indexBy('o', 'o.id')
+            ->innerJoin('o.event', 'e')
+            ->innerJoin('e.campaign', 'c')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->eq('IDENTITY(o.event)', ':eventId'),
+                    $q->expr()->eq('o.isScheduled', ':true'),
+                    $q->expr()->lte('o.triggerDate', ':now'),
+                    $q->expr()->eq('c.isPublished', 1)
+                )
+            )
+            ->setParameter('eventId', (int) $eventId)
+            ->setParameter('now', $now)
+            ->setParameter('true', true, Type::BOOLEAN);
+
+        $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
+
+        if ($limiter->hasCampaignLimit() && $limiter->getCampaignLimitRemaining() < $limiter->getBatchLimit()) {
+            $q->setMaxResults($limiter->getCampaignLimitRemaining());
+        }
+
+        $result = new ArrayCollection($q->getQuery()->getResult());
+
+        if ($limiter->hasCampaignLimit()) {
+            $limiter->reduceCampaignLimitRemaining($result->count());
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return ArrayCollection
+     *
+     * @throws \Doctrine\ORM\Query\QueryException
+     */
+    public function getScheduledByIds(array $ids)
+    {
+        $this->getSlaveConnection();
+        $q = $this->createQueryBuilder('o');
+
+        $q->select('o, e, c')
+            ->indexBy('o', 'o.id')
+            ->innerJoin('o.event', 'e')
+            ->innerJoin('e.campaign', 'c')
+            ->where(
+                $q->expr()->andX(
+                    $q->expr()->in('o.id', $ids),
+                    $q->expr()->eq('o.isScheduled', 1),
+                    $q->expr()->eq('c.isPublished', 1)
+                )
+            );
+
+        return new ArrayCollection($q->getQuery()->getResult());
+    }
+
+    /**
+     * @param int $campaignId
+     *
+     * @return array
+     */
+    public function getScheduledCounts($campaignId, \DateTime $date, ContactLimiter $limiter)
+    {
+        $now = clone $date;
+        $now->setTimezone(new \DateTimeZone('UTC'));
+
+        $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('l.campaign_id', ':campaignId'),
+            $q->expr()->eq('l.is_scheduled', ':true'),
+            $q->expr()->lte('l.trigger_date', ':now'),
+            $q->expr()->eq('c.is_published', 1)
+        );
+
+        $this->updateQueryFromContactLimiter('l', $q, $limiter, true);
+
+        $results = $q->select('COUNT(*) as event_count, l.event_id')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'l')
+            ->join('l', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'l.campaign_id = c.id')
+            ->where($expr)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('now', $now->format('Y-m-d H:i:s'))
+            ->setParameter('true', true, \PDO::PARAM_BOOL)
+            ->groupBy('l.event_id')
+            ->execute()
+            ->fetchAll();
+
+        $events = [];
+
+        foreach ($results as $result) {
+            $events[$result['event_id']] = (int) $result['event_count'];
+        }
+
+        return $events;
+    }
+
+    /**
+     * @param $eventId
+     *
+     * @return array
+     */
+    public function getDatesExecuted($eventId, array $contactIds)
+    {
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
+        $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('log.event_id', $eventId),
+                    $qb->expr()->in('log.lead_id', $contactIds)
+                )
+            );
+
+        $results = $qb->execute()->fetchAll();
+
+        $dates = [];
+        foreach ($results as $result) {
+            $dates[$result['lead_id']] = new \DateTime($result['date_triggered'], new \DateTimeZone('UTC'));
+            if (1 === (int) $result['is_scheduled']) {
+                unset($dates[$result['lead_id']]);
+            }
+        }
+
+        return $dates;
+    }
+
+    public function getOldestTriggeredDate(): ?\DateTime
+    {
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
+        $qb->select('log.date_triggered')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->orderBy('log.date_triggered', 'ASC')
+            ->setMaxResults(1);
+
+        $results = $qb->execute()->fetchAll();
+
+        return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
+    }
+
+    /**
+     * @param int $contactId
+     * @param int $campaignId
+     * @param int $rotation
+     *
+     * @return bool
+     */
+    public function hasBeenInCampaignRotation($contactId, $campaignId, $rotation)
+    {
+        $qb = $this->getSlaveConnection()->createQueryBuilder();
+        $qb->select('log.rotation')
+            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('log.lead_id', ':contactId'),
+                    $qb->expr()->eq('log.campaign_id', ':campaignId'),
+                    $qb->expr()->in('log.rotation', ':rotation')
+                )
+            )
+            ->setParameter('contactId', (int) $contactId)
+            ->setParameter('campaignId', (int) $campaignId)
+            ->setParameter('rotation', (int) $rotation)
+            ->setMaxResults(1);
+
+        $results = $qb->execute()->fetchAll();
+
+        return !empty($results);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    public function unscheduleEvents(Lead $campaignMember, $message)
+    {
+        $contactId  = $campaignMember->getLead()->getId();
+        $campaignId = $campaignMember->getCampaign()->getId();
+        $rotation   = $campaignMember->getRotation();
+        $dateAdded  = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+        // Insert entries into the failed log so it's known why they were never executed
+        $prefix = MAUTIC_TABLE_PREFIX;
+        $sql    = <<<SQL
+REPLACE INTO {$prefix}campaign_lead_event_failed_log( `log_id`, `date_added`, `reason`)
+SELECT id, :dateAdded as date_added, :message as reason from {$prefix}campaign_lead_event_log
+WHERE is_scheduled = 1 AND lead_id = :contactId AND campaign_id = :campaignId AND rotation = :rotation
+SQL;
+
+        $connection = $this->getEntityManager()->getConnection();
+        $stmt       = $connection->prepare($sql);
+        $stmt->bindParam('dateAdded', $dateAdded, \PDO::PARAM_STR);
+        $stmt->bindParam('message', $message, \PDO::PARAM_STR);
+        $stmt->bindParam('contactId', $contactId, \PDO::PARAM_INT);
+        $stmt->bindParam('campaignId', $campaignId, \PDO::PARAM_INT);
+        $stmt->bindParam('rotation', $rotation, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        // Now unschedule them
+        $qb = $connection->createQueryBuilder();
+        $qb->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
+            ->set('is_scheduled', 0)
+            ->where(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('is_scheduled', 1),
+                    $qb->expr()->eq('lead_id', ':contactId'),
+                    $qb->expr()->eq('campaign_id', ':campaignId'),
+                    $qb->expr()->eq('rotation', ':rotation')
+                )
+            )
+            ->setParameters(
+                [
+                    'contactId'     => (int) $contactId,
+                    'campaignId'    => (int) $campaignId,
+                    'rotation'      => (int) $rotation,
+                ]
+            )
+            ->execute();
+    }
+
+    /**
+     * Removes logs by event_id.
+     * It uses batch processing for removing
+     * large quantities of records.
+     *
+     * @param int $eventId
+     */
+    public function removeEventLogs($eventId)
+    {
+        $conn = $this->_em->getConnection();
+        $conn->delete(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', [
+            'event_id' => (int) $eventId,
+        ]);
     }
 }

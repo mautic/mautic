@@ -1,42 +1,26 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\SmsBundle\EventListener;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Model\MessageModel;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\ReportBundle\Model\ReportModel;
+use Mautic\SmsBundle\Form\Type\SmsListType;
+use Mautic\SmsBundle\Sms\TransportChain;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class ChannelSubscriber.
- */
-class ChannelSubscriber extends CommonSubscriber
+class ChannelSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var IntegrationHelper
+     * @var TransportChain
      */
-    protected $integrationHelper;
+    private $transportChain;
 
-    /**
-     * ChannelSubscriber constructor.
-     *
-     * @param IntegrationHelper $integrationHelper
-     */
-    public function __construct(IntegrationHelper $integrationHelper)
+    public function __construct(TransportChain $transportChain)
     {
-        $this->integrationHelper = $integrationHelper;
+        $this->transportChain = $transportChain;
     }
 
     /**
@@ -49,14 +33,9 @@ class ChannelSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ChannelEvent $event
-     */
     public function onAddChannel(ChannelEvent $event)
     {
-        $integration = $this->integrationHelper->getIntegrationObject('Twilio');
-
-        if ($integration && $integration->getIntegrationSettings()->getIsPublished()) {
+        if (count($this->transportChain->getEnabledTransports()) > 0) {
             $event->addChannel(
                 'sms',
                 [
@@ -67,7 +46,7 @@ class ChannelSubscriber extends CommonSubscriber
                             'asset.download',
                             'form.submit',
                         ],
-                        'lookupFormType' => 'sms_list',
+                        'lookupFormType' => SmsListType::class,
                         'repository'     => 'MauticSmsBundle:Sms',
                     ],
                     LeadModel::CHANNEL_FEATURE   => [],

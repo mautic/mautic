@@ -29,6 +29,7 @@
     right: 0;
     left: 0;
     margin: auto;
+    z-index: 0;
 
     .screenshot-container {
       overflow: hidden;
@@ -262,4 +263,40 @@
     border-radius: 18px;
     content: "";
   }
+}
+
+.focus-builder .website-preview .website-placeholder.has-error input, .focus-builder .website-preview .website-placeholder.has-error button {
+  border-color: #a94442;
+}
+
+#websiteScreenshot.mobile .screenshot-container{
+  position: absolute;
+  left : 50%;
+  width: 320px;
+  margin: 0px;
+  margin-top: 20px;
+}
+
+#websiteScreenshot.mobile .preview-body, #websiteScreenshot.mobile  #websiteCanvas {
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+  left : -50%;
+  width: 320px;
+  height: 568px;
+}
+
+#websiteScreenshot.mobile  #websiteCanvas {
+  z-index: 0;
+  border: 1px solid #000;
+}
+
+#websiteScreenshot.mobile  #websiteCanvas iframe {
+  height: 100%;
+  width: 320px;
+  border: 0;
 }

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -38,13 +29,10 @@ class IpAddress
     private $ipAddress;
 
     /**
-     * @var array
+     * @var array<string,string>
      */
     private $ipDetails;
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -91,6 +79,16 @@ class IpAddress
     }
 
     /**
+     * IpAddress constructor.
+     *
+     * @param string|null $ipAddress
+     */
+    public function __construct($ipAddress = null)
+    {
+        $this->ipAddress = $ipAddress;
+    }
+
+    /**
      * Get id.
      *
      * @return int
@@ -127,7 +125,7 @@ class IpAddress
     /**
      * Set ipDetails.
      *
-     * @param string $ipDetails
+     * @param array<string,string> $ipDetails
      *
      * @return IpAddress
      */
@@ -141,7 +139,7 @@ class IpAddress
     /**
      * Get ipDetails.
      *
-     * @return string
+     * @return array<string,string>
      */
     public function getIpDetails()
     {
@@ -150,8 +148,6 @@ class IpAddress
 
     /**
      * Set list of IPs to not track.
-     *
-     * @param array $ips
      */
     public function setDoNotTrackList(array $ips)
     {
@@ -175,22 +171,28 @@ class IpAddress
     {
         if (!empty($this->doNotTrack)) {
             foreach ($this->doNotTrack as $ip) {
-                if (strpos($ip, '/') == false) {
-                    if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
-                        return false;
-                    }
-                } else {
+                if (false !== strpos($ip, '/')) {
                     // has a netmask range
                     // https://gist.github.com/tott/7684443
                     list($range, $netmask) = explode('/', $ip, 2);
                     $range_decimal         = ip2long($range);
-                    $ip_decimal            = ip2long($ip);
+                    $ip_decimal            = ip2long($this->ipAddress);
                     $wildcard_decimal      = pow(2, (32 - $netmask)) - 1;
                     $netmask_decimal       = ~$wildcard_decimal;
 
                     if ((($ip_decimal & $netmask_decimal) == ($range_decimal & $netmask_decimal))) {
                         return false;
                     }
+
+                    continue;
+                }
+
+                if ($ip === $this->ipAddress) {
+                    return false;
+                }
+
+                if (preg_match('/'.str_replace('.', '\\.', $ip).'/', $this->ipAddress)) {
+                    return false;
                 }
             }
         }

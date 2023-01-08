@@ -1,45 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Form\Type;
 
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-/**
- * Class UpdateLeadActionType.
- */
 class UpdateLeadActionType extends AbstractType
 {
     use EntityFieldsBuildFormTrait;
 
-    private $factory;
+    /**
+     * @var FieldModel
+     */
+    private $fieldModel;
 
-    /**
-     * @param MauticFactory $factory
-     */
-    public function __construct(MauticFactory $factory)
+    public function __construct(FieldModel $fieldModel)
     {
-        $this->factory = $factory;
+        $this->fieldModel = $fieldModel;
     }
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var \Mautic\LeadBundle\Model\FieldModel $fieldModel */
-        $fieldModel = $this->factory->getModel('lead.field');
-        $leadFields = $fieldModel->getEntities(
+        $leadFields = $this->fieldModel->getEntities(
             [
                 'force' => [
                     [
@@ -54,6 +37,7 @@ class UpdateLeadActionType extends AbstractType
 
         $options['fields']                      = $leadFields;
         $options['ignore_required_constraints'] = true;
+        $options['ignore_date_type']            = true;
 
         $this->getFormFields($builder, $options);
     }
@@ -61,7 +45,7 @@ class UpdateLeadActionType extends AbstractType
     /**
      * @return string
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'updatelead_action';
     }

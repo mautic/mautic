@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -60,9 +51,6 @@ class Message extends FormEntity
      */
     private $channels;
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadMetadata(ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -85,9 +73,6 @@ class Message extends FormEntity
                 ->build();
     }
 
-    /**
-     * @param ValidationClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ValidationClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new NotBlank([
@@ -152,6 +137,7 @@ class Message extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -172,6 +158,7 @@ class Message extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -192,6 +179,7 @@ class Message extends FormEntity
      */
     public function setPublishUp($publishUp)
     {
+        $this->isChanged('publishUp', $publishUp);
         $this->publishUp = $publishUp;
 
         return $this;
@@ -212,6 +200,7 @@ class Message extends FormEntity
      */
     public function setPublishDown($publishDown)
     {
+        $this->isChanged('publishDown', $publishDown);
         $this->publishDown = $publishDown;
 
         return $this;
@@ -232,6 +221,7 @@ class Message extends FormEntity
      */
     public function setCategory($category)
     {
+        $this->isChanged('category', $category);
         $this->category = $category;
 
         return $this;
@@ -252,14 +242,12 @@ class Message extends FormEntity
      */
     public function setChannels($channels)
     {
+        $this->isChanged('channels', $channels);
         $this->channels = $channels;
 
         return $this;
     }
 
-    /**
-     * @param Channel $channel
-     */
     public function addChannel(Channel $channel)
     {
         if (!$this->channels->contains($channel)) {
@@ -270,9 +258,6 @@ class Message extends FormEntity
         }
     }
 
-    /**
-     * @param Channel $channel
-     */
     public function removeChannel(Channel $channel)
     {
         if ($channel->getId()) {

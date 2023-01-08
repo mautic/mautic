@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,6 +12,8 @@ use Mautic\CoreBundle\Entity\CommonEntity;
  */
 class Plugin extends CommonEntity
 {
+    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+
     /**
      * @var int
      */
@@ -35,6 +28,16 @@ class Plugin extends CommonEntity
      * @var string
      */
     private $description;
+
+    /**
+     * @var string
+     */
+    private $primaryDescription;
+
+    /**
+     * @var string
+     */
+    private $secondaryDescription;
 
     /**
      * @var bool
@@ -66,15 +69,12 @@ class Plugin extends CommonEntity
         $this->integrations = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('plugins')
-            ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\PluginRepository')
+            ->setCustomRepositoryClass(PluginRepository::class)
             ->addUniqueConstraint(['bundle'], 'unique_bundle');
 
         $builder->addIdColumns();
@@ -185,6 +185,31 @@ class Plugin extends CommonEntity
     public function setDescription($description)
     {
         $this->description = $description;
+        $this->splitDescriptions();
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getPrimaryDescription()
+    {
+        return $this->primaryDescription ?: $this->description;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSecondaryDescription()
+    {
+        return preg_match(self::DESCRIPTION_DELIMITER_REGEX, $this->description) >= 1;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSecondaryDescription()
+    {
+        return $this->secondaryDescription;
     }
 
     /**
@@ -233,5 +258,17 @@ class Plugin extends CommonEntity
     public function setAuthor($author)
     {
         $this->author = $author;
+    }
+
+    /**
+     * Splits description into primary and secondary.
+     */
+    public function splitDescriptions()
+    {
+        if ($this->hasSecondaryDescription()) {
+            $parts                      = preg_split(self::DESCRIPTION_DELIMITER_REGEX, $this->description);
+            $this->primaryDescription   = trim($parts[0]);
+            $this->secondaryDescription = trim($parts[1]);
+        }
     }
 }

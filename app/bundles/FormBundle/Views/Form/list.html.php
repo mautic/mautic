@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticFormBundle:Form:index.html.php');
 }
 
@@ -35,7 +35,7 @@ if ($tmpl == 'index') {
                                     'confirmText'   => $view['translator']->trans('mautic.form.rebuild'),
                                     'confirmAction' => $view['router']->path(
                                         'mautic_form_action',
-                                        array_merge(['objectAction' => 'batchRebuildHtml'])
+                                        ['objectAction' => 'batchRebuildHtml']
                                     ),
                                     'iconClass'       => 'fa fa-fw fa-refresh',
                                     'btnText'         => $view['translator']->trans('mautic.form.rebuild'),
@@ -55,7 +55,6 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'f.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-form-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -76,6 +75,37 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'submission_count',
                         'text'       => 'mautic.form.form.results',
                         'class'      => 'visible-md visible-lg col-form-submissions',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'form',
+                        'orderBy'    => 'f.dateAdded',
+                        'text'       => 'mautic.lead.import.label.dateAdded',
+                        'class'      => 'visible-md visible-lg col-form-dateAdded',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'form',
+                        'orderBy'    => 'f.dateModified',
+                        'text'       => 'mautic.lead.import.label.dateModified',
+                        'class'      => 'visible-md visible-lg col-form-dateModified',
+                        'default'    => true,
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'form',
+                        'orderBy'    => 'f.createdByUser',
+                        'text'       => 'mautic.core.createdby',
+                        'class'      => 'visible-md visible-lg col-form-createdby',
                     ]
                 );
 
@@ -155,7 +185,7 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index">
                                 <?php echo $item->getName(); ?>
-                                <?php if ($item->getFormType() == 'campaign'): ?>
+                                <?php if ('campaign' == $item->getFormType()): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
                                         'mautic.form.icon_tooltip.campaign_form'
                                     ); ?>"><i class="fa fa-fw fa-cube"></i></span>
@@ -178,15 +208,17 @@ if ($tmpl == 'index') {
                         <a href="<?php echo $view['router']->path(
                             'mautic_form_action',
                             ['objectAction' => 'results', 'objectId' => $item->getId()]
-                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo ($i['submission_count']
-                            == 0) ? 'disabled=disabled' : ''; ?>>
-                            <?php echo $view['translator']->transChoice(
+                        ); ?>" data-toggle="ajax" data-menu-link="mautic_form_index" class="btn btn-primary btn-xs" <?php echo (0
+                            == $i['submission_count']) ? 'disabled=disabled' : ''; ?>>
+                            <?php echo $view['translator']->trans(
                                 'mautic.form.form.viewresults',
-                                $i['submission_count'],
                                 ['%count%' => $i['submission_count']]
                             ); ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateAdded() ? $view['date']->toFull($item->getDateAdded()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getDateModified() ? $view['date']->toFull($item->getDateModified()) : ''; ?></td>
+                    <td class="visible-md visible-lg"><?php echo $item->getCreatedByUser(); ?></td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>

@@ -1,91 +1,87 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
+use DateTime;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class WebhookQueue.
- */
 class WebhookQueue
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
+
     /**
-     * @var Webhook
+     * @var Webhook|null
      */
     private $webhook;
+
     /**
-     * @var \DateTime
+     * @var DateTime|null
      */
     private $dateAdded;
+
     /**
-     * @var string
+     * @var string|null
      */
-    private $payload;
+    private $payload; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
+
     /**
-     * @var Event
+     * @var string|resource|null
+     */
+    private $payloadCompressed;
+
+    /**
+     * @var Event|null
      **/
     private $event;
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_queue')
-            ->setCustomRepositoryClass('Mautic\WebhookBundle\Entity\WebhookQueueRepository');
+            ->setCustomRepositoryClass(WebhookQueueRepository::class);
         $builder->addId();
-        // M:1 for webhook
         $builder->createManyToOne('webhook', 'Webhook')
-            ->inversedBy('queues')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
-        // date added
-        $builder->createField('dateAdded', 'datetime')
-            ->columnName('date_added')
+        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
+        $builder->addNullableField('payload', Types::TEXT);
+        $builder->createField('payloadCompressed', Types::BLOB)
+            ->columnName('payload_compressed')
             ->nullable()
+            ->length(MySqlPlatform::LENGTH_LIMIT_MEDIUMBLOB)
             ->build();
-        // payload
-        $builder->createField('payload', 'text')
-            ->columnName('payload')
-            ->build();
-        // M:1 for event
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
             ->build();
     }
+
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
         return $this->id;
     }
+
     /**
-     * @return mixed
+     * @return Webhook|null
      */
     public function getWebhook()
     {
         return $this->webhook;
     }
+
     /**
-     * @param mixed $webhook
+     * @param Webhook|null $webhook
+     *
+     * @return WebhookQueue
      */
     public function setWebhook($webhook)
     {
@@ -93,15 +89,19 @@ class WebhookQueue
 
         return $this;
     }
+
     /**
-     * @return mixed
+     * @return DateTime|null
      */
     public function getDateAdded()
     {
         return $this->dateAdded;
     }
+
     /**
-     * @param mixed $dateAdded
+     * @param DateTime|null $dateAdded
+     *
+     * @return WebhookQueue
      */
     public function setDateAdded($dateAdded)
     {
@@ -109,31 +109,56 @@ class WebhookQueue
 
         return $this;
     }
+
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPayload()
     {
-        return $this->payload;
+        if (null !== $this->payload) {
+            // BC: plain payload is fetched by ORM
+            return $this->payload;
+        }
+
+        if (null === $this->payloadCompressed) {
+            // no payload is set
+            return null;
+        }
+
+        $payloadCompressed = $this->payloadCompressed;
+
+        if (is_resource($payloadCompressed)) {
+            // compressed payload is fetched by ORM
+            $payloadCompressed = stream_get_contents($this->payloadCompressed);
+        }
+
+        return gzuncompress($payloadCompressed);
     }
+
     /**
-     * @param mixed $payload
+     * @param string $payload
+     *
+     * @return WebhookQueue
      */
     public function setPayload($payload)
     {
-        $this->payload = $payload;
+        $this->payloadCompressed = gzcompress($payload, 9);
 
         return $this;
     }
+
     /**
-     * @return mixed
+     * @return Event|null
      */
     public function getEvent()
     {
         return $this->event;
     }
+
     /**
-     * @param mixed $event
+     * @param Event|null $event
+     *
+     * @return WebhookQueue
      */
     public function setEvent($event)
     {

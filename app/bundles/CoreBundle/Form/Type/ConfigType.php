@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -17,18 +8,23 @@ use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class ConfigType.
- */
 class ConfigType extends AbstractType
 {
     /**
@@ -44,15 +40,10 @@ class ConfigType extends AbstractType
     /**
      * @var array
      */
-    private $ipLookupChoices;
-
-    /**
-     * @var array
-     */
     private $supportedLanguages;
 
     /**
-     * @var
+     * @var IpLookupFactory
      */
     private $ipLookupFactory;
 
@@ -62,48 +53,32 @@ class ConfigType extends AbstractType
     private $ipLookup;
 
     /**
-     * ConfigType constructor.
-     *
-     * @param TranslatorInterface $translator
-     * @param LanguageHelper      $langHelper
-     * @param IpLookupFactory     $ipLookupFactory
-     * @param array               $supportedLanguages
-     * @param array               $ipLookupServices
-     * @param AbstractLookup      $ipLookup
+     * @var array
      */
+    private $ipLookupServices;
+
     public function __construct(
         TranslatorInterface $translator,
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
-        array $supportedLanguages,
         array $ipLookupServices,
         AbstractLookup $ipLookup = null
     ) {
-        $this->translator         = $translator;
-        $this->langHelper         = $langHelper;
-        $this->ipLookupFactory    = $ipLookupFactory;
-        $this->ipLookup           = $ipLookup;
-        $this->supportedLanguages = $supportedLanguages;
-
-        $choices = [];
-        foreach ($ipLookupServices as $name => $service) {
-            $choices[$name] = $service['display_name'];
-        }
-
-        natcasesort($choices);
-
-        $this->ipLookupChoices = $choices;
+        $this->translator          = $translator;
+        $this->langHelper          = $langHelper;
+        $this->ipLookupFactory     = $ipLookupFactory;
+        $this->ipLookup            = $ipLookup;
+        $this->supportedLanguages  = $langHelper->getSupportedLanguages();
+        $this->ipLookupServices    = $ipLookupServices;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->add('last_shown_tab', HiddenType::class);
+
         $builder->add(
             'site_url',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.site.url',
                 'label_attr' => ['class' => 'control-label'],
@@ -123,7 +98,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'webroot',
-            'page_list',
+            PageListType::class,
             [
                 'label'      => 'mautic.core.config.form.webroot',
                 'label_attr' => ['class' => 'control-label'],
@@ -133,14 +108,30 @@ class ConfigType extends AbstractType
                     'data-placeholder' => $this->translator->trans('mautic.core.config.form.webroot.dashboard'),
                 ],
                 'multiple'    => false,
-                'empty_value' => '',
+                'placeholder' => '',
                 'required'    => false,
             ]
         );
 
         $builder->add(
+            '404_page',
+            PageListType::class,
+            [
+                'label'         => 'mautic.core.config.form.404_page',
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'            => 'form-control',
+                    'tooltip'          => 'mautic.core.config.form.404_page.tooltip',
+                ],
+                'multiple'       => false,
+                'placeholder'    => '',
+                'published_only' => true,
+            ]
+        );
+
+        $builder->add(
             'cache_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.cache.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -160,7 +151,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'log_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.log.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -180,7 +171,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'image_path',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.image.path',
                 'label_attr' => ['class' => 'control-label'],
@@ -199,42 +190,30 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'theme',
-            'theme_list',
+            'composer_updates',
+            YesNoButtonGroupType::class,
             [
-                'label' => 'mautic.core.config.form.theme',
+                'label' => 'mautic.core.config.form.update.composer',
+                'data'  => (array_key_exists('composer_updates', $options['data']) && !empty($options['data']['composer_updates'])),
                 'attr'  => [
                     'class'   => 'form-control',
-                    'tooltip' => 'mautic.page.form.template.help',
+                    'tooltip' => 'mautic.core.config.form.update.composer.tooltip',
                 ],
             ]
         );
 
-        // Get the list of available languages
-        $languages   = $this->langHelper->fetchLanguages(false, false);
-        $langChoices = [];
-
-        foreach ($languages as $code => $langData) {
-            $langChoices[$code] = $langData['name'];
-        }
-
-        $langChoices = array_merge($langChoices, $this->supportedLanguages);
-
-        // Alpha sort the languages by name
-        asort($langChoices);
-
         $builder->add(
             'locale',
-            'choice',
+            ChoiceType::class,
             [
-                'choices'  => $langChoices,
-                'label'    => 'mautic.core.config.form.locale',
-                'required' => false,
-                'attr'     => [
+                'choices'           => $this->getLanguageChoices(),
+                'label'             => 'mautic.core.config.form.locale',
+                'required'          => false,
+                'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.locale.tooltip',
                 ],
-                'empty_value' => false,
+                'placeholder'       => false,
             ]
         );
 
@@ -242,7 +221,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'trusted_hosts',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.trusted.hosts',
                     'label_attr' => ['class' => 'control-label'],
@@ -258,7 +237,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'trusted_proxies',
-                'text',
+                TextType::class,
                 [
                     'label'      => 'mautic.core.config.form.trusted.proxies',
                     'label_attr' => ['class' => 'control-label'],
@@ -275,7 +254,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'do_not_track_ips',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.form.do_not_track_ips',
                     'label_attr' => ['class' => 'control-label'],
@@ -292,7 +271,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'do_not_track_bots',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.form.do_not_track_bots',
                     'label_attr' => ['class' => 'control-label'],
@@ -308,34 +287,34 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'default_pagelimit',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    5   => 'mautic.core.pagination.5',
-                    10  => 'mautic.core.pagination.10',
-                    15  => 'mautic.core.pagination.15',
-                    20  => 'mautic.core.pagination.20',
-                    25  => 'mautic.core.pagination.25',
-                    30  => 'mautic.core.pagination.30',
-                    50  => 'mautic.core.pagination.50',
-                    100 => 'mautic.core.pagination.100',
+                'choices'           => [
+                    'mautic.core.pagination.5'   => 5,
+                    'mautic.core.pagination.10'  => 10,
+                    'mautic.core.pagination.15'  => 15,
+                    'mautic.core.pagination.20'  => 20,
+                    'mautic.core.pagination.25'  => 25,
+                    'mautic.core.pagination.30'  => 30,
+                    'mautic.core.pagination.50'  => 50,
+                    'mautic.core.pagination.100' => 100,
                 ],
-                'expanded'   => false,
-                'multiple'   => false,
-                'label'      => 'mautic.core.config.form.default.pagelimit',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.core.config.form.default.pagelimit',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.default.pagelimit.tooltip',
                 ],
-                'required'    => false,
-                'empty_value' => false,
+                'required'          => false,
+                'placeholder'       => false,
             ]
         );
 
         $builder->add(
             'default_timezone',
-            'timezone',
+            TimezoneType::class,
             [
                 'label'      => 'mautic.core.config.form.default.timezone',
                 'label_attr' => ['class' => 'control-label'],
@@ -344,14 +323,14 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.core.config.form.default.timezone.tooltip',
                 ],
                 'multiple'    => false,
-                'empty_value' => 'mautic.user.user.form.defaulttimezone',
+                'placeholder' => 'mautic.user.user.form.defaulttimezone',
                 'required'    => false,
             ]
         );
 
         $builder->add(
             'cached_data_timeout',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.cached.data.timeout',
                 'label_attr' => ['class' => 'control-label'],
@@ -373,7 +352,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_full',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.full',
                 'label_attr' => ['class' => 'control-label'],
@@ -393,7 +372,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_short',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.short',
                 'label_attr' => ['class' => 'control-label'],
@@ -413,7 +392,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_dateonly',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.dateonly',
                 'label_attr' => ['class' => 'control-label'],
@@ -433,7 +412,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'date_format_timeonly',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.date.format.timeonly',
                 'label_attr' => ['class' => 'control-label'],
@@ -452,16 +431,45 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'ip_lookup_service',
-            'choice',
+            'default_daterange_filter',
+            ChoiceType::class,
             [
-                'choices'    => $this->ipLookupChoices,
-                'label'      => 'mautic.core.config.form.ip.lookup.service',
-                'label_attr' => [
+                'choices' => [
+                    'mautic.core.daterange.0days'                                                                 => 'midnight',
+                    'mautic.core.daterange.1days'                                                                 => '-24 hours',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])  => '-1 week',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])  => '-2 weeks',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])  => '-3 weeks',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1]) => '-1 month',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2]) => '-2 months',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3]) => '-3 months',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])  => '-1 year',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])  => '-2 years',
+                ],
+                'expanded'          => false,
+                'multiple'          => false,
+                'label'             => 'mautic.core.config.form.default.daterange_default',
+                'label_attr'        => ['class' => 'control-label'],
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.default.daterange_default.tooltip',
+                ],
+                'required'          => false,
+                'placeholder'       => false,
+            ]
+        );
+
+        $builder->add(
+            'ip_lookup_service',
+            ChoiceType::class,
+            [
+                'choices'           => $this->getIpServicesChoices(),
+                'label'             => 'mautic.core.config.form.ip.lookup.service',
+                'label_attr'        => [
                     'class' => 'control-label',
                 ],
-                'required' => false,
-                'attr'     => [
+                'required'          => false,
+                'attr'              => [
                     'class'    => 'form-control',
                     'tooltip'  => 'mautic.core.config.form.ip.lookup.service.tooltip',
                     'onchange' => 'Mautic.getIpLookupFormConfig()',
@@ -471,7 +479,7 @@ class ConfigType extends AbstractType
 
         $builder->add(
             'ip_lookup_auth',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.ip.lookup.auth',
                 'label_attr' => ['class' => 'control-label'],
@@ -479,6 +487,21 @@ class ConfigType extends AbstractType
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.ip.lookup.auth.tooltip',
                 ],
+                'required' => false,
+            ]
+        );
+
+        $builder->add(
+            'ip_lookup_create_organization',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.create.organization.from.ip.lookup',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.create.organization.from.ip.lookup.tooltip',
+                ],
+                'data'     => isset($options['data']['ip_lookup_create_organization']) ? (bool) $options['data']['ip_lookup_create_organization'] : false,
                 'required' => false,
             ]
         );
@@ -518,60 +541,28 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'transifex_username',
-            'text',
-            [
-                'label'      => 'mautic.core.config.form.transifex.username',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.transifex.username.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
-            'transifex_password',
-            'password',
-            [
-                'label'      => 'mautic.core.config.form.transifex.password',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'placeholder'  => 'mautic.user.user.form.passwordplaceholder',
-                    'preaddon'     => 'fa fa-lock',
-                    'tooltip'      => 'mautic.core.config.form.transifex.password.tooltip',
-                    'autocomplete' => 'off',
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'update_stability',
-            'choice',
+            ChoiceType::class,
             [
-                'choices' => [
-                    'alpha'  => 'mautic.core.config.update_stability.alpha',
-                    'beta'   => 'mautic.core.config.update_stability.beta',
-                    'rc'     => 'mautic.core.config.update_stability.rc',
-                    'stable' => 'mautic.core.config.update_stability.stable',
+                'choices'           => [
+                    'mautic.core.config.update_stability.alpha'  => 'alpha',
+                    'mautic.core.config.update_stability.beta'   => 'beta',
+                    'mautic.core.config.update_stability.rc'     => 'rc',
+                    'mautic.core.config.update_stability.stable' => 'stable',
                 ],
-                'label'    => 'mautic.core.config.form.update.stability',
-                'required' => false,
-                'attr'     => [
+                'label'             => 'mautic.core.config.form.update.stability',
+                'required'          => false,
+                'attr'              => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.core.config.form.update.stability.tooltip',
                 ],
-                'empty_value' => false,
+                'placeholder'       => false,
             ]
         );
 
         $builder->add(
             'link_shortener_url',
-            'text',
+            TextType::class,
             [
                 'label'      => 'mautic.core.config.form.link.shortener',
                 'label_attr' => ['class' => 'control-label'],
@@ -584,8 +575,35 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'max_entity_lock_time',
+            NumberType::class,
+            [
+                'label'      => 'mautic.core.config.form.link.max_entity_lock_time',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.link.max_entity_lock_time.tooltip',
+                ],
+                'required' => false,
+            ]
+            );
+
+        $builder->add(
+          'transliterate_page_title',
+          YesNoButtonGroupType::class,
+          [
+            'label' => 'mautic.core.config.form.transliterate.page.title',
+            'data'  => (array_key_exists('transliterate_page_title', $options['data']) && !empty($options['data']['transliterate_page_title'])),
+            'attr'  => [
+              'class'   => 'form-control',
+              'tooltip' => 'mautic.core.config.form.transliterate.page.title.tooltip',
+            ],
+          ]
+        );
+
+        $builder->add(
             'cors_restrict_domains',
-            'yesno_button_group',
+            YesNoButtonGroupType::class,
             [
                 'label' => 'mautic.core.config.cors.restrict.domains',
                 'data'  => (array_key_exists('cors_restrict_domains', $options['data']) && !empty($options['data']['cors_restrict_domains'])),
@@ -600,7 +618,7 @@ class ConfigType extends AbstractType
         $builder->add(
             $builder->create(
                 'cors_valid_domains',
-                'textarea',
+                TextareaType::class,
                 [
                     'label'      => 'mautic.core.config.cors.valid.domains',
                     'label_attr' => ['class' => 'control-label'],
@@ -611,6 +629,61 @@ class ConfigType extends AbstractType
                     ],
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
+            'headers_sts',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts',
+                'data'  => (array_key_exists('headers_sts', $options['data']) && !empty($options['data']['headers_sts'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.response.headers.sts.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_expire_time',
+            IntegerType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.expire_time',
+                'data'  => $options['data']['headers_sts_expire_time'] ?? 60,
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'min'          => 60,
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_subdomains',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.subdomains',
+                'data'  => (array_key_exists('headers_sts_subdomains', $options['data']) && !empty($options['data']['headers_sts_subdomains'])),
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_preload',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.preload',
+                'data'  => (array_key_exists('headers_sts_preload', $options['data']) && !empty($options['data']['headers_sts_preload'])),
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.response.headers.sts.preload.tooltip',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
         );
     }
 
@@ -625,8 +698,38 @@ class ConfigType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'coreconfig';
+    }
+
+    private function getLanguageChoices(): array
+    {
+        // Get the list of available languages
+        $languages   = $this->langHelper->fetchLanguages(false, false);
+        $choices     = [];
+
+        foreach ($languages as $code => $langData) {
+            $choices[$langData['name']] = $code;
+        }
+
+        $choices = array_merge($choices, array_flip($this->supportedLanguages));
+
+        // Alpha sort the languages by name
+        ksort($choices, SORT_FLAG_CASE | SORT_NATURAL);
+
+        return $choices;
+    }
+
+    private function getIpServicesChoices(): array
+    {
+        $choices = [];
+        foreach ($this->ipLookupServices as $name => $service) {
+            $choices[$service['display_name']] = $name;
+        }
+
+        ksort($choices, SORT_FLAG_CASE | SORT_NATURAL);
+
+        return $choices;
     }
 }

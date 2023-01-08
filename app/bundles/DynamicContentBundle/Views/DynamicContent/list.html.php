@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticDynamicContentBundle:DynamicContent:index.html.php');
 }
 /* @var \Mautic\DynamicContentBundle\Entity\DynamicContent[] $items */
@@ -37,9 +37,9 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.title',
-                        'text'       => 'mautic.core.title',
-                        'class'      => 'col-dwc-title',
+                        'orderBy'    => 'e.name',
+                        'text'       => 'mautic.core.name',
+                        'class'      => 'col-dwc-name',
                         'default'    => true,
                     ]
                 );
@@ -48,9 +48,19 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'dynamicContent',
-                        'orderBy'    => 'e.name',
+                        'orderBy'    => 'e.slotName',
+                        'text'       => 'mautic.dynamicContent.label.slot_name',
+                        'class'      => 'col-dwc-slotname visible-md visible-lg',
+                    ]
+                );
+
+                echo $view->render(
+                    'MauticCoreBundle:Helper:tableheader.html.php',
+                    [
+                        'sessionVar' => 'dynamicContent',
+                        'orderBy'    => 'c.title',
                         'text'       => 'mautic.core.category',
-                        'class'      => 'visible-md visible-lg col-dwc-category',
+                        'class'      => 'col-dwc-category visible-md visible-lg',
                     ]
                 );
 
@@ -99,7 +109,7 @@ if ($tmpl == 'index') {
                             'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                             ['item' => $item, 'model' => 'dynamicContent']
                         ); ?>
-                        <a href="<?php echo $view['router']->generate(
+                        <a href="<?php echo $view['router']->url(
                             'mautic_dynamicContent_action',
                             ['objectAction' => 'view', 'objectId' => $item->getId()]
                         ); ?>" data-toggle="ajax">
@@ -107,8 +117,9 @@ if ($tmpl == 'index') {
                             <?php
                             $hasVariants     = $item->isVariant();
                             $hasTranslations = $item->isTranslation();
+                            $isFilterBased   = !$item->getIsCampaignBased();
 
-                            if ($hasVariants || $hasTranslations): ?>
+                            if ($hasVariants || $hasTranslations || $isFilterBased): ?>
                                 <span>
                                 <?php if ($hasVariants): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.icon_tooltip.ab_test'); ?>">
@@ -126,6 +137,7 @@ if ($tmpl == 'index') {
                             <?php endif; ?>
                         </a>
                     </td>
+                    <td class="visible-md visible-lg"><?php echo $item->getSlotName(); ?></td>
                     <td class="visible-md visible-lg">
                         <?php $category = $item->getCategory(); ?>
                         <?php $catName  = ($category) ? $category->getTitle() : $view['translator']->trans('mautic.core.form.uncategorized'); ?>
@@ -145,7 +157,7 @@ if ($tmpl == 'index') {
                     'page'       => $page,
                     'limit'      => $limit,
                     'menuLinkId' => 'mautic_dynamicContent_index',
-                    'baseUrl'    => $view['router']->generate('mautic_dynamicContent_index'),
+                    'baseUrl'    => $view['router']->url('mautic_dynamicContent_index'),
                     'sessionVar' => 'dynamicContent',
                 ]
             ); ?>

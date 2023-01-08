@@ -1,19 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ListChangeEvent.
@@ -28,9 +19,8 @@ class ListChangeEvent extends Event
     /**
      * ListChangeEvent constructor.
      *
-     * @param          $leads
-     * @param LeadList $list
-     * @param bool     $added
+     * @param      $leads
+     * @param bool $added
      */
     public function __construct($leads, LeadList $list, $added = true)
     {
@@ -64,7 +54,7 @@ class ListChangeEvent extends Event
     }
 
     /**
-     * @return LeadList|List
+     * @return LeadList
      */
     public function getList()
     {

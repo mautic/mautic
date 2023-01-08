@@ -1,34 +1,34 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Command;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
-use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\ChannelBroadcastEvent as BcChannelBroadcastEvent;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to send a scheduled broadcast.
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    private EventDispatcherInterface $dispatcher;
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
+    {
+        $this->dispatcher = $dispatcher;
+        $this->translator = $translator;
+
+        parent::__construct($pathsHelper);
+    }
+
     protected function configure()
     {
         $this->setName('mautic:broadcasts:send')
@@ -50,48 +50,51 @@ EOT
                         'id', 'i', InputOption::VALUE_OPTIONAL,
                         'The ID for a specifc channel to process broadcasts for pending contacts.'
                     ),
+                    new InputOption(
+                        'min-contact-id', null, InputOption::VALUE_OPTIONAL,
+                        'Min contact ID to filter recipients.'
+                    ),
+                    new InputOption(
+                        'max-contact-id', null, InputOption::VALUE_OPTIONAL,
+                        'Max contact ID to filter recipients.'
+                    ),
+                    new InputOption(
+                        'limit', 'l', InputOption::VALUE_OPTIONAL,
+                        'Limit how many contacts to load from database to process.'
+                    ),
+                    new InputOption(
+                        'batch', 'b', InputOption::VALUE_OPTIONAL,
+                        'Limit how many messages to send at once.'
+                    ),
                 ]
             );
 
         parent::configure();
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $channel   = $input->getOption('channel');
-        $channelId = $input->getOption('id');
-        $key       = $channel.$channelId;
+        $channel      = $input->getOption('channel');
+        $channelId    = $input->getOption('id');
+        $limit        = $input->getOption('limit');
+        $batch        = $input->getOption('batch');
+        $minContactId = $input->getOption('min-contact-id');
+        $maxContactId = $input->getOption('max-contact-id');
+        $key          = $channel.$channelId;
+
         if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
             return 0;
         }
 
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->getParameter('locale'));
+        $event = new ChannelBroadcastEvent($channel, $channelId, $output);
+        $event->setLimit($limit);
+        $event->setBatch($batch);
+        $event->setMinContactIdFilter($minContactId);
+        $event->setMaxContactIdFilter($maxContactId);
 
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
+        $this->dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
 
-        /** @var ChannelBroadcastEvent $event */
-        $event = $dispatcher->dispatch(
-            ChannelEvents::CHANNEL_BROADCAST,
-            new ChannelBroadcastEvent($channel, $channelId, $output)
-        );
         $results = $event->getResults();
-
-        // @deprecated 2.4 to be removed in 3.0; BC support
-        if ($dispatcher->hasListeners(CoreEvents::CHANNEL_BROADCAST)) {
-            /** @var BcChannelBroadcastEvent $bcEvent */
-            $bcEvent = $dispatcher->dispatch(
-                CoreEvents::CHANNEL_BROADCAST,
-                new BcChannelBroadcastEvent($channel, $channelId, $output)
-            );
-            $results = array_merge($results, $bcEvent->getResults());
-        }
 
         $rows = [];
         foreach ($results as $channel => $counts) {
@@ -104,7 +107,7 @@ EOT
 
         $table = new Table($output);
         $table
-            ->setHeaders([$translator->trans('mautic.core.channel'), $translator->trans('mautic.core.channel.broadcast_success_count'), $translator->trans('mautic.core.channel.broadcast_failed_count')])
+            ->setHeaders([$this->translator->trans('mautic.core.channel'), $this->translator->trans('mautic.core.channel.broadcast_success_count'), $this->translator->trans('mautic.core.channel.broadcast_failed_count')])
             ->setRows($rows);
         $table->render();
 

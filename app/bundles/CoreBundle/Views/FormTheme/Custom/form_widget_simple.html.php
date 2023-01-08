@@ -18,9 +18,9 @@ if (!empty($attr['preaddon']) || !empty($attr['postaddon']) || !empty($attr['pre
         <span><?php echo $attr['preaddon_text']; ?></span>
     </span>
         <?php endif; ?>
-        <input autocomplete="false" type="<?php echo isset($type) ? $view->escape($type) : 'text' ?>"
-            <?php echo $view['form']->block($form, 'widget_attributes') ?><?php if (!empty($value) || is_numeric($value)): ?>
-            value="<?php echo $view->escape($value) ?>"<?php endif ?> />
+        <input autocomplete="false" type="<?php echo isset($type) ? $view->escape($type) : 'text'; ?>"
+            <?php echo $view['form']->block($form, 'widget_attributes'); ?><?php if (!empty($value) || is_numeric($value)): ?>
+            value="<?php echo $view->escape($value); ?>"<?php endif; ?> />
 
         <?php if (!empty($attr['postaddon'])): ?>
             <span class="input-group-addon postaddon" <?php foreach ($postaddonAttr as $k => $v) {
@@ -38,7 +38,7 @@ if (!empty($attr['preaddon']) || !empty($attr['postaddon']) || !empty($attr['pre
         <?php endif; ?>
     </div>
 <?php else: ?>
-    <input type="<?php echo isset($type) ? $view->escape($type) : 'text' ?>"
-        <?php echo $view['form']->block($form, 'widget_attributes') ?><?php if (!empty($value) || is_numeric($value)): ?>
-        value="<?php echo $view->escape($value) ?>"<?php endif ?> />
+    <input type="<?php echo isset($type) ? $view->escape($type) : 'text'; ?>"
+        <?php echo $view['form']->block($form, 'widget_attributes'); ?><?php if (!empty($value) || is_numeric($value)): ?>
+        value="<?php echo $view->escape($value); ?>"<?php endif; ?> />
 <?php endif; ?>

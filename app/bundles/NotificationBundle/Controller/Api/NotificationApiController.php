@@ -1,32 +1,32 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\LeadBundle\Tracker\ContactTracker;
+use Mautic\NotificationBundle\Entity\Notification;
+use Mautic\NotificationBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class NotificationApiController.
+ * @extends CommonApiController<Notification>
  */
 class NotificationApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var ContactTracker
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $contactTracker;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model           = $this->getModel('notification');
-        $this->entityClass     = 'Mautic\NotificationBundle\Entity\Notification';
+        $notificationModel = $this->getModel('notification');
+        \assert($notificationModel instanceof NotificationModel);
+
+        $this->model           = $notificationModel;
+        $this->contactTracker  = $this->container->get('mautic.tracker.contact');
+        $this->entityClass     = Notification::class;
         $this->entityNameOne   = 'notification';
         $this->entityNameMulti = 'notifications';
 
@@ -45,11 +45,10 @@ class NotificationApiController extends CommonApiController
             /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
             $leadModel = $this->getModel('lead');
 
-            $currentLead = $leadModel->getCurrentLead();
-
-            $currentLead->addPushIDEntry($osid);
-
-            $leadModel->saveEntity($currentLead);
+            if ($currentLead = $this->contactTracker->getContact()) {
+                $currentLead->addPushIDEntry($osid);
+                $leadModel->saveEntity($currentLead);
+            }
 
             return new JsonResponse(['success' => true, 'osid' => $osid], 200, ['Access-Control-Allow-Origin' => '*']);
         }

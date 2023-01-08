@@ -7,9 +7,9 @@ Mautic.reportOnLoad = function (container) {
 
     // Append an index of the number of filters on the edit form
     if (mQuery('div[id=report_filters]').length) {
-        mQuery('div[id=report_filters]').attr('data-index', mQuery('#report_filters > div').length + 1);
-        mQuery('div[id=report_tableOrder]').attr('data-index', mQuery('#report_tableOrder > div').length + 1);
-        mQuery('div[id=report_aggregators]').attr('data-index', mQuery('#report_aggregators > div').length + 1);
+        mQuery('div[id=report_filters]').attr('data-index', Mautic.getHighestIndex('report_filters'));
+        mQuery('div[id=report_tableOrder]').attr('data-index', Mautic.getHighestIndex('report_tableOrder'));
+        mQuery('div[id=report_aggregators]').attr('data-index', Mautic.getHighestIndex('report_aggregators'));
 
         if (mQuery('.filter-columns').length) {
             mQuery('.filter-columns').each(function () {
@@ -29,8 +29,91 @@ Mautic.reportOnLoad = function (container) {
             })
         })
     }
+    Mautic.updateReportGlueTriggers();
     Mautic.checkSelectedGroupBy();
     Mautic.initDateRangePicker();
+
+    var $isScheduled = mQuery('[data-report-schedule="isScheduled"]');
+    var $unitTypeId = mQuery('[data-report-schedule="scheduleUnit"]');
+    var $scheduleDay = mQuery('[data-report-schedule="scheduleDay"]');
+    var $scheduleMonthFrequency = mQuery('[data-report-schedule="scheduleMonthFrequency"]');
+
+    mQuery($isScheduled).change(function () {
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($unitTypeId).change(function () {
+        Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($scheduleDay).change(function () {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    mQuery($scheduleMonthFrequency).change(function () {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    });
+    Mautic.scheduleDisplay($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+
+    jQuery(document).ajaxComplete(function(){
+        Mautic.ajaxifyForm('daterange');
+    });
+};
+
+Mautic.scheduleDisplay = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+    Mautic.checkIsScheduled($isScheduled);
+
+    var unitVal = mQuery($unitTypeId).val();
+    mQuery('#scheduleDay, #scheduleDay label, #scheduleMonthFrequency').hide();
+    if (unitVal === 'WEEKLY' || unitVal === 'MONTHLY') {
+        mQuery('#scheduleDay').show();
+    }
+    if (unitVal === 'MONTHLY') {
+        mQuery('#scheduleMonthFrequency').show();
+        mQuery('#scheduleDay label').hide();
+    } else {
+        mQuery('#scheduleDay label').show();
+    }
+    if($isScheduled.length) {
+        Mautic.schedulePreview($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency);
+    }
+};
+
+Mautic.schedulePreview = function ($isScheduled, $unitTypeId, $scheduleDay, $scheduleMonthFrequency) {
+    var previewUrl = mQuery('#schedule_preview_url').data('url');
+    var $schedulePreviewData = mQuery('#schedule_preview_data');
+
+    var isScheduledVal = 0;
+    if (!mQuery($isScheduled).prop("checked")) { //$isScheduled.val() does not work
+        isScheduledVal = 1;
+    }
+
+    if (!isScheduledVal) {
+        $schedulePreviewData.hide();
+
+        return;
+    }
+    var unitVal = mQuery($unitTypeId).val();
+    var scheduleDayVal = mQuery($scheduleDay).val();
+    var scheduleMonthFrequencyVal = mQuery($scheduleMonthFrequency).val();
+
+    mQuery.get(
+        previewUrl + '/' + isScheduledVal + '/' + unitVal + '/' + scheduleDayVal + '/' + scheduleMonthFrequencyVal,
+        function( data ) {
+            if (!data.html) {
+                return;
+            }
+
+            mQuery("#schedule_preview_data_content").html(data.html);
+            $schedulePreviewData.show();
+        }
+    );
+};
+
+Mautic.checkIsScheduled = function ($isScheduled) {
+    var $scheduleForm = mQuery('#schedule-container .schedule_form');
+    if (!mQuery($isScheduled).prop("checked")) {
+        $scheduleForm.show();
+        return;
+    }
+    $scheduleForm.hide();
 };
 
 /**
@@ -43,8 +126,10 @@ Mautic.addReportRow = function (elId) {
     // Fetch the index
     var index = parseInt(prototypeHolder.attr('data-index'));
     if (!index) {
-        index = 1;
+        index = 0;
     }
+
+    index++;
 
     // Fetch the prototype markup
     var prototype = prototypeHolder.data('prototype');
@@ -53,7 +138,7 @@ Mautic.addReportRow = function (elId) {
     var output = prototype.replace(/__name__/g, index);
 
     // Increase the index for the next row
-    prototypeHolder.attr('data-index', index + 1);
+    prototypeHolder.attr('data-index', index);
 
     // Render the new row
     prototypeHolder.append(output);
@@ -65,18 +150,38 @@ Mautic.addReportRow = function (elId) {
             mQuery(newColumnId).html(Mautic.reportPrototypeFilterOptions);
         }
 
+        // Add `in-group` class by default
+        mQuery('#report_filters_' + index + '_container').addClass('in-group');
+
         mQuery(newColumnId).on('change', function () {
             Mautic.updateReportFilterValueInput(this);
         });
         Mautic.updateReportFilterValueInput(newColumnId);
+        Mautic.updateReportGlueTriggers();
     } else if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
         // Update the column options if applicable
-        mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
+        mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions.clone());
     }
 
     Mautic.activateChosenSelect(mQuery('#' + elId + '_' + index + '_column'));
     mQuery("#" + elId + " *[data-toggle='tooltip']").tooltip({html: true, container: 'body'});
 
+};
+
+Mautic.updateReportGlueTriggers = function () {
+    var filterContainer = mQuery('#report_filters');
+    var glueEl = filterContainer.find('.filter-glue');
+
+    glueEl.off('change');
+    glueEl.on('change', function () {
+        var $this = mQuery(this);
+
+        if ($this.val() === 'and') {
+            $this.parents('.panel').addClass('in-group');
+        } else {
+            $this.parents('.panel').removeClass('in-group');
+        }
+    });
 };
 
 Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
@@ -108,9 +213,7 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
     }
 
     // Replace the value field appropriately
-    if (mQuery('#' + valueId + '_chosen').length) {
-        mQuery('#' + valueId).chosen('destroy');
-    }
+    Mautic.destroyChosen(mQuery('#' + valueId));
 
     if (filterType == 'bool' || filterType == 'boolean') {
         if (mQuery(valueEl).attr('type') != 'radio') {
@@ -148,7 +251,9 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
         };
 
         if (filterType == 'multiselect') {
+            attr.name += '[]';
             attr.multiple = true;
+            currentValue = (typeof currentValue !== 'undefined') ? currentValue.split(",") : null;
         }
 
         var newSelect = mQuery('<select />', attr);
@@ -158,12 +263,15 @@ Mautic.updateReportFilterValueInput = function (filterColumn, setup) {
                 .val(value)
                 .html(label);
 
-            if (value == currentValue) {
+            if (value == currentValue && filterType != 'multiselect') {
                 newOption.prop('selected', true);
             }
 
             newOption.appendTo(newSelect);
         });
+        if (filterType == 'multiselect') {
+            newSelect.val(currentValue);
+        }
         mQuery(valueEl).replaceWith(newSelect);
 
         Mautic.activateChosenSelect(newSelect);
@@ -244,9 +352,9 @@ Mautic.checkReportCondition = function (selector) {
 
     // Disable the value input if the condition is empty or notEmpty
     if (option == 'empty' || option == 'notEmpty') {
-        mQuery('#' + valueInput).prop('disabled', true);
+        mQuery('#' + valueInput).prop('disabled', true).trigger('chosen:updated');
     } else {
-        mQuery('#' + valueInput).prop('disabled', false);
+        mQuery('#' + valueInput).prop('disabled', false).trigger('chosen:updated');
     }
 };
 
@@ -262,4 +370,16 @@ Mautic.checkSelectedGroupBy = function () {
         });
         mQuery('#aggregators-button').prop('disabled', true);
     }
+};
+
+Mautic.getHighestIndex = function (selector) {
+    var highestIndex = 1;
+    var selectorChildren = mQuery('#' + selector + ' > div');
+
+    selectorChildren.each(function() {
+        var index = parseInt(mQuery(this).attr('id').split('_')[2]);
+        highestIndex = (index > highestIndex) ? index : highestIndex;
+    });
+
+    return parseInt(highestIndex);
 };

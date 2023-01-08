@@ -1,24 +1,16 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class IpLookupDownloadDataStoreButtonType extends AbstractType
 {
@@ -34,9 +26,6 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
 
     /**
      * IpLookupDownloadDataStoreButtonType constructor.
-     *
-     * @param DateHelper          $dateHelper
-     * @param TranslatorInterface $translator
      */
     public function __construct(DateHelper $dateHelper, TranslatorInterface $translator)
     {
@@ -53,7 +42,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
 
         $builder->add(
             'fetch_button',
-            'button',
+            ButtonType::class,
             [
                 'label' => ($localDataExists) ? 'mautic.core.ip_lookup.update_data' : 'mautic.core.ip_lookup.fetch_data',
                 'attr'  => [
@@ -67,7 +56,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['ip_lookup_service' => null]);
     }
@@ -93,7 +82,7 @@ class IpLookupDownloadDataStoreButtonType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getBlockPrefix()
     {
         return 'iplookup_download_data_store_button';
     }

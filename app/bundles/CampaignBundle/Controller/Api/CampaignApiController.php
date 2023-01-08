@@ -1,37 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Controller\Api;
 
-use FOS\RestBundle\Util\Codes;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class CampaignApiController.
+ * @extends CommonApiController<Campaign>
  */
 class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var MembershipManager
+     */
+    private $membershipManager;
+
+    /**
+     * @var CampaignModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('campaign');
-        $this->entityClass      = 'Mautic\CampaignBundle\Entity\Campaign';
-        $this->entityNameOne    = 'campaign';
-        $this->entityNameMulti  = 'campaigns';
-        $this->serializerGroups = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
+        $campaignModel = $this->getModel('campaign');
+        \assert($campaignModel instanceof CampaignModel);
+
+        $this->model             = $campaignModel;
+        $this->membershipManager = $this->get('mautic.campaign.membership.manager');
+        $this->entityClass       = Campaign::class;
+        $this->entityNameOne     = 'campaign';
+        $this->entityNameMulti   = 'campaigns';
+        $this->permissionBase    = 'campaign:campaigns';
+        $this->serializerGroups  = ['campaignDetails', 'campaignEventDetails', 'categoryList', 'publishDetails', 'leadListList', 'formList'];
 
         parent::initialize($event);
     }
@@ -53,15 +63,15 @@ class CampaignApiController extends CommonApiController
             $leadModel = $this->getModel('lead');
             $lead      = $leadModel->getEntity($leadId);
 
-            if ($lead == null) {
+            if (null == $lead) {
                 return $this->notFound();
             } elseif (!$this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $lead->getOwner())) {
                 return $this->accessDenied();
             }
 
-            $this->model->addLead($entity, $leadId);
+            $this->membershipManager->addContact($lead, $entity);
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -88,9 +98,9 @@ class CampaignApiController extends CommonApiController
                 return $lead;
             }
 
-            $this->model->removeLead($entity, $leadId);
+            $this->membershipManager->removeContact($lead, $entity);
 
-            $view = $this->view(['success' => 1], Codes::HTTP_OK);
+            $view = $this->view(['success' => 1], Response::HTTP_OK);
 
             return $this->handleView($view);
         }
@@ -101,24 +111,24 @@ class CampaignApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Campaign &$entity
+     * @param $parameters
+     * @param $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
         $method = $this->request->getMethod();
 
-        if ($method === 'POST' || $method === 'PUT') {
+        if ('POST' === $method || 'PUT' === $method) {
             if (empty($parameters['events'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
                 $msg = $this->get('translator')->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
-                return $this->returnError($msg, Codes::HTTP_BAD_REQUEST);
+                return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             }
         }
 
@@ -130,14 +140,14 @@ class CampaignApiController extends CommonApiController
         ];
 
         // delete events and sources which does not exist in the PUT request
-        if ($method === 'PUT') {
+        if ('PUT' === $method) {
             $requestEventIds   = [];
             $requestSegmentIds = [];
             $requestFormIds    = [];
 
             foreach ($parameters['events'] as $key => $requestEvent) {
                 if (!isset($requestEvent['id'])) {
-                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                    return $this->returnError('$campaign[events]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                 }
                 $requestEventIds[] = $requestEvent['id'];
             }
@@ -151,7 +161,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['lists'])) {
                 foreach ($parameters['lists'] as $requestSegment) {
                     if (!isset($requestSegment['id'])) {
-                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                        return $this->returnError('$campaign[lists]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                     }
                     $requestSegmentIds[] = $requestSegment['id'];
                 }
@@ -166,7 +176,7 @@ class CampaignApiController extends CommonApiController
             if (isset($parameters['forms'])) {
                 foreach ($parameters['forms'] as $requestForm) {
                     if (!isset($requestForm['id'])) {
-                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Codes::HTTP_BAD_REQUEST);
+                        return $this->returnError('$campaign[forms]['.$key.']["id"] is missing', Response::HTTP_BAD_REQUEST);
                     }
                     $requestFormIds[] = $requestForm['id'];
                 }
@@ -195,8 +205,10 @@ class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if ($method === 'PUT' && !empty($deletedEvents)) {
-            $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
+        if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
+            $campaignEventModel = $this->getModel('campaign.event');
+            \assert($campaignEventModel instanceof EventModel);
+            $campaignEventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
 
@@ -233,16 +245,18 @@ class CampaignApiController extends CommonApiController
     {
         $entity = $this->model->getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             return $this->notFound();
         }
 
-        if (!$this->checkEntityAccess($entity, 'view')) {
+        if (!$this->checkEntityAccess($entity)) {
             return $this->accessDenied();
         }
 
         $where = InputHelper::clean($this->request->query->get('where', []));
         $order = InputHelper::clean($this->request->query->get('order', []));
+        $start = (int) $this->request->query->get('start', 0);
+        $limit = (int) $this->request->query->get('limit', 100);
 
         $where[] = [
             'col'  => 'campaign_id',
@@ -257,13 +271,50 @@ class CampaignApiController extends CommonApiController
         ];
 
         return $this->forward(
-            'MauticCoreBundle:Api\StatsApi:list',
+            'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
             [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',
                 'order'     => $order,
                 'where'     => $where,
+                'start'     => $start,
+                'limit'     => $limit,
             ]
         );
+    }
+
+    public function cloneCampaignAction($campaignId)
+    {
+        if (empty($campaignId) || false == intval($campaignId)) {
+            return $this->notFound();
+        }
+
+        $original = $this->model->getEntity($campaignId);
+        if (empty($original)) {
+            return $this->notFound();
+        }
+        $entity = clone $original;
+
+        if (!$this->checkEntityAccess($entity, 'create')) {
+            return $this->accessDenied();
+        }
+
+        $this->model->saveEntity($entity);
+
+        $headers = [];
+        //return the newly created entities location if applicable
+
+        $route               = 'mautic_api_campaigns_getone';
+        $headers['Location'] = $this->generateUrl(
+            $route,
+            array_merge(['id' => $entity->getId()], $this->routeParams),
+            true
+        );
+
+        $view = $this->view([$this->entityNameOne => $entity], Response::HTTP_OK, $headers);
+
+        $this->setSerializationContext($view);
+
+        return $this->handleView($view);
     }
 }

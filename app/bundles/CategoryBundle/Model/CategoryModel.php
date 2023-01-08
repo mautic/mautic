@@ -1,48 +1,41 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CategoryBundle\Model;
 
 use Mautic\CategoryBundle\CategoryEvents;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
+use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\FormModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class CategoryModel
- * {@inheritdoc}
+ * @extends FormModel<Category>
  */
 class CategoryModel extends FormModel
 {
     /**
-     * @var null|\Symfony\Component\HttpFoundation\Request
+     * @var RequestStack
      */
-    protected $request;
+    protected $requestStack;
 
     /**
      * CategoryModel constructor.
-     *
-     * @param RequestStack $requestStack
      */
     public function __construct(RequestStack $requestStack)
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
     }
 
-    public function getRepository()
+    public function getRepository(): CategoryRepository
     {
-        return $this->em->getRepository('MauticCategoryBundle:Category');
+        $result = $this->em->getRepository(Category::class);
+        \assert($result instanceof CategoryRepository);
+
+        return $result;
     }
 
     public function getNameGetter()
@@ -53,7 +46,7 @@ class CategoryModel extends FormModel
     public function getPermissionBase($bundle = null)
     {
         if (null === $bundle) {
-            $bundle = $this->request->get('bundle');
+            $bundle = $this->requestStack->getCurrentRequest()->get('bundle');
         }
 
         if ('global' === $bundle || empty($bundle)) {
@@ -66,8 +59,8 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param   $entity
-     * @param   $unlock
+     * @param $entity
+     * @param $unlock
      *
      * @return mixed
      */
@@ -102,10 +95,10 @@ class CategoryModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
@@ -120,7 +113,7 @@ class CategoryModel extends FormModel
             $options['action'] = $action;
         }
 
-        return $formFactory->create('category_form', $entity, $options);
+        return $formFactory->create(CategoryType::class, $entity, $options);
     }
 
     /**
@@ -128,17 +121,15 @@ class CategoryModel extends FormModel
      *
      * @param $id
      *
-     * @return Category
+     * @return Category|null
      */
     public function getEntity($id = null)
     {
-        if ($id === null) {
+        if (null === $id) {
             return new Category();
         }
 
-        $entity = parent::getEntity($id);
-
-        return $entity;
+        return parent::getEntity($id);
     }
 
     /**
@@ -180,7 +171,7 @@ class CategoryModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

@@ -1,47 +1,47 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\UserBundle\Model\RoleModel;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-/**
- * Class SearchSubscriber.
- */
-class SearchSubscriber extends CommonSubscriber
+class SearchSubscriber implements EventSubscriberInterface
 {
     /**
      * @var UserModel
      */
-    protected $userModel;
+    private $userModel;
 
     /**
      * @var RoleModel
      */
-    protected $userRoleModel;
+    private $userRoleModel;
 
     /**
-     * SearchSubscriber constructor.
-     *
-     * @param UserModel $userModel
-     * @param RoleModel $roleModel
+     * @var CorePermissions
      */
-    public function __construct(UserModel $userModel, RoleModel $roleModel)
-    {
+    private $security;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templating;
+
+    public function __construct(
+        UserModel $userModel,
+        RoleModel $roleModel,
+        CorePermissions $security,
+        TemplatingHelper $templating
+    ) {
         $this->userModel     = $userModel;
         $this->userRoleModel = $roleModel;
+        $this->security      = $security;
+        $this->templating    = $templating;
     }
 
     /**
@@ -73,8 +73,8 @@ class SearchSubscriber extends CommonSubscriber
                 $userResults = [];
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
-                    $userResults[] = $this->templating->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
+                    $userResults[] = $this->templating->getTemplating()->renderResponse(
+                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
                         [
                             'user'    => $user,
                             'canEdit' => $canEdit,
@@ -82,8 +82,8 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($users) > 5) {
-                    $userResults[] = $this->templating->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
+                    $userResults[] = $this->templating->getTemplating()->renderResponse(
+                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -107,8 +107,8 @@ class SearchSubscriber extends CommonSubscriber
                 $canEdit     = $this->security->isGranted('user:roles:edit');
 
                 foreach ($roles as $role) {
-                    $roleResults[] = $this->templating->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
+                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
+                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
                         [
                             'role'    => $role,
                             'canEdit' => $canEdit,
@@ -116,8 +116,8 @@ class SearchSubscriber extends CommonSubscriber
                     )->getContent();
                 }
                 if (count($roles) > 5) {
-                    $roleResults[] = $this->templating->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
+                    $roleResults[] = $this->templating->getTemplating()->renderResponse(
+                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -131,9 +131,6 @@ class SearchSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MauticEvents\CommandListEvent $event
-     */
     public function onBuildCommandList(MauticEvents\CommandListEvent $event)
     {
         if ($this->security->isGranted('user:users:view')) {

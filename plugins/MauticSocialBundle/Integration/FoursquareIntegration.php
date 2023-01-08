@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Integration;
 
 /**
@@ -266,7 +257,7 @@ class FoursquareIntegration extends SocialIntegration
      */
     public function matchFieldName($field, $subfield = '')
     {
-        if ($field == 'contact' && in_array($subfield, ['facebook', 'twitter'])) {
+        if ('contact' == $field && in_array($subfield, ['facebook', 'twitter'])) {
             return $subfield.'ProfileHandle';
         }
 
@@ -339,5 +330,13 @@ class FoursquareIntegration extends SocialIntegration
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormType()
+    {
+        return null;
     }
 }

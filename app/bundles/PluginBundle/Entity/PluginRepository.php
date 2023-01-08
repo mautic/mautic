@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class PluginRepository.
+ * @extends CommonRepository<Plugin>
  */
 class PluginRepository extends CommonRepository
 {
@@ -30,7 +21,7 @@ class PluginRepository extends CommonRepository
     public function findByBundle($bundle)
     {
         $q = $this->createQueryBuilder($this->getTableAlias());
-        $q->where($q->expr()->eq('i.bundle', ':bundle'))
+        $q->where($q->expr()->eq('p.bundle', ':bundle'))
             ->setParameter('bundle', $bundle);
 
         return $q->getQuery()->getOneOrNullResult();

@@ -1,18 +1,12 @@
 <?php
 
-/*
- * @copyright   Mautic, Inc
- * @author      Mautic, Inc
- *
- * @link        http://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Event>
+ */
 class EventRepository extends CommonRepository
 {
     /**
@@ -27,7 +21,7 @@ class EventRepository extends CommonRepository
             ->leftJoin($alias.'.webhook', 'u');
 
         $q->where(
-            $q->expr()->eq($alias.'.event_type', ':type')
+            $q->expr()->eq($alias.'.eventType', ':type')
         )->setParameter('type', $type);
 
         // only find published webhooks

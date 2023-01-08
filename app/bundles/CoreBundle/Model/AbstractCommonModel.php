@@ -1,52 +1,26 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Intl\Intl;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Intl\Locales;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
- * Class AbstractCommonModel.
+ * @template T of object
  */
-abstract class AbstractCommonModel
+abstract class AbstractCommonModel implements MauticModelInterface
 {
-    /**
-     * Do not use Factory in Models. There's a couple places where we
-     * still need to in core, but we are working on refactoring. This
-     * is completely temporary.
-     *
-     * @param MauticFactory $factory
-     */
-    public function setFactory(MauticFactory $factory)
-    {
-        $this->factory = $factory;
-    }
-
-    /**
-     * @deprecated 2.0; to be removed in 3.0
-     *
-     * @var MauticFactory
-     */
-    protected $factory;
-
     /**
      * @var \Doctrine\ORM\EntityManager
      */
@@ -68,7 +42,7 @@ abstract class AbstractCommonModel
     protected $router;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -83,61 +57,54 @@ abstract class AbstractCommonModel
     protected $logger;
 
     /**
-     * @param EntityManager $em
+     * @var CoreParametersHelper
      */
-    public function setEntityManager(EntityManager $em)
+    protected $coreParametersHelper;
+
+    public function setEntityManager(EntityManager $em): void
     {
         $this->em = $em;
     }
 
-    /**
-     * @param CorePermissions $security
-     */
-    public function setSecurity(CorePermissions $security)
+    public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }
 
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @param Router $router
-     */
-    public function setRouter(Router $router)
+    public function setRouter(Router $router): void
     {
         $this->router = $router;
     }
 
-    /**
-     * @param TranslatorInterface $translator
-     */
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator): void
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
     /**
      * Initialize the user parameter for use in locking procedures.
-     *
-     * @param UserHelper $userHelper
      */
-    public function setUserHelper(UserHelper $userHelper)
+    public function setUserHelper(UserHelper $userHelper): void
     {
         $this->userHelper = $userHelper;
+    }
+
+    /**
+     * Initialize the CoreParameters parameter.
+     */
+    public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper): void
+    {
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -159,20 +126,20 @@ abstract class AbstractCommonModel
     {
         $repo = $this->getRepository();
 
-        return ($repo instanceof CommonRepository) ? $repo->getSearchCommands() : [];
+        return $repo->getSearchCommands();
     }
 
     /**
      * Retrieve the repository for an entity.
      *
-     * @return \Mautic\CoreBundle\Entity\CommonRepository|bool
+     * @return CommonRepository<T>
      */
     public function getRepository()
     {
         static $commonRepo;
 
-        if ($commonRepo === null) {
-            $commonRepo = new CommonRepository($this->em, new ClassMetadata('MauticCoreBundle:FormEntity'));
+        if (null === $commonRepo) {
+            $commonRepo = $this->em->getRepository(FormEntity::class);
         }
 
         return $commonRepo;
@@ -200,14 +167,10 @@ abstract class AbstractCommonModel
         //set the translator
         $repo = $this->getRepository();
 
-        if ($repo instanceof CommonRepository) {
-            $repo->setTranslator($this->translator);
-            $repo->setCurrentUser($this->userHelper->getUser());
+        $repo->setTranslator($this->translator);
+        $repo->setCurrentUser($this->userHelper->getUser());
 
-            return $repo->getEntities($args);
-        }
-
-        return [];
+        return $repo->getEntities($args);
     }
 
     /**
@@ -215,7 +178,7 @@ abstract class AbstractCommonModel
      *
      * @param int|array id
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntity($id = null)
     {
@@ -240,7 +203,7 @@ abstract class AbstractCommonModel
      */
     public function encodeArrayForUrl($array)
     {
-        return urlencode(base64_encode(serialize($array)));
+        return ClickthroughHelper::encodeArrayForUrl((array) $array);
     }
 
     /**
@@ -253,14 +216,7 @@ abstract class AbstractCommonModel
      */
     public function decodeArrayFromUrl($string, $urlDecode = true)
     {
-        $raw     = $urlDecode ? urldecode($string) : $string;
-        $decoded = base64_decode($raw);
-
-        if (strpos(strtolower($decoded), 'a') !== 0) {
-            throw new \InvalidArgumentException(sprintf('The string %s is not a serialized array.', $decoded));
-        }
-
-        return unserialize($decoded);
+        return ClickthroughHelper::decodeArrayFromUrl($string, $urlDecode);
     }
 
     /**
@@ -273,10 +229,10 @@ abstract class AbstractCommonModel
      */
     public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
-        $url = $this->router->generate($route, $routeParams, $absolute);
-        $url .= (!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '';
+        $referenceType = ($absolute) ? UrlGeneratorInterface::ABSOLUTE_URL : UrlGeneratorInterface::ABSOLUTE_PATH;
+        $url           = $this->router->generate($route, $routeParams, $referenceType);
 
-        return $url;
+        return $url.((!empty($clickthrough)) ? '?ct='.$this->encodeArrayForUrl($clickthrough) : '');
     }
 
     /**
@@ -294,15 +250,15 @@ abstract class AbstractCommonModel
         $lang     = null;
 
         $slugCount = count($slugs);
-        $locales   = Intl::getLocaleBundle()->getLocaleNames();
+        $locales   = Locales::getNames();
 
         switch (true) {
-            case $slugCount === 3:
+            case 3 === $slugCount:
                 list($lang, $category, $idSlug) = $slugs;
 
                 break;
 
-            case $slugCount === 2:
+            case 2 === $slugCount:
                 list($category, $idSlug) = $slugs;
 
                 // Check if the first slug is actually a locale
@@ -313,7 +269,7 @@ abstract class AbstractCommonModel
 
                 break;
 
-            case $slugCount === 1:
+            case 1 === $slugCount:
                 $idSlug = $slugs[0];
 
                 break;
@@ -331,9 +287,9 @@ abstract class AbstractCommonModel
         }
 
         $entity = false;
-        if (strpos($idSlug, ':') !== false) {
+        if (false !== strpos($idSlug, ':')) {
             $parts = explode(':', $idSlug);
-            if (count($parts) == 2) {
+            if (2 == count($parts)) {
                 $entity = $this->getEntity($parts[0]);
             }
         } else {
@@ -349,11 +305,23 @@ abstract class AbstractCommonModel
     }
 
     /**
-     * @param $alias
+     * @param string      $alias
+     * @param string|null $categoryAlias
+     * @param string|null $lang
      *
-     * @return null|object
+     * @return object|null
      */
     public function getEntityByAlias($alias, $categoryAlias = null, $lang = null)
     {
+    }
+
+    /**
+     * @phpstan-param class-string<T> $class
+     *
+     * @return CommonRepository<T>
+     */
+    protected function getServiceRepository(string $class)
+    {
+        return $this->em->getRepository($class);
     }
 }

@@ -11,7 +11,7 @@
 ?>
 
 .mf-bar-collapser {
-    position: fixed;
+    position: absolute;
     right: 3px;
     width: 24px;
     height: 24px;

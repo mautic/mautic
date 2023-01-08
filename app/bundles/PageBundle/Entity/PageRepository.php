@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Entity;
 
-use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class PageRepository.
+ * @extends CommonRepository<Page>
  */
 class PageRepository extends CommonRepository
 {
@@ -24,9 +14,20 @@ class PageRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        $q = $this
-            ->createQueryBuilder('p')
-            ->select('p')
+        $select = ['p'];
+
+        if (!empty($args['submissionCount'])) {
+            //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+            $sq = $this->_em->createQueryBuilder()
+                ->select('count(fs.id)')
+                ->from('MauticFormBundle:Submission', 'fs')
+                ->where('fs.page = p');
+
+            $select[] = '('.$sq->getDql().') as submission_count';
+        }
+
+        $q = $this->createQueryBuilder('p')
+            ->select($select)
             ->leftJoin('p.category', 'c');
 
         $args['qb'] = $q;
@@ -66,13 +67,15 @@ class PageRepository extends CommonRepository
      * @param bool   $viewOther
      * @param bool   $topLevel
      * @param array  $ignoreIds
+     * @param array  $extraColumns
+     * @param bool   $publishedOnly
      *
      * @return array
      */
-    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [])
+    public function getPageList($search = '', $limit = 10, $start = 0, $viewOther = false, $topLevel = false, $ignoreIds = [], $extraColumns = [], $publishedOnly = false)
     {
         $q = $this->createQueryBuilder('p');
-        $q->select('partial p.{id, title, language, alias}');
+        $q->select(sprintf('partial p.{id, title, language, alias %s}', empty($extraColumns) ? '' : ','.implode(',', $extraColumns)));
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('p.title', ':search'))
@@ -84,10 +87,10 @@ class PageRepository extends CommonRepository
                 ->setParameter('id', $this->currentUser->getId());
         }
 
-        if ($topLevel == 'translation') {
+        if ('translation' == $topLevel) {
             //only get top level pages
             $q->andWhere($q->expr()->isNull('p.translationParent'));
-        } elseif ($topLevel == 'variant') {
+        } elseif ('variant' == $topLevel) {
             $q->andWhere($q->expr()->isNull('p.variantParent'));
         }
 
@@ -95,6 +98,11 @@ class PageRepository extends CommonRepository
             $q->andWhere($q->expr()->notIn('p.id', ':pageIds'))
                 ->setParameter('pageIds', $ignoreIds);
         }
+
+        if ($publishedOnly) {
+            $q->andWhere($q->expr()->eq('p.isPublished', 1));
+        }
+
         $q->orderBy('p.title');
 
         if (!empty($limit)) {
@@ -149,6 +157,11 @@ class PageRepository extends CommonRepository
                 );
                 $returnParameter = true;
                 break;
+            case $this->translator->trans('mautic.page.searchcommand.isprefcenter'):
+            case $this->translator->trans('mautic.page.searchcommand.isprefcenter', [], null, 'en_US'):
+                $expr            = $q->expr()->eq('p.isPreferenceCenter', ":$unique");
+                $forceParameters = [$unique => true];
+                break;
         }
 
         if ($expr && $filter->not) {
@@ -177,6 +190,7 @@ class PageRepository extends CommonRepository
             'mautic.core.searchcommand.ismine',
             'mautic.core.searchcommand.category',
             'mautic.core.searchcommand.lang',
+            'mautic.page.searchcommand.isprefcenter',
         ];
 
         return array_merge($commands, parent::getSearchCommands());

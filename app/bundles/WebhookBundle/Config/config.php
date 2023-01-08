@@ -1,24 +1,27 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_webhook_index' => [
                 'path'       => '/webhooks/{page}',
-                'controller' => 'MauticWebhookBundle:Webhook:index',
+                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::indexAction',
             ],
             'mautic_webhook_action' => [
                 'path'       => '/webhooks/{objectAction}/{objectId}',
-                'controller' => 'MauticWebhookBundle:Webhook:execute',
+                'controller' => 'Mautic\WebhookBundle\Controller\WebhookController::executeAction',
+            ],
+        ],
+        'api' => [
+            'mautic_api_webhookstandard' => [
+                'standard_entity' => true,
+                'name'            => 'hooks',
+                'path'            => '/hooks',
+                'controller'      => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController',
+            ],
+            'mautic_api_webhookevents' => [
+                'path'       => '/hooks/triggers',
+                'controller' => 'Mautic\WebhookBundle\Controller\Api\WebhookApiController::getTriggersAction',
             ],
         ],
     ],
@@ -37,50 +40,65 @@ return [
     ],
 
     'services' => [
-        'forms' => [
-            'mautic.form.type.webhook' => [
-                'class'     => 'Mautic\WebhookBundle\Form\Type\WebhookType',
-                'arguments' => 'translator',
-                'alias'     => 'webhook',
-            ],
-            'mautic.form.type.webhookconfig' => [
-                'class' => 'Mautic\WebhookBundle\Form\Type\ConfigType',
-                'alias' => 'webhookconfig',
-            ],
-        ],
-        'events' => [
-            'mautic.webhook.config.subscriber' => [
-                'class' => 'Mautic\WebhookBundle\EventListener\ConfigSubscriber',
-            ],
-            'mautic.webhook.audit.subscriber' => [
-                'class'     => 'Mautic\WebhookBundle\EventListener\WebhookSubscriber',
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.webhook.stats.subscriber' => [
-                'class'     => \Mautic\WebhookBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.webhook.model.webhook' => [
-                'class'     => 'Mautic\WebhookBundle\Model\WebhookModel',
+                'class'     => \Mautic\WebhookBundle\Model\WebhookModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'jms_serializer',
+                    'mautic.webhook.http.client',
+                    'event_dispatcher',
+                ],
+            ],
+        ],
+        'others' => [
+            'mautic.webhook.notificator.webhookkillnotificator' => [
+                'class'     => \Mautic\WebhookBundle\Notificator\WebhookKillNotificator::class,
+                'arguments' => [
+                    'translator',
+                    'router',
+                    'mautic.core.model.notification',
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.mailer',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'mautic.webhook.campaign.helper' => [
+                'class'     => \Mautic\WebhookBundle\Helper\CampaignHelper::class,
+                'arguments' => [
+                    'mautic.http.client',
+                    'mautic.lead.model.company',
+                    'event_dispatcher',
+                ],
+            ],
+            'mautic.webhook.http.client' => [
+                'class'     => \Mautic\WebhookBundle\Http\Client::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.guzzle.client',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.webhook.repository.queue' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \Mautic\WebhookBundle\Entity\WebhookQueue::class,
                 ],
             ],
         ],
     ],
 
     'parameters' => [
-        'webhook_start'   => 0,
-        'webhook_limit'   => 1000,
-        'webhook_log_max' => 10,
-        'queue_mode'      => 'immediate_process',
+        'webhook_limit'                        => 10, // How many entities can be sent in one webhook
+        'webhook_time_limit'                   => 600, // How long the webhook processing can run in seconds
+        'webhook_log_max'                      => 1000, // How many recent logs to keep
+        'clean_webhook_logs_in_background'     => false,
+        'webhook_disable_limit'                => 100, // How many times the webhook response can fail until the webhook will be unpublished
+        'webhook_timeout'                      => 15, // How long the CURL request can wait for response before Mautic hangs up. In seconds
+        'queue_mode'                           => \Mautic\WebhookBundle\Model\WebhookModel::IMMEDIATE_PROCESS, // Trigger the webhook immediately or queue it for faster response times
+        'events_orderby_dir'                   => \Doctrine\Common\Collections\Criteria::ASC, // Order the queued events chronologically or the other way around
+        'webhook_email_details'                => true, // If enabled, email related webhooks send detailed data
     ],
 ];

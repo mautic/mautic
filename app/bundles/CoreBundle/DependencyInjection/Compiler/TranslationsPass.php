@@ -1,38 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Class TranslationsPass.
- */
 class TranslationsPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $translator = $container->findDefinition('translator.default');
-
-        if ($translator !== null) {
-            // Disable cache for dev environment
-            if (MAUTIC_ENV === 'dev') {
-                $translatorOptions              = $translator->getArgument(3);
-                $translatorOptions['cache_dir'] = null;
-                $translator->replaceArgument(3, $translatorOptions);
-            }
+        if (!$container->has('translator')) {
+            return;
         }
+
+        $container->register('translator.decorated', Translator::class)
+            ->setDecoratedService('translator', 'translator.decorated.inner', -100)
+            ->setArgument(0, new Reference('translator.decorated.inner'));
     }
 }

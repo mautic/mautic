@@ -1,8 +1,53 @@
 /** SmsBundle **/
 Mautic.smsOnLoad = function (container, response) {
+    const smsMessage = mQuery('#sms_message');
+
+    if (smsMessage.length) {
+        Mautic.setSmsCharactersCount(smsMessage);
+        smsMessage.on('input', () => {
+            Mautic.setSmsCharactersCount(smsMessage);
+        });
+    }
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'sms');
     }
+
+    if (mQuery('table.sms-list').length) {
+        var ids = [];
+        mQuery('td.col-stats').each(function () {
+            var id = mQuery(this).attr('data-stats');
+            ids.push(id);
+        });
+
+        // Get all stats numbers in batches of 10
+        while (ids.length > 0) {
+            let batchIds = ids.splice(0, 10);
+            Mautic.ajaxActionRequest(
+                'sms:getSmsCountStats',
+                {ids: batchIds},
+                function (response) {
+                    if (response.success && response.stats) {
+                        for (var i = 0; i < response.stats.length; i++) {
+                            var stat = response.stats[i];
+                            if (mQuery('#pending-' + stat.id).length) {
+                                if (stat.pending) {
+                                    mQuery('#pending-' + stat.id + ' > a').html(stat.pending);
+                                    mQuery('#pending-' + stat.id).removeClass('hide');
+                                }
+                            }
+                        }
+                    }
+                },
+                false,
+                true
+            );
+        }
+    }
+};
+
+Mautic.setSmsCharactersCount = function (smsMessage) {
+    mQuery('#sms_nb_char').text((smsMessage.val().length))
 };
 
 Mautic.selectSmsType = function(smsType) {

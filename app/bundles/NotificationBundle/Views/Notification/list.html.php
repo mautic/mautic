@@ -8,7 +8,7 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-if ($tmpl == 'index') {
+if ('index' == $tmpl) {
     $view->extend('MauticNotificationBundle:Notification:index.html.php');
 }
 
@@ -121,7 +121,7 @@ if (count($items)):
                     </td>
                     <td>
                         <div>
-                            <?php if ($type == 'template'): ?>
+                            <?php if ('template' == $type): ?>
                                 <?php echo $view->render(
                                     'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                     ['item' => $item, 'model' => 'notification']
@@ -134,7 +134,7 @@ if (count($items)):
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>">
                                 <?php echo $item->getName(); ?>
-                                <?php if ($type == 'list'): ?>
+                                <?php if ('list' == $type): ?>
                                     <span data-toggle="tooltip" title="<?php echo $view['translator']->trans(
                                         'mautic.notification.icon_tooltip.list_notification'
                                     ); ?>"><i class="fa fa-fw fa-list"></i></span>
@@ -149,10 +149,17 @@ if (count($items)):
                         <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats">
-                        <span class="mt-xs label label-warning"><?php echo $view['translator']->trans(
-                                'mautic.notification.stat.sentcount',
-                                ['%count%' => $item->getSentCount(true)]
-                            ); ?></span>
+                        <span class="mt-xs label label-warning has-click-event clickable-stat"
+                              data-toggle="tooltip"
+                              title="<?php echo $view['translator']->trans('mautic.channel.stat.leadcount.tooltip'); ?>">
+                            <a href="<?php echo $view['router']->path(
+                                'mautic_contact_index',
+                                ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.web_sent').':'.$item->getId()]
+                            ); ?>"><?php echo $view['translator']->trans(
+                                    'mautic.notification.stat.sentcount',
+                                    ['%count%' => $item->getSentCount(true)]
+                                ); ?></a>
+                        </span>
                     </td>
                     <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
                 </tr>

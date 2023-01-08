@@ -1,9 +1,15 @@
 //FormBundle
 Mautic.formOnLoad = function (container) {
+
     if (mQuery(container + ' #list-search').length) {
         Mautic.activateSearchAutocomplete('list-search', 'form.form');
     }
+
+    Mautic.formBuilderNewComponentInit();
+    Mautic.iniNewConditionalField();
+
     var bodyOverflow = {};
+
     if (mQuery('#mauticforms_fields')) {
         //make the fields sortable
         mQuery('#mauticforms_fields').sortable({
@@ -38,14 +44,6 @@ Mautic.formOnLoad = function (container) {
                     data: mQuery('#mauticforms_fields').sortable("serialize", {attribute: 'data-sortable-id'}) + "&formId=" + mQuery('#mauticform_sessionId').val()
                 });
             }
-        });
-
-        mQuery('#available_fields').change(function (e) {
-            mQuery(this).find('option:selected');
-            Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
-            // Reset the dropdown
-            mQuery(this).val('');
-            mQuery(this).trigger('chosen:updated');
         });
 
         Mautic.initFormFieldButtons();
@@ -101,6 +99,16 @@ Mautic.formOnLoad = function (container) {
     Mautic.initHideItemButton('#mauticforms_actions');
 };
 
+Mautic.formBuilderNewComponentInit = function () {
+    mQuery('select.form-builder-new-component').change(function (e) {
+        mQuery(this).find('option:selected');
+        Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+        // Reset the dropdown
+        mQuery(this).val('');
+        mQuery(this).trigger('chosen:updated');
+    });
+}
+
 Mautic.updateFormFields = function () {
     Mautic.activateLabelLoadingIndicator('campaignevent_properties_field');
 
@@ -147,7 +155,7 @@ Mautic.updateFormFieldValues = function (field) {
             .attr('value', valueFieldAttrs['value']);
         mQuery.each(options[fieldValue], function(key, optionVal) {
             var option = mQuery("<option></option>")
-                .attr('value', optionVal)
+                .attr('value', key)
                 .text(optionVal);
             newValueField.append(option);
         });
@@ -176,9 +184,14 @@ Mautic.formFieldOnLoad = function (container, response) {
             mQuery(fieldContainer).replaceWith(newHtml);
             var newField = false;
         } else {
-            //append content
-            var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
-            panel.before(newHtml);
+            var parentContainer = mQuery('#mauticform_'+response.parent);
+            if (parentContainer.length) {
+                (parentContainer.parents('.panel:first')).append(newHtml);
+            }else {
+                //append content
+                var panel = mQuery('#mauticforms_fields .mauticform-button-wrapper').closest('.form-field-wrapper');
+                panel.before(newHtml);
+            }
             var newField = true;
         }
 
@@ -215,8 +228,21 @@ Mautic.formFieldOnLoad = function (container, response) {
         if (mQuery('#form-field-placeholder').length) {
             mQuery('#form-field-placeholder').remove();
         }
+
+        Mautic.activateChosenSelect(mQuery('.form-builder-new-component'));
+        Mautic.formBuilderNewComponentInit();
+        Mautic.iniNewConditionalField();
     }
 };
+
+Mautic.iniNewConditionalField = function(){
+    mQuery('.add-new-conditional-field').click(function (e) {
+        e.preventDefault();
+        mQuery(this).parent().next().show('normal');
+    })
+    mQuery('.add-new-conditional-field').parent().next().hide();
+
+}
 
 Mautic.initFormFieldButtons = function (container) {
     if (typeof container == 'undefined') {
@@ -285,7 +311,7 @@ Mautic.formActionOnLoad = function (container, response) {
 Mautic.initHideItemButton = function(container) {
     mQuery(container).find('[data-hide-panel]').click(function(e) {
         e.preventDefault();
-        mQuery(this).closest('.panel').hide('fast');
+        mQuery(this).closest('.panel,.panel2').hide('fast');
     });
 }
 
@@ -303,12 +329,14 @@ Mautic.onPostSubmitActionChange = function(value) {
 
 Mautic.selectFormType = function(formType) {
     if (formType == 'standalone') {
-        mQuery('.action-standalone-only').removeClass('hide');
+        mQuery('option.action-standalone-only').removeClass('hide');
         mQuery('.page-header h3').text(mauticLang.newStandaloneForm);
     } else {
-        mQuery('.action-standalone-only').addClass('hide');
+        mQuery('option.action-standalone-only').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newCampaignForm);
     }
+
+    mQuery('.available-actions select').trigger('chosen:updated');
 
     mQuery('#mauticform_formType').val(formType);
 

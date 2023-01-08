@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -31,9 +22,6 @@ class ContentHelper extends Helper
 
     /**
      * UIHelper constructor.
-     *
-     * @param DelegatingEngine         $templating
-     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(DelegatingEngine $templating, EventDispatcherInterface $dispatcher)
     {
@@ -61,21 +49,39 @@ class ContentHelper extends Helper
             $viewName = $vars['mauticTemplate'];
         }
 
-        /** @var ContentEvent $event */
+        /** @var CustomContentEvent $event */
         $event = $this->dispatcher->dispatch(
-            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT,
-            new CustomContentEvent($viewName, $context, $vars)
+            new CustomContentEvent($viewName, $context, $vars),
+            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT
         );
 
         $content = $event->getContent();
 
-        if ($templates = $event->getTemplates()) {
-            foreach ($templates as $template => $templateVars) {
-                $content[] = $this->templating->render($template, array_merge($vars, $templateVars));
+        if ($templatProps = $event->getTemplates()) {
+            foreach ($templatProps as $props) {
+                $content[] = $this->templating->render($props['template'], array_merge($vars, $props['vars']));
             }
         }
 
         return implode("\n\n", $content);
+    }
+
+    /**
+     * Replaces HTML script tags with non HTML tags so the JS inside them won't execute and will be readable.
+     *
+     * @param string $html
+     *
+     * @return string
+     */
+    public function showScriptTags($html)
+    {
+        $tagsToShow = ['script', 'style'];
+
+        foreach ($tagsToShow as $tag) {
+            $html = preg_replace('/<'.$tag.'(.*?)>(.*?)<\/'.$tag.'>/s', '['.$tag.'$1]$2[/'.$tag.']', $html);
+        }
+
+        return $html;
     }
 
     /**

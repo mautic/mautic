@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -19,6 +11,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\PageBundle\Entity\Page;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ORM\Entity
@@ -109,9 +103,6 @@ class Tweet extends FormEntity
      */
     private $stats;
 
-    /**
-     * Tweet constructor.
-     */
     public function __construct()
     {
         $this->stats = new ArrayCollection();
@@ -120,7 +111,6 @@ class Tweet extends FormEntity
     public function __clone()
     {
         $this->id            = null;
-        $this->tweetId       = null;
         $this->sentCount     = 0;
         $this->favoriteCount = 0;
         $this->retweetCount  = 0;
@@ -129,55 +119,25 @@ class Tweet extends FormEntity
         parent::__clone();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('tweets')
-            ->setCustomRepositoryClass('MauticPlugin\MauticSocialBundle\Entity\TweetRepository')
-            ->addIndex(['text'], 'tweet_text_index')
+            ->setCustomRepositoryClass(TweetRepository::class)
             ->addIndex(['sent_count'], 'sent_count_index')
             ->addIndex(['favorite_count'], 'favorite_count_index')
             ->addIndex(['retweet_count'], 'retweet_count_index');
 
         $builder->addIdColumns();
         $builder->addCategory();
-
-        $builder->createField('mediaId', 'string')
-            ->columnName('media_id')
-            ->nullable()
-            ->build();
-
-        $builder->createField('mediaPath', 'string')
-            ->columnName('media_path')
-            ->nullable()
-            ->build();
-
-        $builder->createField('text', 'string')
-            ->build();
-
-        $builder->createField('sentCount', 'integer')
-            ->columnName('sent_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('favoriteCount', 'integer')
-            ->columnName('favorite_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('retweetCount', 'integer')
-            ->columnName('retweet_count')
-            ->nullable()
-            ->build();
-
-        $builder->createField('language', 'string')
-            ->columnName('lang')
-            ->nullable()
-            ->build();
+        $builder->addNullableField('mediaId', Type::STRING, 'media_id');
+        $builder->addNullableField('mediaPath', Type::STRING, 'media_path');
+        $builder->addField('text', Type::STRING, ['length' => 280]);
+        $builder->addNullableField('sentCount', Type::INTEGER, 'sent_count');
+        $builder->addNullableField('favoriteCount', Type::INTEGER, 'favorite_count');
+        $builder->addNullableField('retweetCount', Type::INTEGER, 'retweet_count');
+        $builder->addNullableField('language', Type::STRING, 'lang');
 
         $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')
@@ -226,6 +186,18 @@ class Tweet extends FormEntity
     }
 
     /**
+     * Constraints for required fields.
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addPropertyConstraint('text', new Assert\Length(
+            [
+                'max' => 280,
+            ]
+        ));
+    }
+
+    /**
      * @return int|null
      */
     public function getId()
@@ -260,6 +232,7 @@ class Tweet extends FormEntity
      */
     public function setName($name)
     {
+        $this->isChanged('name', $name);
         $this->name = $name;
 
         return $this;
@@ -280,6 +253,7 @@ class Tweet extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -357,8 +331,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param DateTime $dateTweeted
-     *
      * @return $this
      */
     public function setSentCount($sentCount)
@@ -453,8 +425,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Asset $asset
-     *
      * @return $this
      */
     public function setAsset(Asset $asset)
@@ -473,8 +443,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Page $page
-     *
      * @return $this
      */
     public function setPage(Page $page)
@@ -493,8 +461,6 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param Category $page
-     *
      * @return $this
      */
     public function setCategory(Category $category)

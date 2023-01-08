@@ -1,28 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_message_index' => [
                 'path'       => '/messages/{page}',
-                'controller' => 'MauticChannelBundle:Message:index',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::indexAction',
             ],
             'mautic_message_contacts' => [
                 'path'       => '/messages/contacts/{objectId}/{channel}/{page}',
-                'controller' => 'MauticChannelBundle:Message:contacts',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
             ],
             'mautic_message_action' => [
                 'path'       => '/messages/{objectAction}/{objectId}',
-                'controller' => 'MauticChannelBundle:Message:execute',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::executeAction',
+            ],
+            'mautic_channel_batch_contact_set' => [
+                'path'       => '/channels/batch/contact/set',
+                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::setAction',
+            ],
+            'mautic_channel_batch_contact_view' => [
+                'path'       => '/channels/batch/contact/view',
+                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::indexAction',
             ],
         ],
         'api' => [
@@ -30,11 +29,10 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => 'MauticChannelBundle:Api\MessageApi',
+                'controller'      => 'Mautic\ChannelBundle\Controller\Api\MessageApiController',
             ],
         ],
         'public' => [
-
         ],
     ],
 
@@ -48,58 +46,18 @@ return [
             ],
         ],
         'admin' => [
-
         ],
         'profile' => [
-
         ],
         'extra' => [
-
         ],
     ],
 
     'categories' => [
-        'messages',
+        'messages' => null,
     ],
 
     'services' => [
-        'events' => [
-            'mautic.channel.campaignbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\CampaignSubscriber',
-                'arguments' => [
-                    'mautic.channel.model.message',
-                    'mautic.campaign.model.campaign',
-                    'mautic.campaign.model.event',
-                ],
-            ],
-            'mautic.channel.channelbundle.subscriber' => [
-                'class'     => 'Mautic\ChannelBundle\EventListener\MessageSubscriber',
-                'arguments' => [
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-
-        ],
-        'forms' => [
-            \Mautic\ChannelBundle\Form\Type\MessageType::class => [
-                'class'       => \Mautic\ChannelBundle\Form\Type\MessageType::class,
-                'methodCalls' => [
-                    'setSecurity' => ['mautic.security'],
-                ],
-                'arguments' => [
-                    'mautic.channel.model.message',
-                ],
-            ],
-            'mautic.form.type.message_list' => [
-                'class' => 'Mautic\ChannelBundle\Form\Type\MessageListType',
-                'alias' => 'message_list',
-            ],
-            'mautic.form.type.message_send' => [
-                'class'     => 'Mautic\ChannelBundle\Form\Type\MessageSendType',
-                'arguments' => ['router', 'mautic.channel.model.message'],
-                'alias'     => 'message_send',
-            ],
-        ],
         'helpers' => [
             'mautic.channel.helper.channel_list' => [
                 'class'     => \Mautic\ChannelBundle\Helper\ChannelListHelper::class,
@@ -126,10 +84,31 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'mautic.channel.model.channel.action' => [
+                'class'     => \Mautic\ChannelBundle\Model\ChannelActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.dnc',
+                    'translator',
+                ],
+            ],
+            'mautic.channel.model.frequency.action' => [
+                'class'     => \Mautic\ChannelBundle\Model\FrequencyActionModel::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.repository.frequency_rule',
+                ],
+            ],
+        ],
+        'repositories' => [
+            'mautic.channel.repository.message_queue' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => \Mautic\ChannelBundle\Entity\MessageQueue::class,
+            ],
         ],
     ],
 
     'parameters' => [
-
     ],
 ];

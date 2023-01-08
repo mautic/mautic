@@ -1,0 +1,13 @@
+{
+  "name": "mautic/theme-cards",
+  "description": "Mautic Cards Theme",
+  "type": "mautic-theme",
+  "keywords": ["mautic","theme"],
+  "extra": {
+    "install-directory-name": "cards"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "mautic/core-lib": "^5.0"
+  }
+}

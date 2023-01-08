@@ -15,7 +15,7 @@ $dataRelated  = (!empty($settings['related'])) ? ' data-related="'.$settings['re
 $dataHashtags = (!empty($settings['hashtags'])) ? ' data-hashtags="'.$settings['hashtags'].'"' : '';
 $dataSize     = (!empty($settings['size'])) ? ' data-size="'.$settings['size'].'"' : '';
 $dataCount    = (!empty($settings['count'])) ? ' data-count="'.$settings['count'].'"' : '';
-$dataLang     = ($locale != 'en_US') ? ' data-lang="'.$locale.'"' : '';
+$dataLang     = ('en_US' != $locale) ? ' data-lang="'.$locale.'"' : '';
 
 $js = <<<'JS'
 !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');

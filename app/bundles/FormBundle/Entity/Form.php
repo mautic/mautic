@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -34,6 +27,11 @@ class Form extends FormEntity
      * @var string
      */
     private $name;
+
+    /**
+     * @var string
+     */
+    private $formAttributes;
 
     /**
      * @var string
@@ -119,11 +117,21 @@ class Form extends FormEntity
     private $formType;
 
     /**
+     * @var bool
+     */
+    private $noIndex;
+
+    /**
+     * @var int
+     */
+    private $progressiveProfilingLimit;
+
+    /**
      * This var is used to cache the result once gained from the loop.
      *
      * @var bool
      */
-    private $usesProgressiveProfiling = null;
+    private $usesProgressiveProfiling;
 
     public function __clone()
     {
@@ -142,9 +150,6 @@ class Form extends FormEntity
         $this->submissions = new ArrayCollection();
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -155,6 +160,8 @@ class Form extends FormEntity
         $builder->addIdColumns();
 
         $builder->addField('alias', 'string');
+
+        $builder->addNullableField('formAttributes', 'string', 'form_attr');
 
         $builder->addCategory();
 
@@ -167,7 +174,7 @@ class Form extends FormEntity
             ->columnName('post_action')
             ->build();
 
-        $builder->createField('postActionProperty', 'string')
+        $builder->createField('postActionProperty', Types::TEXT)
             ->columnName('post_action_property')
             ->nullable()
             ->build();
@@ -211,11 +218,15 @@ class Form extends FormEntity
             ->build();
 
         $builder->addNullableField('formType', 'string', 'form_type');
+
+        $builder->createField('noIndex', 'boolean')
+            ->columnName('no_index')
+            ->nullable()
+            ->build();
+
+        $builder->addNullableField('progressiveProfilingLimit', Type::INTEGER, 'progressive_profiling_limit');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
@@ -241,11 +252,15 @@ class Form extends FormEntity
         $metadata->addPropertyConstraint('formType', new Assert\Choice([
             'choices' => ['standalone', 'campaign'],
         ]));
+
+        $metadata->addPropertyConstraint('progressiveProfilingLimit', new Assert\GreaterThan([
+            'value'   => 0,
+            'message' => 'mautic.form.form.progressive_profiling_limit.error',
+            'groups'  => ['progressiveProfilingLimit'],
+        ]));
     }
 
     /**
-     * @param \Symfony\Component\Form\Form $form
-     *
      * @return array
      */
     public static function determineValidationGroups(\Symfony\Component\Form\Form $form)
@@ -255,10 +270,14 @@ class Form extends FormEntity
 
         $postAction = $data->getPostAction();
 
-        if ($postAction == 'message') {
+        if ('message' == $postAction) {
             $groups[] = 'messageRequired';
-        } elseif ($postAction == 'redirect') {
+        } elseif ('redirect' == $postAction) {
             $groups[] = 'urlRequired';
+        }
+
+        if ('' != $data->getProgressiveProfilingLimit()) {
+            $groups[] = 'progressiveProfilingLimit';
         }
 
         return $groups;
@@ -289,12 +308,13 @@ class Form extends FormEntity
                     'fields',
                     'actions',
                     'template',
-                    'submissionCount',
                     'inKioskMode',
                     'renderStyle',
                     'formType',
                     'postAction',
                     'postActionProperty',
+                    'noIndex',
+                    'formAttributes',
                 ]
             )
             ->build();
@@ -306,13 +326,11 @@ class Form extends FormEntity
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
-        $current = $this->$getter();
-        if ($prop == 'actions' || $prop == 'fields') {
+        if ('actions' == $prop || 'fields' == $prop) {
             //changes are already computed so just add them
             $this->changes[$prop][$val[0]] = $val[1];
-        } elseif ($current != $val) {
-            $this->changes[$prop] = [$current, $val];
+        } else {
+            parent::isChanged($prop, $val);
         }
     }
 
@@ -527,8 +545,7 @@ class Form extends FormEntity
     /**
      * Add a field.
      *
-     * @param       $key
-     * @param Field $field
+     * @param $key
      *
      * @return Form
      */
@@ -545,8 +562,7 @@ class Form extends FormEntity
     /**
      * Remove a field.
      *
-     * @param       $key
-     * @param Field $field
+     * @param $key
      */
     public function removeField($key, Field $field)
     {
@@ -559,7 +575,7 @@ class Form extends FormEntity
     /**
      * Get fields.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Field[]
      */
     public function getFields()
     {
@@ -613,8 +629,6 @@ class Form extends FormEntity
     /**
      * Add submissions.
      *
-     * @param Submission $submissions
-     *
      * @return Form
      */
     public function addSubmission(Submission $submissions)
@@ -626,8 +640,6 @@ class Form extends FormEntity
 
     /**
      * Remove submissions.
-     *
-     * @param Submission $submissions
      */
     public function removeSubmission(Submission $submissions)
     {
@@ -637,7 +649,7 @@ class Form extends FormEntity
     /**
      * Get submissions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Submission[]
      */
     public function getSubmissions()
     {
@@ -647,8 +659,7 @@ class Form extends FormEntity
     /**
      * Add actions.
      *
-     * @param        $key
-     * @param Action $action
+     * @param $key
      *
      * @return Form
      */
@@ -664,8 +675,6 @@ class Form extends FormEntity
 
     /**
      * Remove action.
-     *
-     * @param Action $action
      */
     public function removeAction(Action $action)
     {
@@ -683,7 +692,7 @@ class Form extends FormEntity
     /**
      * Get actions.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return \Doctrine\Common\Collections\Collection|Action[]
      */
     public function getActions()
     {
@@ -775,11 +784,50 @@ class Form extends FormEntity
     }
 
     /**
+     * @param bool|null $noIndex
+     */
+    public function setNoIndex($noIndex)
+    {
+        $sanitizedNoIndex = null === $noIndex ? null : (bool) $noIndex;
+        $this->isChanged('noIndex', $sanitizedNoIndex);
+        $this->noIndex = $sanitizedNoIndex;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getNoIndex()
+    {
+        return $this->noIndex;
+    }
+
+    /**
+     * @param string $formAttributes
+     *
+     * @return Form
+     */
+    public function setFormAttributes($formAttributes)
+    {
+        $this->isChanged('formAttributes', $formAttributes);
+        $this->formAttributes = $formAttributes;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormAttributes()
+    {
+        return $this->formAttributes;
+    }
+
+    /**
      * @return bool
      */
     public function isStandalone()
     {
-        return $this->formType != 'campaign';
+        return 'campaign' != $this->formType;
     }
 
     /**
@@ -805,15 +853,21 @@ class Form extends FormEntity
      */
     public function usesProgressiveProfiling()
     {
-        if ($this->usesProgressiveProfiling !== null) {
+        if (null !== $this->usesProgressiveProfiling) {
             return $this->usesProgressiveProfiling;
         }
 
         // Progressive profiling must be turned off in the kiosk mode
-        if ($this->getInKioskMode() === false) {
+        if (false === $this->getInKioskMode()) {
+            if ('' != $this->getProgressiveProfilingLimit()) {
+                $this->usesProgressiveProfiling = true;
+
+                return $this->usesProgressiveProfiling;
+            }
+
             // Search for a field with a progressive profiling setting on
             foreach ($this->fields->toArray() as $field) {
-                if ($field->getShowWhenValueExists() === false || $field->getShowAfterXSubmissions() > 0) {
+                if (false === $field->getShowWhenValueExists() || $field->getShowAfterXSubmissions() > 0) {
                     $this->usesProgressiveProfiling = true;
 
                     return $this->usesProgressiveProfiling;
@@ -824,5 +878,30 @@ class Form extends FormEntity
         $this->usesProgressiveProfiling = false;
 
         return $this->usesProgressiveProfiling;
+    }
+
+    /**
+     * @param int $progressiveProfilingLimit
+     *
+     * @return Form
+     */
+    public function setProgressiveProfilingLimit($progressiveProfilingLimit)
+    {
+        $this->isChanged('progressiveProfilingLimit', $progressiveProfilingLimit);
+        $this->progressiveProfilingLimit = $progressiveProfilingLimit;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getProgressiveProfilingLimit()
+    {
+        if (0 === $this->progressiveProfilingLimit) {
+            $this->progressiveProfilingLimit = '';
+        }
+
+        return $this->progressiveProfilingLimit;
     }
 }

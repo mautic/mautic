@@ -1,0 +1,50 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 428457,
+      "name": "Jan Kowalski",
+      "default_currency": "PLN",
+      "locale": "pl_PL",
+      "lang": 1,
+      "email": "test@test.pl",
+      "phone": null,
+      "activated": true,
+      "last_login": "0000-00-00 00:00:00",
+      "created": "2014-12-18 10:29:05",
+      "modified": "2016-09-13 06:55:26",
+      "signup_flow_variation": null,
+      "has_created_company": true,
+      "is_admin": 0,
+      "role_id": "1",
+      "timezone_name": "Europe/Berlin",
+      "active_flag": true,
+      "icon_url": null,
+      "is_you": false
+    },
+    {
+      "id": 2558281,
+      "name": "Test User",
+      "default_currency": "PLN",
+      "locale": "en_US",
+      "lang": 1,
+      "email": "test123@test.com",
+      "phone": null,
+      "activated": true,
+      "last_login": "2017-05-24 08:38:47",
+      "created": "2017-05-22 11:40:55",
+      "modified": "2017-05-24 08:38:47",
+      "signup_flow_variation": "short_form",
+      "has_created_company": true,
+      "is_admin": 1,
+      "role_id": "1",
+      "timezone_name": "Europe/Berlin",
+      "active_flag": true,
+      "icon_url": "https://d3myhnqlqw2314.cloudfront.net/profile_120x120_2558281_a40046cb532f0202bec118a3b0eb6fb8.jpg",
+      "is_you": true
+    }
+  ],
+  "additional_data": {
+    "company_id": 1770970
+  }
+}

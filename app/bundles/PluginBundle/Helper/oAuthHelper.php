@@ -1,17 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Helper;
 
-use Mautic\PluginBundle\Integration\AbstractIntegration;
+use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,7 +26,7 @@ class oAuthHelper
 
     private $request;
 
-    public function __construct(AbstractIntegration $integration, Request $request, $settings = [])
+    public function __construct(UnifiedIntegrationInterface $integration, Request $request = null, $settings = [])
     {
         $clientId                = $integration->getClientIdKey();
         $clientSecret            = $integration->getClientSecretKey();
@@ -62,7 +53,7 @@ class oAuthHelper
         //Get standard OAuth headers
         $headers = $this->getOauthHeaders();
 
-        if (!empty($this->settings['include_verifier']) && $this->request->query->has('oauth_verifier')) {
+        if (!empty($this->settings['include_verifier']) && $this->request && $this->request->query->has('oauth_verifier')) {
             $headers['oauth_verifier'] = $this->request->query->get('oauth_verifier');
         }
 
@@ -73,7 +64,9 @@ class oAuthHelper
 
         if (!empty($this->settings['double_encode_basestring_parameters'])) {
             // Parameters must be encoded before going through buildBaseString
-            array_walk($parameters, create_function('&$val, $key, $oauth', '$val = $oauth->encode($val);'), $this);
+            array_walk($parameters, function (&$val, $key, $oauth) {
+                $val = $oauth->encode($val);
+            }, $this);
         }
 
         $signature = array_merge($headers, $parameters);
@@ -157,9 +150,8 @@ class oAuthHelper
     {
         $r      = 'Authorization: OAuth ';
         $values = $this->normalizeParameters($oauth, true, true);
-        $r .= implode(', ', $values);
 
-        return $r;
+        return $r.implode(', ', $values);
     }
 
     /**
@@ -169,7 +161,7 @@ class oAuthHelper
      * @param bool $encode
      * @param bool $returnarray
      *
-     * @return string
+     * @return string|array<string,string>
      */
     private function normalizeParameters($parameters, $encode = false, $returnarray = false, $normalized = [], $key = '')
     {
@@ -220,14 +212,14 @@ class oAuthHelper
         $result          = '';
         $accumulatedBits = 0;
         $random          = mt_getrandmax();
-        for ($totalBits = 0; $random != 0; $random >>= 1) {
+        for ($totalBits = 0; 0 != $random; $random >>= 1) {
             ++$totalBits;
         }
         $usableBits = intval($totalBits / 8) * 8;
 
         while ($accumulatedBits < $bits) {
             $bitsToAdd = min($totalBits - $usableBits, $bits - $accumulatedBits);
-            if ($bitsToAdd % 4 != 0) {
+            if (0 != $bitsToAdd % 4) {
                 // add bits in whole increments of 4
                 $bitsToAdd += 4 - $bitsToAdd % 4;
             }
