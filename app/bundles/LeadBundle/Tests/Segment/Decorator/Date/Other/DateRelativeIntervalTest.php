@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Tests\Segment\Decorator\Date\Other;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionAbstract;
 use Mautic\LeadBundle\Segment\Decorator\Date\DateOptionParameters;
 use Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval;
 use Mautic\LeadBundle\Segment\Decorator\Date\TimezoneResolver;
@@ -105,7 +106,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper();
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
@@ -119,7 +120,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateRelativeInterval($dateDecorator, '-3 months', $dateOptionParameters);
 
-        $this->assertEquals('2017-12-02%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($date->getString(DateOptionAbstract::Y_M_D).'%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
     /**
@@ -130,7 +131,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper();
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
@@ -144,7 +145,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days ago', $dateOptionParameters);
 
-        $this->assertEquals('2018-02-25%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($date->getString(DateOptionAbstract::Y_M_D).'%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 
     /**
@@ -180,7 +181,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper('2018-03-02', null, 'local');
+        $date = new DateTimeHelper();
 
         $timezoneResolver->method('getDefaultDate')
             ->with()
@@ -194,6 +195,36 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days', $dateOptionParameters);
 
-        $this->assertEquals('2018-03-07%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+        $this->assertEquals($date->getString(DateOptionAbstract::Y_M_D).'%', $filterDecorator->getParameterValue($contactSegmentFilterCrate));
+    }
+
+    /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\Date\Other\DateRelativeInterval::getParameterValue
+     */
+    public function testGetParameterValueDaysWithEqualOperatorWithDateTimeTimezone()
+    {
+        $dateDecorator    = $this->createMock(DateDecorator::class);
+        $timezoneResolver = $this->createMock(TimezoneResolver::class);
+
+        $date = new DateTimeHelper('now', null, 'Europe/Paris');
+
+        $timezoneResolver->method('getDefaultDate')
+            ->with()
+            ->willReturn($date);
+
+        $filter = [
+            'operator' => '=',
+            'type'     => 'datetime',
+        ];
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
+
+        $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days', $dateOptionParameters);
+        $results         = $filterDecorator->getParameterValue($contactSegmentFilterCrate);
+
+        $endDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
+        $date->modify('-1 day +1 second');
+        $startDate     = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
+        $this->assertEquals([$startDate, $endDate], $results);
     }
 }
