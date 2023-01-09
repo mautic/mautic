@@ -21,7 +21,10 @@
 {% if route is defined and actionRoute is not defined %}
     {% set actionRoute = route %}
 {% elseif actionRoute is not defined %}
-    {% set actionRoute = ('mautic_' ~ routeBase|replace({'mautic_': ''}) ~ '_action') %}
+    {% set actionRoute = '' %}
+    {% if routeBase is defined %}
+        {% set actionRoute = ('mautic_' ~ routeBase|replace({'mautic_': ''}) ~ '_action') %}
+    {% endif %}
 {% endif %}
 {% set indexRoute = routeBase is defined ? ('mautic_' ~ routeBase|replace({'mautic_': ''}) ~ '_index') : actionRoute %}
 {% set routeVars = routeVars is defined ? routeVars : [] %}
