@@ -89,7 +89,6 @@
                             })
                             -}}
                         </div>
-
                         <div class="tab-pane fade bdr-w-0" id="advanced-container">
                             <div class="row">
                                 <div class="col-md-6">
@@ -203,7 +202,7 @@
                     {{ form_row(form.preferenceCenter) }}
                 {% endif %}
                 <hr />
-                <h5>{{ 'mautic.email.utm_tags'|trans }}</h5>
+                <h5>{{ mautic.email.utm_tags|trans }}</h5>
                 <br />
                 {% for i, utmTag in form.utmTags %}
                     {{ form_row(utmTag) }}
@@ -224,7 +223,7 @@
     {% endif %}
     <div class="hide" id="templates">
         {% for dataKey, template in templates %}
-            {% set attr = ('tags' == dataKey) ? ' data-placeholder="' ~ 'mautic.lead.tags.select_or_create'|trans ~ '" data-no-results-text="' ~ 'mautic.lead.tags.enter_to_create'|trans ~ '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : '' %}
+            {% set attr = ('tags' == dataKey) ? ' data-placeholder="' ~ mautic.lead.tags.select_or_create|trans ~ '" data-no-results-text="' ~ mautic.lead.tags.enter_to_create|trans ~ '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' : '' %}
             <select class="form-control not-chosen {{ template }}" name="emailform[dynamicContent][__dynamicContentIndex__][filters][__dynamicContentFilterIndex__][filters][__name__][filter]" id="emailform_dynamicContent___dynamicContentIndex___filters___dynamicContentFilterIndex___filters___name___filter"{{ attr }}>
                 {% if form.vars[dataKey] is defined %}
                     {% for value, label in form.vars[dataKey] %}

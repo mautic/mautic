@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
+use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
 use Mautic\CoreBundle\Helper\ListParser\BarListParser;
 use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
@@ -25,14 +26,28 @@ class EmailExtension extends AbstractExtension
             new TwigFunction('instanceof', [$this, 'isInstanceof']),
             new TwigFunction('parseBooleanList', [$this, 'parseBooleanList']),
             new TwigFunction('parseListForChoices', [$this, 'parseListForChoices']),
+            new TwigFunction('fileExists', [$this, 'checkFileExists']),
+            new TwigFunction('getUrl', [$this, 'getUrl']),
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getFilters(): array
     {
         return [
             new TwigFilter('truncate', [$this, 'truncate']),
         ];
+    }
+
+    /**
+     * @param string $file
+     * @return bool
+     */
+    public function checkFileExists(string $file): bool
+    {
+        return file_exists($file);
     }
 
     /**
