@@ -848,7 +848,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function indexStandard($page = null, $template = 'php')
+    protected function indexStandard($page = null)
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -954,7 +954,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.'.$template),
+                    'contentTemplate' => $this->getTemplateName('list.html.php'),
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
