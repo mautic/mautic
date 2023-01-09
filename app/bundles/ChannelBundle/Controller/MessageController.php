@@ -52,7 +52,7 @@ class MessageController extends AbstractStandardFormController
      */
     public function indexAction($page = 1)
     {
-        return $this->indexStandard($page, 'twig');
+        return $this->indexStandard($page);
     }
 
     /**
