@@ -36,7 +36,7 @@
                 {% set thumbnailName = 'thumbnail.png' %}
                 {% set hasThumbnail  = fileExists(themeInfo['dir'] ~ '/' ~ thumbnailName) %}
             {% endif %}
-            {% set thumbnailUrl = AssetgetUrl(themeInfo['themesLocalDir'] ~ '/' ~ themeKey ~ '/' ~ thumbnailName) %}
+            {% set thumbnailUrl = getUrl(themeInfo['themesLocalDir'] ~ '/' ~ themeKey ~ '/' ~ thumbnailName) %}
             <div class="col-md-3 theme-list">
                 <div class="panel panel-default {{ isSelected ? 'theme-selected' : '' }}">
                     <div class="panel-body text-center">

@@ -2,26 +2,36 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Twig\Error\Error;
 
 trait FormThemeTrait
 {
     /**
      * Sets a specific theme for the form.
      *
-     * @param FormInterface<FormInterface> $form
-     * @param string                       $template
-     * @param mixed                        $themes
+     * @param FormInterface $form
+     * @param string $template
+     * @param mixed $themes
      *
-     * @return \Symfony\Component\Form\FormView
+     * @return FormView
+     * @throws Error
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     protected function setFormTheme(FormInterface $form, $template, $themes = null)
     {
         $formView = $form->createView();
+        $templating = $this->container->get('mautic.helper.templating');
+        $templating = $templating->getTemplating();
 
-        $templating = $this->container->get('mautic.helper.templating')->getTemplating();
         if ($templating instanceof DelegatingEngine) {
             $templating = $templating->getEngine($template);
         }
@@ -48,9 +58,9 @@ trait FormThemeTrait
         $themes   = (array) $themes;
         $themes[] = 'MauticCoreBundle:FormTheme\Custom';
         $themes   = array_values(array_unique(array_merge($themes, $fieldThemes)));
-
-        $templating->get('form')->setTheme($formView, $themes);
-
+        /** @var TwigEngine $templating */
+        //$templating->get('form')->setTheme($formView, $themes);
+        $templating->render('MauticEmailBundle:Email:form.html.twig', [$themes]);
         return $formView;
     }
 }

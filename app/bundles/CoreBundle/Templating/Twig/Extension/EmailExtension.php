@@ -4,19 +4,33 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
 use Mautic\CoreBundle\Helper\ListParser\BarListParser;
 use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
 use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
 use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
+use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class EmailExtension extends AbstractExtension
 {
+
+    /**
+     * @var AssetsHelper
+     */
+    protected AssetsHelper $helper;
+
+    /**
+     * @param AssetsHelper $helper
+     */
+    public function __construct(AssetsHelper $helper)
+    {
+        $this->helper = $helper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -29,6 +43,15 @@ class EmailExtension extends AbstractExtension
             new TwigFunction('fileExists', [$this, 'checkFileExists']),
             new TwigFunction('getUrl', [$this, 'getUrl']),
         ];
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function getUrl(string $path): string
+    {
+        return $this->helper->getUrl($path);
     }
 
     /**
