@@ -61,12 +61,13 @@ class DateRelativeInterval extends DateOptionAbstract
 
     protected function getValueForBetweenRange(DateTimeHelper $dateTimeHelper)
     {
+        $dateTimeHelper->modify($this->getModifierForBetweenRange());
+
         if (!$this->dateOptionParameters->hasTimePart()) {
-            return $dateTimeHelper->getString('Y-m-d%');
+            return $dateTimeHelper->getString('Y-m-d');
         }
 
         $dateFormat = 'Y-m-d H:i:s';
-        $dateTimeHelper->modify($this->getModifierForBetweenRange());
         $startWith  = $dateTimeHelper->toUtcString($dateFormat);
 
         $modifier = '+1 day -1 second';
