@@ -106,7 +106,7 @@
                     {% set message = ('all' is same as(channel)) ? 'mautic.channel.message.all_contacts' : 'mautic.channel.message.channel_contacts' %}
                     <div class="alert alert-info"><strong>{{ message|trans }}</strong></div>
                     <div class="message-{{ channel }}">
-                        {{ contacts|purify }}
+                        {{ contacts|raw }}
                     </div>
                 </div>
                 {% set active = '' %}
