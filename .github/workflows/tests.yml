@@ -118,7 +118,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
+        commands: ['PHPSTAN', 'CS Fixer', 'Rector', 'Twig Lint', 'scaffolded files mismatch', 'PHPStan baseline changes', 'composer install']
         php-versions: ['8.0']
 
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
@@ -158,6 +158,8 @@ jobs:
           export SYMFONY_ENV=test
           bin/console cache:warmup
           composer rector -- --dry-run --no-progress-bar
+        elif [[ "${{ matrix.commands }}" == "Twig Lint" ]]; then
+          bin/console lint:twig app plugins
         elif [[ "${{ matrix.commands }}" == "CS Fixer" ]]; then
           for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
             if [[ $file == *.php ]]; then

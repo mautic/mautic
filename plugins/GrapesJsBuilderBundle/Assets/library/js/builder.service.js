@@ -34,9 +34,6 @@ export default class BuilderService {
     if (!assets.conf.deletePath) {
       throw Error('No deletePath found');
     }
-    if (!assets.files || !assets.files[0]) {
-      console.warn('no assets');
-    }
 
     this.assets = assets.files;
     this.uploadPath = assets.conf.uploadPath;

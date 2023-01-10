@@ -237,8 +237,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             return $companies[$key];
         }
 
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+        $q->select('comp.*, cl.is_primary')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id');
 
         if (!empty($id)) {
             $q->where(
