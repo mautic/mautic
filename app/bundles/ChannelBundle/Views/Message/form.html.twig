@@ -2,14 +2,14 @@
 {% form_theme form _self %}
 {% block channel_row %}
     {% if form.children.channel is defined %}
-        {% set channel = form.children['channel'].vars['data'] %}
-        {% set hide = form.children['isEnabled'].vars['data'] is empty %}
+        {% set channel = form.children.channel.vars.data %}
+        {% set enabled = form.children.isEnabled.vars.data %}
         {% set channelContent = customContent('channel.right', mauticTemplateVars is defined ? mauticTemplateVars : []) %}
         {% set leftCol = channelContent ? 6 : 12 %}
         {% set enableCol = channelContent ? '' : 'col-md-2' %}
         {% set propsCol = channelContent ? '' : 'col-md-10' %}
 
-        {{ form_row(form.children['channel']) }}
+        {{ form_row(form.children.channel) }}
         {{ form_errors(form) }}
         <div class="row">
             <div class="col-md-{{ leftCol }}">
@@ -17,7 +17,7 @@
                     {{ form_row(form.children.isEnabled) }}
                 </div>
                 <div class="{{ propsCol }}">
-                    <div class="message_channel_properties_{{ channel }}{% if hide %} hide{% endif %}">
+                    <div class="message_channel_properties_{{ channel }}{% if not enabled %} hide{% endif %}">
                         {% if form.children.channelId is defined %}
                             {{ form_row(form.children.channelId) }}
                         {% endif %}
@@ -60,8 +60,6 @@
     {% endif %}
 {% endfor %}
 {% set formTabs = tabs %}
-
-{#{% block formTabs %}{{ tabs }}{% endblock %}#}
 
 {% block aboveTabsContent %}
 <div class="pa-md row">
