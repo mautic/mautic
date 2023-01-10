@@ -7,7 +7,10 @@ namespace Mautic\CoreBundle\Tests\Functional\Controller;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 final class AjaxControllerTest extends MauticMysqlTestCase
 {
@@ -37,5 +40,39 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
         Assert::assertSame(200, $response->getStatusCode(), $response->getContent());
         Assert::assertStringContainsString('Great! You are running the current version of Mautic.', $response->getContent());
+    }
+
+    public function testGlobalSearch(): void
+    {
+        // Create some entities to search for.
+        $contact = new Lead();
+        $contact->setFirstName('John8888');
+
+        $page = new Page();
+        $page->setTitle('John8888\'s page');
+        $page->setAlias('john8888s-page');
+
+        $this->em->persist($contact);
+        $this->em->persist($page);
+        $this->em->flush();
+
+        // Searching for a string that does not match any entity.
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search=unicorn&tmp=list', [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk(), $response->getContent());
+        $content = \json_decode($response->getContent(), true);
+        Assert::assertArrayHasKey('newContent', $content);
+        Assert::assertSame("\n<div class=\"panel-group\" id=\"globalSearchPanel\">\n</div>", $content['newContent']);
+
+        // Searching for a string that match 2 entities.
+        $this->client->request(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search=John8888&tmp=list', [], [], $this->createAjaxHeaders());
+        $response = $this->client->getResponse();
+        Assert::assertTrue($response->isOk(), $response->getContent());
+        $content = \json_decode($response->getContent(), true);
+        Assert::assertArrayHasKey('newContent', $content);
+        Assert::assertStringContainsString("/s/contacts/view/{$contact->getId()}", $content['newContent']);
+        Assert::assertStringContainsString('John8888', $content['newContent']);
+        Assert::assertStringContainsString("/s/pages/view/{$page->getId()}", $content['newContent']);
+        Assert::assertStringContainsString('John8888\'s page', $content['newContent']);
     }
 }
