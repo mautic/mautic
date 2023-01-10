@@ -1,7 +1,5 @@
 {% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
 {% set ignoreStandardColumns = ignoreStandardColumns is defined ? ignoreStandardColumns : [] %}
-
-
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
@@ -15,28 +13,28 @@
     {% else %}
         {{ slot('mauticContent') }}
     {% endif %}
-    
 {% endblock %}
+
 {% block headerTitle %}
-{% if not slot('headerTitle') %}
-    {% if headerTitle is not defined %}
-        {% set headerTitle = 'Mautic' %}
+    {% if not slot('headerTitle') %}
+        {% if headerTitle is not defined %}
+            {% set headerTitle = 'Mautic' %}
+        {% endif %}
+        {{ headerTitle|trans }}
+        {% else %}
+        {{ slot('headerTitle') }}
     {% endif %}
-    {{ headerTitle|trans }}
-    {% else %}
-     {{ slot('headerTitle') }}
-{% endif %}
 {% endblock %}
 
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig',
     {
-            'templateButtons' : {
-                'new' : permissions[permissionBase ~ ':create'],
-            },
-            'actionRoute'     : actionRoute,
-            'indexRoute'      : indexRoute,
-            'translationBase' : translationBase,
+        'templateButtons' : {
+            'new' : permissions[permissionBase ~ ':create'],
+        },
+        'actionRoute'     : actionRoute,
+        'indexRoute'      : indexRoute,
+        'translationBase' : translationBase,
     }) -}}
 {% endblock %}
 
@@ -44,18 +42,18 @@
     {% if isIndex %}
         <div class="panel panel-default bdr-t-wdh-0 mb-0">
             {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig',
-                    {
-                        'searchValue'      : searchValue,
-                        'searchHelp'       : searchHelp is defined ? searchHelp : '',
-                        'action'           : currentRoute,
-                        'actionRoute'      : actionRoute,
-                        'indexRoute'       : indexRoute,
-                        'translationBase'  : translationBase,
-                        'preCustomButtons' : toolBarButtons is defined ? toolBarButtons : null,
-                        'templateButtons'  : {
-                            'delete' : permissions[permissionBase ~ ':delete'],
-                        },
-                        'filters' : filters is defined ? filters : [],
+                {
+                    'searchValue'      : searchValue,
+                    'searchHelp'       : searchHelp is defined ? searchHelp : '',
+                    'action'           : currentRoute,
+                    'actionRoute'      : actionRoute,
+                    'indexRoute'       : indexRoute,
+                    'translationBase'  : translationBase,
+                    'preCustomButtons' : toolBarButtons is defined ? toolBarButtons : null,
+                    'templateButtons'  : {
+                        'delete' : permissions[permissionBase ~ ':delete'],
+                    },
+                    'filters' : filters is defined ? filters : [],
             }) -}}
 
             <div class="page-list">
@@ -94,13 +92,13 @@
                 <tr>
                     {% if ignoreStandardColumns is empty %}
                         {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
-                                {
-                                    'checkall'        : 'true',
-                                    'actionRoute'     : actionRoute,
-                                    'indexRoute'      : indexRoute,
-                                    'templateButtons' : {
-                                        'delete' : permissions[permissionBase ~ ':deleteown'] is not empty or permissions[permissionBase ~ ':deleteown'] is not empty or permissions[permissionBase ~ ':delete'] is not empty,
-                                    },
+                            {
+                                'checkall'        : 'true',
+                                'actionRoute'     : actionRoute,
+                                'indexRoute'      : indexRoute,
+                                'templateButtons' : {
+                                    'delete' : permissions[permissionBase ~ ':deleteown'] is not empty or permissions[permissionBase ~ ':deleteown'] is not empty or permissions[permissionBase ~ ':delete'] is not empty,
+                                },
                         }) -}}
                         {{- include(
                             'MauticCoreBundle:Helper:tableheader.html.twig',
@@ -129,7 +127,6 @@
                                 {% if header.sessionVar is not defined %}
                                     {% set header = header|merge({'sessionVar': sessionVar}) %}
                                 {% endif %}
-
                             {{- include('MauticCoreBundle:Helper:tableheader.html.twig', header) -}}
                             {% endfor %}
                         {% endif %}

@@ -1,6 +1,6 @@
 {% extends "MauticCoreBundle:FormTheme:form_tabbed.html.twig" %}
 {% form_theme form _self %}
-{%  block channel_row %}
+{% block channel_row %}
     {% if form.children.channel is defined %}
         {% set channel = form.children['channel'].vars['data'] %}
         {% set hide = form.children['isEnabled'].vars['data'] is empty %}
@@ -24,7 +24,7 @@
 
                         {% if form.children.properties is defined and form.children.properties is not empty %}
                             {{ form_row(form.children.properties) }}
-                            {% endif %}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -58,13 +58,10 @@
 
         {% set tabs, active = tabs|merge([tab]), false %}
     {% endif %}
-    
 {% endfor %}
 {% set formTabs = tabs %}
 
 {#{% block formTabs %}{{ tabs }}{% endblock %}#}
-
-
 
 {% block aboveTabsContent %}
 <div class="pa-md row">
