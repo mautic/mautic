@@ -35,7 +35,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
-    const ACCESS_KEY = 'accessKey';
+    public const ACCESS_KEY = 'accessKey';
 
     /**
      * @var UserHelper
