@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-use Mautic\ConfigBundle\Controller\SysinfoController;
-use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
 return function (ContainerConfigurator $configurator) {
     $services = $configurator->services()
@@ -28,8 +25,4 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('mautic.config.config_change_logger', \Mautic\ConfigBundle\Service\ConfigChangeLogger::class);
     $services->alias('mautic.config.form.escape_transformer', \Mautic\ConfigBundle\Form\Type\EscapeTransformer::class);
     $services->alias('mautic.config.form.restriction_helper', \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::class);
-
-    $services->set(SysinfoController::class)
-        ->arg('$sysinfoModel', ref(SysinfoModel::class))
-        ->call('setContainer', [ref('service_container')]);
 };
