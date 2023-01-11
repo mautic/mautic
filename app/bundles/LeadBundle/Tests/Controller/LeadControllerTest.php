@@ -471,6 +471,43 @@ class LeadControllerTest extends MauticMysqlTestCase
         $this->assertStringContainsString('title: This value is too long. It should have 191 characters or less', $clientResponse->getContent());
     }
 
+    public function testQuickAddRendersErrorOnEmailDuplicate(): void
+    {
+        $email = 'duplicate@email.a';
+        $this->createContact($email);
+        $crawler = $this->client->request('GET', 's/contacts/quickAdd');
+        $form    = $crawler->filter('form[name="lead"]')->form([
+            'lead' => [
+                'email' => $email,
+            ],
+        ]);
+
+        $crawler = $this->client->submit($form);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $errorContainer = $crawler->filter('form[name="lead"] .has-error .help-block');
+        self::assertCount(1, $errorContainer);
+        self::assertSame('This field must be unique.', $errorContainer->text(null, true));
+    }
+
+    public function testEditRendersErrorOnEmailDuplicate(): void
+    {
+        $email = 'duplicate@email.a';
+        $this->createContact($email);
+        $crawler = $this->client->request('GET', 's/contacts/new');
+        $form    = $crawler->filter('form[name="lead"]')->form([
+            'lead' => [
+                'email' => $email,
+            ],
+        ]);
+
+        $this->client->submit($form);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $clientResponse = $this->client->getResponse();
+        Assert::assertStringContainsString('email: This field must be unique.', $clientResponse->getContent());
+    }
+
     private function createCampaign(): Campaign
     {
         $campaign = new Campaign();
@@ -611,6 +648,53 @@ class LeadControllerTest extends MauticMysqlTestCase
             ],
             $updateAuditLog->getDetails()
         );
+    }
+
+    public function testSetNullCompanyToContact(): void
+    {
+        /** @var LeadModel $contactModel */
+        $contactModel = self::$container->get('mautic.lead.model.lead');
+
+        $company = new Company();
+        $company->setName('Doe Corp');
+
+        $this->em->persist($company);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', 's/contacts/new/');
+        $form    = $crawler->filterXPath('//form[@name="lead"]')->form();
+        $form->setValues(
+            [
+                'lead[firstname]' => 'John',
+                'lead[lastname]'  => 'Doe',
+                'lead[email]'     => 'john_23657@doe.com',
+                'lead[companies]' => [$company->getId()],
+            ]
+        );
+
+        $this->client->submit($form);
+
+        $clientResponse = $this->client->getResponse();
+
+        Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
+
+        /** @var Lead $contact */
+        $contact = $this->em->getRepository(Lead::class)->findOneBy(['email' => 'john_23657@doe.com']);
+
+        $companies  = $this->getCompanyLeads($contact->getId());
+        $collection = new Collection($companies);
+        // Should have no companies associated
+        $this->assertCount(1, $collection);
+
+        $this->em->flush();
+
+        $contact->addUpdatedField('company', null);
+        $contactModel->saveEntity($contact);
+
+        $companies  = $this->getCompanyLeads($contact->getId());
+        $collection = new Collection($companies);
+        // Should have no companies associated
+        $this->assertCount(0, $collection);
     }
 
     private function getContactAuditLogForSpecificAction(Lead $contact, string $action): AuditLog

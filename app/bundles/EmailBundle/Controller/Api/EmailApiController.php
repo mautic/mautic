@@ -6,20 +6,38 @@ use Doctrine\ORM\EntityNotFoundException;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Email>
+ */
 class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
+    /**
+     * @var EmailModel|null
+     */
+    protected $model = null;
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('email');
-        $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
+        $emailModel = $this->getModel('email');
+        \assert($emailModel instanceof EmailModel);
+
+        $this->model            = $emailModel;
+        $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];

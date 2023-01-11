@@ -55,7 +55,7 @@ class LeadSubscriber implements EventSubscriberInterface
     {
         // Set available event types
         $eventTypeKey      = 'dynamic.content.sent';
-        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
+        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.triggered');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
         $event->addSerializerGroup('dwcList');
 
@@ -92,7 +92,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                 'type' => 'sent',
                             ],
                             'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                            'icon'            => 'fa-envelope',
+                            'icon'            => 'fa-puzzle-piece',
                             'contactId'       => $contactId,
                         ]
                     );

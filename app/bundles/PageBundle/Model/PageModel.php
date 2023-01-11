@@ -40,6 +40,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Page>
+ */
 class PageModel extends FormModel
 {
     use TranslationModelTrait;
@@ -505,7 +508,7 @@ class PageModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -639,7 +642,7 @@ class PageModel extends FormModel
             try {
                 $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
             } catch (\Exception $exception) {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -662,7 +665,7 @@ class PageModel extends FormModel
                 if (MAUTIC_ENV === 'dev') {
                     throw $exception;
                 } else {
-                    $this->logger->addError(
+                    $this->logger->error(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
@@ -710,7 +713,7 @@ class PageModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );

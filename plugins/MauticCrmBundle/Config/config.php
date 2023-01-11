@@ -204,13 +204,10 @@ return [
             ],
         ],
         'other' => [
-            'mautic_integration.pipedrive.guzzle.client' => [
-                'class' => 'GuzzleHttp\Client',
-            ],
             'mautic_integration.service.transport' => [
                 'class'     => 'MauticPlugin\MauticCrmBundle\Services\Transport',
                 'arguments' => [
-                    'mautic_integration.pipedrive.guzzle.client',
+                    'mautic.http.client',
                 ],
             ],
             'mautic_integration.pipedrive.import.owner' => [

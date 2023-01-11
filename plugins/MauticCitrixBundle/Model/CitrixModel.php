@@ -8,12 +8,16 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent;
+use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventRepository;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Event\CitrixEventUpdateEvent;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @extends FormModel<CitrixEvent>
+ */
 class CitrixModel extends FormModel
 {
     /**
@@ -35,11 +39,14 @@ class CitrixModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return \MauticPlugin\MauticCitrixBundle\Entity\CitrixEventRepository
+     * @return CitrixEventRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticCitrixBundle:CitrixEvent');
+        $result = $this->em->getRepository(CitrixEvent::class);
+        \assert($result instanceof CitrixEventRepository);
+
+        return $result;
     }
 
     /**

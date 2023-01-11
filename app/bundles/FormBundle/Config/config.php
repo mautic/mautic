@@ -290,7 +290,7 @@ return [
             'mautic.form.fixture.form' => [
                 'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['mautic.form.model.form', 'mautic.form.model.field', 'mautic.form.model.action'],
+                'arguments' => ['mautic.form.model.form', 'mautic.form.model.field', 'mautic.form.model.action', 'event_dispatcher'],
             ],
             'mautic.form.fixture.form_result' => [
                 'class'     => \Mautic\FormBundle\DataFixtures\ORM\LoadFormResultData::class,

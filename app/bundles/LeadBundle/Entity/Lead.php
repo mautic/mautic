@@ -9,10 +9,12 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
@@ -452,6 +454,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
     }
 
     public static function getDefaultIdentifierFields(): array

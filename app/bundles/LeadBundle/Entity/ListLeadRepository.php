@@ -4,6 +4,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<LeadList>
+ */
 class ListLeadRepository extends CommonRepository
 {
     /**
