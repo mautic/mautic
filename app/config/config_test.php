@@ -13,6 +13,20 @@ EnvLoader::load();
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
 
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'cache'            => false,
+    'debug'            => '%kernel.debug%',
+    'strict_variables' => true,
+    'paths'            => [
+        '%kernel.project_dir%/app/bundles' => 'bundles',
+    ],
+    'form_themes' => [
+        // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
+]);
+
 $container->loadFromExtension('framework', [
     'test'    => true,
     'session' => [

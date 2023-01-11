@@ -5,17 +5,24 @@ namespace Mautic\CampaignBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Serializer\Exclusion\FieldExclusionStrategy;
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Event>
+ */
 class EventApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
     public function initialize(ControllerEvent $event)
     {
-        $this->model                    = $this->getModel('campaign.event');
-        $this->entityClass              = 'Mautic\CampaignBundle\Entity\Event';
+        $campaignEventModel = $this->getModel('campaign.event');
+        \assert($campaignEventModel instanceof EventModel);
+
+        $this->model                    = $campaignEventModel;
+        $this->entityClass              = Event::class;
         $this->entityNameOne            = 'event';
         $this->entityNameMulti          = 'events';
         $this->serializerGroups         = ['campaignEventStandaloneDetails', 'campaignList'];

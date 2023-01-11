@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Tag;
+use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Event\TagEvent;
 use Mautic\LeadBundle\Form\Type\TagEntityType;
 use Mautic\LeadBundle\LeadEvents;
@@ -11,19 +12,19 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class TagModel
- * {@inheritdoc}
+ * @extends FormModel<Tag>
  */
 class TagModel extends FormModel
 {
     /**
-     * {@inheritdoc}
-     *
-     * @return object
+     * @return TagRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository(Tag::class);
+        $result = $this->em->getRepository(Tag::class);
+        \assert($result instanceof TagRepository);
+
+        return $result;
     }
 
     /**

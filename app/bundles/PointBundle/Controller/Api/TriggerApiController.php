@@ -3,19 +3,30 @@
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Model\TriggerEventModel;
+use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Trigger>
+ */
 class TriggerApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var TriggerModel|null
      */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('point.trigger');
-        $this->entityClass      = 'Mautic\PointBundle\Entity\Trigger';
+        $triggerModel = $this->getModel('point.trigger');
+        \assert($triggerModel instanceof TriggerModel);
+
+        $this->model            = $triggerModel;
+        $this->entityClass      = Trigger::class;
         $this->entityNameOne    = 'trigger';
         $this->entityNameMulti  = 'triggers';
         $this->serializerGroups = ['triggerDetails', 'categoryList', 'publishDetails'];
@@ -91,7 +102,10 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm($entity)
     {
-        return $this->getModel('point.triggerevent')->createForm(
+        $triggerEventModel = $this->getModel('point.triggerevent');
+        \assert($triggerEventModel instanceof TriggerEventModel);
+
+        return $triggerEventModel->createForm(
             $entity,
             $this->get('form.factory'),
             null,

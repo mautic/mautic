@@ -35,7 +35,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $sessionMock;
 
     /**
-     * @var MockObject|ModelFactory
+     * @var MockObject|ModelFactory<EmailModel>
      */
     private $modelFactoryMock;
 

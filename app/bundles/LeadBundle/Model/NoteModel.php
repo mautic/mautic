@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Model;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Entity\LeadNoteRepository;
 use Mautic\LeadBundle\Event\LeadNoteEvent;
 use Mautic\LeadBundle\Form\Type\NoteType;
 use Mautic\LeadBundle\LeadEvents;
@@ -13,8 +14,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NoteModel
- * {@inheritdoc}
+ * @extends FormModel<LeadNote>
  */
 class NoteModel extends FormModel
 {
@@ -28,14 +28,12 @@ class NoteModel extends FormModel
         $this->session = $session;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return string
-     */
-    public function getRepository()
+    public function getRepository(): LeadNoteRepository
     {
-        return $this->em->getRepository('MauticLeadBundle:LeadNote');
+        $result = $this->em->getRepository(LeadNote::class);
+        \assert($result instanceof LeadNoteRepository);
+
+        return $result;
     }
 
     /**
@@ -67,10 +65,10 @@ class NoteModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
