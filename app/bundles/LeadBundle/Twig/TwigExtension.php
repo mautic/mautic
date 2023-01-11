@@ -7,12 +7,12 @@ use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * TwigExtension class
+ * TwigExtension class.
  */
 class TwigExtension extends AbstractExtension
 {
     /**
-     * getFilters function
+     * getFilters function.
      *
      * @return mixed[]
      */
@@ -20,14 +20,15 @@ class TwigExtension extends AbstractExtension
     {
         return [
             new TwigFilter('parseBooleanList', [$this, 'parseBooleanList']),
-            new TwigFilter('parseListForChoices', [$this, 'parseListForChoices'])
+            new TwigFilter('parseListForChoices', [$this, 'parseListForChoices']),
         ];
     }
 
     /**
-     * Parse Boolean List
+     * Parse Boolean List.
      *
      * @param mixed[] $list
+     *
      * @return mixed[]
      */
     public function parseListForChoices($list)
@@ -36,9 +37,10 @@ class TwigExtension extends AbstractExtension
     }
 
     /**
-     * Parse Boolean List
+     * Parse Boolean List.
      *
      * @param mixed[] $list
+     *
      * @return mixed[]
      */
     public function parseBooleanList($list)

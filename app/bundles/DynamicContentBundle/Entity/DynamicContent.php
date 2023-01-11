@@ -91,9 +91,9 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __construct()
     {
-        $this->stats               = new ArrayCollection();
+        $this->stats = new ArrayCollection();
         $this->translationChildren = new ArrayCollection();
-        $this->variantChildren     = new ArrayCollection();
+        $this->variantChildren = new ArrayCollection();
     }
 
     /**
@@ -101,11 +101,11 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     public function __clone()
     {
-        $this->id                  = null;
-        $this->sentCount           = 0;
-        $this->stats               = new ArrayCollection();
+        $this->id = null;
+        $this->sentCount = 0;
+        $this->stats = new ArrayCollection();
         $this->translationChildren = new ArrayCollection();
-        $this->variantChildren     = new ArrayCollection();
+        $this->variantChildren = new ArrayCollection();
 
         parent::__clone();
     }
@@ -161,14 +161,14 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         self::addFiltersMetadata($builder);
 
         $builder->createField('isCampaignBased', 'boolean')
-                ->columnName('is_campaign_based')
-                ->option('default', 1)
-                ->build();
+            ->columnName('is_campaign_based')
+            ->option('default', 1)
+            ->build();
 
         $builder->createField('slotName', 'string')
-                ->columnName('slot_name')
-                ->nullable()
-                ->build();
+            ->columnName('slot_name')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -181,7 +181,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
         $metadata->addPropertyConstraint('name', new NotBlank(['message' => 'mautic.core.name.required']));
 
         $metadata->addConstraint(new Callback([
-            'callback' => function (self $dwc, ExecutionContextInterface $context) {
+            'callback' => function (self$dwc, ExecutionContextInterface $context) {
                 if (!$dwc->getIsCampaignBased()) {
                     $validator = $context->getValidator();
                     $violations = $validator->validate(
@@ -197,8 +197,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     if (count($violations) > 0) {
                         foreach ($violations as $violation) {
                             $context->buildViolation($violation->getMessage())
-                                    ->atPath('slotName')
-                                    ->addViolation();
+                                ->atPath('slotName')
+                                ->addViolation();
                         }
                     }
                     $violations = $validator->validate(
@@ -207,7 +207,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                             new Count(
                                 [
                                     'minMessage' => 'mautic.dynamicContent.filter.options.empty',
-                                    'min'        => 1,
+                                    'min' => 1,
                                 ]
                             ),
                         ]
@@ -215,8 +215,8 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
                     if (count($violations) > 0) {
                         foreach ($violations as $violation) {
                             $context->buildViolation($violation->getMessage())
-                                    ->atPath('filters')
-                                    ->addViolation();
+                                ->atPath('filters')
+                                ->addViolation();
                         }
                     }
                 }
@@ -255,12 +255,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
      */
     protected function isChanged($prop, $val)
     {
-        $getter  = 'get'.ucfirst($prop);
+        $getter = 'get' . ucfirst($prop);
         $current = $this->$getter();
 
         if ('variantParent' == $prop || 'translationParent' == $prop || 'category' == $prop) {
             $currentId = ($current) ? $current->getId() : '';
-            $newId     = ($val) ? $val->getId() : null;
+            $newId = ($val) ? $val->getId() : null;
             if ($currentId != $newId) {
                 $this->changes[$prop] = [$currentId, $newId];
             }

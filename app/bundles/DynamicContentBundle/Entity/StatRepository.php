@@ -22,11 +22,11 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
+            ->from(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats', 's')
             ->where('s.dynamic_content_id = :dynamic_content')
             ->setParameter('dynamic_content', $dynamicContentId);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -50,7 +50,7 @@ class StatRepository extends CommonRepository
         $q = $this->_em->getConnection()->createQueryBuilder();
 
         $q->select('count(s.id) as sent_count')
-            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's');
+            ->from(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats', 's');
 
         if ($dynamicContentIds) {
             if (!is_array($dynamicContentIds)) {
@@ -61,7 +61,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -78,7 +78,7 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('s.dynamic_content_id, count(s.id) as sent_count')
-            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
+            ->from(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats', 's')
             ->andWhere(
                 $q->expr()->in('e.dynamic_content_id', $dynamicContentIds)
             );
@@ -93,7 +93,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('e.dynamic_content_id');
 
         //get a total number of sent DC stats first
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
 
@@ -119,8 +119,8 @@ class StatRepository extends CommonRepository
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         $query->select('dc.id AS dynamic_content_id, s.id, s.date_sent as dateSent, dc.name, s.sent_details as sentDetails, s.lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', 's')
-            ->leftJoin('s', MAUTIC_TABLE_PREFIX.'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
+            ->from(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats', 's')
+            ->leftJoin('s', MAUTIC_TABLE_PREFIX . 'dynamic_content', 'dc', 'dc.id = s.dynamic_content_id');
 
         if ($leadId) {
             $query->where($query->expr()->eq('s.lead_id', (int) $leadId));
@@ -128,7 +128,7 @@ class StatRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->like('dc.name', $query->expr()->literal('%'.$options['search'].'%'))
+                $query->expr()->like('dc.name', $query->expr()->literal('%' . $options['search'] . '%'))
             );
         }
 
@@ -144,9 +144,9 @@ class StatRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
-        $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content_stats')
+        $q->update(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats')
             ->set('lead_id', (int) $toLeadId)
-            ->where('lead_id = '.(int) $fromLeadId)
+            ->where('lead_id = ' . (int) $fromLeadId)
             ->execute();
     }
 
@@ -157,7 +157,7 @@ class StatRepository extends CommonRepository
      */
     public function deleteStat($id)
     {
-        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX.'dynamic_content_stats', ['id' => (int) $id]);
+        $this->_em->getConnection()->delete(MAUTIC_TABLE_PREFIX . 'dynamic_content_stats', ['id' => (int) $id]);
     }
 
     /**

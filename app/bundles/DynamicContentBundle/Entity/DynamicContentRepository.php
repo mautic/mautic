@@ -50,19 +50,19 @@ class DynamicContentRepository extends CommonRepository
             return [$expr, $parameters];
         }
 
-        $command         = $filter->command;
-        $unique          = $this->generateRandomParameterName();
+        $command = $filter->command;
+        $unique = $this->generateRandomParameterName();
         $returnParameter = false; //returning a parameter that is not used will lead to a Doctrine error
 
         switch ($command) {
             case $this->translator->trans('mautic.core.searchcommand.lang'):
-                $langUnique      = $this->generateRandomParameterName();
-                $langValue       = $filter->string.'_%';
+                $langUnique = $this->generateRandomParameterName();
+                $langValue = $filter->string . '_%';
                 $forceParameters = [
                     $langUnique => $langValue,
-                    $unique     => $filter->string,
+                    $unique => $filter->string,
                 ];
-                $expr = $q->expr()->orX(
+                $expr = $q->expr()->or(
                     $q->expr()->eq('e.language', ":$unique"),
                     $q->expr()->like('e.language', ":$langUnique")
                 );
@@ -76,7 +76,7 @@ class DynamicContentRepository extends CommonRepository
         if (!empty($forceParameters)) {
             $parameters = $forceParameters;
         } elseif ($returnParameter) {
-            $string     = ($filter->strict) ? $filter->string : "%{$filter->string}%";
+            $string = ($filter->strict) ? $filter->string : "%{$filter->string}%";
             $parameters = ["$unique" => $string];
         }
 
@@ -128,9 +128,9 @@ class DynamicContentRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->update(MAUTIC_TABLE_PREFIX.'dynamic_content')
-            ->set('sent_count', 'sent_count + '.(int) $increaseBy)
-            ->where('id = '.(int) $id);
+        $q->update(MAUTIC_TABLE_PREFIX . 'dynamic_content')
+            ->set('sent_count', 'sent_count + ' . (int) $increaseBy)
+            ->where('id = ' . (int) $id);
 
         $q->execute();
     }
@@ -155,10 +155,10 @@ class DynamicContentRepository extends CommonRepository
             if (is_array($search)) {
                 $search = array_map('intval', $search);
                 $q->andWhere($q->expr()->in('e.id', ':search'))
-                  ->setParameter('search', $search);
+                    ->setParameter('search', $search);
             } else {
                 $q->andWhere($q->expr()->like('e.name', ':search'))
-                  ->setParameter('search', "%{$search}%");
+                    ->setParameter('search', "%{$search}%");
             }
         }
 
@@ -203,14 +203,14 @@ class DynamicContentRepository extends CommonRepository
         $qb = $this->_em->getConnection()->createQueryBuilder();
 
         $qb->select('ce.properties')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_events', 'ce')
-            ->leftJoin('ce', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'c.id = ce.campaign_id')
+            ->from(MAUTIC_TABLE_PREFIX . 'campaign_events', 'ce')
+            ->leftJoin('ce', MAUTIC_TABLE_PREFIX . 'campaigns', 'c', 'c.id = ce.campaign_id')
             ->andWhere($qb->expr()->eq('ce.type', $qb->expr()->literal('dwc.decision')))
             ->andWhere($qb->expr()->like('ce.properties', ':slot'))
-            ->setParameter('slot', '%'.$slot.'%')
+            ->setParameter('slot', '%' . $slot . '%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAll();
+        $result = $qb->execute()->fetchAllAssociative();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

@@ -115,7 +115,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->dynamicContentModel->setSlotContentForLead($defaultDwc, $lead, $eventDetails);
         }
 
-        $this->session->set('dwc.slot_name.lead.' . $lead->getId(), $eventDetails);
+        $this->session->set('dwc.slot_name.lead.'.$lead->getId(), $eventDetails);
 
         $event->stopPropagation();
 
@@ -126,7 +126,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $eventConfig = $event->getConfig();
         $lead        = $event->getLead();
-        $slot        = $this->session->get('dwc.slot_name.lead.' . $lead->getId());
+        $slot        = $this->session->get('dwc.slot_name.lead.'.$lead->getId());
 
         $dwc = $this->dynamicContentModel->getRepository()->getEntity($eventConfig['dynamicContent']);
 
@@ -141,7 +141,9 @@ class CampaignSubscriber implements EventSubscriberInterface
             $this->dynamicContentModel->createStatEntry($dwc, $lead, $slot);
 
             $tokenEvent = new TokenReplacementEvent($dwc->getContent(), $lead, ['slot' => $slot, 'dynamic_content_id' => $dwc->getId()]);
-            $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
+            // Note: the function is only have 1 arg
+            // $this->dispatcher->dispatch($tokenEvent, DynamicContentEvents::TOKEN_REPLACEMENT);
+            $this->dispatcher->dispatch($tokenEvent);
 
             $content = $tokenEvent->getContent();
             $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
