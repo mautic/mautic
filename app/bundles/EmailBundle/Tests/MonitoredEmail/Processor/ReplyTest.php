@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Tests\MonitoredEmail\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailReply;
@@ -38,20 +39,22 @@ class ReplyTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->statRepo       = $this->createMock(StatRepository::class);
-        $this->contactFinder  = $this->createMock(ContactFinder::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
-        $this->logger         = $this->createMock(Logger::class);
-        $this->contactTracker = $this->createMock(ContactTracker::class);
-        $this->processor      = new Reply(
+        $this->statRepo           = $this->createMock(StatRepository::class);
+        $this->contactFinder      = $this->createMock(ContactFinder::class);
+        $this->leadModel          = $this->createMock(LeadModel::class);
+        $this->leadModel          = $this->createMock(LeadModel::class);
+        $this->dispatcher         = $this->createMock(EventDispatcherInterface::class);
+        $this->logger             = $this->createMock(Logger::class);
+        $this->contactTracker     = $this->createMock(ContactTracker::class);
+        $this->emailAddressHelper = new EmailAddressHelper();
+        $this->processor          = new Reply(
             $this->statRepo,
             $this->contactFinder,
             $this->leadModel,
             $this->dispatcher,
             $this->logger,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->emailAddressHelper
         );
     }
 
