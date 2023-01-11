@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\MonitoredEmail\Processor;
 
 use Doctrine\ORM\EntityNotFoundException;
+use Mautic\CoreBundle\Helper\EmailAddressHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\EmailReply;
 use Mautic\EmailBundle\Entity\Stat;
@@ -20,6 +21,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class Reply implements ProcessorInterface
 {
+    /**
+     * @var EmailAddressHelper
+     */
+    private $addressHelper;
+
     /**
      * @var StatRepository
      */
@@ -56,7 +62,8 @@ class Reply implements ProcessorInterface
         LeadModel $leadModel,
         EventDispatcherInterface $dispatcher,
         LoggerInterface $logger,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        EmailAddressHelper $addressHelper
     ) {
         $this->statRepo         = $statRepository;
         $this->contactFinder    = $contactFinder;
@@ -64,6 +71,7 @@ class Reply implements ProcessorInterface
         $this->dispatcher       = $dispatcher;
         $this->logger           = $logger;
         $this->contactTracker   = $contactTracker;
+        $this->addressHelper = $addressHelper;
     }
 
     public function process(Message $message)
@@ -90,8 +98,8 @@ class Reply implements ProcessorInterface
         }
 
         // A stat has been found so let's compare to the From address for the contact to prevent false positives
-        $possibleFromEmails = $this->getPossibleContactEmails($stat->getLead()->getEmail());
-        $fromEmail          = $this->cleanEmail($repliedEmail->getFromAddress());
+        $possibleFromEmails = $this->addressHelper->getVariations($stat->getLead()->getEmail(), $this);
+        $fromEmail          = $this->addressHelper->cleanEmail($repliedEmail->getFromAddress());
 
         if (!in_array($fromEmail, $possibleFromEmails)) {
             // We can't reliably assume this email was from the originating contact
@@ -153,18 +161,6 @@ class Reply implements ProcessorInterface
         }
     }
 
-    /**
-     * Clean the email for comparison.
-     *
-     * @param string $email
-     *
-     * @return string
-     */
-    protected function cleanEmail($email)
-    {
-        return strtolower(preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
-    }
-
     private function dispatchEvent(Stat $stat)
     {
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_REPLY)) {
@@ -176,15 +172,4 @@ class Reply implements ProcessorInterface
         }
     }
 
-    private function getPossibleContactEmails(string $email): array
-    {
-        $emails = [$email, $this->cleanEmail($email)];
-        // email without suffix
-        preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
-        if (!empty($parts)) {
-            $emails[] = $parts[1].'@'.$parts[3];
-        }
-
-        return $emails;
-    }
 }
