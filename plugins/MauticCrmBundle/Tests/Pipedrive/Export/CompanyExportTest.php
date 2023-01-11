@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Export;
 
+use GuzzleHttp\Psr7\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CompanyExportTest extends PipedriveTest
 {
     private $features = [
-        'objects'       => [
+        'objects' => [
             'company',
         ],
         'companyFields' => [
@@ -27,7 +31,7 @@ class CompanyExportTest extends PipedriveTest
         ]);
     }
 
-    public function testCreateCompanyWhenFeatureIsDisabled()
+    public function testCreateCompanyWhenFeatureIsDisabled(): void
     {
         $this->installPipedriveIntegration(
             true,
@@ -49,25 +53,24 @@ class CompanyExportTest extends PipedriveTest
         ]);
         $this->client->submit($form);
 
-        /** @var Company $company */
+        /** @var IntegrationEntity[] $integrationEntities */
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
 
-        /** @var Company $company */
         $company = $this->em->getRepository(Company::class)->findOneById(1);
-
-        $requests = $GLOBALS['requests'];
+        \assert($company instanceof Company);
 
         $this->assertNotNull($company, 'Company failed to be created');
-        $this->assertSame(count($requests), 0);
+        $this->assertSame(null, $this->mockHandler->getLastRequest(), 'Last request was not submitting the company form');
         $this->assertSame(count($integrationEntities), 0);
         $this->assertEquals($company->getName(), 'Test Name');
         $this->assertEquals($company->getAddress1(), 'Test Address');
     }
 
-    public function testCreateCompany()
+    public function testCreateCompanyWithFeatureEnabled(): void
     {
         $testName     = 'Test Name';
         $testAddress1 = 'Test Adddress 123, Wrocław, Poland';
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Post/organizations')));
 
         $this->installPipedriveIntegration(
             true,
@@ -92,15 +95,12 @@ class CompanyExportTest extends PipedriveTest
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $company             = $this->em->getRepository(Company::class)->findOneById(1);
         $integrationEntity   = $integrationEntities[0];
-        $requests            = $GLOBALS['requests'];
-        $request             = $requests['POST/Api/Post/organizations'][0];
 
-        $this->assertSame(count($requests), 1);
+        $this->assertStringEndsWith('Api/Post/organizations', $this->mockHandler->getLastRequest()->getUri()->getPath());
+        $this->assertEquals('name=Test+Name&address=Test+Adddress+123%2C+Wroc%C5%82aw%2C+Poland', $this->mockHandler->getLastRequest()->getBody()->__toString());
         $this->assertSame(count($integrationEntities), 1);
         $this->assertEquals($company->getName(), $testName);
         $this->assertEquals($company->getAddress1(), $testAddress1);
-        $this->assertEquals($request['form_params']['name'], $testName);
-        $this->assertEquals($request['form_params']['address'], $testAddress1);
         $this->assertEquals($integrationEntity->getInternalEntityId(), $company->getId());
         $this->assertNotNull($integrationEntity->getIntegrationEntityId());
         $this->assertEquals($integrationEntity->getIntegrationEntity(), PipedriveIntegration::ORGANIZATION_ENTITY_TYPE);
@@ -108,7 +108,7 @@ class CompanyExportTest extends PipedriveTest
         $this->assertEquals($integrationEntity->getIntegration(), PipedriveIntegration::INTEGRATION_NAME);
     }
 
-    public function testUpdateCompanyWhenFeatureIsDisabled()
+    public function testUpdateCompanyWhenFeatureIsDisabled(): void
     {
         $testName     = 'New Test Name';
         $testAddress1 = 'New Test Adddress 123, Wrocław, Poland';
@@ -138,20 +138,21 @@ class CompanyExportTest extends PipedriveTest
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
         $company             = $companies[0];
-        $requests            = $GLOBALS['requests'];
 
-        $this->assertSame(count($requests), 0);
+        $this->assertSame(null, $this->mockHandler->getLastRequest(), 'Last request was not submitting the company form');
         $this->assertSame(count($integrationEntities), 0);
         $this->assertSame(count($companies), 1);
         $this->assertSame($company->getName(), $testName);
         $this->assertSame($company->getAddress1(), $testAddress1);
     }
 
-    public function testUpdateCompany()
+    public function testUpdateCompanyWithFeatureEnabled(): void
     {
         $integrationId = 66;
         $testName      = 'New Test Name';
         $testAddress1  = 'New Test Adddress 123, Wrocław, Poland';
+
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Put/organizations')));
 
         $this->installPipedriveIntegration(
             true,
@@ -179,16 +180,16 @@ class CompanyExportTest extends PipedriveTest
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
         $company             = $companies[0];
-        $requests            = $GLOBALS['requests'];
 
-        $this->assertSame(count($requests), 1);
+        $this->assertStringEndsWith('Api/Put/organizations/'.$integrationId, $this->mockHandler->getLastRequest()->getUri()->getPath());
+        $this->assertEquals('name=New+Test+Name&address=New+Test+Adddress+123%2C+Wroc%C5%82aw%2C+Poland', $this->mockHandler->getLastRequest()->getBody()->__toString());
         $this->assertSame(count($integrationEntities), 1);
         $this->assertSame(count($companies), 1);
         $this->assertSame($company->getName(), $testName);
         $this->assertSame($company->getAddress1(), $testAddress1);
     }
 
-    public function testDeleteCompanyWhenFeatureIsDisabled()
+    public function testDeleteCompanyWhenFeatureIsDisabled(): void
     {
         $this->installPipedriveIntegration(
             true,
@@ -211,16 +212,16 @@ class CompanyExportTest extends PipedriveTest
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
 
-        $requests = $GLOBALS['requests'];
-
-        $this->assertSame(count($requests), 0);
+        $this->assertSame(null, $this->mockHandler->getLastRequest(), 'Last request was not submitting the company form');
         $this->assertSame(count($integrationEntities), 0);
         $this->assertSame(count($companies), 0);
     }
 
-    public function testDeleteCompany()
+    public function testDeleteCompany(): void
     {
         $integrationId = 66;
+
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Delete/organizations')));
 
         $this->installPipedriveIntegration(
             true,
@@ -243,12 +244,8 @@ class CompanyExportTest extends PipedriveTest
         $integrationEntities = $this->em->getRepository(IntegrationEntity::class)->findAll();
         $companies           = $this->em->getRepository(Company::class)->findAll();
 
-        $requests = $GLOBALS['requests'];
-        $request  = $requests['DELETE/Api/Delete/organizations/'.$integrationId][0];
-
-        $this->assertSame(count($requests), 1);
+        $this->assertStringEndsWith('Api/Delete/organizations/'.$integrationId, $this->mockHandler->getLastRequest()->getUri()->getPath());
         $this->assertSame(count($integrationEntities), 0);
         $this->assertSame(count($companies), 0);
-        $this->assertEmpty($request['form_params']);
     }
 }

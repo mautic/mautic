@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends CommonFormModel<Field>
+ */
 class FieldModel extends CommonFormModel
 {
     /**
@@ -35,9 +38,9 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param object                              $entity
+     * @param object|array<mixed>                 $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
+     * @param string|null                         $action
      * @param array                               $options
      *
      * @return \Symfony\Component\Form\FormInterface

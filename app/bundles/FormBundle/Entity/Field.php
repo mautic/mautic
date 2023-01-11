@@ -88,7 +88,7 @@ class Field
     private $conditions = [];
 
     /**
-     * @var Form
+     * @var Form|null
      */
     private $form;
 
@@ -561,7 +561,7 @@ class Field
     /**
      * Get form.
      *
-     * @return Form
+     * @return Form|null
      */
     public function getForm()
     {

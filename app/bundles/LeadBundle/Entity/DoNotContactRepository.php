@@ -6,6 +6,9 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
+/**
+ * @extends CommonRepository<DoNotContact>
+ */
 class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;

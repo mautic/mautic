@@ -914,6 +914,24 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "Robmobius",
+      "name": "Robmobius",
+      "avatar_url": "https://avatars.githubusercontent.com/u/16938630?v=4",
+      "profile": "https://github.com/Robmobius",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "onairmarc",
+      "name": "Marc Beinder",
+      "avatar_url": "https://avatars.githubusercontent.com/u/50760632?v=4",
+      "profile": "https://podtrics.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

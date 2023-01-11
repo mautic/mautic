@@ -10,6 +10,9 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Event\UntrackableUrlsEvent;
 use Mautic\PageBundle\PageEvents;
 
+/**
+ * @extends AbstractCommonModel<Trackable>
+ */
 class TrackableModel extends AbstractCommonModel
 {
     /**
