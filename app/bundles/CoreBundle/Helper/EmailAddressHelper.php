@@ -25,6 +25,6 @@ class EmailAddressHelper
             $emails[] = $parts[1].'@'.$parts[3];
         }
 
-        return array_unique($emails);
+        return array_values(array_unique($emails));
     }
 }
