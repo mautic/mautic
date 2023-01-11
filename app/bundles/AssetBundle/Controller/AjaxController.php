@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
         $connector = new Filesystem($adapter);
 
         $output = $this->renderView(
-            'MauticAssetBundle:Remote:list.html.php',
+            'MauticAssetBundle:Remote:list.html.twig',
             [
                 'connector'   => $connector,
                 'integration' => $integration,
