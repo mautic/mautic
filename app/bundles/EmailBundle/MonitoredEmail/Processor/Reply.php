@@ -71,7 +71,7 @@ class Reply implements ProcessorInterface
         $this->dispatcher       = $dispatcher;
         $this->logger           = $logger;
         $this->contactTracker   = $contactTracker;
-        $this->addressHelper = $addressHelper;
+        $this->addressHelper    = $addressHelper;
     }
 
     public function process(Message $message)
@@ -98,7 +98,7 @@ class Reply implements ProcessorInterface
         }
 
         // A stat has been found so let's compare to the From address for the contact to prevent false positives
-        $possibleFromEmails = $this->addressHelper->getVariations($stat->getLead()->getEmail(), $this);
+        $possibleFromEmails = $this->addressHelper->getVariations($stat->getLead()->getEmail());
         $fromEmail          = $this->addressHelper->cleanEmail($repliedEmail->getFromAddress());
 
         if (!in_array($fromEmail, $possibleFromEmails)) {
@@ -171,5 +171,4 @@ class Reply implements ProcessorInterface
             unset($event);
         }
     }
-
 }

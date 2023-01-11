@@ -2,8 +2,6 @@
 
 namespace Mautic\CoreBundle\Helper;
 
-use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
-
 class EmailAddressHelper
 {
     /**
@@ -18,9 +16,9 @@ class EmailAddressHelper
         return strtolower(preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
     }
 
-    public function getVariations(string $email, Reply $reply): array
+    public function getVariations(string $email): array
     {
-        $emails = [$email, $reply->cleanEmail($email)];
+        $emails = [$email, $this->cleanEmail($email)];
         // email without suffix
         preg_match('#^(.*?)\+(.*?)@(.*?)$#', $email, $parts);
         if (!empty($parts)) {
