@@ -6,7 +6,6 @@ use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 
 class EmailAddressHelper
 {
-
     /**
      * Clean the email for comparison.
      *
@@ -28,6 +27,6 @@ class EmailAddressHelper
             $emails[] = $parts[1].'@'.$parts[3];
         }
 
-        return $emails;
+        return array_unique($emails);
     }
 }
