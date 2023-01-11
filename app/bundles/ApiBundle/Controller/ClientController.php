@@ -94,7 +94,7 @@ class ClientController extends FormController
                     'searchValue' => $filter,
                     'filters'     => $filters,
                 ],
-                'contentTemplate' => 'MauticApiBundle:Client:list.html.php',
+                'contentTemplate' => 'MauticApiBundle:Client:list.html.twig',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_client_index', ['page' => $page]),
                     'mauticContent' => 'client',
@@ -113,7 +113,7 @@ class ClientController extends FormController
         $me             = $this->get('security.token_storage')->getToken()->getUser();
         $clients        = $apiClientModel->getUserClients($me);
 
-        return $this->render('MauticApiBundle:Client:authorized.html.php', ['clients' => $clients]);
+        return $this->render('MauticApiBundle:Client:authorized.html.twig', ['clients' => $clients]);
     }
 
     /**
@@ -252,7 +252,7 @@ class ClientController extends FormController
                     'form' => $form->createView(),
                     'tmpl' => $this->request->get('tmpl', 'form'),
                 ],
-                'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
+                'contentTemplate' => 'MauticApiBundle:Client:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_client_new',
                     'route'         => $action,
@@ -359,7 +359,7 @@ class ClientController extends FormController
                     'form' => $form->createView(),
                     'tmpl' => $this->request->get('tmpl', 'form'),
                 ],
-                'contentTemplate' => 'MauticApiBundle:Client:form.html.php',
+                'contentTemplate' => 'MauticApiBundle:Client:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_client_index',
                     'route'         => $action,
