@@ -18,10 +18,12 @@
 <?php endif; ?>
 
 <?php if (method_exists($entity, 'getCreatedByUser')): ?>
+<?php if ($entity->getCreatedByUser()): ?>
 <tr>
     <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.createdby'); ?></span></td>
     <td><?php echo $entity->getCreatedByUser(); ?></td>
 </tr>
+<?php endif; ?>
 <tr>
     <td width="20%"><span class="fw-b textTitle"><?php echo $view['translator']->trans('mautic.core.created'); ?></span></td>
     <td><?php echo $view['date']->toFull($entity->getDateAdded()); ?></td>

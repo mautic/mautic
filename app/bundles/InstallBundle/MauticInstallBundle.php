@@ -17,6 +17,6 @@ class MauticInstallBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new InstallCommandPass());
+        $container->addCompilerPass(new InstallCommandPass(), \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

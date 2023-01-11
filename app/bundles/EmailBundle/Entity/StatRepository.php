@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * Class StatRepository.
+ * @extends CommonRepository<Stat>
  */
 class StatRepository extends CommonRepository
 {
@@ -167,7 +167,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $listId
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
      *
      * @return array
      */
@@ -203,9 +204,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -215,9 +216,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int|string>|int|null $emailIds
+     * @param array<int,int|string>|int|null $listId
+     * @param bool                           $combined
      *
      * @return array|int
      */
@@ -227,9 +228,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -239,10 +240,10 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param      $column
-     * @param null $emailIds
-     * @param null $listId
-     * @param bool $combined
+     * @param string                              $column
+     * @param array<int,int|string>|int|null      $emailIds
+     * @param array<int,int|string>|int|true|null $listId
+     * @param bool                                $combined
      *
      * @return array|int
      */
@@ -269,8 +270,9 @@ class StatRepository extends CommonRepository
                         ->groupBy('s.list_id');
                 } elseif (is_array($listId)) {
                     $q->andWhere(
-                        $q->expr()->in('s.list_id', array_map('intval', $listId))
+                        $q->expr()->in('s.list_id', ':segmentIds')
                     );
+                    $q->setParameter('segmentIds', $listId, Connection::PARAM_INT_ARRAY);
 
                     $q->addSelect('s.list_id')
                         ->groupBy('s.list_id');
@@ -321,8 +323,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param           $emailIds
-     * @param \DateTime $fromDate
+     * @param array<int,int|string>|int $emailIds
      *
      * @return array
      */
@@ -383,7 +384,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param array|int $emailIds
+     * @param array<int,int|string>|int $emailIds
      *
      * @return int
      */
@@ -678,6 +679,83 @@ class StatRepository extends CommonRepository
         $contacts = [];
         foreach ($results as $result) {
             $contacts[$result['lead_id']] = $result['sent_count'];
+        }
+
+        return $contacts;
+    }
+
+    /**
+     * @param array<int> $contacts
+     *
+     * @return array<int, array<string, int|float>>
+     */
+    public function getStatsSummaryForContacts(array $contacts): array
+    {
+        $queryBuilder               = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $subQueryBuilder            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $leadAlias     = 'l'; // leads
+        $statsAlias    = 'es'; // email_stats
+        $subQueryAlias = 'sq'; // sub query
+        $cutAlias      = 'cut'; // channel_url_trackables
+        $pageHitsAlias = 'ph'; // page_hits
+
+        // use sub query to get page hits for and unique page hits selected contacts
+        $subQueryBuilder->select(
+            "COUNT({$pageHitsAlias}.id) AS hits",
+            "COUNT(DISTINCT({$pageHitsAlias}.redirect_id)) AS unique_hits",
+            "{$cutAlias}.channel_id",
+            "{$pageHitsAlias}.lead_id"
+        )
+            ->from(MAUTIC_TABLE_PREFIX.'channel_url_trackables', $cutAlias)
+            ->join(
+                $cutAlias,
+                MAUTIC_TABLE_PREFIX.'page_hits',
+                $pageHitsAlias,
+                "{$cutAlias}.redirect_id = {$pageHitsAlias}.redirect_id AND {$cutAlias}.channel_id = {$pageHitsAlias}.source_id"
+            )
+            ->where("{$cutAlias}.channel = 'email' AND {$pageHitsAlias}.source = 'email'")
+            ->andWhere("{$pageHitsAlias}.lead_id in (:contacts)")
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy("{$cutAlias}.channel_id, {$pageHitsAlias}.lead_id");
+
+        // main query
+        $queryBuilder->select(
+            "{$leadAlias}.id AS `lead_id`",
+            "COUNT({$statsAlias}.id) AS `sent_count`",
+            "SUM(IF({$statsAlias}.is_read IS NULL, 0, {$statsAlias}.is_read)) AS `read_count`",
+            "SUM(IF({$subQueryAlias}.hits is NULL, 0, 1)) AS `clicked_through_count`",
+        )->from(MAUTIC_TABLE_PREFIX.'email_stats', $statsAlias)
+            ->rightJoin(
+                $statsAlias,
+                MAUTIC_TABLE_PREFIX.'leads',
+                $leadAlias,
+                "{$statsAlias}.lead_id=l.id"
+            )->leftJoin(
+                $statsAlias,
+                "({$subQueryBuilder->getSQL()})",
+                $subQueryAlias,
+                "{$statsAlias}.email_id = {$subQueryAlias}.channel_id AND {$statsAlias}.lead_id = {$subQueryAlias}.lead_id"
+            )->andWhere("{$leadAlias}.id in (:contacts)")
+            ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
+            ->groupBy("{$leadAlias}.id");
+
+        $results = $queryBuilder->execute()->fetchAll();
+
+        $contacts = [];
+        foreach ($results as $result) {
+            $sentCount    = (int) $result['sent_count'];
+            $readCount    = (int) $result['read_count'];
+            $clickedCount = (int) $result['clicked_through_count'];
+
+            $contacts[(int) $result['lead_id']] = [
+                'sent_count'              => $sentCount,
+                'read_count'              => $readCount,
+                'clicked_count'           => $clickedCount,
+                'open_rate'               => round(($sentCount > 0 ? ($readCount / $sentCount) : 0), 4),
+                'click_through_rate'      => round(($sentCount > 0 ? ($clickedCount / $sentCount) : 0), 4),
+                'click_through_open_rate' => round(($readCount > 0 ? ($clickedCount / $readCount) : 0), 4),
+            ];
         }
 
         return $contacts;

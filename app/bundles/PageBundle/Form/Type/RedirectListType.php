@@ -50,14 +50,6 @@ class RedirectListType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
-    {
-        return 'redirect_list';
-    }
-
-    /**
-     * @return string
-     */
     public function getParent()
     {
         return ChoiceType::class;

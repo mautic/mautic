@@ -7,6 +7,8 @@ namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Executioner;
 use Mautic\IntegrationsBundle\Event\InternalObjectCreateEvent;
 use Mautic\IntegrationsBundle\Event\InternalObjectUpdateEvent;
 use Mautic\IntegrationsBundle\IntegrationEvents;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
+use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectMappingsDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\OrderDAO;
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Helper\MappingHelper;
@@ -32,31 +34,56 @@ class OrderExecutioner
      */
     private $objectProvider;
 
+    /**
+     * @var ReferenceResolverInterface
+     */
+    private $referenceResolver;
+
+    /**
+     * @var FieldValidatorInterface
+     */
+    private $fieldValidator;
+
     public function __construct(
         MappingHelper $mappingHelper,
         EventDispatcherInterface $dispatcher,
-        ObjectProvider $objectProvider
+        ObjectProvider $objectProvider,
+        ReferenceResolverInterface $referenceResolver,
+        FieldValidatorInterface $fieldValidator
     ) {
-        $this->mappingHelper  = $mappingHelper;
-        $this->dispatcher     = $dispatcher;
-        $this->objectProvider = $objectProvider;
+        $this->mappingHelper     = $mappingHelper;
+        $this->dispatcher        = $dispatcher;
+        $this->objectProvider    = $objectProvider;
+        $this->referenceResolver = $referenceResolver;
+        $this->fieldValidator    = $fieldValidator;
     }
 
-    public function execute(OrderDAO $syncOrderDAO): void
+    public function execute(OrderDAO $syncOrderDAO): ObjectMappingsDAO
     {
         $identifiedObjects   = $syncOrderDAO->getIdentifiedObjects();
         $unidentifiedObjects = $syncOrderDAO->getUnidentifiedObjects();
 
+        $objectMappings = new ObjectMappingsDAO();
+
         foreach ($identifiedObjects as $objectName => $updateObjects) {
-            $this->updateObjects($objectName, $updateObjects, $syncOrderDAO);
+            $this->referenceResolver->resolveReferences($objectName, $updateObjects);
+            $this->fieldValidator->validateFields($objectName, $updateObjects);
+            $this->updateObjects($objectMappings, $objectName, $updateObjects, $syncOrderDAO);
         }
 
         foreach ($unidentifiedObjects as $objectName => $createObjects) {
-            $this->createObjects($objectName, $createObjects);
+            $this->referenceResolver->resolveReferences($objectName, $createObjects);
+            $this->fieldValidator->validateFields($objectName, $createObjects);
+            $this->createObjects($objectMappings, $objectName, $createObjects);
         }
+
+        return $objectMappings;
     }
 
-    private function updateObjects(string $objectName, array $updateObjects, OrderDAO $syncOrderDAO): void
+    /**
+     * @param ObjectChangeDAO[] $updateObjects
+     */
+    private function updateObjects(ObjectMappingsDAO $objectMappings, string $objectName, array $updateObjects, OrderDAO $syncOrderDAO): void
     {
         $updateCount = count($updateObjects);
         DebugLogger::log(
@@ -85,13 +112,29 @@ class OrderExecutioner
                 $objectName,
                 __CLASS__.':'.__FUNCTION__
             );
+
+            return;
         }
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS, $event);
-        $this->mappingHelper->updateObjectMappings($event->getUpdatedObjectMappings());
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_UPDATE_INTERNAL_OBJECTS);
+        $updatedObjectMappings = $event->getUpdatedObjectMappings();
+        $this->mappingHelper->updateObjectMappings($updatedObjectMappings);
+
+        // The ObjectMapping entity is pushed into UpdatedObjectMappingDAO in MappingHelper::updateObjectMapping in order
+        // to make it available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        foreach ($updatedObjectMappings as $updatedObjectMapping) {
+            if (!$updatedObjectMapping->getObjectMapping()) {
+                continue;
+            }
+
+            $objectMappings->addUpdatedObjectMapping($updatedObjectMapping->getObjectMapping());
+        }
     }
 
-    private function createObjects(string $objectName, array $createObjects): void
+    /**
+     * @param ObjectChangeDAO[] $createObjects
+     */
+    private function createObjects(ObjectMappingsDAO $objectMappings, string $objectName, array $createObjects): void
     {
         $createCount = count($createObjects);
 
@@ -120,9 +163,17 @@ class OrderExecutioner
                 $objectName,
                 __CLASS__.':'.__FUNCTION__
             );
+
+            return;
         }
 
-        $this->dispatcher->dispatch(IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS, $event);
-        $this->mappingHelper->saveObjectMappings($event->getObjectMappings());
+        $this->dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CREATE_INTERNAL_OBJECTS);
+        $createdObjectMappings = $event->getObjectMappings();
+        $this->mappingHelper->saveObjectMappings($createdObjectMappings);
+
+        // Make ObjectMappings available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        foreach ($createdObjectMappings as $createdObjectMapping) {
+            $objectMappings->addNewObjectMapping($createdObjectMapping);
+        }
     }
 }
