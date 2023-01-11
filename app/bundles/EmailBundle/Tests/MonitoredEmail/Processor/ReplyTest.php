@@ -23,6 +23,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReplyTest extends \PHPUnit\Framework\TestCase
 {
+    private EmailAddressHelper $emailAddressHelper;
+
     private $statRepo;
     private $contactFinder;
     private $leadModel;

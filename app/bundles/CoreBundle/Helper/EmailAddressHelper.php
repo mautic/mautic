@@ -16,6 +16,9 @@ class EmailAddressHelper
         return strtolower(preg_replace("/[^a-z0-9\+\.@]/i", '', $email));
     }
 
+    /**
+     * @return array<string>
+     */
     public function getVariations(string $email): array
     {
         $emails = [$email, $this->cleanEmail($email)];

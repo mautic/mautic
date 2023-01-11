@@ -23,6 +23,9 @@ final class EmailAddressHelperTest extends TestCase
         $this->assertSame($expected, $this->helper->cleanEmail($email));
     }
 
+    /**
+     * @return array<int, array<int, string>>
+     */
     public function emailProvider(): array
     {
         return [
@@ -34,6 +37,8 @@ final class EmailAddressHelperTest extends TestCase
     }
 
     /**
+     * @param array<int, array<int, array<int, string>|string>> $expected
+     *
      * @dataProvider variationsProvider
      */
     public function testGetVariations(string $email, array $expected): void
@@ -44,6 +49,9 @@ final class EmailAddressHelperTest extends TestCase
         );
     }
 
+    /**
+     * @return array<int, array<int, array<int, string>|string>>
+     */
     public function variationsProvider(): array
     {
         return [
