@@ -47,6 +47,10 @@ class TemplatingPass implements CompilerPassInterface
                     'setRequestStack',
                     [new Reference('request_stack')]
                 )
+                ->addMethodCall(
+                    'setTwig',
+                    [new Reference('twig')]
+                )
                 ->setPublic(true);
         }
 
