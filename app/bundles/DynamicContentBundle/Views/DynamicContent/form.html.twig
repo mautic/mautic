@@ -33,7 +33,11 @@
 
 {% set mainErrors = form.vars.errors.form.getErrors(true) ? 'class="text-danger"' : '' %}
 {% set filterErrors = form.vars.errors.form.filters.getErrors(true) ? 'class="text-danger"' : '' %}
-
+{% form_theme form with [
+    'MauticDynamicContentBundle:FormTheme:Filter\\_dwc_filters_entry_widget.html.twig',
+    'MauticDynamicContentBundle:FormTheme:Filter\\_dwc_filters_widget.html.twig'
+]
+%}
 {{ form_start(form) }}
 <div class="box-layout">
     <div class="col-md-9 bg-white height-auto">
