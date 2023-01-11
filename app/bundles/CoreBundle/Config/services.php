@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
 return function (ContainerConfigurator $configurator) {
     $services = $configurator->services()
@@ -41,6 +42,8 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set('mautic.http.client', \GuzzleHttp\Client::class)->autowire();
+    $services->get(\Mautic\CoreBundle\Templating\Twig\Extension\FormExtension::class)->arg('$formHelper', ref('templating.helper.form'));
+
     $services->alias(\GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(\Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
 

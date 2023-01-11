@@ -16,6 +16,7 @@ class ClassExtension extends AbstractExtension
     {
         return [
             new TwigFunction('get_class', fn ($value) => (new \ReflectionClass($value))->getShortName()),
+            new TwigFunction('instance_of', fn ($value, $class) => ($value instanceof $class)),
         ];
     }
 }
