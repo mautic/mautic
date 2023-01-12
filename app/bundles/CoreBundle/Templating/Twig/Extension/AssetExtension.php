@@ -38,6 +38,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
             new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
+            new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
         ];
     }
 
@@ -112,5 +113,13 @@ class AssetExtension extends AbstractExtension
     public function addScriptDeclaration(string $script, string $location = 'head'): AssetsHelper
     {
         return $this->assetsHelper->addScriptDeclaration($script, $location);
+    }
+
+    /**
+     * @see Mautic\CoreBundle\Templating\Helper\AssetsHelper::getCountryFlag
+     */
+    public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string
+    {
+        return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class);
     }
 }

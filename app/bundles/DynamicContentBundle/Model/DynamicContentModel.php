@@ -19,6 +19,10 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<DynamicContent>
+ * @implements AjaxLookupModelInterface<DynamicContent>
+ */
 class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
@@ -89,10 +93,10 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *

@@ -14,6 +14,9 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Monitoring>
+ */
 class MonitoringModel extends FormModel
 {
     private $networkTypes = [

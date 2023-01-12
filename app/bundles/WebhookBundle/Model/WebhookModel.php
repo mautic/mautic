@@ -26,6 +26,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
+/**
+ * @extends FormModel<Webhook>
+ */
 class WebhookModel extends FormModel
 {
     /**
@@ -353,7 +356,7 @@ class WebhookModel extends FormModel
             }
 
             // log any errors but allow the script to keep running
-            $this->logger->addError($message);
+            $this->logger->error($message);
 
             // log that the request failed to display it to the user
             $this->addLog($webhook, 'N/A', (microtime(true) - $start), $message);
