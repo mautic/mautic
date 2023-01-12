@@ -1,8 +1,38 @@
-{% if 'index' == tmpl %}
-    {% extends 'MauticSmsBundle:Sms:index.html.twig' %}
-{% endif %}
-
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% block mauticContent %}sms{% endblock %}
+{% block headerTitle %}{{ 'mautic.sms.smses'|trans }}{% endblock %}
+{% block actions %}
+{{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+    {
+        'templateButtons' : {
+            'new' : permissions['sms:smses:create'],
+        },
+        'routeBase' : 'sms',
+    }
+) -}}
+{% endblock %}
 {% block content %}
+    {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+            'searchValue' : searchValue,
+            'searchHelp'  : 'mautic.sms.help.searchcommands',
+            'searchId'    : 'sms-search',
+            'action'      : currentRoute,
+        }) -}}
+
+        <div class="page-list">
+            {{ block('listResults') }}
+        </div>
+    </div>
+    {% else %}
+		{{ block('listResults') }}
+	{% endif %}
+{% endblock %}
+
+{% block listResults %}
 {% if items|length %}
     <div class="table-responsive">
         <table class="table table-hover table-striped table-bordered sms-list">
