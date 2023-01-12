@@ -78,14 +78,16 @@
                     permissions['email:emails:editother'],
                     item.getCreatedBy()
                 ) %}
-                {% set customButtons = ('list' == type) ? {
-                    'attr' : {
-                        'data-toggle' : 'ajax',
-                        'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
-                    },
-                    'iconClass' : 'fa fa-send-o',
-                    'btnText'   : 'mautic.email.send',
-                } : {} %}
+                {% set customButtons = ('list' == type) ? [
+                    {
+                        'attr' : {
+                            'data-toggle' : 'ajax',
+                            'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : item.getId()}),
+                        },
+                        'iconClass' : 'fa fa-send-o',
+                        'btnText'   : 'mautic.email.send',
+                    }
+                ] : {} %}
 
                 {{- include('MauticCoreBundle:Helper:list_actions.html.twig', {
                     'item'            : item,
@@ -129,9 +131,9 @@
                         {{ customContent('email.name', mauticTemplateVars) }}
                     </a>
                 </div>
-                {% if description == item.getDescription() %}
+                {% if item.getDescription() is not empty %}
                 <div class="text-muted mt-4">
-                    <small>{{ description }}</small>
+                    <small>{{ item.getDescription() }}</small>
                 </div>
                 {% endif %}
             </td>
