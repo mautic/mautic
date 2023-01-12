@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:FormTheme:form.html.php' %}
+{% extends 'MauticCoreBundle:FormTheme:form.html.twig' %}
 {% set hasRightColumn = block('rightFormContent') is defined %}
 {% set modalView      = app.getRequest().get('modal', false) or block('inModal') is defined %}
 {% block mainFormContent %}
@@ -9,7 +9,7 @@
         </div>
     </div>
     {% if hasRightColumn %}
-    <div class="col-md-<?php echo $modalView ? 12 : 3; ?> bg-white height-auto">
+    <div class="col-md-{{ modalView ? 12 : 3 }} bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             {{ block('rightFormContent') }}
         </div>
