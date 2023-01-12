@@ -30,7 +30,7 @@ class MailjetTransportTest extends \PHPUnit\Framework\TestCase
 
     public function testWebhookPayloadIsProcessed()
     {
-        $this->transportCallback->expects($this->exactly(5))
+        $this->transportCallback->expects($this->exactly(6))
             ->method('addFailureByHashId')
             ->withConsecutive(
                 [$this->equalTo('1'), 'User unsubscribed', DoNotContact::UNSUBSCRIBED],
