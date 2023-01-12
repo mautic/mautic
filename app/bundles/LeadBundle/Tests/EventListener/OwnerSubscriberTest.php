@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -9,10 +10,13 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
 use Mautic\EmailBundle\Tests\Helper\Transport\SmtpTransport;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\EventListener\OwnerSubscriber;
 use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -307,5 +311,82 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue(false));
 
         return $translator;
+    }
+
+    /**
+     * @dataProvider onSmsTokenReplacementProvider
+     */
+    public function testOnSmsTokenReplacement(string $content, string $expected, Lead $lead): void
+    {
+        $leadModel      = $this->createMock(LeadModel::class);
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->method('getLeadOwner')->willReturn(['first_name' => 'John', 'last_name' => 'Doe']);
+        $leadModel->method('getRepository')->willReturn($leadRepository);
+        $translator = $this->createMock(TranslatorInterface::class);
+        $subscriber = new OwnerSubscriber($leadModel, $translator);
+
+        $event = new TokenReplacementEvent($content, $lead);
+        $subscriber->onSmsTokenReplacement($event);
+        $this->assertEquals($expected, $event->getContent());
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        $user = new class() extends User {
+            public function setId(int $id): void
+            {
+                $this->id = $id;
+            }
+        };
+        $user->setId(1);
+        $user->setFirstName('John');
+        $user->setLastName('Doe');
+
+        return $user;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function onSmsTokenReplacementProvider(): array
+    {
+        $lead = $this->getMockBuilder(Lead::class)
+            ->getMock();
+        $lead->expects($this->any())
+            ->method('getId')
+            ->willReturn(1);
+        $lead->expects($this->any())
+            ->method('getProfileFields')
+            ->willReturn(
+                [
+                    'id'     => 1,
+                ]
+            );
+        $lead->expects($this->any())
+            ->method('getowner')
+            ->willReturn(
+                $this->getUser()
+            );
+        $user = $this->getUser();
+        $lead->setOwner($user);
+        $validOwner = [
+            'Hello {ownerfield=firstname} {ownerfield=lastname}',
+            'Hello John Doe',
+            $lead,
+        ];
+
+        $noOwner = [
+            'Hello {ownerfield=firstname} {ownerfield=lastname}',
+            'Hello  ',
+            new Lead(),
+        ];
+
+        return [
+            $validOwner,
+            $noOwner,
+        ];
     }
 }

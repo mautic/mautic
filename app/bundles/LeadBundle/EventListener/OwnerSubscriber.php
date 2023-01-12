@@ -197,7 +197,6 @@ class OwnerSubscriber implements EventSubscriberInterface
         }
 
         $owner = $this->getOwner($contact['owner_id']);
-
         if (!$owner) {
             return $this->getEmptyTokens();
         }
