@@ -1,13 +1,14 @@
 {% extends 'MauticCoreBundle:FormTheme:form_simple.html.twig' %}
-{# 
-    Where those lines needed?
-    $view->addGlobal('translationBase', 'mautic.sms');
-    $view->addGlobal('mauticContent', 'sms');
-#}
+{% form_theme form with [
+    'MauticSmsBundle:FormTheme:SmsSendList/smssend_list_row.html.twig'
+] %}
+
 {% block mauticContent %}sms{% endblock %}
 {# @var sms \Mautic\SmsBundle\Entity\Sms #}
-{% set type       = sms.getSmsType() %}
-{% set isExisting = sms.getId() %}
+{% set type            = sms.getSmsType() %}
+{% set isExisting      = sms.getId() %}
+{% set translationBase = 'mautic.sms' %}
+{% set mauticContent   = 'sms' %}
 
 {% block primaryFormContent %}
 <div class="row">
