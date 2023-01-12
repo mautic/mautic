@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Firewall;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,57 +12,32 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
-use Symfony\Component\Security\Http\Firewall\ListenerInterface;
 use Symfony\Component\Security\Http\SecurityEvents;
 
-class AuthenticationListener implements ListenerInterface
+final class AuthenticationListener
 {
+    private TokenStorageInterface $tokenStorage;
+    private AuthenticationHandler $authenticationHandler;
+    private AuthenticationManagerInterface $authenticationManager;
+    private LoggerInterface $logger;
+    private EventDispatcherInterface $dispatcher;
+    private PermissionRepository $permissionRepository;
+    private EntityManagerInterface $entityManager;
+
     /**
-     * @var TokenStorageInterface
+     * @var string|mixed
      */
-    protected $tokenStorage;
+    private $providerKey;
 
     /**
-     * @var AuthenticationHandler
-     */
-    protected $authenticationHandler;
-
-    /**
-     * @var AuthenticationManagerInterface
-     */
-    protected $authenticationManager;
-
-    protected $providerKey;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @var PermissionRepository
-     */
-    protected $permissionRepository;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @param $providerKey
+     * @param string|mixed $providerKey
      */
     public function __construct(
         AuthenticationHandler $authenticationHandler,
@@ -93,7 +59,7 @@ class AuthenticationListener implements ListenerInterface
         $this->entityManager         = $entityManager;
     }
 
-    public function handle(GetResponseEvent $event)
+    public function __invoke(RequestEvent $event): void
     {
         if (null !== $this->tokenStorage->getToken()) {
             $this->setActivePermissionsOnAuthToken();
@@ -133,28 +99,16 @@ class AuthenticationListener implements ListenerInterface
         }
     }
 
-    /**
-     * @return Response
-     */
-    private function onFailure(Request $request, AuthenticationException $failed)
+    private function onFailure(Request $request, AuthenticationException $failed): Response
     {
         if (null !== $this->logger) {
             $this->logger->info(sprintf('Authentication request failed: %s', $failed->getMessage()));
         }
 
-        $response = $this->authenticationHandler->onAuthenticationFailure($request, $failed);
-
-        if (!$response instanceof Response) {
-            throw new \RuntimeException('Authentication Failure Handler did not return a Response.');
-        }
-
-        return $response;
+        return $this->authenticationHandler->onAuthenticationFailure($request, $failed);
     }
 
-    /**
-     * @return Response
-     */
-    private function onSuccess(Request $request, TokenInterface $token, Response $response = null)
+    private function onSuccess(Request $request, TokenInterface $token, Response $response = null): Response
     {
         if (null !== $this->logger) {
             $this->logger->info(sprintf('User "%s" has been authenticated successfully', $token->getUsername()));
@@ -165,15 +119,11 @@ class AuthenticationListener implements ListenerInterface
 
         if (null !== $this->dispatcher) {
             $loginEvent = new InteractiveLoginEvent($request, $token);
-            $this->dispatcher->dispatch(SecurityEvents::INTERACTIVE_LOGIN, $loginEvent);
+            $this->dispatcher->dispatch($loginEvent, SecurityEvents::INTERACTIVE_LOGIN);
         }
 
         if (null === $response) {
             $response = $this->authenticationHandler->onAuthenticationSuccess($request, $token);
-
-            if (!$response instanceof Response) {
-                throw new \RuntimeException('Authentication Success Handler did not return a Response.');
-            }
         }
 
         return $response;
@@ -182,7 +132,7 @@ class AuthenticationListener implements ListenerInterface
     /**
      * Set the active permissions on the current user.
      */
-    private function setActivePermissionsOnAuthToken()
+    private function setActivePermissionsOnAuthToken(): void
     {
         $token = $this->tokenStorage->getToken();
         $user  = $token->getUser();

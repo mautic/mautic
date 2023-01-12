@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use FOS\OAuthServerBundle\Event\OAuthEvent;
@@ -124,8 +115,8 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         $event = new OAuthEvent($user, $this->getClient());
 
         $this->eventDispatcher->dispatch(
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS,
-            $event
+            $event,
+            OAuthEvent::PRE_AUTHORIZATION_PROCESS
         );
 
         if ($event->isAuthorizedClient()) {
@@ -139,7 +130,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         }
 
         return $this->templating->renderResponse(
-            'MauticApiBundle:Authorize:oAuth2/authorize.html.php',
+            'MauticApiBundle:Authorize:oAuth2/authorize.html.twig',
             [
                 'form'   => $this->authorizeForm->createView(),
                 'client' => $this->getClient(),

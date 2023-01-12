@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\EventListener;
 
 use Doctrine\ORM\EntityNotFoundException;
@@ -25,7 +16,7 @@ use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This class subscribes to events related to building and providing
@@ -92,8 +83,8 @@ class EmailSubscriber implements EventSubscriberInterface
 
         $mappedObjectTokens = new MappedIntegrationObjectTokenEvent();
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT,
-            $mappedObjectTokens
+            $mappedObjectTokens,
+            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT
         );
 
         foreach ($mappedObjectTokens->getTokens() as $integration => $t) {

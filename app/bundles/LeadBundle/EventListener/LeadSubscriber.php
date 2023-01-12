@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -31,7 +23,7 @@ use Mautic\LeadBundle\Model\ChannelTimelineInterface;
 use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -79,6 +71,9 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $isTest;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
@@ -87,6 +82,7 @@ class LeadSubscriber implements EventSubscriberInterface
         EntityManager $entityManager,
         TranslatorInterface $translator,
         RouterInterface $router,
+        ModelFactory $modelFactory,
         $isTest = false
     ) {
         $this->ipLookupHelper      = $ipLookupHelper;
@@ -97,6 +93,8 @@ class LeadSubscriber implements EventSubscriberInterface
         $this->translator          = $translator;
         $this->router              = $router;
         $this->isTest              = $isTest;
+
+        $this->setModelFactory($modelFactory);
     }
 
     /**
@@ -536,7 +534,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'event'      => $eventTypeKey,
                             'eventType'  => $eventTypeName,
                             'eventId'    => $eventTypeKey.$utmTag['id'],
-                            'eventLabel' => !empty($utmTag) ? $utmTag['utm_campaign'] : 'UTM Tags',
+                            'eventLabel' => !empty($utmTag['utm_campaign']) ? $this->translator->trans('mautic.lead.timeline.event.utmcampaign').': '.$utmTag['utm_campaign'] : $eventTypeName,
                             'timestamp'  => $utmTag['date_added'],
                             'icon'       => $icon,
                             'extra'      => [

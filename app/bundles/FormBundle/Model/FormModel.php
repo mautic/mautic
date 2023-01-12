@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Model;
 
 use DOMDocument;
@@ -16,7 +7,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -31,12 +22,12 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class FormModel.
+ * @extends CommonFormModel<Form>
  */
 class FormModel extends CommonFormModel
 {
@@ -51,7 +42,7 @@ class FormModel extends CommonFormModel
     protected $templatingHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     protected $themeHelper;
 
@@ -101,7 +92,7 @@ class FormModel extends CommonFormModel
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
-        ThemeHelper $themeHelper,
+        ThemeHelperInterface $themeHelper,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
         FormFieldHelper $fieldHelper,
@@ -167,9 +158,9 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param null $id
+     * @param string|int|null $id
      *
-     * @return Form
+     * @return Form|object|null
      */
     public function getEntity($id = null)
     {
@@ -191,7 +182,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return bool|FormEvent|void
+     * @return bool|FormEvent|Event|void|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -224,7 +215,7 @@ class FormModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -270,8 +261,16 @@ class FormModel extends CommonFormModel
             }
             $field->setForm($entity);
             $field->setSessionId($key);
-            $field->setOrder($order);
-            ++$order;
+            if (!$field->getParent()) {
+                $field->setOrder($order);
+                ++$order;
+            } else {
+                if (isset($sessionFields[$field->getParent()]['order'])) {
+                    $field->setOrder($sessionFields[$field->getParent()]['order']);
+                } else {
+                    $field->setOrder($order);
+                }
+            }
             $entity->addField($properties['id'], $field);
         }
 
@@ -585,13 +584,11 @@ class FormModel extends CommonFormModel
             $previousId = $fieldId;
         }
 
-        if (!empty($pages)) {
-            if ($openFieldId) {
-                $pages['open'][$openFieldId] = $pageCount;
-            }
-            if ($previousId !== $lastPage) {
-                $pages['close'][$previousId] = $pageCount;
-            }
+        if ($openFieldId) {
+            $pages['open'][$openFieldId] = $pageCount;
+        }
+        if ($previousId !== $lastPage) {
+            $pages['close'][$previousId] = $pageCount;
         }
 
         return [$pages, $lastPage];
@@ -689,7 +686,7 @@ class FormModel extends CommonFormModel
         ];
         $ignoreTypes = $this->getCustomComponents()['viewOnlyFields'];
         foreach ($fields as $f) {
-            if (!in_array($f->getType(), $ignoreTypes) && false !== $f->getSaveResult()) {
+            if (!in_array($f->getType(), $ignoreTypes)) {
                 $columns[] = [
                     'name'    => $f->getAlias(),
                     'type'    => 'text',
@@ -715,7 +712,7 @@ class FormModel extends CommonFormModel
         if (empty($customComponents)) {
             //build them
             $event = new FormBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, FormEvents::FORM_ON_BUILD);
             $customComponents['fields']     = $event->getFormFields();
             $customComponents['actions']    = $event->getSubmitActions();
             $customComponents['choices']    = $event->getSubmitActionGroups();
@@ -1089,10 +1086,26 @@ class FormModel extends CommonFormModel
             return;
         }
 
+        $list = $this->getContactFieldPropertiesList($contactFieldAlias);
+
+        if (!empty($list)) {
+            $formFieldProps['list'] = ['list' => $list];
+            if (array_key_exists('optionlist', $formFieldProps)) {
+                $formFieldProps['optionlist'] = ['list' => $list];
+            }
+            $formField->setProperties($formFieldProps);
+        }
+    }
+
+    /**
+     * @return mixed[]|null
+     */
+    public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
+    {
         $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
-            return;
+            return null;
         }
 
         $contactFieldProps = $contactField->getProperties();
@@ -1101,7 +1114,7 @@ class FormModel extends CommonFormModel
             case 'select':
             case 'multiselect':
             case 'lookup':
-                $list = isset($contactFieldProps['list']) ? $contactFieldProps['list'] : [];
+                $list = $contactFieldProps['list'] ?? [];
                 break;
             case 'boolean':
                 $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
@@ -1119,16 +1132,10 @@ class FormModel extends CommonFormModel
                 $list = ContactFieldHelper::getLocaleChoices();
                 break;
             default:
-                return;
+                return null;
         }
 
-        if (!empty($list)) {
-            $formFieldProps['list'] = ['list' => $list];
-            if (array_key_exists('optionlist', $formFieldProps)) {
-                $formFieldProps['optionlist'] = ['list' => $list];
-            }
-            $formField->setProperties($formFieldProps);
-        }
+        return $list;
     }
 
     /**

@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-coffee",
+            "directory": "themes/coffee",
+            "target": "git@github.com:mautic/theme-coffee.git"
+        }
+    ]
+}

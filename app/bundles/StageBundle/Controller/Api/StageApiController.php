@@ -1,23 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\StageBundle\Entity\Stage;
+use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class PointApiController.
+ * @extends CommonApiController<Stage>
  */
 class StageApiController extends CommonApiController
 {
@@ -26,10 +20,13 @@ class StageApiController extends CommonApiController
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('stage');
-        $this->entityClass      = 'Mautic\StageBundle\Entity\Stage';
+        $stageModel = $this->getModel('stage');
+        \assert($stageModel instanceof StageModel);
+
+        $this->model            = $stageModel;
+        $this->entityClass      = Stage::class;
         $this->entityNameOne    = 'stage';
         $this->entityNameMulti  = 'stages';
         $this->serializerGroups = ['stageDetails', 'categoryList', 'publishDetails'];
@@ -65,7 +62,9 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->addToStages($contact, $stage)->saveEntity($contact);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $leadModel->addToStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }
@@ -98,7 +97,9 @@ class StageApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->removeFromStages($contact, $stage)->saveEntity($contact);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $leadModel->removeFromStages($contact, $stage)->saveEntity($contact);
 
         return $this->handleView($this->view(['success' => 1], Response::HTTP_OK));
     }

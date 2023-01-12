@@ -11,6 +11,9 @@ use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilderRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @extends AbstractCommonModel<GrapesJsBuilder>
+ */
 class GrapesJsBuilderModel extends AbstractCommonModel
 {
     /**
@@ -47,6 +50,10 @@ class GrapesJsBuilderModel extends AbstractCommonModel
      */
     public function addOrEditEntity(Email $email)
     {
+        if ($this->emailModel->isUpdatingTranslationChildren()) {
+            return;
+        }
+
         $grapesJsBuilder = $this->getRepository()->findOneBy(['email' => $email]);
 
         if (!$grapesJsBuilder) {

@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CacheBundle\Cache;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -18,7 +10,7 @@ use Psr\Cache\InvalidArgumentException as Psr6CacheInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
 use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Simple\Psr6Cache;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 final class CacheProvider implements CacheProviderInterface
 {
     /**
-     * @var Psr6Cache
+     * @var Psr16Cache|null
      */
     private $psr16;
 
@@ -62,10 +54,10 @@ final class CacheProvider implements CacheProviderInterface
         return $adaptor;
     }
 
-    public function getSimpleCache(): Psr6Cache
+    public function getSimpleCache(): Psr16Cache
     {
         if (is_null($this->psr16)) {
-            $this->psr16 = new Psr6Cache($this->getCacheAdapter());
+            $this->psr16 = new Psr16Cache($this->getCacheAdapter());
         }
 
         return $this->psr16;

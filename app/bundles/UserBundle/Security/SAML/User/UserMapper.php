@@ -1,19 +1,9 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\SAML\User;
 
 use LightSaml\Model\Assertion\Assertion;
 use LightSaml\Model\Protocol\Response;
-use LightSaml\SamlConstants;
 use LightSaml\SpBundle\Security\User\UsernameMapperInterface;
 use Mautic\UserBundle\Entity\User;
 

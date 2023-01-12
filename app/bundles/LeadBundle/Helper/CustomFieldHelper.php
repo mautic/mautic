@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -18,9 +9,9 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
  */
 class CustomFieldHelper
 {
-    const TYPE_BOOLEAN = 'boolean';
-    const TYPE_NUMBER  = 'number';
-    const TYPE_SELECT  = 'select';
+    public const TYPE_BOOLEAN = 'boolean';
+    public const TYPE_NUMBER  = 'number';
+    public const TYPE_SELECT  = 'select';
 
     /**
      * Fixes value type for specific field types.

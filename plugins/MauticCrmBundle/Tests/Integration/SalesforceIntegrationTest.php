@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Tests\Integration;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -27,11 +18,11 @@ use ReflectionClass;
 
 class SalesforceIntegrationTest extends AbstractIntegrationTestCase
 {
-    const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
-    const SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
-    const SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
-    const SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
-    const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
+    public const SC_MULTIPLE_SF_LEADS        = 'multiple_sf_leads';
+    public const SC_MULTIPLE_SF_CONTACTS     = 'multiple_sf_contacts';
+    public const SC_CONVERTED_SF_LEAD        = 'converted_sf_lead';
+    public const SC_EMAIL_WITH_APOSTROPHE    = 'email_with_apostrophe';
+    public const SC_MULTIPLE_MAUTIC_CONTACTS = 'multiple_mautic_contacts';
 
     /**
      * @var array

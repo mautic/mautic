@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -21,9 +12,9 @@ use Mautic\CoreBundle\Entity\CommonEntity;
  */
 class FrequencyRule extends CommonEntity
 {
-    const TIME_DAY   = 'DAY';
-    const TIME_WEEK  = 'WEEK';
-    const TIME_MONTH = 'MONTH';
+    public const TIME_DAY   = 'DAY';
+    public const TIME_WEEK  = 'WEEK';
+    public const TIME_MONTH = 'MONTH';
 
     /**
      * @var int

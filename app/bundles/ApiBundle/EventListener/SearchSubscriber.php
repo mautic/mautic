@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\EventListener;
 
 use Mautic\ApiBundle\Model\ClientModel;
@@ -72,7 +63,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
                     $clientResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticApiBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticApiBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'client'  => $client,
                             'canEdit' => $canEdit,
@@ -81,7 +72,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($clients) > 5) {
                     $clientResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticApiBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticApiBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

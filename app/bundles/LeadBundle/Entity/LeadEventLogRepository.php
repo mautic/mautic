@@ -1,20 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<LeadEventLog>
+ */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -84,8 +78,8 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @param null              $bundle
-     * @param null              $object
+     * @param ?string           $bundle
+     * @param ?string           $object
      * @param array|string|null $actions
      *
      * @return array

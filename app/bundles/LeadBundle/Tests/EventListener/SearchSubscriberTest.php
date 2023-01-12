@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
@@ -24,17 +16,15 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchSubscriberTest extends TestCase
 {
     /**
      * Tests emailread search command.
      */
-    public function testOnBuildSearchCommands()
+    public function testOnBuildSearchCommands(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $contactRepository = $this->createMock(LeadRepository::class);
         $emailRepository   = $this->createMock(EmailRepository::class);
         $connection        = $this->createMock(Connection::class);
@@ -109,44 +99,56 @@ class SearchSubscriberTest extends TestCase
 
         // test email read
         $event = new LeadBuildSearchEvent('1', 'email_read', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (es.email_id = ?) AND (es.is_read = ?) GROUP BY l.id', $sql);
 
         // test email sent
         $event = new LeadBuildSearchEvent('1', 'email_sent', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE es.email_id = ? GROUP BY l.id', $sql);
 
         // test email pending
         $event = new LeadBuildSearchEvent('1', 'email_pending', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
 
         // test email queued
         $event = new LeadBuildSearchEvent('1', 'email_queued', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
-        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status = ?) GROUP BY l.id', $sql);
+        $this->assertEquals('SELECT  WHERE (mq.channel_id = ?) AND (mq.channel = ?) AND (mq.status IN (?, ?)) GROUP BY l.id', $sql);
 
         // test sms sent
         $event = new LeadBuildSearchEvent('1', 'sms_sent', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE ss.sms_id = ? GROUP BY l.id', $sql);
 
         // test web sent
         $event = new LeadBuildSearchEvent('1', 'web_sent', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
 
         // test mobile sent
         $event = new LeadBuildSearchEvent('1', 'mobile_sent', $alias, false, new QueryBuilder($connection));
-        $dispatcher->dispatch(LeadEvents::LEAD_BUILD_SEARCH_COMMANDS, $event);
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
         $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
         $this->assertEquals('SELECT  WHERE (pn.id = ?) AND (pn.mobile = ?) GROUP BY l.id', $sql);
+
+        // test import id
+        $event = new LeadBuildSearchEvent('1', 'import_id', $alias, false, new QueryBuilder($connection));
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE (lel.object_id = ?) AND (lel.object = ?) GROUP BY l.id', $sql);
+
+        // test import action
+        $event = new LeadBuildSearchEvent('1', 'import_action', $alias, false, new QueryBuilder($connection));
+        $dispatcher->dispatch($event, LeadEvents::LEAD_BUILD_SEARCH_COMMANDS);
+        $sql = preg_replace('/:\w+/', '?', $event->getQueryBuilder()->getSQL());
+        $this->assertEquals('SELECT  WHERE lel.action = ? GROUP BY l.id', $sql);
     }
 }

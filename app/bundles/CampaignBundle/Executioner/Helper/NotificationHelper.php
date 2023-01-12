@@ -1,23 +1,16 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Helper;
 
 use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NotificationHelper
 {
@@ -42,14 +35,22 @@ class NotificationHelper
     private $router;
 
     /**
-     * NotificationHelper constructor.
+     * @var CoreParametersHelper
      */
-    public function __construct(UserModel $userModel, NotificationModel $notificationModel, TranslatorInterface $translator, Router $router)
-    {
-        $this->userModel         = $userModel;
-        $this->notificationModel = $notificationModel;
-        $this->translator        = $translator;
-        $this->router            = $router;
+    private $coreParametersHelper;
+
+    public function __construct(
+        UserModel $userModel,
+        NotificationModel $notificationModel,
+        TranslatorInterface $translator,
+        Router $router,
+        CoreParametersHelper $coreParametersHelper
+    ) {
+        $this->userModel            = $userModel;
+        $this->notificationModel    = $notificationModel;
+        $this->translator           = $translator;
+        $this->router               = $router;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function notifyOfFailure(Lead $contact, Event $event)
@@ -78,8 +79,76 @@ class NotificationHelper
         );
     }
 
+    public function notifyOfUnpublish(Event $event): void
+    {
+        /**
+         * Pass a fake lead so we can just get the campaign creator.
+         */
+        $user = $this->getUser(new Lead(), $event);
+
+        if (!$user || !$user->getId()) {
+            return;
+        }
+
+        $campaign = $event->getCampaign();
+
+        // Campaign is already unpublished, do not trigger further notification/email
+        if (!$campaign->isPublished()) {
+            return;
+        }
+
+        $this->notificationModel->addNotification(
+            $campaign->getName().' / '.$event->getName(),
+            'error',
+            false,
+            $this->translator->trans(
+                'mautic.campaign.event.failed.campaign.unpublished',
+                [
+                    '%campaign%' => '<a href="'.$this->router->generate(
+                            'mautic_campaign_action',
+                            ['objectAction' => 'view', 'objectId' => $campaign->getId()]
+                        ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                    '%event%' => $event->getName(),
+                ]
+            ),
+            null,
+            null,
+            $user
+        );
+
+        $subject = $this->translator->trans(
+            'mautic.campaign.event.campaign_unpublished.title',
+            [
+                '%title%' => $campaign->getName(),
+            ]
+        );
+
+        $content = $this->translator->trans(
+            'mautic.campaign.event.failed.campaign.unpublished',
+            [
+                '%campaign%' => '<a href="'.$this->router->generate(
+                        'mautic_campaign_action',
+                        [
+                            'objectAction' => 'view',
+                            'objectId'     => $campaign->getId(),
+                        ],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ).'" data-toggle="ajax">'.$campaign->getName().'</a>',
+                '%event%' => $event->getName(),
+            ]
+        );
+
+        $sendToAuthor = $this->coreParametersHelper->get('campaign_send_notification_to_author', 1);
+        if ($sendToAuthor) {
+            $this->userModel->emailUser($user, $subject, $content);
+        } else {
+            $emailAddresses =  array_map('trim', explode(',', $this->coreParametersHelper->get('campaign_notification_email_addresses')));
+            $this->userModel->sendMailToEmailAddresses($emailAddresses, $subject, $content);
+        }
+    }
+
     /**
-     * @return User
+     * @return User|null
      */
     private function getUser(Lead $contact, Event $event)
     {

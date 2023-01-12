@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes'   => [
         'main'   => [],
@@ -29,9 +20,6 @@ return [
                 ],
             ],
         ],
-        'forms'     => [],
-        'helpers'   => [],
-        'menus'     => [],
         'other'     => [
             'mautic.cache.provider'           => [
                 'class'     => \Mautic\CacheBundle\Cache\CacheProvider::class,
@@ -63,6 +51,7 @@ return [
                     '%mautic.cache_adapter_redis%',
                     '%mautic.cache_prefix%',
                     '%mautic.cache_lifetime%',
+                    '%mautic.redis_primary_only%',
                 ],
                 'tag'       => 'mautic.cache.adapter',
             ],

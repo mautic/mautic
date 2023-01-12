@@ -8,13 +8,12 @@ use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\InstallBundle\InstallFixtures\ORM\RoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
+use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 {
-    /**
-     * @var bool
-     */
-    private static $databasePrepared = false;
+    private bool $databaseInstalled = false;
 
     /**
      * Use transaction rollback for cleanup. Sometimes it is not possible to use it because of the following:
@@ -26,15 +25,33 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     protected $useCleanupRollback = true;
 
     /**
+     * @param array<mixed> $data
+     */
+    public function __construct(?string $name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->configParams += [
+            'db_driver' => 'pdo_mysql',
+        ];
+    }
+
+    /**
      * @throws Exception
      */
     protected function setUp(): void
     {
         parent::setUp();
 
-        if (!self::$databasePrepared) {
+        if (!$this->isDatabasePrepared()) {
             $this->prepareDatabase();
-            self::$databasePrepared = true;
+
+            if ($this->databaseInstalled) {
+                // re-create client/container as some services can be already wired
+                parent::setUpSymfony($this->configParams);
+            }
+
+            $this->markDatabasePrepared();
         }
 
         if ($this->useCleanupRollback) {
@@ -91,6 +108,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         }
     }
 
+    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): Client
+    {
+        // turn off rollback cleanup as this client creates a separate DB connection
+        $this->useCleanupRollback = false;
+
+        return self::createClient(
+            $this->clientOptions,
+            [
+                'PHP_AUTH_USER' => $username,
+                'PHP_AUTH_PW'   => $password,
+            ]
+        );
+    }
+
     /**
      * Warning: To perform Truncate on tables with foreign keys we have to turn off the foreign keys temporarily.
      * This may lead to corrupted data. Make sure you know what you are doing.
@@ -114,13 +145,22 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function applySqlFromFile($file)
     {
         $connection = $this->connection;
-        $password   = ($connection->getPassword()) ? " -p{$connection->getPassword()}" : '';
-        $command    = "mysql -h{$connection->getHost()} -P{$connection->getPort()} -u{$connection->getUsername()}$password {$connection->getDatabase()} < {$file} 2>&1 | grep -v \"Using a password\" || true";
+        $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $connection->getPassword(),
+            'db_host'        => $connection->getHost(),
+            'db_port'        => $connection->getPort(),
+            'db_user'        => $connection->getUsername(),
+            'db_name'        => $connection->getDatabase(),
+            'db_backup_file' => $file,
+        ];
 
-        $lastLine = system($command, $status);
+        $process = Process::fromShellCommandline($command);
+        $process->run(null, $envVars);
 
-        if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
     }
 
@@ -131,7 +171,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function prepareDatabase()
     {
-        if (!function_exists('system')) {
+        if (!function_exists('proc_open')) {
             $this->installDatabase();
 
             return;
@@ -157,6 +197,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $this->createDatabase();
         $this->applyMigrations();
         $this->installDatabaseFixtures([LeadFieldData::class, RoleData::class, LoadRoleData::class, LoadUserData::class]);
+        $this->databaseInstalled = true;
     }
 
     /**
@@ -164,27 +205,9 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function createDatabase()
     {
-        $this->runCommand(
-            'doctrine:database:drop',
-            [
-                '--env'   => 'test',
-                '--force' => true,
-            ]
-        );
-
-        $this->runCommand(
-            'doctrine:database:create',
-            [
-                '--env' => 'test',
-            ]
-        );
-
-        $this->runCommand(
-            'doctrine:schema:create',
-            [
-                '--env' => 'test',
-            ]
-        );
+        $this->runCommand('doctrine:database:drop', ['--if-exists' => true, '--force' => true]);
+        $this->runCommand('doctrine:database:create');
+        $this->runCommand('doctrine:schema:create');
     }
 
     /**
@@ -192,22 +215,27 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
      */
     private function dumpToFile(string $sqlDumpFile): void
     {
-        $password   = ($this->connection->getPassword()) ? " -p{$this->connection->getPassword()}" : '';
-        $command    = "mysqldump --add-drop-table --opt -h{$this->connection->getHost()} -P{$this->connection->getPort()} -u{$this->connection->getUsername()}$password {$this->connection->getDatabase()} > {$sqlDumpFile} 2>&1 | grep -v \"Using a password\" || true";
+        $connection = $this->connection;
+        $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
+        $envVars    = [
+            'MYSQL_PWD'      => $connection->getPassword(),
+            'db_host'        => $connection->getHost(),
+            'db_port'        => $connection->getPort(),
+            'db_user'        => $connection->getUsername(),
+            'db_name'        => $connection->getDatabase(),
+            'db_backup_file' => $sqlDumpFile,
+        ];
 
-        $lastLine = system($command, $status);
-        if (0 !== $status) {
-            throw new Exception($command.' failed with status code '.$status.' and last line of "'.$lastLine.'"');
-        }
+        $process = Process::fromShellCommandline($command);
+        $process->run(null, $envVars);
 
-        $f         = fopen($sqlDumpFile, 'r');
-        $firstLine = fgets($f);
-        if (false !== strpos($firstLine, 'Using a password')) {
-            $file = file($sqlDumpFile);
-            unset($file[0]);
-            file_put_contents($sqlDumpFile, $file);
+        // executes after the command finishes
+        if (!$process->isSuccessful()) {
+            if (file_exists($sqlDumpFile)) {
+                unlink($sqlDumpFile);
+            }
+            throw new Exception($command.' failed with status code '.$process->getExitCode().' and last line of "'.$process->getErrorOutput().'"');
         }
-        fclose($f);
     }
 
     /**
@@ -221,5 +249,20 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         putenv('SHELL_VERBOSITY='.$defaultVerbosity);
         $_ENV['SHELL_VERBOSITY']    = $defaultVerbosity;
         $_SERVER['SHELL_VERBOSITY'] = $defaultVerbosity;
+    }
+
+    private function getSqlFilePath(string $name): string
+    {
+        return sprintf('%s/%s.sql', self::$container->getParameter('kernel.cache_dir'), $name);
+    }
+
+    private function isDatabasePrepared(): bool
+    {
+        return file_exists($this->getSqlFilePath('prepared'));
+    }
+
+    private function markDatabasePrepared(): void
+    {
+        touch($this->getSqlFilePath('prepared'));
     }
 }

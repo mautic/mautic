@@ -1,24 +1,19 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Controller\Api;
 
 use DateTimeImmutable;
 use DateTimeZone;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Report>
+ */
 class ReportApiController extends CommonApiController
 {
     /**
@@ -27,11 +22,16 @@ class ReportApiController extends CommonApiController
     private $formFactory;
 
     /**
-     * {@inheritdoc}
+     * @var ReportModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('report');
+        $reportModel = $this->getModel('report');
+        \assert($reportModel instanceof ReportModel);
+
+        $this->model            = $reportModel;
         $this->entityClass      = Report::class;
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';

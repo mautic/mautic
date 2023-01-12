@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Menu;
 
 use Knp\Menu\FactoryInterface;
@@ -117,7 +108,7 @@ class MenuBuilder
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
             $menuItems    = $event->getMenuItems();
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -22,8 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class FieldType.
@@ -56,6 +47,7 @@ class FieldType extends AbstractType
             'inputAttributes'     => 'string',
             'containerAttributes' => 'string',
             'label'               => 'strict_html',
+            'helpMessage'         => 'strict_html',
         ];
 
         $addHelpMessage         =
@@ -151,6 +143,29 @@ class FieldType extends AbstractType
                     break;
             }
         }
+
+        // disable progressing profiling  for conditional fields
+        if (!empty($options['data']['parent'])) {
+            $addBehaviorFields = false;
+            $builder->add(
+                'conditions',
+                FormFieldConditionType::class,
+                [
+                    'label'      => false,
+                    'data'       => isset($options['data']['conditions']) ? $options['data']['conditions'] : [],
+                    'formId'     => $options['data']['formId'],
+                    'parent'     => isset($options['data']['parent']) ? $options['data']['parent'] : null,
+                ]
+            );
+        }
+
+        $builder->add(
+            'parent',
+            HiddenType::class,
+            [
+                'label'=> false,
+            ]
+        );
 
         // Build form fields
         $builder->add(

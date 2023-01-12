@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\ORM\NoResultException;
@@ -16,27 +7,30 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
 /**
- * Class CopyRepository.
+ * @extends CommonRepository<Copy>
  */
 class CopyRepository extends CommonRepository
 {
     /**
-     * @param $hash
-     * @param $subject
-     * @param $body
+     * @param string $hash
+     * @param string $subject
+     * @param string $body
+     * @param string $bodyText
      */
-    public function saveCopy($hash, $subject, $body)
+    public function saveCopy($hash, $subject, $body, $bodyText)
     {
         $db = $this->getEntityManager()->getConnection();
 
         try {
-            $body    = EmojiHelper::toShort($body);
-            $subject = EmojiHelper::toShort($subject);
+            $body     = EmojiHelper::toShort($body);
+            $subject  = EmojiHelper::toShort($subject);
+            $bodyText = EmojiHelper::toShort($bodyText);
             $db->insert(
                 MAUTIC_TABLE_PREFIX.'email_copies',
                 [
                     'id'           => $hash,
                     'body'         => $body,
+                    'body_text'    => $bodyText,
                     'subject'      => $subject,
                     'date_created' => (new \DateTime())->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s'),
                 ]

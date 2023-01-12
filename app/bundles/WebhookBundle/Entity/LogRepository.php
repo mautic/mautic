@@ -1,22 +1,41 @@
 <?php
 
-/*
- * @copyright   Mautic, Inc
- * @author      Mautic, Inc
- *
- * @link        http://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Log>
+ */
 class LogRepository extends CommonRepository
 {
+    private const LOG_DELETE_BATCH_SIZE = 5000;
+
+    /**
+     * @return int[]
+     */
+    public function getWebhooksBasedOnLogLimit(int $logMaxLimit): array
+    {
+        $qb = $this->_em->getConnection()->createQueryBuilder();
+        $qb->select('webhook_id')
+            ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
+            ->groupBy('webhook_id')
+            ->having('count(id) > :logMaxLimit')
+            ->setParameter('logMaxLimit', $logMaxLimit);
+
+        return array_map(
+            function ($row) {
+                return (int) $row['webhook_id'];
+            },
+            $qb->execute()->fetchAll()
+        );
+    }
+
     /**
      * Retains a rolling number of log records for a webhook id.
+     *
+     * @depreacated use removeLimitExceedLogs() instead
      *
      * @param int $webhookId
      * @param int $logMax    how many recent logs should remain, the rest will be deleted
@@ -52,6 +71,34 @@ class LogRepository extends CommonRepository
                 ->where($qb->expr()->in('id', $id))
                 ->execute();
         }
+    }
+
+    /**
+     * Retains a rolling number of log records for a webhook id.
+     */
+    public function removeLimitExceedLogs(int $webHookId, int $logMax): int
+    {
+        $deletedLogs   = 0;
+        $table_name    = $this->getTableName();
+        $conn          = $this->getEntityManager()->getConnection();
+
+        $id = $conn->createQueryBuilder()
+            ->select('id')
+            ->from($table_name)
+            ->where('webhook_id = '.$webHookId)
+            ->orderBy('id', 'DESC')
+            ->setMaxResults(1)
+            ->setFirstResult($logMax) // if log max limit is 1000 then it will fetch id of 1001'th record from last and we will delete all log which have id less than or equal to this id.
+            ->execute()->fetchColumn();
+
+        if ($id) {
+            $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
+            while ($rows = $conn->executeQuery($sql, [$webHookId, $id], [ParameterType::INTEGER, ParameterType::INTEGER])->rowCount()) {
+                $deletedLogs += $rows;
+            }
+        }
+
+        return $deletedLogs;
     }
 
     /**

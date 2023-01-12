@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Tests\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -241,7 +232,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.php',
+                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.twig',
                 'timelineTemplateVars'   => [
                     'messageSettings' => [],
                 ],
@@ -251,7 +242,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
-        $this->dispatcher->dispatch(ChannelEvents::ON_CAMPAIGN_BATCH_ACTION, $pendingEvent);
+        $this->dispatcher->dispatch($pendingEvent, ChannelEvents::ON_CAMPAIGN_BATCH_ACTION);
 
         $this->assertCount(0, $pendingEvent->getFailures());
 

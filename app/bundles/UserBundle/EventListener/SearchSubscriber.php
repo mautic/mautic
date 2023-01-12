@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -83,7 +74,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
                     $userResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
+                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
                         [
                             'user'    => $user,
                             'canEdit' => $canEdit,
@@ -92,7 +83,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($users) > 5) {
                     $userResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.php',
+                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -117,7 +108,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($roles as $role) {
                     $roleResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
+                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
                         [
                             'role'    => $role,
                             'canEdit' => $canEdit,
@@ -126,7 +117,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($roles) > 5) {
                     $roleResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.php',
+                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

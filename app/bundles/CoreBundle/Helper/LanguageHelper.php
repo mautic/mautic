@@ -1,20 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use GuzzleHttp\Client;
 use Mautic\CoreBundle\Helper\Language\Installer;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Finder\Finder;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Helper class for managing Mautic's installed languages.
@@ -24,19 +16,26 @@ class LanguageHelper
     private string $cacheFile;
     private Client $client;
     private PathsHelper $pathsHelper;
-    private Logger $logger;
+    private LoggerInterface $logger;
     private Installer $installer;
     private CoreParametersHelper $coreParametersHelper;
+    private TranslatorInterface $translator;
     private array $supportedLanguages = [];
     private string $installedTranslationsDirectory;
     private string $defaultTranslationsDirectory;
 
-    public function __construct(PathsHelper $pathsHelper, Logger $logger, CoreParametersHelper $coreParametersHelper, Client $client)
-    {
+    public function __construct(
+        PathsHelper $pathsHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
+        Client $client,
+        TranslatorInterface $translator
+    ) {
         $this->pathsHelper                    = $pathsHelper;
         $this->logger                         = $logger;
         $this->coreParametersHelper           = $coreParametersHelper;
         $this->client                         = $client;
+        $this->translator                     = $translator;
         $this->defaultTranslationsDirectory   = __DIR__.'/../Translations';
         $this->installedTranslationsDirectory = $this->pathsHelper->getSystemPath('translations_root').'/translations';
         $this->installer                      = new Installer($this->installedTranslationsDirectory);
@@ -186,7 +185,7 @@ class LanguageHelper
             ksort($languages);
         } catch (\Exception $exception) {
             // Log the error
-            $this->logger->addError('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
+            $this->logger->error('An error occurred while attempting to fetch the language list: '.$exception->getMessage());
 
             return (!$returnError)
                 ? []
@@ -198,7 +197,7 @@ class LanguageHelper
 
         if (200 != $data->getStatusCode()) {
             // Log the error
-            $this->logger->addError(
+            $this->logger->error(
                 sprintf(
                     'An unexpected %1$s code was returned while attempting to fetch the language.  The message received was: %2$s',
                     $data->code,
@@ -258,7 +257,7 @@ class LanguageHelper
         try {
             $data = $this->client->get($langUrl);
         } catch (\Exception $exception) {
-            $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
+            $this->logger->error('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
             return [
                 'error'   => true,
@@ -297,6 +296,67 @@ class LanguageHelper
         return [
             'error' => false,
         ];
+    }
+
+    /**
+     * Returns Mautic translation files.
+     *
+     * @param string[] $forBundles empty array means all bundles
+     *
+     * @return array<string,string[]>
+     */
+    public function getLanguageFiles(array $forBundles = []): array
+    {
+        $files         = [];
+        $mauticBundles = $this->coreParametersHelper->get('bundles');
+        $pluginBundles = $this->coreParametersHelper->get('plugin.bundles');
+
+        foreach (array_merge($mauticBundles, $pluginBundles) as $bundle) {
+            // Apply the bundle filter.
+            if (!empty($forBundles) && !in_array($bundle['bundle'], $forBundles)) {
+                continue;
+            }
+
+            // Parse the namespace into a filepath
+            $translationsDir = $bundle['directory'].'/Translations/en_US';
+
+            if (is_dir($translationsDir)) {
+                $files[$bundle['bundle']] = [];
+
+                // Get files within the directory
+                $finder = new Finder();
+                $finder->files()->in($translationsDir)->name('*.ini');
+
+                /** @var \Symfony\Component\Finder\SplFileInfo $file */
+                foreach ($finder as $file) {
+                    $files[$bundle['bundle']][] = $file->getPathname();
+                }
+
+                asort($files[$bundle['bundle']]);
+            }
+        }
+
+        return $files;
+    }
+
+    public function createLanguageFile(string $filePath, string $content): void
+    {
+        $bundleDir   = dirname($filePath, 1);
+        $languageDir = dirname($filePath, 2);
+
+        foreach ([$languageDir, $bundleDir] as $dir) {
+            if (is_dir($dir)) {
+                continue;
+            }
+
+            if (!mkdir($dir)) {
+                throw new \RuntimeException($this->translator->trans('mautic.core.command.transifex_error_creating_directory', ['%directory%' => $dir]));
+            }
+        }
+
+        if (!file_put_contents($filePath, $content)) {
+            throw new \RuntimeException($this->translator->trans('mautic.core.command.transifex_error_creating_file', ['%file%' => $filePath]));
+        }
     }
 
     private function loadSupportedLanguages()

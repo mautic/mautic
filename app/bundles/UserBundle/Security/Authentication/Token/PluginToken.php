@@ -1,111 +1,87 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication\Token;
 
+use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
 
-class PluginToken extends AbstractToken
+class PluginToken extends AbstractToken implements GuardTokenInterface
 {
-    /**
-     * @var array|\Symfony\Component\Security\Core\Role\RoleInterface[]
-     */
-    protected $providerKey;
+    private ?string $providerKey;
+
+    private string $credentials;
+
+    private ?string $authenticatingService;
+
+    private ?Response $response;
 
     /**
-     * @var string
-     */
-    protected $credentials;
-
-    protected $authenticatingService;
-
-    /**
-     * @var Response
-     */
-    protected $response;
-
-    /**
-     * @param array|\Symfony\Component\Security\Core\Role\RoleInterface[] $providerKey
-     * @param null                                                        $authenticatingService
-     * @param string                                                      $user
-     * @param string                                                      $credentials
-     * @param Response                                                    $response
+     * @param UserInterface|string|null $user
+     * @param array<string>             $roles
      */
     public function __construct(
-        $providerKey,
-        $authenticatingService = null,
-        $user = '',
-        $credentials = '',
+        ?string $providerKey,
+        ?string $authenticatingService = null,
+        $user = null,
+        string $credentials = '',
         array $roles = [],
         Response $response = null
     ) {
         parent::__construct($roles);
 
-        if (empty($providerKey)) {
-            throw new \InvalidArgumentException('$providerKey must not be empty.');
+        if ('' === $providerKey) {
+            throw new InvalidArgumentException('$providerKey must not be empty.');
         }
 
-        $this->setUser($user);
+        if (null !== $user) {
+            $this->setUser($user);
+        }
+
         $this->authenticatingService = $authenticatingService;
         $this->credentials           = $credentials;
         $this->providerKey           = $providerKey;
         $this->response              = $response;
 
-        parent::setAuthenticated(count($roles) > 0);
+        $this->setAuthenticated(count($roles) > 0);
     }
 
-    /**
-     * @return string
-     */
-    public function getCredentials()
+    public function getCredentials(): string
     {
         return $this->credentials;
     }
 
-    /**
-     * @return array|\Symfony\Component\Security\Core\Role\RoleInterface[]
-     */
-    public function getProviderKey()
+    public function getProviderKey(): ?string
     {
         return $this->providerKey;
     }
 
-    public function getAuthenticatingService()
+    public function getAuthenticatingService(): ?string
     {
         return $this->authenticatingService;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getResponse()
+    public function getResponse(): ?Response
     {
         return $this->response;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<int, mixed>
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->authenticatingService, $this->credentials, $this->providerKey, parent::serialize()]);
+        return array_merge([$this->authenticatingService, $this->credentials, $this->providerKey, parent::__serialize()]);
     }
 
     /**
-     * {@inheritdoc}
+     * @param array<int, mixed> $data
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $data): void
     {
-        list($this->authenticatingService, $this->credentials, $this->providerKey, $parentStr) = unserialize($serialized);
-        parent::unserialize($parentStr);
+        [$this->authenticatingService, $this->credentials, $this->providerKey, $parentArray] = $data;
+        parent::__unserialize($parentArray);
     }
 }

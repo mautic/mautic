@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal;
 
 use Mautic\IntegrationsBundle\Event\InternalObjectEvent;
@@ -45,8 +36,8 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS,
-                $this->isInstanceOf(InternalObjectEvent::class)
+                $this->isInstanceOf(InternalObjectEvent::class),
+                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS
             );
 
         $this->expectException(ObjectNotFoundException::class);
@@ -59,13 +50,13 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS,
                 $this->callback(function (InternalObjectEvent $e) use ($contact) {
                     // Fake a subscriber.
                     $e->addObject($contact);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS
             );
 
         $this->assertSame($contact, $this->objectProvider->getObjectByName(Contact::NAME));
@@ -76,8 +67,8 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
+                $this->isInstanceOf(InternalObjectEvent::class),
                 IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS,
-                $this->isInstanceOf(InternalObjectEvent::class)
             );
 
         $this->expectException(ObjectNotFoundException::class);
@@ -90,13 +81,13 @@ class ObjectProviderTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS,
                 $this->callback(function (InternalObjectEvent $e) use ($contact) {
                     // Fake a subscriber.
                     $e->addObject($contact);
 
                     return true;
-                })
+                }),
+                IntegrationEvents::INTEGRATION_COLLECT_INTERNAL_OBJECTS
             );
 
         $this->assertSame($contact, $this->objectProvider->getObjectByEntityName(Lead::class));

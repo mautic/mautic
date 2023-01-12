@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
@@ -26,16 +17,18 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Focus>
+ */
 class FocusModel extends FormModel
 {
     /**
-     * @var ContainerAwareEventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -104,7 +97,7 @@ class FocusModel extends FormModel
      *
      * @param object                              $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
+     * @param string|null                         $action
      * @param array                               $options
      *
      * @throws NotFoundHttpException
@@ -226,7 +219,7 @@ class FocusModel extends FormModel
         // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
         $lead       = $this->contactTracker->getContact();
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
-        $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
         $focusContent = $tokenEvent->getContent();
         $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
         if (!$formReplaced && !empty($cached['form'])) {
@@ -247,7 +240,7 @@ class FocusModel extends FormModel
      */
     public function getContent(array $focus, $isPreview = false, $url = '#')
     {
-        $form = (!empty($focus['form'])) ? $this->formModel->getEntity($focus['form']) : null;
+        $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
             $htmlMode = $focus['html_mode'];
@@ -323,28 +316,26 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param      $type
-     * @param null $data
-     * @param null $lead
-     *
-     * @return Stat
+     * @param mixed                                         $type
+     * @param null                                          $data
+     * @param array<int|string|array<int|string>>|Lead|null $lead
      */
-    public function addStat(Focus $focus, $type, $data = null, $lead = null)
+    public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
     {
         if (empty($lead)) {
-            return;
+            return null;
         }
 
         if ($lead instanceof Lead && !$lead->getId()) {
-            return;
+            return null;
         }
 
         if (is_array($lead)) {
             if (empty($lead['id'])) {
-                return;
+                return null;
             }
 
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+            $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
         switch ($type) {
@@ -377,7 +368,7 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return bool|FocusEvent|void
+     * @return Event|void|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -410,7 +401,7 @@ class FocusModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

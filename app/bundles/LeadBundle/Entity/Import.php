@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
@@ -30,42 +21,42 @@ class Import extends FormEntity
     /**
      * When the import entity is created for background processing.
      */
-    const QUEUED = 1;
+    public const QUEUED = 1;
 
     /**
      * When the background process started the import.
      */
-    const IN_PROGRESS = 2;
+    public const IN_PROGRESS = 2;
 
     /**
      * When the import is finished.
      */
-    const IMPORTED = 3;
+    public const IMPORTED = 3;
 
     /**
      * When the import process failed.
      */
-    const FAILED = 4;
+    public const FAILED = 4;
 
     /**
      * When the import has been stopped by a user.
      */
-    const STOPPED = 5;
+    public const STOPPED = 5;
 
     /**
      * When the import happens in the browser.
      */
-    const MANUAL = 6;
+    public const MANUAL = 6;
 
     /**
      * When the import is scheduled for later processing.
      */
-    const DELAYED = 7;
+    public const DELAYED = 7;
 
     /** ===== Priorities: ===== */
-    const LOW    = 512;
-    const NORMAL = 64;
-    const HIGH   = 1;
+    public const LOW    = 512;
+    public const NORMAL = 64;
+    public const HIGH   = 1;
 
     /**
      * @var int
@@ -147,7 +138,7 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $properties = [];
 
@@ -798,7 +789,7 @@ class Import extends FormEntity
     }
 
     /**
-     * @param string $properties
+     * @param array<mixed> $properties
      *
      * @return Import
      */
@@ -825,7 +816,7 @@ class Import extends FormEntity
      * Set a default value to the defaults array.
      *
      * @param string $key
-     * @param string $value
+     * @param mixed  $value
      *
      * @return Import
      */

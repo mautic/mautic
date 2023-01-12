@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Model;
 
 use Mautic\ChannelBundle\ChannelEvents;
@@ -21,12 +12,15 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<MessageQueue>
+ */
 class MessageQueueModel extends FormModel
 {
     /** @var string A default message reschedule interval */
-    const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
+    public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
     /**
      * @var LeadModel
@@ -458,7 +452,7 @@ class MessageQueueModel extends FormModel
                 $event = new MessageQueueEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

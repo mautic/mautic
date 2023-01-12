@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CampaignBundle\Model\CampaignModel;
@@ -17,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CampaignListType.
@@ -82,10 +73,5 @@ class CampaignListType extends AbstractType
     public function getParent()
     {
         return ChoiceType::class;
-    }
-
-    public function getBlockPrefix()
-    {
-        return 'campaign_list';
     }
 }

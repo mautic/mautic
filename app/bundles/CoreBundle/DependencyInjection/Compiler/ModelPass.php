@@ -1,31 +1,18 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-/**
- * Class ModelPass.
- */
 class ModelPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    public const TAG = 'mautic.model';
+
     public function process(ContainerBuilder $container)
     {
-        foreach ($container->findTaggedServiceIds('mautic.model') as $id => $tags) {
+        foreach ($container->findTaggedServiceIds(self::TAG) as $id => $tags) {
             $definition = $container->findDefinition($id);
 
             $modelClass = $definition->getClass();

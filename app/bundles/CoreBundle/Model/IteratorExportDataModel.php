@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\DataExporterHelper;
@@ -23,7 +14,12 @@ class IteratorExportDataModel implements \Iterator
     private $data;
     private $totalResult;
 
-    public function __construct(AbstractCommonModel $model, $args, callable $callback)
+    /**
+     * @param AbstractCommonModel<T> $model
+     * @param array<mixed>           $args
+     * @template T of object
+     */
+    public function __construct(AbstractCommonModel $model, array $args, callable $callback)
     {
         $this->model       = $model;
         $this->args        = $args;

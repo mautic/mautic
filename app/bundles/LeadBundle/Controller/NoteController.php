@@ -1,20 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class NoteController extends FormController
@@ -151,7 +144,8 @@ class NoteController extends FormController
         $note = new LeadNote();
         $note->setLead($lead);
 
-        $model  = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -164,7 +158,7 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -233,7 +227,8 @@ class NoteController extends FormController
             return $lead;
         }
 
-        $model      = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $note       = $model->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
@@ -253,7 +248,7 @@ class NoteController extends FormController
         $form = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -317,9 +312,9 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-
         $model = $this->getModel('lead.note');
-        $note  = $model->getEntity($objectId);
+        \assert($model instanceof NoteModel);
+        $note = $model->getEntity($objectId);
 
         if (null === $note) {
             return $this->notFound();

@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\EventListener;
 
 use Mautic\IntegrationsBundle\Entity\FieldChangeRepository;
@@ -283,21 +274,39 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnLeadPostDelete(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Lead();
         $lead->deletedId = $deletedId;
+        $lead->setEmail('john@doe.email');
 
-        $this->leadEvent->expects($this->exactly(2))
-            ->method('getLead')
+        $this->leadEvent->method('getLead')
             ->willReturn($lead);
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+            ->with((int) $deletedId, Lead::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
             ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_CONTACT);
+
+        $this->subscriber->onLeadPostDelete($this->leadEvent);
+    }
+
+    public function testOnLeadPostDeleteForAnonymousLeads(): void
+    {
+        $deletedId       = 5;
+        $lead            = new Lead();
+        $lead->deletedId = $deletedId;
+
+        $this->leadEvent->method('getLead')
+            ->willReturn($lead);
+
+        $this->fieldChangeRepository->expects($this->never())
+            ->method('deleteEntitiesForObject');
+
+        $this->objectMappingRepository->expects($this->never())
+            ->method('deleteEntitiesForObject');
 
         $this->subscriber->onLeadPostDelete($this->leadEvent);
     }
@@ -415,7 +424,7 @@ class LeadSubscriberTest extends TestCase
 
     public function testOnCompanyPostDelete(): void
     {
-        $deletedId       = '5';
+        $deletedId       = 5;
         $lead            = new Company();
         $lead->deletedId = $deletedId;
 
@@ -425,7 +434,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+            ->with((int) $deletedId, Company::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')

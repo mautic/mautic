@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventCollector;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -18,7 +9,7 @@ use Mautic\CampaignBundle\EventCollector\Accessor\Event\AbstractEventAccessor;
 use Mautic\CampaignBundle\EventCollector\Accessor\EventAccessor;
 use Mautic\CampaignBundle\EventCollector\Builder\ConnectionBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventCollector
 {
@@ -105,7 +96,7 @@ class EventCollector
     {
         //build them
         $event  = new CampaignBuilderEvent($this->translator);
-        $this->dispatcher->dispatch(CampaignEvents::CAMPAIGN_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, CampaignEvents::CAMPAIGN_ON_BUILD);
 
         $this->eventsArray[Event::TYPE_ACTION]    = $event->getActions();
         $this->eventsArray[Event::TYPE_CONDITION] = $event->getConditions();

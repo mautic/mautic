@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -33,7 +24,7 @@ class JsController extends CommonController
         $event      = new BuildJsEvent($this->getJsHeader(), $debug);
 
         if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
-            $dispatcher->dispatch(CoreEvents::BUILD_MAUTIC_JS, $event);
+            $dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
         return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);

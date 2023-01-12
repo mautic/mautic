@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -21,13 +12,13 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_PAGES      = 'pages';
-    const CONTEXT_PAGE_HITS  = 'page.hits';
-    const CONTEXT_VIDEO_HITS = 'video.hits';
+    public const CONTEXT_PAGES      = 'pages';
+    public const CONTEXT_PAGE_HITS  = 'page.hits';
+    public const CONTEXT_VIDEO_HITS = 'video.hits';
 
     /**
      * @var CompanyReportData

@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class UserTokenRepository.
+ * @extends CommonRepository<UserToken>
  */
 final class UserTokenRepository extends CommonRepository implements UserTokenRepositoryInterface
 {

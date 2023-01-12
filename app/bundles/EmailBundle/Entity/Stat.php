@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /** @var int Limit number of stored 'openDetails' */
-    const MAX_OPEN_DETAILS = 1000;
+    public const MAX_OPEN_DETAILS = 1000;
 
     /**
      * @var int|null

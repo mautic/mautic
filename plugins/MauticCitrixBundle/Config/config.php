@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'Citrix',
     'description' => 'Enables integration with Mautic supported Citrix collaboration products.',
@@ -18,11 +9,11 @@ return [
         'public' => [
             'mautic_citrix_proxy' => [
                 'path'       => '/citrix/proxy',
-                'controller' => 'MauticCitrixBundle:Public:proxy',
+                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::proxyAction',
             ],
             'mautic_citrix_sessionchanged' => [
                 'path'       => '/citrix/sessionChanged',
-                'controller' => 'MauticCitrixBundle:Public:sessionChanged',
+                'controller' => 'MauticPlugin\MauticCitrixBundle\Controller\PublicController::sessionChangedAction',
             ],
         ],
     ],
@@ -42,13 +33,6 @@ return [
                     'setEmailModel' => ['mautic.email.model.email'],
                 ],
             ],
-            'mautic.citrix.leadbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                ],
-            ],
             'mautic.citrix.campaignbundle.subscriber' => [
                 'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
@@ -58,49 +42,6 @@ return [
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
-                ],
-            ],
-            'mautic.citrix.emailbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.citrix.stats.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.citrix.integration.request' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber::class,
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.fieldslist.citrixlist' => [
-                'class' => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType::class,
-            ],
-            'mautic.form.type.citrix.submitaction' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType::class,
-                'arguments' => [
-                    'mautic.form.model.field',
-                ],
-            ],
-            'mautic.form.type.citrix.campaignevent' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.citrix.campaignaction' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType::class,
-                'arguments' => [
-                    'translator',
                 ],
             ],
         ],

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\DashboardBundle\Event\WidgetDetailEvent;
@@ -18,7 +9,7 @@ use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DashboardSubscriber extends MainDashboardSubscriber
 {
@@ -118,7 +109,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
 
             return;
@@ -134,7 +125,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
 
             return;
@@ -145,11 +136,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 $params = $event->getWidget()->getParams();
                 $event->setTemplateData([
                     'height' => $event->getWidget()->getHeight() - 80,
-                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], $canViewOthers),
+                    'data'   => $this->leadModel->getLeadMapData($params['dateFrom'], $params['dateTo'], [], $canViewOthers),
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:map.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:map.html.twig');
             $event->stopPropagation();
 
             return;
@@ -200,7 +191,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -301,7 +292,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'stages'      => $stages,
                     'devices'     => $deviceGranularity,
                 ]);
-                $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.php');
+                $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.twig');
                 $event->stopPropagation();
             }
 
@@ -357,7 +348,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -412,7 +403,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -463,7 +454,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
 
             return;

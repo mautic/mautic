@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Scheduler;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -357,8 +348,8 @@ class EventScheduler
     private function dispatchScheduledEvent(AbstractEventAccessor $config, LeadEventLog $log, $isReschedule = false)
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_SCHEDULED,
-            new ScheduledEvent($config, $log, $isReschedule)
+            new ScheduledEvent($config, $log, $isReschedule),
+            CampaignEvents::ON_EVENT_SCHEDULED
         );
     }
 
@@ -372,8 +363,8 @@ class EventScheduler
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_SCHEDULED_BATCH,
-            new ScheduledBatchEvent($config, $event, $logs, $isReschedule)
+            new ScheduledBatchEvent($config, $event, $logs, $isReschedule),
+            CampaignEvents::ON_EVENT_SCHEDULED_BATCH
         );
     }
 
@@ -395,7 +386,7 @@ class EventScheduler
             //lead actively triggered this event, a decision wasn't involved, or it was system triggered and a "no" path so schedule the event to be fired at the defined time
             $this->logger->debug(
                 'CAMPAIGN: '.ucfirst($event->getEventType()).' ID# '.$event->getId().' for contact ID# '.$contact->getId()
-                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:m:i T')
+                .' has timing that is not appropriate and thus scheduled for '.$executionDate->format('Y-m-d H:i:s T')
             );
 
             $this->dispatchScheduledEvent($config, $log);

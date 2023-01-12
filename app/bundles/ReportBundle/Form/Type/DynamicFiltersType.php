@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
@@ -37,7 +28,7 @@ class DynamicFiltersType extends AbstractType
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => [
                         'class'    => 'form-control',
-                        'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',this.value,'list','.report-content');",
+                        'onchange' => "Mautic.filterTableData('report.".$options['report']->getId()."','".$column."',mQuery(this).val(),'list','.report-content');",
                     ],
                     'required' => false,
                 ];
@@ -75,6 +66,8 @@ class DynamicFiltersType extends AbstractType
                         $args['attr']['class'] .= ' datetimepicker';
                         break;
                     case 'multiselect':
+                        $args['multiple']         = true;
+                        // no break
                     case 'select':
                         $type            = ChoiceType::class;
                         $args['choices'] = array_flip($definition['list']);

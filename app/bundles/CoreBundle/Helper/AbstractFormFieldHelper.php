@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
@@ -17,29 +8,29 @@ use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
 use Mautic\CoreBundle\Helper\ListParser\JsonListParser;
 use Mautic\CoreBundle\Helper\ListParser\ListParserInterface;
 use Mautic\CoreBundle\Helper\ListParser\ValueListParser;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 abstract class AbstractFormFieldHelper
 {
     /**
      * Json encoded format.
      */
-    const FORMAT_JSON = 'json';
+    public const FORMAT_JSON = 'json';
 
     /**
      * Bar format value1|value2.
      */
-    const FORMAT_BAR = 'bar';
+    public const FORMAT_BAR = 'bar';
 
     /**
      * Simple value => label array.
      */
-    const FORMAT_SIMPLE_ARRAY = 'simple_array';
+    public const FORMAT_SIMPLE_ARRAY = 'simple_array';
 
     /**
      * Array [['value' => 'value', 'label' => 'label'] ..].
      */
-    const FORMAT_ARRAY = 'array';
+    public const FORMAT_ARRAY = 'array';
 
     /**
      * @var string
@@ -47,7 +38,7 @@ abstract class AbstractFormFieldHelper
     protected $translationKeyPrefix;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -66,7 +57,7 @@ abstract class AbstractFormFieldHelper
         $this->setTranslationKeyPrefix();
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }
@@ -109,52 +100,66 @@ abstract class AbstractFormFieldHelper
             return static::parseBooleanList($list);
         }
 
-        /** @var ListParserInterface[] $parsers */
-        $parsers = [
-            new JsonListParser(),
-            new BarListParser(),
-            new ValueListParser(),
-            new ArrayListParser(),
-        ];
-
-        $listParser = null;
-        foreach ($parsers as $parser) {
-            try {
-                $list = $parser->parse($list);
-            } catch (FormatNotSupportedException $exception) {
-                continue;
-            }
-        }
-
-        return static::parseChoiceList($list);
+        return static::parseChoiceList(
+            self::parseListsWithParsers(
+                $list,
+                [
+                    new JsonListParser(),
+                    new BarListParser(),
+                    new ValueListParser(),
+                    new ArrayListParser(),
+                ]
+            )
+        );
     }
 
+    /**
+     * Same as parseList method above but it will return labels as keys.
+     *
+     * @param mixed $list
+     *
+     * @return mixed[]
+     */
+    public static function parseListForChoices($list): array
+    {
+        return static::parseChoiceList(
+            self::parseListsWithParsers(
+                $list,
+                [
+                    new JsonListParser(),
+                    new BarListParser(),
+                    new ValueListParser(),
+                    new ArrayListParser(),
+                ]
+            ),
+            true
+        );
+    }
+
+    /**
+     * @param mixed $list
+     *
+     * @return mixed[]
+     */
     public static function parseBooleanList($list): array
     {
-        /** @var ListParserInterface[] $parsers */
-        $parsers = [
-            new JsonListParser(),
-            new BarListParser(),
-            new ValueListParser(),
-        ];
-
-        $listParser = null;
-        foreach ($parsers as $parser) {
-            try {
-                $list = $parser->parse($list);
-            } catch (FormatNotSupportedException $exception) {
-                continue;
-            }
-        }
-
-        return static::parseChoiceList($list);
+        return static::parseChoiceList(
+            self::parseListsWithParsers(
+                $list,
+                [
+                    new JsonListParser(),
+                    new BarListParser(),
+                    new ValueListParser(),
+                ]
+            )
+        );
     }
 
     /**
      * @param $format
      * @param $choices
      *
-     * @return array|string
+     * @return mixed[]|string
      */
     public static function formatList($format, $choices)
     {
@@ -188,11 +193,11 @@ abstract class AbstractFormFieldHelper
         }
     }
 
-    protected static function parseChoiceList(array $list)
+    protected static function parseChoiceList(array $list, bool $labelsAsKeys = false)
     {
         $choices = [];
         foreach ($list as $value => $label) {
-            if (is_array($label) && isset($label['value'])) {
+            if (is_array($label) && array_key_exists('value', $label)) {
                 $value = $label['value'];
                 $label = $label['label'];
 
@@ -201,7 +206,8 @@ abstract class AbstractFormFieldHelper
                     continue;
                 }
 
-                $choices[trim(html_entity_decode($value, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+                $choices = self::appendChoice($choices, $label, $value, $labelsAsKeys);
+
                 continue;
             }
 
@@ -218,9 +224,47 @@ abstract class AbstractFormFieldHelper
                 continue;
             }
 
-            $choices[trim(html_entity_decode($value, ENT_QUOTES))] = trim(html_entity_decode($label, ENT_QUOTES));
+            $choices = self::appendChoice($choices, $label, $value, $labelsAsKeys);
         }
 
         return $choices;
+    }
+
+    /**
+     * @param mixed[] $choices
+     *
+     * @return mixed[]
+     */
+    private static function appendChoice(array $choices, string $label, string $value, bool $labelsAsKeys = false): array
+    {
+        $label = trim(html_entity_decode($label, ENT_QUOTES));
+        $value = trim(html_entity_decode($value, ENT_QUOTES));
+
+        if ($labelsAsKeys) {
+            $choices[$label] = $value;
+        } else {
+            $choices[$value] = $label;
+        }
+
+        return $choices;
+    }
+
+    /**
+     * @param mixed                 $list
+     * @param ListParserInterface[] $parsers
+     *
+     * @return mixed[]
+     */
+    private static function parseListsWithParsers($list, array $parsers): array
+    {
+        foreach ($parsers as $parser) {
+            try {
+                $list = $parser->parse($list);
+            } catch (FormatNotSupportedException $exception) {
+                continue;
+            }
+        }
+
+        return $list;
     }
 }

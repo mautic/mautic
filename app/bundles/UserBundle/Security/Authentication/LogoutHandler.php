@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Authentication;
 
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -57,7 +48,7 @@ class LogoutHandler implements LogoutHandlerInterface
     {
         if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
             $event = new LogoutEvent($this->user, $request);
-            $this->dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_LOGOUT);
         }
 
         // Clear session

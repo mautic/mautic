@@ -2,22 +2,13 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
 
 class ObjectMappingDAO
 {
-    const SYNC_TO_MAUTIC       = 'mautic';
-    const SYNC_TO_INTEGRATION  = 'integration';
-    const SYNC_BIDIRECTIONALLY = 'bidirectional';
+    public const SYNC_TO_MAUTIC       = 'mautic';
+    public const SYNC_TO_INTEGRATION  = 'integration';
+    public const SYNC_BIDIRECTIONALLY = 'bidirectional';
 
     /**
      * @var string

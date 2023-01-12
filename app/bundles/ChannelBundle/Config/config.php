@@ -1,36 +1,27 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_message_index' => [
                 'path'       => '/messages/{page}',
-                'controller' => 'MauticChannelBundle:Message:index',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::indexAction',
             ],
             'mautic_message_contacts' => [
                 'path'       => '/messages/contacts/{objectId}/{channel}/{page}',
-                'controller' => 'MauticChannelBundle:Message:contacts',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::contactsAction',
             ],
             'mautic_message_action' => [
                 'path'       => '/messages/{objectAction}/{objectId}',
-                'controller' => 'MauticChannelBundle:Message:execute',
+                'controller' => 'Mautic\ChannelBundle\Controller\MessageController::executeAction',
             ],
             'mautic_channel_batch_contact_set' => [
                 'path'       => '/channels/batch/contact/set',
-                'controller' => 'MauticChannelBundle:BatchContact:set',
+                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::setAction',
             ],
             'mautic_channel_batch_contact_view' => [
                 'path'       => '/channels/batch/contact/view',
-                'controller' => 'MauticChannelBundle:BatchContact:index',
+                'controller' => 'Mautic\ChannelBundle\Controller\BatchContactController::indexAction',
             ],
         ],
         'api' => [
@@ -38,7 +29,7 @@ return [
                 'standard_entity' => true,
                 'name'            => 'messages',
                 'path'            => '/messages',
-                'controller'      => 'MauticChannelBundle:Api\MessageApi',
+                'controller'      => 'Mautic\ChannelBundle\Controller\Api\MessageApiController',
             ],
         ],
         'public' => [
@@ -67,64 +58,6 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.channel.campaignbundle.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.channel.model.message',
-                    'mautic.campaign.dispatcher.action',
-                    'mautic.campaign.event_collector',
-                    'monolog.logger.mautic',
-                    'translator',
-                ],
-            ],
-            'mautic.channel.channelbundle.subscriber' => [
-                'class'     => \Mautic\ChannelBundle\EventListener\MessageSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.channel.channelbundle.lead.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'translator',
-                    'router',
-                    'mautic.channel.repository.message_queue',
-                ],
-            ],
-            'mautic.channel.reportbundle.subscriber' => [
-                'class'     => Mautic\ChannelBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'mautic.lead.model.company_report_data',
-                    'router',
-                ],
-            ],
-            'mautic.channel.button.subscriber' => [
-                'class'     => \Mautic\ChannelBundle\EventListener\ButtonSubscriber::class,
-                'arguments' => [
-                    'router',
-                    'translator',
-                ],
-            ],
-        ],
-        'forms' => [
-            \Mautic\ChannelBundle\Form\Type\MessageType::class => [
-                'class'       => \Mautic\ChannelBundle\Form\Type\MessageType::class,
-                'methodCalls' => [
-                    'setSecurity' => ['mautic.security'],
-                ],
-                'arguments' => [
-                    'mautic.channel.model.message',
-                ],
-            ],
-            'mautic.form.type.message_list' => [
-                'class' => \Mautic\ChannelBundle\Form\Type\MessageListType::class,
-            ],
-            'mautic.form.type.message_send' => [
-                'class'     => \Mautic\ChannelBundle\Form\Type\MessageSendType::class,
-                'arguments' => ['router', 'mautic.channel.model.message'],
-            ],
-        ],
         'helpers' => [
             'mautic.channel.helper.channel_list' => [
                 'class'     => \Mautic\ChannelBundle\Helper\ChannelListHelper::class,

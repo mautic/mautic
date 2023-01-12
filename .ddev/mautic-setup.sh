@@ -1,6 +1,10 @@
 #!/bin/bash
 
 setup_mautic() {
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}/index_dev.php"
+    [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
+    [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
+
     printf "Installing Mautic Composer dependencies...\n"
     composer install
 
@@ -8,9 +12,9 @@ setup_mautic() {
     cp ./.env.dist ./.env
 
     printf "Installing Mautic...\n"
-    php bin/console mautic:install https://${DDEV_HOSTNAME} \
+    php bin/console mautic:install "${MAUTIC_URL}" \
         --mailer_from_name="DDEV" --mailer_from_email="mautic@ddev.local" \
-        --mailer_transport="smtp" --mailer_host="localhost" --mailer_port="1025"
+        --mailer_transport="smtp" --mailer_host="localhost" --mailer_port="1025" --messenger_type="sync"
     php bin/console cache:warmup --no-interaction --env=dev
 
     printf "Enabling plugins...\n"
@@ -19,9 +23,9 @@ setup_mautic() {
     tput setaf 2
     printf "All done! Here's some useful information:\n"
     printf "🔒 The default login is admin/mautic\n"
-    printf "🌐 To open the Mautic instance, go to https://${DDEV_HOSTNAME} in your browser.\n"
-    printf "🌐 To open PHPMyAdmin for managing the database, go to https://${DDEV_HOSTNAME}:8037 in your browser.\n"
-    printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to https://${DDEV_HOSTNAME}:8026 in your browser.\n"
+    printf "🌐 To open the Mautic instance, go to ${MAUTIC_URL} in your browser.\n"
+    printf "🌐 To open PHPMyAdmin for managing the database, go to ${PHPMYADMIN_URL} in your browser.\n"
+    printf "🌐 To open MailHog for seeing all emails that Mautic sent, go to ${MAILHOG_URL} in your browser.\n"
     printf "🚀 Run \"ddev exec composer test\" to run PHPUnit tests.\n"
     printf "🚀 Run \"ddev exec bin/console COMMAND\" (like mautic:segments:update) to use the Mautic CLI. For an overview of all available CLI commands, go to https://mau.tc/cli\n"
     printf "🔴 If you want to stop the instance, simply run \"ddev stop\".\n"
@@ -40,7 +44,7 @@ then
     printf "\nAnswer [yes/no]: "
     read MAUTIC_PREF
 
-    if [[ $MAUTIC_PREF == "yes" ]]
+    if [ $MAUTIC_PREF == "yes" ] || [ -n $GITPOD_HEADLESS ];
     then
         printf "Okay, setting up your Mautic instance... 🚀\n"
         echo "ddev-managed" > ./.ddev/mautic-preference

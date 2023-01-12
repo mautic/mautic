@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Deduplicate;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -82,7 +73,7 @@ class ContactMerger
 
         // Dispatch pre merge event
         $event = new LeadMergeEvent($winner, $loser);
-        $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_MERGE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_MERGE);
 
         // Merge everything
         $this->updateMergeRecords($winner, $loser)
@@ -97,7 +88,7 @@ class ContactMerger
         $this->leadModel->saveEntity($winner, false);
 
         // Dispatch post merge event
-        $this->dispatcher->dispatch(LeadEvents::LEAD_POST_MERGE, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_MERGE);
 
         // Delete the loser
         $this->leadModel->deleteEntity($loser);

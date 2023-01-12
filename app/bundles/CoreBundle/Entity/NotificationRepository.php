@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Entity;
 
+use DateTime;
+
 /**
- * NotificationRepository.
+ * @extends CommonRepository<Notification>
  */
 class NotificationRepository extends CommonRepository
 {
@@ -152,5 +145,25 @@ class NotificationRepository extends CommonRepository
         }
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    public function isDuplicate(int $userId, string $deduplicate, DateTime $from): bool
+    {
+        $qb = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder();
+
+        $qb->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'notifications')
+            ->where('user_id = :userId')
+            ->andWhere('deduplicate = :deduplicate')
+            ->andWhere('date_added >= :from')
+            ->setParameter(':userId', $userId)
+            ->setParameter(':deduplicate', $deduplicate)
+            ->setParameter(':from', $from->format('Y-m-d H:i:s'))
+            ->setMaxResults(1);
+
+        return (bool) $qb->execute()
+            ->fetchColumn();
     }
 }

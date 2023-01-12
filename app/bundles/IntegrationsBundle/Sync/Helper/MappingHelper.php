@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\Helper;
 
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
@@ -123,8 +114,8 @@ class MappingHelper
         $event->setFieldValues($identifiers);
 
         $this->dispatcher->dispatch(
+            $event,
             IntegrationEvents::INTEGRATION_FIND_INTERNAL_RECORDS,
-            $event
         );
 
         $foundObjects = $event->getFoundObjects();
@@ -266,5 +257,8 @@ class MappingHelper
         $objectMapping->setLastSyncDate($updatedObjectMappingDAO->getObjectModifiedDate());
 
         $this->saveObjectMapping($objectMapping);
+
+        // Make the ObjectMapping available to the IntegrationEvents::INTEGRATION_BATCH_SYNC_COMPLETED_* events
+        $updatedObjectMappingDAO->setObjectMapping($objectMapping);
     }
 }

@@ -1,31 +1,22 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Command;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 use MauticPlugin\MauticSocialBundle\Event\SocialMonitorEvent;
 use MauticPlugin\MauticSocialBundle\Helper\TwitterCommandHelper;
 use MauticPlugin\MauticSocialBundle\Integration\TwitterIntegration;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
-abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
+abstract class MonitorTwitterBaseCommand extends Command
 {
     /**
      * @var TwitterIntegration
@@ -33,7 +24,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     protected $twitter;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -77,12 +68,9 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
      */
     protected $queryCount = 100;
 
-    /**
-     * MonitorTwitterBaseCommand constructor.
-     */
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
+        Translator $translator,
         IntegrationHelper $integrationHelper,
         TwitterCommandHelper $twitterCommandHelper,
         CoreParametersHelper $coreParametersHelper
@@ -155,10 +143,8 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
 
     /**
      * Main execution method. Gets the integration settings, processes the search criteria.
-     *
-     * @return int|null
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input      = $input;
         $this->output     = $output;
@@ -201,8 +187,8 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
         $this->processMonitor($monitor);
 
         $this->dispatcher->dispatch(
-            SocialEvents::MONITOR_POST_PROCESS,
-            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount())
+            new SocialMonitorEvent($this->getNetworkName(), $monitor, $this->twitterCommandHelper->getManipulatedLeads(), $this->twitterCommandHelper->getNewLeadsCount(), $this->twitterCommandHelper->getUpdatedLeadsCount()),
+            SocialEvents::MONITOR_POST_PROCESS
         );
 
         return 0;

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -47,8 +38,8 @@ class AjaxController extends CommonAjaxController
                 $formTypeOptions = (!empty($actions['actions'][$type]['formTypeOptions'])) ? $actions['actions'][$type]['formTypeOptions'] : [];
 
                 $form = $this->get('form.factory')->create(StageActionType::class, [], ['formType' => $formType, 'formTypeOptions' => $formTypeOptions]);
-                $html = $this->renderView('MauticStageBundle:Stage:actionform.html.php', [
-                    'form' => $this->setFormTheme($form, 'MauticStageBundle:Stage:actionform.html.php', $themes),
+                $html = $this->renderView('MauticStageBundle:Stage:actionform.html.twig', [
+                    'form' => $this->setFormTheme($form, 'MauticStageBundle:Stage:actionform.html.twig', $themes),
                 ]);
 
                 $html                 = str_replace('stageaction', 'stage', $html);

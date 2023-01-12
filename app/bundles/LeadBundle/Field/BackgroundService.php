@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Field;
 
 use Doctrine\DBAL\DBALException;
@@ -95,7 +86,7 @@ class BackgroundService
 
         try {
             $this->customFieldColumn->processCreateLeadColumn($leadField, false);
-        } catch (DriverException | SchemaException | \Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException|SchemaException|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
             throw $e;
         } catch (CustomFieldLimitException $e) {

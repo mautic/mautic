@@ -1,14 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\PageBundle\Tests\Model;
 
@@ -62,7 +54,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertSame(['page_title' => $expectedTitle], $hit->getQuery());
     }
 
-    public function testGenerateUrl_WhenCalled_ReturnsValidUrl()
+    public function testGenerateUrlWhenCalledReturnsValidUrl()
     {
         $page = new Page();
         $page->setAlias('this-is-a-test');
@@ -71,7 +63,7 @@ class PageModelTest extends PageTestAbstract
         $this->assertStringContainsString('/this-is-a-test', $url);
     }
 
-    public function testCleanQuery_WhenCalled_ReturnsSafeAndValidData()
+    public function testCleanQueryWhenCalledReturnsSafeAndValidData()
     {
         $pageModel           = $this->getPageModel();
         $pageModelReflection = new ReflectionClass(get_class($pageModel));

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Tests\EventListener;
 
 use DateTime;
@@ -24,7 +15,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -51,7 +42,6 @@ class ReportSubscriberTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->companyReportData = $this->createMock(CompanyReportData::class);
         $this->hitRepository     = $this->createMock(HitRepository::class);
@@ -63,7 +53,7 @@ class ReportSubscriberTest extends TestCase
         );
     }
 
-    public function testOnReportBuilderAddsPageAndPageHitReports()
+    public function testOnReportBuilderAddsPageAndPageHitReports(): void
     {
         $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
             ->disableOriginalConstructor()
@@ -123,7 +113,7 @@ class ReportSubscriberTest extends TestCase
         $this->assertCount(9, $setGraphs);
     }
 
-    public function testOnReportGeneratePagesContext()
+    public function testOnReportGeneratePagesContext(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -169,7 +159,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGeneratePageHitsContext()
+    public function testOnReportGeneratePageHitsContext(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGeneratorEvent::class)
             ->disableOriginalConstructor()
@@ -219,7 +209,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerateBadContextWillReturn()
+    public function testOnReportGraphGenerateBadContextWillReturn(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()
@@ -236,7 +226,7 @@ class ReportSubscriberTest extends TestCase
         $this->subscriber->onReportGraphGenerate($mockEvent);
     }
 
-    public function testOnReportGraphGenerate()
+    public function testOnReportGraphGenerate(): void
     {
         $mockEvent = $this->getMockBuilder(ReportGraphEvent::class)
             ->disableOriginalConstructor()

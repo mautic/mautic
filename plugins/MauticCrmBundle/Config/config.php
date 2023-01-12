@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'name'        => 'CRM',
     'description' => 'Enables integration with Mautic supported CRMs.',
@@ -18,50 +9,26 @@ return [
         'public' => [
             'mautic_integration_contacts' => [
                 'path'         => '/plugin/{integration}/contact_data',
-                'controller'   => 'MauticCrmBundle:Public:contactData',
+                'controller'   => 'MauticPlugin\MauticCrmBundle\Controller\PublicController::contactDataAction',
                 'requirements' => [
                     'integration' => '.+',
                 ],
             ],
             'mautic_integration_companies' => [
                 'path'         => '/plugin/{integration}/company_data',
-                'controller'   => 'MauticCrmBundle:Public:companyData',
+                'controller'   => 'MauticPlugin\MauticCrmBundle\Controller\PublicController::companyDataAction',
                 'requirements' => [
                     'integration' => '.+',
                 ],
             ],
             'mautic_integration.pipedrive.webhook' => [
                 'path'       => '/plugin/pipedrive/webhook',
-                'controller' => 'MauticCrmBundle:Pipedrive:webhook',
+                'controller' => 'MauticPlugin\MauticCrmBundle\Controller\PipedriveController::webhookAction',
                 'method'     => 'POST',
             ],
         ],
     ],
     'services' => [
-        'events' => [
-            'mautic_integration.pipedrive.lead.subscriber' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic_integration.pipedrive.export.lead',
-                ],
-            ],
-            'mautic_integration.pipedrive.company.subscriber' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\EventListener\CompanySubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic_integration.pipedrive.export.company',
-                ],
-            ],
-            'mautic.integration.leadbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCrmBundle\EventListener\LeadListSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.lead.model.list',
-                    'translator',
-                ],
-            ],
-        ],
         'integrations' => [
             'mautic.integration.hubspot' => [
                 'class'     => \MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration::class,
@@ -237,13 +204,10 @@ return [
             ],
         ],
         'other' => [
-            'mautic_integration.pipedrive.guzzle.client' => [
-                'class' => 'GuzzleHttp\Client',
-            ],
             'mautic_integration.service.transport' => [
                 'class'     => 'MauticPlugin\MauticCrmBundle\Services\Transport',
                 'arguments' => [
-                    'mautic_integration.pipedrive.guzzle.client',
+                    'mautic.http.client',
                 ],
             ],
             'mautic_integration.pipedrive.import.owner' => [
@@ -278,33 +242,6 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic_integration.pipedrive.export.company',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.connectwise.campaignaction' => [
-                'class'     => MauticPlugin\MauticCrmBundle\Form\Type\IntegrationCampaignsTaskType::class,
-                'arguments' => ['mautic.integration.connectwise'],
-            ],
-        ],
-        'commands' => [
-            'mautic_integration.pipedrive.data_fetch' => [
-                'tag'       => 'console.command',
-                'class'     => MauticPlugin\MauticCrmBundle\Command\FetchPipedriveDataCommand::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'templating.helper.translator',
-                ],
-            ],
-            'mautic_integration.pipedrive.data_push' => [
-                'tag'       => 'console.command',
-                'class'     => MauticPlugin\MauticCrmBundle\Command\PushDataToPipedriveCommand::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'templating.helper.translator',
-                    'doctrine.orm.entity_manager',
-                    'mautic_integration.pipedrive.export.company',
-                    'mautic_integration.pipedrive.export.lead',
                 ],
             ],
         ],

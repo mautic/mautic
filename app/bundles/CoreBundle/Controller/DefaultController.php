@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -30,7 +21,7 @@ class DefaultController extends CommonController
         $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            return $this->redirectToRoute('mautic_dashboard_index');
         } else {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel = $this->getModel('page');
@@ -44,7 +35,7 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
+            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
     }
 
@@ -58,13 +49,13 @@ class DefaultController extends CommonController
 
         if (!empty($searchStr)) {
             $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-            $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+            $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
             $results = $event->getResults();
         } else {
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.php',
+        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -84,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.php',
+                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -16,6 +7,7 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -27,20 +19,19 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Mautic\StageBundle\Model\StageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_LEADS                     = 'leads';
-    const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
-    const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
-    const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
-    const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
-    const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
-    const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
-    const CONTEXT_COMPANIES                 = 'companies';
+    public const CONTEXT_LEADS                     = 'leads';
+    public const CONTEXT_LEAD_POINT_LOG            = 'lead.pointlog';
+    public const CONTEXT_CONTACT_ATTRIBUTION_MULTI = 'contact.attribution.multi';
+    public const CONTEXT_CONTACT_ATTRIBUTION_FIRST = 'contact.attribution.first';
+    public const CONTEXT_CONTACT_ATTRIBUTION_LAST  = 'contact.attribution.last';
+    public const CONTEXT_CONTACT_FREQUENCYRULES    = 'contact.frequencyrules';
+    public const CONTEXT_CONTACT_MESSAGE_FREQUENCY = 'contact.message.frequency';
+    public const CONTEXT_COMPANIES                 = 'companies';
 
-    const GROUP_CONTACTS = 'contacts';
+    public const GROUP_CONTACTS = 'contacts';
 
     private $leadContexts = [
         self::CONTEXT_LEADS,
@@ -98,7 +89,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private $companyReportData;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -110,7 +101,7 @@ class ReportSubscriber implements EventSubscriberInterface
         CompanyModel $companyModel,
         CompanyReportData $companyReportData,
         FieldsBuilder $fieldsBuilder,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->leadModel         = $leadModel;
         $this->stageModel        = $stageModel;

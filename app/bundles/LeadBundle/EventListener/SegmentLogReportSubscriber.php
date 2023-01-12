@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -19,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
-    const SEGMENT_LOG = 'segment.log';
+    public const SEGMENT_LOG = 'segment.log';
 
     /**
      * @var FieldsBuilder
@@ -127,6 +118,6 @@ class SegmentLogReportSubscriber implements EventSubscriberInterface
      */
     private function generateLeftJoinCondition($alias, $action)
     {
-        return'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
+        return 'l.id = '.$alias.'.lead_id  AND '.$alias.'.bundle = \'lead\' AND '.$alias.'.object = \'segment\'  AND '.$alias.'.`action` =\''.$action.'\' AND '.$alias.'.date_added BETWEEN :dateFrom AND :dateTo';
     }
 }

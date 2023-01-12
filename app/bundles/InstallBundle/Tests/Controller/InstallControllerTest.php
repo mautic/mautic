@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Tests\Controller;
 
+use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -23,10 +15,10 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -62,7 +54,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->formMock             = $this->createMock(Form::class);
         $this->templatingMock       = $this->createMock(DelegatingEngine::class);
 
-        $this->configurator         = $this->createMock(Form::class);
+        $this->configurator         = $this->createMock(Configurator::class);
         $this->installer            = $this->createMock(InstallService::class);
 
         $this->controller           = new InstallController();
@@ -86,7 +78,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
                 $this->pathsHelper
             );
 
-        $event = $this->createMock(FilterControllerEvent::class);
+        $event = $this->createMock(ControllerEvent::class);
         $this->controller->initialize($event);
     }
 

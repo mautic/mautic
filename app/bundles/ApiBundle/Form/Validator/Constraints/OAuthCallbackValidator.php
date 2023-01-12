@@ -1,24 +1,5 @@
 <?php
 
-/*
- * Modified from \Symfony\Component\Validator\Constraints\UrlValidator.
- *
- * This file is part of the Symfony package.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- *
- *
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Form\Validator\Constraints;
 
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -27,7 +8,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class OAuthCallbackValidator extends ConstraintValidator
 {
-    const PATTERN = '~^[0-9a-z].*://(.*?)(:[0-9]+)?(/?|/\S+)$~ixu';
+    public const PATTERN = '~^[0-9a-z].*://(.*?)(:[0-9]+)?(/?|/\S+)$~ixu';
 
     /**
      * @param mixed $value

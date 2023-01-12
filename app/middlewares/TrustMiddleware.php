@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   20169 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\Middleware;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -19,7 +10,7 @@ class TrustMiddleware implements HttpKernelInterface, PrioritizedMiddlewareInter
 {
     use ConfigAwareTrait;
 
-    const PRIORITY = 0;
+    public const PRIORITY = 0;
 
     /**
      * @var HttpKernelInterface

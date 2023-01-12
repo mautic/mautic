@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -26,18 +17,18 @@ use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
  */
 class PipedriveController extends CommonController
 {
-    const INTEGRATION_NAME = 'Pipedrive';
+    public const INTEGRATION_NAME = 'Pipedrive';
 
-    const LEAD_ADDED_EVENT  = 'added.person';
-    const LEAD_UPDATE_EVENT = 'updated.person';
-    const LEAD_DELETE_EVENT = 'deleted.person';
+    public const LEAD_ADDED_EVENT  = 'added.person';
+    public const LEAD_UPDATE_EVENT = 'updated.person';
+    public const LEAD_DELETE_EVENT = 'deleted.person';
 
-    const COMPANY_ADD_EVENT    = 'added.organization';
-    const COMPANY_UPDATE_EVENT = 'updated.organization';
-    const COMPANY_DELETE_EVENT = 'deleted.organization';
+    public const COMPANY_ADD_EVENT    = 'added.organization';
+    public const COMPANY_UPDATE_EVENT = 'updated.organization';
+    public const COMPANY_DELETE_EVENT = 'deleted.organization';
 
-    const USER_ADD_EVENT    = 'added.user';
-    const USER_UPDATE_EVENT = 'updated.user';
+    public const USER_ADD_EVENT    = 'added.user';
+    public const USER_UPDATE_EVENT = 'updated.user';
 
     /**
      * @return JsonResponse

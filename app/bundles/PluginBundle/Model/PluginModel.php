@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Model;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -16,9 +7,10 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
+use Mautic\PluginBundle\Entity\Plugin;
 
 /**
- * Class PluginModel.
+ * @extends FormModel<Plugin>
  */
 class PluginModel extends FormModel
 {

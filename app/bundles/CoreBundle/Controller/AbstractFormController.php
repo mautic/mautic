@@ -1,17 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 
 abstract class AbstractFormController extends CommonController
 {
@@ -248,5 +241,16 @@ abstract class AbstractFormController extends CommonController
         }
 
         return $vars;
+    }
+
+    protected function getFormButton(FormInterface $form, array $elements): ClickableInterface
+    {
+        foreach ($elements as $element) {
+            $form = $form->get($element);
+        }
+
+        \assert($form instanceof ClickableInterface);
+
+        return $form;
     }
 }

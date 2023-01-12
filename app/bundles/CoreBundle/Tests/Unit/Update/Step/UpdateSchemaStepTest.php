@@ -1,28 +1,19 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://www.mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Update\Step;
 
 use Doctrine\Bundle\MigrationsBundle\Command\MigrationsMigrateDoctrineCommand;
 use Mautic\CoreBundle\Exception\UpdateFailedException;
 use Mautic\CoreBundle\Update\Step\UpdateSchemaStep;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Event\ConsoleEvent;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UpdateSchemaStepTest extends AbstractStepTest
 {
@@ -122,9 +113,9 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }
@@ -145,9 +136,9 @@ class UpdateSchemaStepTest extends AbstractStepTest
 
         $this->eventDispatcher->method('dispatch')
             ->willReturnCallback(
-                function (Event $event, string $eventName) {
-                    switch ($eventName) {
-                        case ConsoleEvents::COMMAND:
+                function (ConsoleEvent $event, string $eventName) {
+                    switch (true) {
+                        case $event instanceof ConsoleCommandEvent:
                             $event->enableCommand();
                             break;
                     }

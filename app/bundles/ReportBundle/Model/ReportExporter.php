@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Model;
 
 use Mautic\ReportBundle\Adapter\ReportDataAdapter;
@@ -124,7 +115,7 @@ class ReportExporter
 
             $file  = $this->reportFileWriter->getFilePath($scheduler);
             $event = new ReportScheduleSendEvent($scheduler, $file);
-            $this->eventDispatcher->dispatch(ReportEvents::REPORT_SCHEDULE_SEND, $event);
+            $this->eventDispatcher->dispatch($event, ReportEvents::REPORT_SCHEDULE_SEND);
         }
 
         $this->schedulerModel->reportWasScheduled($report);

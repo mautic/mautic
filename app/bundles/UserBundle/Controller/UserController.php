@@ -1,21 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Form\Type\ContactType;
+use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\HttpFoundation\Request;
 
 class UserController extends FormController
 {
@@ -72,7 +67,7 @@ class UserController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticUserBundle:User:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_user_index',
                     'mauticContent' => 'user',
@@ -95,7 +90,7 @@ class UserController extends FormController
                     'delete' => $this->get('mautic.security')->isGranted('user:users:deleteother'),
                 ],
             ],
-            'contentTemplate' => 'MauticUserBundle:User:list.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:list.html.twig',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_user_index', ['page' => $page]),
                 'mauticContent' => 'user',
@@ -183,11 +178,11 @@ class UserController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticUserBundle:User:index',
+                    'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_user_index',
                         'mauticContent' => 'user',
@@ -200,7 +195,7 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => ['form' => $form->createView()],
-            'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_new',
                 'route'         => $action,
@@ -223,7 +218,8 @@ class UserController extends FormController
             return $this->accessDenied();
         }
         $model = $this->getModel('user.user');
-        $user  = $model->getEntity($objectId);
+        \assert($model instanceof UserModel);
+        $user = $model->getEntity($objectId);
 
         //set the page we came from
         $page = $this->get('session')->get('mautic.user.page', 1);
@@ -234,7 +230,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',
@@ -275,7 +271,7 @@ class UserController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $user->setPassword($password);
-                    $model->saveEntity($user, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($user, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     //check if the user's locale has been downloaded already, fetch it if not
                     /** @var LanguageHelper $languageHelper */
@@ -318,7 +314,7 @@ class UserController extends FormController
                 $model->unlockEntity($user);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
             }
         } else {
@@ -328,7 +324,7 @@ class UserController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => ['form' => $form->createView()],
-            'contentTemplate' => 'MauticUserBundle:User:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $action,
@@ -358,7 +354,7 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'route'         => $returnUrl,
@@ -369,7 +365,8 @@ class UserController extends FormController
         if ('POST' == $this->request->getMethod()) {
             //ensure the user logged in is not getting deleted
             if ((int) $currentUser->getId() !== (int) $objectId) {
-                $model  = $this->getModel('user.user');
+                $model = $this->getModel('user.user');
+                \assert($model instanceof UserModel);
                 $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
@@ -423,7 +420,7 @@ class UserController extends FormController
         if (null === $user) {
             return $this->postActionRedirect([
                 'returnUrl'       => $this->generateUrl('mautic_dashboard_index'),
-                'contentTemplate' => 'MauticUserBundle:User:contact',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::contactAction',
                 'flashes'         => [
                     [
                         'type'    => 'error',
@@ -484,7 +481,9 @@ class UserController extends FormController
                         'details'   => $details,
                         'ipAddress' => $this->factory->getIpAddressFromRequest(),
                     ];
-                    $this->getModel('core.auditlog')->writeToLog($log);
+                    $auditLogModel = $this->getModel('core.auditlog');
+                    \assert($auditLogModel instanceof AuditLogModel);
+                    $auditLogModel->writeToLog($log);
 
                     $this->addFlash('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }
@@ -503,6 +502,7 @@ class UserController extends FormController
             $form->get('returnUrl')->setData($returnUrl);
 
             if (!empty($reEntity) && !empty($reEntityId)) {
+                /** @var FormModel<object> $model */
                 $model  = $this->getModel($reEntity);
                 $entity = $model->getEntity($reEntityId);
 
@@ -518,7 +518,7 @@ class UserController extends FormController
                 'form' => $form->createView(),
                 'user' => $user,
             ],
-            'contentTemplate' => 'MauticUserBundle:User:contact.html.php',
+            'contentTemplate' => 'MauticUserBundle:User:contact.html.twig',
             'passthroughVars' => [
                 'route'         => $action,
                 'mauticContent' => 'user',
@@ -540,15 +540,16 @@ class UserController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:User:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\UserController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_user_index',
                 'mauticContent' => 'user',
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model       = $this->getModel('user');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('user');
+            \assert($model instanceof UserModel);
             $ids         = json_decode($this->request->query->get('ids', ''));
             $deleteIds   = [];
             $currentUser = $this->user;

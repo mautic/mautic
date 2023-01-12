@@ -1,38 +1,33 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\EventListener;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\Exception\ORMException;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\Lead as CampaignLead;
-use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\LeadEvents;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var LeadRepository
-     */
-    private $contactRepository;
+    private LeadRepository $contactRepository;
 
-    private $contacts = [
+    /**
+     * @var array<int, array<string, int|string>>
+     */
+    private array $contacts = [
         [
             'email'     => 'contact1@email.com',
             'firstname' => 'Isaac',
@@ -52,11 +47,41 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ],
     ];
 
+    /**
+     * @var array<int, array<string, int|string>>
+     */
+    private array $stages = [
+        [
+            'name'        => 'novice',
+            'weight'      => 1,
+            'description' => 'This is the first stage',
+            'isPublished' => 1,
+        ],
+        [
+            'name'        => 'advanced beginner',
+            'weight'      => 2,
+            'description' => 'This is the second stage',
+            'isPublished' => 1,
+        ],
+    ];
+
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->contactRepository  = $this->em->getRepository(Lead::class);
+    }
+
+    /**
+     * Clean up after the tests.
+     *
+     * @throws DBALException
+     */
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->truncateTables('leads', 'stages', 'campaigns', 'campaign_events');
     }
 
     public function testUpdateLeadAction(): void
@@ -116,8 +141,68 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
     }
 
+    public function testLeadFieldStageValueCondition(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
+
+        $contactIds = $this->createContacts();
+        $stageIds   = $this->createStages();
+        $this->addStageToContacts($contactIds, $stageIds[0]);
+        $campaign   = $this->createCampaignWithStageConditionEvent($contactIds);
+
+        // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
+        $this->em->clear();
+
+        // Execute the campaign.
+        $exitCode = $applicationTester->run(
+            [
+                'command'       => 'mautic:campaigns:trigger',
+                '--campaign-id' => $campaign->getId(),
+            ]
+        );
+
+        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+    }
+
+    public function testIsContactInOneOfStages(): void
+    {
+        $contactIds = $this->createContacts();
+        $stageIds   = $this->createStages();
+        $this->addStageToContacts($contactIds, $stageIds[0]);
+
+        $args = [
+            'event' => [
+                'type'       => 'lead.stages',
+                'properties' => [
+                    'type'   => 'lead.stages',
+                    'stages' => [0 => '1'],
+                ],
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+        foreach ($contactIds as $contactId) {
+            $args['lead'] = $this->contactRepository->getEntity($contactId);
+
+            $event  = new CampaignExecutionEvent($args, true);
+
+            /** @var EventDispatcherInterface $dispatcher */
+            $dispatcher = self::$container->get('event_dispatcher');
+            $result     = $dispatcher->dispatch(
+                $event,
+                LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION
+            );
+
+            Assert::assertSame(true, $event->getResult());
+        }
+    }
+
     /**
-     * @return int[]
+     * @return array<int, int>
      */
     private function createContacts(): array
     {
@@ -137,6 +222,43 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         ];
     }
 
+    /**
+     * @return array<int, mixed>
+     */
+    private function createStages(): array
+    {
+        foreach ($this->stages as $key => $stage) {
+            $this->client->request('POST', '/api/stages/new', $stage);
+            $clientResponse = $this->client->getResponse();
+            $response       = json_decode($clientResponse->getContent(), true);
+
+            $this->assertEquals(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+            $stages[$key] = $response['stage']['id'];
+        }
+
+        return $stages ?? [];
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     */
+    private function addStageToContacts(array $contactIds, int $stageId): void
+    {
+        foreach ($contactIds as $contactId) {
+            $this->client->request('POST', "/api/stages/$stageId/contact/$contactId/add");
+            $clientResponse = $this->client->getResponse();
+
+            $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+        }
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
     private function createCampaign(array $contactIds): Campaign
     {
         $campaign = new Campaign();
@@ -336,5 +458,173 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         return $campaign;
+    }
+
+    /**
+     * @param array<int, int> $contactIds
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignWithStageConditionEvent(array $contactIds): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Update contact');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        foreach ($contactIds as $key => $contactId) {
+            $campaignLead = new CampaignLead();
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setLead($this->em->getReference(Lead::class, $contactId));
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($key, $campaignLead);
+        }
+
+        $this->em->flush();
+
+        $event1 = new Event();
+        $event1->setCampaign($campaign);
+        $event1->setName('Check if the contact on one of the stage(s)');
+        $event1->setType('lead.stages');
+        $event1->setEventType('condition');
+        $event1->setTriggerMode('immediate');
+        $event1->setProperties(
+            [
+                'canvasSettings'             => [
+                    'droppedX' => '696',
+                    'droppedY' => '155',
+                ],
+                'name'                       => 'Contact stages',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'order'                      => 1,
+                'anchor'                     => 'leadsource',
+                'properties'                 => ['stages' => [0 => '1']],
+                'type'                       => 'lead.stages',
+                'eventType'                  => 'condition',
+                'anchorEventType'            => 'source',
+                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'                    => ['save' => ''],
+                'stages'                     => [0 => '1'],
+            ]
+        );
+
+        $this->em->persist($event1);
+        $this->em->flush();
+
+        $event2 = new Event();
+        $event2->setCampaign($campaign);
+        $event2->setName('Change contact\'s stage');
+        $event2->setType('stage.change');
+        $event2->setEventType('action');
+        $event2->setTriggerMode('immediate');
+        $event2->setProperties(
+            [
+                'canvasSettings'             => [
+                    'droppedX' => '696',
+                    'droppedY' => '155',
+                ],
+                'name'                       => '',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'order'                      => 2,
+                'anchor'                     => 'bottom',
+                'properties'                 => ['stage' => '2'],
+                'type'                       => 'stage.change',
+                'eventType'                  => 'action',
+                'anchorEventType'            => 'action',
+                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'                    => ['save' => ''],
+                'stage'                      => 2,
+            ]
+        );
+
+        $this->em->persist($event2);
+        $this->em->flush();
+
+        $campaign->setCanvasSettings(
+            [
+                'nodes'       => [
+                    [
+                        'id'        => $event2->getId(),
+                        'positionX' => '696',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => $event2->getId(),
+                        'positionX' => '696',
+                        'positionY' => '155',
+                    ],
+                    [
+                        'id'        => 'lists',
+                        'positionX' => '796',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => $event1->getId(),
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => $event2->getId(),
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    public function testManipulatorSetOnCampaignTriggerAction(): void
+    {
+        $lead = new Lead();
+        $args = [
+            'lead'  => $lead,
+            'event' => [
+                'campaign'   => ['id' => 1],
+                'properties' => ['integration' => 'vTiger', 'config' => ['campaigns' => 1]],
+                'type'       => 'test',
+            ],
+            'eventDetails'    => null,
+            'systemTriggered' => false,
+            'eventSettings'   => [],
+        ];
+
+        $event           = new CampaignExecutionEvent($args, false);
+        $eventDispatcher = self::$container->get('event_dispatcher');
+        $eventDispatcher->dispatch($event, 'mautic.lead.on_campaign_trigger_action');
+
+        $leadManipulator = $lead->getManipulator();
+        Assert::assertInstanceOf(LeadManipulator::class, $leadManipulator);
+        Assert::assertSame('campaign', $leadManipulator->getBundleName());
+        Assert::assertSame('trigger-action', $leadManipulator->getObjectName());
     }
 }

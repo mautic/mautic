@@ -2,14 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CacheBundle\Tests\Cache;
 
 use Mautic\CacheBundle\Cache\Adapter\FilesystemTagAwareAdapter;
@@ -18,7 +10,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\Simple\Psr6Cache;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CacheProviderTest extends TestCase
@@ -90,7 +82,7 @@ class CacheProviderTest extends TestCase
             ->willReturn($this->adapter);
 
         $simpleCache = $this->cacheProvider->getSimpleCache();
-        $this->assertInstanceOf(Psr6Cache::class, $simpleCache);
+        $this->assertInstanceOf(Psr16Cache::class, $simpleCache);
     }
 
     public function testExceptionThrownIfAdaptorNotFoundInContainer(): void

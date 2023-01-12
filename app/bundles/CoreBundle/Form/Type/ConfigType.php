@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form\Type;
 
 use Mautic\CoreBundle\Factory\IpLookupFactory;
@@ -21,6 +12,7 @@ use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -30,8 +22,8 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
@@ -193,6 +185,19 @@ class ConfigType extends AbstractType
                             'message' => 'mautic.core.value.required',
                         ]
                     ),
+                ],
+            ]
+        );
+
+        $builder->add(
+            'composer_updates',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.form.update.composer',
+                'data'  => (array_key_exists('composer_updates', $options['data']) && !empty($options['data']['composer_updates'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.update.composer.tooltip',
                 ],
             ]
         );
@@ -432,14 +437,14 @@ class ConfigType extends AbstractType
                 'choices' => [
                     'mautic.core.daterange.0days'                                                                 => 'midnight',
                     'mautic.core.daterange.1days'                                                                 => '-24 hours',
-                    $this->translator->transChoice('mautic.core.daterange.week', 1, ['%count%' => 1])  => '-1 week',
-                    $this->translator->transChoice('mautic.core.daterange.week', 2, ['%count%' => 2])  => '-2 weeks',
-                    $this->translator->transChoice('mautic.core.daterange.week', 3, ['%count%' => 3])  => '-3 weeks',
-                    $this->translator->transChoice('mautic.core.daterange.month', 1, ['%count%' => 1]) => '-1 month',
-                    $this->translator->transChoice('mautic.core.daterange.month', 2, ['%count%' => 2]) => '-2 months',
-                    $this->translator->transChoice('mautic.core.daterange.month', 3, ['%count%' => 3]) => '-3 months',
-                    $this->translator->transChoice('mautic.core.daterange.year', 1, ['%count%' => 1])  => '-1 year',
-                    $this->translator->transChoice('mautic.core.daterange.year', 2, ['%count%' => 2])  => '-2 years',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 1])  => '-1 week',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 2])  => '-2 weeks',
+                    $this->translator->trans('mautic.core.daterange.week', ['%count%' => 3])  => '-3 weeks',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 1]) => '-1 month',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 2]) => '-2 months',
+                    $this->translator->trans('mautic.core.daterange.month', ['%count%' => 3]) => '-3 months',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 1])  => '-1 year',
+                    $this->translator->trans('mautic.core.daterange.year', ['%count%' => 2])  => '-2 years',
                 ],
                 'expanded'          => false,
                 'multiple'          => false,
@@ -624,6 +629,61 @@ class ConfigType extends AbstractType
                     ],
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
+            'headers_sts',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts',
+                'data'  => (array_key_exists('headers_sts', $options['data']) && !empty($options['data']['headers_sts'])),
+                'attr'  => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.response.headers.sts.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_expire_time',
+            IntegerType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.expire_time',
+                'data'  => $options['data']['headers_sts_expire_time'] ?? 60,
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                    'min'          => 60,
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_subdomains',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.subdomains',
+                'data'  => (array_key_exists('headers_sts_subdomains', $options['data']) && !empty($options['data']['headers_sts_subdomains'])),
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.response.headers.sts.subdomains.tooltip',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'headers_sts_preload',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'mautic.core.config.response.headers.sts.preload',
+                'data'  => (array_key_exists('headers_sts_preload', $options['data']) && !empty($options['data']['headers_sts_preload'])),
+                'attr'  => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.response.headers.sts.preload.tooltip',
+                    'data-show-on' => '{"config_coreconfig_headers_sts_1":"checked"}',
+                ],
+            ]
         );
     }
 

@@ -304,3 +304,9 @@
   top: 0;
   left: 0;
 }
+
+#leads-container .spinner {
+    text-align: center;
+    line-height: 250px;
+    font-size: 24px;
+}

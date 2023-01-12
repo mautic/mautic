@@ -1,22 +1,10 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Loader\ParameterLoader;
 use Mautic\UserBundle\Entity\User;
 
-/**
- * Class PathsHelper.
- */
 class PathsHelper
 {
     /**
@@ -69,11 +57,9 @@ class PathsHelper
      */
     private $user;
 
-    /**
-     * PathsHelper constructor.
-     */
     public function __construct(UserHelper $userHelper, CoreParametersHelper $coreParametersHelper, string $cacheDir, string $logsDir, string $rootDir)
     {
+        $root                         = $rootDir.'/app'; // Do not rename the variable, used in paths_helper.php
         $this->user                   = $userHelper->getUser();
         $this->theme                  = $coreParametersHelper->get('theme');
         $this->imagePath              = $this->removeTrailingSlash($coreParametersHelper->get('image_path'));
@@ -82,9 +68,8 @@ class PathsHelper
         $this->dashboardUserImportDir = $this->removeTrailingSlash($coreParametersHelper->get('dashboard_import_user_dir'));
         $this->kernelCacheDir         = $this->removeTrailingSlash($cacheDir);
         $this->kernelLogsDir          = $this->removeTrailingSlash($logsDir);
-        $this->kernelRootDir          = $this->removeTrailingSlash($rootDir);
+        $this->kernelRootDir          = $this->removeTrailingSlash($root);
 
-        $root  = $rootDir;
         $paths = [];
         include $root.'/config/paths_helper.php';
 

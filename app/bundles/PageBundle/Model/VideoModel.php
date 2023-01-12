@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -16,12 +7,13 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\VideoHit;
+use Mautic\PageBundle\Entity\VideoHitRepository;
 use Mautic\PageBundle\Event\VideoHitEvent;
 use Mautic\PageBundle\PageEvents;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class PageModel.
+ * @extends FormModel<VideoHit>
  */
 class VideoModel extends FormModel
 {
@@ -46,12 +38,12 @@ class VideoModel extends FormModel
         $this->contactTracker = $contactTracker;
     }
 
-    /**
-     * @return \Mautic\PageBundle\Entity\VideoHitRepository
-     */
-    public function getHitRepository()
+    public function getHitRepository(): VideoHitRepository
     {
-        return $this->em->getRepository('MauticPageBundle:VideoHit');
+        $result = $this->em->getRepository(VideoHit::class);
+        \assert($result instanceof VideoHitRepository);
+
+        return $result;
     }
 
     /**
@@ -141,7 +133,7 @@ class VideoModel extends FormModel
         if (!empty($browserLanguages)) {
             $languages = explode(',', $browserLanguages);
             foreach ($languages as $k => $l) {
-                if ($pos = false !== strpos(';q=', $l)) {
+                if (($pos = strpos(';q=', $l)) !== false) {
                     //remove weights
                     $languages[$k] = substr($l, 0, $pos);
                 }
@@ -157,7 +149,7 @@ class VideoModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -166,7 +158,7 @@ class VideoModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::VIDEO_ON_HIT)) {
             $event = new VideoHitEvent($hit, $request, $code);
-            $this->dispatcher->dispatch(PageEvents::VIDEO_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::VIDEO_ON_HIT);
         }
     }
 }

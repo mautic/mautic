@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Mapping;
 
 use Doctrine\DBAL\Types\Types;
@@ -22,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 /**
  * Override Doctrine's builder classes to add support to orphanRemoval until the fix is incorporated into Doctrine release
- * See @link https://github.com/doctrine/doctrine2/pull/1326/.
+ * See @see https://github.com/doctrine/doctrine2/pull/1326/.
  */
 class ClassMetadataBuilder extends OrmClassMetadataBuilder
 {
@@ -433,14 +424,11 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     }
 
     /**
-     * Add partial index.
-     *
-     * @param $name
-     * @param $where
-     *
-     * @return $this
+     * @param string  $name
+     * @param mixed[] $flags
+     * @param mixed[] $options
      */
-    public function addPartialIndex(array $columns, $name, $where)
+    public function addIndex(array $columns, $name, array $flags = null, array $options = null): self
     {
         $cm = $this->getClassMetadata();
 
@@ -448,14 +436,40 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
             $cm->table['indexes'] = [];
         }
 
-        $cm->table['indexes'][$name] = ['
-            columns'  => $columns,
-            'options' => [
-                'where' => $where,
-            ],
-        ];
+        $definition = ['columns' => $columns];
+
+        if (null !== $flags) {
+            $definition['flags'] = $flags;
+        }
+
+        if (null !== $options) {
+            $definition['options'] = $options;
+        }
+
+        $cm->table['indexes'][$name] = $definition;
 
         return $this;
+    }
+
+    /**
+     * @deprecated this method will be removed as MySQL does not support partial indices whatsoever
+     *
+     * @param string $name
+     * @param string $where
+     *
+     * @return self
+     */
+    public function addPartialIndex(array $columns, $name, $where)
+    {
+        return $this->addIndex($columns, $name, null, ['where' => $where]);
+    }
+
+    /**
+     * @param mixed[] $columns
+     */
+    public function addFulltextIndex(array $columns, string $name): self
+    {
+        return $this->addIndex($columns, $name, ['fulltext']);
     }
 
     /**
@@ -464,5 +478,23 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     public function isIndexedVarchar(string $name, string $type): bool
     {
         return Types::STRING === $type || isset($this->getClassMetadata()->table['indexes'][$name]);
+    }
+
+    /**
+     * Adds Index with options.
+     *
+     * @param list<string>         $columns
+     * @param array<string, mixed> $options
+     */
+    public function addIndexWithOptions(array $columns, string $name, array $options): ClassMetadataBuilder
+    {
+        $cm = $this->getClassMetadata();
+
+        $cm->table['indexes'][$name] = [
+            'columns' => $columns,
+            'options' => $options,
+        ];
+
+        return $this;
     }
 }

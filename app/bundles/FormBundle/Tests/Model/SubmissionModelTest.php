@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Tests\Model;
 
 use Mautic\FormBundle\Entity\Field;
@@ -43,7 +34,6 @@ class SubmissionModelTest extends FormTestAbstract
         $formModel->setFields($form, $fields);
 
         $submissionModel = $this->getSubmissionModel();
-        $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
         /** @var SubmissionEvent $submissionEvent */
         $submissionEvent = $submissionModel->saveSubmission($post, $server, $form, $request, true)['submission'];
         $this->assertInstanceOf(SubmissionEvent::class, $submissionEvent);
@@ -56,6 +46,8 @@ class SubmissionModelTest extends FormTestAbstract
         $token              = '{formfield='.$alias.'}';
         $tokens[$token]     = $formData[$alias];
         $this->assertNotEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
+
+        $this->assertFalse($submissionModel->saveSubmission($post, $server, $form, $request));
     }
 
     public function testNormalizeValues()

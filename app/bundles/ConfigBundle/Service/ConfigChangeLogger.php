@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Service;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -23,7 +14,7 @@ class ConfigChangeLogger
     /**
      * Keys to remove from log.
      *
-     * @var array
+     * @var string[]
      */
     private $filterKeys = [
         'transifex_password',
@@ -31,20 +22,14 @@ class ConfigChangeLogger
         'mailer_is_owner',
     ];
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private AuditLogModel $auditLogModel;
+
+    private IpLookupHelper $ipLookupHelper;
 
     /**
-     * @var IpLookupHelper
+     * @var mixed[]|null
      */
-    private $ipLookupHelper;
-
-    /**
-     * @var array
-     */
-    private $originalNormData;
+    private ?array $originalNormData = null;
 
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {

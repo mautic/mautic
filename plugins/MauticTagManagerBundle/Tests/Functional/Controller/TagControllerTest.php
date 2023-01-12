@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 use Mautic\LeadBundle\Model\TagModel;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request;
 
 class TagControllerTest extends MauticMysqlTestCase
 {
@@ -128,28 +130,6 @@ class TagControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * Get tag's clone page.
-     */
-    public function testCloneAction(): void
-    {
-        $tag            = $this->tagRepository->findOneBy([]);
-        $crawler        = $this->client->request('GET', '/s/tags/clone/'.$tag->getId());
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isOk(), 'Return code must be 200.');
-
-        $form = $crawler->selectButton('Save & Close')->form();
-        $this->assertSame($tag->getTag(), $form['tag_entity[tag]']->getValue());
-    }
-
-    public function testCloneActionNotFound(): void
-    {
-        $this->client->followRedirects(false);
-        $this->client->request('GET', '/s/tags/clone/99999');
-        $clientResponse = $this->client->getResponse();
-        $this->assertTrue($clientResponse->isRedirection(), 'Must be redirect response.');
-    }
-
-    /**
      * Get tag's create page.
      */
     public function testNewAction(): void
@@ -177,7 +157,7 @@ class TagControllerTest extends MauticMysqlTestCase
         $form['tag_entity[tag]']->setValue($TagName);
         $crawler = $this->client->submit($form);
 
-        $this->assertStringContainsString($TagName.' already exists!', $crawler->text(), 'Must contain already exist.');
+        $this->assertStringContainsString($TagName.' has been updated!', strip_tags($crawler->text()), 'Must contain already exist.');
     }
 
     public function testBatchDeleteAction(): void
@@ -189,5 +169,18 @@ class TagControllerTest extends MauticMysqlTestCase
         $this->client->request('POST', '/s/tags/batchDelete?ids='.json_encode($tagsId));
         $this->assertTrue($this->client->getResponse()->isOk(), 'Return code must be 200.');
         $this->assertEmpty($this->tagRepository->count([]), 'All tags must be deleted.');
+    }
+
+    public function testEmptyTagShouldThrowValidationError(): void
+    {
+        $crawler = $this->client->request(Request::METHOD_GET, '/s/tags/new');
+        Assert::assertTrue($this->client->getResponse()->isOk());
+
+        $buttonCrawler  = $crawler->selectButton('Save & Close');
+        $form           = $buttonCrawler->form();
+        $form->setValues(['tag_entity[tag]' => '']);
+        $this->client->submit($form);
+        Assert::assertTrue($this->client->getResponse()->isOk());
+        Assert::assertStringContainsString('A value is required.', $this->client->getResponse()->getContent());
     }
 }

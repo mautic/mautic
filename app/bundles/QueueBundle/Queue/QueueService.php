@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\QueueBundle\Queue;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -66,7 +57,7 @@ class QueueService
         $protocol                   = $this->coreParametersHelper->get('queue_protocol');
         $payload['mauticQueueName'] = $queueName;
         $event                      = new QueueEvent($protocol, $queueName, $payload);
-        $this->eventDispatcher->dispatch(QueueEvents::PUBLISH_MESSAGE, $event);
+        $this->eventDispatcher->dispatch($event, QueueEvents::PUBLISH_MESSAGE);
     }
 
     /**
@@ -78,7 +69,7 @@ class QueueService
     {
         $protocol = $this->coreParametersHelper->get('queue_protocol');
         $event    = new QueueEvent($protocol, $queueName, [], $messages, $timeout);
-        $this->eventDispatcher->dispatch(QueueEvents::CONSUME_MESSAGE, $event);
+        $this->eventDispatcher->dispatch($event, QueueEvents::CONSUME_MESSAGE);
     }
 
     /**
@@ -104,7 +95,7 @@ class QueueService
         $this->logger->debug('QUEUE: Consuming job for '.$queueName, $logPayload);
 
         $event = new QueueConsumerEvent($payload);
-        $this->eventDispatcher->dispatch($eventName, $event);
+        $this->eventDispatcher->dispatch($event, $eventName);
 
         return $event;
     }

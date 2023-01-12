@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticTagManagerBundle\Controller;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -18,9 +9,9 @@ use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Model\TagModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TagController extends FormController
 {
@@ -29,14 +20,14 @@ class TagController extends FormController
      *
      * @param int $page
      *
-     * @return JsonResponse | Response
+     * @return JsonResponse|Response
      */
     public function indexAction($page = 1)
     {
-        /** @var TagModel $model */
         // Use overwritten tag model so overwritten repository can be fetched,
         // we need it to define table alias so we can define sort order.
-        $model   = $this->getModel('tagmanager.tag');
+        $model = $this->getModel('tagmanager.tag');
+        \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
         $session = $this->get('session');
 
         //set some permissions
@@ -110,7 +101,7 @@ class TagController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+                'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_tagmanager_index',
                     'mauticContent' => 'tagmanager',
@@ -138,7 +129,7 @@ class TagController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => $parameters,
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:list.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $this->generateUrl('mautic_tagmanager_index', ['page' => $page]),
@@ -150,7 +141,7 @@ class TagController extends FormController
     /**
      * Generate's new form and processes post data.
      *
-     * @return JsonResponse | RedirectResponse | Response
+     * @return JsonResponse|RedirectResponse|Response
      */
     public function newAction()
     {
@@ -159,8 +150,9 @@ class TagController extends FormController
         }
 
         //retrieve the entity
-        $tag   = new Tag();
+        $tag   = new \MauticPlugin\MauticTagManagerBundle\Entity\Tag();
         $model = $this->getModel('tagmanager.tag');
+        \assert($model instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
         //set the page we came from
         $page = $this->get('session')->get('mautic.tagmanager.page', 1);
         //set the return URL for post actions
@@ -171,7 +163,7 @@ class TagController extends FormController
         $form = $model->createForm($tag, $this->get('form.factory'), $action);
 
         // Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -179,7 +171,7 @@ class TagController extends FormController
                     $found = $model->getRepository()->countOccurrences($tag->getTag());
                     if (0 !== $found) {
                         $valid = false;
-                        $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -206,7 +198,7 @@ class TagController extends FormController
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+                    'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_tagmanager_index',
                         'mauticContent' => 'tagmanager',
@@ -222,57 +214,13 @@ class TagController extends FormController
                 'form'   => $form->createView(),
                 'entity' => $tag,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'new']),
                 'mauticContent' => 'tagmanager',
             ],
         ]);
-    }
-
-    /**
-     * Generate's clone form and processes post data.
-     *
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
-     * @return Response
-     */
-    public function cloneAction($objectId, $ignorePost = false)
-    {
-        if (!$this->get('mautic.security')->isGranted('tagManager:tagManager:create')) {
-            return $this->accessDenied();
-        }
-
-        $postActionVars = $this->getPostActionVars();
-
-        try {
-            $tag   = $this->getTag($objectId);
-            $clone = new Tag();
-            $clone->setTag($tag->getTag());
-
-            return $this->createTagModifyResponse(
-                $clone,
-                $postActionVars,
-                $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'clone', 'objectId' => $objectId]),
-                $ignorePost
-            );
-        } catch (AccessDeniedException $exception) {
-            return $this->accessDenied();
-        } catch (EntityNotFoundException $exception) {
-            return $this->postActionRedirect(
-                array_merge($postActionVars, [
-                    'flashes' => [
-                        [
-                            'type'    => 'error',
-                            'msg'     => 'mautic.tagmanager.tag.error.notfound',
-                            'msgVars' => ['%id%' => $objectId],
-                        ],
-                    ],
-                ])
-            );
-        }
     }
 
     /**
@@ -314,7 +262,7 @@ class TagController extends FormController
     }
 
     /**
-     * Create modifying response for tags - edit/clone.
+     * Create modifying response for tags - edit.
      *
      * @param string $action
      * @param bool   $ignorePost
@@ -333,10 +281,18 @@ class TagController extends FormController
         if (!$ignorePost && 'POST' == $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
-                    $found = $tagModel->getRepository()->countOccurrences($tag->getTag());
-                    if (0 !== $found) {
-                        $valid = false;
-                        $this->addFlash('mautic.tagmanager.tag.error.already_exists', [
+                    // We are editing existing tag.in the database.
+                    $valid        = true;
+                    $existingTags = $tagModel->getRepository()->getTagsByName([$tag->getTag()]);
+                    foreach ($existingTags as $e) {
+                        if ($e->getId() != $tag->getId()) {
+                            $valid = false;
+                            break;
+                        }
+                    }
+
+                    if (!$valid) {
+                        $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -359,7 +315,7 @@ class TagController extends FormController
                     }
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticTagManagerBundle:Tag:form.html.php';
+                        $contentTemplate                     = 'MauticTagManagerBundle:Tag:form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_tagmanager_action', [
@@ -376,7 +332,7 @@ class TagController extends FormController
                             'objectAction' => 'edit',
                             'entity'       => $tag,
                             'objectId'     => $tag->getId(),
-                            'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticTagManagerBundle:FormTheme\Filter'),
+                            'form'         => $this->getFormView($form, 'edit'),
                         ];
 
                         return $this->postActionRedirect($postActionVars);
@@ -397,7 +353,7 @@ class TagController extends FormController
                 'entity'     => $tag,
                 'currentTag' => $tag->getId(),
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $action,
@@ -418,11 +374,11 @@ class TagController extends FormController
      */
     private function getTag($tagId)
     {
-        /** @var Tag $tag */
+        /** @var Tag|null $tag */
         $tag = $this->getModel('lead.tag')->getEntity($tagId);
 
         // Check if exists
-        if (!$tag instanceof Tag) {
+        if (!$tag) {
             throw new EntityNotFoundException(sprintf('Tag with id %d not found.', $tagId));
         }
 
@@ -442,13 +398,13 @@ class TagController extends FormController
         if ($objectId) {
             $returnUrl       = $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId'=> $objectId]);
             $viewParameters  = ['objectAction' => 'view', 'objectId'=> $objectId];
-            $contentTemplate = 'MauticTagManagerBundle:Tag:view';
+            $contentTemplate = 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::viewAction';
         } else {
             //set the page we came from
             $page            = $this->get('session')->get('mautic.tagmanager.page', 1);
             $returnUrl       = $this->generateUrl('mautic_tagmanager_index', ['page' => $page]);
             $viewParameters  = ['page' => $page];
-            $contentTemplate = 'MauticTagManagerBundle:Tag:index';
+            $contentTemplate = 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction';
         }
 
         return [
@@ -475,7 +431,6 @@ class TagController extends FormController
         $model    = $this->getModel('lead.tag');
         $security = $this->get('mautic.security');
 
-        /** @var Tag $tag */
         $tag = $model->getEntity($objectId);
 
         //set the page we came from
@@ -487,7 +442,7 @@ class TagController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+                'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_tagmanager_index',
                     'mauticContent' => 'tagmanager',
@@ -507,9 +462,10 @@ class TagController extends FormController
         return $this->delegateView([
             'returnUrl'      => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'view', 'objectId' => $tag->getId()]),
             'viewParameters' => [
-                'tag' => $tag,
+                'tag'      => $tag,
+                'security' => $security,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.php',
+            'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',
@@ -522,7 +478,7 @@ class TagController extends FormController
      *
      * @param $objectId
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function deleteAction($objectId)
     {
@@ -535,7 +491,7 @@ class TagController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+            'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',
@@ -546,7 +502,8 @@ class TagController extends FormController
             /** @var TagModel $model */
             $model         = $this->getModel('lead.tag');
             $overrideModel = $this->getModel('tagmanager.tag');
-            $tag           = $model->getEntity($objectId);
+            \assert($overrideModel instanceof \MauticPlugin\MauticTagManagerBundle\Model\TagModel);
+            $tag = $model->getEntity($objectId);
 
             if (null === $tag) {
                 $flashes[] = [
@@ -593,7 +550,7 @@ class TagController extends FormController
     /**
      * Deletes a group of entities.
      *
-     * @return JsonResponse | RedirectResponse
+     * @return JsonResponse|RedirectResponse
      */
     public function batchDeleteAction()
     {
@@ -604,7 +561,7 @@ class TagController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:index',
+            'contentTemplate' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',

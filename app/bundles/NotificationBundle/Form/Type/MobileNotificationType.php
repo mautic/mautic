@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -217,13 +208,5 @@ class MobileNotificationType extends AbstractType
         );
 
         $resolver->setDefined(['update_select']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'mobile_notification';
     }
 }

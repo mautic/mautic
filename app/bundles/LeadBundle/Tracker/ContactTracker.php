@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tracker;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -25,7 +16,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\Service\ContactTrackingService\ContactTrackingServiceInterface;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContactTracker
@@ -259,7 +249,7 @@ class ContactTracker
     /**
      * @return Lead|null
      */
-    private function getContactByTrackedDevice()
+    public function getContactByTrackedDevice()
     {
         $lead = null;
 
@@ -333,12 +323,12 @@ class ContactTracker
         if ($persist && !defined('MAUTIC_NON_TRACKABLE_REQUEST')) {
             // Dispatch events for new lead to write create log, ip address change, etc
             $event = new LeadEvent($lead, true);
-            $this->dispatcher->dispatch(LeadEvents::LEAD_PRE_SAVE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LEAD_PRE_SAVE);
             $this->setEntityDefaultValues($lead);
             $this->leadRepository->saveEntity($lead);
             $this->hydrateCustomFieldData($lead);
 
-            $this->dispatcher->dispatch(LeadEvents::LEAD_POST_SAVE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LEAD_POST_SAVE);
 
             $this->logger->addDebug("CONTACT: New lead created with ID# {$lead->getId()}.");
         }
@@ -389,7 +379,7 @@ class ContactTracker
         if (null !== $previouslyTrackedId) {
             if ($this->dispatcher->hasListeners(LeadEvents::CURRENT_LEAD_CHANGED)) {
                 $event = new LeadChangeEvent($previouslyTrackedContact, $previouslyTrackedId, $this->trackedContact, $newTrackingId);
-                $this->dispatcher->dispatch(LeadEvents::CURRENT_LEAD_CHANGED, $event);
+                $this->dispatcher->dispatch($event, LeadEvents::CURRENT_LEAD_CHANGED);
             }
         }
     }

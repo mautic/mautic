@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -127,11 +118,11 @@ class AuthController extends FormController
 
         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
         $event = $this->dispatcher->dispatch(
-            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
             new PluginIntegrationAuthRedirectEvent(
                 $integrationObject,
                 $integrationObject->getAuthLoginUrl()
-            )
+            ),
+            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
         );
         $oauthUrl = $event->getAuthUrl();
 

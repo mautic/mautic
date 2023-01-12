@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -60,8 +51,8 @@ class ContentHelper extends Helper
 
         /** @var CustomContentEvent $event */
         $event = $this->dispatcher->dispatch(
-            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT,
-            new CustomContentEvent($viewName, $context, $vars)
+            new CustomContentEvent($viewName, $context, $vars),
+            CoreEvents::VIEW_INJECT_CUSTOM_CONTENT
         );
 
         $content = $event->getContent();

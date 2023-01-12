@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Command;
 
 use Doctrine\DBAL\DBALException;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\LeadBundle\Model\IpAddressModel;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,14 +12,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CLI Command to delete unused IP addresses.
  */
-class UnusedIpDeleteCommand extends ContainerAwareCommand
+class UnusedIpDeleteCommand extends Command
 {
-    const DEFAULT_LIMIT = 10000;
+    private const DEFAULT_LIMIT = 10000;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    private IpAddressModel $ipAddressModel;
+
+    public function __construct(IpAddressModel $ipAddressModel)
+    {
+        $this->ipAddressModel = $ipAddressModel;
+
+        parent::__construct();
+    }
+
+    protected function configure(): void
     {
         $this->setName('mautic:unusedip:delete')
             ->setDescription('Deletes IP addresses that are not used in any other database table')
@@ -47,17 +45,11 @@ EOT
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $em             = $this->getContainer()->get('doctrine')->getEntityManager();
-        $ipAddressRepo  = $em->getRepository('MauticCoreBundle:IpAddress');
-
         try {
             $limit       = $input->getOption('limit');
-            $deletedRows = $ipAddressRepo->deleteUnusedIpAddresses($limit);
+            $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
         } catch (DBALException $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));

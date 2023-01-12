@@ -1,24 +1,16 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\Tag;
 use Mautic\LeadBundle\Entity\TagRepository;
 
 class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetTagByNameOrCreateNewOneWithSomeExistingTag()
+    use RepositoryConfiguratorTrait;
+
+    public function testGetTagByNameOrCreateNewOneWithSomeExistingTag(): void
     {
         $fetchedEntity = new Tag('sometag');
 
@@ -35,7 +27,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('sometag'));
     }
 
-    public function testGetTagByNameOrCreateNewOneWithSomeNewTag()
+    public function testGetTagByNameOrCreateNewOneWithSomeNewTag(): void
     {
         $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
@@ -53,17 +45,26 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($newEntity->getId());
     }
 
-    public function testRemoveMinusFromTags()
+    public function testGetTagByNameOrCreateNewOneInputFilter(): void
     {
-        $mockEntityManager = $this->getMockBuilder(EntityManager::class)
+        $fetchedEntity = new Tag('hello" world');
+
+        $mockRepository = $this->getMockBuilder(TagRepository::class)
             ->disableOriginalConstructor()
+            ->setMethods(['findOneBy'])
             ->getMock();
 
-        $mockMetadata = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $mockRepository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['tag' => 'hello" world'])
+            ->willReturn($fetchedEntity);
 
-        $repository = new TagRepository($mockEntityManager, $mockMetadata);
+        $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('hello" world'));
+    }
+
+    public function testRemoveMinusFromTags(): void
+    {
+        $repository = $this->configureRepository(Tag::class);
 
         $tags = [
             'sometag1',

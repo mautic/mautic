@@ -1,19 +1,14 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
+/**
+ * @extends CommonRepository<LeadField>
+ */
 class LeadFieldRepository extends CommonRepository
 {
     /**
@@ -92,7 +87,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return string[][]
      */
     protected function getDefaultOrder()
     {
@@ -118,6 +113,21 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()->fetchAll();
+    }
+
+    /**
+     * @return ArrayCollection<int,LeadField>
+     */
+    public function getListablePublishedFields(): ArrayCollection
+    {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder->select($this->getTableAlias());
+        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->where("{$this->getTableAlias()}.isListable = 1");
+        $queryBuilder->andWhere("{$this->getTableAlias()}.isPublished = 1");
+        $queryBuilder->orderBy("{$this->getTableAlias()}.object");
+
+        return new ArrayCollection($queryBuilder->getQuery()->execute());
     }
 
     /**
@@ -360,7 +370,7 @@ class LeadFieldRepository extends CommonRepository
         $qb = $this->createQueryBuilder($this->getTableAlias());
         $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
         $qb->orderBy("{$this->getTableAlias()}.dateAdded", 'ASC');
-        $qb->getMaxResults(1);
+        $qb->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();
     }
@@ -373,5 +383,19 @@ class LeadFieldRepository extends CommonRepository
     public function getFieldsByType($type)
     {
         return $this->findBy(['type' => $type]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFieldSchemaData(string $object): array
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
+            ->from($this->_entityName, 'f', 'f.alias')
+            ->where('f.object = :object')
+            ->setParameter('object', $object)
+            ->getQuery()
+            ->execute();
     }
 }

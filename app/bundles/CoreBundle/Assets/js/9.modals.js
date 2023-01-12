@@ -293,7 +293,7 @@ Mautic.showConfirmation = function (el) {
             .addClass("btn btn-primary")
             .click(function () {
                 if (cancelCallback && typeof Mautic[cancelCallback] === "function") {
-                    window["Mautic"][cancelCallback].apply('window', []);
+                    window["Mautic"][cancelCallback].apply('window', [el]);
                 } else {
                     Mautic.dismissConfirmation();
                 }

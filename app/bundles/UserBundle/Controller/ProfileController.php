@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\LanguageHelper;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
@@ -29,6 +21,7 @@ class ProfileController extends FormController
     {
         //get current user
         $me    = $this->get('security.token_storage')->getToken()->getUser();
+        /** @var UserModel */
         $model = $this->getModel('user');
 
         //set some permissions
@@ -210,7 +203,7 @@ class ProfileController extends FormController
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $returnUrl,
-                            'contentTemplate' => 'MauticUserBundle:Profile:index',
+                            'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                             'passthroughVars' => [
                                 'mauticContent' => 'user',
                             ],
@@ -224,7 +217,7 @@ class ProfileController extends FormController
                     );
                 }
             } else {
-                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                return $this->redirectToRoute('mautic_dashboard_index');
             }
         }
         $this->get('session')->set('formProcessed', 0);
@@ -233,13 +226,13 @@ class ProfileController extends FormController
             'permissions'       => $permissions,
             'me'                => $me,
             'userForm'          => $form->createView(),
-            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent(),
+            'authorizedClients' => $this->forward('Mautic\ApiBundle\Controller\ClientController::authorizedClientsAction')->getContent(),
         ];
 
         return $this->delegateView(
             [
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:Profile:index.html.php',
+                'contentTemplate' => 'MauticUserBundle:Profile:index.html.twig',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_user_account'),
                     'mauticContent' => 'user',

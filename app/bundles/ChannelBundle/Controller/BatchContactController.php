@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ChannelBundle\Controller;
 
 use Mautic\ChannelBundle\Model\ChannelActionModel;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Form\Type\ContactChannelsType;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class BatchContactController extends AbstractFormController
 {
@@ -40,7 +31,7 @@ class BatchContactController extends AbstractFormController
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->channelActionModel   = $this->container->get('mautic.channel.model.channel.action');
         $this->frequencyActionModel = $this->container->get('mautic.channel.model.frequency.action');
@@ -65,7 +56,6 @@ class BatchContactController extends AbstractFormController
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);
 
             $this->addFlash('mautic.lead.batch_leads_affected', [
-                'pluralCount' => count($ids),
                 '%count%'     => count($ids),
             ]);
         } else {

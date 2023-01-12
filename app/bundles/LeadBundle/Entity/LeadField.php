@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -22,9 +13,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class LeadField.
- */
 class LeadField extends FormEntity
 {
     /**
@@ -212,10 +200,12 @@ class LeadField extends FormEntity
 
         $builder->createField('columnIsNotCreated', 'boolean')
             ->columnName('column_is_not_created')
+            ->option('default', false)
             ->build();
 
         $builder->createField('originalIsPublishedValue', 'boolean')
             ->columnName('original_is_published_value')
+            ->option('default', false)
             ->build();
     }
 
@@ -266,8 +256,13 @@ class LeadField extends FormEntity
                 [
                     'defaultValue',
                     'isRequired',
-                    'isPubliclyUpdatable',
+                    'isFixed',
+                    'isListable',
+                    'isVisible',
+                    'isVisible',
+                    'isShortVisible',
                     'isUniqueIdentifier',
+                    'isPubliclyUpdatable',
                     'properties',
                 ]
             )
@@ -361,12 +356,13 @@ class LeadField extends FormEntity
     /**
      * Set defaultValue.
      *
-     * @param string $defaultValue
+     * @param string|array<string> $defaultValue
      *
      * @return LeadField
      */
     public function setDefaultValue($defaultValue)
     {
+        $defaultValue = is_array($defaultValue) ? implode('|', $defaultValue) : $defaultValue;
         $this->isChanged('defaultValue', $defaultValue);
         $this->defaultValue = $defaultValue;
 
@@ -453,9 +449,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Set properties.
-     *
-     * @param string $properties
+     * @param mixed[] $properties
      *
      * @return LeadField
      */
@@ -468,9 +462,7 @@ class LeadField extends FormEntity
     }
 
     /**
-     * Get properties.
-     *
-     * @return array
+     * @return mixed[]
      */
     public function getProperties()
     {
@@ -517,7 +509,7 @@ class LeadField extends FormEntity
     /**
      * Set object.
      *
-     * @param int $object
+     * @param string $object
      *
      * @return LeadField
      */
@@ -781,11 +773,16 @@ class LeadField extends FormEntity
     public function setColumnWasCreated()
     {
         $this->columnIsNotCreated = false;
-        $this->setIsPublished($this->originalIsPublishedValue);
+        $this->setIsPublished($this->getOriginalIsPublishedValue());
     }
 
     public function disablePublishChange()
     {
         return 'email' === $this->getAlias() || $this->getColumnIsNotCreated();
+    }
+
+    public function getOriginalIsPublishedValue(): bool
+    {
+        return (bool) $this->originalIsPublishedValue;
     }
 }

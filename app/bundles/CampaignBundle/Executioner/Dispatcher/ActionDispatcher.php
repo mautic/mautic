@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -86,7 +77,7 @@ class ActionDispatcher
 
         // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($customEvent, $pendingEvent);
+            $this->dispatcher->dispatch($pendingEvent, $customEvent);
 
             $success = $pendingEvent->getSuccessful();
             $failed  = $pendingEvent->getFailures();
@@ -120,14 +111,14 @@ class ActionDispatcher
 
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_EXECUTED,
-                new ExecutedEvent($config, $log)
+                new ExecutedEvent($config, $log),
+                CampaignEvents::ON_EVENT_EXECUTED
             );
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
-            new ExecutedBatchEvent($config, $event, $logs)
+            new ExecutedBatchEvent($config, $event, $logs),
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH
         );
     }
 
@@ -144,8 +135,8 @@ class ActionDispatcher
             );
 
             $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_FAILED,
-                new FailedEvent($config, $log)
+                new FailedEvent($config, $log),
+                CampaignEvents::ON_EVENT_FAILED
             );
 
             $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
@@ -47,7 +38,7 @@ class PublicController extends FormController
                         $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
                     }
 
-                    return $this->redirect($this->generateUrl('login'));
+                    return $this->redirectToRoute('login');
                 }
             }
         }
@@ -56,7 +47,7 @@ class PublicController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:reset.html.php',
+            'contentTemplate' => 'MauticUserBundle:Security:reset.html.twig',
             'passthroughVars' => [
                 'route' => $action,
             ],
@@ -101,14 +92,14 @@ class PublicController extends FormController
 
                             $this->request->getSession()->remove('resetToken');
 
-                            return $this->redirect($this->generateUrl('login'));
+                            return $this->redirectToRoute('login');
                         }
 
                         return $this->delegateView([
                             'viewParameters' => [
                                 'form' => $form->createView(),
                             ],
-                            'contentTemplate' => 'MauticUserBundle:Security:resetconfirm.html.php',
+                            'contentTemplate' => 'MauticUserBundle:Security:resetconfirm.html.twig',
                             'passthroughVars' => [
                                 'route' => $action,
                             ],
@@ -116,7 +107,7 @@ class PublicController extends FormController
                     } else {
                         $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken');
 
-                        return $this->redirect($this->generateUrl('mautic_user_passwordresetconfirm'));
+                        return $this->redirectToRoute('mautic_user_passwordresetconfirm');
                     }
                 }
             }
@@ -126,7 +117,7 @@ class PublicController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:resetconfirm.html.php',
+            'contentTemplate' => 'MauticUserBundle:Security:resetconfirm.html.twig',
             'passthroughVars' => [
                 'route' => $action,
             ],

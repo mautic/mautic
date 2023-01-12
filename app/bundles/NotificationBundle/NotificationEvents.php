@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle;
 
 /**
@@ -25,7 +16,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const TOKEN_REPLACEMENT = 'mautic.notification_token_replacement';
+    public const TOKEN_REPLACEMENT = 'mautic.notification_token_replacement';
 
     /**
      * The mautic.notification_form_action_send event is thrown when a notification is sent
@@ -36,7 +27,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const NOTIFICATION_ON_FORM_ACTION_SEND = 'mautic.notification_form_action_send';
+    public const NOTIFICATION_ON_FORM_ACTION_SEND = 'mautic.notification_form_action_send';
 
     /**
      * The mautic.notification_on_send event is thrown when a notification is sent.
@@ -46,7 +37,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const NOTIFICATION_ON_SEND = 'mautic.notification_on_send';
+    public const NOTIFICATION_ON_SEND = 'mautic.notification_on_send';
 
     /**
      * The mautic.notification_pre_save event is thrown right before a notification is persisted.
@@ -56,7 +47,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const NOTIFICATION_PRE_SAVE = 'mautic.notification_pre_save';
+    public const NOTIFICATION_PRE_SAVE = 'mautic.notification_pre_save';
 
     /**
      * The mautic.notification_post_save event is thrown right after a notification is persisted.
@@ -66,7 +57,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const NOTIFICATION_POST_SAVE = 'mautic.notification_post_save';
+    public const NOTIFICATION_POST_SAVE = 'mautic.notification_post_save';
 
     /**
      * The mautic.notification_pre_delete event is thrown prior to when a notification is deleted.
@@ -76,7 +67,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const NOTIFICATION_PRE_DELETE = 'mautic.notification_pre_delete';
+    public const NOTIFICATION_PRE_DELETE = 'mautic.notification_pre_delete';
 
     /**
      * The mautic.notification_post_delete event is thrown after a notification is deleted.
@@ -86,7 +77,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const NOTIFICATION_POST_DELETE = 'mautic.notification_post_delete';
+    public const NOTIFICATION_POST_DELETE = 'mautic.notification_post_delete';
 
     /**
      * The mautic.notification.on_campaign_trigger_action event is fired when the campaign action triggers.
@@ -96,7 +87,7 @@ final class NotificationEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.notification.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.notification.on_campaign_trigger_action';
 
     /**
      * The mautic.notification.on_campaign_trigger_condition event is fired when the campaign condition triggers.
@@ -106,5 +97,5 @@ final class NotificationEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.notification.on_campaign_trigger_notification';
+    public const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.notification.on_campaign_trigger_notification';
 }

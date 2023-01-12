@@ -1,20 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Event;
 
-use Doctrine\ORM\EntityRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class StatsEvent.
@@ -93,7 +83,7 @@ class StatsEvent extends Event
     /**
      * Source repository to fetch the results from.
      *
-     * @var CommonRepository
+     * @var CommonRepository<object>
      */
     protected $repository;
 
@@ -122,8 +112,8 @@ class StatsEvent extends Event
     /**
      * Returns if event is for this table.
      *
-     * @param                       $table
-     * @param EntityRepository|null $repository
+     * @param                               $table
+     * @param CommonRepository<object>|null $repository
      *
      * @return bool
      */
@@ -139,6 +129,8 @@ class StatsEvent extends Event
 
     /**
      * Set the source repository to fetch the results from.
+     *
+     * @param CommonRepository<object> $repository
      *
      * @return string
      */
