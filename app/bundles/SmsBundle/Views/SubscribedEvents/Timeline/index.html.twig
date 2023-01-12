@@ -29,7 +29,7 @@
 
 {% if errors is defined %}
 <p class="text-danger mt-0 mb-10">
-    <i class="fa fa-warning"></i> {{ 'mautic.campaign.event.last_error'|trans }} ~ ': ' ~ errors }}
+    <i class="fa fa-warning"></i> {{ 'mautic.campaign.event.last_error'|trans ~ ': ' ~ errors }}
 </p>
 {% else %}
 <dl class="dl-horizontal">
