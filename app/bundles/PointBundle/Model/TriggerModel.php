@@ -7,9 +7,11 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadTriggerLog;
+use Mautic\PointBundle\Entity\LeagueContactScore;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Event as Events;
@@ -126,30 +128,38 @@ class TriggerModel extends CommonFormModel
 
         //should we trigger for existing leads?
         if ($entity->getTriggerExistingLeads() && $entity->isPublished()) {
-            $events    = $entity->getEvents();
-            $repo      = $this->getEventRepository();
-            $persist   = [];
-            $ipAddress = $this->ipLookupHelper->getIpAddress();
+            $events      = $entity->getEvents();
+            $repo        = $this->getEventRepository();
+            $persist     = [];
+            $ipAddress   = $this->ipLookupHelper->getIpAddress();
+            $pointLeague = $entity->getLeague();
+
+            /** @var LeadRepository $leadRepository */
+            $leadRepository = $this->em->getRepository('MauticLeadBundle:Lead');
 
             foreach ($events as $event) {
-                $filter = ['force' => [
-                    [
-                        'column' => 'l.date_added',
-                        'expr'   => 'lte',
-                        'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                $args = [
+                    'filter' => [
+                        'force' => [
+                            [
+                                'column' => 'l.date_added',
+                                'expr'   => 'lte',
+                                'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
+                            ],
+                            [
+                                'column' => 'l.points',
+                                'expr'   => 'gte',
+                                'value'  => $entity->getPoints(),
+                            ],
+                        ],
                     ],
-                    [
-                        'column' => 'l.points',
-                        'expr'   => 'gte',
-                        'value'  => $entity->getPoints(),
-                    ],
-                ]];
+                ];
 
                 if (!$isNew) {
                     //get a list of leads that has already had this event applied
                     $leadIds = $repo->getLeadsForEvent($event->getId());
                     if (!empty($leadIds)) {
-                        $filter['force'][] = [
+                        $args['filter']['force'][] = [
                             'column' => 'l.id',
                             'expr'   => 'notIn',
                             'value'  => $leadIds,
@@ -157,11 +167,25 @@ class TriggerModel extends CommonFormModel
                     }
                 }
 
-                //get a list of leads that are before the trigger's date_added and trigger if not already done so
-                $leads = $this->leadModel->getEntities([
-                    'filter' => $filter,
-                ]);
+                if ($pointLeague) {
+                    $args['qb'] = $leadRepository->getEntitiesDbalQueryBuilder()
+                        ->leftJoin('l', MAUTIC_TABLE_PREFIX.LeagueContactScore::TABLE_NAME, 'pls', 'l.id = pls.contact_id');
+                    $args['filter']['force'][] = [
+                        'column' => 'pls.score',
+                        'expr'   => 'gte',
+                        'value'  => $entity->getPoints(),
+                    ];
+                    $args['filter']['force'][] = [
+                        'column' => 'pls.league_id',
+                        'expr'   => 'eq',
+                        'value'  => $entity->getLeague()->getId(),
+                    ];
+                }
 
+                //get a list of leads that are before the trigger's date_added and trigger if not already done so
+                $leads = $this->leadModel->getEntities($args);
+
+                /** @var Lead $l */
                 foreach ($leads as $l) {
                     if ($this->triggerEvent($event->convertToArray(), $l, true)) {
                         $log = new LeadTriggerLog();
@@ -403,14 +427,17 @@ class TriggerModel extends CommonFormModel
 
         //find all published triggers that is applicable to this points
         /** @var \Mautic\PointBundle\Entity\TriggerEventRepository $repo */
-        $repo   = $this->getEventRepository();
-        $events = $repo->getPublishedByPointTotal($points);
+        $repo         = $this->getEventRepository();
+        $events       = $repo->getPublishedByPointTotal($points);
+        $leagueEvents = $repo->getPublishedByLeagueScore($lead->getLeagueScores());
+        $events       = array_merge($events, $leagueEvents);
 
         if (!empty($events)) {
             //get a list of actions that has already been applied to this lead
             $appliedEvents = $repo->getLeadTriggeredEvents($lead->getId());
             $ipAddress     = $this->ipLookupHelper->getIpAddress();
             $persist       = [];
+
             foreach ($events as $event) {
                 if (isset($appliedEvents[$event['id']])) {
                     //don't apply the event to the lead if it's already been done

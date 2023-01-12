@@ -2,6 +2,7 @@
 
 namespace Mautic\PointBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -31,6 +32,45 @@ class TriggerEventRepository extends CommonRepository
         );
 
         $q->where($expr);
+        $q->andWhere('r.league IS NULL');
+
+        return $q->getQuery()->getArrayResult();
+    }
+
+    /**
+     * @param ArrayCollection|LeagueContactScore[] $leagueScores
+     *
+     * @return array
+     */
+    public function getPublishedByLeagueScore($leagueScores)
+    {
+        if ($leagueScores->isEmpty()) {
+            return [];
+        }
+
+        $q = $this->createQueryBuilder('a')
+            ->select('partial a.{id, type, name, properties}, partial r.{id, name, points, color}, partial pl.{id, name}')
+            ->leftJoin('a.trigger', 'r')
+            ->leftJoin('r.league', 'pl')
+            ->orderBy('a.order');
+
+        //make sure the published up and down dates are good
+        $expr = $this->getPublishedByDateExpression($q, 'r');
+
+        $leaguesExpr = $q->expr()->orX();
+        /** @var LeagueContactScore $score */
+        foreach ($leagueScores as $score) {
+            $leaguesExpr->add(
+                $q->expr()->andX(
+                    $q->expr()->eq('pl.id', $score->getLeague()->getId()),
+                    $q->expr()->lte('r.points', $score->getScore())
+                )
+            );
+        }
+
+        $q->where($expr);
+        $q->andWhere($leaguesExpr);
+        $q->andWhere('r.league IS NOT NULL');
 
         return $q->getQuery()->getArrayResult();
     }

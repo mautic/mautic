@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\PointBundle\Entity\LeagueContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -204,6 +205,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     private $frequencyRules;
 
+    /**
+     * @var LeagueContactScore[]
+     */
+    private $leagueScores;
+
     private $primaryCompany;
 
     /**
@@ -224,6 +230,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $this->stageChangeLog   = new ArrayCollection();
         $this->frequencyRules   = new ArrayCollection();
         $this->companyChangeLog = new ArrayCollection();
+        $this->leagueScores     = new ArrayCollection();
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -372,6 +379,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
             ->setIndexBy('channel')
             ->setOrderBy(['dateAdded' => 'DESC'])
             ->mappedBy('lead')
+            ->cascadeAll()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('leagueScores', 'Mautic\PointBundle\Entity\LeagueContactScore')
+            ->mappedBy('contact')
             ->cascadeAll()
             ->fetchExtraLazy()
             ->build();
@@ -1996,5 +2009,33 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         }
 
         return $rules;
+    }
+
+    /**
+     * @return LeagueContactScore[]
+     */
+    public function getLeagueScores()
+    {
+        return $this->leagueScores;
+    }
+
+    /**
+     * @param LeagueContactScore[] $leagueScores
+     */
+    public function setLeagueScores(array $leagueScores): void
+    {
+        $this->leagueScores = $leagueScores;
+    }
+
+    public function addLeagueScore(LeagueContactScore $leagueContactScore): Lead
+    {
+        $this->leagueScores[] = $leagueContactScore;
+
+        return $this;
+    }
+
+    public function removeLeagueScore(LeagueContactScore $leagueContactScore): void
+    {
+        $this->leagueScores->removeElement($leagueContactScore);
     }
 }
