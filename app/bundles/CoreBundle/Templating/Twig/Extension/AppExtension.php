@@ -9,21 +9,13 @@ use Twig\TwigTest;
 
 class AppExtension extends AbstractExtension
 {
-    public function getTests()
+    /**
+     * @return TwigTest[]
+     */
+    public function getTests(): array
     {
         return [
-            new TwigTest('instanceof', [$this, 'isinstanceof']),
-            new TwigTest('string', [$this, 'is_string']),
+            new TwigTest('string', fn ($value) => is_string($value)),
         ];
-    }
-
-    public function isInstanceof(mixed $var, string $instance): bool
-    {
-        return $var instanceof $instance;
-    }
-
-    public function is_string(mixed $value): bool
-    {
-        return is_string($value);
     }
 }
