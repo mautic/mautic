@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
-use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -53,14 +52,16 @@ trait FormThemeTrait
             }
         };
 
-        $findThemes($form, $formView);
+        //$findThemes($form, $formView);
 
         $themes   = (array) $themes;
         $themes[] = 'MauticCoreBundle:FormTheme\Custom';
         $themes   = array_values(array_unique(array_merge($themes, $fieldThemes)));
-        /** @var TwigEngine $templating */
-        //$templating->get('form')->setTheme($formView, $themes);
-        $templating->render('MauticEmailBundle:Email:form.html.twig', [$themes]);
+        /** @var TwigEngine $form */
+
+       // $form->setTheme($formView, $themes);
+//        $templating->render('MauticEmailBundle:Email:form.html.twig', [$themes]);
+
         return $formView;
     }
 }

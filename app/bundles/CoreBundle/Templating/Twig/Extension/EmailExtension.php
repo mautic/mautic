@@ -37,7 +37,6 @@ class EmailExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('instanceof', [$this, 'isInstanceof']),
             new TwigFunction('parseBooleanList', [$this, 'parseBooleanList']),
             new TwigFunction('parseListForChoices', [$this, 'parseListForChoices']),
             new TwigFunction('fileExists', [$this, 'checkFileExists']),
@@ -71,16 +70,6 @@ class EmailExtension extends AbstractExtension
     public function checkFileExists(string $file): bool
     {
         return file_exists($file);
-    }
-
-    /**
-     * @param object $object
-     * @param object $class
-     * @return bool
-     */
-    public function isInstanceOf(object $object, object $class): bool
-    {
-        return $object instanceof $class;
     }
 
     /**

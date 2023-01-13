@@ -1,51 +1,3 @@
-{#{% block _leadlist_filters_entry_widget %}#}
-{#{% set first = true %}#}
-{#{% set isPrototype = ('__name__' == form.vars.name) %}#}
-{#{% set filterType = form.field.vars.value %}#}
-{#{% set filterGroup = form.object.vars.value %}#}
-{#{% set inGroup = (form.vars.data.glue is defined and 'and' === form.vars.data.glue) %}#}
-{#{% set isBehavior = fields.behaviors[filterType].label is defined %}#}
-{#{% set class = (form.vars.data.object is defined and form.vars.object is defined and 'company' == form.vars.object) ? 'fa-building' : 'fa-user' %}#}
-{#{% set objectIcon = (form.vars.data.object is defined and 'company' == form.vars.data.object) ? 'fa-building' : 'fa-user' %}#}
-
-{#{% if isBehavior %}#}
-{#    {% set object = 'behaviors' %}#}
-{#{% else %}#}
-{#    {% set object = (form.vars.data.object is defined) ? form.vars.data.object : 'lead' %}#}
-{#{% endif %}#}
-
-{#<div class="panel {{ (isPrototype or (inGroup and not first)) ? ' in-group' : '' }}">#}
-{#    <div class="panel-footer {% if not isPrototype and '0' === form.vars.name %} {{ ' hide' }} {% endif %}">#}
-{#        <div class="col-sm-2 pl-0">#}
-{#            {{ form_widget(form.glue) }}#}
-{#        </div>#}
-{#    </div>#}
-{#    <div class="panel-body">#}
-{#        <div class="col-xs-6 col-sm-3 field-name">#}
-{#            <i class="object-icon fa {{ objectIcon }}"></i> <span>{{ (isPrototype) ? '__label__' : form.parent.parent.vars.fields.[filterGroup].[filterType].label }}</span>#}
-{#        </div>#}
-
-{#        <div class="col-xs-6 col-sm-3 padding-none">#}
-{#            {{ form_widget(form.operator) }}#}
-{#        </div>#}
-
-{#        {% set hasErrors = form.filter.vars.errors|length or form.display.vars.errors|length %}#}
-{#        <div class="col-xs-10 col-sm-5 padding-none {% if hasErrors %} {{ ' has-error' }}{% endif %}">#}
-{#            {{ form_widget(form.filter) }}#}
-{#            {{ form_errors(form.filter) }}#}
-{#            {{ form_widget(form.display) }}#}
-{#            {{ form_errors(form.display) }}#}
-{#        </div>#}
-
-{#        <div class="col-xs-2 col-sm-1">#}
-{#            <a href="javascript: void(0);" class="remove-selected btn btn-default text-danger pull-right"><i class="fa fa-trash-o"></i></a>#}
-{#        </div>#}
-{#        {{ form_widget(form.field) }}#}
-{#        {{ form_widget(form.type) }}#}
-{#        {{ form_widget(form.object) }}#}
-{#    </div>#}
-{#</div>#}
-
 {#
 Variables
   - form
@@ -65,12 +17,6 @@ Variables
   {% else %}
       {% set object = (form.vars.data.object is defined) ? form.vars.data.object : 'lead' %}
   {% endif %}
-
-{#
-if (!$isPrototype && !isset($fields[$object][$filterType]['label'])) {
-    return;
-}
-#}
 <div class="panel {% if inGroup and false == first %}in-group{% endif %}" id="{{ id }}">
     <div class="panel-heading {% if not isPrototype and '0' == form.vars.name %}hide{% endif %}">
         <div class="panel-glue col-sm-2 pl-0 ">

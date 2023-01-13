@@ -16,6 +16,17 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigTest('string', fn ($value) => is_string($value)),
+            new TwigTest('instanceof', [$this, 'isinstanceof']),
         ];
+    }
+
+    /**
+     * @param object $object
+     * @param object $class
+     * @return bool
+     */
+    public function isInstanceOf(object $object, object $class): bool
+    {
+        return $object instanceof $class;
     }
 }
