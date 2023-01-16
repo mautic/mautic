@@ -1,19 +1,9 @@
 <?php
-/**
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @see        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
-/*
- * Common file for preparing an installation package
- */
+echo "Removing extra files\n";
+// Common file for preparing an installation package
 
 // Step 4 - Remove stuff that shouldn't be distro'ed
-echo "Removing extra files\n";
 chdir($baseDir.'/packaging');
 
 system('rm -f app/phpunit.*');
@@ -35,8 +25,8 @@ system('rm -f app/config/local*.php');
 system('rm -f app/config/routing_dev.php');
 system('rm -f app/config/security_test.php');
 
-// babdev/transifex
-system('rm -f vendor/babdev/transifex/.scrutinizer.yml');
+// mautic/transifex
+system('rm -f vendor/mautic/transifex/.scrutinizer.yml');
 
 // doctrine/common
 system('rm -f vendor/doctrine/common/UPGRADE_TO*');
