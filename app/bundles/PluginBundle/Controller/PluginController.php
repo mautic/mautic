@@ -132,8 +132,10 @@ class PluginController extends FormController
     /**
      * @param string $name
      * @param string $activeTab
-     * @param int $page
+     * @param int    $page
+     *
      * @return JsonResponse|Response
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */

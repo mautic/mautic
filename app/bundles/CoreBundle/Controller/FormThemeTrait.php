@@ -15,10 +15,7 @@ trait FormThemeTrait
      * Sets a specific theme for the form.
      *
      * @param FormInterface<object> $form
-     * @param string $template
-     * @param mixed $themes
-     *
-     * @return FormView
+     * @param mixed                 $themes
      *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

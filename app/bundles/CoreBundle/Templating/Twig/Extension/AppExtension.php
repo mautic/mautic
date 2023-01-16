@@ -20,11 +20,6 @@ class AppExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param object $object
-     * @param object $class
-     * @return bool
-     */
     public function isInstanceOf(object $object, object $class): bool
     {
         return $object instanceof $class;

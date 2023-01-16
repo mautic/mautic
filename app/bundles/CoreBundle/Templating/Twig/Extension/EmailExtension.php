@@ -48,27 +48,17 @@ class EmailExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     public function getUrl(string $path): string
     {
         return $this->helper->getUrl($path);
     }
 
-    /**
-     * @param string $file
-     * @return bool
-     */
     public function checkFileExists(string $file): bool
     {
         return file_exists($file);
     }
 
     /**
-     * @param string $string
-     * @param int $length
      * @return false|string
      */
     public function truncate(string $string, int $length)
@@ -80,6 +70,7 @@ class EmailExtension extends AbstractExtension
      * Same as parseList method above but it will return labels as keys.
      *
      * @param mixed[] $list
+     *
      * @return mixed[]|string[]
      */
     public function parseListForChoices(array $list): array
@@ -100,7 +91,7 @@ class EmailExtension extends AbstractExtension
 
     /**
      * @param mixed[] $list
-     * @param bool $labelsAsKeys
+     *
      * @return mixed[]|string[]
      */
     public function parseChoiceList(array $list, bool $labelsAsKeys = false): array
@@ -142,9 +133,7 @@ class EmailExtension extends AbstractExtension
 
     /**
      * @param mixed[] $choices
-     * @param string $label
-     * @param string $value
-     * @param bool $labelsAsKeys
+     *
      * @return mixed[]
      */
     private function appendChoice(array $choices, string $label, string $value, bool $labelsAsKeys = false): array
@@ -162,8 +151,9 @@ class EmailExtension extends AbstractExtension
     }
 
     /**
-     * @param mixed $list
+     * @param mixed                 $list
      * @param ListParserInterface[] $parsers
+     *
      * @return mixed[]
      */
     private static function parseListsWithParsers($list, array $parsers): array
