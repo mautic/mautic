@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
+use Mautic\CoreBundle\Helper\AbstractFormFieldHelper;
 use Mautic\CoreBundle\Helper\ListParser\ArrayListParser;
 use Mautic\CoreBundle\Helper\ListParser\BarListParser;
 use Mautic\CoreBundle\Helper\ListParser\Exception\FormatNotSupportedException;
@@ -17,15 +18,8 @@ use Twig\TwigFunction;
 
 class EmailExtension extends AbstractExtension
 {
-
-    /**
-     * @var AssetsHelper
-     */
     protected AssetsHelper $helper;
 
-    /**
-     * @param AssetsHelper $helper
-     */
     public function __construct(AssetsHelper $helper)
     {
         $this->helper = $helper;
@@ -37,20 +31,11 @@ class EmailExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('parseBooleanList', [$this, 'parseBooleanList']),
+            new TwigFunction('parseBooleanList', [AbstractFormFieldHelper::class, 'parseBooleanList']),
             new TwigFunction('parseListForChoices', [$this, 'parseListForChoices']),
             new TwigFunction('fileExists', [$this, 'checkFileExists']),
             new TwigFunction('getUrl', [$this, 'getUrl']),
         ];
-    }
-
-    /**
-     * @param string $path
-     * @return string
-     */
-    public function getUrl(string $path): string
-    {
-        return $this->helper->getUrl($path);
     }
 
     /**
@@ -61,6 +46,15 @@ class EmailExtension extends AbstractExtension
         return [
             new TwigFilter('truncate', [$this, 'truncate']),
         ];
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     */
+    public function getUrl(string $path): string
+    {
+        return $this->helper->getUrl($path);
     }
 
     /**
@@ -75,21 +69,20 @@ class EmailExtension extends AbstractExtension
     /**
      * @param string $string
      * @param int $length
-     * @return bool
+     * @return false|string
      */
-    public function truncate(string $string, int $length): bool
+    public function truncate(string $string, int $length)
     {
-        return substr($string,0, $length);
+        return substr($string, 0, $length);
     }
 
     /**
      * Same as parseList method above but it will return labels as keys.
      *
-     * @param mixed $list
-     *
-     * @return array
+     * @param mixed[] $list
+     * @return mixed[]|string[]
      */
-    public function parseListForChoices($list): array
+    public function parseListForChoices(array $list): array
     {
         return self::parseChoiceList(
             self::parseListsWithParsers(
@@ -106,31 +99,17 @@ class EmailExtension extends AbstractExtension
     }
 
     /**
-     * @param mixed $list
-     *
-     * @return array
+     * @param mixed[] $list
+     * @param bool $labelsAsKeys
+     * @return mixed[]|string[]
      */
-    public function parseBooleanList($list): array
-    {
-        return self::parseChoiceList(
-            self::parseListsWithParsers(
-                $list,
-                [
-                    new JsonListParser(),
-                    new BarListParser(),
-                    new ValueListParser(),
-                ]
-            )
-        );
-    }
-
     public function parseChoiceList(array $list, bool $labelsAsKeys = false): array
     {
         $choices = [];
         foreach ($list as $value => $label) {
             if (is_array($label) && array_key_exists('value', $label)) {
-                $value = $label['value'];
-                $label = $label['label'];
+                $value = $label['value'] ?? null;
+                $label = $label['label'] ?? null;
 
                 if ('' === $value || null === $value) {
                     // Value is empty which can't work as a key
@@ -142,7 +121,7 @@ class EmailExtension extends AbstractExtension
                 continue;
             }
 
-            if (('' === $label || null === $label) && ('' === $value || null === $value)) {
+            if ('' === $label && '' === $value) {
                 // Both label and value are empty which can't work as choices
                 continue;
             }
@@ -162,11 +141,11 @@ class EmailExtension extends AbstractExtension
     }
 
     /**
-     * @param array $choices
+     * @param mixed[] $choices
      * @param string $label
      * @param string $value
      * @param bool $labelsAsKeys
-     * @return array
+     * @return mixed[]
      */
     private function appendChoice(array $choices, string $label, string $value, bool $labelsAsKeys = false): array
     {
@@ -183,10 +162,9 @@ class EmailExtension extends AbstractExtension
     }
 
     /**
-     * @param mixed                 $list
+     * @param mixed $list
      * @param ListParserInterface[] $parsers
-     *
-     * @return array
+     * @return mixed[]
      */
     private static function parseListsWithParsers($list, array $parsers): array
     {
