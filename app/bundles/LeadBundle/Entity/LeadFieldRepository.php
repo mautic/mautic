@@ -15,10 +15,10 @@ class LeadFieldRepository extends CommonRepository
     /**
      * Retrieves array of aliases used to ensure unique alias for new fields.
      *
-     * @param $exludingId
-     * @param $publishedOnly
-     * @param $includeEntityFields
-     * @param string $object name of object using the custom fields
+     * @param int    $exludingId
+     * @param bool   $publishedOnly
+     * @param bool   $includeEntityFields
+     * @param string $object              name of object using the custom fields
      *
      * @return array
      */
@@ -71,7 +71,7 @@ class LeadFieldRepository extends CommonRepository
 
     /**
      * @param \Doctrine\ORM\QueryBuilder|\Doctrine\DBAL\Query\QueryBuilder $q
-     * @param                                                              $filter
+     * @param object                                                       $filter
      *
      * @return array
      */
@@ -173,7 +173,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return bool
      */
-    public function compareValue($lead, $field, $value, $operatorExpr)
+    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
@@ -204,19 +204,21 @@ class LeadFieldRepository extends CommonRepository
         } else {
             $property = $this->getPropertyByField($field, $q);
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
+                $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
+                $compositeExpression              = ('empty' === $operatorExpr) ?
+                    $q->expr()->orX(
+                         $q->expr()->isNull($property),
+                        $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
+                    )
+                    :
+                    $q->expr()->andX(
+                        $q->expr()->isNotNull($property),
+                        $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
+                    );
                 $q->where(
                     $q->expr()->andX(
                         $q->expr()->eq('l.id', ':lead'),
-                        ('empty' === $operatorExpr) ?
-                            $q->expr()->orX(
-                                $q->expr()->isNull($property),
-                                $q->expr()->eq($property, $q->expr()->literal(''))
-                            )
-                        :
-                        $q->expr()->andX(
-                            $q->expr()->isNotNull($property),
-                            $q->expr()->neq($property, $q->expr()->literal(''))
-                        )
+                        $compositeExpression
                     )
                 )
                   ->setParameter('lead', (int) $lead);
