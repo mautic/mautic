@@ -45,7 +45,7 @@
     {{ form_rest(form) }}
 </div>
 
-{% if updateSelect is defined and updateSelect is not empty and not isExisting and not formContainsErrors(form) or type is empty %}
+{% if (updateSelect is not defined or updateSelect is empty) and not isExisting and not formContainsErrors(form) or type is empty %}
     {{- include('MauticCoreBundle:Helper:form_selecttype.html.twig',
         {
             'item'       : sms,
