@@ -12,8 +12,12 @@ return function (ContainerConfigurator $configurator) {
         ->autoconfigure()
         ->public();
 
+    $excludes = [
+        'Controller', // Enabling this will require to refactor all controllers to use DI.
+    ];
+
     $services->load('Mautic\\ConfigBundle\\', '../')
-        ->exclude('../{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+        ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->get(\Mautic\ConfigBundle\Form\Type\EscapeTransformer::class)->arg('$allowedParameters', '%mautic.config_allowed_parameters%');
     $services->get(\Mautic\ConfigBundle\Form\Helper\RestrictionHelper::class)->arg('$restrictedFields', '%mautic.security.restrictedConfigFields%');

@@ -5,6 +5,7 @@ namespace Mautic\UserBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -51,7 +52,7 @@ class UserApiController extends CommonApiController
     /**
      * Creates a new user.
      */
-    public function newEntityAction()
+    public function newEntityAction(Request $request)
     {
         $entity = $this->model->getEntity();
 
@@ -59,7 +60,7 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
@@ -67,7 +68,7 @@ class UserApiController extends CommonApiController
             $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
         }
 
-        return $this->processForm($entity, $parameters, 'POST');
+        return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
     /**
@@ -79,11 +80,11 @@ class UserApiController extends CommonApiController
      *
      * @throws NotFoundHttpException
      */
-    public function editEntityAction($id)
+    public function editEntityAction(Request $request, $id)
     {
         $entity     = $this->model->getEntity($id);
-        $parameters = $this->request->request->all();
-        $method     = $this->request->getMethod();
+        $parameters = $request->request->all();
+        $method     = $request->getMethod();
 
         if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
             return $this->accessDenied();
@@ -122,7 +123,7 @@ class UserApiController extends CommonApiController
             }
         }
 
-        return $this->processForm($entity, $parameters, $method);
+        return $this->processForm($request, $entity, $parameters, $method);
     }
 
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -154,14 +155,14 @@ class UserApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
      */
-    public function isGrantedAction($id)
+    public function isGrantedAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
             return $this->notFound();
         }
 
-        $permissions = $this->request->request->get('permissions');
+        $permissions = $request->request->get('permissions');
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
@@ -180,7 +181,7 @@ class UserApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getRolesAction()
+    public function getRolesAction(Request $request)
     {
         if (!$this->get('mautic.security')->isGranted(
             ['user:users:create', 'user:users:edit'],
@@ -190,8 +191,8 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $this->request->query->get('filter', null);
-        $limit  = $this->request->query->get('limit', null);
+        $filter = $request->query->get('filter', null);
+        $limit  = $request->query->get('limit', null);
         $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);

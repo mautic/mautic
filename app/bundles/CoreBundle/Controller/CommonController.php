@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -60,10 +61,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected $dispatcher;
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    protected Translator $translator;
 
     /**
      * @var FlashBag
@@ -104,7 +102,7 @@ class CommonController extends AbstractController implements MauticController
         $this->dispatcher = $dispatcher;
     }
 
-    public function setTranslator(TranslatorInterface $translator)
+    public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }
@@ -150,7 +148,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function getModel($modelNameKey)
     {
-        return $this->container->get('mautic.model.factory')->getModel($modelNameKey);
+        return $this->modelFactory->getModel($modelNameKey);
     }
 
     /**
@@ -450,12 +448,19 @@ class CommonController extends AbstractController implements MauticController
      * @param int    $objectSubId
      * @param string $objectModel
      *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     * @return Response
      */
-    public function executeAction($objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
+    public function executeAction(Request $request, $objectAction, $objectId = 0, $objectSubId = 0, $objectModel = '')
     {
-        if (method_exists($this, "{$objectAction}Action")) {
-            return $this->{"{$objectAction}Action"}($objectId, $objectModel);
+        if (method_exists($this, $objectAction . 'Action')) {
+            return $this->forward(
+                static::class . '::'.$objectAction.'Action',
+                [
+                    'objectId' => $objectId,
+                    'objectModel' => $objectModel,
+                ],
+                $request->query->all()
+            );
         }
 
         return $this->notFound();

@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -326,7 +327,7 @@ class FormModel extends AbstractCommonModel
      * Creates the appropriate form per the model.
      *
      * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
+     * @param FormFactoryInterface $formFactory
      * @param string|null                         $action
      * @param array                               $options
      *
@@ -334,7 +335,7 @@ class FormModel extends AbstractCommonModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }

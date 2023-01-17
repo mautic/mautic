@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\DependencyInjection\Container;
@@ -40,7 +41,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translatorMock       = $this->createMock(TranslatorInterface::class);
+        $this->translatorMock       = $this->createMock(Translator::class);
         $this->sessionMock          = $this->createMock(Session::class);
         $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
         $this->containerMock        = $this->createMock(Container::class);

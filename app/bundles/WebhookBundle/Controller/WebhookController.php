@@ -3,13 +3,17 @@
 namespace Mautic\WebhookBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Class WebhookController.
  */
 class WebhookController extends FormController
 {
-    public function __construct()
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
     {
         $this->setStandardParameters(
             'webhook.webhook', // model name
@@ -21,6 +25,8 @@ class WebhookController extends FormController
             'mautic_webhook', // activeLink
             'mauticWebhook' // mauticContent
         );
+
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
     }
 
     /**

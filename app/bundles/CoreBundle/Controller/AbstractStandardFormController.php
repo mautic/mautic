@@ -3,15 +3,30 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
+
+    protected FormFactoryInterface $formFactory;
+
+    protected FormFieldHelper $fieldHelper;
+
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
+    {
+        $this->formFactory = $formFactory;
+        $this->fieldHelper = $fieldHelper;
+
+        parent::__construct($security, $userHelper);
+    }
 
     /**
      * Get this controller's model name.

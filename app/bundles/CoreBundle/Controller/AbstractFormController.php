@@ -2,6 +2,9 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
@@ -11,6 +14,16 @@ abstract class AbstractFormController extends CommonController
     use FormThemeTrait;
 
     protected $permissionBase;
+
+    protected CorePermissions $security;
+
+    protected UserHelper $userHelper;
+
+    public function __construct(CorePermissions $security, UserHelper $userHelper)
+    {
+        $this->security = $security;
+        $this->userHelper = $userHelper;
+    }
 
     /**
      * @param $id
@@ -68,7 +81,7 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase   = $modelClass->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            $override = $this->get('translator')->trans(
+            $override = $this->translator->trans(
                 'mautic.core.override.lock',
                 [
                     '%url%' => $this->generateUrl(
@@ -128,7 +141,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormCancelled(Form $form)
+    protected function isFormCancelled(FormInterface $form)
     {
         $formData = $this->request->request->get($form->getName());
 
@@ -154,7 +167,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(FormInterface $form, array $data = null)
     {
         //bind request to the form
         $form->handleRequest($this->request);
@@ -172,8 +185,6 @@ abstract class AbstractFormController extends CommonController
      */
     protected function canEdit($entity = null)
     {
-        $security = $this->get('mautic.security');
-
         if ($this->permissionBase) {
             $permissionBase = $this->permissionBase;
         } else {
@@ -181,20 +192,20 @@ abstract class AbstractFormController extends CommonController
         }
 
         if ($permissionBase) {
-            if ($entity && $security->checkPermissionExists($permissionBase.':editown')) {
-                return $security->hasEntityAccess(
+            if ($entity && $this->security->checkPermissionExists($permissionBase.':editown')) {
+                return $this->security->hasEntityAccess(
                     $permissionBase.':editown',
                     $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
-                return $security->isGranted(
+            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+                return $this->security->isGranted(
                     $permissionBase.':edit'
                 );
             }
         }
 
-        return $this->get('mautic.helper.user')->getUser()->isAdmin();
+        return $this->userHelper->getUser()->isAdmin();
     }
 
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)

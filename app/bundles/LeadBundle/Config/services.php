@@ -13,6 +13,7 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
+        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'Deduplicate/Exception',
         'Field/DTO',
         'Field/Event',
@@ -27,6 +28,9 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\LeadBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\LeadBundle\\Controller\\Api\\', '../Controller/Api')
+        ->tag('controller.service_arguments');
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php');
     $services->alias('mautic.lead.model.lead', \Mautic\LeadBundle\Model\LeadModel::class);

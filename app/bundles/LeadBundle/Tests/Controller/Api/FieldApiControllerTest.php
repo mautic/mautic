@@ -2,8 +2,13 @@
 
 namespace Mautic\LeadBundle\Tests\Controller\Api;
 
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\Api\FieldApiController;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class FieldApiControllerTest extends CampaignTestAbstract
@@ -52,7 +57,13 @@ class FieldApiControllerTest extends CampaignTestAbstract
 
     protected function getResultFromProtectedMethod($method, array $args, Request $request = null)
     {
-        $controller = new FieldApiController();
+        $controller = new FieldApiController(
+            $this->createMock(CorePermissions::class),
+            $this->createMock(Translator::class),
+            $this->createMock(EntityResultHelper::class),
+            $this->createMock(Router::class),
+            $this->createMock(FormFactoryInterface::class)
+        );
 
         if ($request) {
             $controller->setRequest($request);

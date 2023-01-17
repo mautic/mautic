@@ -12,8 +12,15 @@ return function (ContainerConfigurator $configurator) {
         ->autoconfigure()
         ->public();
 
+    $excludes = [
+        //'Controller/*.php', // Enabling this will require to refactor all controllers to use DI.
+    ];
+
     $services->load('Mautic\\UserBundle\\', '../')
-        ->exclude('../{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+        ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\UserBundle\\Controller\\Api\\', '../Controller/Api')
+        ->tag('controller.service_arguments');
 
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php');
 

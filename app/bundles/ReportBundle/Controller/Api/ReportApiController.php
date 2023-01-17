@@ -17,11 +17,6 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 class ReportApiController extends CommonApiController
 {
     /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
      * @var ReportModel|null
      */
     protected $model = null;
@@ -36,7 +31,6 @@ class ReportApiController extends CommonApiController
         $this->entityNameOne    = 'report';
         $this->entityNameMulti  = 'reports';
         $this->serializerGroups = ['reportList', 'reportDetails'];
-        $this->formFactory      = $this->container->get('form.factory');
 
         parent::initialize($event);
     }

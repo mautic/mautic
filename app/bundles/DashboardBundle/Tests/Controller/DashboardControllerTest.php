@@ -7,6 +7,7 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -34,7 +35,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private $securityMock;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translatorMock;
 
@@ -79,7 +80,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->requestMock        = $this->createMock(Request::class);
         $this->securityMock       = $this->createMock(CorePermissions::class);
-        $this->translatorMock     = $this->createMock(TranslatorInterface::class);
+        $this->translatorMock     = $this->createMock(Translator::class);
         $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);

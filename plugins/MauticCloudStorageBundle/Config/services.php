@@ -12,6 +12,10 @@ return function (ContainerConfigurator $configurator) {
         ->autoconfigure()
         ->public();
 
+    $excludes = [
+        'Controller', // Enabling this will require to refactor all controllers to use DI.
+    ];
+
     $services->load('MauticPlugin\\MauticCloudStorageBundle\\', '../')
-        ->exclude('../{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+        ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 };

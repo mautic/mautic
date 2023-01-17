@@ -6,6 +6,7 @@ use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Model\FieldModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -68,9 +69,9 @@ class FieldApiController extends CommonApiController
      *
      * @return array
      */
-    protected function getWhereFromRequest()
+    protected function getWhereFromRequest(Request $request)
     {
-        $where = parent::getWhereFromRequest();
+        $where = parent::getWhereFromRequest($request);
 
         $where[] = [
             'col'  => 'object',

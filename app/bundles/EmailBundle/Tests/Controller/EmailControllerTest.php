@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -25,7 +26,7 @@ use Twig\Environment;
 class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translatorMock;
 
@@ -98,7 +99,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translatorMock       = $this->createMock(TranslatorInterface::class);
+        $this->translatorMock       = $this->createMock(Translator::class);
         $this->sessionMock          = $this->createMock(Session::class);
         $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
         $this->containerMock        = $this->createMock(Container::class);

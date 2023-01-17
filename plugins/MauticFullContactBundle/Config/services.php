@@ -13,6 +13,7 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
+        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'Services',
     ];
 
