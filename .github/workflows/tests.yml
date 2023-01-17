@@ -45,7 +45,7 @@ jobs:
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       # Codecov needs access to previous commits, so we add fetch-depth: 0
       with:
         fetch-depth: 0
@@ -91,7 +91,7 @@ jobs:
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -105,7 +105,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
         path: ./var/logs/*
@@ -124,7 +124,7 @@ jobs:
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -137,7 +137,7 @@ jobs:
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v18.7
+      uses: tj-actions/changed-files@v35
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
