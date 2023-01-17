@@ -215,10 +215,10 @@
     </div>
     {{ form_end(form) }}
     <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|escape }}"></div>
-    {% if filterBlockPrototype is instanceof(FormView) %}
+    {% if filterBlockPrototype is instanceof('\Symfony\Component\Form\FormView') %}
         <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|escape }}"></div>
     {% endif %}
-    {% if filterSelectPrototype is instanceof(FormView) %}
+    {% if filterSelectPrototype is instanceof('\Symfony\Component\Form\FormView') %}
         <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|escape }}"></div>
     {% endif %}
     <div class="hide" id="templates">
