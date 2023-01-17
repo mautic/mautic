@@ -93,6 +93,6 @@ jobs:
 
             # Sync commits and tags for the configured subtree splits
             -   name: subtree split
-                uses: acrobat/subtree-splitter@v1.0.0
+                uses: acrobat/subtree-splitter@v1.1.3
                 with:
                     config-path: .github/workflows/gitsplit/${{ matrix.config }}.json # Reference the location where you saved your config file

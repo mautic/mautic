@@ -32,10 +32,6 @@ $container->loadFromExtension('framework', [
 
 $container->setParameter('mautic.famework.csrf_protection', true);
 
-$container
-    ->register('mautic_integration.pipedrive.guzzle.client', Client::class)
-    ->setPublic(true);
-
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
     'intercept_redirects' => false,
