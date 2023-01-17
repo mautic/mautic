@@ -282,7 +282,8 @@ export default class BuilderService {
     const richTextEditor = this.editor.RichTextEditor;
 
     if (!richTextEditor) {
-      throw new Error('No RichTextEditor found');
+      console.error('No RichTextEditor found');
+      return;
     }
 
     if (richTextEditor.customRte) {
