@@ -215,10 +215,10 @@
     </div>
     {{ form_end(form) }}
     <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|escape }}"></div>
-    {% if instanceof(filterBlockPrototype, FormView)%}
+    {% if filterBlockPrototype is instanceof(FormView) %}
         <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|escape }}"></div>
     {% endif %}
-    {% if instanceof(filterSelectPrototype, FormView) %}
+    {% if filterSelectPrototype is instanceof(FormView) %}
         <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|escape }}"></div>
     {% endif %}
     <div class="hide" id="templates">
