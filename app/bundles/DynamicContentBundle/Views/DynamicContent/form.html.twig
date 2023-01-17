@@ -87,10 +87,11 @@
                                 <div class="col-xs-7">
                                     <label>{% trans %}Filters{% endtrans %}</label>
                                 </div>
-                            
                                 <div class="col-xs-5">
                                     <div class="form-group">
-                                        <div class="available-filters mb-md pl-0" data-prototype="{{ form_widget(form.filters.vars.prototype)|escape }}" data-index="{{ index + 1 }}">
+                                        <div class="available-filters mb-md pl-0"
+                                             data-prototype="{{ form_widget(form['filters'].vars['prototype'])|escape }}"
+                                             data-index="{{ index + 1 }}">
                                             <select class="chosen form-control" id="available_filters">
                                                 <option value=""></option>
                                                 {% for object, field in fields %}
@@ -100,10 +101,17 @@
                                                         {% for value, params in field %}
                                                             {% set list = params.properties.list is defined ? params.properties.list : [] %}
                                                             {% set choices = 'boolean' == params.properties.type ? list|parseBooleanList|reverse : list|parseListForChoices %}
-                                                            {% set listJson = list|json_encode() %}
+                                                            {% set list = choices|json_encode() %}
                                                             {% set callback = params.properties.callback is defined and params.properties.callback is not empty ? params.properties.callback : '' %}
-                                                            {% set operators = params.properties.operators is defined and params.properties.operators is not empty ? params.properties.operators|json_encode() : '' %}
-                                                            <option value="{{ value|escape }}" id="available_{{ object ~ '_' ~ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-list="{{ listJson|escape }}" data-field-callback="{{ callback }}" data-field-operators="{{ operators }}" class="segment-filter {{ icon }}">
+                                                            {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                                                            <option value="{{ value|escape }}"
+                                                                    id="available_{{ object ~ '_' ~ value }}"
+                                                                    data-field-object="{{ object }}"
+                                                                    data-field-type="{{ params.properties.type }}"
+                                                                    data-field-list="{{ list|escape }}"
+                                                                    data-field-callback="{{ callback }}"
+                                                                    data-field-operators="{{ operators }}"
+                                                                    class="segment-filter {{ icon }}">
                                                                 {{ params.label|trans }}
                                                             </option>
                                                         {% endfor %}
@@ -164,8 +172,9 @@
 
 <div class="hide" id="templates">
     {% for dataKey, template in templates %}
-        {% set attr = ('tags' == dataKey) ? : ' data-placeholder="' ~ 'mautic.lead.tags.select_or_create'|trans ~ '" data-no-results-text="' ~ 'mautic.lead.tags.enter_to_create'|trans ~ '" data-allow-add="true" onchange="Mautic.createLeadTag(this)"' %} 
-        
+        {% set select_or_create = 'mautic.lead.tags.select_or_create'|trans %}
+        {% set enter_to_create = 'mautic.lead.tags.enter_to_create'|trans %}
+        {% set attr = ('tags' == dataKey) ? " data-placeholder=\"#{select_or_create}\" data-no-results-text=\"#{enter_to_create}\" data-allow-add=\"true\" onchange=\"Mautic.createLeadTag(this)\"" : "" %}
         <select class="form-control not-chosen {{ template }}" name="dwc[filters][__name__][filter]" id="dwc_filters___name___filter" {{ attr }}>
             {% if form.vars[dataKey] is defined %}
                 {% for value, label in form.vars[dataKey] %}
@@ -179,7 +188,7 @@
                         {% if 'lists' == dataKey and currentListId is defined and value == currentListId %}
                             
                         {% else %}
-                            <option value="{{ value }}">$label</option>
+                            <option value="{{ value }}">{{ label }}</option>
                         {% endif %}
                     {% endif %}
                 {% endfor %}

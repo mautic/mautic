@@ -217,7 +217,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $form->createView(), //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
                 'passthroughVars' => $passthrough,
@@ -322,7 +322,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $form->createView(), //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form'          => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                     'currentListId' => $objectId,
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
