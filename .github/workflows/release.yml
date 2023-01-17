@@ -33,7 +33,7 @@ jobs:
 
     - name: Get tag name
       id: get-mautic-version
-      run: echo "::set-output name=version::${GITHUB_REF/refs\/tags\//}"
+      run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
     - name: Check if tag name matches version in release_metadata.json
       run: |
@@ -69,7 +69,7 @@ jobs:
           PRERELEASE=true
         fi
 
-        echo "::set-output name=is-prerelease::${PRERELEASE}"
+        echo "is-prerelease=${PRERELEASE}" >> $GITHUB_OUTPUT
 
     - name: Create Release
       id: create_release
