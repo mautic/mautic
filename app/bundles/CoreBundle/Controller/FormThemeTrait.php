@@ -24,7 +24,7 @@ trait FormThemeTrait
         $formView = $form->createView();
 
         $templating = $this->container->get('mautic.helper.templating')->getTemplating();
-        $helper = null;
+        $helper     = null;
 
         if ($templating instanceof DelegatingEngine) {
             $templating = $templating->getEngine($template);
@@ -32,7 +32,7 @@ trait FormThemeTrait
 
         if ($templating instanceof PhpEngine) {
             $helper = $templating->get('form');
-        } else if ($templating instanceof TwigEngine) {
+        } elseif ($templating instanceof TwigEngine) {
             $helper = $this->container->get('templating.helper.form');
         }
 

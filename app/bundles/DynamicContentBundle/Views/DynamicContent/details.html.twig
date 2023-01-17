@@ -213,7 +213,7 @@
             <!-- #translation-container -->
             {% if showTranslations is defined and showTranslations is not empty %}
                 <div class="tab-pane bdr-w-0" id="translation-container">
-                    {{ translationContent }}
+                    {{ translationContent|raw }}
                 </div>
             {% endif %}
             <!--/ #translation-container -->

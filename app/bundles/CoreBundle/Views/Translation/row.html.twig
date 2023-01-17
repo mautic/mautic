@@ -11,24 +11,26 @@
                         'size': '',
                         'query': 'size=',
                     }
-                )}}
+                ) }}
             </h3>
         </div>
         <div class="col-md-7 va-m">
             <h5 class="fw-sb text-primary">
-                <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': translation.getId()}) }}" data-toggle="ajax">
-                    <span>{{ translation[nameGetter]() }}</span>
+                <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': translation.getId()}) }}"
+                   data-toggle="ajax">
+                    {% set translation_getter = attribute(translation, nameGetter) %}
+                    <span>{{ translation_getter }}</span>
                 </a>
-               {% if isCurrent %}
+                {% if isCurrent %}
                     <span class="label label-success">{{ 'mautic.core.current'|trans }}</span>
                 {% endif %}
                 {% if translations.parent.getId() == translation.getId() %}
                     <span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
                 {% endif %}
             </h5>
-            {% attribute(translation, 'getAlias') is defined %}
-                <span class="text-white dark-sm">{{ translation.getAlias() }}</span>
-            {% endif %}
+            {# {% if attribute(translation, 'getAlias') is defined %}
+            <span class="text-white dark-sm">{{ translation.getAlias() }}</span>
+            {% endif %} #}
         </div>
         <div class="col-md-4 va-m text-right">
             <em class="text-white dark-sm">{{ translation.getLanguage() }}</em>
