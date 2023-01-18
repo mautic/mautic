@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -14,6 +15,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -63,6 +65,10 @@ class CommonController extends AbstractController implements MauticController
 
     protected Translator $translator;
 
+    protected ContainerBagInterface $parametersContainer;
+
+    private TemplatingHelper $templatingHelper;
+
     /**
      * @var FlashBag
      */
@@ -110,6 +116,16 @@ class CommonController extends AbstractController implements MauticController
     public function setFlashBag(FlashBag $flashBag)
     {
         $this->flashBag = $flashBag;
+    }
+
+    public function setParametersContainer(ContainerBagInterface $parametersContainer): void
+    {
+        $this->parametersContainer = $parametersContainer;
+    }
+
+    public function setTemplatingHelper(TemplatingHelper $templatingHelper): void
+    {
+        $this->templatingHelper = $templatingHelper;
     }
 
     public function initialize(ControllerEvent $event)

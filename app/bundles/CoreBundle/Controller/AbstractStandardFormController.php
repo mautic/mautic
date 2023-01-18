@@ -192,9 +192,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function checkActionPermission($action, $entity = null, $objectId = null)
     {
-        /** @var CorePermissions $security */
-        $security = $this->get('mautic.security');
-
         $permissionUser = 0;
 
         if ($entity) {
@@ -204,31 +201,31 @@ abstract class AbstractStandardFormController extends AbstractFormController
         if ($entity) {
             switch ($action) {
                 case 'new':
-                    return $security->isGranted($this->getPermissionBase().':create');
+                    return $this->security->isGranted($this->getPermissionBase().':create');
                 case 'view':
                 case 'index':
-                    return ($entity) ? $security->hasEntityAccess(
+                    return ($entity) ? $this->security->hasEntityAccess(
                         $this->getPermissionBase().':viewown',
                         $this->getPermissionBase().':viewother',
                         $permissionUser
-                    ) : $security->isGranted($this->getPermissionBase().':view');
+                    ) : $this->security->isGranted($this->getPermissionBase().':view');
                 case 'clone':
                     return
-                        $security->isGranted($this->getPermissionBase().':create')
-                        && $this->get('mautic.security')->hasEntityAccess(
+                        $this->security->isGranted($this->getPermissionBase().':create')
+                        && $this->security->hasEntityAccess(
                             $this->getPermissionBase().':viewown',
                             $this->getPermissionBase().':viewother',
                             $permissionUser
                         );
                 case 'delete':
                 case 'batchDelete':
-                    return $this->get('mautic.security')->hasEntityAccess(
+                    return $this->security->hasEntityAccess(
                         $this->getPermissionBase().':deleteown',
                         $this->getPermissionBase().':deleteother',
                         $permissionUser
                     );
                 default:
-                    return $this->get('mautic.security')->hasEntityAccess(
+                    return $this->security->hasEntityAccess(
                         $this->getPermissionBase().':'.$action.'own',
                         $this->getPermissionBase().':'.$action.'other',
                         $permissionUser
@@ -237,19 +234,19 @@ abstract class AbstractStandardFormController extends AbstractFormController
         } else {
             switch ($action) {
                 case 'new':
-                    return $security->isGranted($this->getPermissionBase().':create');
+                    return $this->security->isGranted($this->getPermissionBase().':create');
                 case 'view':
                 case 'index':
-                    return $security->isGranted($this->getPermissionBase().':view');
+                    return $this->security->isGranted($this->getPermissionBase().':view');
                 case 'clone':
                     return
-                        $security->isGranted($this->getPermissionBase().':create')
-                        && $security->isGranted($this->getPermissionBase().':view');
+                        $this->security->isGranted($this->getPermissionBase().':create')
+                        && $this->security->isGranted($this->getPermissionBase().':view');
                 case 'delete':
                 case 'batchDelete':
-                    return $security->isGranted($this->getPermissionBase().':delete');
+                    return $this->security->isGranted($this->getPermissionBase().':delete');
                 default:
-                    return $security->isGranted($this->getPermissionBase().':'.$action);
+                    return $this->security->isGranted($this->getPermissionBase().':'.$action);
             }
         }
 
@@ -325,7 +322,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
             $model->deleteEntity($entity);
 
-            $identifier = $this->get('translator')->trans($entity->getName());
+            $identifier = $this->translator->trans($entity->getName());
             $flashes[]  = [
                 'type'    => 'notice',
                 'msg'     => 'mautic.core.notice.deleted',
@@ -413,7 +410,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $form    = $model->createForm($entity, $this->get('form.factory'), $action, $options);
+        $form    = $model->createForm($entity, $this->formFactory, $action, $options);
 
         $isPost = !$ignorePost && 'POST' == $this->request->getMethod();
         $this->beforeFormProcessed($entity, $form, 'edit', $isPost, $objectId, $isClone);
@@ -482,7 +479,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             } elseif ($valid) {
                 // Rebuild the form with new action so that apply doesn't keep creating a clone
                 $action = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'edit', 'objectId' => $entity->getId()]);
-                $form   = $model->createForm($entity, $this->get('form.factory'), $action);
+                $form   = $model->createForm($entity, $this->formFactory, $action);
                 $this->beforeFormProcessed($entity, $form, 'edit', false, $isClone);
             }
         } elseif (!$isClone) {
@@ -756,7 +753,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getTranslatedString($string)
     {
-        return $this->get('translator')->hasId($this->getTranslationBase().'.'.$string) ? $this->getTranslationBase()
+        return $this->translator->hasId($this->getTranslationBase().'.'.$string) ? $this->getTranslationBase()
             .'.'.$string : 'mautic.core.'.$string;
     }
 
@@ -832,7 +829,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $dateRangeValues = $this->request->$method->get('daterange', $this->get('session')->get($name, []));
         $this->get('session')->set($name, $dateRangeValues);
 
-        $dateRangeForm = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);
+        $dateRangeForm = $this->formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $returnUrl]);
         $dateFrom      = new \DateTime($dateRangeForm['date_from']->getData());
         $dateFrom->setTime(0, 0, 0);
         $dateTo = new \DateTime($dateRangeForm['date_to']->getData());
@@ -856,7 +853,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
     protected function indexStandard($page = null)
     {
         //set some permissions
-        $permissions = $this->get('mautic.security')->isGranted(
+        $permissions = $this->security->isGranted(
             [
                 $this->getPermissionBase().':view',
                 $this->getPermissionBase().':viewown',
@@ -993,7 +990,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
         $options = $this->getEntityFormOptions();
         $action  = $this->generateUrl($this->getActionRoute(), ['objectAction' => 'new']);
-        $form    = $model->createForm($entity, $this->get('form.factory'), $action, $options);
+        $form    = $model->createForm($entity, $this->formFactory, $action, $options);
 
         ///Check for a submitted form and process it
         $isPost = 'POST' === $this->request->getMethod();
@@ -1115,7 +1112,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);
-        $security = $this->get('mautic.security');
 
         if (null === $entity) {
             $page = $this->get('session')->get('mautic.'.$this->getSessionBase().'.page', 1);
@@ -1164,7 +1160,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 $itemName     => $entity,
                 'logs'        => $logs,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                'permissions' => $security->isGranted(
+                'permissions' => $this->security->isGranted(
                     [
                         $this->getPermissionBase().':view',
                         $this->getPermissionBase().':viewown',

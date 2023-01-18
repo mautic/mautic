@@ -11,8 +11,6 @@ use Symfony\Component\Form\FormInterface;
 
 abstract class AbstractFormController extends CommonController
 {
-    use FormThemeTrait;
-
     protected $permissionBase;
 
     protected CorePermissions $security;
