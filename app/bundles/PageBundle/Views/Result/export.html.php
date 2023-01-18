@@ -19,7 +19,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.page.resul
     <table class="table table-hover table-striped table-bordered pageresult-list">
         <thead>
         <tr>
-            <th class="col-pageresult-id"></th>
+            <th class="col-pageresult-id"><?php echo $view['translator']->trans('mautic.form.report.submission.id'); ?></th>
             <th class="col-pageresult-leadId"><?php echo $view['translator']->trans('mautic.lead.report.contact_id'); ?></th>
             <th class="col-pageresult-formId"><?php echo $view['translator']->trans('mautic.form.report.form_id'); ?></th>
             <th class="col-pageresult-date"><?php echo $view['translator']->trans('mautic.form.result.thead.date'); ?></th>
