@@ -14,7 +14,6 @@ return function (ContainerConfigurator $configurator) {
 
     $excludes = [
         'Api',
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
     ];
 
     $services->load('MauticPlugin\\MauticCitrixBundle\\', '../')

@@ -13,13 +13,15 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'PreferenceBuilder/ChannelPreferences.php',
         'PreferenceBuilder/PreferenceBuilder.php',
     ];
 
     $services->load('Mautic\\ChannelBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\ChannelBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
 
     $services->load('Mautic\\ChannelBundle\\Entity\\', '../Entity/*Repository.php');
 };
