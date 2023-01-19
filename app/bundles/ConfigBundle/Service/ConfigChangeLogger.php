@@ -14,7 +14,7 @@ class ConfigChangeLogger
     /**
      * Keys to remove from log.
      *
-     * @var array
+     * @var string[]
      */
     private $filterKeys = [
         'transifex_password',
@@ -22,20 +22,14 @@ class ConfigChangeLogger
         'mailer_is_owner',
     ];
 
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
+    private AuditLogModel $auditLogModel;
+
+    private IpLookupHelper $ipLookupHelper;
 
     /**
-     * @var IpLookupHelper
+     * @var mixed[]|null
      */
-    private $ipLookupHelper;
-
-    /**
-     * @var array
-     */
-    private $originalNormData;
+    private ?array $originalNormData = null;
 
     public function __construct(IpLookupHelper $ipLookupHelper, AuditLogModel $auditLogModel)
     {

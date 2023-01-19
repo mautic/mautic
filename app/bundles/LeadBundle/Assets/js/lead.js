@@ -1140,10 +1140,10 @@ Mautic.reloadLeadImportProgress = function() {
     }
 };
 
-Mautic.removeBounceStatus = function (el, dncId) {
+Mautic.removeBounceStatus = function (el, dncId, channel) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
-    Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+    Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });

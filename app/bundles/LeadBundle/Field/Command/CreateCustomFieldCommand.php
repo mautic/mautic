@@ -46,7 +46,7 @@ class CreateCustomFieldCommand extends Command
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(
                 <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
+The <info>%command.name%</info> command will create a column in a lead_fields table if the process should run in background.
 
 <info>php %command.full_name%</info>
 EOT

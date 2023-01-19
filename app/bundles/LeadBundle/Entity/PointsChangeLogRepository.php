@@ -5,6 +5,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<PointsChangeLog>
+ */
 class PointsChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;

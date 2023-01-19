@@ -37,69 +37,6 @@ return [
         ],
     ],
 
-    'services' => [
-        'events' => [
-            'mautic.config.subscriber' => [
-                'class'     => \Mautic\ConfigBundle\EventListener\ConfigSubscriber::class,
-                'arguments' => [
-                    'mautic.config.config_change_logger',
-                ],
-            ],
-        ],
-
-        'forms' => [
-            'mautic.form.type.config' => [
-                'class'     => \Mautic\ConfigBundle\Form\Type\ConfigType::class,
-                'arguments' => [
-                    'mautic.config.form.restriction_helper',
-                    'mautic.config.form.escape_transformer',
-                ],
-            ],
-        ],
-        'models' => [
-            'mautic.config.model.sysinfo' => [
-                'class'     => \Mautic\ConfigBundle\Model\SysinfoModel::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'mautic.helper.core_parameters',
-                    'translator',
-                    'doctrine.dbal.default_connection',
-                    'mautic.install.service',
-                    'mautic.install.configurator.step.check',
-                ],
-            ],
-        ],
-        'others' => [
-            'mautic.config.mapper' => [
-                'class'     => \Mautic\ConfigBundle\Mapper\ConfigMapper::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.config.form.restriction_helper' => [
-                'class'     => \Mautic\ConfigBundle\Form\Helper\RestrictionHelper::class,
-                'arguments' => [
-                    'translator',
-                    '%mautic.security.restrictedConfigFields%',
-                    '%mautic.security.restrictedConfigFields.displayMode%',
-                ],
-            ],
-            'mautic.config.config_change_logger' => [
-                'class'     => \Mautic\ConfigBundle\Service\ConfigChangeLogger::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.config.form.escape_transformer' => [
-                'class'     => \Mautic\ConfigBundle\Form\Type\EscapeTransformer::class,
-                'arguments' => [
-                    '%mautic.config_allowed_parameters%',
-                ],
-            ],
-        ],
-    ],
-
     'parameters' => [
         'config_allowed_parameters' => [
             'kernel.project_dir',

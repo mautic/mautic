@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -26,7 +27,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -54,7 +55,7 @@ class CoreSubscriber implements EventSubscriberInterface
     private $assetsHelper;
 
     /**
-     * @var AuthorizationChecker
+     * @var AuthorizationCheckerInterface
      */
     private $securityContext;
 
@@ -94,23 +95,32 @@ class CoreSubscriber implements EventSubscriberInterface
     private $factory;
 
     /**
+     * @var ModelFactory<object>
+     */
+    private $modelFactory;
+
+    /**
      * @var FlashBag
      */
     private $flashBag;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
         UserHelper $userHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
-        AuthorizationChecker $securityContext,
+        AuthorizationCheckerInterface $securityContext,
         UserModel $userModel,
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
         MauticFactory $factory,
+        ModelFactory $modelFactory,
         FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
@@ -125,6 +135,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->requestStack         = $requestStack;
         $this->formRepository       = $formRepository;
         $this->factory              = $factory;
+        $this->modelFactory         = $modelFactory;
         $this->flashBag             = $flashBag;
     }
 
@@ -227,6 +238,8 @@ class CoreSubscriber implements EventSubscriberInterface
             // set the factory for easy use access throughout the controllers
             // @deprecated To be removed in 3.0
             $controller[0]->setFactory($this->factory);
+
+            $controller[0]->setModelFactory($this->modelFactory);
 
             // set the user as well
             $controller[0]->setUser($this->userHelper->getUser());

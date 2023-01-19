@@ -2,10 +2,9 @@
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
 use Mautic\CoreBundle\Test\EnvLoader;
-use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -13,6 +12,20 @@ EnvLoader::load();
 // Define some constants from .env
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'cache'            => false,
+    'debug'            => '%kernel.debug%',
+    'strict_variables' => true,
+    'paths'            => [
+        '%kernel.project_dir%/app/bundles' => 'bundles',
+    ],
+    'form_themes' => [
+        // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
+]);
 
 $container->loadFromExtension('framework', [
     'test'    => true,
@@ -28,13 +41,16 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
+    'messenger' => [
+        'transports' => [
+            'email_transport' => [
+                'dsn'            => 'in-memory://',
+            ],
+        ],
+    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
-
-$container
-    ->register('mautic_integration.pipedrive.guzzle.client', Client::class)
-    ->setPublic(true);
 
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
@@ -136,11 +152,4 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
     ->setPublic(true);
 
 // HTTP client mock handler providing response queue
-$container->register('mautic.http.client.mock_handler', \GuzzleHttp\Handler\MockHandler::class)
-    ->setClass('\GuzzleHttp\Handler\MockHandler');
-
-// Stub Guzzle HTTP client to prevent accidental request to third parties
-$container->register('mautic.http.client', \GuzzleHttp\Client::class)
-    ->setPublic(true)
-    ->setFactory('\Mautic\CoreBundle\Test\Guzzle\ClientFactory::stub')
-    ->addArgument(new Reference('mautic.http.client.mock_handler'));
+$container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);

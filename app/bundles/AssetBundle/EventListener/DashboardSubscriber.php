@@ -80,7 +80,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -94,7 +94,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -140,7 +140,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
 
@@ -182,7 +182,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
     }

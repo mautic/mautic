@@ -3,9 +3,13 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\InputHelper;
 
+/**
+ * @extends CommonRepository<LeadField>
+ */
 class LeadFieldRepository extends CommonRepository
 {
     /**
@@ -84,7 +88,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return string[][]
      */
     protected function getDefaultOrder()
     {
@@ -163,8 +167,8 @@ class LeadFieldRepository extends CommonRepository
      * Compare a form result value with defined value for defined lead.
      *
      * @param int    $lead         ID
-     * @param int    $field        alias
-     * @param string $value        to compare with
+     * @param string $field        alias
+     * @param mixed  $value        to compare with
      * @param string $operatorExpr for WHERE clause
      *
      * @return bool
@@ -232,27 +236,44 @@ class LeadFieldRepository extends CommonRepository
                   ->setParameter('lead', (int) $lead)
                   ->setParameter('value', $value);
             } elseif ('in' === $operatorExpr || 'notIn' === $operatorExpr) {
-                $value = $q->expr()->literal(
-                    InputHelper::clean($value)
-                );
+                $property  = $this->getPropertyByField($field, $q);
+                $fieldType = $this->findOneBy(['alias' => $field])->getType();
+                $values    = (!is_array($value)) ? [$value] : $value;
 
-                $value = trim($value, "'");
-                if ('not' === substr($operatorExpr, 0, 3)) {
-                    $operator = 'NOT REGEXP';
+                if ('multiselect' == $fieldType) {
+                    // multiselect field values are separated by `|` and must be queried using regexp
+                    $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
+
+                    $expr = $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead')
+                    );
+
+                    // require all multiselect values in condition
+                    $andExpr = $q->expr()->andX();
+                    foreach ($value as $v) {
+                        $v = $q->expr()->literal(
+                            InputHelper::clean($v)
+                        );
+
+                        $v = trim($v, "'");
+                        $andExpr->add(
+                            $property." $operator '\\\\|?$v\\\\|?'"
+                        );
+                    }
+                    $expr->add($andExpr);
+
+                    $q->where($expr)
+                        ->setParameter('lead', (int) $lead);
                 } else {
-                    $operator = 'REGEXP';
+                    $expr = $q->expr()->andX(
+                        $q->expr()->eq('l.id', ':lead'),
+                        ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
+                    );
+
+                    $q->where($expr)
+                        ->setParameter('lead', (int) $lead)
+                        ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
                 }
-
-                $expr = $q->expr()->andX(
-                    $q->expr()->eq('l.id', ':lead')
-                );
-
-                $expr->add(
-                    $property." $operator '\\\\|?$value\\\\|?'"
-                );
-
-                $q->where($expr)
-                    ->setParameter('lead', (int) $lead);
             } else {
                 $expr = $q->expr()->andX(
                     $q->expr()->eq('l.id', ':lead')
@@ -380,5 +401,19 @@ class LeadFieldRepository extends CommonRepository
     public function getFieldsByType($type)
     {
         return $this->findBy(['type' => $type]);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getFieldSchemaData(string $object): array
+    {
+        return $this->_em->createQueryBuilder()
+            ->select('f.alias, f.label, f.type, f.isUniqueIdentifer')
+            ->from($this->_entityName, 'f', 'f.alias')
+            ->where('f.object = :object')
+            ->setParameter('object', $object)
+            ->getQuery()
+            ->execute();
     }
 }

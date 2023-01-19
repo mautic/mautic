@@ -7,11 +7,6 @@ return [
     'author'      => 'Mautic',
 
     'services' => [
-        'events' => [
-            'mautic.cloudstorage.remoteassetbrowse.subscriber' => [
-                'class' => \MauticPlugin\MauticCloudStorageBundle\EventListener\RemoteAssetBrowseSubscriber::class,
-            ],
-        ],
         'integrations' => [
             'mautic.integration.amazons3' => [
                 'class'     => \MauticPlugin\MauticCloudStorageBundle\Integration\AmazonS3Integration::class,
