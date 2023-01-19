@@ -8,7 +8,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
 class FilesystemTagAwareAdapter extends TagAwareAdapter
 {
-    public function __construct(?string $prefix, int $lifetime = 0, $directory = null)
+    public function __construct(?string $prefix, int $lifetime = 0, string $directory = null)
     {
         $prefix = 'app_cache_'.$prefix;
 
