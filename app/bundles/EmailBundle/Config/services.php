@@ -13,7 +13,7 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
+        //'Controller', // Enabling this will require to refactor all controllers to use DI.
         'OptionsAccessor',
         'MonitoredEmail/Accessor',
         'MonitoredEmail/Organizer',

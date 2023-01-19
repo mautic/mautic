@@ -22,10 +22,11 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
+class LegacyEventDispatcherTest extends TestCase
 {
     /**
      * @var MockObject|EventDispatcherInterface
@@ -86,7 +87,7 @@ class LegacyEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->pendingEvent->expects($this->once())
             ->method('failAll');
 
-        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent, $this->mauticFactory);
+        $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
     }
 
     public function testPrimayLegacyEventsAreProcessed(): void

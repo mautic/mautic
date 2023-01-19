@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -59,7 +60,7 @@ class EmailApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction(Request $request)
     {
         //get parent level only
         $this->listFilters[] = [
@@ -67,7 +68,7 @@ class EmailApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request);
     }
 
     /**

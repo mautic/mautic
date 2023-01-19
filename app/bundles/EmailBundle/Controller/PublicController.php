@@ -22,6 +22,7 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
+use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
@@ -91,9 +92,8 @@ class PublicController extends CommonFormController
      *
      * @return Response
      */
-    public function trackingImageAction($idHash)
+    public function trackingImageAction(QueueService $queueService, $idHash)
     {
-        $queueService = $this->get('mautic.queue.service');
         if ($queueService->isQueueEnabled()) {
             $msg = [
                 'request' => $this->request,

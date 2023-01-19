@@ -13,7 +13,6 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'EventCollector',
         'Executioner/ContactFinder/Limiter/ContactLimiter.php',
         'Executioner/Dispatcher/Exception',
@@ -23,6 +22,9 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\CampaignBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\CampaignBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
 
     $services->load('Mautic\\CampaignBundle\\Entity\\', '../Entity/*Repository.php');
 };
