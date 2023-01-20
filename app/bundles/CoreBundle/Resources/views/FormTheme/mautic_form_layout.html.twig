@@ -95,12 +95,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:choice_row.html.php #}
 {% block choice_row %}
-{% set hasErrors = form.vars.errors|length %}
-{% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
+{% set hasErrors = form.vars.errors is not empty %}
+{% set feedbackClass = hasErrors ? ' has-error' : '' %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
 <div class="row">
-    <div class="form-group col-xs-12 {{ feedbackClass }}>">
+    <div class="form-group col-xs-12 {{ feedbackClass }}">
         {{ form_label(form, label) }}
         <div class="choice-wrapper">
             {% if expanded and multiple %}
@@ -422,7 +422,8 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:tel_widget.html.php #}
 {% block tel_widget %}
-{{ block('form_widget_simple', {'type': type is defined ? type : get_class('Mautic\\CoreBundle\\Form\\Type\\TelType')}) }}
+{#{ block('form_widget_simple', {'type': type is defined ? type : get_class('Mautic\\CoreBundle\\Form\\Type\\TelType')}) }#}
+{{ block('form_widget_simple') }}
 {% endblock %}
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:time_widget.html.php #}
@@ -494,7 +495,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {% set attr = attr|merge({'style' : 'width: 1px; height: 1px; top: 0; left: 0; margin-top: 0;'}) %}
 <div class="btn-group btn-block" data-toggle="buttons">
     {% for child in form %}
-        {% set class = 
+        {% set class =
             (child.vars.checked is not empty ? ' active' : '') ~
             (((child.vars.disabled is defined and child.vars.disabled is not empty) or (attr.readonly is defined and attr.readonly is not empty)) ? ' disabled' : '' ) ~
             (child.vars.name == '0' ? ' btn-no' : (child.vars.name == '1' ? ' btn-yes' : ' btn-extra')) ~
