@@ -52,6 +52,7 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('templating.helper.assets', \Mautic\CoreBundle\Templating\Helper\AssetsHelper::class);
     $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
+    $services->alias('mautic.helper.email.address', \Mautic\CoreBundle\Helper\EmailAddressHelper::class);
 
     $services->get(\Mautic\CoreBundle\Templating\Helper\AssetsHelper::class)->tag('templating.helper', ['alias' => 'assets']);
 };
