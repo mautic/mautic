@@ -262,10 +262,9 @@ class DashboardModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Widget                              $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param Widget      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *
