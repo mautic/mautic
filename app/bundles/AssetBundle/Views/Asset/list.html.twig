@@ -181,7 +181,7 @@
                         {% set description = item.getDescription() %}
                         {% if description %}
                             <div class="text-muted mt-4">
-                                <small>{{ description }}</small>
+                                <small>{{ description|purify }}</small>
                             </div>
                         {% endif %}
                     </td>

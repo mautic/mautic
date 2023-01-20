@@ -184,7 +184,7 @@ class ConfigController extends AbstractFormController
     private function showForm(Form $form)
     {
         $integrationObject = $this->integrationObject;
-        $form              = $this->setFormTheme($form, 'IntegrationsBundle:Config:form.html.php');
+        $form              = $this->setFormTheme($form, 'IntegrationsBundle:Config:form.html.twig');
         $formHelper        = $this->get('templating.helper.form');
 
         $showFeaturesTab =
@@ -227,7 +227,7 @@ class ConfigController extends AbstractFormController
                     'callbackUrl'         => $callbackUrl,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
-                    ?: 'IntegrationsBundle:Config:form.html.php',
+                    ?: 'IntegrationsBundle:Config:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',
