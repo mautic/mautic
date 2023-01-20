@@ -532,7 +532,8 @@ class SubmissionModel extends CommonFormModel
                         //build the header row
                         $fields = $form->getFields();
                         $header = [
-                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.report.submission.id'),
+                            $translator->trans('mautic.lead.report.contact_id'),
                             $translator->trans('mautic.form.result.thead.date'),
                             $translator->trans('mautic.core.ipaddress'),
                             $translator->trans('mautic.form.result.thead.referrer'),
@@ -553,6 +554,7 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
+                                $s['leadId'],
                                 $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
                                 $s['ipAddress'],
                                 $s['referer'],
@@ -608,7 +610,8 @@ class SubmissionModel extends CommonFormModel
                             //build the header row
                             $fields = $form->getFields();
                             $header = [
-                                $translator->trans('mautic.core.id'),
+                                $translator->trans('mautic.form.report.submission.id'),
+                                $translator->trans('mautic.lead.report.contact_id'),
                                 $translator->trans('mautic.form.result.thead.date'),
                                 $translator->trans('mautic.core.ipaddress'),
                                 $translator->trans('mautic.form.result.thead.referrer'),
@@ -630,6 +633,7 @@ class SubmissionModel extends CommonFormModel
                             foreach ($results as $k => $s) {
                                 $row = [
                                     $s['id'],
+                                    $s['leadId'],
                                     $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
                                     $s['ipAddress'],
                                     $s['referer'],
@@ -699,7 +703,7 @@ class SubmissionModel extends CommonFormModel
 
                         //build the header row
                         $header = [
-                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.report.submission.id'),
                             $translator->trans('mautic.lead.report.contact_id'),
                             $translator->trans('mautic.form.report.form_id'),
                             $translator->trans('mautic.form.result.thead.date'),
@@ -761,7 +765,8 @@ class SubmissionModel extends CommonFormModel
                         $objPHPExcel->createSheet();
 
                         $header = [
-                            $translator->trans('mautic.core.id'),
+                            $translator->trans('mautic.form.report.submission.id'),
+                            $translator->trans('mautic.lead.report.contact_id'),
                             $translator->trans('mautic.form.result.thead.date'),
                             $translator->trans('mautic.core.ipaddress'),
                             $translator->trans('mautic.form.result.thead.referrer'),
@@ -775,6 +780,7 @@ class SubmissionModel extends CommonFormModel
                         foreach ($results as $k => $s) {
                             $row = [
                                 $s['id'],
+                                $s['leadId'],
                                 $this->dateHelper->toFull($s['dateSubmitted'], 'UTC'),
                                 $s['ipAddress'],
                                 $s['referer'],

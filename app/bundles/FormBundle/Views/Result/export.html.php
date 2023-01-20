@@ -19,7 +19,8 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.form.resul
     <table class="table table-hover table-striped table-bordered formresult-list">
         <thead>
         <tr>
-            <th class="col-formresult-id"></th>
+            <th class="col-formresult-id"><?php echo $view['translator']->trans('mautic.form.report.submission.id'); ?></th>
+            <th class="col-formresult-id"><?php echo $view['translator']->trans('mautic.lead.report.contact_id'); ?></th>
             <th class="col-formresult-date"><?php echo $view['translator']->trans('mautic.form.result.thead.date'); ?></th>
             <th class="col-formresult-ip"><?php echo $view['translator']->trans('mautic.core.ipaddress'); ?></th>
             <?php
@@ -37,6 +38,7 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.form.resul
         <?php foreach ($results as $item):?>
             <tr>
                 <td><?php echo $item['id']; ?></td>
+                <td><?php echo $item['leadId']; ?></td>
                 <td><?php echo $view['date']->toFull($item['dateSubmitted'], 'UTC'); ?></td>
                 <td><?php echo $item['ipAddress']; ?></td>
                 <?php foreach ($item['results'] as $r):?>
