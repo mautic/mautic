@@ -488,6 +488,30 @@ $view['slots']->set(
                     <hr>
                 <?php endif; ?>
             </div>
+            <?php if (!$lead->getLeagueScores()->isEmpty()): ?>
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        <?php echo $view['translator']->trans('mautic.lead.leagues.panel.title'); ?>
+                    </div>
+                </div>
+                <div class="panel-body pt-sm league-points-panel">
+                    <?php foreach ($lead->getLeagueScores() as $leagueScore): ?>
+                        <div class="row">
+                            <h6 class="fw-sb col-md-6">
+                                <?php echo $leagueScore->getLeague()->getName(); ?>
+                            </h6>
+                            <p class="text-muted col-md-6">
+                                <?php echo $view['translator']->trans(
+                                    'mautic.lead.points.count',
+                                    ['%count%' => $leagueScore->getScore()]
+                                ); ?>
+                            </p>
+                        </div>
+
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
             <?php if ($doNotContact) :
                 ?>
                 <?php echo $view->render(

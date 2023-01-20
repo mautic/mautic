@@ -53,18 +53,6 @@ class LeagueController extends AbstractStandardFormController
     }
 
     /**
-     * Displays details on a League.
-     *
-     * @param $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function viewAction($objectId)
-    {
-        return parent::viewStandard($objectId, 'league', 'point');
-    }
-
-    /**
      * Deletes the entity.
      *
      * @param int $objectId
