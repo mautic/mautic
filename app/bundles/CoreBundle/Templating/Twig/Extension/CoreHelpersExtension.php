@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
@@ -33,6 +34,16 @@ class CoreHelpersExtension extends AbstractExtension
             new TwigFunction('getFilterAttributes', [$this, 'getFilterAttributes'], ['is_safe' => 'all']),
             // Used by CoreBundle:Helper:pagination.html.twig
             new TwigFunction('getPaginationAction', [$this, 'getPaginationAction'], ['is_safe' => 'all']),
+        ];
+    }
+
+    /**
+     * @return TwigFilter[]
+     */
+    public function getFilters(): array
+    {
+        return [
+            new TwigFilter('json_decode', fn (string $json) => json_decode($json, true)),
         ];
     }
 
