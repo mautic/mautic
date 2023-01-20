@@ -301,7 +301,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                  'MoneyType',
                             ], true)) {
                                 $type = 'int';
-                            } elseif ('Boolean' === $fieldType) {
+                            } elseif ('BooleanType' === $fieldType) {
                                 $type = 'boolean';
                             } elseif ('DateTimeType' === $fieldType) {
                                 $type = 'datetime';
