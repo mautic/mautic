@@ -297,12 +297,12 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
                 case 'America/North_Dakota/Center':
                     $this->assertCount(2, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([3, 4], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertEquals('2018-10-19 06:00', $executionDate->format('Y-m-d H:i'));
                     break;
                 case 'America/New_York':
                     $this->assertCount(4, $groupExecutionDateDAO->getContacts());
                     $this->assertEquals([5, 6, 7, 8], $groupExecutionDateDAO->getContacts()->getKeys());
-                    $this->assertEquals('2018-10-18 06:00', $executionDate->format('Y-m-d H:i'));
+                    $this->assertEquals('2018-10-19 06:00', $executionDate->format('Y-m-d H:i'));
                     break;
             }
         }
@@ -338,7 +338,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $interval = $this->getInterval();
 
         Assert::assertTrue($interval->isContactSpecificExecutionDateRequired($event));
-        Assert::assertEquals($expectedDateTime->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
+        Assert::assertEquals($expectedDateTime->modify('+1 day')->format('Y-m-d H:i'), $interval->validateExecutionDateTime($log, $compareFromDateTime)->format('Y-m-d H:i'));
     }
 
     public function testValidateExecutionDateTimeWhenIsContactSpecificExecutionDateRequiredIsFalse(): void
