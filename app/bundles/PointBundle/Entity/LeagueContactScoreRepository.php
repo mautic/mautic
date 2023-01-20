@@ -19,24 +19,25 @@ class LeagueContactScoreRepository extends CommonRepository
             $contactScore->setScore(0);
         }
         $oldScore = $contactScore->getScore();
+        $newScore = $oldScore;
 
         switch ($operator) {
             case Lead::POINTS_ADD:
-                $oldScore += $points;
+                $newScore += $points;
                 break;
             case Lead::POINTS_SUBTRACT:
-                $oldScore -= $points;
+                $newScore -= $points;
                 break;
             case Lead::POINTS_MULTIPLY:
-                $oldScore *= $points;
+                $newScore *= $points;
                 break;
             case Lead::POINTS_DIVIDE:
-                $oldScore /= $points;
+                $newScore /= $points;
                 break;
             default:
                 throw new \UnexpectedValueException('Invalid operator');
         }
-        $contactScore->setScore($oldScore);
+        $contactScore->setScore($newScore);
         $this->_em->persist($contactScore);
         $this->_em->flush();
 

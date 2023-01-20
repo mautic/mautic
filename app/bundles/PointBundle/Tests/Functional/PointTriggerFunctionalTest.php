@@ -12,6 +12,7 @@ use Mautic\PointBundle\Entity\League;
 use Mautic\PointBundle\Entity\LeagueContactScore;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Entity\TriggerEvent;
+use Mautic\PointBundle\Model\TriggerModel;
 
 class PointTriggerFunctionalTest extends MauticMysqlTestCase
 {
@@ -69,16 +70,87 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->leadHasTag($lead, 'tagA'));
     }
 
+    public function testTriggerForExistingContacts(): void
+    {
+        /** @var LeadModel $leadModel */
+        $leadModel = self::$container->get('mautic.lead.model.lead');
+
+        /** @var TriggerModel $triggerModel */
+        $triggerModel = self::$container->get('mautic.point.model.trigger');
+
+        $lead = new Lead();
+        $data = ['email' => 'pointtest@example.com', 'points' => 5];
+        $leadModel->setFieldValues($lead, $data, false, true, true);
+        $leadModel->saveEntity($lead);
+
+        $this->em->clear(Lead::class);
+
+        $triggerA      = $this->createTrigger('League A Trigger (should trigger)', 5, null, true);
+        $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);
+        $triggerA->addTriggerEvent(0, $triggerEventA);
+        $triggerModel->saveEntity($triggerA);
+
+        $triggerB      = $this->createTrigger('League B Trigger (should not trigger)', 6, null, true);
+        $triggerEventB = $this->createAddTagEvent('tagB', $triggerB);
+        $triggerB->addTriggerEvent(0, $triggerEventB);
+        $triggerModel->saveEntity($triggerB);
+
+        $lead = $leadModel->getEntity($lead->getId());
+
+        $this->assertFalse($this->leadHasTag($lead, 'tagB'));
+        $this->assertTrue($this->leadHasTag($lead, 'tagA'));
+    }
+
+    public function testTriggerWithLeagueForExistingContacts(): void
+    {
+        /** @var LeadModel $leadModel */
+        $leadModel = self::$container->get('mautic.lead.model.lead');
+
+        /** @var TriggerModel $triggerModel */
+        $triggerModel = self::$container->get('mautic.point.model.trigger');
+
+        $leagueA = $this->createLeague('League A');
+        $leagueB = $this->createLeague('League B');
+
+        $lead = new Lead();
+        $data = ['email' => 'pointtest@example.com', 'points' => 5];
+        $leadModel->setFieldValues($lead, $data, false, true, true);
+        $this->addLeagueContactScore($lead, $leagueA, 5);
+        $leadModel->saveEntity($lead);
+
+        $this->em->clear(Lead::class);
+
+        $triggerA      = $this->createTrigger('League A Trigger (should trigger)', 5, $leagueA, true);
+        $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);
+        $triggerA->addTriggerEvent(0, $triggerEventA);
+        $triggerModel->saveEntity($triggerA);
+
+        $triggerB      = $this->createTrigger('League B Trigger (should not trigger)', 5, $leagueB, true);
+        $triggerEventB = $this->createAddTagEvent('tagB', $triggerB);
+        $triggerB->addTriggerEvent(0, $triggerEventB);
+        $triggerModel->saveEntity($triggerB);
+
+        $lead = $leadModel->getEntity($lead->getId());
+
+        $this->assertFalse($this->leadHasTag($lead, 'tagB'));
+        $this->assertTrue($this->leadHasTag($lead, 'tagA'));
+    }
+
     private function createTrigger(
         string $name,
         int $points = 0,
-        League $league = null
+        League $league = null,
+        bool $triggerExistingLeads = false
     ): Trigger {
         $trigger = new Trigger();
         $trigger->setName($name);
         $trigger->setPoints($points);
+
         if (isset($league)) {
             $trigger->setLeague($league);
+        }
+        if ($triggerExistingLeads) {
+            $trigger->setTriggerExistingLeads($triggerExistingLeads);
         }
         $this->em->persist($trigger);
 
