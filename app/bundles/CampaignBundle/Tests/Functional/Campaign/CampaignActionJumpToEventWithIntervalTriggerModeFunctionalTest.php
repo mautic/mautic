@@ -136,7 +136,19 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         yield 'Points at a relative time: Scheduled at - before one hour' => [
             $adjustPointEvent,
             '%h',
-            1,
+            23,
+        ];
+
+        $adjustPointEvent = clone $event;
+        $adjustPointEvent->setTriggerDate();
+        $adjustPointEvent->setTriggerInterval(1);
+        $adjustPointEvent->setTriggerIntervalUnit('H');
+        $adjustPointEvent->setTriggerHour($now->modify('-1 hour')->format('H:i'));
+
+        yield 'Points at a relative time: Scheduled at - before one hour with delay of 1 hour' => [
+            $adjustPointEvent,
+            '%h',
+            0,
         ];
 
         $adjustPointEvent = clone $event;
