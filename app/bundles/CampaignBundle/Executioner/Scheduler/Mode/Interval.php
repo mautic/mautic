@@ -255,11 +255,19 @@ class Interval implements ScheduleModeInterface
             }
         }
 
-        /** @var \DateTime $groupExecutionDate */
-        $groupExecutionDate = clone $compareFromDateTime;
-        $groupExecutionDate->setTimezone($this->getDefaultTimezone());
+        if (!isset($groupExecutionDate)) {
+            $groupExecutionDate = clone $compareFromDateTime;
+            $groupExecutionDate->setTimezone($this->getDefaultTimezone());
+        }
 
-        $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
+        $testGroupHour = clone $groupExecutionDate;
+        $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
+
+        if ($groupExecutionDate <= $testGroupHour) {
+            return $testGroupHour;
+        } else {
+            $groupExecutionDate->modify('+1 day')->setTime($groupHour->format('H'), $groupHour->format('i'));
+        }
 
         return $groupExecutionDate;
     }
