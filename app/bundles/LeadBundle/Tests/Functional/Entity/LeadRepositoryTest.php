@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadRepository;
 final class LeadRepositoryTest extends MauticMysqlTestCase
 {
     /**
-     * @return array<array<string|null, bool|null>>
+     * @return array<int, array<string, array<string, bool>>>
      */
     public function joinIpAddressesProvider(): array
     {
@@ -26,6 +26,8 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
 
     /**
      * @dataProvider joinIpAddressesProvider
+     *
+     * @param array<string, bool> $args
      */
     public function testSaveIpAddressToContacts($args): void
     {
