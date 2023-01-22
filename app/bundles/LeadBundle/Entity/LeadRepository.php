@@ -568,19 +568,23 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
-        $alias  = $this->getTableAlias();
-        $select = [$alias, 'u', $order];
-        $q      = $this->getEntityManager()->createQueryBuilder();
+        $alias           = $this->getTableAlias();
+        $select          = [$alias, 'u', $order];
+        $q               = $this->getEntityManager()->createQueryBuilder();
+        $joinIpAddresses = !isset($args['joinIpAddresses']) || true === $args['joinIpAddresses'];
 
-        if (!isset($args['joinIpAddresses']) || true === $args['joinIpAddresses']) {
+        if ($joinIpAddresses) {
             $select[] = 'i';
-            $q->leftJoin($alias.'.ipAddresses', 'i');
         }
 
         $q->select($select)
             ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
+
+        if ($joinIpAddresses) {
+            $q->leftJoin($alias.'.ipAddresses', 'i');
+        }
 
         return $q;
     }
