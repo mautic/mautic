@@ -45,7 +45,7 @@
                     <div class="text-muted mb-1 ellipsis">
                         <i class="fa fa-fw fa-globe mr-xs"></i>{{ fields.core.country.value|default('') }}
                     </div>
-                    {% set flag = (fields.core.country is not empty) ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                    {% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
 
                     {% if flag is not empty %}
                         <div style="position: absolute; right: 30px; bottom: 30px">

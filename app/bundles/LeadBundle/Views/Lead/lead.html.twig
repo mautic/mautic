@@ -14,7 +14,7 @@
   {% endif %}
 {% endset %}
 
-{% set flag = fields.core.country is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+{% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
