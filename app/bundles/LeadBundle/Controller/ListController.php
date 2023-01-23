@@ -210,7 +210,8 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
+                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
+                'form' => $form->createView(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
             'passthroughVars' => [
@@ -349,7 +350,8 @@ class ListController extends FormController
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
-                            'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
+                            //'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
+                            'form'         => $form->createView(),
                         ];
 
                         return $this->postActionRedirect($postActionVars);
@@ -372,7 +374,8 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
+                //'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
+                'form'          => $form->createView(),
                 'currentListId' => $segment->getId(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',

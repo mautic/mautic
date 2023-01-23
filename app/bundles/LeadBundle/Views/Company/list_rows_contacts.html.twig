@@ -198,7 +198,7 @@
                     </td>
                     <td class="visible-md visible-lg">{{ fields.core.email.value|purify }}</td>
                     <td class="visible-md visible-lg">
-                        {% set flag = fields.core.country is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+                        {% set flag = fields.core.country is not empty and fields.core.country.value is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
                         {% if flag is not empty %}
                           <img src="{{ flag }}" style="max-height: 24px;" class="mr-sm" />
                         {% endif %}

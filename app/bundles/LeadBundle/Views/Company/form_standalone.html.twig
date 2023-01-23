@@ -18,11 +18,7 @@
 {% endblock %}
 
 {% block actions %}
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
-        'item': entity,
-        'routeBase': 'company',
-        'langVar': 'lead.company',
-  }) }}
+  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {'item': entity, 'routeBase': 'company', 'langVar': 'lead.company'}) }}
 {% endblock %}
 
 {% block content %}
