@@ -54,6 +54,11 @@ class TriggerModel extends CommonFormModel
      */
     private $contactTracker;
 
+    /**
+     * @var array<string,array<string,mixed>>
+     */
+    private static array $events;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
@@ -301,17 +306,15 @@ class TriggerModel extends CommonFormModel
      */
     public function getEvents()
     {
-        static $events;
-
-        if (empty($events)) {
+        if (empty(self::$events)) {
             //build them
-            $events = [];
-            $event  = new Events\TriggerBuilderEvent($this->translator);
+            self::$events = [];
+            $event        = new Events\TriggerBuilderEvent($this->translator);
             $this->dispatcher->dispatch($event, PointEvents::TRIGGER_ON_BUILD);
-            $events = $event->getEvents();
+            self::$events = $event->getEvents();
         }
 
-        return $events;
+        return self::$events;
     }
 
     /**

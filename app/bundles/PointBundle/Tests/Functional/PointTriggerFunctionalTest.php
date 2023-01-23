@@ -16,6 +16,16 @@ use Mautic\PointBundle\Model\TriggerModel;
 
 class PointTriggerFunctionalTest extends MauticMysqlTestCase
 {
+    protected function tearDown(): void
+    {
+        /** @var TriggerModel $triggerModel */
+        $triggerModel = self::$container->get('mautic.point.model.trigger');
+
+        $reflector = new \ReflectionClass(get_class($triggerModel));
+        $reflector->setStaticPropertyValue('events', []);
+        parent::tearDown();
+    }
+
     public function testPointsTriggerWithTagAction(): void
     {
         /** @var LeadModel $model */
@@ -118,8 +128,6 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $this->addLeagueContactScore($lead, $leagueA, 5);
         $leadModel->saveEntity($lead);
 
-        $this->em->clear(Lead::class);
-
         $triggerA      = $this->createTrigger('League A Trigger (should trigger)', 5, $leagueA, true);
         $triggerEventA = $this->createAddTagEvent('tagA', $triggerA);
         $triggerA->addTriggerEvent(0, $triggerEventA);
@@ -129,7 +137,6 @@ class PointTriggerFunctionalTest extends MauticMysqlTestCase
         $triggerEventB = $this->createAddTagEvent('tagB', $triggerB);
         $triggerB->addTriggerEvent(0, $triggerEventB);
         $triggerModel->saveEntity($triggerB);
-
         $lead = $leadModel->getEntity($lead->getId());
 
         $this->assertFalse($this->leadHasTag($lead, 'tagB'));
