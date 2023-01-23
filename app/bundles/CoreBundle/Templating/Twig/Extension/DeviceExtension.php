@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use DeviceDetector\Parser\Device\AbstractDeviceParser;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
 class DeviceExtension extends AbstractExtension
 {
