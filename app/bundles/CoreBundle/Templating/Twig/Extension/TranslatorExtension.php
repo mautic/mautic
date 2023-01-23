@@ -40,15 +40,9 @@ class TranslatorExtension extends AbstractExtension
      * Checks for $preferred string existence and returns translation if it
      * does.  Otherwise, returns translation for $alternative.
      *
-     * @param string       $preferred
-     * @param string       $alternative
      * @param array<mixed> $parameters
-     * @param string|null  $domain
-     * @param string|null  $locale
-     *
-     * @return string
      */
-    public function transConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
+    public function translatorConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translatorHelper->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
