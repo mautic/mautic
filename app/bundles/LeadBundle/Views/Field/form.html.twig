@@ -14,16 +14,6 @@
   {%- endif -%}
 {% endblock %}
 
-{% block actions %}
-  {{ include ('MauticCoreBundle:Helper:page_actions.html.twig', {
-        'routeBase': 'contactfield',
-        'langVar': 'lead.field',
-        'templateButtons': {
-            'close': true,
-        }
-  }) }}
-{% endblock %}
-
 {% block content %}
 {{ form_start(form) }}
 <div class="box-layout">
