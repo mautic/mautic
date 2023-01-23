@@ -229,36 +229,8 @@ class Interval implements ScheduleModeInterface
         /** @var \DateTime $groupHour */
         $groupHour = clone $hour;
 
-        // Set execution to UTC
-        if ($timezone = $contact->getTimezone()) {
-            try {
-                // Set the group's timezone to the contact's
-                $contactTimezone = new \DateTimeZone($timezone);
-
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
-                );
-
-                // Get now in the contacts timezone then add the number of days from now and the original execution date
-                /** @var \DateTime $groupExecutionDate */
-                $groupExecutionDate = clone $compareFromDateTime;
-                $groupExecutionDate->setTimezone($contactTimezone);
-
-                $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
-
-                return $groupExecutionDate;
-            } catch (\Exception) {
-                // Timezone is not recognized so use the default
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
-                );
-            }
-        }
-
-        if (!isset($groupExecutionDate)) {
-            $groupExecutionDate = clone $compareFromDateTime;
-            $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-        }
+        $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
+        $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
         $testGroupHour = clone $groupExecutionDate;
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
@@ -295,33 +267,7 @@ class Interval implements ScheduleModeInterface
             unset($tempStartTime);
         }
 
-        // Set execution to UTC
-        if ($timezone = $contact->getTimezone()) {
-            try {
-                // Set the group's timezone to the contact's
-                $contactTimezone = new \DateTimeZone($timezone);
-
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
-                );
-
-                // Get now in the contacts timezone then add the number of days from now and the original execution date
-                /** @var \DateTime $groupExecutionDate */
-                $groupExecutionDate = clone $compareFromDateTime;
-                $groupExecutionDate->setTimezone($contactTimezone);
-            } catch (\Exception) {
-                // Timezone is not recognized so use the default
-                $this->logger->debug(
-                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
-                );
-            }
-        }
-
-        if (!isset($groupExecutionDate)) {
-            /** @var \DateTime $groupExecutionDate */
-            $groupExecutionDate = clone $compareFromDateTime;
-            $groupExecutionDate->setTimezone($this->getDefaultTimezone());
-        }
+        $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
 
         // Is the time between the start and end hours?
         /* @var \DateTime $testStartDateTime */
@@ -359,5 +305,31 @@ class Interval implements ScheduleModeInterface
         );
 
         return $this->defaultTimezone;
+    }
+
+    private function getGroupExecutionDateWithTimeZone(Lead $contact, int $eventId, \DateTime $compareFromDateTime): \DateTime
+    {
+        $groupExecutionDate = clone $compareFromDateTime;
+        $contactTimezone    = $this->getDefaultTimezone();
+        // Set execution to UTC
+        if ($timezone = $contact->getTimezone()) {
+            try {
+                // Set the group's timezone to the contact's
+                $contactTimezone = new \DateTimeZone($timezone);
+
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$eventId.') Setting '.$timezone.' for contact '.$contact->getId()
+                );
+            } catch (\Exception $exception) {
+                // Timezone is not recognized so use the default
+                $this->logger->debug(
+                    'CAMPAIGN: ('.$eventId.') '.$timezone.' for contact '.$contact->getId().' is not recognized'
+                );
+            }
+        }
+
+        $groupExecutionDate->setTimezone($contactTimezone);
+
+        return $groupExecutionDate;
     }
 }
