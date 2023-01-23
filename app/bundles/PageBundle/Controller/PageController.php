@@ -121,12 +121,14 @@ class PageController extends FormController
         $orderByDir = $this->get('session')->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
         $pages      = $model->getEntities(
             [
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-            ]);
+                'start'           => $start,
+                'limit'           => $limit,
+                'filter'          => $filter,
+                'orderBy'         => $orderBy,
+                'orderByDir'      => $orderByDir,
+                'submissionCount' => true,
+            ]
+        );
 
         $count = count($pages);
         if ($count && $count < ($start + 1)) {

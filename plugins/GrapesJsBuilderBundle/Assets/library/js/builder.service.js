@@ -34,9 +34,6 @@ export default class BuilderService {
     if (!assets.conf.deletePath) {
       throw Error('No deletePath found');
     }
-    if (!assets.files || !assets.files[0]) {
-      console.warn('no assets');
-    }
 
     this.assets = assets.files;
     this.uploadPath = assets.conf.uploadPath;
@@ -116,6 +113,7 @@ export default class BuilderService {
     codeModeButton.addCommand();
     codeModeButton.addButton();
 
+    this.overrideCustomRteDisable();
     this.setListeners();
   }
 
@@ -288,6 +286,26 @@ export default class BuilderService {
 
   getEditor() {
     return this.editor;
+  }
+
+  overrideCustomRteDisable() {
+    const richTextEditor = this.editor.RichTextEditor;
+
+    if (!richTextEditor) {
+      console.error('No RichTextEditor found');
+      return;
+    }
+
+    if (richTextEditor.customRte) {
+      richTextEditor.customRte.disable = (el, rte) => {
+        el.contentEditable = false;
+        if(rte && rte.focusManager) {
+          rte.focusManager.blur(true);
+        }
+
+        rte.destroy(true);
+      }
+    }
   }
   /**
    * Generate assets list from GrapesJs

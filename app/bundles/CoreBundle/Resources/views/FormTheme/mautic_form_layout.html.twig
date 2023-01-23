@@ -95,12 +95,12 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:choice_row.html.php #}
 {% block choice_row %}
-{% set hasErrors = form.vars.errors|length %}
-{% set feedbackClass = hasErrors is not empty ? ' has-error' : '' %}
+{% set hasErrors = form.vars.errors is not empty %}
+{% set feedbackClass = hasErrors ? ' has-error' : '' %}
 {# apply attributes to radios #}
 {% set attr = form.vars.attr %}
 <div class="row">
-    <div class="form-group col-xs-12 {{ feedbackClass }}>">
+    <div class="form-group col-xs-12 {{ feedbackClass }}">
         {{ form_label(form, label) }}
         <div class="choice-wrapper">
             {% if expanded and multiple %}

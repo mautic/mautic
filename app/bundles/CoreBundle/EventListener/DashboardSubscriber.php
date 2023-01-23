@@ -122,7 +122,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $event->setTemplateData(['logs' => $logs, 'icons' => $iconEvent->getIcons()]);
         }
 
-        $event->setTemplate('MauticDashboardBundle:Dashboard:recentactivity.html.php');
+        $event->setTemplate('MauticDashboardBundle:Dashboard:recentactivity.html.twig');
         $event->stopPropagation();
     }
 }

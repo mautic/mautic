@@ -130,7 +130,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         }
 
         return $this->templating->renderResponse(
-            'MauticApiBundle:Authorize:oAuth2/authorize.html.php',
+            'MauticApiBundle:Authorize:oAuth2/authorize.html.twig',
             [
                 'form'   => $this->authorizeForm->createView(),
                 'client' => $this->getClient(),
