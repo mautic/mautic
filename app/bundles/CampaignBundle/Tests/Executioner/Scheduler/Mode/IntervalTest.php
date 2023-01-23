@@ -220,6 +220,8 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getId')
+            ->willReturn(1);
 
         $interval = $this->getInterval();
         $contact1 = $this->createMock(Lead::class);
