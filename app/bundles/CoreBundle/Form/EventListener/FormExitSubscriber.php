@@ -23,8 +23,8 @@ class FormExitSubscriber implements EventSubscriberInterface
     private $options;
 
     /**
-     * @param \Mautic\CoreBundle\Model\CommonModel $model
-     * @param array                                $options
+     * @param string $model
+     * @param array  $options
      */
     public function __construct($model, $options = [])
     {

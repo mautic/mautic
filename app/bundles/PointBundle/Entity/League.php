@@ -15,7 +15,7 @@ class League extends FormEntity
     /**
      * @var int
      */
-    private $id;
+    private $id = null;
 
     /**
      * @var string
@@ -27,14 +27,10 @@ class League extends FormEntity
      */
     private $description;
 
-    public function __clone()
-    {
-        $this->id = null;
-
-        parent::__clone();
-    }
-
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    /**
+     * @param ORM\ClassMetadata<League> $metadata
+     */
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -44,7 +40,7 @@ class League extends FormEntity
         $builder->addIdColumns();
     }
 
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank([
             'message' => 'mautic.core.name.required',

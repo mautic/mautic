@@ -261,10 +261,10 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a contact column.
      *
-     * @param bool|false $nullable
-     * @param string     $onDelete
-     * @param bool|false $isPrimaryKey
-     * @param null       $inversedBy
+     * @param bool|false  $nullable
+     * @param string      $onDelete
+     * @param bool|false  $isPrimaryKey
+     * @param string|null $inversedBy
      *
      * @return $this
      */

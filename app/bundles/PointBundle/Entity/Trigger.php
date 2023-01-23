@@ -62,10 +62,7 @@ class Trigger extends FormEntity
      */
     private $events;
 
-    /**
-     * @var League
-     */
-    private $league;
+    private ?League $league = null;
 
     public function __clone()
     {
@@ -378,15 +375,12 @@ class Trigger extends FormEntity
         $this->category = $category;
     }
 
-    /**
-     * @return League
-     */
-    public function getLeague()
+    public function getLeague(): ?League
     {
         return $this->league;
     }
 
-    public function setLeague(League $league)
+    public function setLeague(League $league): void
     {
         $this->league = $league;
     }

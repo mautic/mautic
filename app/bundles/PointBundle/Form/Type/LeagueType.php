@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\League;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -18,17 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LeagueType extends AbstractType
 {
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    public function __construct(CorePermissions $security)
-    {
-        $this->security = $security;
-    }
-
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
         $builder->addEventSubscriber(new FormExitSubscriber('point.league', $options));
@@ -68,7 +57,7 @@ class LeagueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

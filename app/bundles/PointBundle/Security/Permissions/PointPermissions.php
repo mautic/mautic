@@ -17,10 +17,7 @@ class PointPermissions extends AbstractPermissions
     {
         parent::__construct($params);
 
-        $this->addStandardPermissions('points');
-        $this->addStandardPermissions('triggers');
-        $this->addStandardPermissions('leagues');
-        $this->addStandardPermissions('categories');
+        $this->addStandardPermissions(['points', 'triggers', 'leagues', 'categories']);
     }
 
     /**

@@ -69,10 +69,7 @@ class Point extends FormEntity
      **/
     private $category;
 
-    /**
-     * @var League
-     */
-    private $league;
+    private ?League $league = null;
 
     public function __clone()
     {
@@ -391,15 +388,12 @@ class Point extends FormEntity
         return $this->repeatable;
     }
 
-    /**
-     * @return League
-     */
-    public function getLeague()
+    public function getLeague(): ?League
     {
         return $this->league;
     }
 
-    public function setLeague(League $league)
+    public function setLeague(League $league): void
     {
         $this->league = $league;
     }

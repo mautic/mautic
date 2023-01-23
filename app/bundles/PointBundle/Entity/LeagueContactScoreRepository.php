@@ -7,6 +7,9 @@ namespace Mautic\PointBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
+/**
+ * @extends CommonRepository<LeagueContactScore>
+ */
 class LeagueContactScoreRepository extends CommonRepository
 {
     public function adjustPoints(Lead $contact, League $league, int $points, string $operator = Lead::POINTS_ADD): Lead

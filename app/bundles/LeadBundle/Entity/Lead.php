@@ -206,7 +206,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $frequencyRules;
 
     /**
-     * @var LeagueContactScore[]
+     * @var ArrayCollection<int,LeagueContactScore>
      */
     private $leagueScores;
 
@@ -2012,7 +2012,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return LeagueContactScore[]
+     * @return ArrayCollection<int,LeagueContactScore>
      */
     public function getLeagueScores()
     {
@@ -2020,9 +2020,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @param LeagueContactScore[] $leagueScores
+     * @param ArrayCollection<int,LeagueContactScore> $leagueScores
      */
-    public function setLeagueScores(array $leagueScores): void
+    public function setLeagueScores($leagueScores): void
     {
         $this->leagueScores = $leagueScores;
     }

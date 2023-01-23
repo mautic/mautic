@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PointBundle\Entity\LeadPointLog;
+use Mautic\PointBundle\Entity\LeagueContactScore;
 use Mautic\PointBundle\Entity\LeagueContactScoreRepository;
 use Mautic\PointBundle\Entity\Point;
 use Mautic\PointBundle\Entity\PointRepository;
@@ -292,7 +293,7 @@ class PointModel extends CommonFormModel
                     $pointLeague              = $action->getLeague();
                     if (!empty($pointLeague)) {
                         /** @var LeagueContactScoreRepository $scoreRepository */
-                        $scoreRepository = $this->em->getRepository('MauticPointBundle:LeagueContactScore');
+                        $scoreRepository = $this->em->getRepository(LeagueContactScore::class);
                         $scoreRepository->adjustPoints($lead, $pointLeague, $delta);
                         $pointsChangeLogEntryName .= ' ('.$pointLeague->getName().')';
                     }

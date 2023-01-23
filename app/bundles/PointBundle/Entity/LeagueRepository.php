@@ -6,6 +6,9 @@ namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<League>
+ */
 class LeagueRepository extends CommonRepository
 {
     public function getTableAlias()

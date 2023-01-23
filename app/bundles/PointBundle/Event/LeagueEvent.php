@@ -31,7 +31,7 @@ class LeagueEvent extends CommonEvent
     /**
      * Sets the League entity.
      */
-    public function setLeague(League $league)
+    public function setLeague(League $league): void
     {
         $this->entity = $league;
     }

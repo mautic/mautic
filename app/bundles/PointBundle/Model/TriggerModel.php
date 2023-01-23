@@ -135,7 +135,7 @@ class TriggerModel extends CommonFormModel
             $pointLeague = $entity->getLeague();
 
             /** @var LeadRepository $leadRepository */
-            $leadRepository = $this->em->getRepository('MauticLeadBundle:Lead');
+            $leadRepository = $this->em->getRepository(Lead::class);
 
             foreach ($events as $event) {
                 $args = [

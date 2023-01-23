@@ -10,14 +10,21 @@ use Mautic\PointBundle\Entity\LeagueRepository;
 use Mautic\PointBundle\Event as Events;
 use Mautic\PointBundle\Form\Type\LeagueType;
 use Mautic\PointBundle\LeagueEvents;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends CommonFormModel<League>
+ */
 class LeagueModel extends CommonFormModel
 {
     public function getRepository(): LeagueRepository
     {
-        return $this->em->getRepository(League::class);
+        $result = $this->em->getRepository(League::class);
+        \assert($result instanceof LeagueRepository);
+
+        return $result;
     }
 
     public function getPermissionBase(): string
@@ -27,6 +34,13 @@ class LeagueModel extends CommonFormModel
 
     /**
      * {@inheritdoc}
+     *
+     * @param object               $entity
+     * @param FormFactory          $formFactory
+     * @param string|null          $action
+     * @param array<string,string> $options
+     *
+     * @return mixed
      *
      * @throws MethodNotAllowedHttpException
      */
@@ -46,7 +60,7 @@ class LeagueModel extends CommonFormModel
     /**
      * Get a specific entity or generate a new one if id is empty.
      *
-     * @param $id
+     * @param int $id
      *
      * @return object|null
      */
@@ -93,7 +107,7 @@ class LeagueModel extends CommonFormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

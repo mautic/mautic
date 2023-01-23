@@ -38,9 +38,9 @@ class TriggerEventRepository extends CommonRepository
     }
 
     /**
-     * @param ArrayCollection|LeagueContactScore[] $leagueScores
+     * @param ArrayCollection<int,LeagueContactScore> $leagueScores
      *
-     * @return array
+     * @return mixed[]
      */
     public function getPublishedByLeagueScore($leagueScores)
     {

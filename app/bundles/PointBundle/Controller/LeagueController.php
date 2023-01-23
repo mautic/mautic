@@ -14,7 +14,7 @@ class LeagueController extends AbstractStandardFormController
         return 'MauticPointBundle:League';
     }
 
-    protected function getModelName()
+    protected function getModelName(): string
     {
         return 'point.league';
     }
