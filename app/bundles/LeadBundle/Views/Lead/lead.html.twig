@@ -49,7 +49,7 @@
           'attr': {
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
-              'data-header': 'mautic.lead.lead.header.contact.frequency'|trans({'%name%': lead.primaryIdentifier|purify}),
+              'data-header': 'mautic.lead.lead.header.contact.frequency'|trans({'%name%': lead.primaryIdentifier|e}),
               'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactFrequency'}),
           },
           'btnText': 'mautic.lead.contact.frequency'|trans,
@@ -63,7 +63,7 @@
             'attr': {
                 'data-toggle': 'ajaxmodal',
                 'data-target': '#MauticSharedModal',
-                'data-header': 'mautic.lead.lead.header.campaigns'|trans({'%name%': lead.primaryIdentifier|purify}),
+                'data-header': 'mautic.lead.lead.header.campaigns'|trans({'%name%': lead.primaryIdentifier|e}),
                 'data-footer': 'false',
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'campaign'}),
             },
@@ -78,7 +78,7 @@
             'attr': {
                 'data-toggle': 'ajaxmodal',
                 'data-target': '#MauticSharedModal',
-                'data-header': 'mautic.lead.lead.header.merge'|trans({'%name%': lead.primaryIdentifier|purify}),
+                'data-header': 'mautic.lead.lead.header.merge'|trans({'%name%': lead.primaryIdentifier|e}),
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'merge'}),
             },
             'btnText': 'mautic.lead.merge'|trans,
@@ -371,7 +371,7 @@
                         </a>
                     </div>
                     <div class="collapse {% if 'expanded' == avatarPanelState %}in{% endif %}" id="lead-avatar-block">
-                        <img class="img-responsive" src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|purify }}"/>
+                        <img class="img-responsive" src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|e }}"/>
                     </div>
                 </div>
             {% endif %}
