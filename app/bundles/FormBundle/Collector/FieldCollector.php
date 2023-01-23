@@ -35,7 +35,7 @@ final class FieldCollector implements FieldCollectorInterface
     private function collect(string $object): void
     {
         $event = new FieldCollectEvent($object);
-        $this->dispatcher->dispatch(FormEvents::ON_FIELD_COLLECT, $event);
+        $this->dispatcher->dispatch($event, FormEvents::ON_FIELD_COLLECT);
         $this->fieldCollections[$object] = $event->getFields();
     }
 }

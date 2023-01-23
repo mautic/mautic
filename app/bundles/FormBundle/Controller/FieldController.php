@@ -3,7 +3,6 @@
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Field;
@@ -13,8 +12,6 @@ use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class FieldController extends CommonFormController
@@ -22,11 +19,6 @@ class FieldController extends CommonFormController
     private FormModel $formModel;
 
     private FieldModel $formFieldModel;
-
-    /**
-     * @var FormFieldHelper
-     */
-    private $fieldHelper;
 
     /**
      * @var MappedObjectCollectorInterface
@@ -37,6 +29,7 @@ class FieldController extends CommonFormController
      * @var AlreadyMappedFieldCollectorInterface
      */
     private $alreadyMappedFieldCollector;
+
     private FormFieldHelper $fieldHelper;
 
     public function initialize(ControllerEvent $event)
@@ -51,6 +44,9 @@ class FieldController extends CommonFormController
         $this->formFieldModel = $formFieldModel;
 
         $this->fieldHelper    = $this->get('mautic.helper.form.field_helper');
+
+        $this->mappedObjectCollector       = $this->get('mautic.form.collector.mapped.object');
+        $this->alreadyMappedFieldCollector = $this->get('mautic.form.collector.already.mapped.field');
     }
 
     /**

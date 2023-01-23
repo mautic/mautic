@@ -837,15 +837,15 @@ class FormController extends CommonFormController
             $deletedActions = [];
         }
 
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-
-        $mappedFields  = [];
-        $mappedObjects = $entity->getMappedFieldObjects();
-
-        foreach ($mappedObjects as $mappedObject) {
-            $mappedFields[$mappedObject] = $this->fieldCollector->getFields($mappedObject);
-        }
+//        $leadFieldModel = $this->getModel('lead.field');
+//        \assert($leadFieldModel instanceof FieldModel);
+//
+//        $mappedFields  = [];
+//        $mappedObjects = $entity->getMappedFieldObjects();
+//
+//        foreach ($mappedObjects as $mappedObject) {
+//            $mappedFields[$mappedObject] = $this->fieldCollector->getFields($mappedObject);
+//        }
 
         return $this->delegateView(
             [

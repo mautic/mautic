@@ -31,7 +31,7 @@ final class ObjectCollector implements ObjectCollectorInterface
     private function collect(): void
     {
         $event = new ObjectCollectEvent();
-        $this->dispatcher->dispatch(FormEvents::ON_OBJECT_COLLECT, $event);
+        $this->dispatcher->dispatch($event, FormEvents::ON_OBJECT_COLLECT);
         $this->objects = $event->getObjects();
     }
 }
