@@ -173,6 +173,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getId')
+            ->willReturn(1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00', new \DateTimeZone('America/New_York'));
@@ -226,6 +228,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $event->method('getCampaign')
             ->willReturn($campaign);
+        $event->method('getId')
+            ->willReturn(1);
 
         // The campaign executed with + 1 day at 1pm ET
         $logDateTriggered = new \DateTime('2018-08-30 17:00:00');
@@ -288,6 +292,8 @@ class EventSchedulerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($campaign);
         $event->method('getTriggerIntervalUnit')
             ->willReturn('d');
+        $event->method('getId')
+            ->willReturn(1);
 
         $contact = $this->createMock(Lead::class);
         $contact->method('getId')
