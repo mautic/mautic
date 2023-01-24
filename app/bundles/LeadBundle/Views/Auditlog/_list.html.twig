@@ -91,11 +91,17 @@
               {% endif %}
 
               {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
+              {% set hasDetails = false %}
+              {% for key, value in event.details %}
+                  {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
+                      {% set hasDetails = true %}
+                  {% endif %}
+              {% endfor %}
               <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
                   <td class="timeline-icon">
                       <a href="javascript:void(0);"
                          data-activate-details="{{ counter }}"
-                         class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined %}disabled{% endif %}"
+                         class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined or hasDetails == false %}disabled{% endif %}"
                          data-toggle="tooltip"
                          title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
                           <span class="fa fa-fw {{ icon }}"></span>
@@ -106,11 +112,11 @@
               </td>
                   <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
               </tr>
-              {% if event.contentTemplate %}
+              {% if event.contentTemplate and hasDetails == true %}
                   <!-- contentTemplate: "{{ event.contentTemplate }}" -->
                   <tr class="timeline-row {{ rowStripe }} timeline-details hide" id="auditlog-details-{{ counter }}">
                       <td colspan="4">
-                          {{ include([event.contentTemplate|replace({'.html.php': '.html.twig'}), event.contentTemplate], {'event': event, 'lead': lead}) }}
+                        {{ include([event.contentTemplate|replace({'.html.php': '.html.twig'}), event.contentTemplate], {'event': event, 'lead': lead}) }}
                       </td>
                   </tr>
               {% endif %}

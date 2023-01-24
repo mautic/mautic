@@ -9,10 +9,6 @@
         {% set objects = objects|merge({(key): value}) %}
     {% endif %}
 {% endfor %}
-
-<!--
-  obj length: {{dump(objects|length)}}
--->
 {% if objects|length > 0 %}
     {% if 'create' == event.eventType %}
         <table class="table">
