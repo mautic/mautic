@@ -1,0 +1,92 @@
+{#
+  Variables
+    - event
+    - lead
+#}
+{% set details = event.details %}
+{% set type = event.eventType %}
+{% set text = '' %}
+{% set objects = {} %}
+
+{% for key, value in details %}
+    {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key and details.fields[key] is defined %}
+        {% set objects = objects|merge({(key): value}) %}
+    {% endif %}
+{% endfor %}
+
+{% if objects|length > 0 %}
+    {% if 'create' == type %}
+        <table class="table">
+        <tr>
+          <th>Field/Object</th>
+          <th>New Value</th>
+          <th>Old Value</th>
+        </tr>
+        {% for field, values in objects %}
+            <tr>
+              {% if values is iterable %}
+                {% if values|length >= 2 %}
+                    <td>{{ field|e }}</td>
+                    <td>{{ normalizeStringValue(values[1])|e }}</td>
+                    <td>{{ normalizeStringValue(values[0])|e }}</td>
+                {% else %}
+                    {% set v = '' %}
+                    {% for k, value in values %}
+                        {% set v = k ~ ': ' ~ value|join(', ')|e %}
+                    {% endfor %}
+                    <td>{{ field|e }}</td>
+                    <td>{{ v|e }}</td>
+                    <td>&nbsp;</td>
+                {% endif %}
+              {% else %}
+                <td>{{ field|e }}</td>
+                <td>{{ normalizeStringValue(values)|e }}</td>
+                <td>&nbsp;</td>
+              {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+    {% elseif 'delete' == type %}
+        {{ 'mautic.lead.audit.deleted'|trans }}
+    {% elseif 'update' == type %}
+      <table class="table">
+        <tr>
+          <th>Field/Object</th>
+          <th>New Value</th>
+          <th>Old Value</th>
+        </tr>
+        {% for field, values in objects %}
+            <tr>
+            {% if values is iterable %}
+                {% if values|length >= 2 %}
+                    <td>{{ field|e }}</td>
+                    <td>{{ normalizeStringValue(values[1])|e }}</td>
+                    <td>{{ normalizeStringValue(values[0])|e }}</td>
+                {% else %}
+                    {% set v = '' %}
+                    {% for k, value in values %}
+                        {% set v = k ~ ': ' ~ value|join(', ')|e %}
+                    {% endfor %}
+                    <td>{{ field|e }}</td>
+                    <td>{{ v }}</td>
+                    <td>&nbsp;</td>
+                {% endif %}
+            {% else %}
+                <td>{{ field|e }}</td>
+                <td>{{ normalizeStringValue(values)|e }}</td>
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+      </table>
+    {% elseif 'identified' == type %}
+        {{ 'mautic.lead.audit.identified'|trans }}
+    {% elseif 'ipadded' == type %}
+        {{ 'mautic.lead.audit.accessed'|trans }} {{ details|first|join(',') }}
+    {% elseif 'merged' == type %}
+        {{ 'mautic.lead.audit.merged'|trans }}
+    {% endif %}
+{% endif %}
+<!--
+{{ details|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}
+-->
