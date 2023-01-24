@@ -39,7 +39,7 @@ class AppKernel extends Kernel
         defined('MAUTIC_ENV') or define('MAUTIC_ENV', $environment);
         defined('MAUTIC_VERSION') or define('MAUTIC_VERSION', $metadata->getVersion());
 
-        /**
+        /*
          * This is required for Doctrine's automatic database detection. When Mautic hasn't been
          * installed yet, we don't have a database to connect to, causing automatic database platform
          * detection to fail. We use the MAUTIC_DB_SERVER_VERSION constant to temporarily set a server_version
@@ -145,6 +145,7 @@ class AppKernel extends Kernel
             new Mautic\IntegrationsBundle\IntegrationsBundle(),
             new Mautic\LeadBundle\MauticLeadBundle(),
             new Mautic\MarketplaceBundle\MarketplaceBundle(),
+            new Mautic\MessengerBundle\MauticMessengerBundle(),
             new Mautic\NotificationBundle\MauticNotificationBundle(),
             new Mautic\PageBundle\MauticPageBundle(),
             new Mautic\PluginBundle\MauticPluginBundle(),
@@ -240,8 +241,16 @@ class AppKernel extends Kernel
         $parameterLoader->loadIntoEnvironment();
 
         if (!defined('MAUTIC_TABLE_PREFIX')) {
-            //set the table prefix before boot
-            define('MAUTIC_TABLE_PREFIX', $parameterLoader->getLocalParameterBag()->get('db_table_prefix', ''));
+            // Set the table prefix before boot.
+            // Firstly look into environment variables.
+            $prefix = getenv('MAUTIC_TABLE_PREFIX');
+
+            // Secondly look into the local.php file.
+            if (false === $prefix) {
+                $prefix = $parameterLoader->getLocalParameterBag()->get('db_table_prefix', '');
+            }
+
+            define('MAUTIC_TABLE_PREFIX', $prefix);
         }
 
         // init bundles

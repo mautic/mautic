@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * @property LeadModel $model
+ * @extends CommonApiController<Lead>
  */
 class LeadApiController extends CommonApiController
 {
@@ -31,9 +31,16 @@ class LeadApiController extends CommonApiController
 
     public const MODEL_ID = 'lead.lead';
 
+    /**
+     * @var LeadModel|null
+     */
+    protected $model = null;
+
     public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel(self::MODEL_ID);
+        $leadModel = $this->getModel(self::MODEL_ID);
+        \assert($leadModel instanceof LeadModel);
+        $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
@@ -411,7 +418,7 @@ class LeadApiController extends CommonApiController
             return $this->returnError(
                 'Invalid reason code given',
                 Response::HTTP_BAD_REQUEST,
-                'Reason code needs to be an integer and higher than 0.'
+                ['Reason code needs to be an integer and higher than 0.']
             );
         }
 
@@ -662,7 +669,7 @@ class LeadApiController extends CommonApiController
             $viewParameters = [];
             $data           = $this->getFrequencyRuleFormData($entity, null, null, false, $parameters['frequencyRules']);
 
-            if (!$frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
+            if (true !== $frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
                 $formErrors = $this->getFormErrorMessages($frequencyForm);
                 $msg        = $this->getFormErrorMessage($formErrors);
 

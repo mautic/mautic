@@ -4,7 +4,7 @@ use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesComp
 use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
+/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $loader->import('config.php');
 
 EnvLoader::load();
@@ -12,6 +12,20 @@ EnvLoader::load();
 // Define some constants from .env
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'cache'            => false,
+    'debug'            => '%kernel.debug%',
+    'strict_variables' => true,
+    'paths'            => [
+        '%kernel.project_dir%/app/bundles' => 'bundles',
+    ],
+    'form_themes' => [
+        // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
+]);
 
 $container->loadFromExtension('framework', [
     'test'    => true,
@@ -26,6 +40,13 @@ $container->loadFromExtension('framework', [
     ],
     'csrf_protection' => [
         'enabled' => true,
+    ],
+    'messenger' => [
+        'transports' => [
+            'email_transport' => [
+                'dsn'            => 'in-memory://',
+            ],
+        ],
     ],
 ]);
 

@@ -58,18 +58,21 @@ class ReportBuilderEvent extends AbstractReportEvent
 
     private $reportHelper;
 
+    private ?string $reportSource;
+
     /**
      * ReportBuilderEvent constructor.
      *
      * @param string $context
      */
-    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper)
+    public function __construct(TranslatorInterface $translator, ChannelListHelper $channelListHelper, $context, $leadFields, ReportHelper $reportHelper, ?string $reportSource = null)
     {
         $this->context           = $context;
         $this->translator        = $translator;
         $this->channelListHelper = $channelListHelper;
         $this->leadFields        = $leadFields;
         $this->reportHelper      = $reportHelper;
+        $this->reportSource      = $reportSource;
     }
 
     /**
@@ -141,6 +144,14 @@ class ReportBuilderEvent extends AbstractReportEvent
     public function getTables()
     {
         return $this->tableArray;
+    }
+
+    /**
+     * Fetch the source of the report.
+     */
+    public function getReportSource(): ?string
+    {
+        return $this->reportSource;
     }
 
     /**

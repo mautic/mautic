@@ -15,6 +15,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
@@ -33,8 +35,8 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -140,9 +142,9 @@ class FormTestAbstract extends TestCase
         $contactTracker           = $this->createMock(ContactTracker::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $entityManager            = $this->createMock(EntityManager::class);
-        $formRepository           = $this->createMock(FormRepository::class);
+        $formRepository           = $this->createMock(SubmissionRepository::class);
         $leadRepository           = $this->createMock(LeadRepository::class);
-        $mockLogger               = $this->createMock(Logger::class);
+        $mockLogger               = $this->createMock(LoggerInterface::class);
         $uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
@@ -186,8 +188,8 @@ class FormTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $leadRepository],
-                        ['MauticFormBundle:Submission', $formRepository],
+                        [Lead::class, $leadRepository],
+                        [Submission::class, $formRepository],
                     ]
                 )
             );

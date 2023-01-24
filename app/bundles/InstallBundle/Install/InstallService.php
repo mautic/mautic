@@ -16,9 +16,11 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Release\ThisRelease;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
+use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Exception\AlreadyInstalledException;
 use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
+use Mautic\MessengerBundle\Helper\MessengerDsnConvertor;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -32,20 +34,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallService
 {
-    public const CHECK_STEP    = 0;
+    public const CHECK_STEP = 0;
+
     public const DOCTRINE_STEP = 1;
-    public const USER_STEP     = 2;
-    public const EMAIL_STEP    = 3;
-    public const FINAL_STEP    = 4;
+
+    public const USER_STEP = 2;
+
+    public const EMAIL_STEP = 3;
+
+    public const FINAL_STEP = 4;
 
     private Configurator $configurator;
+
     private CacheHelper $cacheHelper;
+
     protected PathsHelper $pathsHelper;
+
     private EntityManager $entityManager;
+
     private TranslatorInterface $translator;
+
     private KernelInterface $kernel;
+
     private ValidatorInterface $validator;
+
     private UserPasswordEncoder $encoder;
+
     private FixturesLoaderInterface $fixturesLoader;
 
     public function __construct(
@@ -316,7 +330,7 @@ class InstallService
      */
     public function createSchemaStep(array $dbParams): array
     {
-        $schemaHelper  = new SchemaHelper($dbParams);
+        $schemaHelper = new SchemaHelper($dbParams);
         $schemaHelper->setEntityManager($this->entityManager);
 
         $messages = [];
@@ -325,13 +339,15 @@ class InstallService
                 $messages['error'] = $this->translator->trans(
                     'mautic.installer.error.no.metadata',
                     [],
-                    'flashes');
+                    'flashes'
+                );
             }
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.installing.data',
                 ['%exception%' => $exception->getMessage()],
-                'flashes');
+                'flashes'
+            );
         }
 
         return $messages;
@@ -426,7 +442,7 @@ class InstallService
             return $messages;
         }
 
-        $validations  = [];
+        $validations = [];
 
         $emailConstraint          = new Assert\Email();
         $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
@@ -493,6 +509,7 @@ class InstallService
         $required = [
             'mailer_from_name',
             'mailer_from_email',
+            'messenger_type',
         ];
 
         $messages = [];
@@ -511,7 +528,8 @@ class InstallService
         }
 
         $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
+        $emailConstraint->message = $this->translator->trans(
+            'mautic.core.email.required',
             [],
             'validators'
         );
@@ -527,6 +545,12 @@ class InstallService
             }
 
             return $messages;
+        }
+        if ($step instanceof EmailStep) {
+            if ('sync' === $data['messenger_type']) {
+                $data['messenger_transport'] = 'sync';
+            }
+            $step->messenger_dsn = MessengerDsnConvertor::convertArrayToDsnString($data, []);
         }
 
         return $this->saveConfiguration($data, $step, true);

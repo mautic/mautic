@@ -29,7 +29,7 @@
     "http-interop/http-factory-guzzle": "^1.0",
     "liip/functional-test-bundle": "^4.2",
     "liip/test-fixtures-bundle": "^2.0",
-    "mautic/transifex": "^4.0",
+    "mautic/transifex": "^5.0",
     "php-http/mock-client": "^1.4",
     "phpstan/phpstan": "^1.8.2",
     "phpunit/phpunit": "^9.5",

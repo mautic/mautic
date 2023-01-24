@@ -104,10 +104,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        //Version 6.x supports all features
-        if (isset($this->keys['version']) && '6' == $this->keys['version']) {
-            return ['push_lead', 'get_leads', 'push_leads'];
-        }
         //Only push_lead is currently supported for version 7
         return ['push_lead', 'get_leads', 'push_leads'];
     }

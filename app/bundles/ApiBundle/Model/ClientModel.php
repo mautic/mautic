@@ -13,6 +13,9 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Client>
+ */
 class ClientModel extends FormModel
 {
     /**

@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * MessageQueueRepository.
+ * @extends CommonRepository<MessageQueue>
  */
 class MessageQueueRepository extends CommonRepository
 {

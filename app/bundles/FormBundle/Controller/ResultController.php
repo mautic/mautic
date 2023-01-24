@@ -6,9 +6,11 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -303,8 +305,9 @@ class ResultController extends CommonFormController
         $page     = $session->get("mautic.formresult.{$formId}.page", 1);
         $flashes  = [];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             $model = $this->getModel('form.submission');
+            \assert($model instanceof SubmissionModel);
 
             // Find the result
             $entity = $model->getEntity($objectId);
