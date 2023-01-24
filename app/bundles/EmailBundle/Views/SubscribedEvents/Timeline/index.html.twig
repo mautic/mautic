@@ -3,10 +3,10 @@
     - event
     - lead
 #}
-{% set item = event.extra is defined ? event.extra.stat : false %}
+{% set item = event.extra is defined and event.extra is not empty ? event.extra.stat : false %}
 {% if item != false %}
     <p>
-        {% if item.isFailed is not empty %}
+        {% if item.isFailed is not empty and item.isFailed %}
             {% if item.openDetails.bouces is defined %}
                 <span class="label label-warning" data-toggle="tooltip" title="{{ 'mautic.email.timeline.event.bounced'|trans }}">
                     {{ 'mautic.email.timeline.event.bounced'|trans }}
@@ -15,7 +15,7 @@
                 {{ 'mautic.email.timeline.event.failed'|trans }}
             {% endif %}
         {% elseif item.dateRead is empty %}
-            {{ 'mautic.email.timeline.event.not.read'|trans }}
+            {{ 'mautic.email.timeline.event.not.read'|trans|raw }}
         {% else %}
             {{ ('mautic.email.timeline.event.' ~ event['extra']['type'])|trans({
                     '%date%': dateToFull(event['timestamp']),
@@ -24,11 +24,11 @@
             }) }}
         {% endif %}
 
-        {% if item.viewedInBrowser is not empty %}
+        {% if item.viewedInBrowser is not empty and item.viewedInBrowser %}
             {{ 'mautic.email.timeline.event.viewed.in.browser'|trans }}
         {% endif %}
 
-        {% if item.retryCount is not empty %}
+        {% if item.retryCount is not empty and item.retryCount %}
             {{ 'mautic.email.timeline.event.retried'|trans({'%count%': item['retryCount']})}}
         {% endif %}
 
