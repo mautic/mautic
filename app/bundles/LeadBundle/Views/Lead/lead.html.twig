@@ -58,7 +58,7 @@
     {% endif %}
 
     {# View Campaigns List button #}
-    {% if is_granted('campaign:campaigns:edit') %}
+    {% if securityIsGranted('campaign:campaigns:edit') %}
       {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'ajaxmodal',
