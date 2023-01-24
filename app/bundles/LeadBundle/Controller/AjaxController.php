@@ -201,7 +201,6 @@ class AjaxController extends CommonAjaxController
         $formHtml = $this->renderView(
             'MauticLeadBundle:List:filterpropform.html.twig',
             [
-                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.twig', []),
                 'form' => $form->createView(),
             ]
         );

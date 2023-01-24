@@ -23,8 +23,8 @@
                   <i class="fa fa-fw fa-{{ 'smartphone' == device.device ? 'mobile' : device.device }}"></i>
               </td>
               <td>{{ translatorConditional('mautic.lead.device.' ~ device['device'], device['device']|title) }}</td>
-              <td><{{ device['device_os_name'] }}</td>
-              <td><{{ device['device_os_version'] }}</td>
+              <td>{{ device['device_os_name'] }}</td>
+              <td>{{ device['device_os_version'] }}</td>
               <td>
                   {% set clientInfo = serializerDecode(device.client_info) %}
                   {{ clientInfo is iterable and clientInfo.name is defined ? clientInfo.name }}
