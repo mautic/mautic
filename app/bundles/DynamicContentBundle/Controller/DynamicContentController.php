@@ -5,6 +5,7 @@ namespace Mautic\DynamicContentBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Templating\Helper\ContentHelper;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
@@ -217,7 +218,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form' => $form->createView(), //$this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                 ],
                 'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
                 'passthroughVars' => $passthrough,
@@ -410,12 +411,13 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'returnUrl'       => $action,
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.php',
+                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
                 ],
                 'viewParameters' => [
+                    'content'      => $this->get('mautic.helper.template.content'),
                     'entity'       => $entity,
                     'permissions'  => $this->getPermissions(),
                     'logs'         => $logs,

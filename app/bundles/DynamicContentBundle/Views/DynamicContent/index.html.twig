@@ -27,7 +27,7 @@
     })
 }}
     <div class="page-list">
-        <?php $view['slots']->output('_content'); ?>
+        {{ slot('_content') }}
     </div>
 </div>
 {% endblock %}

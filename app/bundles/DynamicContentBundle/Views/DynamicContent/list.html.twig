@@ -98,10 +98,10 @@
                         })
                     }}
                      
-                        <a href="<?php echo $view['router']->url(
+                        <a href="{{ url(
                             'mautic_dynamicContent_action',
-                            ['objectAction' => 'view', 'objectId' => $item->getId()]
-                        ); ?>" data-toggle="ajax">
+                            {objectAction: 'view', objectId: item.getId()}
+                        ) }}" data-toggle="ajax">
                             {{  item.getName() }}
                             {% set hasVariants     = item.isVariant() %}
                             {% set hasTranslations = item.isTranslation() %}
@@ -128,7 +128,7 @@
                         {% set category = item.getCategory() %}
                         {% set catName = category ? category.getTitle() : 'Emtpy category' %}
                         {% set color = category ? '#' ~ category.getColor() : 'inherit' %}
-                        <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: <?php echo $color; ?>;"> </span> <span><?php echo $catName; ?></span></span>
+                        <span style="white-space: nowrap;"><span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> <span>{{ catName }}</span></span>
                     </td>
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>

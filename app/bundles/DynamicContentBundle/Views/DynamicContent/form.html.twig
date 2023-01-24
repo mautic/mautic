@@ -97,8 +97,8 @@
                                                             {% set list = params.properties.list is defined ? params.properties.list : [] %}
                                                             {% set choices = 'boolean' == params.properties.type ? list|parseBooleanList|reverse : list|parseListForChoices %}
                                                             {% set listJson = list|json_encode() %}
-                                                            {% set callback = params.properties.callback is defined and not empty ? params.properties.callback : '' %}
-                                                            {% set operators = params.properties.operators is defined and not empty ? params.properties.operators|json_encode() : '' %}
+                                                            {% set callback = params.properties.callback is defined and params.properties.callback is not empty ? params.properties.callback : '' %}
+                                                            {% set operators = params.properties.operators is defined and params.properties.operators is not empty ? params.properties.operators|json_encode() : '' %}
                                                             <option value="{{ value|escape }}" id="available_{{ object ~ '_' ~ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-list="{{ listJson|escape }}" data-field-callback="{{ callback }}" data-field-operators="{{ operators }}" class="segment-filter {{ icon }}">
                                                                 {{ params.label|trans }}
                                                             </option>
