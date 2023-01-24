@@ -1,7 +1,7 @@
 <td class="{{ class }}">
     {% for field in fields %}
         {% if field[column].value is defined %}
-            {{ normalizeStringValue(field[column].normalizedValue)|purify }}
+            {% if field[column].normalizedValue is string %}{{ normalizeStringValue(field[column].normalizedValue)|purify }}{% endif %}
         {% endif %}
     {% endfor %}
 </td>
