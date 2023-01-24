@@ -30,7 +30,7 @@ class ChannelExtension extends AbstractExtension
         ];
     }
 
-    public function getChannelLabel($channel)
+    public function getChannelLabel(string $channel): string
     {
         return $this->helper->getChannelLabel($channel);
     }
