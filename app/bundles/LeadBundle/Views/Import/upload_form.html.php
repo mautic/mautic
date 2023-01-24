@@ -28,13 +28,15 @@ $view['slots']->set(
     )
 );
 
+$uploadMaxFilesize = (int) ini_get('upload_max_filesize');
+
 ?>
 <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
         <div class="ml-lg mr-lg mt-md pa-lg">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.import.start.instructions'); ?></div>
+                    <div class="panel-title"><?php echo $view['translator']->trans('mautic.lead.import.start.instructions', ['%size%' => $uploadMaxFilesize]); ?></div>
                 </div>
                 <div class="panel-body">
                     <?php echo $view['form']->start($form); ?>
