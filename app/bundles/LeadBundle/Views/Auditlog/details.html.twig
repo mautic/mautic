@@ -3,19 +3,18 @@
     - event
     - lead
 #}
-{% set details = event.details %}
-{% set type = event.eventType %}
-{% set text = '' %}
 {% set objects = {} %}
-
-{% for key, value in details %}
-    {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key and details.fields[key] is defined %}
+{% for key, value in event.details %}
+    {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
         {% set objects = objects|merge({(key): value}) %}
     {% endif %}
 {% endfor %}
 
+<!--
+  obj length: {{dump(objects|length)}}
+-->
 {% if objects|length > 0 %}
-    {% if 'create' == type %}
+    {% if 'create' == event.eventType %}
         <table class="table">
         <tr>
           <th>Field/Object</th>
@@ -46,9 +45,9 @@
             </tr>
         {% endfor %}
         </table>
-    {% elseif 'delete' == type %}
+    {% elseif 'delete' == event.eventType %}
         {{ 'mautic.lead.audit.deleted'|trans }}
-    {% elseif 'update' == type %}
+    {% elseif 'update' == event.eventType %}
       <table class="table">
         <tr>
           <th>Field/Object</th>
@@ -79,14 +78,15 @@
             </tr>
         {% endfor %}
       </table>
-    {% elseif 'identified' == type %}
+    {% elseif 'identified' == event.eventType %}
         {{ 'mautic.lead.audit.identified'|trans }}
-    {% elseif 'ipadded' == type %}
-        {{ 'mautic.lead.audit.accessed'|trans }} {{ details|first|join(',') }}
-    {% elseif 'merged' == type %}
+    {% elseif 'ipadded' == event.eventType %}
+        {{ 'mautic.lead.audit.accessed'|trans }} {{ event.details|first|join(',') }}
+    {% elseif 'merged' == event.eventType %}
         {{ 'mautic.lead.audit.merged'|trans }}
     {% endif %}
 {% endif %}
 <!--
-{{ details|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}
+Event Type: "{{ event.eventType }}"
+{{ event.details|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}
 -->

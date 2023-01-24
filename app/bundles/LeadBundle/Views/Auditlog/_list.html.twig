@@ -93,7 +93,11 @@
               {% set rowStripe = cycle(['', 'timeline-row-highlighted'], loop.index0) %}
               <tr class="timeline-row {{ rowStripe }} {% if event.featured is defined %}timeline-featured{% endif %}">
                   <td class="timeline-icon">
-                      <a href="javascript:void(0);" data-activate-details="{{ counter }}" class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined %}disabled{% endif %}" data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
+                      <a href="javascript:void(0);"
+                         data-activate-details="{{ counter }}"
+                         class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined %}disabled{% endif %}"
+                         data-toggle="tooltip"
+                         title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
                           <span class="fa fa-fw {{ icon }}"></span>
                       </a>
                   </td>
