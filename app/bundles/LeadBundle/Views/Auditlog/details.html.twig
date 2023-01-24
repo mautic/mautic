@@ -22,8 +22,8 @@
               {% if values is iterable %}
                 {% if values|length >= 2 %}
                     <td>{{ field|e }}</td>
-                    <td>{{ normalizeStringValue(values[1])|e }}</td>
-                    <td>{{ normalizeStringValue(values[0])|e }}</td>
+                    <td>{% if values[1] is string %}{{ normalizeStringValue(values[1])|e }}{% endif %}</td>
+                    <td>{% if values[0] is string %}{{ normalizeStringValue(values[0])|e }}{% endif %}</td>
                 {% else %}
                     {% set v = '' %}
                     {% for k, value in values %}
@@ -35,7 +35,7 @@
                 {% endif %}
               {% else %}
                 <td>{{ field|e }}</td>
-                <td>{{ normalizeStringValue(values)|e }}</td>
+                <td>{% if values is string %}{{ normalizeStringValue(values)|e }}{% endif %}</td>
                 <td>&nbsp;</td>
               {% endif %}
             </tr>
@@ -55,8 +55,8 @@
             {% if values is iterable %}
                 {% if values|length >= 2 %}
                     <td>{{ field|e }}</td>
-                    <td>{{ normalizeStringValue(values[1])|e }}</td>
-                    <td>{{ normalizeStringValue(values[0])|e }}</td>
+                    <td>{% if values[1] is string %}{{ normalizeStringValue(values[1])|e }}{% endif %}</td>
+                    <td>{% if values[0] is string %}{{ normalizeStringValue(values[0])|e }}{% endif %}</td>
                 {% else %}
                     {% set v = '' %}
                     {% for k, value in values %}
@@ -68,7 +68,7 @@
                 {% endif %}
             {% else %}
                 <td>{{ field|e }}</td>
-                <td>{{ normalizeStringValue(values)|e }}</td>
+                <td>{% if values is string %}{{ normalizeStringValue(values)|e }}{% endif %}</td>
                 <td>&nbsp;</td>
             {% endif %}
             </tr>
