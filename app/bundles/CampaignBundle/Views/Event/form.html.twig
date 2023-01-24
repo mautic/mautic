@@ -1,3 +1,10 @@
+{#
+  Variables
+    - form
+#}
+{% form_theme form with [
+      'MauticCampaignBundle:FormTheme:Event/_campaignevent_properties_row.html.twig',
+] %}
 <div class="bundle-form">
     <div class="bundle-form-header mb-10">
         <h3>{{ eventHeader }}</h3>

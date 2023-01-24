@@ -1,3 +1,8 @@
+{#
+  Variables
+    - event
+    - campaignId
+#}
 {% set route = route|default('mautic_campaignevent_action') %}
 {% if update is not defined %}
   <div id="CampaignEvent_{{ event['id'] }}"

@@ -162,7 +162,7 @@
         <div class="tab-content pa-md">
             <!-- #events-container -->
                 <div class="active tab-pane fade in bdr-w-0" id="preview-container">
-                  {{- include('MauticCampaignBundle:Campaign:preview.html.twig', {
+                  {{- include('MauticCampaignBundle:Campaign:_preview.html.twig', {
                         'campaignId': campaign.id,
                         'campaign': campaign,
                         'campaignEvents': campaignEvents,
@@ -173,24 +173,23 @@
                 </div>
               {% if events.decision is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="decisions-container">
-                  {{- include('MauticCampaignBundle:Campaign:events.html.twig', {'events': events['decision']}) -}}
+                  {{- include('MauticCampaignBundle:Campaign:_events.html.twig', {'events': events['decision']}) -}}
                 </div>
               {% endif %}
               {% if events.action is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="actions-container">
-                  {{- include('MauticCampaignBundle:Campaign:events.html.twig', {'events': events['action']}) -}}
+                  {{- include('MauticCampaignBundle:Campaign:_events.html.twig', {'events': events['action']}) -}}
                 </div>
               {% endif %}
               {% if events.condition is not empty %}
                 <div class="tab-pane fade in bdr-w-0" id="conditions-container">
-                  {{- include('MauticCampaignBundle:Campaign:events.html.twig', {'events': events['condition']}) -}}
+                  {{- include('MauticCampaignBundle:Campaign:_events.html.twig', {'events': events['condition']}) -}}
                 </div>
               {% endif %}
             <!--/ #events-container -->
-            <div class="tab-pane fade in bdr-w-0 page-list" id="leads-container" data-target-url="{{ url('mautic_campaign_contacts',
-                        {'objectId': campaign.id,
-                        'page': app.session.get('mautic.campaign.contact.page', 1)})
-                }}">
+            <div class="tab-pane fade in bdr-w-0 page-list"
+                 id="leads-container"
+                 data-target-url="{{ url('mautic_campaign_contacts', {'objectId': campaign.id, 'page': app.session.get('mautic.campaign.contact.page', 1)}) }}">
                 <div class="spinner"><i class="fa fa-spin fa-spinner"></i></div>
                 <div class="clearfix"></div>
             </div>

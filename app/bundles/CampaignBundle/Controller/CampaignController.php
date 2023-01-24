@@ -281,7 +281,7 @@ class CampaignController extends AbstractStandardFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.twig'),
+                    'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.twig',
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),

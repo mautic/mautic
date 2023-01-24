@@ -1,3 +1,11 @@
+{#
+  Variables
+    - campaignId
+    - campaignEvents
+    - campaignSources
+    - eventSettings
+    - canvasSettings
+#}
 <div class="hide builder campaign-builder live">
     <div class="btns-builder">
         <button type="button" class="btn btn-primary btn-apply-builder" onclick="Mautic.saveCampaignFromBuilder();">{{ 'mautic.core.form.apply'|trans }}</button>
@@ -17,7 +25,7 @@
             </div>
 
             {% for source in campaignSources %}
-              {{- include('MauticCampaignBundle:Source:index.html.twig', {
+              {{- include('MauticCampaignBundle:Source:_index.html.twig', {
                     'sourceType': source.sourceType,
                     'names': source.names,
                     'campaignId': source.campaignId,
@@ -26,13 +34,13 @@
 
             {% for event in campaignEvents %}
               {% set settings = eventSettings[event.eventType][event.type] %}
-              {{- include(settings['template']|default('MauticCampaignBundle:Event:generic.html.twig'), {
+              {{- include(settings['template']|default('MauticCampaignBundle:Event:_generic.html.twig'), {
                     'event': event,
                     'campaignId': campaignId,
               }) -}}
             {% endfor %}
 
-            {{- include('MauticCampaignBundle:Campaign/Builder:index.html.twig', {
+            {{- include('MauticCampaignBundle:Campaign/Builder:_index.html.twig', {
                   'campaignSources': campaignSources,
                   'eventSettings': eventSettings,
                   'campaignId': campaignId,

@@ -1,3 +1,12 @@
+{#
+  Variables
+    - campaign
+    - campaignId
+    - campaignEvents
+    - campaignSources
+    - eventSettings
+    - canvasSettings
+#}
 <div class="builder campaign-builder preview">
     <div class="builder-content">
         <div id="CampaignCanvas">
@@ -16,7 +25,7 @@
               {% for form in campaign.forms.toArray %}
                 {% set names = names + [form.name] %}
               {% endfor %}
-              {{- include('MauticCampaignBundle:Source:index.html.twig', {
+              {{- include('MauticCampaignBundle:Source:_index.html.twig', {
                     'sourceType': 'forms',
                     'campaignId': campaign.id,
                     'names': names|join(', '),
@@ -28,7 +37,7 @@
               {% for list in campaign.lists.toArray %}
                 {% set names = names + [list.name] %}
               {% endfor %}
-              {{- include('MauticCampaignBundle:Source:index.html.twig', {
+              {{- include('MauticCampaignBundle:Source:_index.html.twig', {
                     'sourceType': 'lists',
                     'campaignId': campaign.id,
                     'names': names|join(', '),
@@ -36,13 +45,13 @@
             {% endif %}
 
             {% for event in campaignEvents %}
-              {{- include('MauticCampaignBundle:Event:preview.html.twig', {
+              {{- include('MauticCampaignBundle:Event:_preview.html.twig', {
                     'event': event,
                     'campaignId': campaign.id,
               }) -}}
             {% endfor %}
 
-            {{- include('MauticCampaignBundle:Campaign/Builder:index.html.twig', {
+            {{- include('MauticCampaignBundle:Campaign/Builder:_index.html.twig', {
                     'campaignSources': campaignSources,
                     'eventSettings': eventSettings,
                     'campaignId': campaign.id,

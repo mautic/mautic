@@ -1,3 +1,8 @@
+{#
+  Variables
+    - event
+    - campaignId
+#}
 <div class="hide" id="CampaignEventPanel">
     <div id="CampaignEventPanelGroups">
         <div class="row">
@@ -71,12 +76,12 @@
         </div>
     </div>
     <div id="CampaignEventPanelLists" class="hide">
-        {{- include('MauticCampaignBundle:Campaign/Builder:source_list.html.twig', {
+        {{- include('MauticCampaignBundle:Campaign/Builder:_source_list.html.twig', {
               'campaignSources': campaignSources,
               'campaignId': campaignId,
         }) -}}
 
-        {{- include('MauticCampaignBundle:Campaign/Builder:event_list.html.twig', {
+        {{- include('MauticCampaignBundle:Campaign/Builder:_event_list.html.twig', {
               'eventSettings': eventSettings,
               'campaignId': campaignId,
         }) -}}

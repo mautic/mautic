@@ -86,7 +86,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['sourceHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.twig',
+                    'MauticCampaignBundle:Source:_index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -193,7 +193,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['updateHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.twig',
+                    'MauticCampaignBundle:Source:_index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
