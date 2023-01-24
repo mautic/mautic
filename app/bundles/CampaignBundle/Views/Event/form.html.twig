@@ -5,6 +5,9 @@
 {% form_theme form with [
       'MauticCampaignBundle:FormTheme:Event/_campaignevent_properties_row.html.twig',
 ] %}
+{% if formTheme is defined %}
+  {% form_theme form formTheme %}
+{% endif %}
 <div class="bundle-form">
     <div class="bundle-form-header mb-10">
         <h3>{{ eventHeader }}</h3>

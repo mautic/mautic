@@ -115,12 +115,10 @@ class EventController extends CommonFormController
             $closeModal = true;
         } else {
             $closeModal = false;
-            $formThemes = ['MauticCampaignBundle:FormTheme\Event'];
             if (isset($event['settings']['formTheme'])) {
-                $formThemes[] = $event['settings']['formTheme'];
+                $viewParams['formTheme'] = $event['settings']['formTheme'];
             }
 
-            //$viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.twig', $formThemes);
             $viewParams['form']             = $form->createView();
             $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
             $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
@@ -323,14 +321,11 @@ class EventController extends CommonFormController
         ];
 
         if (!$cancelled && !$valid) {
-            $formThemes = ['MauticCampaignBundle:FormTheme\Event'];
-
             if (isset($event['settings']['formTheme'])) {
-                $formThemes[] = $event['settings']['formTheme'];
+                $viewParams['formTheme'] = $event['settings']['formTheme'];
             }
 
             $viewParams = array_merge($viewParams, [
-                //'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.twig', $formThemes),
                 'form'             => $form->createView(),
                 'eventHeader'      => $event['settings']['label'],
                 'eventDescription' => $event['settings']['description'],

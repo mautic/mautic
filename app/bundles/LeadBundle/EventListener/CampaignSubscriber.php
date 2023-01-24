@@ -249,7 +249,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.campaigns',
             'description' => 'mautic.lead.lead.events.campaigns_descr',
             'formType'    => CampaignEventLeadCampaignsType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ContactCampaignsCondition',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:ContactCampaignsCondition/_campaignevent_lead_campaigns_widget.html.twig',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
 
