@@ -161,7 +161,7 @@
                                           {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': lead}) }}
                                         {% endif %}
                                         {% for field in fields[group] %}
-                                            {% if field.value %}
+                                            {% if field.value is not empty %}
                                                 <tr>
                                                     <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span></td>
                                                     <td>
