@@ -110,7 +110,7 @@ class FormController extends CommonFormController
                     'security'    => $this->get('mautic.security'),
                     'tmpl'        => $this->request->get('tmpl', 'index'),
                 ],
-                'contentTemplate' => 'MauticFormBundle:Form:list.html.php',
+                'contentTemplate' => 'MauticFormBundle:Form:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -245,7 +245,7 @@ class FormController extends CommonFormController
                     'formContent'       => htmlspecialchars($model->getContent($activeForm, false), ENT_QUOTES, 'UTF-8'),
                     'availableActions'  => $customComponents['actions'],
                 ],
-                'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
+                'contentTemplate' => 'MauticFormBundle:Form:details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -448,7 +448,7 @@ class FormController extends CommonFormController
                     'companyFields'  => $leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'      => true,
                 ],
-                'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
+                'contentTemplate' => 'MauticFormBundle:Builder:index.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -838,7 +838,7 @@ class FormController extends CommonFormController
                     'companyFields'      => $leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'          => true,
                 ],
-                'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
+                'contentTemplate' => 'MauticFormBundle:Builder:index.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -963,7 +963,7 @@ class FormController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName     = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':form.html.php');
+            $logicalName     = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':form.html.twig');
             $assetsHelper    = $this->get('templating.helper.assets');
             $slotsHelper     = $this->get('templating.helper.slots');
             $analyticsHelper = $this->get('mautic.helper.template.analytics');
@@ -982,7 +982,7 @@ class FormController extends CommonFormController
             return $this->render($logicalName, $viewParams);
         }
 
-        return $this->render('MauticFormBundle::form.html.php', $viewParams);
+        return $this->render('MauticFormBundle::form.html.twig', $viewParams);
     }
 
     /**
