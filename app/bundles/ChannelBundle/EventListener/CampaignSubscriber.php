@@ -83,7 +83,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description'            => 'mautic.channel.message.send.marketing.message.descr',
             'batchEventName'         => ChannelEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'               => MessageSendType::class,
-            'formTheme'              => 'MauticChannelBundle:FormTheme\MessageSend', // No template exists
             'channel'                => 'channel.message',
             'channelIdField'         => 'marketingMessage',
             'connectionRestrictions' => [
