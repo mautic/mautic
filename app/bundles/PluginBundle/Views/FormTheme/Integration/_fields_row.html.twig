@@ -47,7 +47,7 @@
                 {% set remainder = rowCount % numberOfFields %}
                 {% if 1 == remainder or 3 == remainder %}
                     {% set class = (5 == numberOfFields) ? 'col-sm-5' : 'col-sm-6' %}
-                {% elseif 2 = remainder %}
+                {% elseif 2 == remainder %}
                     {% set class = (5 == numberOfFields) ? 'col-sm-2' : 'col-sm-6' %}
                 {% endif %}
             {% endif %}
@@ -121,7 +121,7 @@
                               {% for o, keyValue in options %}
                               <option value="{{ keyValue|e }}"
                                       {% if keyValue == child.vars['data'] %}selected{% set selected = true %}
-                                      {% elseif selected is defeind and selected is empty and '-1' == keyValue %}selected{% endif %}>
+                                      {% elseif selected is defined and selected is empty and '-1' == keyValue %}selected{% endif %}>
                                   {{ o }}
                               </option>
                               {% endfor %}
@@ -153,12 +153,12 @@
                 'target': '#IntegrationEditModal',
                 'totalItems': totalFields,
                 'jsCallback': 'Mautic.getIntegrationFields',
-                'jsArguments': {
+                'jsArguments': [
                     {
                         'object': object,
                         'integration': integration,
                     },
-                },
+                ],
         }) }}
     </div>
     {% endif %}
