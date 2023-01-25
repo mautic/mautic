@@ -1,0 +1,140 @@
+{#
+  Variables
+    - template
+    - field
+    - viewOnlyFields
+    - inForm
+    - id
+    - formId
+    - formName
+    - contactFields
+    - companyFields
+    - inBuilder
+    - fields
+    - formFields
+    - conditionalFieldTypes
+#}
+{% set inBuilder = inBuilder|default(false) %}
+<div class="{% if isConditional is not defined %}panel{% else %}panel2{% endif %} form-field-wrapper" data-sortable-id="mauticform_{{ field.id }}">
+        {{ include('MauticFormBundle:Builder:_actions.html.twig', {
+                'id': field.id,
+                'formId': formId,
+                'formName': '',
+                'disallowDelete': ('button' == field.type),
+        }) }}
+        <div class="row ml-0 mr-0">
+            {# wrap in a row to keep bootstrap container classes from affecting builder layout #}
+            {{ include(template, {
+                    'field': field,
+                    'inForm': true,
+                    'id': field.id,
+                    'formId': formId,
+                    'contactFields': contactFields|default([]),
+                    'companyFields': companyFields|default([]),
+                    'inBuilder': inBuilder,
+            }) }}
+        </div>
+
+        {% if ((field['showWhenValueExists'] is defined and false == field['showWhenValueExists']) or field['showAfterXSubmissions']) is not empty
+            or (field['alwaysDisplay'] is defined and true == field['alwaysDisplay'])
+            or field['leadField'] is not empty
+            or field['conditions'] is not empty
+        %}
+            <div class="panel-footer">
+                {% if field.conditions.expr is defined and field.conditions.expr is not empty %}
+                    <span class="inline-spacer">
+                      <span style="text-transform: none">{{ 'mautic.form.field.form.condition.show.on'|trans }}</span>
+                      <strong>{{ formFields[field['parent']]['label'] }}</strong>
+                      <span style="text-transform: none">
+                          {{ ('mautic.core.operator.' ~ field['conditions']['expr']|lower)|trans }}
+                          {{ 'mautic.form.field.form.condition.select.value'|trans }}
+                      </span>
+                      <strong>
+                          {% if 'in' == field.conditions.expr and field.conditions.any is not empty %}
+                              *
+                          {% else %}
+                            {{ field.conditions.values|join(', ') }}
+                          {% endif %}
+                      </strong>
+                    </span>
+                    <br>
+                {% endif %}
+
+                {% if field.leadField is defined and field.leadField is not empty %}
+                    {% set icon = field.leadField in companyFields|keys ? 'building' : 'user' %}
+                    <i class="fa fa-{{ icon }}" aria-hidden="true"></i>
+                    <span class="inline-spacer">
+                        {% if contactFields[field.leadField].label is defined %}
+                            {{ contactFields[field.leadField].label }}
+                        {% elseif companyFields[field.leadField].label is defined %}
+                            {{ companyFields[field.leadField].label }}
+                        {% else %}
+                            {{ field.leadField|title }}
+                        {% endif %}
+                    </span>
+                {% endif %}
+
+                {% if field.alwaysDisplay is defined and field.alwaysDisplay %}
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                  <span class="inline-spacer">{{ 'mautic.form.field.form.always_display'|trans }}</span>
+                {% else %}
+                  {% if field.showWhenValueExists is defined and false == field.showWhenValueExists %}
+                    <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                    <span class="inline-spacer">{{ 'mautic.form.field.hide.if.value'|trans }}</span>
+                  {% endif %}
+
+                  {% if field.showAfterXSubmissions is defined and field.showAfterXSubmissions is not empty %}
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                    <span class="inline-spacer">{{ 'mautic.form.field.hide.if.submission.count'|trans({'%count%': field.showAfterXSubmissions}) }}</span>
+                  {% endif %}
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if isConditional is not defined and fields is defined and field.type in enumConditionalFieldTypes() %}
+            <div class="row ml-15 mr-0 pb-15">
+                <div class="pull-left mt-15">
+                  <a class="add-new-conditional-field" href=""><i class="fa fa-plus"></i> {{ 'mautic.form.form.component.fields.conditional'|trans }}</a>
+                </div>
+                <div class="mt-10 col-sm-4 col-xs-12" style="display:none">
+                    <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.fields'|trans }}">
+                        <option value=""></option>
+                        {% for conditionalField, conditionalFieldType in fields %}
+                            {% if conditionalFieldType not in viewOnlyFields %}
+                                <option data-toggle="ajaxmodal"
+                                        data-target="#formComponentModal"
+                                        data-href="{{ path('mautic_formfield_action', {'objectAction': 'new', 'type': conditionalFieldType, 'tmpl': 'field', 'formId': formId, 'inBuilder': inBuilder, 'parent': field.id}) }}">
+                                  {{ conditionalField }}
+                                </option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        {% endif %}
+
+        {% for field2 in formFields %}
+            {% if field2.parent is not empty and field2.parent == field.id %}
+              {% if field2.isCustom is defined and field2.isCustom is not empty %}
+                  {% set params  = field2.customParameters %}
+                  {% set template = params.template %}
+              {% else %}
+                  {% set template = 'MauticFormBundle:Field:_' ~ field2.type ~ '.html.twig' %}
+              {% endif %}
+              {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
+                      'isConditional': true,
+                      'template': template,
+                      'field': field2,
+                      'viewOnlyFields': viewOnlyFields,
+                      'inForm': true,
+                      'id': field2.id,
+                      'formId': formId,
+                      'contactFields': contactFields,
+                      'companyFields': companyFields,
+                      'inBuilder': inBuilder,
+                      'fields': fields,
+                      'formFields': formFields,
+              }) }}
+            {% endif %}
+        {% endfor %}
+</div>

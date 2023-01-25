@@ -1,0 +1,12 @@
+{#
+#}
+{% set defaultInputClass = 'button' %}
+{% set containerType = 'button-wrapper' %}
+
+include __DIR__.'/field_helper.php';
+
+{% set buttonType = properties.type is defined ? properties.type : 'submit' %}
+
+<div {{ containerAttr|default('') }}>
+    <button type="{{ buttonType }}" name="mauticform[{{ field.alias }}]" {{ inputAttr|default('') }} value="1">{{ field.label }}</button>
+</div>
