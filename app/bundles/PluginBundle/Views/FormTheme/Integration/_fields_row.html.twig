@@ -45,7 +45,7 @@
             {% else %}
                 {% set class = '' %}
                 {% set remainder = rowCount % numberOfFields %}
-                {% if 1 == remainder or 3 = remainder %}
+                {% if 1 == remainder or 3 == remainder %}
                     {% set class = (5 == numberOfFields) ? 'col-sm-5' : 'col-sm-6' %}
                 {% elseif 2 = remainder %}
                     {% set class = (5 == numberOfFields) ? 'col-sm-2' : 'col-sm-6' %}
