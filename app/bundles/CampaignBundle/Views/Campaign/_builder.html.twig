@@ -33,7 +33,7 @@
             {% endfor %}
 
             {% for event in campaignEvents %}
-              {% set settings = eventSettings[event.eventType][event.type] %}
+              {% set settings = eventSettings[event.eventType][event.type]|default(null) %}
               {{- include(settings['template']|default('MauticCampaignBundle:Event:_generic.html.twig'), {
                     'event': event,
                     'campaignId': campaignId,
