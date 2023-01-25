@@ -504,7 +504,7 @@ class FormModel extends CommonFormModel
 
         if ($entity->getRenderStyle()) {
             $templating = $this->templatingHelper->getTemplating();
-            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $styleTheme = $theme.'MauticFormBundle:Builder:_style.html.twig';
             $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
         }
 
@@ -522,7 +522,7 @@ class FormModel extends CommonFormModel
 
         [$pages, $lastPage] = $this->getPages($fields);
         $html               = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
+            $theme.'MauticFormBundle:Builder:form.html.twig',
             [
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
                 'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
@@ -752,7 +752,7 @@ class FormModel extends CommonFormModel
         $script = '
             var scr  = document.currentScript;
             var html = "'.$html.'";
-            
+
             if (scr !== undefined) {
                 scr.insertAdjacentHTML("afterend", html);
                 '.$newFormScript.'
@@ -776,7 +776,7 @@ class FormModel extends CommonFormModel
         }
 
         $script = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:script.html.php',
+            $theme.'MauticFormBundle:Builder:_script.html.twig',
             [
                 'form'  => $form,
                 'theme' => $theme,
