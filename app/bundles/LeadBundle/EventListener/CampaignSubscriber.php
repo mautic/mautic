@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Form\Type\CampaignEventLeadOwnerType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadSegmentsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadStagesType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadTagsType;
+use Mautic\LeadBundle\Form\Type\CampaignEventPointType;
 use Mautic\LeadBundle\Form\Type\ChangeOwnerType;
 use Mautic\LeadBundle\Form\Type\CompanyChangeScoreActionType;
 use Mautic\LeadBundle\Form\Type\ListActionType;
@@ -254,6 +255,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.campaigns', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.points',
+            'description' => 'mautic.lead.lead.events.points_descr',
+            'formType'    => CampaignEventPointType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.points', $trigger);
     }
 
     public function onCampaignTriggerActionChangePoints(CampaignExecutionEvent $event)
