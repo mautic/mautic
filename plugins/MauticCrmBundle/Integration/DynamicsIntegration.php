@@ -301,7 +301,10 @@ class DynamicsIntegration extends CrmAbstractIntegration
                                  'MoneyType',
                             ], true)) {
                                 $type = 'int';
-                            } elseif ('BooleanType' === $fieldType) {
+                            } elseif (in_array($fieldType, [
+                                'BooleanType',
+                                'Boolean',
+                            ], true)) {
                                 $type = 'boolean';
                             } elseif ('DateTimeType' === $fieldType) {
                                 $type = 'datetime';
@@ -846,10 +849,19 @@ class DynamicsIntegration extends CrmAbstractIntegration
             foreach ($fieldsToUpdate[$object] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
                     if ($v === $dk) {
-                        if ($dv) {
-                            if (isset($availableFields[$object][$k])) {
-                                $mappedData[$availableFields[$object][$k]['dv']] = $dv;
+                        if (isset($dv)) {
+                          if (isset($availableFields[$object][$k])) {
+                            if ($availableFields[$object][$k]['type'] === 'boolean') {
+                              // Map boolean values correctly
+                              if ($dv === '1') {
+                                $mappedData[$availableFields[$object][$k]['dv']] = true;
+                              } else {
+                                $mappedData[$availableFields[$object][$k]['dv']] = false;
+                              }
+                            } else {
+                              $mappedData[$availableFields[$object][$k]['dv']] = $dv;
                             }
+                          }
                         }
                     }
                 }
@@ -878,9 +890,18 @@ class DynamicsIntegration extends CrmAbstractIntegration
             foreach ($config['leadFields'] as $k => $v) {
                 foreach ($lead as $dk => $dv) {
                     if ($v === $dk) {
-                        if ($dv) {
+                        if (isset($dv)) {
                             if (isset($availableFields[$object][$k])) {
+                              if ($availableFields[$object][$k]['type'] === 'boolean') {
+                                // Map boolean values correctly
+                                if ($dv === '1') {
+                                  $mappedData[$availableFields[$object][$k]['dv']] = true;
+                                } else {
+                                  $mappedData[$availableFields[$object][$k]['dv']] = false;
+                                }
+                              } else {
                                 $mappedData[$availableFields[$object][$k]['dv']] = $dv;
+                              }
                             }
                         }
                     }
