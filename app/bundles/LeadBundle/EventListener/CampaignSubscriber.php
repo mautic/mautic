@@ -35,6 +35,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Provider\FilterOperatorProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -77,6 +78,11 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $coreParametersHelper;
 
     /**
+     * @var FilterOperatorProvider
+     */
+    private $filterOperatorProvider;
+
+    /**
      * @var array
      */
     private $fields;
@@ -88,15 +94,17 @@ class CampaignSubscriber implements EventSubscriberInterface
         ListModel $listModel,
         CompanyModel $companyModel,
         CampaignModel $campaignModel,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        FilterOperatorProvider $filterOperatorProvider
     ) {
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->listModel            = $listModel;
-        $this->companyModel         = $companyModel;
-        $this->campaignModel        = $campaignModel;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->ipLookupHelper         = $ipLookupHelper;
+        $this->leadModel              = $leadModel;
+        $this->leadFieldModel         = $leadFieldModel;
+        $this->listModel              = $listModel;
+        $this->companyModel           = $companyModel;
+        $this->campaignModel          = $campaignModel;
+        $this->coreParametersHelper   = $coreParametersHelper;
+        $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
     /**
@@ -522,6 +530,21 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $field,
                     $fieldValue,
                     $operators[$event->getConfig()['operator']]['expr']
+                );
+            }
+        } elseif ($event->checkContext('lead.points')) {
+            $operators    = $this->filterOperatorProvider->getAllOperators();
+            $league       = $event->getConfig()['league'];
+            $score        = $event->getConfig()['score'];
+            $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
+
+            if ($league) {
+                $result = $this->leadModel->getLeagueContactScoreRepository()->compareValue(
+                    $lead->getId(), $league, $score, $operatorExpr,
+                );
+            } else {
+                $result = $this->leadFieldModel->getRepository()->compareValue(
+                    $lead->getId(), 'points', $score, $operatorExpr
                 );
             }
         }

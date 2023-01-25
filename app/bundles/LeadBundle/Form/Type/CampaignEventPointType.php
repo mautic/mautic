@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Form\Type;
 
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\PointBundle\Form\Type\LeagueListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -10,6 +11,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class CampaignEventPointType extends AbstractType
 {
+    use OperatorListTrait;
+
     /**
      * {@inheritdoc}
      */
@@ -19,14 +22,20 @@ class CampaignEventPointType extends AbstractType
             'operator',
             ChoiceType::class,
             [
-                'choices' => [
-                    'mautic.lead.list.form.operator.equals'            => '=',
-                    'mautic.lead.list.form.operator.notequals'         => '!=',
-                    'mautic.lead.list.form.operator.greaterthan'       => 'gt',
-                    'mautic.lead.list.form.operator.greaterthanequals' => 'gte',
-                    'mautic.lead.list.form.operator.lessthan'          => 'lt',
-                    'mautic.lead.list.form.operator.lessthanequals'    => 'lte',
-                ],
+                'label'             => 'mautic.lead.campaign.event.point_operator',
+                'multiple'          => false,
+                'choices'           => $this->getOperatorsForFieldType([
+                    'include' => [
+                        '=',
+                        '!=',
+                        'gt',
+                        'gte',
+                        'lt',
+                        'lte',
+                    ],
+                ]),
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
             ]
         );
 

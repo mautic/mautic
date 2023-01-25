@@ -50,6 +50,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Mautic\PointBundle\Entity\LeagueContactScoreRepository;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Security\Provider\UserProvider;
@@ -339,6 +340,14 @@ class LeadModel extends FormModel
     public function getLeadListRepository()
     {
         return $this->em->getRepository('MauticLeadBundle:LeadList');
+    }
+
+    /**
+     * @return LeagueContactScoreRepository
+     */
+    public function getLeagueContactScoreRepository()
+    {
+        return $this->em->getRepository('MauticPointBundle:LeagueContactScore');
     }
 
     /**
