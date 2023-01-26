@@ -1,10 +1,10 @@
 {% if formTheme is defined %}
   {#
-    @TODO git grep 'FormBuilderEvent', there are various listeners
+    git grep 'FormBuilderEvent', there are various listeners
     that set the form theme, all those need to be converted to use
     twig files and not directories
   #}
-  {#% form_theme form formTheme %#}
+  {% form_theme form formTheme %}
 {% endif %}
 <div class="bundle-form">
     <div class="bundle-form-header">
