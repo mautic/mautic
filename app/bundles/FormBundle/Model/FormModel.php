@@ -18,6 +18,7 @@ use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -520,12 +521,14 @@ class FormModel extends CommonFormModel
             return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
         });
 
+        $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
+        $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
         $html               = $this->templatingHelper->getTemplating()->render(
             $theme.'MauticFormBundle:Builder:form.html.twig',
             [
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
+                'viewOnlyFields' => $viewOnlyFields,
                 'fields'         => $fields,
                 'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
                 'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
@@ -537,6 +540,7 @@ class FormModel extends CommonFormModel
                 'lastFormPage'   => $lastPage,
                 'style'          => $style,
                 'inBuilder'      => false,
+                'displayManager' => $displayManager,
             ]
         );
 

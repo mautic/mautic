@@ -1,10 +1,9 @@
-{{ include('MauticFormBundle:Field:_text.html.twig', {
+{{ include('MauticFormBundle:Field:text.html.twig', {
         'field': field,
         'fields': fields|default([]),
         'inForm': inForm|default(false),
-        'type': 'email',
+        'type': 'number',
         'id': id,
-        'deleted': deleted is defined ? true : false,
         'formId': formId|default(0),
         'formName': formName|default(''),
 }) }}

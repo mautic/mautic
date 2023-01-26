@@ -119,7 +119,7 @@
                   {% set params  = field2.customParameters %}
                   {% set template = params.template %}
               {% else %}
-                  {% set template = 'MauticFormBundle:Field:_' ~ field2.type ~ '.html.twig' %}
+                  {% set template = 'MauticFormBundle:Field:' ~ field2.type ~ '.html.twig' %}
               {% endif %}
               {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
                       'isConditional': true,
