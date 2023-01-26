@@ -131,7 +131,7 @@
                             </a>
                         </div>
                         {%- if item.description -%}
-                            <div class="text-muted mt-4"><small>{{ item.description }}</small></div>
+                            <div class="text-muted mt-4"><small>{{ item.description|purify }}</small></div>
                         {%- endif -%}
                     </td>
                     <td class="visible-md visible-lg">
