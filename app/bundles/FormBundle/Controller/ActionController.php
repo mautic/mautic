@@ -91,9 +91,13 @@ class ActionController extends CommonFormController
         } else {
             $closeModal                 = false;
             $viewParams['tmpl']         = 'action';
-            $viewParams['form']         = (isset($formAction['settings']['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:action.html.twig', $formAction['settings']['formTheme']) : $form->createView();
+            $viewParams['form']         = $form->createView();
             $header                     = $formAction['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
+
+            if (isset($formAction['settings']['formTheme'])) {
+                $viewParams['formTheme'] = $formAction['settings']['formTheme'];
+            }
         }
 
         $passthroughVars = [
@@ -221,8 +225,12 @@ class ActionController extends CommonFormController
             } else {
                 $closeModal                 = false;
                 $viewParams['tmpl']         = 'action';
-                $viewParams['form']         = (isset($formAction['settings']['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:action.html.twig', $formAction['settings']['formTheme']) : $form->createView();
+                $viewParams['form']         = $form->createView();
                 $viewParams['actionHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
+
+                if (isset($formAction['settings']['formTheme'])) {
+                    $viewParams['formTheme'] = $formAction['settings']['formTheme'];
+                }
             }
 
             $passthroughVars = [
