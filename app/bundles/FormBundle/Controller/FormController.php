@@ -447,7 +447,6 @@ class FormController extends CommonFormController
                     'contactFields'         => $leadFieldModel->getFieldListWithProperties(),
                     'companyFields'         => $leadFieldModel->getFieldListWithProperties('company'),
                     'inBuilder'             => true,
-                    'conditionalFieldTypes' => ConditionalFieldEnum::getConditionalFieldTypes(),
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.twig',
                 'passthroughVars' => [
