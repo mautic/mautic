@@ -539,7 +539,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
 
             if ($league) {
-                $result = $this->leadModel->getLeagueContactScoreRepository()->compareValue(
+                $result = $this->leadModel->getLeagueContactScoreRepository()->compareScore(
                     $lead->getId(), $league, $score, $operatorExpr,
                 );
             } else {

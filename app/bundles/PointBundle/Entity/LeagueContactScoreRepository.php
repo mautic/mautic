@@ -50,7 +50,7 @@ class LeagueContactScoreRepository extends CommonRepository
         return $contact;
     }
 
-    public function compareValue(int $leadId, int $leagueId, int $score, string $operatorExpr): bool
+    public function compareScore(int $leadId, int $leagueId, int $score, string $operatorExpr): bool
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('lcs.contact_id')
