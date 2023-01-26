@@ -202,7 +202,7 @@
   </div>
   {{ form_end(form) }}
 
-  {% if activeForm.formType is null or forceTypeSelection is not empty %}
+  {% if activeForm.formType is null or (forceTypeSelection is defined and forceTypeSelection is not empty) %}
       {{ include('MauticCoreBundle:Helper:form_selecttype.html.twig', {
               'item': activeForm,
               'mauticLang': {

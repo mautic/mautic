@@ -53,7 +53,7 @@
                         {% else %}
                             {{ displayManager.increaseDisplayedFields(f) }}
                         {% endif %}
-                        {% set template = 'MauticFormBundle:Field:_' ~ f.type ~ '.html.twig' %}
+                        {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
                     {% endif %}
 
                     {{ include(theme ~ template, {
@@ -76,7 +76,7 @@
                           {{ f.setCustomParameters(params) }}
                           {% set template = params.template %}
                       {% else %}
-                          {% set template = 'MauticFormBundle:Field:_' ~ f.type ~ '.html.twig' %}
+                          {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
                       {% endif %}
 
                       {{ include(theme ~ template, {

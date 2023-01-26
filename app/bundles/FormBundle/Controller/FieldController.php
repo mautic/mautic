@@ -166,7 +166,7 @@ class FieldController extends CommonFormController
             $leadFieldModel               = $this->getModel('lead.field');
             \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
-                'MauticFormBundle:Builder:fieldwrapper.html.twig',
+                'MauticFormBundle:Builder:_field_wrapper.html.twig',
                 [
                     'isConditional'        => !empty($formField['parent']),
                     'template'             => $template,
@@ -319,7 +319,7 @@ class FieldController extends CommonFormController
             $leadFieldModel = $this->getModel('lead.field');
             \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
-                'MauticFormBundle:Builder:fieldwrapper.html.twig',
+                'MauticFormBundle:Builder:_field_wrapper.html.twig',
                 [
                     'isConditional'        => !empty($formField['parent']),
                     'template'             => $template,
