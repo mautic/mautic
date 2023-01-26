@@ -342,12 +342,12 @@ class LeadModel extends FormModel
         return $this->em->getRepository('MauticLeadBundle:LeadList');
     }
 
-    /**
-     * @return LeagueContactScoreRepository
-     */
-    public function getLeagueContactScoreRepository()
+    public function getLeagueContactScoreRepository(): LeagueContactScoreRepository
     {
-        return $this->em->getRepository('MauticPointBundle:LeagueContactScore');
+        $result = $this->em->getRepository(LeagueContactScoreRepository::class);
+        \assert($result instanceof LeagueContactScoreRepository);
+
+        return $result;
     }
 
     /**

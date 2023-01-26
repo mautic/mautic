@@ -14,6 +14,8 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\PointBundle\Entity\League;
+use Mautic\PointBundle\Entity\LeagueContactScore;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\ApplicationTester;
@@ -199,6 +201,84 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
 
             Assert::assertSame(true, $event->getResult());
         }
+    }
+
+    public function testLeadPointEvents(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
+
+        $contactIds = $this->createContacts();
+        $campaign   = $this->createCampaignWithPointEvents($contactIds);
+
+        // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
+        $this->em->clear();
+
+        // Execute the campaign.
+        $exitCode = $applicationTester->run(
+            [
+                'command'       => 'mautic:campaigns:trigger',
+                '--campaign-id' => $campaign->getId(),
+            ]
+        );
+
+        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+
+        /** @var Lead $contactA */
+        $contactA = $this->contactRepository->getEntity($contactIds[0]);
+        /** @var Lead $contactB */
+        $contactB = $this->contactRepository->getEntity($contactIds[1]);
+        /** @var Lead $contactC */
+        $contactC = $this->contactRepository->getEntity($contactIds[2]);
+
+        $this->assertEquals(0, $contactA->getPoints());
+        $this->assertEquals(0, $contactB->getPoints());
+        $this->assertEquals(2, $contactC->getPoints());
+    }
+
+    public function testLeadLeaguePointEvents(): void
+    {
+        $application = new Application(self::$kernel);
+        $application->setAutoExit(false);
+        $applicationTester = new ApplicationTester($application);
+
+        $leagueA    = $this->createLeague('A');
+        $contactIds = $this->createContacts();
+
+        /** @var Lead $contactB */
+        $contactB = $this->contactRepository->getEntity($contactIds[1]);
+        $this->addLeagueContactScore($contactB, $leagueA, 0);
+
+        /** @var Lead $contactC */
+        $contactC = $this->contactRepository->getEntity($contactIds[2]);
+        $this->addLeagueContactScore($contactC, $leagueA, 1);
+
+        $campaign   = $this->createCampaignWithPointEvents($contactIds);
+
+        // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
+        $this->em->clear();
+
+        // Execute the campaign.
+        $exitCode = $applicationTester->run(
+            [
+                'command'       => 'mautic:campaigns:trigger',
+                '--campaign-id' => $campaign->getId(),
+            ]
+        );
+
+        Assert::assertSame(0, $exitCode, $applicationTester->getDisplay());
+
+        /** @var Lead $contactA */
+        $contactA = $this->contactRepository->getEntity($contactIds[0]);
+        /** @var Lead $contactB */
+        $contactB = $this->contactRepository->getEntity($contactIds[1]);
+        /** @var Lead $contactC */
+        $contactC = $this->contactRepository->getEntity($contactIds[2]);
+
+        $this->assertEquals(0, $contactA->getPoints());
+        $this->assertEquals(0, $contactB->getPoints());
+        $this->assertEquals(2, $contactC->getPoints());
     }
 
     /**
@@ -460,6 +540,28 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         return $campaign;
     }
 
+    private function createLeague(
+        string $name
+    ): League {
+        $league = new League();
+        $league->setName($name);
+        $this->em->persist($league);
+
+        return $league;
+    }
+
+    private function addLeagueContactScore(
+        Lead $lead,
+        League $league,
+        int $score
+    ): void {
+        $leagueContactScore = new LeagueContactScore();
+        $leagueContactScore->setContact($lead);
+        $leagueContactScore->setLeague($league);
+        $leagueContactScore->setScore($score);
+        $lead->addLeagueScore($leagueContactScore);
+    }
+
     /**
      * @param array<int, int> $contactIds
      *
@@ -590,6 +692,172 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                         'targetId' => $event2->getId(),
                         'anchors'  => [
                             'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                ],
+            ]
+        );
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        return $campaign;
+    }
+
+    /**
+     * Creates campaign with point condition and point change action.
+     *
+     * Campaign diagram:
+     * -------------------
+     * -   Has 1 point?  -
+     * -------------------
+     *         | Yes
+     * -------------------
+     * -   Add 1 point   -
+     * -------------------
+     *
+     * @param array<int, int> $contactIds
+     * @param int|null        $pointLeague optional use of point league in campaign
+     *
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    private function createCampaignWithPointEvents(array $contactIds, int $pointLeague = null): Campaign
+    {
+        $campaign = new Campaign();
+        $campaign->setName('Test Update contact');
+
+        $this->em->persist($campaign);
+        $this->em->flush();
+
+        foreach ($contactIds as $key => $contactId) {
+            $campaignLead = new CampaignLead();
+            $campaignLead->setCampaign($campaign);
+            $campaignLead->setLead($this->em->getReference(Lead::class, $contactId));
+            $campaignLead->setDateAdded(new \DateTime());
+            $this->em->persist($campaignLead);
+            $campaign->addLead($key, $campaignLead);
+        }
+
+        $this->em->flush();
+
+        $event1 = new Event();
+        $event1->setCampaign($campaign);
+        $event1->setName('Check if the contact has points');
+        $event1->setType('lead.points');
+        $event1->setEventType('condition');
+        $event1->setTriggerMode('immediate');
+        $event1->setOrder(1);
+        $event1->setProperties(
+            [
+                'canvasSettings'             => [
+                    'droppedX' => '696',
+                    'droppedY' => '155',
+                ],
+                'name'                       => 'Lead points',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'order'                      => 1,
+                'anchor'                     => 'leadsource',
+                'properties'                 => [
+                    'operator'                   => 'gte',
+                    'score'                      => 1,
+                    'league'                     => $pointLeague,
+                ],
+                'type'                       => 'lead.points',
+                'eventType'                  => 'condition',
+                'anchorEventType'            => 'source',
+                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'                    => ['save' => ''],
+                'operator'                   => 'gte',
+                'score'                      => 1,
+                'league'                     => $pointLeague,
+            ]
+        );
+
+        $this->em->persist($event1);
+        $this->em->flush();
+
+        $event2 = new Event();
+        $event2->setCampaign($campaign);
+        $event2->setName('Change contact\'s points');
+        $event2->setType('lead.changepoints');
+        $event2->setEventType('action');
+        $event2->setTriggerMode('immediate');
+        $event2->setDecisionPath('yes');
+        $event2->setOrder(2);
+        $event2->setParent($event1);
+        $event2->setProperties(
+            [
+                'canvasSettings'             => [
+                    'droppedX' => '696',
+                    'droppedY' => '300',
+                ],
+                'name'                       => '',
+                'triggerMode'                => 'immediate',
+                'triggerDate'                => null,
+                'triggerInterval'            => '1',
+                'triggerIntervalUnit'        => 'd',
+                'triggerHour'                => '',
+                'triggerRestrictedStartHour' => '',
+                'triggerRestrictedStopHour'  => '',
+                'anchor'                     => 'yes',
+                'properties'                 => [
+                    'points'                     => 1,
+                ],
+                'type'                       => 'lead.changepoints',
+                'eventType'                  => 'action',
+                'anchorEventType'            => 'condition',
+                'campaignId'                 => 'mautic_28ac4b8a4758b8597e8d189fa97b245996e338bb',
+                '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
+                'buttons'                    => ['save' => ''],
+                'points'                     => 1,
+            ]
+        );
+
+        $this->em->persist($event2);
+        $this->em->flush();
+
+        $campaign->setCanvasSettings(
+            [
+                'nodes'       => [
+                    [
+                        'id'        => $event1->getId(),
+                        'positionX' => '696',
+                        'positionY' => '150',
+                    ],
+                    [
+                        'id'        => $event2->getId(),
+                        'positionX' => '696',
+                        'positionY' => '300',
+                    ],
+                    [
+                        'id'        => 'lists',
+                        'positionX' => '796',
+                        'positionY' => '50',
+                    ],
+                ],
+                'connections' => [
+                    [
+                        'sourceId' => 'lists',
+                        'targetId' => $event1->getId(),
+                        'anchors'  => [
+                            'source' => 'leadsource',
+                            'target' => 'top',
+                        ],
+                    ],
+                    [
+                        'sourceId' => $event1->getId(),
+                        'targetId' => $event2->getId(),
+                        'anchors'  => [
+                            'source' => 'yes',
                             'target' => 'top',
                         ],
                     ],
