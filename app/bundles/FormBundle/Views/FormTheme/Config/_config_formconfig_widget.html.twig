@@ -1,0 +1,30 @@
+{% block _config_formconfig_widget %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.config.tab.formconfig'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          {% for name, f in form.children %}
+              {% if 'form_results_data_sources' != name %}
+                  <div class="row">
+                      <div class="col-md-6">
+                          {{ form_row(f) }}
+                      </div>
+                  </div>
+              {% endif %}
+          {% endfor %}
+      </div>
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.config.tab.formresultsconfig'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          {% for name, f in form.children %}
+              <div class="row">
+                  <div class="col-md-6">
+                      {{ form_row(form.form_results_data_sources) }}
+                  </div>
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+{% endblock %}
