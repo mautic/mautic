@@ -81,7 +81,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => FormSubmitActionPointsChangeType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:FormActionChangePoints/_formaction_properties_row.html.twig',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
@@ -106,7 +106,6 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.addutmtags',
             'description'       => 'mautic.lead.lead.events.addutmtags_descr',
             'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -116,7 +115,6 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.removedonotcontact',
             'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
             'formType'          => ActionRemoveDoNotContact::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
