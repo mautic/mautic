@@ -138,24 +138,24 @@
                                           <option value=""></option>
                                           {% for group, groupActions in actions %}
                                                   {% set campaignActionFound = false %}
-                                                  {% set actionOptions = '' %}
                                                   {% for k, e in groupActions %}
-                                                      {% set actionOptions = actionOptions ~ include('MauticFormBundle:Action:_option.html.twig', {
-                                                              'action': e,
-                                                              'type': k,
-                                                              'isStandalone': activeForm.isStandalone,
-                                                              'formId': form['sessionId'].vars['data'],
-                                                          }) ~ "\n\n" %}
                                                       {% if e.allowCampaignForm is defined and e.allowCampaignForm is not empty %}
                                                           {% set campaignActionFound = true %}
                                                       {% endif %}
                                                   {% endfor %}
-                                                  {% set class = campaignActionFound ? '' : 'action-standalone-only' %}
+                                                  {% set class = campaignActionFound is empty ? 'action-standalone-only' : '' %}
                                                   {% if not campaignActionFound and not activeForm.isStandalone %}
                                                       {% set class = class ~ ' hide' %}
                                                   {% endif %}
                                                   <optgroup class="{{ class }}" label="{{ group|trans }}"></optgroup>
-                                                  {{ actionOptions }}
+                                                  {% for k, e in groupActions %}
+                                                      {{ include('MauticFormBundle:Action:_option.html.twig', {
+                                                              'action': e,
+                                                              'type': k,
+                                                              'isStandalone': activeForm.isStandalone,
+                                                              'formId': form['sessionId'].vars['data'],
+                                                      }) }}
+                                                  {% endfor %}
                                           {% endfor %}
                                       </select>
                                   </div>

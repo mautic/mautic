@@ -5,8 +5,8 @@
     - isStandalone
     - formId
 #}
-{% set class = action.allowCampaignForm is not defined ? 'action-standalone-only' : '' %}
-{% if action.allowCampaignForm is not defined and not isStandalone %}
+{% set class = action.allowCampaignForm is not defined or action.allowCampaignForm is empty ? 'action-standalone-only' : '' %}
+{% if ( action.allowCampaignForm is not defined or action.allowCampaignForm is empty) and not isStandalone %}
     {% set class = class ~ ' hide' %}
 {% endif %}
 <option id="action_{{ type }}"
