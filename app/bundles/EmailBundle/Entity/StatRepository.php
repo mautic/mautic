@@ -658,19 +658,20 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $emailId
+     * @param array<int> $contacts
+     * @param array<int> $emailIds
      *
      * @return array Formatted as [contactId => sentCount]
      */
-    public function getSentCountForContacts(array $contacts, $emailId)
+    public function getSentCountForContacts(array $contacts, array $emailIds)
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $query->from(MAUTIC_TABLE_PREFIX.'email_stats', 's');
         $query->select('count(s.id) as sent_count, s.lead_id')
-            ->where('s.email_id = :email')
+            ->where('s.email_id in (:emails)')
             ->andWhere('s.lead_id in (:contacts)')
             ->andWhere('s.is_failed = 0')
-            ->setParameter(':email', $emailId)
+            ->setParameter(':emails', $emailIds, Connection::PARAM_INT_ARRAY)
             ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy('s.lead_id');
 

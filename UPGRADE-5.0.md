@@ -29,6 +29,8 @@
         * `Mautic\UserBundle\Entity\User::isEnabled()`
     * Two French regions were updates based on ISO_3166-2 (Val-d\'Oise, La Réunion). If you use it in API, please change values to Val d\'Oise or Réunion
     * `AbstractMauticTestCase::loadFixtures` and `AbstractMauticTestCase::loadFixtureFiles` now accept only two arguments: `array $fixtures` and `bool $append`. If you need to use old parameters - refer to the documentation of `LiipTestFixturesBundle`
+    * `Mautic\EmailBundle\Entity\StatRepository::getSentCountForContacts()` method now takes an array of $emailIds instead of a single $emailId as second parameter
+	
 
 # Dependency injection improvements
 
