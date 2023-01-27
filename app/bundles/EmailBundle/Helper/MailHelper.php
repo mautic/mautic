@@ -10,6 +10,7 @@ use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\Event\EmailTokenReplacedEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
@@ -417,6 +418,11 @@ class MailHelper
             if (true === $this->factory->getParameter('mailer_convert_embed_images')) {
                 $this->convertEmbedImages();
             }
+
+            if (null == $this->dispatcher) {
+                $this->dispatcher = $this->factory->getDispatcher();
+            }
+            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_TOKEN_REPLACED, new EmailTokenReplacedEvent($this));
 
             // Attach assets
             if (!empty($this->assets)) {
