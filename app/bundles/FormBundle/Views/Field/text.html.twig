@@ -1,37 +1,177 @@
-$containerType     = (isset($type)) ? $type : 'text';
-$defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
+{#% set containerType = type|default('text') %#}
+{#% set defaultInputClass = inputClass|default('input') %#}
 
-include __DIR__.'/field_helper.php';
+{# start: field_helper #}
+{#
+$appendAttribute = function (&$attributes, $attributeName, $append) {
+    if (false === stripos($attributes, "{$attributeName}=")) {
+        $attributes .= ' '.$attributeName.'="'.$append.'"';
+    } else {
+        $attributes = str_ireplace($attributeName.'="', $attributeName.'="'.$append.' ', $attributes);
+    }
+};
+#}
 
-$label = (!$field['showLabel']) ? '' : <<<HTML
+{#% set defaultInputFormClass = defaultInputFormClass|default('') %#}
+{#% set defaultLabelClass = defaultLabelClass|default('label') %#}
+{#% set formName = formName|default('') %#}
 
-                <label $labelAttr>{$field['label']}</label>
-HTML;
+{% set properties = field.properties %}
 
-$help = (empty($field['helpMessage'])) ? '' : <<<HTML
+{#% set defaultInputClass = 'mauticform-' ~ defaultInputClass %#}
+{#% set defaultLabelClass = 'mauticform-' ~ defaultLabelClass %#}
 
-                <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
-HTML;
+{#% set name = '' %#}
+{#% if ignoreName is not defined %}
+    {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+    {% if properties.multiple is defined %}
+        {% set inputName = inputName ~ '[]' %}
+    {% endif %}
+    {% set name = ' name="' ~ inputName ~ '"' %}
+{% endif %#}
 
-if ('textarea' == $containerType):
-$textInput = <<<HTML
+{#% if field.type in ['checkboxgrp', 'radiogrp', 'textarea'] %}
+    {% set value = '' %}
+{% else %}
+    {% set value = (field.defaultValue is defined and field.defaultValue is not empty) ? ' value="' ~ field.defaultValue ~ '"' : ' value=""' %}
+{% endif %#}
 
-                <textarea $inputAttr>{$field['defaultValue']}</textarea>
-HTML;
+{#% if ignoreId is not defined %#}
+    {#% set inputId = 'id="mauticform_input' ~ formName ~ '_' ~ field.alias ~ '"' %#}
+    {#% set labelId = 'id="mauticform_label' ~ formName ~ '_' ~ field.alias ~ '" for="mauticform_input' ~ formName ~ '_' ~ field.alias ~ '"' %#}
+{#% else %#}
+    {#% set inputId, labelId = '', '' %#}
+{#% endif %#}
 
-else:
-$textInput = <<<HTML
+{#% set inputAttr = inputId ~ name ~ value %#}
+{#% set labelAttr = labelId %#}
 
-                <input {$inputAttr} type="$containerType" />
-HTML;
-endif;
+{#% if properties.placeholder is defined and properties.placeholder is not empty %}
+    {% set inputAttr = inputAttr ~ ' placeholder="' ~ properties.placeholder ~ '"' %}
+{% endif %#}
 
-$html = <<<HTML
+{# Label and input #}
+{#% if inForm is defined and inForm is not empty %}
+    {% if field.type in ['button', 'pagebreak'] %}
+        {% set defaultInputClass = defaultInputClass ~ ' btn btn-default' %}
+    {% endif %#}
+    {#% set labelAttr = labelAttr ~ ' class="' ~ defaultLabelClass ~ '"' %#}
+    {#% set inputAttr = inputAttr ~ ' disabled="disabled" class="' ~ defaultInputClass ~ defaultInputFormClass ~ '"' %}
+{% else %#}
+    {#% if field.labelAttributes %#}
+        {# $labelAttr .= ' '.htmlspecialchars_decode($field['labelAttributes']); #}
+        {#% set labelAttr = labelAttr ~ ' ' ~ field.labelAttributes %#}
+    {#% endif %#}
 
-            <div $containerAttr>{$label}{$help}{$textInput}
-                <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
-            </div>
+    {# $appendAttribute($labelAttr, 'class', $defaultLabelClass); #}
 
-HTML;
+    {#% if field.inputAttributes %#}
+        {# $inputAttr .= ' '.htmlspecialchars_decode($field['inputAttributes']); #}
+        {#% set inputAttr = inputAttr ~ ' ' ~ field.inputAttributes %}
+    {% endif %#}
 
-echo $html;
+    {# $appendAttribute($inputAttr, 'class', $defaultInputClass); #}
+{#% endif %#}
+
+{# Container #}
+{# $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']); #}
+{#% set containerAttr = 'id="mauticform' ~ formName ~ '_' ~ id ~'" ' ~ field.containerAttributes %#}
+{#% set defaultContainerClass = 'mauticform-row mauticform-' ~ containerClass|default(containerType) ~ ' mauticform-field-' ~ field.order|default(0) %#}
+{#% if field.parent and fields[field.parent] is defined %}
+    {% set defaultContainerClass = defaultContainerClass ~ ' mautic-field-hidden' %}
+{% endif %#}
+
+{# Field is required #}
+{#% set validationMessage = '' %#}
+{#% if field.isRequired is defined and field.isRequired %#}
+    {#% set required = true %#}
+    {#% set defaultContainerClass = defaultContainerClass ~ ' mauticform-required' %#}
+    {#% set validationMessage = field.validationMessage %#}
+    {#% if validationMessage is empty %#}
+        {#% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %#}
+    {#% endif %#}
+    {#% set containerAttr = containerAttr ~ ' data-validate="' ~ field.alias ~ '" data-validation-type="' ~ field.type ~ '"' %#}
+    {#% if properties.multiple is defined and properties.multiple is not empty %}
+        {% set containerAttr = containerAttr ~ ' data-validate-multiple="true"' %}
+    {% endif %#}
+{#% elseif required is not defined %#}
+    {# Forced to be required #}
+    {#% set defaultContainerClass = defaultContainerClass ~ ' mauticform-required' %#}
+{#% endif %#}
+
+{# $appendAttribute($containerAttr, 'class', $defaultContainerClass); #}
+
+{# Setup list parsing #}
+{% if list is defined or properties.syncList is defined or properties.list is defined or properties.optionlist is defined %}
+    {% set parseList = [] %}
+    {% set isBooleanList = false %}
+    {% set contactFields = contactFields|default([]) %}
+    {% set companyFields = companyFields|default([]) %}
+    {% set formFields = contactFields|merge(companyFields) %}
+    {% if properties.syncList is defined and properties.syncList is not empty and field.leadField is not empty and formFields[field.leadField] is defined %}
+        $leadFieldType = $formFields[$field['leadField']]['type'];
+        switch (true) {
+            case !empty($formFields[$field['leadField']]['properties']['list']):
+                $parseList = $formFields[$field['leadField']]['properties']['list'];
+                break;
+            case 'boolean' == $leadFieldType:
+                $parseList     = [
+                    0 => $formFields[$field['leadField']]['properties']['no'],
+                    1 => $formFields[$field['leadField']]['properties']['yes'],
+                ];
+                $isBooleanList = true;
+                break;
+            case 'country' == $leadFieldType:
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
+                break;
+            case 'region' == $leadFieldType:
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
+                break;
+            case 'timezone' == $leadFieldType:
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
+                break;
+            case 'locale':
+                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
+                break;
+        }
+    {% endif %}
+
+    {% if parseList is not defined or (parseList is defined and parseList is empty) %}
+        if (isset($list)) {
+            $parseList = $list;
+        } elseif (!empty($properties['optionlist'])) {
+            $parseList = $properties['optionlist'];
+        } elseif (!empty($properties['list'])) {
+            $parseList = $properties['list'];
+        }
+
+        if (isset($parseList['list'])) {
+            $parseList = $parseList['list'];
+        }
+    {% endif %}
+
+    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type'])
+        && in_array(
+            $formFields[$field['leadField']]['type'],
+            ['datetime', 'date']
+        )) {
+        $tempLeadFieldType = $formFields[$field['leadField']]['type'];
+        foreach ($parseList as $key => $aTemp) {
+            if ($date = ('datetime' == $tempLeadFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
+                $parseList[$key]['label'] = $date;
+            }
+        }
+    }
+
+    $list = $isBooleanList
+        ?
+        \Mautic\FormBundle\Helper\FormFieldHelper::parseBooleanList($parseList)
+        :
+        \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
+
+    $firstListValue = reset($list);
+{% endif %}
+{# end: field_helper #}
+
+{%- use 'MauticFormBundle:Field:layout.html.twig' -%}
+{{- block('mautic_form_row') -}}
