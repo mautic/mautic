@@ -6,7 +6,7 @@
       for="mauticform_input{{ formName|default('') }}_{{ field.alias }}"
   {% endif %}
   {% if inForm is defined and inForm is not empty %}
-      class="{{ defaultLabelClass }}"
+      class="{{ labelClassValue }}"
   {% else %}
       {% if field.labelAttributes %}
           {{ field.labelAttributes|raw }}
@@ -114,9 +114,9 @@
 
 {%- block mautic_form_row -%}
   <div {{ block('mautic_form_container_attributes') }}>
-    {{- block('mautic_form_label') -}}
-    {{- block('mautic_form_help') -}}
-    {{- block('mautic_form_widget') -}}
-    {{- block('mautic_form_errors') -}}
+    {{ block('mautic_form_label') }}
+    {{ block('mautic_form_help') }}
+    {{ block('mautic_form_widget') }}
+    {{ block('mautic_form_errors') }}
   </div>
 {%- endblock -%}

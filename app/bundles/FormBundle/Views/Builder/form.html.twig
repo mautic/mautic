@@ -56,7 +56,8 @@
                         {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
                     {% endif %}
 
-                    {{ include(theme ~ template, {
+                    <!-- start: "{{ theme }}{{ template }}" -->
+                    {{- include(theme ~ template, {
                             'field': f.convertToArray,
                             'id': f.alias,
                             'formName': formName,
@@ -65,7 +66,8 @@
                             'companyFields': companyFields,
                             'inBuilder': inBuilder,
                             'fields': fields,
-                    }) }}
+                    }) -}}
+                    <!-- end: "{{ theme }}{{ template }}" -->
                 {% endif %}
 
                 {% set parentField = f %}
@@ -79,7 +81,8 @@
                           {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
                       {% endif %}
 
-                      {{ include(theme ~ template, {
+                      <!-- start: "{{ theme }}{{ template }}" -->
+                      {{- include(theme ~ template, {
                               'field': f.convertToArray(),
                               'id': f.alias,
                               'formName': formName,
@@ -88,7 +91,8 @@
                               'companyFields': companyFields,
                               'inBuilder': inBuilder,
                               'fields': fields,
-                      }) }}
+                      }) -}}
+                      <!-- end: "{{ theme }}{{ template }}" -->
                     {% endif %}
                 {% endfor %}
 

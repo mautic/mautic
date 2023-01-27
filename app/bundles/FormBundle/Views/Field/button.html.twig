@@ -1,12 +1,10 @@
 {#
 #}
-{% set defaultInputClass = 'button' %}
-{% set containerType = 'button-wrapper' %}
+{% set inputClass = inputcClass|default('button') %}
+{% set type = type|default('button-wrapper') %}
+{% set buttonType = filed.properties.type is defined ? filed.properties.type : 'submit' %}
 
-include __DIR__.'/field_helper.php';
-
-{% set buttonType = properties.type is defined ? properties.type : 'submit' %}
-
-<div {{ containerAttr|default('') }}>
-    <button type="{{ buttonType }}" name="mauticform[{{ field.alias }}]" {{ inputAttr|default('') }} value="1">{{ field.label }}</button>
+{%- use 'MauticFormBundle:Field:layout.html.twig' -%}
+<div {{ block('mautic_form_container_attributes') }}>
+  <button type="{{ buttonType }}" name="mauticform[{{ field.alias }}]" {{ block('mautic_form_widget_attributes') }} value="1">{{ field.label }}</button>
 </div>
