@@ -47,14 +47,17 @@ class CampaignEventPointType extends AbstractType
                 'attr'       => ['class' => 'form-control'],
                 'label_attr' => ['class' => 'control-label'],
                 'scale'      => 0,
-                'required'   => false,
+                'required'   => true,
             ]
         );
 
         $builder->add('league', LeagueListType::class, [
             'label'            => 'mautic.lead.campaign.event.point_league',
             'label_attr'       => ['class' => 'control-label'],
-            'attr'             => ['class' => 'form-control'],
+            'attr'             => [
+                'class'    => 'form-control',
+                'tooltip'  => 'mautic.lead.campaign.event.point_league.help',
+            ],
             'required'         => false,
             'by_reference'     => false,
             'return_entity'    => false,
