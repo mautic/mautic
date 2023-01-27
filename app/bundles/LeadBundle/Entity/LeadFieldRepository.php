@@ -173,7 +173,7 @@ class LeadFieldRepository extends CommonRepository
      *
      * @return bool
      */
-    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType)
+    public function compareValue($lead, $field, $value, $operatorExpr, ?string $fieldType = null)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
         $q->select('l.id')
