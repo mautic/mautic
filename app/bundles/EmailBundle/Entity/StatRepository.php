@@ -658,8 +658,8 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @param $contacts
-     * @param $emailIds
+     * @param array<int> $contacts
+     * @param array<int> $emailIds
      *
      * @return array Formatted as [contactId => sentCount]
      */

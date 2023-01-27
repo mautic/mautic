@@ -311,14 +311,18 @@ class CampaignSubscriber implements EventSubscriberInterface
             // Prepare a list of email IDs that we are going to check in contact's history, including the translations.
             $emailIdsToCheck = [$emailId];
             // Add translations of this email to the ID list to be checked in history
-            list($parentTranslation, $childrenTranslations) = $email->getTranslations();
+			
+			$emailTranslations = $email->getTranslations();
+			$parentTranslation = $emailTranslations[0];
+			$childrenTranslations = $emailTranslations[1];
+
             if ($parentTranslation) {
-                /** @var $parentTranslation Email */
+                /** @var Email $parentTranslation */
                 $emailIdsToCheck[] = $parentTranslation->getId();
             }
 
             if ($childrenTranslations) {
-                /** @var $childrenTranslations Email[] */
+                /** @var Email[] $childrenTranslations */
                 foreach ($childrenTranslations as $childrenTranslation) {
                     $emailIdsToCheck[] = $childrenTranslation->getId();
                 }
