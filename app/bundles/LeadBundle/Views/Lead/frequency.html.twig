@@ -24,11 +24,6 @@
             <tbody >
 
             {% for channel in form.lead_channels.subscribed_channels.vars.choices %}
-                {#$contactMe     = isset($leadChannels[$channel->value]);
-                $isContactable = $contactMe ? '' : 'text-muted';
-                $hidden        = $contactMe ? '' : 'hide';
-                $checked       = $contactMe ? 'checked' : '';
-                $disabled      = isset($leadChannels[$channel->value]) ? '' : 'disabled';#}
                 {% set isContactable = leadChannels[channel.value] is not defined %}
                 {% set isHidden = leadChannels[channel.value] is not defined %}
                 {% set isChecked = leadChannels[channel.value] is defined %}
@@ -88,6 +83,7 @@
                         <div class="clearfix"></div>
                     </td>
                 </tr>
+                {% do form.lead_channels.setRendered() %}
             {% endfor %}
             </tbody>
         </table>
