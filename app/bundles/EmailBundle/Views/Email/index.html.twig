@@ -8,21 +8,19 @@
             'new' : permissions['email:emails:create']
         },
         'routeBase' : 'email',
-    })
-    -}}
+    }) -}}
 {% endblock %}
 
+{% block list_toolbar %}
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
         'searchValue' : searchValue,
         'searchHelp'  : 'mautic.email.help.searchcommands',
         'action'      : currentRoute,
         'filters'     : filters,
-    })
-    -}}
-
+    }) -}}
     <div class="page-list">
         {% block content %}{% endblock %}
     </div>
 </div>
-
+{% endblock %}

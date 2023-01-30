@@ -2,40 +2,49 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 
 trait FormThemeTrait
 {
     /**
      * Sets a specific theme for the form.
      *
-     * @param FormInterface<object> $form
-     * @param mixed                 $themes
+     * @param FormInterface<FormInterface> $form
+     * @param string                       $template
+     * @param mixed                        $themes
      *
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @return \Symfony\Component\Form\FormView
      */
-    protected function setFormTheme(FormInterface $form, string $template, $themes = null): FormView
+    protected function setFormTheme(FormInterface $form, $template, $themes = null)
     {
         $formView = $form->createView();
 
         $templating = $this->container->get('mautic.helper.templating')->getTemplating();
+        $helper     = null;
+
         if ($templating instanceof DelegatingEngine) {
             $templating = $templating->getEngine($template);
         }
 
+        if ($templating instanceof PhpEngine) {
+            $helper = $templating->get('form');
+        } elseif ($templating instanceof TwigEngine) {
+            $helper = $this->container->get('templating.helper.form');
+        }
+
         // Extract form theme from options if applicable
         $fieldThemes = [];
-        $findThemes  = function (FormInterface $form, FormView $formView) use ($templating, &$findThemes, &$fieldThemes) {
+        $findThemes  = function ($form, $formView) use ($helper, &$findThemes, &$fieldThemes) {
+            /** @var Form $field */
             foreach ($form as $name => $field) {
                 $fieldView = $formView[$name];
                 if ($theme = $field->getConfig()->getOption('default_theme')) {
                     $fieldThemes[] = $theme;
-                    $templating->get('form')->setTheme($fieldView, $theme);
+                    $helper->setTheme($fieldView, $theme);
                 }
 
                 if ($field->count()) {
@@ -50,7 +59,7 @@ trait FormThemeTrait
         $themes[] = 'MauticCoreBundle:FormTheme\Custom';
         $themes   = array_values(array_unique(array_merge($themes, $fieldThemes)));
 
-        $templating->get('form')->setTheme($formView, $themes);
+        $helper->setTheme($formView, $themes);
 
         return $formView;
     }
