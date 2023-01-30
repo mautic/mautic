@@ -1,0 +1,11 @@
+{% set defaultInputClass = 'hidden' %}
+{% set containerType = 'hidden' %}
+
+{% use 'MauticFormBundle:Field:layout.html.twig' %}
+{% if inForm is defined or true == inForm %}
+  <div {{ block('mautic_form_container_attributes') }}>
+    <label class="text-muted">{{ field.label }}</label>
+  </div>
+{% else %}
+  <input {{ block('mautic_form_widget_attributes') }} type="hidden" />
+{% endif %}

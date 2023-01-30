@@ -203,7 +203,7 @@
                   {% if properties.optionlist is defined %}
                       <div class="row">
                           <div class="col-md-12">
-                              {{ form_row(form.properties.optionlist) }}
+                              {{ form_row(form.properties.optionlist)|raw }}
                           </div>
                       </div>
                   {% endif %}
@@ -238,7 +238,7 @@
                       {{ formRowIfExists(form, 'labelAttributes', template) }}
                       {{ formRowIfExists(form, 'inputAttributes', template) }}
                       {{ formRowIfExists(form, 'containerAttributes', template) }}
-                      {{ customAttributes }}
+                      {{ customAttributes|raw }}
                   </div>
               </div>
             {% endif %}
