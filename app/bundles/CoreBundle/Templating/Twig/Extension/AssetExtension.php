@@ -133,6 +133,10 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class);
     }
 
+    /**
+     * @param array<string> $protocols
+     * @param array<mixed>  $attributes
+     */
     public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): string
     {
         return $this->assetsHelper->makeLinks($text, $protocols, $attributes);
