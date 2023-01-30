@@ -270,6 +270,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'customHeaders'  => [
                 'X-EMAIL-ID' => $emailId,
             ],
+            'ignoreDNC'      => 'transactional' === $type,
         ];
 
         // Determine if this email is transactional/marketing
