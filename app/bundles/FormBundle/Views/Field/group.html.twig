@@ -1,67 +1,49 @@
-$containerType     = "{$type}grp";
-$defaultInputClass = "{$containerType}-{$type}";
-$ignoreId          = true;
-$ignoreName        = ('checkbox' == $type);
+{% set containerType = type ~ 'grp' %}
+{% set defaultInputClass = containerType ~ '-' ~ type %}
+{% set ignoreId = true %}
+{% set ignoreName = 'checkbox' == type %}
+{% set optionLabelAttr = properties.labelAttributes|default('') %}
+{% set wrapDiv = true %}
+{% set defaultOptionLabelClass = 'mauticform-' ~ containerType ~ '-label' %}
+{% if 'class' not in optionLabelAttr %}
+    {% set optionLabelAttr = optionLabelAttr ~ ' class="' ~ defaultOptionLabelClass ~ '"' %}
+{% else %}
+    {% set optionLabelAttr = optionLabelAttr|replace({
+            'class="': 'class="' ~ defaultOptionLabelClass ~ ' ',
+    }) %}
+    {% set wrapDiv = false %}
+{% endif %}
+{% set firstId = 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ field.alias ~ '_' ~ inputAlphanum(inputTransliterate(firstListValue|default(null))) ~ '1' %}
 
-include __DIR__.'/field_helper.php';
+{%- use 'MauticFormBundle:Field:layout.html.twig' -%}
 
-$optionLabelAttr = (isset($properties['labelAttributes'])) ? $properties['labelAttributes'] : '';
-$wrapDiv         = true;
+{%- block mautic_form_label -%}
+  {%- if field.showLabel is defined or true == field.showLabel -%}
+    <label {{ block('mautic_form_label_attributes') }} for="{{ firstId }}">{{ field.label }}</label>
+  {%- endif -%}
+{%- endblock -%}
 
-$defaultOptionLabelClass = 'mauticform-'.$containerType.'-label';
-if (false === stripos($optionLabelAttr, 'class')) {
-    $optionLabelAttr .= ' class="'.$defaultOptionLabelClass.'"';
-} else {
-    $optionLabelAttr = str_ireplace('class="', 'class="'.$defaultOptionLabelClass.' ', $optionLabelAttr);
-    $wrapDiv         = false;
-}
+{%- block mautic_form_row -%}
+  <div {{ block('mautic_form_container_attributes') }}>
+    {{ block('mautic_form_label') }}
+    {{ block('mautic_form_help') }}
+    {% for listValue, listLabel in list|default([]) %}
+        {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
+        {% set checked = field.defaultValue is same as listValue ? 'checked="checked"' : '' %}
+        {% set checkboxBrackets = 'checkbox' == type ? '[]' : '' %}
 
-$count   = 0;
-$firstId = 'mauticform_'.$containerType.'_'.$type.'_'.$field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($firstListValue)).'1';
+        {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
 
-$label = (!$field['showLabel']) ? '' : <<<HTML
+        <input {{ block('mautic_form_label_attributes') }} {{ checked }}
+               name="mauticform[{{ field.alias }}]{{ checkboxBrackets }}"
+               id="mauticform_{{ containerType }}_{{ type }}_{{ id }}"
+               type="{{ type }}"
+               value="{{ listValue|e }}" />
+        <label id="mauticform_{{ containerType }}_label_{{ id }}" for="mauticform_{{ containerType }}_{{ type }}_{{ id }}" {{ optionLabelAttr }}>{{ listLabel }}</label>
 
-                <label $labelAttr for="$firstId">{$field['label']}</label>
-HTML;
+        {% if wrapDiv %}</div>{% endif %}
 
-$help = (empty($field['helpMessage'])) ? '' : <<<HTML
-
-                <span class="mauticform-helpmessage">{$field['helpMessage']}</span>
-HTML;
-
-$options = [];
-$counter = 0;
-foreach ($list as $listValue => $listLabel):
-
-$id               = $field['alias'].'_'.InputHelper::alphanum(InputHelper::transliterate($listValue)).$counter;
-$checked          = ($field['defaultValue'] === $listValue) ? 'checked="checked"' : '';
-$checkboxBrackets = ('checkbox' == $type) ? '[]' : '';
-
-$option = <<<HTML
-                    <input {$inputAttr}{$checked} name="mauticform[{$field['alias']}]{$checkboxBrackets}" id="mauticform_{$containerType}_{$type}_{$id}" type="{$type}" value="{$view->escape($listValue)}" />
-                    <label id="mauticform_{$containerType}_label_{$id}" for="mauticform_{$containerType}_{$type}_{$id}" {$optionLabelAttr}>$listLabel</label>
-HTML;
-
-if ($wrapDiv):
-$option = <<<HTML
-
-                <div class="mauticform-{$containerType}-row">$option
-                </div>
-HTML;
-endif;
-
-$options[] = $option;
-++$counter;
-endforeach;
-
-$optionHtml = implode('', $options);
-
-$html = <<<HTML
-
-            <div $containerAttr>{$label}{$help}{$optionHtml}
-                <span class="mauticform-errormsg" style="display: none;">$validationMessage</span>
-            </div>
-
-HTML;
-
-echo $html;
+    {% endfor %}
+    {{ block('mautic_form_errors') }}
+  </div>
+{% endblock %}

@@ -1,7 +1,7 @@
 {%- block mautic_form_label_attributes -%}
   {% set labelClassValue = 'mauticform-' ~ defaultLabelClass|default('label') %}
 
-  {% if ignoreId is not defined %}
+  {% if ignoreId is not defined or false == ignoreId %}
       id="mauticform_label{{ formName|default('') }}_{{ field.alias }}"
       for="mauticform_input{{ formName|default('') }}_{{ field.alias }}"
   {% endif %}
@@ -15,7 +15,7 @@
 {%- endblock -%}
 
 {%- block mautic_form_label -%}
-  {%- if field.showLabel -%}
+  {%- if field.showLabel is defined or true == field.showLabel -%}
     <label {{ block('mautic_form_label_attributes') }}>{{ field.label }}</label>
   {%- endif -%}
 {%- endblock -%}
@@ -28,7 +28,7 @@
 
 {%- block mautic_form_widget_attributes -%}
   {% set inputClassValue = 'mauticform-' ~ inputClass|default('input') %}
-  {% if ignoreId is not defined %}
+  {% if ignoreId is not defined or false == ignoreId %}
       id="mauticform_input{{ formName|default('') }}_{{ field.alias }}"
   {% endif %}
 
