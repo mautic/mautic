@@ -1,3 +1,14 @@
+{#
+  Varables
+    - field
+    - formName
+    - fieldPage
+    - contactFields
+    - companyFields
+    - inBuilder
+    - fields
+#}
+{% import 'MauticFormBundle:Field:fields.html.twig' as mautic_form %}
 {#% set containerType = type|default('text') %#}
 {#% set defaultInputClass = inputClass|default('input') %#}
 
@@ -173,5 +184,7 @@ $appendAttribute = function (&$attributes, $attributeName, $append) {
 {% endif %}
 {# end: field_helper #}
 
-{%- use 'MauticFormBundle:Field:layout.html.twig' -%}
-{{- block('mautic_form_row') -}}
+{#%- use 'MauticFormBundle:Field:layout.html.twig' -%}
+{{- block('mautic_form_row') -}#}
+
+{{ mautic_form.row(field) }}

@@ -1,6 +1,19 @@
 {#
   Variables
     - form (\Mautic\FormBundle\Entity\Form)
+    - fieldSettings
+    - viewOnlyFields
+    - fields
+    - contactFields
+    - companyFields
+    - theme
+    - submissions
+    - lead
+    - formPages
+    - lastFormPage
+    - style
+    - inBuilder
+    - displayManager
 #}
 {% set formName = '_' ~ form.generateFormName() ~ suffix|default('') %}
 {% set fields = fields|default(form.fields) %}

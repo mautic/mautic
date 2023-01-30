@@ -1,0 +1,74 @@
+{% macro label_attributes(field) %}
+{% endmacro %}
+
+{% macro label(field) %}
+  {% if field.showLabel is defined and true == field.showLabel %}
+    <label {{ _self.label_attributes(field) }}>{{ field.label }}</label>
+  {% endif %}
+{% endmacro %}
+
+{% macro help(field) %}
+  {%- if field.helpMessage is defined and field.helpMessage is not empty -%}
+    <span class="mauticform-helpmessage">{{ field.helpMessage }}</span>
+  {%- endif -%}
+{% endmacro %}
+
+{% macro widget_attributes(field) %}
+{% endmacro %}
+
+{% macro widget(field) %}
+  {% if 'textarea' == field.type %}
+    <textarea {{ _self.widget_attributes(field) }}>{{ field.defaultValue }}</textarea>
+  {% else %}
+    <input {{ _self.widget_attributes(field) }} type="{{ field.type }}" />
+  {% endif %}
+{% endmacro %}
+
+{% macro errors(field) %}
+  <span class="mauticform-errormsg" style="display:none;">
+    {%- if field.isRequired is defined and true == field.isRequired -%}
+      {%- if field.validationMessage is empty -%}
+        {{- 'mautic.form.field.generic.required'|trans([], 'validators') -}}
+      {%- else -%}
+        {{- field.validationMessage -}}
+      {%- endif -%}
+    {%- endif -%}
+  </span>
+{% endmacro %}
+
+{% macro row_attributes(field) %}
+  {% set formName = '_' ~ field.form.generateFormName|default('') %}
+  {% set defaultClasses = [
+          'mauticform-row',
+          'mauticform-' ~ field.type,
+          'mauticform-field-' ~ field.order|default(0),
+  ] %}
+  {% set attributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+
+  {% if 'class' in attributes|keys %}
+    {% set attributes = attributes|merge({
+            'class': attributes.class|merge(defaultClasses)
+    }) %}
+  {% else %}
+    {% set attributes = attributes|merge({
+            'class': defaultClasses
+    }) %}
+  {% endif %}
+
+  {% set attributes = attributes|merge({
+          'id': 'mauticform' ~ formName ~ '_' ~ field.alias,
+  }) %}
+
+  {% for attrName, attrValue in attributes %}
+    {{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"
+  {% endfor %}
+{% endmacro %}
+
+{% macro row(field) %}
+  <div {{ _self.row_attributes(field) }}>
+    {{ _self.label(field) }}
+    {{ _self.help(field) }}
+    {{ _self.widget(field) }}
+    {{ _self.errors(field) }}
+  <div>
+{% endmacro %}
