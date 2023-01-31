@@ -28,7 +28,6 @@
 {% set submissions = submissions|default(null) %}
 {% set lead = lead|default(null) %}
 
-<!-- start: 'MauticFormBundle:Builder:form.html.twig -->
 {{ style|raw }}
 <style type="text/css" scoped>
     .mauticform-field-hidden { display:none }
@@ -66,7 +65,6 @@
                       {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
                   {% endif %}
 
-                  <!-- start: "{{ theme }}{{ template }}" -->
                   {{- include(theme ~ template, {
                           'field': f.convertToArray,
                           'id': f.alias,
@@ -77,7 +75,6 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
-                  <!-- end: "{{ theme }}{{ template }}" -->
               {% endif %}
 
               {% set parentField = f %}
@@ -91,7 +88,6 @@
                       {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
                   {% endif %}
 
-                  <!-- start: "{{ theme }}{{ template }}" -->
                   {{- include(theme ~ template, {
                           'field': f.convertToArray,
                           'id': f.alias,
@@ -102,7 +98,6 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
-                  <!-- end: "{{ theme }}{{ template }}" -->
                 {% endif %}
               {% endfor %}
 
@@ -121,4 +116,3 @@
         {{ formExtra|default('') }}
 </form>
 </div>
-<!-- end: 'MauticFormBundle:Builder:form.html.twig -->

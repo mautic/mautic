@@ -8,6 +8,7 @@
     - inBuilder
     - fields
     - inForm (optional, bool)
+    - required (optional, bool)
 #}
 {#
 $containerType     = (isset($type)) ? $type : 'text';
@@ -236,7 +237,7 @@ if (isset($field['isRequired']) && $field['isRequired']) {
 
 $appendAttribute($containerAttr, 'class', $defaultContainerClass);
 #}
-{% if field.isRequired is defined and true == field.isRequired %}
+{% if field.isRequired is defined and field.isRequired %}
   {% set required = true %}
   {% set validationMessage = field.validationMessage %}
   {% if validationMessage is empty %}
@@ -254,7 +255,7 @@ $appendAttribute($containerAttr, 'class', $defaultContainerClass);
             'data-validate-multiple': 'true',
     }) %}
   {% endif %}
-{% elseif required is defined %}
+{% elseif required is defined and true == required %}
   {# Forced to be required #}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
@@ -344,11 +345,14 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
   {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
+
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
+
   {% if 'textarea' == field.type %}
     <textarea {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.defaultValue }}</textarea>
   {% else %}
-    <input type="{{ field.type }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+    <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
   {% endif %}
-  <span class="mauticform-errormsg" style="display:none;">{{ field.validationMessage }}</span>
+
+  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
 </div>

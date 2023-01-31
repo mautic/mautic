@@ -105,7 +105,7 @@
             'data-validate-multiple': 'true',
     }) %}
   {% endif %}
-{% elseif required is defined %}
+{% elseif required is defined and true == required %}
   {# Forced to be required #}
   {% set containerAttributes = containerAttributes|merge({
           'class': containerAttributes.class|default([])|merge([
