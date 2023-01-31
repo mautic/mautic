@@ -9,10 +9,15 @@
     - fields
     - inForm (optional, bool)
 #}
+{#
 $containerType     = (isset($type)) ? $type : 'text';
 $defaultInputClass = (isset($inputClass)) ? $inputClass : 'input';
+#}
+{% set containerType = type|default('text') %}
+{% set defaultInputClass = inputClass|default('input') %}
 
 {# start: field_helper #}
+{#
 $appendAttribute = function (&$attributes, $attributeName, $append) {
     if (false === stripos($attributes, "{$attributeName}=")) {
         $attributes .= ' '.$attributeName.'="'.$append.'"';
@@ -20,7 +25,9 @@ $appendAttribute = function (&$attributes, $attributeName, $append) {
         $attributes = str_ireplace($attributeName.'="', $attributeName.'="'.$append.' ', $attributes);
     }
 };
+#}
 
+{#
 if (!isset($defaultInputFormClass)) {
     $defaultInputFormClass = '';
 }
@@ -33,10 +40,32 @@ if (!isset($formName)) {
     $formName = '';
 }
 
+if (!isset($containerClass)) {
+    $containerClass = $containerType;
+}
+
+$order                 = (isset($field['order'])) ? $field['order'] : 0;
+$validationMessage = '';
+
 $properties = $field['properties'];
 
 $defaultInputClass = 'mauticform-'.$defaultInputClass;
 $defaultLabelClass = 'mauticform-'.$defaultLabelClass;
+#}
+{% set defaultInputFormClass = defaultInputFormClass|default('') %}
+{% set defaultLabelClass = defaultLabelClass|default('label') %}
+{% set formName = formName|default('') %}
+{% set defaultInputClass = 'mauticform-' ~ defaultInputClass %}
+{% set defaultLabelClass = 'mauticform-' ~ defaultLabelClass %}
+{% set containerClass = containerClass|default(containerType) %}
+{% set order = field.order|default(0) %}
+{% set validationMessage = '' %}
+
+{% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
+{% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
+{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
+
+{#% set properties = field.properties %#}
 
 {#
 $name = '';
@@ -68,20 +97,29 @@ if (!empty($properties['placeholder'])) {
     $inputAttr .= ' placeholder="'.$properties['placeholder'].'"';
 }
 #}
-{% set inputAttributes = htmlAttributesStringToArray(field.inputAttributes|default('')) %}
-{% set inputAttributes = inputAttributes|merge({
-        'id': 'mauticform_input' ~ formName|default('') ~ '_' ~ field.alias,
-        'name': 'mauticform[' ~ field.alias ~ ']',
-        'value': '',
-}) %}
-{% if field.properties.multiple is defined %}
+{% if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
+  {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
+  {% if field.properties.multiple is defined %}
+    {% set inputName = inputName ~ '[]' %}
+  {% endif %}
   {% set inputAttributes = inputAttributes|merge({
-          'name': inputAttributes.name ~ '[]',
+          'name': inputName,
   }) %}
 {% endif %}
-{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] and field.defaultValue is defined %}
+
+{% if field.type not in ['checkboxgrp', 'radiogrp', 'textarea'] %}
   {% set inputAttributes = inputAttributes|merge({
-          'value': field.defaultValue,
+          'value': field.defaultValue|default(''),
+  }) %}
+{% endif %}
+
+{% if ignoreId is not defined or (ignoreId is defined and ignoreId is empty) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'id': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
+  }) %}
+  {% set labelAttributes = inputAttributes|merge({
+          'id': 'mauticform_label' ~ formName ~ '_' ~ field.alias,
+          'for': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
   }) %}
 {% endif %}
 
@@ -91,11 +129,6 @@ if (!empty($properties['placeholder'])) {
   }) %}
 {% endif %}
 
-{% set labelAttributes = htmlAttributesStringToArray(field.labelAttributes|default('')) %}
-{% set labelAttributes = labelAttributes|merge({
-        'id': 'mauticform_label' ~ formName|default('') ~ '_' ~ field.alias,
-        'for': 'mauticform_input' ~ formName|default('') ~ '_' ~ field.alias,
-}) %}
 
 {# Label and input #}
 {#
@@ -119,26 +152,23 @@ if (!empty($inForm)) {
     $appendAttribute($inputAttr, 'class', $defaultInputClass);
 }
 #}
-{% if inForm is defined and true == inForm %}
+{% if inForm is defined and (true == inForm or inForm is not empty) %}
   {% if field.type in ['button', 'pagebreak'] %}
-    {% set inputAttributes = inputAttributes|merge({
-            'class': inputAttributes.class|default([])|merge(['btn', 'btn-default']),
-    }) %}
+    {% set defaultInputFormClass = defaultInputFormClass ~ ' btn btn-default' %}
   {% endif %}
 
-  {% set inputAttributes = inputAttributes|merge({
-          'class': inputAttributes.class|default([])|merge(['mauticform-input']),
+  {% set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
   }) %}
-{% else %}
+  {% set inputAttributes = inputAttributes|merge({
+          'disabled': 'disabled',
+          'class': inputAttributes.class|default([])|merge([defaultInputClass, defaultInputFormClass]),
+  }) %}
 {% endif %}
 
 {# Container #}
 {#
 $containerAttr = 'id="mauticform'.$formName.'_'.$id.'" '.htmlspecialchars_decode($field['containerAttributes']);
-if (!isset($containerClass)) {
-    $containerClass = $containerType;
-}
-$order                 = (isset($field['order'])) ? $field['order'] : 0;
 $defaultContainerClass = 'mauticform-row mauticform-'.$containerClass.' mauticform-field-'.$order;
 if ($field['parent'] && isset($fields[$field['parent']])) {
     $values = implode('|', $field['conditions']['values']);
@@ -152,36 +182,20 @@ if ($field['parent'] && isset($fields[$field['parent']])) {
     $defaultContainerClass .= '  mauticform-field-hidden';
 }
 #}
-{% set containerAttributes = htmlAttributesStringToArray(field.containerAttributes|default('')) %}
 {% set containerAttributes = containerAttributes|merge({
-        'id': 'mauticform' ~ formName|default('') ~ '_' ~ field.alias,
+        'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
 }) %}
-{% if 'class' in containerAttributes|keys %}
-  {% set containerAttributes = containerAttributes|merge({
-          'class': containerAttributes.class|merge([
-            'mauticform-row',
-            'mauticform-' ~ field.type,
-            'mauticform-field-' ~ field.order|default(0),
-          ]),
-  }) %}
-{% else %}
-  {% set containerAttributes = containerAttributes|merge({
-          'class': [
-            'mauticform-row',
-            'mauticform-' ~ field.type,
-            'mauticform-field-0',
-          ],
-  }) %}
-{% endif %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
+
   {% if field.conditions.any is not empty and 'notIn' != field.conditions.expr %}
     {% set values = '*' %}
   {% endif %}
+
   {% set containerAttributes = containerAttributes|merge({
           'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
           'data-mautic-form-expr': field.conditions.expr,
-          'class': containerAttributes.class|merge([
+          'class': containerAttributes.class|default([])|merge([
             'mauticform-field-hidden',
           ]),
   }) %}
@@ -189,7 +203,7 @@ if ($field['parent'] && isset($fields[$field['parent']])) {
 
 
 {# Field is required #}
-$validationMessage = '';
+{#
 if (isset($field['isRequired']) && $field['isRequired']) {
     $required = true;
     $defaultContainerClass .= ' mauticform-required';
@@ -209,8 +223,36 @@ if (isset($field['isRequired']) && $field['isRequired']) {
 }
 
 $appendAttribute($containerAttr, 'class', $defaultContainerClass);
+#}
+{% if field.isRequired is defined and true == field.isRequired %}
+  {% set required = true %}
+  {% set validationMessage = field.validationMessage %}
+  {% if validationMessage is empty %}
+        {% set validationMessage = 'mautic.form.field.generic.required'|trans([], 'validators') %}
+  {% endif %}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+          'data-validate': field.alias,
+          'data-validation-type': field.type,
+  }) %}
+  {% if field.properties.multiple is not empty %}
+    {% set containerAttributes = containerAttributes|merge({
+            'data-validate-multiple': 'true',
+    }) %}
+  {% endif %}
+{% elseif required is defined %}
+  {# Forced to be required #}
+  {% set containerAttributes = containerAttributes|merge({
+          'class': containerAttributes.class|default([])|merge([
+            'mauticform-required',
+          ]),
+  }) %}
+{% endif %}
 
-// Setup list parsing
+{# Setup list parsing #}
+{#
 if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
     $parseList     = [];
     $isBooleanList = false;
@@ -285,6 +327,7 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
 
     $firstListValue = reset($list);
 }
+#}
 {# end: field_helper #}
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
@@ -303,5 +346,5 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
     <input type="{{ field.type }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
   {% endif %}
 
-  <span class="mauticform-errormsg" style="display: none;">{{ field.validationMessage }}</span>
+  <span class="mauticform-errormsg" style="display:none;">{{ field.validationMessage }}</span>
 </div>

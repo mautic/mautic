@@ -96,37 +96,37 @@
                                   </div>
                               </div>
                               <div class="drop-here">
-                              {% for field in formFields %}
-                                  {% if field.parent is null %}
-                                    {% if field.id not in deletedFields %}
-                                        {% if field.isCustom is defined and field.isCustom is not empty %}
-                                            {% set params = field.customParameters %}
-                                            {% set template = params.template %}
-                                        {% else %}
-                                            {% set template = 'MauticFormBundle:Field:' ~ field.type ~ '.html.twig' %}
-                                        {% endif %}
-                                        {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
-                                                'template': template,
-                                                'field': field,
-                                                'viewOnlyFields': viewOnlyFields,
-                                                'inForm': true,
-                                                'id': field.id,
-                                                'formId': formId,
-                                                'formName': activeForm.generateFormName,
-                                                'contactFields': contactFields,
-                                                'companyFields': companyFields,
-                                                'inBuilder': inBuilder,
-                                                'fields': fields,
-                                                'formFields': formFields,
-                                        }) }}
+                                {% for field in formFields %}
+                                    {% if field.parent is null %}
+                                      {% if field.id not in deletedFields %}
+                                          {% if field.isCustom is defined and field.isCustom is not empty %}
+                                              {% set params = field.customParameters %}
+                                              {% set template = params.template %}
+                                          {% else %}
+                                              {% set template = 'MauticFormBundle:Field:' ~ field.type ~ '.html.twig' %}
+                                          {% endif %}
+                                          {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
+                                                  'template': template,
+                                                  'field': field,
+                                                  'viewOnlyFields': viewOnlyFields,
+                                                  'inForm': true,
+                                                  'id': field.id,
+                                                  'formId': formId,
+                                                  'formName': activeForm.generateFormName,
+                                                  'contactFields': contactFields,
+                                                  'companyFields': companyFields,
+                                                  'inBuilder': inBuilder,
+                                                  'fields': fields,
+                                                  'formFields': formFields,
+                                          }) }}
+                                      {% endif %}
                                     {% endif %}
-                                  {% endif %}
-                              {% endfor %}
+                                {% endfor %}
                               </div>
                               {% if 0 == formFields|length %}
-                              <div class="alert alert-info" id="form-field-placeholder">
-                                  <p>{{ 'mautic.form.form.addfield'|trans }}</p>
-                              </div>
+                                <div class="alert alert-info" id="form-field-placeholder">
+                                    <p>{{ 'mautic.form.form.addfield'|trans }}</p>
+                                </div>
                               {% endif %}
                           </div>
                       </div>
