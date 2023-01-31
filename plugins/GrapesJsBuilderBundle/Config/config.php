@@ -31,8 +31,6 @@ return [
     ],
     'menu'        => [],
     'services'    => [
-        'events'  => [
-        ],
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
             'grapesjsbuilder.config' => [
