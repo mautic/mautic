@@ -122,82 +122,6 @@
 {% endif %}
 
 {# Setup list parsing #}
-{#
-if (isset($list) || isset($properties['syncList']) || isset($properties['list']) || isset($properties['optionlist'])) {
-    $parseList     = [];
-    $isBooleanList = false;
-
-    if (!isset($contactFields)) {
-        $contactFields = [];
-    }
-    if (!isset($companyFields)) {
-        $companyFields = [];
-    }
-    $formFields = array_merge($contactFields, $companyFields);
-    if (!empty($properties['syncList']) && !empty($field['leadField']) && isset($formFields[$field['leadField']])) {
-        $leadFieldType = $formFields[$field['leadField']]['type'];
-        switch (true) {
-            case !empty($formFields[$field['leadField']]['properties']['list']):
-                $parseList = $formFields[$field['leadField']]['properties']['list'];
-                break;
-            case 'boolean' == $leadFieldType:
-                $parseList     = [
-                    0 => $formFields[$field['leadField']]['properties']['no'],
-                    1 => $formFields[$field['leadField']]['properties']['yes'],
-                ];
-                $isBooleanList = true;
-                break;
-            case 'country' == $leadFieldType:
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getCountryChoices();
-                break;
-            case 'region' == $leadFieldType:
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getRegionChoices();
-                break;
-            case 'timezone' == $leadFieldType:
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getTimezonesChoices();
-                break;
-            case 'locale':
-                $list = \Mautic\LeadBundle\Helper\FormFieldHelper::getLocaleChoices();
-                break;
-        }
-    }
-
-    if (empty($parseList)) {
-        if (isset($list)) {
-            $parseList = $list;
-        } elseif (!empty($properties['optionlist'])) {
-            $parseList = $properties['optionlist'];
-        } elseif (!empty($properties['list'])) {
-            $parseList = $properties['list'];
-        }
-
-        if (isset($parseList['list'])) {
-            $parseList = $parseList['list'];
-        }
-    }
-
-    if ($field['leadField'] && !empty($formFields[$field['leadField']]['type'])
-        && in_array(
-            $formFields[$field['leadField']]['type'],
-            ['datetime', 'date']
-        )) {
-        $tempLeadFieldType = $formFields[$field['leadField']]['type'];
-        foreach ($parseList as $key => $aTemp) {
-            if ($date = ('datetime' == $tempLeadFieldType ? $view['date']->toFull($aTemp['label']) : $view['date']->toDate($aTemp['label']))) {
-                $parseList[$key]['label'] = $date;
-            }
-        }
-    }
-
-    $list = $isBooleanList
-        ?
-        \Mautic\FormBundle\Helper\FormFieldHelper::parseBooleanList($parseList)
-        :
-        \Mautic\FormBundle\Helper\FormFieldHelper::parseList($parseList);
-
-    $firstListValue = reset($list);
-}
-#}
 {% if list is defined or field.properties.syncList is defined or field.properties.list is defined or field.properties.optionList is defined %}
   {% set parseList = [] %}
   {% set isBooleanList = false %}
@@ -206,13 +130,23 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
   {% set formFields = contactFields|merge(companyFields) %}
 
   {% if field.properties.syncList is not empty and field.leadField is not empty and formFields[field.leadField] is defined %}
-    @TODO
     {% set leadFieldType = formFields[field.leadField].type %}
     {% if formFields[field.leadField].properties.list is not empty %}
       {% set parseList = formFields[field.leadField].properties.list %}
+    {% elseif 'boolean' == leadFieldType %}
+      {% set parseList = {
+              '0': formFields[field.leadField].properties.no,
+              '1': formFields[field.leadField].properties.yes,
+      }%}
+    {% elseif 'country' == leadFieldType %}
+      {% set list = formFieldCountryChoices() %}
+    {% elseif 'region' == leadFieldType %}
+      {% set list = formFieldRegionChoices() %}
+    {% elseif 'timezone' == leadFieldType %}
+      {% set list = formFieldTimezonesChoices() %}
+    {% elseif 'locale' == leadFieldType %}
+      {% set list = formFieldLocaleChoices() %}
     {% endif %}
-
-    {% set list = [] %}
   {% endif %}
 
   {% if parseList is empty %}
@@ -230,7 +164,17 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
   {% endif %}
 
   {% if field.leadField and formFields[field.leadField].type is not empty and formFields[field.leadField].type in ['datetime', 'date'] %}
-    @TODO
+    {% set tempLeadFieldType = formFields[field.leadField].type %}
+    {% for key, aTemp in parseList %}
+      {% set date = 'datetime' == tempLeadFieldType ? dateToFull(aTemp.label) : dateToDate(aTemp.label) %}
+      {% if date %}
+          {% set parseList = parseList|merge({
+                  (key): parseList[key]|merge({
+                          'label': date,
+                  }),
+          }) %}
+      {% endif %}
+    {% endfor %}
   {% endif %}
 
   {% if isBooleanList %}
