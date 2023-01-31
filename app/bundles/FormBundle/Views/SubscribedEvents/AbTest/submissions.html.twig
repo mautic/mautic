@@ -3,7 +3,7 @@
 {% set chart = barChartInitialize(support.labels) %}
 
 {% if support.data %}
-    {% for datasetLabel, values, in support.data %}
+    {% for datasetLabel, values in support.data %}
         {% do chart.setDataset(datasetLabel, values) %}
     {% endfor %}
 {% endif %}
