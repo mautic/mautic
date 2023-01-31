@@ -13,7 +13,6 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        //'Controller', // Enabling this will require to refactor all controllers to use DI.
         'OptionsAccessor',
         'MonitoredEmail/Accessor',
         'MonitoredEmail/Organizer',
@@ -32,6 +31,9 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\EmailBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\EmailBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
 
     $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
 
