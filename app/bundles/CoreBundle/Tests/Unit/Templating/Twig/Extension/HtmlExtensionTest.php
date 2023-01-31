@@ -24,6 +24,9 @@ final class HtmlExtensionTest extends TestCase
         Assert::assertSame($expected, $actual);
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function convertStringToArrayProvider(): iterable
     {
         yield ['id="test-id" class="test-class"', [
