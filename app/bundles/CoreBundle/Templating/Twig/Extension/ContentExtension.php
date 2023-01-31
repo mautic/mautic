@@ -46,6 +46,6 @@ class ContentExtension extends AbstractExtension
      */
     public function showScriptTags(string $html): string
     {
-        return $this->contentHelper($html);
+        return $this->contentHelper->showScriptTags($html);
     }
 }
