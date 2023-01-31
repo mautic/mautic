@@ -32,30 +32,6 @@ return [
     'menu'        => [],
     'services'    => [
         'events'  => [
-            'grapesjsbuilder.event.assets.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'mautic.install.service',
-                ],
-            ],
-            'grapesjsbuilder.event.email.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                ],
-            ],
-            'grapesjsbuilder.event.content.subscriber' => [
-                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\InjectCustomContentSubscriber::class,
-                'arguments' => [
-                    'grapesjsbuilder.config',
-                    'grapesjsbuilder.model',
-                    'mautic.helper.templating',
-                    'request_stack',
-                    'router',
-                ],
-            ],
         ],
         'other'        => [
             // Provides access to configured API keys, settings, field mapping, etc
