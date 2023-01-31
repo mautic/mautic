@@ -117,7 +117,7 @@ if (!empty($properties['placeholder'])) {
   {% set inputAttributes = inputAttributes|merge({
           'id': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
   }) %}
-  {% set labelAttributes = inputAttributes|merge({
+  {% set labelAttributes = labelAttributes|merge({
           'id': 'mauticform_label' ~ formName ~ '_' ~ field.alias,
           'for': 'mauticform_input' ~ formName ~ '_' ~ field.alias,
   }) %}
@@ -164,6 +164,13 @@ if (!empty($inForm)) {
           'disabled': 'disabled',
           'class': inputAttributes.class|default([])|merge([defaultInputClass, defaultInputFormClass]),
   }) %}
+{% else %}
+  {% set labelAttributes = labelAttributes|merge({
+          'class': labelAttributes.class|default([])|merge([defaultLabelClass]),
+  }) %}
+  {% set inputAttributes = inputAttributes|merge({
+          'class': inputAttributes.class|default([])|merge([defaultInputClass]),
+  }) %}
 {% endif %}
 
 {# Container #}
@@ -184,6 +191,11 @@ if ($field['parent'] && isset($fields[$field['parent']])) {
 #}
 {% set containerAttributes = containerAttributes|merge({
         'id': 'mauticform' ~ formName|default('') ~ '_' ~ id,
+        'class': containerAttributes.class|default([])|merge([
+          'mauticform-row',
+          'mauticform-' ~ containerClass,
+          'mauticform-field-' ~ order,
+        ]),
 }) %}
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
@@ -195,7 +207,7 @@ if ($field['parent'] && isset($fields[$field['parent']])) {
   {% set containerAttributes = containerAttributes|merge({
           'data-mautic-form-show-on': fields[field.parent].alias ~ ':' ~ values,
           'data-mautic-form-expr': field.conditions.expr,
-          'class': containerAttributes.class|default([])|merge([
+          'class': containerAttributes.class|merge([
             'mauticform-field-hidden',
           ]),
   }) %}
@@ -331,20 +343,12 @@ if (isset($list) || isset($properties['syncList']) || isset($properties['list'])
 {# end: field_helper #}
 
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-
-  {% if field.showLabel %}
-    <label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>
-  {% endif %}
-
-  {% if field.helpMessage is not empty %}
-    <span class="mauticform-helpmessage">{{ field.helpMessage }}</span>
-  {% endif %}
-
+  {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
+  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
   {% if 'textarea' == field.type %}
     <textarea {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.defaultValue }}</textarea>
   {% else %}
     <input type="{{ field.type }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
   {% endif %}
-
   <span class="mauticform-errormsg" style="display:none;">{{ field.validationMessage }}</span>
 </div>

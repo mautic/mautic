@@ -31,7 +31,7 @@ final class HtmlExtension extends AbstractExtension
      *   ];
      * </example>
      *
-     * @return array<string, string|array>
+     * @return array<string, mixed>
      */
     public function convertHtmlAttributesToArray(string $attributes): array
     {
