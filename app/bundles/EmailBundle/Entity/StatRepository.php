@@ -683,7 +683,7 @@ class StatRepository extends CommonRepository
 
         return $contacts;
     }
-	
+
     /**
      * @param array<int> $contacts
      * @param array<int> $emailIds
