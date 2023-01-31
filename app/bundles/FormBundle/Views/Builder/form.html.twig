@@ -68,7 +68,7 @@
 
                   <!-- start: "{{ theme }}{{ template }}" -->
                   {{- include(theme ~ template, {
-                          'field': f,
+                          'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
                           'fieldPage': (pageCount - 1),
@@ -93,7 +93,7 @@
 
                   <!-- start: "{{ theme }}{{ template }}" -->
                   {{- include(theme ~ template, {
-                          'field': f,
+                          'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
                           'fieldPage': (pageCount - 1),
