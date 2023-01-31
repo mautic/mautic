@@ -126,16 +126,17 @@ class UpdateLeadListsCommand extends ModeratedCommand
 
                     $startTimeForSingleSegment = time();
                     $processed                 = $this->listModel->rebuildListLeads($leadList, $batch, $max, $output);
+                    $totalTime                 = round(microtime(true) - $startTimeForSingleSegment, 2);
                     if (0 >= (int) $max) {
                         // Only full segment rebuilds count
                         $leadList->setLastBuiltDateToCurrentDatetime();
+                        $leadList->setLastBuiltTime($totalTime);
                         $this->listModel->saveEntity($leadList);
                     }
                     $output->writeln(
                         '<comment>'.$this->translator->trans('mautic.lead.list.rebuild.leads_affected', ['%leads%' => $processed]).'</comment>'
                     );
                     if ($enableTimeMeasurement) {
-                        $totalTime = round(microtime(true) - $startTimeForSingleSegment, 2);
                         $output->writeln('<fg=cyan>'.$this->translator->trans('mautic.lead.list.rebuild.contacts.time', ['%time%' => $totalTime]).'</>'."\n");
                     }
                 }
