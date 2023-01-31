@@ -12,7 +12,7 @@
 
     {% if form.description %}
         <dt>{{ 'mautic.core.description'|trans }}</dt>
-        <dd>{{ form.description }}</dd>
+        <dd>{{ form.description|purify }}</dd>
     {% endif %}
 
     <dt>{{ 'mautic.form.result.thead.referrer'|trans }}</dt>

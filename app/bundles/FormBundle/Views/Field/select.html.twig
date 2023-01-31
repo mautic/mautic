@@ -189,7 +189,7 @@
 {% endif %}
 {# end: field_helper #}
 
-{% if field.properties.multiple is defined and field.properties.multiple is not empty %}
+{% if field.properties.multiple is defined and true == field.properties.multiple %}
   {% set inputAttributes = inputAttributes|merge({
           'multiple': 'multiple',
   }) %}
