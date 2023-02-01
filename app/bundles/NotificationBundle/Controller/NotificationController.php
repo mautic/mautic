@@ -131,7 +131,7 @@ class NotificationController extends AbstractFormController
                     'model'       => $model,
                     'security'    => $this->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:list.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification',
@@ -239,7 +239,7 @@ class NotificationController extends AbstractFormController
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticNotificationBundle:Notification:details.html.php',
+            'contentTemplate' => 'MauticNotificationBundle:Notification:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_notification_index',
                 'mauticContent' => 'notification',
@@ -363,10 +363,10 @@ class NotificationController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'         => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.php', 'MauticNotificationBundle:FormTheme\Notification'),
+                    'form'         => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.twig', 'MauticNotificationBundle:FormTheme\Notification'),
                     'notification' => $entity,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification',
@@ -526,11 +526,11 @@ class NotificationController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.php', 'MauticNotificationBundle:FormTheme\Notification'),
+                    'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.twig', 'MauticNotificationBundle:FormTheme\Notification'),
                     'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification',
@@ -739,7 +739,7 @@ class NotificationController extends AbstractFormController
                 'viewParameters' => [
                     'notification' => $notification,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.php',
+                'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.twig',
             ]
         );
     }
