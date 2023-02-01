@@ -141,13 +141,13 @@
               '1': formFields[field.leadField].properties.yes,
       }-%}
     {%- elseif 'country' == leadFieldType -%}
-      {%- set list = formFieldCountryChoices() -%}
+      {%- set list = leadFieldCountryChoices() -%}
     {%- elseif 'region' == leadFieldType -%}
-      {%- set list = formFieldRegionChoices() -%}
+      {%- set list = leadFieldRegionChoices() -%}
     {%- elseif 'timezone' == leadFieldType -%}
-      {%- set list = formFieldTimezonesChoices() -%}
+      {%- set list = leadFieldTimezonesChoices() -%}
     {%- elseif 'locale' == leadFieldType -%}
-      {%- set list = formFieldLocaleChoices() -%}
+      {%- set list = leadFieldLocaleChoices() -%}
     {%- endif -%}
   {%- endif -%}
 
