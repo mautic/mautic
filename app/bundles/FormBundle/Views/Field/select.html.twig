@@ -213,12 +213,12 @@
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
 
   <select {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
+    {# (!empty($properties['placeholder']) || empty($field['defaultValue']) && empty($properties['multiple'])) #}
     {%- if
           (
-            (field.properties.placeholder is defined and field.properties.placeholder is not empty) or
-            (field.defaultValue is defined and field.defaultValue is empty)
+            field.properties.placeholder is defined or (field.defaultValue is not defined or (field.defaultValue is defined and false == field.defaultValue))
           ) and
-          ((field.properties.multiple is defined and field.properties.multiple is empty) or field.properties.multiple is not defined)
+          (field.properties.multiple is not defined or (field.properties.multiple is defined and false == field.properties.multiple))
     -%}
         {%- set placeholder = field.properties.placeholder|default('') -%}
         <option value="">{{ placeholder }}</option>
