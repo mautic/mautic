@@ -3,13 +3,18 @@
 namespace Mautic\FormBundle\Tests;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
+use Mautic\CoreBundle\Entity\IpAddress;
+use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -35,7 +40,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Templating\EngineInterface;
 
 class FormTestAbstract extends TestCase
@@ -67,22 +74,23 @@ class FormTestAbstract extends TestCase
      */
     protected function getFormModel()
     {
-        $requestStack         = $this->createMock(RequestStack::class);
-        $templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $themeHelper          = $this->createMock(ThemeHelperInterface::class);
-        $formActionModel      = $this->createMock(ActionModel::class);
-        $formFieldModel       = $this->createMock(FieldModel::class);
-        $this->leadModel      = $this->createMock(LeadModel::class);
-        $this->fieldHelper    = $this->createMock(FormFieldHelper::class);
-        $dispatcher           = $this->createMock(EventDispatcher::class);
-        $translator           = $this->createMock(Translator::class);
-        $entityManager        = $this->createMock(EntityManager::class);
-        $formUploaderMock     = $this->createMock(FormUploader::class);
-        $contactTracker       = $this->createMock(ContactTracker::class);
-        $this->leadFieldModel = $this->createMock(LeadFieldModel::class);
-        $this->formRepository = $this->createMock(FormRepository::class);
-        $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
-        $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
+        $requestStack          = $this->createMock(RequestStack::class);
+        $templatingHelperMock  = $this->createMock(TemplatingHelper::class);
+        $themeHelper           = $this->createMock(ThemeHelperInterface::class);
+        $formActionModel       = $this->createMock(ActionModel::class);
+        $formFieldModel        = $this->createMock(FieldModel::class);
+        $this->leadModel       = $this->createMock(LeadModel::class);
+        $this->fieldHelper     = $this->createMock(FormFieldHelper::class);
+        $dispatcher            = $this->createMock(EventDispatcher::class);
+        $translator            = $this->createMock(Translator::class);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $formUploaderMock      = $this->createMock(FormUploader::class);
+        $contactTracker        = $this->createMock(ContactTracker::class);
+        $this->leadFieldModel  = $this->createMock(LeadFieldModel::class);
+        $this->formRepository  = $this->createMock(FormRepository::class);
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
+        $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
 
         $contactTracker->expects($this
             ->any())
@@ -113,12 +121,13 @@ class FormTestAbstract extends TestCase
             $themeHelper,
             $formActionModel,
             $formFieldModel,
-            $fieldHelper,
+            $this->fieldHelper,
             $this->leadFieldModel,
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
-            $tableSchemaHelper
+            $tableSchemaHelper,
+            $mappedObjectCollector
         );
 
         $formModel->setDispatcher($dispatcher);

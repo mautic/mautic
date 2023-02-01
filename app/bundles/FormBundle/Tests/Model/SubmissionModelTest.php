@@ -20,6 +20,7 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -35,7 +36,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -192,6 +193,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->file1Mock                = $this->createMock(UploadedFile::class);
         $this->router                   = $this->createMock(RouterInterface::class);
         $this->contactTracker           = $this->createMock(ContactTracker::class);
+        $this->contactMerger            = $this->createMock(ContactMerger::class);
+
         $this->submissionModel          = new SubmissionModel(
             $this->ipLookupHelper,
             $this->templatingHelperMock,
@@ -208,7 +211,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             $this->deviceTrackingService,
             new FieldValueTransformer($this->router),
             $this->dateHelper,
-            $this->contactTracker
+            $this->contactTracker,
+            $this->contactMerger
         );
 
         $this->submissionModel->setDispatcher($this->dispatcher);
