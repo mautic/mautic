@@ -133,7 +133,7 @@
         formFields[field.leadField] is defined
   %}
     {% set leadFieldType = formFields[field.leadField].type %}
-    {% if formFields[field.leadField].properties.list is not empty %}
+    {% if formFields[field.leadField].properties.list is defined and formFields[field.leadField].properties.list is not empty %}
       {% set parseList = formFields[field.leadField].properties.list %}
     {% elseif 'boolean' == leadFieldType %}
       {% set parseList = {
