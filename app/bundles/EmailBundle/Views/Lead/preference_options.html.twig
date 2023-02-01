@@ -22,9 +22,8 @@
         }
     }
 </script>
-
 <div class="row text-left">
-    {{ form_start(form) }}
+    {{ form_start(form, {'render_rest': false}) }}
     <div class="col-xs-12 col-md-8 col-md-offset-2">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -32,116 +31,68 @@
             </div>
             <div class="panel-body">
                 <div class="the-price">
-                    <h4> {{ leadName }}</h4>
-                    <small> {{ 'mautic.lead.message.preferences.descr'|trans }}</small>
+                    <h4>{{ leadName }}</h4>
+                    <small>{{ 'mautic.lead.message.preferences.descr'|trans }}</small>
                 </div>
                 <table class="table table-striped">
                     {% if showContactFrequency %}
-                    {% for key, channel in form['lead_channels']['subscribed_channels'].var['choices'] %}
-                        {% set contactMe = leadChannels[channel.value] %}
-                        {% set checked = contactMe ? 'checked' : '' %}
-                        {% set channelName = view['channel'].getChannelLabel(channel.value)|lower %}
-                    <tr>
-                        <td>
-                            <div class="text-left">
-                                <input type="hidden" id="{{ channel.value }}-hidden"
-                                       name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
-                                       value="">
-                                <input type="checkbox" id="{{ channel.value }}"
-                                       name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
-                                       onclick="togglePreferredChannel(this.value);"
-                                       value="{{ channel.value|escape }}" {{ checked }}>
-                                <label for="{{ channel.value }}" id="is-contactable-{{ channel.value }}">
-                                    {{ 'mautic.lead.contact.me.label'|trans ({'%channel%' : channelName}) }}
-                                </label>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div id="frequency_{{ channel.value }}" class="text-left row">
-                                {% if showContactFrequency %}
-                                <div class="col-md-6">
-                                    <label class="text-muted">{{ form['lead_channels']['frequency_number_' ~ channel.value].vars['label']|trans }}</label>
-                                    {{ form_widget(form['lead_channels']['frequency_number_' ~ channel.value]) }}
-                                    {{ form_label(form['lead_channels']['frequency_time_' ~ channel.value]) }}
-                                    {{ form_widget(form['lead_channels']['frequency_time_' ~ channel.value]) }}
-                                </div>
-                                {% else %}
-                                    {{ form['lead_channels']|filter((v, k) => k != 'frequency_number_' ~ channel.value) }}
-                                    {{ form['lead_channels']|filter((v, k) => k != 'frequency_time_' ~ channel.value) }}
-                                {% endif %}
-
-                                {% if showContactPauseDates %}
-                                <div class="col-md-6">
-                                    <label class="text-muted">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
-                                    {{ form_widget(form['lead_channels']['contact_pause_start_date_' ~ channel.value]) }}
-                                    {{ form_label(form['lead_channels']['contact_pause_end_date_' ~ channel.value]) }}
-                                    {{ form_widget(form['lead_channels']['contact_pause_end_date_' ~ channel.value]) }}
-                                </div>
-                                {% else %}
-                                    {{ form['lead_channels']|filter((v, k) => k != 'contact_pause_start_date_' ~ channel.value) }}
-                                    {{ form['lead_channels']|filter((v, k) => k != 'contact_pause_end_date_' ~ channel.value) }}
-                                {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
+                        {% for  key, channel in form.lead_channels.subscribed_channels.vars.choices %}
+                            {% set contactMe = leadChannels[channel.value] is defined %}
+                            {% set checked = contactMe ? 'checked' : '' %}
+                            {% set channelName =  getChannelLabel(channel.value)|lower %}
+                            <tr>
+                                <td>
+                                    <div class="text-left">
+                                        <input type="hidden" id="{{ channel.value }}-hidden"
+                                               name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
+                                               value="">
+                                        <input type="checkbox" id="{{ channel.value }}"
+                                               name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
+                                               onclick="togglePreferredChannel(this.value);"
+                                               value="{{ channel.value|escape }}" {{ checked }}>
+                                        <label for="<?php echo $channel->value; ?>" id="is-contactable-{{ channel.value }}">
+                                            {{ 'mautic.lead.contact.me.label'|trans({'%channel%' : channelName}) }}
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
                     {% endif %}
                 </table>
                 {% if showContactPreferredChannels %}
-                <hr />
-                <div id="preferred_channel" class="text-left">{{ form_row(form['lead_channels']['preferred_channel']) }}</div>
-                {% else %}
-                    {{ form['lead_channels']|filter((v, k) => k != 'preferred_channel') }}
-                {% endif %}
-                {% if showContactSegments and form['lead_lists']|length %}
-                <hr />
-                <div id="contact-segments"> <div class="text-left">{{ form_label(form['lead_lists']) }}</div>
-                    {% for leadList, key in form['lead_lists'] %}
-                        <div id="segment-{{ key }}" class="text-left">
-                            {{ form_widget(leadList) }}
-                            {{ form_label(leadList) }}
-                        </div>
-                    {% endfor %}
-                    {{ form|filter((v, k) => k != 'lead_channels') }}
-                </div>
-                {% else %}
-                    {{ form|filter((v, k) => k != 'lead_lists') }}
-                {% endif %}
-
-                {% if showContactCategories and form['global_categories']|length %}
-                <hr />
-                <div id="global-categories" class="text-left">
-                    <div>{{ form_label(form['global_categories']) }}</div>
-                    {% set categoryNumber = form['global_categories'].vars['choices']|length %}
-                    {% for i in (categoryNumber - 1)..0  %}
-                        <div id="category-{{ i }}" class="text-left">
-                            {{ form_widget(form['global_categories'][i]) }}
-                            {{ form_label(form['global_categories'][i]) }}
-
-                        </div>
-                    {% endfor %}
-                    {{ form|filter((v, k) => k != 'global_categories') }}
-                </div>
-                {% else %}
-                    {{ form|filter((v, k) => k != 'global_categories') }}
-                {% endif %}
-
-                {% if successMessage is not empty %}
                     <hr />
-                    <div id="success-message-text">
-                        {{ successMessage }}
+                    <div id="preferred_channel" class="text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
+                {% endif %}
+                {% if showContactSegments and  form.lead_lists|length > 0 %}
+                    <hr />
+                    <div id="contact-segments">
+                        <div class="text-left">{{ form_label(form.lead_lists) }}</div>
+                        {% for key, leadList in form.lead_lists %}
+                            <div id="segment-{{ key }}" class="text-left">
+                                {{ form_widget(leadList) }}
+                                {{ form_label(leadList) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if showContactCategories and form.global_categories|length > 0 %}
+                    <hr />
+                    <div id="global-categories" class="text-left">
+                        <div>{{ form_label(form.global_categories) }}</div>
+                        {% for category in form.global_categories %}
+                            {{ form_widget(category) }}
+                            {{ form_label(category) }}
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>
             <div class="panel-footer text-left">
-                {{ form_row(form['buttons']['save']) }}
+                {{ form_row(form.buttons.save) }}
             </div>
-            {{ form['buttons']|filter((v, k) => k != 'cancel') }}
         </div>
     </div>
-
-    {{ form|filter((v, k) => k != 'lead_channels') }}
+    <div class="hidden">
+        {{ form_rest(form) }}
+    </div>
     {{ form_end(form) }}
 </div>
