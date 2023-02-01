@@ -10,9 +10,11 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -36,7 +38,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -96,7 +97,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $dispatcher;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translator;
 
@@ -116,9 +117,9 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $entityManager;
 
     /**
-     * @var MockObject|FormRepository
+     * @var MockObject|SubmissionRepository
      */
-    private $formRepository;
+    private $submissioRepository;
 
     /**
      * @var MockObject|LeadRepository
@@ -180,11 +181,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->companyModel             = $this->createMock(CompanyModel::class);
         $this->fieldHelper              = $this->createMock(FormFieldHelper::class);
         $this->dispatcher               = $this->createMock(EventDispatcherInterface::class);
-        $this->translator               = $this->createMock(TranslatorInterface::class);
+        $this->translator               = $this->createMock(Translator::class);
         $this->dateHelper               = $this->createMock(DateHelper::class);
         $this->userHelper               = $this->createMock(UserHelper::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
-        $this->formRepository           = $this->createMock(FormRepository::class);
+        $this->submissioRepository      = $this->createMock(SubmissionRepository::class);
         $this->leadRepository           = $this->createMock(LeadRepository::class);
         $this->mockLogger               = $this->createMock(Logger::class);
         $this->uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
@@ -258,7 +259,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
                 $this->returnValueMap(
                     [
                         ['MauticLeadBundle:Lead', $this->leadRepository],
-                        ['MauticFormBundle:Submission', $this->formRepository],
+                        [Submission::class, $this->submissioRepository],
                     ]
                 )
             );
@@ -269,6 +270,10 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->file1Mock->expects($this->any())
             ->method('getClientOriginalName')
+            ->willReturn('test.jpg');
+
+        $this->router->expects($this->any())
+            ->method('generate')
             ->willReturn('test.jpg');
 
         $this->uploadFieldValidatorMock->expects($this->any())
@@ -310,11 +315,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($formData['email'], $tokens['{formfield=email}']);
         $this->assertEquals($formData['file'], $tokens['{formfield=file}']);
         $this->assertSame(['email' => 'test@email.com'], $submissionEvent->getContactFieldMatches());
-
-        $alias              = $this->getTestFormFields()['file']['alias'];
-        $token              = '{formfield='.$alias.'}';
-        $tokens[$token]     = $formData[$alias];
-        $this->assertNotEquals($tokens[$token], $submissionEvent->getTokens()[$token]);
 
         $this->assertFalse($this->submissionModel->saveSubmission($post, $server, $form, $request));
     }

@@ -31,7 +31,19 @@ final class AlreadyMappedFieldCollectorTest extends \PHPUnit\Framework\TestCase
 
     public function testWorkflow(): void
     {
-        $cacheItem = new CacheItem();
+        $createCacheItem = \Closure::bind(
+            function () {
+                $item             = new CacheItem();
+                $item->isHit      = false;
+                $item->isTaggable = true;
+
+                return $item;
+            },
+            $this,
+            CacheItem::class
+        );
+        $cacheItem = $createCacheItem();
+
         $formId    = '3';
         $object    = 'contact';
 

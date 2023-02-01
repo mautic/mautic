@@ -7,10 +7,8 @@ namespace Mautic\FormBundle\Tests\Collector;
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Collector\ObjectCollector;
 use Mautic\FormBundle\Event\ObjectCollectEvent;
-use Mautic\FormBundle\FormEvents;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Contracts\EventDispatcher\Event;
 
 final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,11 +17,10 @@ final class ObjectCollectorTest extends \PHPUnit\Framework\TestCase
         $dispatcher                               = new class() extends EventDispatcher {
             public int $dispatchMethodCallCounter = 0;
 
-            public function dispatch($eventName, Event $event = null)
+            public function dispatch($event)
             {
                 ++$this->dispatchMethodCallCounter;
 
-                Assert::assertSame(FormEvents::ON_OBJECT_COLLECT, $eventName);
                 Assert::assertInstanceOf(ObjectCollectEvent::class, $event);
 
                 return new ObjectCollection();

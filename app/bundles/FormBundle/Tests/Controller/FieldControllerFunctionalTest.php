@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testNewEmailFieldFormIsPreMapped(): void
     {
         $this->client->request(

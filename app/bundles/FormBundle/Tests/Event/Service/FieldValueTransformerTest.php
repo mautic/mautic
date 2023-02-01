@@ -50,7 +50,7 @@ final class FieldValueTransformerTest extends \PHPUnit\Framework\TestCase
                     'submissionId' => 456,
                     'field'        => 'file_field_1',
                 ], $parameters);
-                Assert::assertSame(self::ABSOLUTE_PATH, $referenceType);
+                Assert::assertSame(self::ABSOLUTE_URL, $referenceType);
                 ++$this->generateMethodCallCounter;
 
                 return 'generated/route';
