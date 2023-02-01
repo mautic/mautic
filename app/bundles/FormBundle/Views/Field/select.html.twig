@@ -154,8 +154,8 @@
   {% if parseList is empty %}
     {% if list is defined %}
       {% set parseList = list %}
-    {% elseif field.properties.optionlist is not empty %}
-      {% set parseList = field.properties.optionlist %}
+    {% elseif field.properties.optionList is defined and field.properties.optionList is not empty %}
+      {% set parseList = field.properties.optionList %}
     {% elseif field.properties.list is not empty %}
       {% set parseList = field.properties.list %}
     {% endif %}
