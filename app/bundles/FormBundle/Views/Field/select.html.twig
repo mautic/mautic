@@ -18,7 +18,7 @@
 
 {% if ignoreName is not defined or (ignoreName is defined and ignoreName is empty) %}
   {% set inputName = 'mauticform[' ~ field.alias ~ ']' %}
-  {% if field.properties.multiple is defined %}
+  {% if field.properties.multiple is defined and true == field.properties.multiple %}
     {% set inputName = inputName ~ '[]' %}
   {% endif %}
   {% set inputAttributes = inputAttributes|merge({
@@ -80,7 +80,7 @@
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
 
-  {% if field.conditions.any is not empty and 'notIn' != field.conditions.expr %}
+  {% if field.conditions.any != false and 'notIn' != field.conditions.expr %}
     {% set values = '*' %}
   {% endif %}
 
@@ -106,7 +106,7 @@
           'data-validate': field.alias,
           'data-validation-type': field.type,
   }) %}
-  {% if field.properties.multiple is not empty %}
+  {% if field.properties.multiple != false %}
     {% set containerAttributes = containerAttributes|merge({
             'data-validate-multiple': 'true',
     }) %}
