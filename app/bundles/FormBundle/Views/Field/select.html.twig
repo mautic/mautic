@@ -217,7 +217,7 @@
             (field.properties.placeholder is defined and field.properties.placeholder is not empty) or
             (field.defaultValue is defined and field.defaultValue is empty)
           ) and
-          field.properties.multiple is empty
+          ((field.properties.multiple is defined and field.properties.multiple is empty) or field.properties.multiple is not defined)
     %}
         {% set placeholder = field.properties.placeholder|default('') %}
         <option value="">{{ placeholder }}</option>
