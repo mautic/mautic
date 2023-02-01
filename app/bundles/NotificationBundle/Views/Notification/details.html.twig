@@ -1,63 +1,64 @@
-<?php
+{#
+  Variables
+    - notification
+    - trackables
+    - logs
+    - permissions
+    - security
+    - entityViews
+    - contacts
+    - dateRangeForm
+#}
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'notification');
-$view['slots']->set('headerTitle', $notification->getName());
+{% block mauticContent %}notification{% endblock %}
 
-$notificationType = $notification->getNotificationType();
-if (empty($notificationType)) {
-    $notificationType = 'template';
-}
+{% block headerTitle %}{{ notification.name }}{% endblock %}
 
-$customButtons = [];
+{% block actions %}
+    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+            'item': notification,
+            'templateButtons': {
+                'edit': securityHasEntityAccess(permissions['notification:notifications:editown'], permissions['notification:notifications:editother'], notification.createdBy),
+                'delete': permissions['notification:notifications:create'],
+                'close': securityHasEntityAccess(permissions['notification:notifications:viewown'], permissions['notification:notifications:viewother'], notification.createdBy),
+            },
+            'routeBase': 'notification',
+    }) }}
+{% endblock %}
 
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'item'            => $notification,
-            'customButtons'   => (isset($customButtons)) ? $customButtons : [],
-            'templateButtons' => [
-                'edit' => $view['security']->hasEntityAccess(
-                    $permissions['notification:notifications:editown'],
-                    $permissions['notification:notifications:editother'],
-                    $notification->getCreatedBy()
-                ),
-                'delete' => $permissions['notification:notifications:create'],
-                'close'  => $view['security']->hasEntityAccess(
-                    $permissions['notification:notifications:viewown'],
-                    $permissions['notification:notifications:viewother'],
-                    $notification->getCreatedBy()
-                ),
-            ],
-            'routeBase' => 'notification',
-        ]
-    )
-);
-$view['slots']->set(
-    'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $notification])
-);
-?>
+{% block publishStatus %}
+  {{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': notification}) }}
+{% endblock %}
 
+{% block content %}
+            {{ notification.description }}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
-        <div class="bg-auto bg-dark-xs">
+        <div class="bg-auto">
+            <!-- notification detail collapseable -->
+            <div class="collapse" id="notification-details">
+              <div class="pr-md pl-md pb-md">
+                <div class="panel shd-none mb-0">
+                  <table class="table table-bordered table-striped mb-0">
+                    <tbody>
+                      {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': notification}) }}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!--/ notification detail collapseable -->
+
             <!-- notification detail collapseable toggler -->
             <div class="hr-expand nm">
-                <span data-toggle="tooltip" title="<?php echo $view['translator']->trans('mautic.core.details'); ?>">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#notification-details"><span class="caret"></span> <?php echo $view['translator']->trans('mautic.core.details'); ?></a>
+                <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#notification-details">
+                      <span class="caret"></span>
+                      {{ 'mautic.core.details'|trans }}
+                    </a>
                 </span>
             </div>
             <!--/ notification detail collapseable toggler -->
@@ -71,15 +72,15 @@ $view['slots']->set(
                                 <div class="col-md-3 va-m">
                                     <h5 class="text-white dark-md fw-sb mb-xs">
                                         <span class="fa fa-line-chart"></span>
-                                        <?php echo $view['translator']->trans('mautic.core.stats'); ?>
+                                        {{ 'mautic.core.stats'|trans }}
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
-                                    <?php echo $view->render('MauticCoreBundle:Helper:graph_dateselect.html.php', ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']); ?>
+                                    {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}, with_context=false) }}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                <?php echo $view->render('MauticCoreBundle:Helper:chart.html.php', ['chartData' => $entityViews, 'chartType' => 'line', 'chartHeight' => 300]); ?>
+                                {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}, with_context=false) }}
                             </div>
                         </div>
                     </div>
@@ -87,18 +88,18 @@ $view['slots']->set(
             </div>
             <!--/ stats -->
 
-            <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+            {{ customContent('details.stats.graph.below', mauticTemplateVars|default([])) }}
 
             <!-- tabs controls -->
             <ul class="nav nav-tabs pr-md pl-md">
                 <li class="active">
                     <a href="#clicks-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.trackable.click_counts'); ?>
+                        {{ 'mautic.trackable.click_counts'|trans }}
                     </a>
                 </li>
                 <li class="">
                     <a href="#contacts-container" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
+                        {{ 'mautic.lead.leads'|trans }}
                     </a>
                 </li>
             </ul>
@@ -108,25 +109,27 @@ $view['slots']->set(
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                <?php echo $view->render('MauticPageBundle:Trackable:click_counts.html.php', [
-                    'trackables'  => $trackables,
-                    'entity'      => $notification,
-                    'channel'     => 'notification', ]); ?>
+                {{ include('MauticPageBundle:Trackable:click_counts.html.twig', {
+                    'trackables': trackables,
+                    'entity': notification,
+                    'channel': 'notification'
+                }) }}
             </div>
-
             <div class="tab-pane fade in bdr-w-0 page-list" id="contacts-container">
-                <?php echo $contacts; ?>
+                {{ contacts|purify }}
             </div>
         </div>
+        <!--/ tab-content -->
     </div>
     <!--/ left section -->
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
         <!-- activity feed -->
-        <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
+        {{ include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}) }}
     </div>
     <!--/ right section -->
-    <input name="entityId" id="entityId" type="hidden" value="<?php echo $view->escape($notification->getId()); ?>" />
+    <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />
 </div>
 <!--/ end: box layout -->
+{% endblock %}

@@ -1,17 +1,7 @@
-<?php
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-/* @var \Mautic\NotificationBundle\Entity\Notification $notification */
-$url    = $notification->getUrl();
-$button = $notification->getButton();
-
-?>
+{#
+  Variables
+    - notification (\Mautic\NotificationBundle\Entity\Notification)
+#}
 <label>Preview</label>
 <div id="notification-preview" class="panel panel-default">
     <div class="panel-body">
@@ -21,28 +11,25 @@ $button = $notification->getButton();
             </div>
             <div class="text height-auto bg-white">
                 <h4>
-                    <?php
-                    if ($notification->getHeading()) {
-                        echo $notification->getHeading();
-                    } else {
-                        echo 'Your notification header';
-                    }
-                    ?>  
+                    {%- if notification.heading -%}
+                        {{- notification.heading -}}
+                    {%- else -%}
+                        Your notification header
+                    {%- endif -%}
                 </h4>
                 <p>
-                    <?php
-                    if ($notification->getMessage()) {
-                        echo $notification->getMessage();
-                    } else {
-                        echo 'The message body of your notification';
-                    }?>  
+                    {%- if notification.message %}
+                        {{- notification.message -}}
+                    {%- else -%}
+                        The message body of your notification
+                    {%- endif -%}
                 </p>
-                <span><?php echo $_SERVER['HTTP_HOST']; ?></span>
+                <span>{{ app.request.server.get('HTTP_HOST') }}</span>
             </div>
         </div>
-        <?php if ($url && $button) : ?>
+        {% if notification.url and notification.button %}
             <hr>
-            <a href="<?php echo $url; ?>"><?php echo $button; ?></a>
-        <?php endif; ?>
+            <a href="{{ notification.url }}">{{ notification.button }}</a>
+        {% endif %}
     </div>
 </div>
