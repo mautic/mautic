@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\Event;
 use Mautic\CoreBundle\Event\CommonEvent;
 use Mautic\FormBundle\Collection\ObjectCollection;
 use Mautic\FormBundle\Crate\ObjectCrate;
-use Symfony\Contracts\EventDispatcher\Event;
 
 final class ObjectCollectEvent extends CommonEvent
 {

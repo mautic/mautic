@@ -167,5 +167,5 @@ final class FormEvents
      *
      * @var string
      */
-    const ON_FIELD_COLLECT = 'mautic.form.on_field_collect';
+    public const ON_FIELD_COLLECT = 'mautic.form.on_field_collect';
 }
