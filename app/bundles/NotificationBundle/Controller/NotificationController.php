@@ -363,7 +363,6 @@ class NotificationController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    //'form'         => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.twig', 'MauticNotificationBundle:FormTheme\Notification'),
                     'form'         => $form->createView(),
                     'notification' => $entity,
                 ],
@@ -527,7 +526,6 @@ class NotificationController extends AbstractFormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    //'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:Notification:form.html.twig', 'MauticNotificationBundle:FormTheme\Notification'),
                     'form'               => $form->createView(),
                     'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
