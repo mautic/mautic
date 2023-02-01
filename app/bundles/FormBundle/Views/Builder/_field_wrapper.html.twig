@@ -37,10 +37,10 @@
             <!-- end: "{{ template }}" -->
         </div>
 
-        {% if ((field['showWhenValueExists'] is defined and false == field['showWhenValueExists']) or field['showAfterXSubmissions']) is not empty
-            or (field['alwaysDisplay'] is defined and true == field['alwaysDisplay'])
-            or field['leadField'] is not empty
-            or field['conditions'] is not empty
+        {% if ((field.showWhenValueExists is defined and false is same as field.showWhenValueExists) or field.showAfterXSubmissions) is not empty
+            or (field.alwaysDisplay is defined and true is same as field.alwaysDisplay)
+            or field.leadField is not empty
+            or field.conditions is not empty
         %}
             <div class="panel-footer">
                 {% if field.conditions.expr is defined and field.conditions.expr is not empty %}
@@ -52,7 +52,7 @@
                           {{ 'mautic.form.field.form.condition.select.value'|trans }}
                       </span>
                       <strong>
-                          {% if 'in' == field.conditions.expr and field.conditions.any is not empty %}
+                          {% if 'in' is same as field.conditions.expr and (field.conditions.any is not empty and 0 is not same as field.conditions.any) %}
                               *
                           {% else %}
                             {{ field.conditions.values|join(', ') }}
@@ -80,7 +80,7 @@
                   <i class="fa fa-eye" aria-hidden="true"></i>
                   <span class="inline-spacer">{{ 'mautic.form.field.form.always_display'|trans }}</span>
                 {% else %}
-                  {% if field.showWhenValueExists is defined and false == field.showWhenValueExists %}
+                  {% if field.showWhenValueExists is defined and false is same as field.showWhenValueExists %}
                     <i class="fa fa-eye-slash" aria-hidden="true"></i>
                     <span class="inline-spacer">{{ 'mautic.form.field.hide.if.value'|trans }}</span>
                   {% endif %}
@@ -93,7 +93,7 @@
             </div>
         {% endif %}
 
-        {% if isConditional is not defined and fields is defined and field.type in enumConditionalFieldTypes() %}
+        {% if (isConditional is not defined or (isConditional is defined and isConditional is same as false)) and fields is defined and field.type in enumConditionalFieldTypes() %}
             <div class="row ml-15 mr-0 pb-15">
                 <div class="pull-left mt-15">
                   <a class="add-new-conditional-field" href=""><i class="fa fa-plus"></i> {{ 'mautic.form.form.component.fields.conditional'|trans }}</a>
