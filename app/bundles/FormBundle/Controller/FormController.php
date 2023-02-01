@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class FormController extends CommonFormController
 {
@@ -32,7 +32,7 @@ class FormController extends CommonFormController
      */
     private $mappedObjectCollector;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->alreadyMappedFieldCollector = $this->get('mautic.form.collector.already.mapped.field');
         $this->mappedObjectCollector       = $this->get('mautic.form.collector.mapped.object');

@@ -9,7 +9,7 @@ use Mautic\FormBundle\Collector\FieldCollectorInterface;
 use Mautic\FormBundle\Crate\FieldCrate;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class AjaxController extends CommonAjaxController
 {
@@ -23,7 +23,7 @@ class AjaxController extends CommonAjaxController
      */
     private $mappedFieldCollector;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->fieldCollector       = $this->container->get('mautic.form.collector.field');
         $this->mappedFieldCollector = $this->container->get('mautic.form.collector.already.mapped.field');
