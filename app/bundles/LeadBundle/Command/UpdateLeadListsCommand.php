@@ -92,10 +92,13 @@ class UpdateLeadListsCommand extends ModeratedCommand
                     $output->writeln('<info>'.$this->translator->trans('mautic.lead.list.rebuild.rebuilding', ['%id%' => $id]).'</info>');
                     $processed = 0;
                     try {
-                        $processed = $this->listModel->rebuildListLeads($list, $batch, $max, $output);
+                        $startTimeForSingleSegment = time();
+                        $processed                 = $this->listModel->rebuildListLeads($list, $batch, $max, $output);
+                        $totalTime                 = round(microtime(true) - $startTimeForSingleSegment, 2);
                         if (0 >= (int) $max) {
                             // Only full segment rebuilds count
                             $list->setLastBuiltDateToCurrentDatetime();
+                            $list->setLastBuiltTime($totalTime);
                             $this->listModel->saveEntity($list);
                         }
                     } catch (QueryException $e) {
