@@ -85,6 +85,13 @@
                         {% endfor %}
                     </div>
                 {% endif %}
+
+                {% if successMessage is defined %}
+                    <hr />
+                    <div id="success-message-text">
+                        {{ successMessage }}
+                    </div>
+                {% endif %}
             </div>
             <div class="panel-footer text-left">
                 {{ form_row(form.buttons.save) }}
