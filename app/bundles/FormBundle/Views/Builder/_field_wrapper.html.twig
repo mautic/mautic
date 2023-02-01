@@ -15,7 +15,7 @@
     - conditionalFieldTypes
 #}
 {% set inBuilder = inBuilder|default(false) %}
-<div class="{% if isConditional is not defined %}panel{% else %}panel2{% endif %} form-field-wrapper" data-sortable-id="mauticform_{{ field.id }}">
+<div class="{% if isConditional is not defined or (isConditional is defined and false == isConditional) %}panel{% else %}panel2{% endif %} form-field-wrapper" data-sortable-id="mauticform_{{ field.id }}">
         {{ include('MauticFormBundle:Builder:_actions.html.twig', {
                 'id': field.id,
                 'formId': formId,
@@ -24,7 +24,8 @@
         }) }}
         <div class="row ml-0 mr-0">
             {# wrap in a row to keep bootstrap container classes from affecting builder layout #}
-            {{ include(template, {
+            <!-- start: "{{ template }}" -->
+            {{- include(template, {
                     'field': field,
                     'inForm': true,
                     'id': field.id,
@@ -32,7 +33,8 @@
                     'contactFields': contactFields|default([]),
                     'companyFields': companyFields|default([]),
                     'inBuilder': inBuilder,
-            }) }}
+            }) -}}
+            <!-- end: "{{ template }}" -->
         </div>
 
         {% if ((field['showWhenValueExists'] is defined and false == field['showWhenValueExists']) or field['showAfterXSubmissions']) is not empty
