@@ -117,7 +117,7 @@
 
 {% set buttonType = field.properties.type|default('submit') %}
 {% set inputAttributes = inputAttributes|merge({
-        'type': field.type,
+        'type': buttonType,
         'name': 'mauticform[' ~ field.alias ~ ']',
         'value': '1',
 }) %}
