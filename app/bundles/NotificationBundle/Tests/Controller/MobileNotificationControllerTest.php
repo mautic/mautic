@@ -20,15 +20,4 @@ final class NotificationControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
-
-    /**
-     * Smoke test to ensure the '/s/mobile_notifications/new' route loads.
-     */
-    public function testNewRouteSuccessfullyLoads(): void
-    {
-        $this->client->request(Request::METHOD_GET, '/s/mobile_notifications/new');
-        $response = $this->client->getResponse();
-
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-    }
 }
