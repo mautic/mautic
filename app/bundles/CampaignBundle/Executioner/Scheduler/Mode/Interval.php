@@ -255,6 +255,7 @@ class Interval implements ScheduleModeInterface
         $groupHour = clone $hour;
 
         $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
+        $groupExecutionDate->setTime((int) $groupExecutionDate->format('H'), (int) $groupExecutionDate->format('i')); //second should be ignore in comparison
 
         $testGroupHour = clone $groupExecutionDate;
         $testGroupHour->setTime($groupHour->format('H'), $groupHour->format('i'));
