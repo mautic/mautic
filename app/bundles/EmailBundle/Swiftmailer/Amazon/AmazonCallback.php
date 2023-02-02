@@ -72,6 +72,15 @@ class AmazonCallback
      */
     public function processJsonPayload(array $payload, $type)
     {
+        $emailId = null;
+        if (isset($payload['mail']['headers'])) {
+            foreach ($payload['mail']['headers'] as $header) {
+                if ('X-EMAIL-ID' === $header['name']) {
+                    $emailId = $header['value'];
+                }
+            }
+        }
+
         switch ($type) {
             case 'SubscriptionConfirmation':
                     // Confirm Amazon SNS subscription by calling back the SubscribeURL from the playload
@@ -116,7 +125,7 @@ class AmazonCallback
                         $reason = $this->translator->trans('mautic.email.complaint.reason.unknown');
                     }
 
-                    $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED);
+                    $this->transportCallback->addFailureByAddress($complainedRecipient['emailAddress'], $reason, DoNotContact::UNSUBSCRIBED, $emailId);
 
                     $this->logger->debug("Unsubscribe email '".$complainedRecipient['emailAddress']."'");
                 }
@@ -124,16 +133,6 @@ class AmazonCallback
             break;
             case 'Bounce':
                 if ('Permanent' == $payload['bounce']['bounceType']) {
-                    $emailId = null;
-
-                    if (isset($payload['mail']['headers'])) {
-                        foreach ($payload['mail']['headers'] as $header) {
-                            if ('X-EMAIL-ID' === $header['name']) {
-                                $emailId = $header['value'];
-                            }
-                        }
-                    }
-
                     // Get bounced recipients in an array
                     $bouncedRecipients = $payload['bounce']['bouncedRecipients'];
                     foreach ($bouncedRecipients as $bouncedRecipient) {
