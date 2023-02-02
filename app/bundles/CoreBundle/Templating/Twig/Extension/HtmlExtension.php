@@ -39,7 +39,11 @@ final class HtmlExtension extends AbstractExtension
             return [];
         }
 
-        $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
+        try {
+            $attributes = current((array) new \SimpleXMLElement("<element $attributes />"));
+        } catch (\Exception $e) {
+            return [];
+        }
 
         /**
          * This will 1) clean whitespace and 2) convert attributes with
