@@ -68,7 +68,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
             'label'                  => 'mautic.campaign.event.jump_to_event',
             'description'            => 'mautic.campaign.event.jump_to_event_descr',
             'formType'               => CampaignEventJumpToEventType::class,
-            'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+            'template'               => 'MauticCampaignBundle:Event:jump.html.twig',
             'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
             'connectionRestrictions' => [
                 'target' => [
