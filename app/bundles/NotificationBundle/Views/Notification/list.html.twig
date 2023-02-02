@@ -10,7 +10,9 @@
     - model
     - security
 #}
-{% extends app.request.isXmlHttpRequest ? 'MauticCoreBundle:Default:raw_output.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
 
 {% block mauticContent %}notification{% endblock %}
 
@@ -26,7 +28,7 @@
 {% endblock %}
 
 {% block content %}
-  {% if not app.request.isXmlHttpRequest %}
+  {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
         {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
                 'searchValue': searchValue,
@@ -39,7 +41,7 @@
 
   {{ include('MauticNotificationBundle:Notification:_list.html.twig') }}
 
-  {% if not app.request.isXmlHttpRequest %}
+  {% if isIndex %}
         </div>
     </div>
   {% endif %}
