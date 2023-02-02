@@ -11,6 +11,7 @@ use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
 use Mautic\ReportBundle\Model\ReportModel;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -682,6 +683,7 @@ class ReportController extends FormController
                     ),
                     'dateRangeForm'     => $dateRangeForm->createView(),
                     'dynamicFilterForm' => $dynamicFilterForm->createView(),
+                    'spreadsheetExist'  => class_exists(Spreadsheet::class),
                 ],
                 'contentTemplate' => $reportData['contentTemplate'],
                 'passthroughVars' => [

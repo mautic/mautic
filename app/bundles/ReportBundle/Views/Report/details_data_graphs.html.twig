@@ -1,0 +1,28 @@
+{% if graphOrder is defined and graphs is defined %}
+    <div class="mt-lg pa-md" style="clear: both">
+        <div class="row equal">
+            {% set rowCount = 0 %}
+            <ul>
+            {% for key in graphOrder %}
+                <li>{{ key }} :
+                {% if graphs.key is defined %}
+                    {{ graphs.key }}
+                    {% set details = graphs.key %}
+                    {{ details }}
+                    {% if rowCount >= 12 %}
+                        </div><div class="row equal">
+                        {% set rowCount = 0 %}
+                    {% endif %}
+                    {{ include('MauticReportBundle:Graph:' ~ details.type|capitalize ~ '.html.twig', {
+                        'graph' : details.data,
+                        'options' : details.option,
+                        'report' : report
+                    }) }}
+                    {% set rowCount = rowCount + ('line' == details.type ? 12 : 4) %}
+                {% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}

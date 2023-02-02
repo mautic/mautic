@@ -1,0 +1,61 @@
+{% extends('MauticReportBundle:Report:details.html.twig') %}
+{% set showGraphsAboveTable = report.settings.shoGraphsAboveTable is defined %}
+{% set dataCount = data|length %}
+{% set columnOrder = report.columns %}
+{% set graphOrder = report.graphs %}
+{% set aggregatorOrder = report.aggregators %}
+{% set aggregatorCount = aggregatorOrder|length %}
+{% set groupBy = report.groupBy %}
+{% set groupByCount = groupBy|length %}
+{% set startCount = totalResults > limit ? (reportPage * limit) - limit + 1 : 1 %}
+{% set graphContent = include('MauticReportBundle:Report:details_data_graphs.html.twig', {
+    'graphOrder' : graphOrder,
+    'graphs' : graphs,
+    'report' : report
+}) %}
+{% block content %}
+    {% if showGraphsAboveTable is defined %}
+        {{ graphContent|raw }}
+    {% endif %}
+    {% if columnOrder is defined and aggregatorOrder is defined %}
+        <div class="col-xs-12">
+            <div class="panel panel-default bdr-t-wdh-0 mb-0">
+                <div class="page-list">
+                    <div class="table-responsive table-responsive-force">
+                        <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+                            <thead>
+
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if showGraphsAboveTable is not defined %}
+        {{ graphContent|raw }}
+    {% endif %}
+    <script>
+        mQuery(document).ready(function() {
+            mQuery('.datetimepicker').datetimepicker({
+                format:'Y-m-d H:i:s',
+                closeOnDateSelect: true,
+                validateOnBlur: false,
+                scrollMonth: false,
+                scrollInput: false
+            });
+        });
+        mQuery(document).ready(function() {
+            mQuery('.datepicker').datetimepicker({
+                format:'Y-m-d',
+                closeOnDateSelect: true,
+                validateOnBlur: false,
+                scrollMonth: false,
+                scrollInput: false
+            });
+        });
+    </script>
+{% endblock %}

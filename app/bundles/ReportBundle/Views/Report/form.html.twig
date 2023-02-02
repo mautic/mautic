@@ -1,7 +1,7 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 {% block mauticContent %}report{% endblock %}
 {% block headerTitle %}
-    {% if report.id is defined %}
+    {% if report.getId() is defined %}
         {{ 'mautic.report.report.header.edit'|trans({'%name%': report.name|trans}) }}
     {% else %}
         {{ 'mautic.report.report.header.new'|trans }}
@@ -105,7 +105,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade bdr-w-0<?php if (!$showGraphTab): echo 'hide'; endif; ?>"
+                        <div class="tab-pane fade bdr-w-0{{ not showGraphTab ? 'hide' : '' }}"
                              id="graphs-container">
                             <div class="row">
                                 <div class="col-md-6">
@@ -148,8 +148,19 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
+            </div>
+        </div>
+        <div class="col-md-3 bg-white height-auto bdr-l">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ form_row(form.isPublished) }}
+                {{ form_row(form.system) }}
+                {{ form_row(form.createdBy) }}
+                <hr>
+                <h5>{{ 'mautic.report.report.form.display.dynamic.filters.settings'|trans }}</h5>
+                <br>
+                {{ form_row(form.vars.form.children.settings.showDynamicFilters) }}
+                {{ form_row(form.vars.form.children.settings.hideDateRangeFilter) }}
             </div>
         </div>
     </div>
