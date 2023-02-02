@@ -146,8 +146,9 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      * @throws Scheduler\Exception\NotSchedulableException
      * @throws \Doctrine\ORM\Query\QueryException
      */
-    public function executeByIds(array $logIds, OutputInterface $output = null)
+    public function executeByIds(array $logIds, OutputInterface $output = null, \DateTime $now = null)
     {
+        $now           = $now ?: new \DateTime();
         $this->output  = ($output) ? $output : new NullOutput();
         $this->counter = new Counter();
 
@@ -182,7 +183,6 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
 
         // Organize the logs by event ID
         $organized = $this->organizeByEvent($logs);
-        $now       = $this->now ?? new \DateTime();
         foreach ($organized as $organizedLogs) {
             /** @var Event $event */
             $event = $organizedLogs->first()->getEvent();

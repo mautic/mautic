@@ -3,6 +3,13 @@
 namespace Mautic\CampaignBundle\Tests\Command;
 
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use DateTime;
+use Mautic\CampaignBundle\Entity\LeadEventLog;
+use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
+use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use PHPUnit\Framework\Assert;
 
 class ExecuteEventCommandTest extends AbstractCampaignCommand
 {
@@ -65,5 +72,144 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
         }
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
+    }
+
+    public function testRepublishScheduledCampaignEventActionWhenEventFailedBecauseCampaignWasUnpublished(): void
+    {
+        $fixtureHelper = new FixtureHelper($this->em);
+        $contact       = $fixtureHelper->createContact('some@contact.email');
+        $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
+        $fixtureHelper->addContactToCampaign($contact, $campaign);
+        $fixtureHelper->createCampaignWithScheduledEvent($campaign);
+
+        $this->em->flush();
+
+        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        Assert::assertStringContainsString('1 total event was scheduled', $output);
+
+        $campaign->setIsPublished(false);
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertTrue($log->getIsScheduled());
+
+        // Time machine so we don't have to wait for that long.
+        $log->setTriggerDate(new DateTime('2 days ago'));
+        $log->setDateTriggered(new DateTime('2 days ago'));
+        $log->setIsScheduled(true);
+        $this->em->persist($log);
+        $this->em->flush();
+        $this->em->clear();
+
+        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
+
+        Assert::assertStringContainsString('0 total events(s) to be processed', $output);
+        Assert::assertStringContainsString('0 total events were executed', $output);
+        Assert::assertStringContainsString('0 total events were scheduled', $output);
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertTrue($log->getIsScheduled());
+        Assert::assertSame([], $log->getMetadata());
+    }
+
+    public function testRepublishScheduledCampaignEventActionWhenEventFailedBecauseCampaignPublishDownIsInThePast(): void
+    {
+        $fixtureHelper = new FixtureHelper($this->em);
+        $contact       = $fixtureHelper->createContact('some@contact.email');
+        $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
+        $fixtureHelper->addContactToCampaign($contact, $campaign);
+        $fixtureHelper->createCampaignWithScheduledEvent($campaign);
+
+        $this->em->flush();
+
+        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        Assert::assertStringContainsString('1 total event was scheduled', $output);
+
+        $campaign->setPublishUp(new DateTime('3 days ago'));
+        $campaign->setPublishDown(new DateTime('1 days ago'));
+        $this->em->persist($campaign);
+        $this->em->flush();
+        $this->em->clear();
+
+        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertTrue($log->getIsScheduled());
+
+        // Time machine so we don't have to wait for that long.
+        $log->setTriggerDate(new DateTime('2 days ago'));
+        $log->setDateTriggered(new DateTime('2 days ago'));
+        $log->setIsScheduled(true);
+        $this->em->persist($log);
+        $this->em->flush();
+        $this->em->clear();
+
+        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
+
+        Assert::assertStringContainsString('1 total events(s) to be processed', $output);
+        Assert::assertStringContainsString('0 total events were executed', $output);
+        Assert::assertStringContainsString('0 total events were scheduled', $output);
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertTrue($log->getIsScheduled());
+        Assert::assertSame([], $log->getMetadata());
+    }
+
+    public function testScheduledCampaignEventActionIfScheduledAtDefined(): void
+    {
+        $interval      = 5;
+        $unit          = 'i';
+        $fixtureHelper = new FixtureHelper($this->em);
+        $contact       = $fixtureHelper->createContact('some@contact.email');
+        $campaign      = $fixtureHelper->createCampaign('Scheduled event test');
+        $fixtureHelper->addContactToCampaign($contact, $campaign);
+        $hour = new DateTime();
+        $hour->add((new DateTimeHelper())->buildInterval($interval, $unit));
+        $fixtureHelper->createCampaignWithScheduledEvent($campaign, $interval, $unit, $hour);
+
+        $this->em->flush();
+
+        $output = $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        Assert::assertStringContainsString('1 total event was scheduled', $output);
+
+        $leadEventLogRepository = $this->em->getRepository(LeadEventLog::class);
+        \assert($leadEventLogRepository instanceof LeadEventLogRepository);
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertTrue($log->getIsScheduled());
+
+        [$tube, $task] = explode('.', EventTube::ACTION);
+        $job           = $this->em->getRepository(Job::class)->findOneBy(['tube' => $tube, 'task' => $task, 'primaryEntityId' => $log->getEvent()->getId()]);
+        \assert($job instanceof Job);
+
+        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId(), '--execution-time' => $job->getDelay()->format(Interval::LOG_DATE_FORMAT)]);
+
+        Assert::assertStringContainsString('1 total events(s) to be processed', $output);
+        Assert::assertStringContainsString('1 total event was executed', $output);
+        Assert::assertStringContainsString('0 total events were scheduled', $output);
+
+        $log = $leadEventLogRepository->findOneBy(['lead' => $contact, 'campaign' => $campaign]);
+        \assert($log instanceof LeadEventLog);
+
+        Assert::assertFalse($log->getIsScheduled());
     }
 }
