@@ -327,6 +327,13 @@ return [
                     'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
                 ],
             ],
+            'mautic.lead.reportbundle.normalize.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\ReportNormalizeSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                ],
+            ],
         ],
         'other' => [
             'mautic.lead.doctrine.subscriber' => [
