@@ -2,12 +2,13 @@
   Variables
     - form
 #}
+{% set uploadMaxFilesize = ini_get('upload_max_filesize')|replace({'M': ''}) %}
 <div class="row">
     <div class="col-sm-offset-3 col-sm-6">
         <div class="ml-lg mr-lg mt-md pa-lg">
             <div class="panel panel-info">
                 <div class="panel-heading">
-                    <div class="panel-title">{{ 'mautic.lead.import.start.instructions'|trans }}</div>
+                    <div class="panel-title">{{ 'mautic.lead.import.start.instructions'|trans({'%size%': uploadMaxFilesize}) }}</div>
                 </div>
                 <div class="panel-body">
                     {{ form_start(form) }}
