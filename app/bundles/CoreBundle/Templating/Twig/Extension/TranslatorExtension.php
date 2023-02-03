@@ -38,8 +38,8 @@ class TranslatorExtension extends AbstractExtension
     }
 
     /**
-     * @see \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::transConditional
-     * @see \Mautic\CoreBundle\Translation\Translator::transConditional
+     * Checks for $preferred string existence and returns translation if it
+     * does.  Otherwise, returns translation for $alternative.
      *
      * @param array<mixed> $parameters
      */
