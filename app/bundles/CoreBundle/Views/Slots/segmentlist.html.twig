@@ -1,45 +1,25 @@
-<?php
-
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-?>
-<?php if (isset($form)) : ?>
-    <?php if ($showContactSegments && isset($form['lead_lists']) && count($form['lead_lists'])):?>
+{% if form is defined %}
+    {% if showContactSegments is defined and showContactSegments and form.lead_lists is defined and form.lead_lists|length > 0 %}
         <div class="contact-segments">
             <div class="text-left">
-                <label class="control-label"><?php echo isset($label_text) ? $label_text : $view['translator']->trans('mautic.lead.form.list'); ?></label>
+                <label class="control-label">{{ label_text|default('mautic.lead.form.list'|trans) }}</label>
             </div>
-            <?php
-            foreach ($form['lead_lists'] as $key => $leadList) {
-                ?>
-                <div id="segment-<?php echo $key; ?>" class="text-left">
-                    <?php echo $view['form']->widget($leadList); ?>
-                    <?php echo $view['form']->label($leadList); ?>
+            {% for key, leadList in form.lead_lists %}
+                <div id="segment-{{ key }}" class="text-left">
+                    {{ form_widget(leadList) }}
+                    {{ form_label(leadList) }}
                 </div>
-                <?php
-            }
-            unset($form['lead_lists']);
-            ?>
+            {% endfor %}
         </div>
-    <?php else:
-        unset($form['lead_lists']);
-    endif;
-else :
-    ?>
+    {% endif %}
+{% else %}
     <div class="contact-segments">
         <div class="text-left">
-            <label class="control-label"><?php echo  $view['translator']->trans('mautic.lead.form.list'); ?></label>
+            <label class="control-label">{{ 'mautic.lead.form.list'|trans }}</label>
         </div>
         <div id="segment-1" class="text-left">
             <input type="checkbox" id="lead_contact_frequency_rules_lead_lists_1" name="lead_contact_frequency_rules[lead_lists][]" autocomplete="false" value="2" checked="checked">
-            <label for="lead_contact_frequency_rules_lead_lists_1"><?php echo  $view['translator']->trans('mautic.lead.lead.field.list'); ?></label>
+            <label for="lead_contact_frequency_rules_lead_lists_1">{{ 'mautic.lead.lead.field.list'|trans }}</label>
         </div>
     </div>
-<?php endif; ?>
+{% endif %}

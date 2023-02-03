@@ -1,23 +1,10 @@
-<?php
-
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-$channelNumber = 0;
-?>
-<?php if (isset($form)) : ?>
+{% set channelNumber = 0 %}
+{% if form is defined %}
 <table class="table table-striped">
     <?php foreach ($form['lead_channels']['subscribed_channels']->vars['choices'] as $key=>$channel):
         $contactMe   = isset($leadChannels[$channel->value]);
         $checked     = $contactMe ? 'checked' : '';
         $channelName = strtolower($view['channel']->getChannelLabel($channel->value));
-        ?>
         <tr>
             <td>
                 <div class="text-left">
@@ -67,7 +54,7 @@ $channelNumber = 0;
     <?php unset($form['lead_channels']['subscribed_channels']); ?>
     <?php endforeach; ?>
 </table>
-<?php else : ?>
+{% else %}
 <table class="table table-striped">
     <tbody>
     <tr>
@@ -75,7 +62,7 @@ $channelNumber = 0;
             <div class="text-left">
                 <input type="checkbox" checked="">
                 <label class="control-label">
-                    <?php echo $view['translator']->trans('mautic.lead.contact.me.label'); ?></label>
+                    {{ 'mautic.lead.contact.me.label'|trans }}</label>
             </div>
         </td>
     </tr>
@@ -83,16 +70,16 @@ $channelNumber = 0;
         <td>
             <div id="frequency_email" class="text-left row">
                 <div class="col-xs-6">
-                    <label class="text-muted label1"><?php echo $view['translator']->trans('mautic.lead.list.frequency.number'); ?></label>
+                    <label class="text-muted label1">{{ 'mautic.lead.list.frequency.number'|trans }}</label>
                     <input type="text" class="frequency form-control">
-                    <label class="text-muted fw-n frequency-label label2"><?php echo $view['translator']->trans('mautic.lead.list.frequency.times'); ?></label>
+                    <label class="text-muted fw-n frequency-label label2">{{ 'mautic.lead.list.frequency.times'|trans }}</label>
                     <select class="form-control">
                         <option value="" selected="selected"></option>
                     </select></div>
                 <div class="col-xs-6">
-                    <label class="text-muted label3"><?php echo  $view['translator']->trans('mautic.lead.frequency.dates.label'); ?></label>
+                    <label class="text-muted label3">{{ 'mautic.lead.frequency.dates.label'|trans }}</label>
                     <input type="date" class="form-control">
-                    <label class="frequency-label text-muted fw-n label4"><?php echo  $view['translator']->trans('mautic.lead.frequency.contact.end.date'); ?></label>
+                    <label class="frequency-label text-muted fw-n label4">{{ 'mautic.lead.frequency.contact.end.date'|trans }}</label>
                     <input type="date" class="form-control">
                 </div>
             </div>
@@ -100,4 +87,4 @@ $channelNumber = 0;
     </tr>
     </tbody>
 </table>
-<?php endif; ?>
+{% endif %}
