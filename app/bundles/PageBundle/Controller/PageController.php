@@ -447,7 +447,6 @@ class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.twig', 'MauticPageBundle:FormTheme\Page'),
                 'form'          => $form->createView(),
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
@@ -598,7 +597,6 @@ class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.twig', 'MauticPageBundle:FormTheme\Page'),
                 'form'          => $form->createView(),
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
