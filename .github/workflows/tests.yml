@@ -74,7 +74,8 @@ jobs:
       run: |
         composer validate
         composer install --prefer-dist --no-progress --no-suggest
-
+        rm -rf var/cache
+        
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
         export DB_PORT_STRING="${{ matrix.db-types }}_port"
