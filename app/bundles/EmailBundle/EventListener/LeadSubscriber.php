@@ -137,7 +137,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'stat' => $stat,
                             'type' => $state,
                         ],
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
                     ]
