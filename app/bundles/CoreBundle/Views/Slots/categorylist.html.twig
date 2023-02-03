@@ -1,22 +1,21 @@
-<?php if (isset($form)) : ?>
 {% if form is defined %}
-    <?php if ($showContactCategories && isset($form['global_categories']) && count($form['global_categories'])):?>
+    {% if showContactCategories is defined and showContactCategories and form.global_categories is defined and form.global_categories|length > 0 %}
 <div class="global-categories text-left">
     <div>
-        <label class="control-label"><?php echo $view['translator']->trans('mautic.lead.form.categories'); ?></label>
+        <label class="control-label">{{ 'mautic.lead.form.categories'|trans }}</label>
     </div>
-        <?php $categoryNumber = count($form['global_categories']->vars['choices']);
-        for ($i = ($categoryNumber - 1); $i >= 0; --$i): ?>
-            <div id="category-<?php echo $i; ?>" class="text-left">
-                <?php echo $view['form']->widget($form['global_categories'][$i]); ?>
-                <?php echo $view['form']->label($form['global_categories'][$i]); ?>
+        {% set categoryNumber = form.global_categories.vars.choices|length %}
+        {% for temp in form.global_categories %}
+            <div id="category-{{ loop.revindex0 }}" class="text-left">
+                {{ form_widget(form.global_categories[loop.revindex0]) }}
+                {{ form_label(form.global_categories[loop.revindex0]) }}
             </div>
-        endfor;
-        unset($form['global_categories']);
+        {% endfor %}
+        {#unset($form['global_categories']);#}
     </div>
-    <?php else:
-        unset($form['global_categories']);
-    endif;
+    {% else %}
+        {#unset($form['global_categories']);#}
+    {% endif %}
 {% else %}
     <div class="global-categories text-left">
         <div>
