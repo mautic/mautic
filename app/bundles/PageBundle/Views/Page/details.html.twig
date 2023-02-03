@@ -41,7 +41,6 @@
 {% block publishStatus %}{{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': activePage}) }}{% endblock %}
 
 {% block content %}
-  {# @TODO finish template #}
   {% set variantContent = include('MauticCoreBundle:Variant:index.html.twig', {
           'activeEntity': activePage,
           'variants': variants,
@@ -52,7 +51,6 @@
   })|trim %}
   {% set showVariants = variantContent is not empty %}
 
-  {# @TODO finish template #}
   {% set translationContent = include('MauticCoreBundle:Translation:index.html.twig', {
           'activeEntity': activePage,
           'translations': translations,

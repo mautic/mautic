@@ -27,6 +27,8 @@ class DateExtension extends AbstractExtension
             new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
             new TwigFunction('dateToFullConcat', [$this, 'toFullConcat'], ['is_safe' => ['all']]),
             new TwigFunction('dateToDate', [$this, 'toDate'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToTime', [$this, 'toTime'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToShort', [$this, 'toShort'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -77,5 +79,25 @@ class DateExtension extends AbstractExtension
     public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
+    }
+
+    /**
+     * Returns time only e.g. 21:19.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toTime($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
+    }
+
+    /**
+     * Returns short date format eg Sun, Oct 8.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toShort($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
     }
 }
