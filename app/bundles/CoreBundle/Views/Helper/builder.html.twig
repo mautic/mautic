@@ -11,7 +11,7 @@
 #}
 <div class="hide builder {{ type }}-builder {% if isCodeMode %}code-mode{% endif %}">
     <script type="text/html" data-builder-assets>
-        {{ builderAssets|raw }}
+        {{ builderAssets }}
     </script>
     <div class="builder-content">
         <input type="hidden" id="builder_url" value="{{ path('mautic_' ~ type ~ '_action', {'objectAction': 'builder', 'objectId': objectId}) }}" />
@@ -54,7 +54,7 @@
 
         <div class="code-editor {% if not isCodeMode %}hide{% endif %}">
             <div id="customHtmlContainer"></div>
-            <i class="text-muted">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans }}</i>
+            <i class="text-muted">{{ 'mautic.core.code.mode.token.dropdown.hint'|trans|raw }}</i>
         </div>
         <div class="builder-toolbar {% if isCodeMode %}hide{% endif %}">
             <div class="panel panel-default">
