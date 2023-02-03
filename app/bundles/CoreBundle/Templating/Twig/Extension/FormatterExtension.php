@@ -24,6 +24,7 @@ class FormatterExtension extends AbstractExtension
     {
         return [
             new TwigFunction('format', [$this, '_'], ['is_safe' => ['all']]),
+            new TwigFunction('normalizeStringValue', [$this, 'normalizeStringValue']),
         ];
     }
 
@@ -35,5 +36,13 @@ class FormatterExtension extends AbstractExtension
     public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1): string
     {
         return $this->formatterHelper->_($val, $type, $textOnly, $round);
+    }
+
+    /**
+     * @see FormatterHelper::normalizeStringValue
+     */
+    public function normalizeStringValue(string $string): string
+    {
+        return $this->formatterHelper->normalizeStringValue($string);
     }
 }
