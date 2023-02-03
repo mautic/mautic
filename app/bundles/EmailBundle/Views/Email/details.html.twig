@@ -55,20 +55,22 @@
             {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
             {% set sendButton = sendButton|merge({'attr' : {'disabled' : true}}) %}
         {% endif %}
-        {% set sendExampleButton = {
-            'attr' : {
-                'class'       : 'btn btn-default btn-nospin',
-                'data-toggle' : 'ajaxmodal',
-                'data-target' : '#MauticSharedModal',
-                'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
-                'data-header' : 'mautic.email.send.example'|trans,
-            },
-            'iconClass' : 'fa fa-send',
-            'btnText'   : 'mautic.email.send.example',
-            'primary'   : true,
-        } %}
-        {% set customButtons = [ sendButton, sendExampleButton] %}
+
+        {% set customButtons = customButtons|merge([sendButton]) %}
     {% endif %}
+    {% set sendExampleButton = {
+        'attr' : {
+            'class'       : 'btn btn-default btn-nospin',
+            'data-toggle' : 'ajaxmodal',
+            'data-target' : '#MauticSharedModal',
+            'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
+            'data-header' : 'mautic.email.send.example'|trans,
+        },
+        'iconClass' : 'fa fa-send',
+        'btnText'   : 'mautic.email.send.example',
+        'primary'   : true,
+    } %}
+    {% set customButtons = customButtons|merge([sendExampleButton]) %}
 {% endif %}
 
 
