@@ -47,4 +47,17 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
         self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
     }
+
+    public function testSiteUrlAlwaysTakesPrecedenceWhenBuildingUrls()
+    {
+        self::$container->setParameter('site_url', 'https://foo.bar.com');
+
+        /** @var EmailModel $emailModel */
+        $emailModel = self::$container->get('mautic.email.model.email');
+        $idHash     = uniqid();
+        $url        = $emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
+
+        self::assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
+    }
+
 }
