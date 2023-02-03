@@ -16,6 +16,7 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigTest('string', fn ($value) => is_string($value)),
+            new TwigTest('class_exists', fn ($value) => class_exists($value)),
         ];
     }
 }
