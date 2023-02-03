@@ -2358,11 +2358,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * @param array<string, string>|array<string, int> $routeParams
      * @param bool                                     $absolute
      * @param array<array<string>>                     $clickthrough
-     * @param array<string>                            $utmTags
      *
      * @return string
      */
-    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
     {
         $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
 
@@ -2377,7 +2376,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $this->router->getContext()->setScheme($parts['scheme']);
         }
 
-        $url = parent::buildUrl($route, $routeParams, $absolute, $clickthrough, $utmTags);
+        $url = parent::buildUrl($route, $routeParams, $absolute, $clickthrough);
 
         $context->setHost($original_host);
         $context->setScheme($original_scheme);
