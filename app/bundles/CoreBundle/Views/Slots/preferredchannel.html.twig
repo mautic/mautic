@@ -2,7 +2,8 @@
     {% if showContactPreferredChannels is defined and showContactPreferredChannels %}
         <div class="preferred_channel text-left">{{ form_row(form.lead_channels.preferred_channel) }}</div>
     {% else %}
-        unset($form['lead_channels']['preferred_channel']);
+        {#unset($form['lead_channels']['preferred_channel']);#}
+        {#% do form.lead_channels.preferred_channel.setRendered(true) %#}
     {% endif %}
 {% else %}
   <div class="preferred_channel text-left">
