@@ -1,0 +1,10 @@
+{% block _report_filters_entry_condition_row %}
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+    <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}" onchange="Mautic.checkReportCondition('{{ form.vars.id }}')">
+        {% for condition in form.vars.choices %}
+            <option value="{{ condition.value|escape }}" {{ condition.value == form.vars.data ? 'selected' : '' }}>
+                {{ condition.label }}
+            </option>
+        {% endfor %}
+    </select>
+{% endblock %}

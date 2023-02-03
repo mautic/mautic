@@ -1,0 +1,12 @@
+{% block _report_tableOrder_entry_direction_row %}
+    <div class="choice-wrapper col-xs-4">
+        <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+        <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
+            {% for direction in form.vars.choices %}
+                <option value="{{ direction.value|escape }}" {{ direction.value == form.vars.data ? 'selected' : '' }}>
+                    {{ direction.label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}

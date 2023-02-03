@@ -1,0 +1,8 @@
+{% set condition = form.parent.children.condition.vars.value %}
+{% block _report_filters_entry_value_row %}
+    <div class="form-group mb-0">
+        <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+        <input type="text" id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}"
+               value="{{ form.vars.data is iterable ? form.vars.data|join(',') : form.vars.data }}" {{ 'empty' in condition and 'notEmpty' in condition ? ' disabled' : '' }} />
+    </div>
+{% endblock %}

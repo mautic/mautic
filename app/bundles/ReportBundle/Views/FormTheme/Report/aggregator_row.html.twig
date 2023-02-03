@@ -1,0 +1,13 @@
+{% set labelClass = form.vars.label_attr.class is not empty ?: 'control-label' %}
+{% block aggregator_row %}
+    <div id="{{ form.vars.id }}_container" class="row mb-sm">
+        {{ form_row(form.vars.form.children.function) }}
+        {{ form_row(form.vars.form.children.column) }}
+        <div class="col-xs-1 mt-lg">
+            <button type="button" class="btn btn-danger"
+                    onclick="Mautic.removeReportRow('{{ form.vars.id }}_container');" data-toggle="tooltip"
+                    title="{{ 'mautic.report.report.label.removefilter'|trans }}"><i class="fa fa-minus-square-o"></i>
+            </button>
+        </div>
+    </div>
+{% endblock %}

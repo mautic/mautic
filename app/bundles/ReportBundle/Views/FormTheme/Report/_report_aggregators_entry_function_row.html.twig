@@ -1,0 +1,12 @@
+{% block _report_aggregators_entry_function_row %}
+    <div class="choice-wrapper col-xs-4">
+        <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
+        <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}" onchange="Mautic.checkReportCondition('{{ form.vars.id }}')">
+            {% for function in form.vars.choices %}
+                <option value="{{ function.value|escape }}" {{ function.value == form.vars.data ? 'selected' : '' }}>
+                    {{ function.label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}

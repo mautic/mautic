@@ -1,0 +1,14 @@
+{% block _report_aggregators_entry_column_row.html.twig %}
+<div class="choice-wrapper col-xs-6">
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">
+        {{ form.vars.label|trans }}
+    </label>
+    <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
+        {% for column in form.vars.choices %}
+            <option value="{{ column.value|escape }}" {{ column.value == form.vars.data ? 'selected' : '' }}>
+                {{ column.label }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% set hasErrors = form.vars.errors|length %}
+{% set feedbackClass = hasErrors > 0 ? ' has-error' : '' %}
+{% block _report_tableOrder_row %}
+    <div id="tableOrderContainer" class="row">
+        <div class="form-group col-md-12{{ feedbackClass }}">
+            {{ form_widget(form) }}
+            {{ form_errors(form) }}
+        </div>
+        <div class="col-xs-12">
+            <button type="button" class="btn btn-primary"
+                    onclick="Mautic.addReportRow('report_tableOrder');">{{ 'mautic.report.report.label.addtableorder'|trans }}</button>
+        </div>
+    </div>
+{% endblock %}
