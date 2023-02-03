@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
-use Joomla\Http\Response;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -448,7 +447,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 /** @var ResponseInterface $response */
                 $response = $this->getApiHelper()->createLead($mappedData, $lead, $object);
                 // OData-EntityId: https://clientname.crm.dynamics.com/api/data/v8.2/contacts(9844333b-c955-e711-80f1-c4346bad526c)
-                $header = $response->headers['OData-EntityId'];
+                $header = $response->getHeader('OData-EntityId');
                 if (preg_match(sprintf('/%s\((.+)\)/', $object), $header, $out)) {
                     $id = $out[1];
                     if (empty($integrationId)) {
