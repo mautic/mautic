@@ -40,7 +40,7 @@
           }
   ] %}
 
-  {% if '\\PhpOffice\\PhpSpreadsheet\\Spreadsheet' is class_exists %}
+  {% if '\\PhpOffice\\PhpSpreadsheet\\Spreadsheet' is class %}
     {% set buttons = buttons|merge([{
           'attr': {
               'data-toggle': '',
