@@ -48,7 +48,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
     }
 
-    public function testSiteUrlAlwaysTakesPrecedenceWhenBuildingUrls()
+    public function testSiteUrlAlwaysTakesPrecedenceWhenBuildingUrls(): void
     {
         self::$container->setParameter('site_url', 'https://foo.bar.com');
 
@@ -59,5 +59,4 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         self::assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
     }
-
 }

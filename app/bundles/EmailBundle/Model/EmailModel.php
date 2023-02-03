@@ -2354,11 +2354,11 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param       $route
-     * @param array $routeParams
-     * @param bool  $absolute
-     * @param array $clickthrough
-     * @param array $utmTags
+     * @param string                                   $route
+     * @param array<string, string>|array<string, int> $routeParams
+     * @param bool                                     $absolute
+     * @param array<array<string>>                     $clickthrough
+     * @param array<string>                            $utmTags
      *
      * @return string
      */
