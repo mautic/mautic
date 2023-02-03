@@ -50,7 +50,6 @@ class FormTestAbstract extends TestCase
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
     protected $mockTrackingId;
-    protected $container;
     protected $formRepository;
     protected $leadFieldModel;
 

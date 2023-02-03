@@ -162,6 +162,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $contactTracker;
 
     /**
+     * @var MockObject|ContactMerger
+     */
+    private $contactMerger;
+
+    /**
      * @var SubmissionModel
      */
     private $submissionModel;

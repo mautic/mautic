@@ -13,6 +13,7 @@ use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\Form\Type\FormType;
@@ -123,7 +124,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\FormBundle\Entity\FormRepository
+     * @return FormRepository
      */
     public function getRepository()
     {

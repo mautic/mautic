@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 class FormApiController extends CommonApiController
 {
     /**
-     * @var FormModel<Form>|null
+     * @var FormModel|null
      */
     protected $model = null;
 
