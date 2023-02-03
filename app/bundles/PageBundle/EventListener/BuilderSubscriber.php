@@ -527,7 +527,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.php');
+            $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:sharebtn_css.html.twig');
         }
 
         return $content;
@@ -705,7 +705,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.php', ['pages' => $related]);
+            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.twig', ['pages' => $related]);
         }
 
         return $langbar;

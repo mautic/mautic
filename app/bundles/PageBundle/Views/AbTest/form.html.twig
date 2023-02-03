@@ -1,5 +1,3 @@
-<?php
-
-foreach ($form as $f) {
-    echo $view['form']->row($f);
-}
+{% for f as form %}
+    {{ form_row(f) }}
+{% endfor %}
