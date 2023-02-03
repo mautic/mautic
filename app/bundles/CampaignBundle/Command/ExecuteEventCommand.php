@@ -35,7 +35,7 @@ class ExecuteEventCommand extends Command
             ->addOption(
                 '--execution-time',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Scheduled execution time of event log'
             );
 
