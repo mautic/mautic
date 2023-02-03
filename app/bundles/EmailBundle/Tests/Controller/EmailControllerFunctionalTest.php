@@ -6,6 +6,7 @@ namespace Mautic\EmailBundle\Tests\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Mautic\CoreBundle\Helper\Serializer;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Tests\Traits\ControllerTrait;
 use Mautic\EmailBundle\Entity\Email;
@@ -174,6 +175,29 @@ final class EmailControllerFunctionalTest extends MauticMysqlTestCase
         $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$email->getId()}");
         $html    = $crawler->filterXPath('//*[@id="toolbar"]/div[1]/a[2]')->html();
         $this->assertStringNotContainsString('disabled', $html, $html);
+    }
+
+    public function testEmailDetailPageForABTest(): void
+    {
+        $segment = $this->createSegment();
+        $this->em->persist($segment);
+
+        $parent = $this->createEmail();
+        $parent->setPublishDown(new \DateTime('now -1 hour'));
+        $parent->setVariantStartDate(new \DateTime('now -1 hour'));
+        $variantSetting = Serializer::decode('a:2:{s:6:"weight";i:50;s:14:"winnerCriteria";s:14:"email.openrate";}');
+        $parent->setVariantSettings($variantSetting);
+        $parent->addList($segment);
+        $this->em->persist($parent);
+
+        $children = clone $parent;
+        $children->setVariantParent($parent);
+        $children->setIsPublished(true);
+        $this->em->persist($children);
+
+        $this->em->flush();
+
+        $crawler = $this->client->request(Request::METHOD_GET, "/s/emails/view/{$parent->getId()}");
     }
 
     /**
