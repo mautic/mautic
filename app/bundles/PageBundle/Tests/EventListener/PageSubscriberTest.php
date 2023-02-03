@@ -45,7 +45,7 @@ class PageSubscriberTest extends TestCase
         $payload = $this->getNonEmptyPayload();
         $event   = new QueueConsumerEvent($payload);
 
-        $dispatcher->dispatch(QueueEvents::PAGE_HIT, $event);
+        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
 
         $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
     }
@@ -60,7 +60,7 @@ class PageSubscriberTest extends TestCase
         $payload = $this->getEmptyPayload();
         $event   = new QueueConsumerEvent($payload);
 
-        $dispatcher->dispatch(QueueEvents::PAGE_HIT, $event);
+        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
 
         $this->assertEquals($event->getResult(), QueueConsumerResults::REJECT);
     }

@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GrapesJsController extends CommonController
 {
-    const OBJECT_TYPE = ['email', 'page'];
+    public const OBJECT_TYPE = ['email', 'page'];
 
     /**
      * @var Logger

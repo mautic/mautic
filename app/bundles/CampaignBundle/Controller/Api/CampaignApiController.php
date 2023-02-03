@@ -5,11 +5,17 @@ namespace Mautic\CampaignBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Campaign>
+ */
 class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
@@ -19,9 +25,17 @@ class CampaignApiController extends CommonApiController
      */
     private $membershipManager;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var CampaignModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model             = $this->getModel('campaign');
+        $campaignModel = $this->getModel('campaign');
+        \assert($campaignModel instanceof CampaignModel);
+
+        $this->model             = $campaignModel;
         $this->membershipManager = $this->get('mautic.campaign.membership.manager');
         $this->entityClass       = Campaign::class;
         $this->entityNameOne     = 'campaign';
@@ -97,10 +111,10 @@ class CampaignApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Campaign &$entity
+     * @param $parameters
+     * @param $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
@@ -191,8 +205,10 @@ class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if ('PUT' === $method && !empty($deletedEvents)) {
-            $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
+        if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
+            $campaignEventModel = $this->getModel('campaign.event');
+            \assert($campaignEventModel instanceof EventModel);
+            $campaignEventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
 
@@ -255,7 +271,7 @@ class CampaignApiController extends CommonApiController
         ];
 
         return $this->forward(
-            'MauticCoreBundle:Api\StatsApi:list',
+            'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
             [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',

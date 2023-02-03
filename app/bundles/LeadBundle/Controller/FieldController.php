@@ -72,7 +72,7 @@ class FieldController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticLeadBundle:Field:index',
+                'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contactfield_index',
                     'mauticContent' => 'leadfield',
@@ -183,11 +183,11 @@ class FieldController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
-                        'contentTemplate' => 'MauticLeadBundle:Field:index',
+                        'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         'passthroughVars' => [
                             'activeLink'    => '#mautic_contactfield_index',
                             'mauticContent' => 'leadfield',
@@ -243,7 +243,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'leadfield',
@@ -289,7 +289,7 @@ class FieldController extends FormController
 
                     if ($valid) {
                         //form is valid so process the data
-                        $model->saveEntity($field, $form->get('buttons')->get('save')->isClicked());
+                        $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $field->getLabel(),
@@ -306,11 +306,11 @@ class FieldController extends FormController
                 $model->unlockEntity($field);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                             'viewParameters'  => ['objectId' => $field->getId()],
-                            'contentTemplate' => 'MauticLeadBundle:Field:index',
+                            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
                         ]
                     )
                 );
@@ -352,7 +352,8 @@ class FieldController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->getModel('lead.field');
+        $model = $this->getModel('lead.field');
+        \assert($model instanceof FieldModel);
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
@@ -389,7 +390,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',
@@ -467,7 +468,7 @@ class FieldController extends FormController
 
         $postActionVars = [
             'returnUrl'       => $returnUrl,
-            'contentTemplate' => 'MauticLeadBundle:Field:index',
+            'contentTemplate' => 'Mautic\LeadBundle\Controller\FieldController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'mauticContent' => 'lead',

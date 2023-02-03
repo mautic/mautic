@@ -4,14 +4,14 @@ namespace Mautic\ChannelBundle\Helper;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelEvent;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class ChannelListHelper extends Helper
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -30,7 +30,7 @@ class ChannelListHelper extends Helper
      */
     protected $dispatcher;
 
-    public function __construct(EventDispatcherInterface $dispatcher, TranslatorInterface $translator)
+    public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
     {
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
@@ -138,7 +138,7 @@ class ChannelListHelper extends Helper
             return;
         }
 
-        $event                 = $this->dispatcher->dispatch(ChannelEvents::ADD_CHANNEL, new ChannelEvent());
+        $event                 = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
         $this->channels        = $event->getChannelConfigs();
         $this->featureChannels = $event->getFeatureChannels();
         unset($event);

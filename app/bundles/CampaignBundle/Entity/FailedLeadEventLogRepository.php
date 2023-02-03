@@ -5,7 +5,7 @@ namespace Mautic\CampaignBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * LeadEventLogRepository.
+ * @extends CommonRepository<FailedLeadEventLog>
  */
 class FailedLeadEventLogRepository extends CommonRepository
 {

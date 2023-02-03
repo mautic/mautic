@@ -28,6 +28,9 @@ on:
             - '[0-9].*'
             - 'gitsplit-action-debug'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
     sync:
         if: github.repository == 'mautic/mautic'
@@ -72,7 +75,7 @@ jobs:
                     - theme-vibrant
         name: Sync commits into mautic/${{ matrix.config }}
         steps:
-            -   uses: actions/checkout@v2
+            -   uses: actions/checkout@v3
                 with:
                     persist-credentials: false
                     fetch-depth: 0
@@ -86,7 +89,7 @@ jobs:
 
             # Cache the splitsh executable to speedup future runs
             -   name: Cache splitsh-lite
-                uses: actions/cache@v2
+                uses: actions/cache@v3
                 with:
                     path: './splitsh'
                     key: '${{ runner.os }}-${{ matrix.config }}-splitsh-v101'

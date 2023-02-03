@@ -10,12 +10,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|AbstractCommonModel
+     * @var MockObject|AbstractCommonModel<object>
      */
     private $commonModel;
 
     /**
-     * @var MockObject|CommonRepository
+     * @var MockObject|CommonRepository<object>
      */
     private $commonRepository;
 

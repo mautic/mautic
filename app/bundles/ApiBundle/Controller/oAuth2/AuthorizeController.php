@@ -115,8 +115,8 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         $event = new OAuthEvent($user, $this->getClient());
 
         $this->eventDispatcher->dispatch(
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS,
-            $event
+            $event,
+            OAuthEvent::PRE_AUTHORIZATION_PROCESS
         );
 
         if ($event->isAuthorizedClient()) {
@@ -130,7 +130,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         }
 
         return $this->templating->renderResponse(
-            'MauticApiBundle:Authorize:oAuth2/authorize.html.php',
+            'MauticApiBundle:Authorize:oAuth2/authorize.html.twig',
             [
                 'form'   => $this->authorizeForm->createView(),
                 'client' => $this->getClient(),

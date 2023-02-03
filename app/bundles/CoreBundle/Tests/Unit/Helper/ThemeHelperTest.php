@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Mautic\CoreBundle\Templating\TemplateReference;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -22,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ThemeHelperTest extends TestCase
 {
@@ -52,7 +53,7 @@ class ThemeHelperTest extends TestCase
     private $builderIntegrationsHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     private $themeHelper;
 
@@ -324,7 +325,8 @@ class ThemeHelperTest extends TestCase
                 }
             },
             new class() extends Finder {
-                private $dirs = [];
+                /** @var \SplFileInfo[] */
+                private array $dirs = [];
 
                 public function __construct()
                 {
@@ -339,6 +341,9 @@ class ThemeHelperTest extends TestCase
                     return $this;
                 }
 
+                /**
+                 * @return \ArrayIterator<int,\SplFileInfo>
+                 */
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -385,6 +390,9 @@ class ThemeHelperTest extends TestCase
                 {
                 }
 
+                /**
+                 * @param string $files
+                 */
                 public function exists($files)
                 {
                     if ('/path/to/themes/requested-theme-dir' === $files) {
@@ -394,6 +402,12 @@ class ThemeHelperTest extends TestCase
                     return true;
                 }
 
+                /**
+                 * @param ?\Traversable<mixed> $iterator
+                 * @param array<mixed>         $options
+                 *
+                 * @return void
+                 */
                 public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
@@ -407,6 +421,9 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
+                /**
+                 * @return void
+                 */
                 public function dumpFile($filename, $content)
                 {
                     Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);
@@ -561,5 +578,48 @@ class ThemeHelperTest extends TestCase
         Assert::assertCount(1, $themes);
         Assert::assertArrayHasKey('name', $themes['theme-legacy-all']);
         Assert::assertArrayHasKey('dir', $themes['theme-legacy-all']);
+    }
+
+    public function testGetCurrentThemeWillReturnCodeModeIfTheThemeIsCodeMode(): void
+    {
+        $themeHelper = new ThemeHelper(
+            new class() extends PathsHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends TemplatingHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Translator {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends CoreParametersHelper {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Filesystem {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends Finder {
+                public function __construct()
+                {
+                }
+            },
+            new class() extends BuilderIntegrationsHelper {
+                public function __construct()
+                {
+                }
+            }
+        );
+
+        Assert::assertSame('mautic_code_mode', $themeHelper->getCurrentTheme('mautic_code_mode', 'foo'));
     }
 }

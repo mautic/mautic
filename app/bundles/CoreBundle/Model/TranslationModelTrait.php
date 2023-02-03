@@ -65,18 +65,16 @@ trait TranslationModelTrait
                 $browserLanguages = $request->server->get('HTTP_ACCEPT_LANGUAGE');
                 if (!empty($browserLanguages)) {
                     $browserLanguages = explode(',', $browserLanguages);
-                    if (!empty($browserLanguages)) {
-                        foreach ($browserLanguages as $language) {
-                            if ($pos = false !== strpos($language, ';q=')) {
-                                //remove weights
-                                $language = substr($language, 0, ($pos + 1));
-                            }
-                            //change - to _
-                            $language = str_replace('-', '_', $language);
+                    foreach ($browserLanguages as $language) {
+                        if (($pos = strpos($language, ';q=')) !== false) {
+                            //remove weights
+                            $language = substr($language, 0, ($pos + 1));
+                        }
+                        //change - to _
+                        $language = str_replace('-', '_', $language);
 
-                            if (!isset($languageList[$language])) {
-                                $languageList[$language] = $language;
-                            }
+                        if (!isset($languageList[$language])) {
+                            $languageList[$language] = $language;
                         }
                     }
                 }

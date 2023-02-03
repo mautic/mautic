@@ -25,7 +25,7 @@ class ExampleClassWithPublicProperty
 
 class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
-    const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
+    public const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
     /** @var ArrayType */
     private $arrayType;

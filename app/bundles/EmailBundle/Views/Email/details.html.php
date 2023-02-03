@@ -46,8 +46,8 @@ if (empty($emailType)) {
 $customButtons = [];
 if (!$isEmbedded) {
     if ('list' == $emailType) {
-        $customButtons[] = [
-            'attr' => [
+        $sendButton             = [
+            'attr'      => [
                 'data-toggle' => 'ajax',
                 'href'        => $view['router']->path(
                     'mautic_email_action',
@@ -58,6 +58,14 @@ if (!$isEmbedded) {
             'btnText'   => 'mautic.email.send',
             'primary'   => true,
         ];
+
+        if ($email->isBackgroundSending()) {
+            $sendButton['attr']['href']     = 'javascript:void(0);';
+            $sendButton['attr']['disabled'] = true;
+            $sendButton['tooltip']          = 'mautic.email.send.disabled';
+        }
+
+        $customButtons[] = $sendButton;
     }
 
     $customButtons[] = [

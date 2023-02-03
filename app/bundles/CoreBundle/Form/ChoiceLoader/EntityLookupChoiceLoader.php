@@ -6,12 +6,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
-use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\ChoiceLoaderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityLookupChoiceLoader implements ChoiceLoaderInterface
 {
@@ -31,12 +30,12 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $options;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     protected $modelFactory;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -46,7 +45,8 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * @param array $options
+     * @param ModelFactory<object> $modelFactory
+     * @param array                $options
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
     {
@@ -169,9 +169,10 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         }
 
         // must be [$label => $id]
-        $prepped = $this->prepareChoices($this->choices[$modelName]);
+        $prepped      = $this->prepareChoices($this->choices[$modelName]);
+        $prepped_keys = array_keys($prepped);
 
-        array_multisort(array_keys($prepped), SORT_NATURAL | SORT_FLAG_CASE, $prepped);
+        array_multisort($prepped_keys, SORT_NATURAL | SORT_FLAG_CASE, $prepped);
 
         if ($includeNew && $modalRoute) {
             $prepped = array_replace([$this->translator->trans('mautic.core.createnew') => 'new'], $prepped);

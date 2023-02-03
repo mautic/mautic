@@ -24,11 +24,14 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Factory\DeviceDetectorFactory\DeviceDetectorFactoryInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceCreatorService\DeviceCreatorServiceInterface;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Asset>
+ */
 class AssetModel extends FormModel
 {
     /**
@@ -292,7 +295,7 @@ class AssetModel extends FormModel
         // Dispatch event
         if ($this->dispatcher->hasListeners(AssetEvents::ASSET_ON_LOAD)) {
             $event = new AssetLoadEvent($download, $isUnique);
-            $this->dispatcher->dispatch(AssetEvents::ASSET_ON_LOAD, $event);
+            $this->dispatcher->dispatch($event, AssetEvents::ASSET_ON_LOAD);
         }
 
         // Wrap in a try/catch to prevent deadlock errors on busy servers
@@ -431,7 +434,7 @@ class AssetModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -556,10 +559,10 @@ class AssetModel extends FormModel
     /**
      * Get line chart data of downloads.
      *
-     * @param char   $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
+     * @param bool        $canViewOthers
      *
      * @return array
      */

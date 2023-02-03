@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CompanyChangeLogRepository.
+ * @extends CommonRepository<CompanyChangeLog>
  */
 class CompanyChangeLogRepository extends CommonRepository
 {

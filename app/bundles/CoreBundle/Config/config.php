@@ -5,56 +5,56 @@ return [
         'main' => [
             'mautic_core_ajax' => [
                 'path'       => '/ajax',
-                'controller' => 'MauticCoreBundle:Ajax:delegateAjax',
+                'controller' => 'Mautic\CoreBundle\Controller\AjaxController::delegateAjaxAction',
             ],
             'mautic_core_update' => [
                 'path'       => '/update',
-                'controller' => 'MauticCoreBundle:Update:index',
+                'controller' => 'Mautic\CoreBundle\Controller\UpdateController::indexAction',
             ],
             'mautic_core_update_schema' => [
                 'path'       => '/update/schema',
-                'controller' => 'MauticCoreBundle:Update:schema',
+                'controller' => 'Mautic\CoreBundle\Controller\UpdateController::schemaAction',
             ],
             'mautic_core_form_action' => [
                 'path'       => '/action/{objectAction}/{objectModel}/{objectId}',
-                'controller' => 'MauticCoreBundle:Form:execute',
+                'controller' => 'Mautic\CoreBundle\Controller\FormController::executeAction',
                 'defaults'   => [
                     'objectModel' => '',
                 ],
             ],
             'mautic_core_file_action' => [
                 'path'       => '/file/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:File:execute',
+                'controller' => 'Mautic\CoreBundle\Controller\FileController::executeAction',
             ],
             'mautic_themes_index' => [
                 'path'       => '/themes',
-                'controller' => 'MauticCoreBundle:Theme:index',
+                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::indexAction',
             ],
             'mautic_themes_action' => [
                 'path'       => '/themes/{objectAction}/{objectId}',
-                'controller' => 'MauticCoreBundle:Theme:execute',
+                'controller' => 'Mautic\CoreBundle\Controller\ThemeController::executeAction',
             ],
         ],
         'public' => [
             'mautic_js' => [
                 'path'       => '/mtc.js',
-                'controller' => 'MauticCoreBundle:Js:index',
+                'controller' => 'Mautic\CoreBundle\Controller\JsController::indexAction',
             ],
             'mautic_base_index' => [
                 'path'       => '/',
-                'controller' => 'MauticCoreBundle:Default:index',
+                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::indexAction',
             ],
             'mautic_secure_root' => [
                 'path'       => '/s',
-                'controller' => 'MauticCoreBundle:Default:redirectSecureRoot',
+                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
             ],
             'mautic_secure_root_slash' => [
                 'path'       => '/s/',
-                'controller' => 'MauticCoreBundle:Default:redirectSecureRoot',
+                'controller' => 'Mautic\CoreBundle\Controller\DefaultController::redirectSecureRootAction',
             ],
             'mautic_remove_trailing_slash' => [
                 'path'         => '/{url}',
-                'controller'   => 'MauticCoreBundle:Common:removeTrailingSlash',
+                'controller'   => 'Mautic\CoreBundle\Controller\CommonController::removeTrailingSlashAction',
                 'method'       => 'GET',
                 'requirements' => [
                     'url' => '.*/$',
@@ -64,39 +64,39 @@ return [
         'api' => [
             'mautic_core_api_file_list' => [
                 'path'       => '/files/{dir}',
-                'controller' => 'MauticCoreBundle:Api\FileApi:list',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::listAction',
             ],
             'mautic_core_api_file_create' => [
                 'path'       => '/files/{dir}/new',
-                'controller' => 'MauticCoreBundle:Api\FileApi:create',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::createAction',
                 'method'     => 'POST',
             ],
             'mautic_core_api_file_delete' => [
                 'path'       => '/files/{dir}/{file}/delete',
-                'controller' => 'MauticCoreBundle:Api\FileApi:delete',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\FileApiController::deleteAction',
                 'method'     => 'DELETE',
             ],
             'mautic_core_api_theme_list' => [
                 'path'       => '/themes',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:list',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::listAction',
             ],
             'mautic_core_api_theme_get' => [
                 'path'       => '/themes/{theme}',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:get',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::getAction',
             ],
             'mautic_core_api_theme_create' => [
                 'path'       => '/themes/new',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:new',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::newAction',
                 'method'     => 'POST',
             ],
             'mautic_core_api_theme_delete' => [
                 'path'       => '/themes/{theme}/delete',
-                'controller' => 'MauticCoreBundle:Api\ThemeApi:delete',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\ThemeApiController::deleteAction',
                 'method'     => 'DELETE',
             ],
             'mautic_core_api_stats' => [
                 'path'       => '/stats/{table}',
-                'controller' => 'MauticCoreBundle:Api\StatsApi:list',
+                'controller' => 'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
                 'defaults'   => [
                     'table' => '',
                 ],
@@ -150,100 +150,24 @@ return [
                     'mautic.core.model.notification',
                 ],
             ],
+            'mautic.core.service.bulk_notification' => [
+                'class'     => \Mautic\CoreBundle\Service\BulkNotification::class,
+                'arguments' => [
+                    'mautic.core.model.notification',
+                ],
+            ],
             'mautic.core.service.local_file_adapter' => [
                 'class'     => \Mautic\CoreBundle\Service\LocalFileAdapterService::class,
                 'arguments' => [
                     '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
                 ],
             ],
+            'mautic.core.service.log_processor' => [
+                'class'     => \Mautic\CoreBundle\Monolog\LogProcessor::class,
+                'tags'      => ['monolog.processor'],
+            ],
         ],
         'events' => [
-            'mautic.core.subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\CoreSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.bundle',
-                    'mautic.helper.menu',
-                    'mautic.helper.user',
-                    'templating.helper.assets',
-                    'mautic.helper.core_parameters',
-                    'security.authorization_checker',
-                    'mautic.user.model.user',
-                    'event_dispatcher',
-                    'translator',
-                    'request_stack',
-                    'mautic.form.repository.form',
-                    'mautic.factory',
-                    'mautic.core.service.flashbag',
-                ],
-            ],
-            'mautic.core.environment.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\EnvironmentSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.core.migration.command.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\MigrationCommandSubscriber::class,
-                'arguments' => [
-                    'mautic.database.version.provider',
-                    'mautic.generated.columns.provider',
-                    'database_connection',
-                ],
-            ],
-            'mautic.core.configbundle.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ConfigSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.language',
-                ],
-            ],
-            'mautic.core.configbundle.subscriber.theme' => [
-                'class'     => \Mautic\CoreBundle\EventListener\ConfigThemeSubscriber::class,
-            ],
-            'mautic.webpush.js.subscriber' => [
-                'class' => \Mautic\CoreBundle\EventListener\BuildJsSubscriber::class,
-            ],
-            'mautic.core.dashboard.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\DashboardSubscriber::class,
-                'arguments' => [
-                    'mautic.core.model.auditlog',
-                    'translator',
-                    'router',
-                    'mautic.security',
-                    'event_dispatcher',
-                    'mautic.model.factory',
-                ],
-            ],
-
-            'mautic.core.maintenance.subscriber' => [
-                'class'     => Mautic\CoreBundle\EventListener\MaintenanceSubscriber::class,
-                'arguments' => [
-                    'doctrine.dbal.default_connection',
-                    'mautic.user.token.repository',
-                    'translator',
-                ],
-            ],
-            'mautic.core.request.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\RequestSubscriber::class,
-                'arguments' => [
-                    'security.csrf.token_manager',
-                    'translator',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.core.stats.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.core.assets.subscriber' => [
-                'class'     => \Mautic\CoreBundle\EventListener\AssetsSubscriber::class,
-                'arguments' => [
-                    'templating.helper.assets',
-                    'event_dispatcher',
-                ],
-            ],
             'mautic.core.subscriber.router' => [
                 'class'     => \Mautic\CoreBundle\EventListener\RouterSubscriber::class,
                 'arguments' => [
@@ -255,26 +179,8 @@ return [
                     '%router.request_context.base_url%',
                 ],
             ],
-            'mautic.core.subscriber.editor_assets' => [
-                'class'       => \Mautic\CoreBundle\EventListener\EditorFontsSubscriber::class,
-                'arguments'   => [
-                    'mautic.helper.core_parameters',
-                ],
-            ],
         ],
         'forms' => [
-            'mautic.form.type.button_group' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\ButtonGroupType',
-            ],
-            'mautic.form.type.standalone_button' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\StandAloneButtonType',
-            ],
-            'mautic.form.type.form_buttons' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\FormButtonsType',
-            ],
-            'mautic.form.type.sortablelist' => [
-                'class' => 'Mautic\CoreBundle\Form\Type\SortableListType',
-            ],
             'mautic.form.type.coreconfig' => [
                 'class'     => \Mautic\CoreBundle\Form\Type\ConfigType::class,
                 'arguments' => [
@@ -283,78 +189,6 @@ return [
                     'mautic.ip_lookup.factory',
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
-                ],
-            ],
-            'mautic.form.type.coreconfig.iplookup_download_data_store_button' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType::class,
-                'arguments' => [
-                    'mautic.helper.template.date',
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.theme_list' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\ThemeListType::class,
-                'arguments' => ['mautic.helper.theme'],
-            ],
-            'mautic.form.type.daterange' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DateRangeType::class,
-                'arguments' => [
-                    'session',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.form.type.timeformat' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\TimeFormatType::class,
-                'arguments' => ['translator'],
-            ],
-            'mautic.form.type.slot.saveprefsbutton' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSavePrefsButtonType',
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.successmessage' => [
-                'class'     => Mautic\CoreBundle\Form\Type\SlotSuccessMessageType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.gatedvideo' => [
-                'class'     => Mautic\CoreBundle\Form\Type\GatedVideoType::class,
-                'arguments' => [
-                    'mautic.form.repository.form',
-                ],
-            ],
-            'mautic.form.type.slot.segmentlist' => [
-                'class'     => 'Mautic\CoreBundle\Form\Type\SlotSegmentListType',
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.categorylist' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\SlotCategoryListType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.preferredchannel' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\SlotPreferredChannelType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.slot.channelfrequency' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\SlotChannelFrequencyType::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.dynamic_content_filter_entry' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterEntryType::class,
-                'arguments' => [
-                    'mautic.lead.model.list',
-                    'mautic.stage.model.stage',
-                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
@@ -366,21 +200,6 @@ return [
                     'setConnection' => [
                         'database_connection',
                     ],
-                ],
-            ],
-            'mautic.form.type.entity_lookup' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\EntityLookupType::class,
-                'arguments' => [
-                    'mautic.model.factory',
-                    'translator',
-                    'database_connection',
-                    'router',
-                ],
-            ],
-            'mautic.form.type.dynamic_content_filter' => [
-                'class'     => \Mautic\CoreBundle\Form\Type\DynamicContentFilterType::class,
-                'arguments' => [
-                    'mautic.integrations.helper.builder_integrations',
                 ],
             ],
         ],
@@ -404,11 +223,6 @@ return [
                     'mautic.helper.core_parameters',
                 ],
                 'alias' => 'date',
-            ],
-            'mautic.helper.template.exception' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\ExceptionHelper',
-                'arguments' => '%kernel.root_dir%',
-                'alias'     => 'exception',
             ],
             'mautic.helper.template.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
@@ -486,14 +300,21 @@ return [
                 ],
                 'alias' => 'security',
             ],
+            'mautic.helper.template.translator' => [
+                'class'     => \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::class,
+                'arguments' => [
+                    'translator',
+                ],
+                'alias' => 'translator',
+            ],
             'mautic.helper.paths' => [
-                'class'     => 'Mautic\CoreBundle\Helper\PathsHelper',
+                'class'     => \Mautic\CoreBundle\Helper\PathsHelper::class,
                 'arguments' => [
                     'mautic.helper.user',
                     'mautic.helper.core_parameters',
                     '%kernel.cache_dir%',
                     '%kernel.logs_dir%',
-                    '%kernel.root_dir%',
+                    '%kernel.project_dir%',
                 ],
             ],
             'mautic.helper.ip_lookup' => [
@@ -607,50 +428,6 @@ return [
                 ],
             ],
         ],
-        'commands' => [
-            'mautic.core.command.transifex_pull' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\CoreBundle\Command\PullTransifexCommand::class,
-                'arguments' => [
-                    'transifex.factory',
-                    'translator',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.core.command.transifex_push' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\CoreBundle\Command\PushTransifexCommand::class,
-                'arguments' => [
-                    'transifex.factory',
-                    'translator',
-                ],
-            ],
-            'mautic.core.command.do_not_sell' => [
-                'class'     => \Mautic\CoreBundle\Command\UpdateDoNotSellListCommand::class,
-                'arguments' => [
-                    'mautic.helper.maxmind_do_not_sell_download',
-                    'translator',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.core.command.apply_update' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\CoreBundle\Command\ApplyUpdatesCommand::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.helper.core_parameters',
-                    'mautic.update.step_provider',
-                ],
-            ],
-            'mautic.core.command.maxmind.purge' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.maxmind.doNotSellList',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.cache.warmer.middleware' => [
                 'class'     => \Mautic\CoreBundle\Cache\MiddlewareCacheWarmer::class,
@@ -658,9 +435,6 @@ return [
                 'arguments' => [
                     '%kernel.environment%',
                 ],
-            ],
-            'mautic.http.client' => [
-                'class' => GuzzleHttp\Client::class,
             ],
             /* @deprecated to be removed in Mautic 4. Use 'mautic.filesystem' instead. */
             'symfony.filesystem' => [
@@ -710,10 +484,6 @@ return [
             ],
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
-                'arguments' => 'service_container',
-            ],
-            'mautic.model.factory' => [
-                'class'     => 'Mautic\CoreBundle\Factory\ModelFactory',
                 'arguments' => 'service_container',
             ],
             'mautic.templating.name_parser' => [
@@ -783,7 +553,7 @@ return [
                 'class'     => 'Mautic\CoreBundle\EventListener\ExceptionListener',
                 'arguments' => [
                     'router',
-                    '"MauticCoreBundle:Exception:show"',
+                    'Mautic\CoreBundle\Controller\ExceptionController::showAction',
                     'monolog.logger.mautic',
                 ],
                 'tag'          => 'kernel.event_listener',
@@ -791,13 +561,6 @@ return [
                     'event'    => 'kernel.exception',
                     'method'   => 'onKernelException',
                     'priority' => 255,
-                ],
-            ],
-            'transifex.factory' => [
-                'class'     => \Mautic\CoreBundle\Factory\TransifexFactory::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             // Helpers
@@ -811,7 +574,7 @@ return [
                 ],
             ],
             'mautic.helper.cookie' => [
-                'class'     => 'Mautic\CoreBundle\Helper\CookieHelper',
+                'class'     => Mautic\CoreBundle\Helper\CookieHelper::class,
                 'arguments' => [
                     '%mautic.cookie_path%',
                     '%mautic.cookie_domain%',
@@ -819,6 +582,7 @@ return [
                     '%mautic.cookie_httponly%',
                     'request_stack',
                 ],
+                'tag' => 'kernel.event_subscriber',
             ],
             'mautic.helper.cache_storage' => [
                 'class'     => Mautic\CoreBundle\Helper\CacheStorageHelper::class,
@@ -883,15 +647,6 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                     'mautic.cipher.openssl',
-                ],
-            ],
-            'mautic.helper.language' => [
-                'class'     => \Mautic\CoreBundle\Helper\LanguageHelper::class,
-                'arguments' => [
-                    'mautic.helper.paths',
-                    'monolog.logger.mautic',
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
                 ],
             ],
             'mautic.helper.url' => [
@@ -980,32 +735,11 @@ return [
 
             'twig.controller.exception.class' => 'Mautic\CoreBundle\Controller\ExceptionController',
 
-            // Form extensions
-            'mautic.form.extension.custom' => [
-                'class'        => \Mautic\CoreBundle\Form\Extension\CustomFormExtension::class,
-                'arguments'    => [
-                    'event_dispatcher',
-                ],
-                'tag'          => 'form.type_extension',
-                'tagArguments' => [
-                    'extended_type' => Symfony\Component\Form\Extension\Core\Type\FormType::class,
-                ],
-            ],
-
-            // Twig
-            'templating.twig.extension.slot' => [
-                'class'     => \Mautic\CoreBundle\Templating\Twig\Extension\SlotExtension::class,
+            'mautic.doctrine.loader.mautic_fixtures_loader' => [
+                'class'     => \Mautic\CoreBundle\Doctrine\Loader\MauticFixturesLoader::class,
                 'arguments' => [
-                    'templating.helper.slots',
+                    'doctrine.fixtures.loader',
                 ],
-                'tag' => 'twig.extension',
-            ],
-            'templating.twig.extension.asset' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension',
-                'arguments' => [
-                    'templating.helper.assets',
-                ],
-                'tag' => 'twig.extension',
             ],
             // Schema
             'mautic.schema.helper.column' => [
@@ -1216,12 +950,12 @@ return [
         'site_url'                        => '',
         'webroot'                         => '',
         '404_page'                        => '',
-        'cache_path'                      => '%kernel.root_dir%/../var/cache',
-        'log_path'                        => '%kernel.root_dir%/../var/logs',
+        'cache_path'                      => '%kernel.project_dir%/var/cache',
+        'log_path'                        => '%kernel.project_dir%/var/logs',
         'max_log_files'                   => 7,
         'log_file_name'                   => 'mautic_%kernel.environment%.php',
         'image_path'                      => 'media/images',
-        'tmp_path'                        => '%kernel.root_dir%/../var/tmp',
+        'tmp_path'                        => '%kernel.project_dir%/var/tmp',
         'theme'                           => 'blank',
         'theme_import_allowed_extensions' => ['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif'],
         'db_driver'                       => 'pdo_mysql',
@@ -1231,6 +965,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
+        'db_host_ro'                      => null,
         'locale'                          => 'en_US',
         'secret_key'                      => 'temp',
         'dev_hosts'                       => [],
@@ -1250,8 +985,7 @@ return [
         'ip_lookup_auth'                  => '',
         'ip_lookup_config'                => [],
         'ip_lookup_create_organization'   => false,
-        'transifex_username'              => '',
-        'transifex_password'              => '',
+        'transifex_api_token'             => '',
         'update_stability'                => 'stable',
         'cookie_path'                     => '/',
         'cookie_domain'                   => '',
@@ -1658,6 +1392,10 @@ return [
         'transliterate_page_title'  => false,
         'cors_restrict_domains'     => true,
         'cors_valid_domains'        => [],
+        'headers_sts'               => false,
+        'headers_sts_expire_time'   => 60,
+        'headers_sts_subdomains'    => false,
+        'headers_sts_preload'       => false,
         'max_entity_lock_time'      => 0,
         'default_daterange_filter'  => '-1 month',
         'debug'                     => false,
@@ -1753,6 +1491,7 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
-        'composer_updates' => false,
+        'composer_updates'   => false,
+        'redis_primary_only' => false,
     ],
 ];

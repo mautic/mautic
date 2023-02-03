@@ -16,7 +16,7 @@ class ModelFactoryTest extends TestCase
     private $container;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     private $factory;
 
