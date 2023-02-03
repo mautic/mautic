@@ -19,9 +19,10 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $operation
-     * @param string $method
-     * @param string $moduleobject
+     * @param string       $operation
+     * @param string       $method
+     * @param string       $moduleobject
+     * @param array<mixed> $settings
      *
      * @return array|ResponseInterface
      *
@@ -50,11 +51,10 @@ class DynamicsApi extends CrmApi
             'request_timeout'   => 300,
         ]);
 
-        /** @var ResponseInterface $response */
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if ('POST' === $method && (!($response instanceof ResponseInterface) || !in_array($response->getStatusCode(), [200, 204], true))) {
-            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response->getBody()));
+        if ('POST' === $method && (!(is_array($response)) || !in_array($response['code'], [200, 204], true))) {
+            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response));
         }
 
         if ('GET' === $method && $response instanceof ResponseInterface) {
@@ -89,9 +89,9 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $data
-     * @param Lead $lead
-     * @param $object
+     * @param array<mixed> $data
+     * @param Lead         $lead
+     * @param string       $object
      */
     public function createLead($data, $lead, $object = 'contacts'): ResponseInterface
     {
@@ -99,8 +99,8 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param $data
-     * @param $objectId
+     * @param array<mixed> $data
+     * @param string       $objectId
      */
     public function updateLead($data, $objectId): ResponseInterface
     {
@@ -203,8 +203,8 @@ class DynamicsApi extends CrmApi
     }
 
     /**
-     * @param array $data
-     * @param $object
+     * @param array  $data
+     * @param string $object
      *
      * @return array
      */
