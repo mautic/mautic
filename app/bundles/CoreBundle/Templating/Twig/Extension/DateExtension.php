@@ -72,12 +72,10 @@ class DateExtension extends AbstractExtension
      * Returns date only e.g. 2014-08-09.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
     }
@@ -87,7 +85,7 @@ class DateExtension extends AbstractExtension
      *
      * @param \DateTime|string $datetime
      */
-    public function toTime($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s'): string
+    public function toTime($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
     }
@@ -97,7 +95,7 @@ class DateExtension extends AbstractExtension
      *
      * @param \DateTime|string $datetime
      */
-    public function toShort($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s'): string
+    public function toShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
         return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
     }
