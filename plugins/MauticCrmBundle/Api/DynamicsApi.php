@@ -53,8 +53,8 @@ class DynamicsApi extends CrmApi
         /** @var ResponseInterface $response */
         $response = $this->integration->makeRequest($url, $parameters, $method, $settings);
 
-        if ('POST' === $method && (!($response instanceof ResponseInterface) || !in_array($response->getStatusCode(), [200, 204], true))) {
-            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response->getBody()));
+        if ('POST' === $method && (!(is_array($response)) || !in_array($response['code'], [200, 204], true))) {
+            throw new ApiErrorException('Dynamics CRM API error: '.json_encode($response));
         }
 
         if ('GET' === $method && $response instanceof ResponseInterface) {
