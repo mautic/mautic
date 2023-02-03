@@ -36,7 +36,7 @@ class EmailController extends FormController
     use BuilderControllerTrait;
     use FormErrorMessagesTrait;
     use EntityContactsTrait;
-    const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
+    public const EXAMPLE_EMAIL_SUBJECT_PREFIX = '[TEST]';
 
     /**
      * @param int $page
@@ -313,18 +313,16 @@ class EmailController extends FormController
                 $variantSettings = $c->getVariantSettings();
 
                 if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
-                        if (!isset($lastCriteria)) {
-                            $lastCriteria = $variantSettings['winnerCriteria'];
-                        }
-
-                        //make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
-
-                        $weight += $variantSettings['weight'];
+                    if (!isset($lastCriteria)) {
+                        $lastCriteria = $variantSettings['winnerCriteria'];
                     }
+
+                    //make sure all the variants are configured with the same criteria
+                    if ($lastCriteria != $variantSettings['winnerCriteria']) {
+                        $variantError = true;
+                    }
+
+                    $weight += $variantSettings['weight'];
                 } else {
                     $variantSettings['winnerCriteria'] = '';
                     $variantSettings['weight']         = 0;
@@ -383,6 +381,7 @@ class EmailController extends FormController
                     'trackables'   => $trackableLinks,
                     'logs'         => $logs,
                     'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
+                    'stats'        => $this->request->query->get('stats', false),
                     'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
