@@ -1,0 +1,38 @@
+{% if event.extra is defined %}
+  {% set form = event.extra.form %}
+  {% set page = event.extra.page %}
+  {% set submission = event.extra.submission %}
+  {% set results = submission.results %}
+
+  <dl class="dl-horizontal">
+    {% if link is defined %}
+        <dt>{{ 'mautic.core.source'|trans }}</dt>
+        <dd>{{ link }}</dd>
+    {% endif %}
+
+    {% if form.description %}
+        <dt>{{ 'mautic.core.description'|trans }}</dt>
+        <dd>{{ form.description }}</dd>
+    {% endif %}
+
+    <dt>{{ 'mautic.form.result.thead.referrer'|trans }}</dt>
+    <dd>{{ assetMakeLinks(submission.referer) }}</dd>
+
+    {% if results is iterable %}
+        {% for field in form.fields %}
+            {% if field.alias in results|keys and results[field.alias] is not empty %}
+                <dt>{{ field.label }}</dt>
+                <dd>
+                    {% if field.isFileType %}
+                        <a href="{{ path('mautic_form_file_download', {'submissionId': submission.id, 'field': field.alias}) }}">
+                            {{ results[field.alias] }}
+                        </a>
+                    {% else %}
+                        {{ results[field.alias] }}
+                    {% endif %}
+                </dd>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+  </dl>
+{% endif %}
