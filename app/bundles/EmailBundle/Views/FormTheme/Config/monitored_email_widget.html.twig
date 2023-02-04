@@ -11,33 +11,33 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">
-                {{ child.vars.label|trans }}
+                {% trans %}child.vars.label{% endtrans %}
             </h3>
         </div>
         <div class="panel-body">
             {% set tooltip =  %}
             <?php $tooltip = $view['translator']->hasId($child->vars['label'].'.tooltip') ? $view['translator']->trans($child->vars['label'].'.tooltip') : ''; ?>
-            <?php if ($tooltip): ?>
+            {% if tooltip %}
                 <p>{{ tooltip }}</p>
-            <?php endif; ?>
+            {% endif %}
             {{ form_widget(child) }}
         </div>
     </div>
 {% endfor %}
 
-foreach ($form->children as $child): ?>
+{% for child in form.children %}
 <div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">
-            {{ child.vars.label|trans }}
+            {% trans %}child.vars.label{% endtrans %}
         </h3>
     </div>
     <div class="panel-body">
         <?php $tooltip = $view['translator']->hasId($child->vars['label'].'.tooltip') ? $view['translator']->trans($child->vars['label'].'.tooltip') : ''; ?>
-        <?php if ($tooltip): ?>
-            <p><?php echo $tooltip; ?></p>
-        <?php endif; ?>
-        <?php echo $view['form']->widget($child); ?>
+        {% if tooltip %}
+            <p>{{ tooltip }}</p>
+        {% endif %}
+        {{ form_widget(child) }}
     </div>
 </div>
-<?php endforeach; ?>
+{% endfor %}
