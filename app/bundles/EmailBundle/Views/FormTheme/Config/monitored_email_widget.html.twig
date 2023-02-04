@@ -15,7 +15,7 @@
             </h3>
         </div>
         <div class="panel-body">
-            {% set tooltip = translatorHasId(child.vars['label'] ~ '.tooltip') ? {{ child.vars['label'] ~ '.tooltip'|trans }} : '' %}
+            {% set tooltip = translatorHasId(child.vars['label'] ~ '.tooltip') ? child.vars['label'] ~ '.tooltip'|trans : '' %}
             {% if tooltip %}
                 <p>{{ tooltip }}</p>
             {% endif %}

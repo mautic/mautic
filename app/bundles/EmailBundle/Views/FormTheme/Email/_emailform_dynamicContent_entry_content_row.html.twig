@@ -10,7 +10,7 @@
         {{ form_label(form) }}
     </div>
     <div class="col-xs-2">
-        {% if 'emailform_dynamicContent_0_content' !== id %}
+        {% if 'emailform_dynamicContent_0_content' is not same as id %}
             <a class="remove-item btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
         {% endif %}
     </div>

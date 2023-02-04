@@ -8,13 +8,13 @@
 {% set fields = form.children %}
 {% set fieldKeys = fields|keys %}
 {% set template  = '<div class="col-md-6">{content}</div>' %}
-{% set arr_mail = {
+{% set arr_mail = [
     'mailer_from_name',
     'mailer_from_email',
     'mailer_reply_to_email',
     'mailer_transport',
     'mailer_spool_type'
-} %}
+] %}
 
 {% if (fieldKeys|filter((key) => key in arr_mail))|length %}
     {% block emailconfig %}
@@ -66,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                <?php endif; ?>
+                {% endif %}
 
                 <div class="row">
                     {% if fields['mailer_amazon_region'] is defined %}
@@ -188,13 +188,13 @@
         </div>
         <div class="panel-body">
             {% if 'imap_open' %}
-                {% form_widget(form['monitored_email']) %}
+                {{ form_widget(form['monitored_email']) }}
             {% else %}
                 <div class="alert alert-info">{{ 'mautic.email.imap_extension_missing'|trans }}</div>
             {% endif %}
         </div>
     </div>
-<?php endif; ?>
+{% endif %}
 
 <div class="panel panel-primary">
     <div class="panel-heading">

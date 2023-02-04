@@ -38,8 +38,6 @@ class EmojiExtension extends AbstractExtension
 
     public function isInstanceOf(object $object, object $class): bool
     {
-        $reflectionClass = new \ReflectionClass($class);
-
         return $object instanceof $class;
     }
 }
