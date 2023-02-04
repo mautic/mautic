@@ -47,7 +47,7 @@
                     <li class="active">
                         <a href="#details" role="tab" data-toggle="tab" {{ mainErrors }}>
                         {% trans %}mautic.core.details{% endtrans %}
-                            {% if mainErrors is not empty %}
+                            {% if form_errors(form) is not empty %}
                                 <i class="fa fa-warning"></i>
                             {% endif %}
                         </a>
@@ -55,7 +55,7 @@
                     <li class="{% if form.vars.value.isCampaignBased() or form.updateSelect is defined %}hide{% endif %}" id="dwcFiltersTab">
                         <a href="#filters" role="tab" data-toggle="tab" {{ filterErrors }}>
                             {% trans %}mautic.core.filters{% endtrans %}
-                            {% if filterErrors is not empty %}
+                            {% if form_errors(form.filters) is not empty %}
                                 <i class="fa fa-warning"></i>
                             {% endif %}
                         </a>
