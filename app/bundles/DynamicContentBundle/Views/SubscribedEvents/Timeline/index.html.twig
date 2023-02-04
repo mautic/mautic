@@ -1,4 +1,4 @@
-{% set data = event.extra.stat.sentDetails %}
+t{% set data = event.extra.stat.sentDetails %}
 {% if data.failed is defined or data.timeline is not defined %}
   <dl class="dl-horizontal">
       <dt>{{ 'mautic.dynamicContent.timeline.content'|trans }}</dt>

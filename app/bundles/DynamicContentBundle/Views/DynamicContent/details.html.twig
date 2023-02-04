@@ -30,15 +30,15 @@
                         <div class="text-muted">{{ entity.getDescription() }}</div>
                         {% if entity.isVariant(true) %}
                             <div class="small">
-                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $variants['parent']->getId()]); ?>" data-toggle="ajax">
+                                <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': variants.parent.getId()}) }}" data-toggle="ajax">
                                     {% trans with {'%parent%': variants.parent.getName()} %}mautic.core.variant_of{% endtrans %}
                                 </a>
                             </div>
                         {% endif %}
                         {% if entity.isTranslation(true) %}
                             <div class="small">
-                                <a href="<?php echo $view['router']->path('mautic_dynamicContent_action', ['objectAction' => 'view', 'objectId' => $translations['parent']->getId()]); ?>" data-toggle="ajax">
-                                    <?php echo $view['translator']->trans('mautic.core.translation_of', ['%parent%' => $translations['parent']->getName()]); ?>
+                                <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.getId()}) }}" data-toggle="ajax">
+                                    {% trans with {'%parent%': translations.parent.getName()} %}mautic.core.translation_of{% endtrans %} ?>
                                 </a>
                             </div>
                         {% endif %}

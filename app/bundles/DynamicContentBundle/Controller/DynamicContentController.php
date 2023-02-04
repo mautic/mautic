@@ -5,7 +5,6 @@ namespace Mautic\DynamicContentBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\ContentHelper;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\DynamicContentBundle\Model\DynamicContentModel;
 use Mautic\PageBundle\Model\PageModel;
