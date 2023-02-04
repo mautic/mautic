@@ -24,20 +24,3 @@
         </div>
     </div>
 {% endfor %}
-
-{% for child in form.children %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <h3 class="panel-title">
-            {% trans %}child.vars.label{% endtrans %}
-        </h3>
-    </div>
-    <div class="panel-body">
-        <?php $tooltip = $view['translator']->hasId($child->vars['label'].'.tooltip') ? $view['translator']->trans($child->vars['label'].'.tooltip') : ''; ?>
-        {% if tooltip %}
-            <p>{{ tooltip }}</p>
-        {% endif %}
-        {{ form_widget(child) }}
-    </div>
-</div>
-{% endfor %}
