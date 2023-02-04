@@ -1,15 +1,17 @@
-<div class="row form-group">
-    <div class="col-xs-10">
-        {{ form_label(form) }}
+{% block _emailform_dynamicContent_entry_content_row %}
+    <div class="row form-group">
+        <div class="col-xs-10">
+            {{ form_label(form) }}
+        </div>
+        <div class="col-xs-2">
+            {% if 'emailform_dynamicContent_0_content' is not same as id %}
+                <a class="remove-item btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+            {% endif %}
+        </div>
     </div>
-    <div class="col-xs-2">
-        {% if 'emailform_dynamicContent_0_content' is not same as id %}
-            <a class="remove-item btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
-        {% endif %}
+    <div class="row form-group">
+        <div class="col-xs-12">
+            {{ form_widget(form) }}
+        </div>
     </div>
-</div>
-<div class="row form-group">
-    <div class="col-xs-12">
-        {{ form_widget(form) }}
-    </div>
-</div>
+{% endblock %}

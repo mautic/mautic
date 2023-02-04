@@ -3,7 +3,7 @@
 {% endif %}
 {% block headerTitle %}
     {% if not isEmbedded %}
-        email.getName()
+        {{ email.getName() }}
     {% endif %}
 {% endblock %}
 {% block mauticContent %}
@@ -13,7 +13,6 @@
 {% endblock %}
 {% set variantContent = include('MauticCoreBundle:Variant:index.html.twig',
     {
-
         'activeEntity'      : email,
         'variants'          : variants,
         'abTestResults'     : abTestResults,
@@ -22,7 +21,7 @@
     }
 ) %}
 
-{% set showVariants = variantContent|trim is not empty %}
+{% set showVariants = variantContent is defined and variantContent|trim is not empty %}
 
 {% set translationContent = include('MauticCoreBundle:Translation:index.html.twig',
     {
@@ -34,35 +33,29 @@
 ) %}
 
 {% set showTranslations = translationContent|trim is not empty %}
-{% set emailType = email.getEmailType() %}
+{% set emailType = email.emailType %}
 
-{% if emailType is not empty %}
+{% if emailType is not defined %}
     {% set emailType = 'template' %}
 {% endif %}
-{% set customButtons = {} %}
+{% set customButtons = [] %}
 
 {% if not isEmbedded %}
     {% if 'list' == emailType %}
         {% set sendButton = {
             'attr'      : {
                 'data-toggle' : 'ajax',
-                'href'        : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : email.getId()}),
+                'href'        : email.isBackgroundSending() ? 'javascript:void(0);' : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : email.getId()}),
             },
             'iconClass' : 'fa fa-send-o',
             'btnText'   : 'mautic.email.send',
             'primary'   : true,
         } %}
         {% if email.isBackgroundSending() %}
-            {% set sendButton = sendButton|merge([
-                sendButton.attr|merge({'href' : 'javascript:void(0);'}),
-                sendButton.attr|merge({'disabled' : true}),
-                sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}),
-            ]) %}
+            {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
+            {% set sendButton = sendButton|merge({'attr' : {'disabled' : true}}) %}
         {% endif %}
-
-        {% set customButtons = customButtons|merge(sendButton) %}
-
-        {% set customButtons = customButtons|merge({
+        {% set sendExampleButton = {
             'attr' : {
                 'class'       : 'btn btn-default btn-nospin',
                 'data-toggle' : 'ajaxmodal',
@@ -73,9 +66,11 @@
             'iconClass' : 'fa fa-send',
             'btnText'   : 'mautic.email.send.example',
             'primary'   : true,
-        }) %}
+        } %}
+        {% set customButtons = [ sendButton, sendExampleButton] %}
     {% endif %}
 {% endif %}
+
 
 {# Only show A/B test button if not already a translation of an a/b test #}
 {% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
@@ -118,7 +113,7 @@
 
 
 {# start: box layout #}
-{% block boxLayout %}
+{% block content %}
     <div class="box-layout">
         <!-- left section -->
         <div class="col-md-9 bg-white height-auto">
@@ -132,14 +127,16 @@
                             </div>
                             {% if email.isVariant(true) %}
                                 <div class="small">
-                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants['parent'].getId()}) }}" data-toggle="ajax">
+                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants['parent'].getId()}) }}"
+                                       data-toggle="ajax">
                                         {{ 'mautic.core.variant_of'|trans ({'%parent%' : variants['parent'].getName()}) }}
                                     </a>
                                 </div>
                             {% endif %}
                             {% if email.isTranslation(true) %}
                                 <div class="small">
-                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations['parent'].getId()}) }}" data-toggle="ajax">
+                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations['parent'].getId()}) }}"
+                                       data-toggle="ajax">
                                         {{ 'mautic.core.translation_of'|trans({'%parent%' : translations['parent'].getName()}) }}
                                     </a>
                                 </div>
@@ -157,8 +154,7 @@
                                 <tbody>
                                 {{- include('MauticCoreBundle:Helper:details.html.twig', {
                                     'entity' : email
-                                })
-                                -}}
+                                }) -}}
                                 <tr>
                                     <td width="20%">
                                         <span class="fw-b">{{ 'mautic.core.form.theme'|trans }}</span>
@@ -173,7 +169,7 @@
                                         <td>{{ email.getFromName() }}</td>
                                     </tr>
                                 {% endif %}
-                                {% if email.getFromAddress()  %}
+                                {% if email.getFromAddress() %}
                                     <tr>
                                         <td width="20%">
                                             <span class="fw-b">{{ 'mautic.email.from_email'|trans }}</span>
@@ -181,7 +177,7 @@
                                         <td>{{ email.getFromAddress() }}</td>
                                     </tr>
                                 {% endif %}
-                                {% if email.getReplyToAddress()  %}
+                                {% if email.getReplyToAddress() %}
                                     <tr>
                                         <td width="20%">
                                             <span class="fw-b">{{ 'mautic.email.reply_to_email'|trans }}</span>
@@ -189,7 +185,7 @@
                                         <td>{{ email.getReplyToAddress() }}</td>
                                     </tr>
                                 {% endif %}
-                                {% if email.getBccAddress()  %}
+                                {% if email.getBccAddress() %}
                                     <tr>
                                         <td width="20%">
                                             <span class="fw-b">{{ 'mautic.email.bcc'|trans }}</span>
@@ -198,7 +194,7 @@
                                     </tr>
                                 {% endif %}
 
-                                {% if email.getHeaders()  %}
+                                {% if email.getHeaders() %}
                                     <tr>
                                         <td width="20%">
                                             <span class="fw-b">{{ 'mautic.email.custom_headers'|trans }}</span>
@@ -241,16 +237,17 @@
                 <!--/ email detail collapseable toggler -->
 
                 {% set isVariant = showTranslations or showVariants ?: 0 %}
-                {% set dateFrom = dateRangeForm.children['date_from'].vars['data']  %}
+                {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
                 {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
 
-                <div id="emailGraphStats" data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                <div id="emailGraphStats"
+                     data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
                     <div class="spinner">
                         <i class="fa fa-spin fa-spinner"></i>
                     </div>
                 </div>
 
-                {{ customContent('details.stats.graph.below', mauticTemplateVars) }}
+                {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ?: []) }}
 
                 <!-- tabs controls -->
                 <ul class="nav nav-tabs pr-md pl-md">
@@ -289,12 +286,11 @@
                         'trackables'  : trackables,
                         'entity'      : email,
                         'channel'     : 'email',
-                    })
-                    -}}
+                    }) -}}
                 </div>
 
                 <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
-                    {{ contacts }}
+                    {{ contacts | raw }}
                 </div>
 
                 {% if showVariants %}
@@ -321,7 +317,7 @@
             <!-- preview URL -->
             <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
                 <div class="panel-heading">
-                    <div class="panel-title">{{ mautic.email.preview.url|trans }}</div>
+                    <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
                 </div>
                 <div class="panel-body pt-xs">
                     <div class="input-group">
@@ -330,8 +326,7 @@
                                 'item'  : email,
                                 'model' : 'email',
                                 'query' : 'customToggle=publicPreview'
-                            })
-                            -}}
+                            }) -}}
                         </div>
                         <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
                                readonly
@@ -348,8 +343,7 @@
             <!-- activity feed -->
             {{- include('MauticCoreBundle:Helper:recentactivity.html.twig', {
                 'logs' : logs
-            })
-            -}}
+            }) -}}
         </div>
         <!--/ right section -->
         <input name="entityId" id="entityId" type="hidden" value="{{ email.getId()|escape }}"/>

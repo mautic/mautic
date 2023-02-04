@@ -1,0 +1,37 @@
+{% if nameGetter is not defined %}
+    {% set nameGetter = 'getName' %}
+{% endif %}
+{% set totalWeight = 0 %}
+{% set abStatsHeader = 'mautic.core.ab_test.stats'|trans %}
+{% if variants.properties is defined and variants.properties is not empty %}
+    {% if variants.parent.getVariantStartDate() is defined %}
+        <div class="box-layout mb-lg">
+            <div class="col-xs-10 va-m">
+                <h4>{{ 'mautic.core.variant_start_date'|trans({
+                        '%time%': variants.parent.getVariantStartDate(),
+                        '%date%': variants.parent.getVariantStartDate(),
+                        '%full%': variants.parent.getVariantStartDate()
+                    }) }}
+                </h4>
+            </div>
+            <!-- button -->
+            <div class="col-xs-2 va-m text-right">
+                <a href="#" data-toggle="modal" data-target="#abStatsModal" class="btn btn-primary">
+                    {{ abStatsHeader }}
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    <ul class="list-group">
+
+    </ul>
+    {{- include('MauticCoreBundle:Helper:modal.html.twig', {
+        'id'     : 'abStatsModal',
+        'header' : abStatsHeader,
+        'body'   : abTestResults.supportTemplate is defined ? include(abTestResults.supportTemplate, {
+            'results' : abTestResults,
+            'variants': variants
+        }) : 'mautic.core.ab_test.noresults'|trans,
+        'size' : 'lg',
+    }) -}}
+{% endif %}

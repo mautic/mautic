@@ -1,28 +1,30 @@
-<div class="tab-pane dynamic-content bdr-w-0{{ '0' == form.vars.name ? ' active' : ' fade' }}" id="{{ form.vars.id }}">
-    <div class="panel">
-        {% set tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_' ~ form.vars.name %}
+{% block dynamic_content_filter_widget %}
+    <div class="tab-pane dynamic-content bdr-w-0{{ '0' == form.vars.name ? ' active' : ' fade' }}"
+         id="{{ form.vars.id }}">
+        <div class="panel">
+            {% set tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_' ~ form.vars.name %}
+            {% set tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_' ~ form.vars['name'] ~'">' %}
+            {% set tabHtml = tabHtml ~ '<li><a role="tab" class="addNewDynamicContentFilter" data-index="' ~  form.vars['name'] ~
+                '"><i class="fa fa-plus text-success"></i> ' ~  'mautic.core.form.new'|trans  ~ '</a></li>' %}
+            {% set tabHtml = tabHtml ~ '<li class="active"><a data-toggle="tab" href="#emailform_dynamicContent_' ~ form.vars['name'] ~ '_default" role="tab">Default</a></li>' %}
+            {% set tabContentHtml = '<div class="tab-content pa-md"><div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_' ~ form.vars['name'] ~'_default">' %}
+            {% set tabContentHtml = tabContentHtml ~ '<div class="row hidden"><div class="col-xs-10">' %}
+            {% set tabContentHtml = tabContentHtml ~ form_row(form['tokenName']) %}
+            {% set tabContentHtml = tabContentHtml ~ '</div></div>' %}
+            {% set tabContentHtml = tabContentHtml ~ form_row(form['content']) %}
+            {% set tabContentHtml = tabContentHtml ~ '</div>' %}
 
-        {% set tabHtml = '<ul class="bg-auto nav nav-tabs pr-md pl-md" id="dynamicContentFilterTabs_' ~ form.vars['name'] ~'">' %}
-        {% set tabHtml = tabHtml ~ '<li><a role="tab" class="addNewDynamicContentFilter" data-index="' ~  form.vars['name'] ~
-            '"><i class="fa fa-plus text-success"></i> ' ~  'mautic.core.form.new'|trans  ~ '</a></li>' %}
-        {% set tabHtml = tabHtml ~ '<li class="active"><a data-toggle="tab" href="#emailform_dynamicContent_' ~ form.vars['name'] ~ '_default" role="tab">Default</a></li>' %}
-        {% set tabContentHtml = '<div class="tab-content pa-md"><div class="tab-pane bdr-w-0 active" id="emailform_dynamicContent_' ~ form.vars['name'] ~'_default">' %}
-        {% set tabContentHtml = tabContentHtml ~ '<div class="row hidden"><div class="col-xs-10">' %}
-        {% set tabContentHtml = tabContentHtml ~ form_row(form['tokenName']) %}
-        {% set tabContentHtml = tabContentHtml ~ '</div></div>' %}
-        {% set tabContentHtml = tabContentHtml ~ form_row(form['content']) %}
-        {% set tabContentHtml = tabContentHtml ~ '</div>' %}
+            {% for i, filter in form['filters'] %}
+                {% set isFirst = i is same as 0 ? ' active' : '' %}
+                {% set tabHtml = tabHtml ~ '<li><a role="tab" data-toggle="tab" href="#' ~ filter.vars.id ~'">' ~ 'mautic.core.dynamicContent.tab'|trans ~' '~(i + 1)~'</a></li>' %}
+                {% set tabContentHtml = tabContentHtml ~ form_widget(filter) %}
+            {% endfor %}
 
-        {% for filter, i in form['filters'] %}
-            {% set isFirst = i is same as 0 ? ' active' : '' %}
-            {% set tabHtml = tabHtml ~ '<li><a role="tab" data-toggle="tab" href="#' ~ filter.vars['id'] ~'">' ~ 'mautic.core.dynamicContent.tab'|trans ~' '~(i + 1)~'</a></li>' %}
-            {% set tabContentHtml = tabContentHtml ~ form_widget(filter) %}
-        {% endfor %}
+            {% set tabHtml = tabHtml ~ '</ul>' %}
+            {% set tabContentHtml = tabContentHtml ~ '</div>' %}
 
-        {% set tabHtml = tabHtml ~ '</ul>' %}
-        {% set tabContentHtml = tabContentHtml ~ '</div>' %}
-
-        {{ tabHtml }}
-        {{ tabContentHtml }}
+            {{ tabHtml|raw }}
+            {{ tabContentHtml|raw }}
+        </div>
     </div>
-</div>
+{% endblock %}

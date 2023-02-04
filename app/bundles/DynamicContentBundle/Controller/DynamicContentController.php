@@ -94,7 +94,7 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:list.html.php',
+                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
@@ -217,9 +217,9 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form' => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                 ],
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
+                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
                 'passthroughVars' => $passthrough,
             ]
         );
@@ -322,10 +322,10 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.php', 'MauticDynamicContentBundle:FormTheme\Filter'),
+                    'form'          => $this->setFormTheme($form, 'MauticDynamicContentBundle:DynamicContent:form.html.twig', 'MauticDynamicContentBundle:FormTheme\Filter'),
                     'currentListId' => $objectId,
                 ],
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.php',
+                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'route'         => $action,
@@ -378,8 +378,7 @@ class DynamicContentController extends FormController
             'dynamiccontent:dynamiccontents:viewown',
             'dynamiccontent:dynamiccontents:viewother',
             $entity->getCreatedBy()
-        )
-        ) {
+        )) {
             return $this->accessDenied();
         }
 
@@ -411,12 +410,13 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'returnUrl'       => $action,
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.php',
+                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
                 ],
                 'viewParameters' => [
+                    'content'      => $this->get('mautic.helper.template.content'),
                     'entity'       => $entity,
                     'permissions'  => $this->getPermissions(),
                     'logs'         => $logs,
@@ -446,7 +446,8 @@ class DynamicContentController extends FormController
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {
-            if (!$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
+            if (
+                !$this->get('mautic.security')->isGranted('dynamiccontent:dynamiccontents:create')
                 || !$this->get('mautic.security')->hasEntityAccess(
                     'dynamiccontent:dynamiccontents:viewown',
                     'dynamiccontent:dynamiccontents:viewother',
@@ -502,8 +503,7 @@ class DynamicContentController extends FormController
                 'dynamiccontent:dynamiccontents:deleteown',
                 'dynamiccontent:dynamiccontents:deleteother',
                 $entity->getCreatedBy()
-            )
-            ) {
+            )) {
                 return $this->accessDenied();
             } elseif ($model->isLocked($entity)) {
                 return $this->isLocked($postActionVars, $entity, 'notification');
@@ -566,8 +566,7 @@ class DynamicContentController extends FormController
                     'dynamiccontent:dynamiccontents:viewown',
                     'dynamiccontent:dynamiccontents:viewother',
                     $entity->getCreatedBy()
-                )
-                ) {
+                )) {
                     $flashes[] = $this->accessDenied(true);
                 } elseif ($model->isLocked($entity)) {
                     $flashes[] = $this->isLocked($postActionVars, $entity, 'dynamicContent', true);

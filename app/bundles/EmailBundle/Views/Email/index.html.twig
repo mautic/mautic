@@ -12,8 +12,6 @@
     -}}
 {% endblock %}
 
-{% block list_toolbar %}
-
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
     {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
         'searchValue' : searchValue,
@@ -27,5 +25,4 @@
         {% block content %}{% endblock %}
     </div>
 </div>
-{% endblock %}
 
