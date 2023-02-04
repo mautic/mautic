@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 
 final class LeadRepositoryTest extends MauticMysqlTestCase
@@ -68,7 +69,9 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
         $this->client->request(Request::METHOD_GET, '/s/contacts');
 
         $profile = $this->client->getProfile();
-        $queries = $profile->getCollector('db')->getQueries();
+        /** @var DoctrineDataCollector $dbCollector */
+        $dbCollector = $profile->getCollector('db');
+        $queries     = $dbCollector->getQueries();
 
         $finalQueries = array_filter(
             $queries['default'],
