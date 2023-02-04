@@ -1,10 +1,3 @@
-{#
-@copyright   2014 Mautic Contributors. All rights reserved
-@author      Mautic
-@link        http://mautic.org
-@license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-#}
-
 {% if 'index' == tmpl %}
     {% extends 'MauticEmailBundle:Email:index.html.twig' %}
 {% endif %}
@@ -119,20 +112,19 @@
                     <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : item.getId()}) }}" data-toggle="ajax">
                         {{ item.getName() }}
                         {% if hasVariants %}
-                        <span data-toggle="tooltip"
-                              title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
-                                    <i class="fa fa-fw fa-sitemap"></i>
-                                </span>
+                            <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
+                                <i class="fa fa-fw fa-sitemap"></i>
+                            </span>
                         {% endif %}
                         {% if hasTranslations %}
-                        <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
-                                    <i class="fa fa-fw fa-language"></i>
-                                </span>
+                            <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                                <i class="fa fa-fw fa-language"></i>
+                            </span>
                         {% endif %}
                         {% if 'list' == type %}
-                        <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}">
-                                    <i class="fa fa-fw fa-pie-chart"></i>
-                                </span>
+                            <span data-toggle="tooltip" title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}">
+                                <i class="fa fa-fw fa-pie-chart"></i>
+                            </span>
                         {% endif %}
                         {{ customContent('email.name', mauticTemplateVars) }}
                     </a>
@@ -148,9 +140,9 @@
                 {% set catName  = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
                 {% set color = (category) ? '#' ~ category.getColor() : 'inherit' %}
                 <span style="white-space: nowrap;">
-                            <span class="label label-default pa-4"
-                                  style="border: 1px solid #d5d5d5; background: {{ color }};"> </span> <span>{{ catName }}</span>
-                        </span>
+                    <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
+                    <span>{{ catName }}</span>
+                </span>
             </td>
             <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                 {{ customContent('email.stats.above', mauticTemplateVars) }}

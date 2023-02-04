@@ -1,16 +1,10 @@
-{#
-    @copyright   2014 Mautic Contributors. All rights reserved
-    @author      Mautic
-    @link        http://mautic.org
-    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-#}
 <div class="tab-pane dynamic-content-filter bdr-w-0" id="{{ form.vars.id }}">
     <div class="row form-group">
         <div class="col-xs-10">
             {{ form_label(form.content) }}
         </div>
         <div class="col-xs-2">
-            {% if 'emailform_dynamicContent_0_filters_0' !== id %}
+            {% if id is not same as 'emailform_dynamicContent_0_filters_0' %}
                 <a class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
             {% endif %}
         </div>
@@ -36,19 +30,14 @@
                             <optgroup label="{{ 'mautic.lead.'.header|trans }}">
                                 {% for value, params in field %}
                                     {% set list = (params.properties.list is not empty) ? params.properties.list : [] %}
-                                    {# TODO: research to fix this #}
-                                    {% set choices = ('boolean' === params.properties.type) ?
-                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList(list)
-                                        :
-                                        \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices(list)
+                                    {% set choices = (params.properties.type is same as 'boolean') ?
+                                        parseBooleanList(list) : parseListForChoices(list)
                                     %}
                                     {% set list = choices|json_encode %}
                                     {% set callback = (params.properties.callback is not empty) ? params.properties.callback : '' %}
                                     {% set operators = (params.operators is not empty) ? (params.operators|json_encode)|escape : '{}' %}
-                                {% endfor %}
-
                                 <option value="{{ value|escape }}" data-mautic="available_{{ value }}" data-field-object="{{ object }}" data-field-type="{{ params.properties.type }}" data-field-list="{{ list|escape }}" data-field-callback="{{ callback }}" data-field-operators='{{ operators }}' class="segment-filter fa {{ icon }}">{{ params.label|trans }}</option>
-                                <?php endforeach; ?>
+                                {% endfor %}
                             </optgroup>
                         {% endfor %}
                     </select>
@@ -60,8 +49,10 @@
     <div data-filter-container data-index="{{ form.filters|length }}">
         {% for i, filter in form.filters %}
             {% set isPrototype = ('__name__' == filter.vars.name) %}
-            {% if isPrototype or form.vars.fields.{filter.vars.value.object}.{filter.vars.value.object}.{filter.vars.value.field} is defined %}
-                {{ form_widget(filter, {'first' : (0 === i)}) }}
+            {% set valueObject = filter.vars.value.object %}
+            {% set valueField = filter.vars.value.field %}
+            {% if isPrototype or form.vars.fields.valueObject.valueObject.valueField is defined %}
+                {{ form_widget(filter, {'first' : (i is same as 0)}) }}
             {% endif %}
         {% endfor %}
     </div>

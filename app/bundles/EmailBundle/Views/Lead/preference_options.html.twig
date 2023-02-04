@@ -1,10 +1,3 @@
-{#
-    @copyright   2014 Mautic Contributors. All rights reserved
-    @author      Mautic
-    @link        http://mautic.org
-    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
-#}
-
 {% set leadId = lead.getId() %}
 {% set leadName = lead.getPrimaryIdentifier() %}
 {% set channelNumber = 0 %}
@@ -75,8 +68,8 @@
                                     {{ form_widget(form['lead_channels']['frequency_time_' ~ channel.value]) }}
                                 </div>
                                 {% else %}
-                                    {% set form['lead_channels']|filter(v, k) => k != 'frequency_number_' ~ channel.value %}
-                                    {% set form['lead_channels']|filter(v, k) => k != 'frequency_time_' ~ channel.value %}
+                                    {{ form['lead_channels']|filter((v, k) => k != 'frequency_number_' ~ channel.value) }}
+                                    {{ form['lead_channels']|filter((v, k) => k != 'frequency_time_' ~ channel.value) }}
                                 {% endif %}
 
                                 {% if showContactPauseDates %}
@@ -87,8 +80,8 @@
                                     {{ form_widget(form['lead_channels']['contact_pause_end_date_' ~ channel.value]) }}
                                 </div>
                                 {% else %}
-                                    {% set form['lead_channels']|filter(v, k) => k != 'contact_pause_start_date_' ~ channel.value %}
-                                    {% set form['lead_channels']|filter(v, k) => k != 'contact_pause_end_date_' ~ channel.value %}
+                                    {{ form['lead_channels']|filter((v, k) => k != 'contact_pause_start_date_' ~ channel.value) }}
+                                    {{ form['lead_channels']|filter((v, k) => k != 'contact_pause_end_date_' ~ channel.value) }}
                                 {% endif %}
                             </div>
                         </td>
@@ -100,7 +93,7 @@
                 <hr />
                 <div id="preferred_channel" class="text-left">{{ form_row(form['lead_channels']['preferred_channel']) }}</div>
                 {% else %}
-                    {% set form['lead_channels']|filter(v, k) => k != 'preferred_channel' %}
+                    {{ form['lead_channels']|filter((v, k) => k != 'preferred_channel') }}
                 {% endif %}
                 {% if showContactSegments and form['lead_lists']|length %}
                 <hr />
@@ -111,10 +104,10 @@
                             {{ form_label(leadList) }}
                         </div>
                     {% endfor %}
-                    {% set form|filter(v, k) => k != 'lead_channels' %}
+                    {{ form|filter((v, k) => k != 'lead_channels') }}
                 </div>
                 {% else %}
-                    {% set form|filter(v, k) => k != 'lead_lists' %}
+                    {{ form|filter((v, k) => k != 'lead_lists') }}
                 {% endif %}
 
                 {% if showContactCategories and form['global_categories']|length %}
@@ -129,10 +122,10 @@
 
                         </div>
                     {% endfor %}
-                    {% set form|filter(v, k) => k != 'global_categories' %}
+                    {{ form|filter((v, k) => k != 'global_categories') }}
                 </div>
                 {% else %}
-                    {% set form|filter(v, k) => k != 'global_categories' %}
+                    {{ form|filter((v, k) => k != 'global_categories') }}
                 {% endif %}
 
                 {% if successMessage is not empty %}
@@ -145,10 +138,10 @@
             <div class="panel-footer text-left">
                 {{ form_row(form['buttons']['save']) }}
             </div>
-            {% set form['buttons']|filter(v, k) => k != 'cancel' %}
+            {{ form['buttons']|filter((v, k) => k != 'cancel') }}
         </div>
     </div>
 
-    {% set form|filter(v, k) => k != 'lead_channels' %}
+    {{ form|filter((v, k) => k != 'lead_channels') }}
     {{ form_end(form) }}
 </div>
