@@ -9,9 +9,17 @@ use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Symfony\Component\HttpFoundation\Request;
 
 final class LeadRepositoryTest extends MauticMysqlTestCase
 {
+    public function setUp(): void
+    {
+        $this->clientOptions = ['debug' => true];
+
+        parent::setUp();
+    }
+
     /**
      * @return array<int, array<string, array<string, bool>>>
      */
@@ -53,6 +61,28 @@ final class LeadRepositoryTest extends MauticMysqlTestCase
             $ipAddresses = $r->getIpAddresses();
             $ipAddress   = $ipAddresses->first();
             $this->assertEquals($ipAddress->getIpAddress(), '127.0.0.1');
+        }
+
+        $this->client->enableProfiler();
+
+        $this->client->request(Request::METHOD_GET, '/s/contacts');
+
+        $profile = $this->client->getProfile();
+        $queries = $profile->getCollector('db')->getQueries();
+
+        $finalQueries = array_filter(
+            $queries['default'],
+            function (array $query) {
+                return false !== strpos($query['sql'], 'SELECT (CASE WHEN t0_.id = 1 THEN 1 ELSE 2 END)');
+            }
+        );
+
+        foreach ($finalQueries as $query) {
+            if ($args['joinIpAddresses'] ?? true) {
+                $this->assertStringContainsString('LEFT JOIN test_ip_addresses', $query['sql']);
+            } else {
+                $this->assertStringNotContainsString('LEFT JOIN test_ip_addresses', $query['sql']);
+            }
         }
     }
 }
