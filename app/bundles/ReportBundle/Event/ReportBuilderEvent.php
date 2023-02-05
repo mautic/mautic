@@ -319,6 +319,20 @@ class ReportBuilderEvent extends AbstractReportEvent
     }
 
     /**
+     * @param array<string, mixed> $properties
+     *
+     * @return array<string, string|int>
+     */
+    public function getObjectColumns(string $object, array $properties = []): array
+    {
+        if ('contact' === $object || 'company' === $object) {
+            return [];
+        }
+
+        return $this->reportHelper->getObjectColumns($object, $properties);
+    }
+
+    /**
      * @param       $context
      * @param       $type
      * @param       $graphId

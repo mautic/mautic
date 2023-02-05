@@ -161,6 +161,13 @@ class ReportSubscriber implements EventSubscriberInterface
                 $leadColumns        = $event->getLeadColumns();
                 $companyColumns     = $this->companyReportData->getCompanyData();
 
+                $mappedObjectData    = $formEntity->getMappedFieldObjectData();
+
+                foreach ($mappedObjectData as $item) {
+                    $columns       = $event->getObjectColumns($item['mappedObject'], ['fieldAlias' => $item['fieldAlias']]);
+                    $columnsMapped = array_merge($columnsMapped ?? [], $columns, $columnsMapped ?? []);
+                }
+
                 $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns);
 
                 $data = [

@@ -81,6 +81,9 @@ return [
             'mautic.report.helper.report' => [
                 'class' => \Mautic\ReportBundle\Helper\ReportHelper::class,
                 'alias' => 'report',
+                'arguments' => [
+                    'event_dispatcher',
+                ],
             ],
         ],
         'models' => [
