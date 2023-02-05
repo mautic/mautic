@@ -932,6 +932,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "bergwerkweb",
+      "name": "bergwerkweb",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29873275?v=4",
+      "profile": "https://github.com/bergwerkweb",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

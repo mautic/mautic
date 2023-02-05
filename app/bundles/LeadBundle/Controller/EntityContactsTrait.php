@@ -127,7 +127,7 @@ trait EntityContactsTrait
                 [
                     'returnUrl'         => $returnUrl,
                     'viewParameters'    => ['page' => $lastPage, 'objectId' => $entityId],
-                    'contentTemplate'   => 'MauticLeadBundle:Lead:grid.html.php',
+                    'contentTemplate'   => 'MauticLeadBundle:Lead:grid.html.twig',
                     'forwardController' => false,
                     'passthroughVars'   => [
                         'mauticContent' => $sessionVar.'Contacts',
@@ -163,7 +163,7 @@ trait EntityContactsTrait
                     'noContactList'   => $dnc,
                     'target'          => $paginationTarget,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:grid.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => $sessionVar.'Contacts',
                     'route'         => false,

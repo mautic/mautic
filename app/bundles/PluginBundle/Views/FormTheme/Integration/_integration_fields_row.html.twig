@@ -1,0 +1,7 @@
+{% block _integration_fields_row %}
+  {{ include('MauticPluginBundle:FormTheme:Integration/_fields_row.html.twig', {
+        'containerId': 'leadFieldsContainer',
+        'numberOfFields': (form.offsetExists('update_mautic1')) ? 5 : 4,
+        'object': 'lead',
+  }) }}
+{% endblock %}
