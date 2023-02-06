@@ -379,7 +379,7 @@ class LeadControllerTest extends MauticMysqlTestCase
 
         // Test that a locale option is present correctly.
         $this->assertStringContainsString(
-            '<option value="cs_CZ" >Czech (Czechia)</option>',
+            '<option value="cs_CZ">Czech (Czechia)</option>',
             $this->client->getResponse()->getContent()
         );
     }

@@ -1,0 +1,18 @@
+{#
+  Variables
+    - lead
+    - campaigns
+#}
+{% set leadId = lead.id %}
+{% set leadName = lead.primaryIdentifier %}
+<ul class="list-group">
+    {% for c in campaigns %}
+        {% set switch = c.inCampaign ? 'fa-toggle-on' : 'fa-toggle-off' %}
+        {% set bgClass = c.inCampaign ? 'text-success' : 'text-danger' %}
+    <li class="list-group-item">
+        <i class="fa fa-lg fa-fw {{ switch }} {{ bgClass }}" id="leadCampaignToggle{{ c.id }}" onclick="Mautic.toggleLeadCampaign('leadCampaignToggle{{ c.id }}', {{ leadId }}, {{ c.id }});"></i>
+        <a data-dismiss="modal" class="pull-right" href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': c.id}) }}" data-toggle="ajax"><span class="label label-primary">{{ 'mautic.core.id'|trans }}: {{ c.id }}</span></a>
+        <span> {{ c.name }}</span>
+    </li>
+    {% endfor %}
+</ul>
