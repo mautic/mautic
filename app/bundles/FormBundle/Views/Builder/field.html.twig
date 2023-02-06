@@ -1,9 +1,18 @@
 {#
+  Variables
+    - field
+    - inForm (bool)
+    - id
+    - formId
+    - contactFields
+    - companyFields
+    - inBuilder (bool)
 #}
 {% set template = '<div class="col-md-6">{content}</div>' %}
 {% set toggleTemplate = '<div class="col-md-3">{content}</div>' %}
 {% set properties = form.properties|default([]) %}
 {% set validation = form.validation|default([]) %}
+
 {% set showAttributes = (form.labelAttributes is defined or form.inputAttributes is defined or form.containerAttributes is defined or properties.labelAttributes is defined or form.alias is defined) %}
 {% set showBehavior = (form.showWhenValueExists is defined or properties.showWhenValueExists is defined) %}
 {% set showConditions = form.parent is defined ? form.parent.vars.value : null %}
