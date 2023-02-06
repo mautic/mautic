@@ -142,15 +142,12 @@
 
 {% set integrations = [] %}
 {% if settings.integrations is defined and settings.integrations is not empty %}
-  {{dump(settings.integrations)}}
-  {% set integrations = settings.integrations|split(',') %}
+  {% set integrations = settings.integrations[0:-1]|split(',') %}
 {% endif %}
 
-{% set formName = formName|replace({'_': ''}) %}
+{% set formName = formName|replace({'_': ''})|default('mauticform') %}
 
-{% if formName is defined and formName is not empty %}
 <script src="{{ url('mautic_social_js_generate', {'formName': formName}) }}" type="text/javascript" charset="utf-8" async="async"></script>
-{% endif %}
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
   {% if inForm %}
       {{ include('MauticFormBundle:Builder:_actions.html.twig', {
@@ -165,9 +162,8 @@
   {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
 
   {% for integration in integrations %}
-      if (isset($settings['buttonImageUrl'])) {
-          echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$settings['buttonImageUrl'].'btn_'
-              .$integration.'.png"></a>';
-      }
+      {% if settings.buttonImageUrl is defined and settings.buttonImageUrl is not empty and integration is not empty %}
+          <a href="#" onclick="openOAuthWindow('{{ settings['authUrl_' ~ integration ~ ''] }}')"><img src="{{ settings['buttonImageUrl'] }}btn_{{ integration }}.png"></a>
+      {% endif %}
   {% endfor %}
 </div>
