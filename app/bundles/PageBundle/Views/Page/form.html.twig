@@ -40,6 +40,8 @@
 {% endblock %}
 
 {% block content %}
+  <div id="grapesjsbuilder_assets" class="hide" data-assets="{{ url('grapesjsbuilder_assets') }}" data-upload="{{ url('grapesjsbuilder_upload') }}" data-delete="{{ url('grapesjsbuilder_delete') }}"></div>
+
   {% set template, attr = form.template.vars.data, form.vars.attr %}
   {% set attr = attr|merge({
           'data-submit-callback-async': 'clearThemeHtmlBeforeSave',
