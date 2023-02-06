@@ -10,8 +10,8 @@
     - inForm (optional, bool)
     - required (optional, bool)
 #}
-{% set containerType = type|default('text') %}
-{% set defaultInputClass = inputClass|default('input') %}
+{% set defaultInputClass = 'button' %}
+{% set containerType = 'div-wrapper' %}
 
 {# start: field_helper #}
 {% set defaultInputFormClass = defaultInputFormClass|default('') %}
@@ -135,86 +135,40 @@
           ]),
   }) %}
 {% endif %}
-
-{% if list is defined or field.properties.syncList is defined or field.properties.list is defined or field.properties.optionList is defined %}
-  {% set parseList = [] %}
-  {% set isBooleanList = false %}
-  {% set contactFields = contactFields|default([]) %}
-  {% set companyFields = companyFields|default([]) %}
-  {% set formFields = contactFields|merge(companyFields) %}
-
-  {% if
-        field.properties.syncList is defined and field.properties.syncList is not empty and
-        field.leadField is defined and field.leadField is not empty and
-        formFields[field.leadField] is defined
-  %}
-    {% set leadFieldType = formFields[field.leadField].type %}
-    {% if formFields[field.leadField].properties.list is not empty %}
-      {% set parseList = formFields[field.leadField].properties.list %}
-    {% elseif 'boolean' == leadFieldType %}
-      {% set parseList = {
-              '0': formFields[field.leadField].properties.no,
-              '1': formFields[field.leadField].properties.yes,
-      }%}
-    {% elseif 'country' == leadFieldType %}
-      {% set list = leadFieldCountryChoices() %}
-    {% elseif 'region' == leadFieldType %}
-      {% set list = leadFieldRegionChoices() %}
-    {% elseif 'timezone' == leadFieldType %}
-      {% set list = leadFieldTimezonesChoices() %}
-    {% elseif 'locale' == leadFieldType %}
-      {% set list = leadFieldLocaleChoices() %}
-    {% endif %}
-  {% endif %}
-
-  {% if parseList is empty %}
-    {% if list is defined %}
-      {% set parseList = list %}
-    {% elseif field.properties.optionlist is not empty %}
-      {% set parseList = field.properties.optionlist %}
-    {% elseif field.properties.list is not empty %}
-      {% set parseList = field.properties.list %}
-    {% endif %}
-
-    {% if parseList.list is defined %}
-      {% set parseList = parseList.list %}
-    {% endif %}
-  {% endif %}
-
-  {% if field.leadField and formFields[field.leadField].type is not empty and formFields[field.leadField].type in ['datetime', 'date'] %}
-    {% set tempLeadFieldType = formFields[field.leadField].type %}
-    {% for key, aTemp in parseList %}
-      {% set date = 'datetime' == tempLeadFieldType ? dateToFull(aTemp.label) : dateToDate(aTemp.label) %}
-      {% if date %}
-          {% set parseList = parseList|merge({
-                  (key): parseList[key]|merge({
-                          'label': date,
-                  }),
-          }) %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
-
-  {% if isBooleanList %}
-    {% set list = formFieldParseBooleanList(parseList) %}
-  {% else %}
-    {% set list = formFieldParseList(parseList) %}
-  {% endif %}
-
-  {% set firstListValue = list|first %}
-{% endif %}
 {# end: field_helper #}
 
+{% set action = app.request.get('objectAction') %}
+{% set settings = field.properties %}
+
+{% set integrations = [] %}
+{% if settings.integrations is defined and settings.integrations is not empty %}
+  {{dump(settings.integrations)}}
+  {% set integrations = settings.integrations|split(',') %}
+{% endif %}
+
+{% set formName = formName|replace({'_': ''}) %}
+
+{{dump(formName)}}
+{#
+<script src="{{ url('mautic_social_js_generate', {'formName': formName}) }}" type="text/javascript" charset="utf-8" async="async"></script>
+#}
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
-  {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
-
-  {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
-
-  {% if 'textarea' == field.type %}
-    <textarea {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.defaultValue }}</textarea>
-  {% else %}
-    <input type="{{ containerType }}" {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+  {% if inForm %}
+      {{ include('MauticFormBundle:Builder:_actions.html.twig', {
+          'deleted': false,
+          'id': id,
+          'formId': formId,
+          'formName': formName,
+          'disallowDelete': false,
+      }, with_context=false) }}
   {% endif %}
 
-  <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
+  {% if field.showLabel %}<label {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</label>{% endif %}
+
+  {% for integration in integrations %}
+      if (isset($settings['buttonImageUrl'])) {
+          echo '<a href="#" onclick="openOAuthWindow(\''.$settings['authUrl_'.$integration].'\')"><img src="'.$settings['buttonImageUrl'].'btn_'
+              .$integration.'.png"></a>';
+      }
+  {% endfor %}
 </div>

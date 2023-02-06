@@ -107,7 +107,7 @@
                                               {% set template = 'MauticFormBundle:Field:' ~ field.type ~ '.html.twig' %}
                                           {% endif %}
                                           {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
-                                                  'template': template,
+                                                  'template': template|replace({'.html.php': '.html.twig'}),
                                                   'field': field,
                                                   'viewOnlyFields': viewOnlyFields,
                                                   'inForm': true,

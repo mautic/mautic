@@ -66,7 +66,7 @@
                   {%- endif %}
 
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template, {
+                  {{- include(theme ~ template|replace({'.html.php': '.html.twig'}), {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -90,7 +90,8 @@
                       {%- set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
-                  {{- include(theme ~ template, {
+                  <!-- start: "{{ theme }}{{ template }}" -->
+                  {{- include(theme ~ template|replace({'.html.php': '.html.twig'}), {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -100,6 +101,7 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
+                  <!-- end: "{{ theme }}{{ template }}" -->
                 {%- endif -%}
               {%- endfor -%}
 
