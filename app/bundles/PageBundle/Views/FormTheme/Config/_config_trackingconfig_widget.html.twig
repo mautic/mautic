@@ -16,7 +16,7 @@
 &lt;/script&gt;</pre>
         </div>
         <div class="row">
-            {% form name, f in form.children %}
+            {% for name, f in form.children %}
                 {% if name in ['anonymize_ip', 'track_contact_by_ip', 'track_by_tracking_url', 'do_not_track_404_anonymous'] %}
                     <div class="col-md-6">{{ form_row(f) }}</div>
                 {% endif %}
