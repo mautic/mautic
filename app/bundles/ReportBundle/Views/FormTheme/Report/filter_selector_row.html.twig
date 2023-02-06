@@ -1,10 +1,10 @@
-{% set labelClass = form.vars.label_attr.class is not empty ?: 'control-label' %}
-{% set inGroup = from.vars.data.glue is not defined or (form.vars.data.glue is defined and 'and' == form.vars.data.glue) %}
 {% block filter_selector_row %}
+    {% set labelClass = form.vars.label_attr.class is defined ? form.vars.label_attr.class : 'control-label' %}
+    {% set inGroup = from.vars.data.glue is not defined or (form.vars.data.glue is defined and 'and' == form.vars.data.glue) %}
     <div class="panel{{ inGroup ? ' in-group' : '' }}" id="{{ form.vars.id }}_container">
         <div class="panel-heading">
             <div class="panel-glue col-sm-2 pl-0">
-                {{ form_row(form.vars.form.childred.glue) }}
+                {{ form_row(form.vars.form.children.glue) }}
             </div>
         </div>
         <div class="panel-body">

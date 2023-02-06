@@ -102,11 +102,11 @@
                 </div>
             </div>
         </div>
-        <div class="collapse {{ showDynamicfilters ? 'in' : '' }}" id="report-filters">
+        <div class="collapse {{ showDynamicFilters ? 'in' : '' }}" id="report-filters">
             <div class="pr-md pl-md pb-md">
                 <div class="panel shd-none mb-0 pa-lg">
                     <div class="row">
-                        <div class="col-sm-12 mb-10{{ hideDataRangeFilter ? ' hide' : '' }}">
+                        <div class="col-sm-12 mb-10{{ hideDateRangeFilter ? ' hide' : '' }}">
                             {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm':dateRangeForm}) }}
                         </div>
                         {{ form_start(dynamicFilterForm) }}
@@ -141,7 +141,7 @@
     </div>
 
     <div class="report-content">
-        {{ block('content') }}
+        {{ block('dataContent') }}
     </div>
     {% if debug is defined and debug.count_query is defined %}
         <div class="well">

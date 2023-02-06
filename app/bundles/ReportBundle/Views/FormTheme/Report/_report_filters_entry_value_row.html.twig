@@ -1,5 +1,5 @@
-{% set condition = form.parent.children.condition.vars.value %}
 {% block _report_filters_entry_value_row %}
+    {% set condition = form.parent.children.condition.vars.value %}
     <div class="form-group mb-0">
         <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
         <input type="text" id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}"

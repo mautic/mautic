@@ -433,7 +433,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
                         }
 
                         $columnValue = ":$paramName";
-                        $type        = $filterDefinitions[$filter['column']]['type'];
+                        $type        = null;
+                        if (isset($filterDefinitions[$filter['column']])) {
+                            $type        = $filterDefinitions[$filter['column']]['type'];
+                        }
                         if (isset($filterDefinitions[$filter['column']]['formula'])) {
                             $filter['column'] = $filterDefinitions[$filter['column']]['formula'];
                         }

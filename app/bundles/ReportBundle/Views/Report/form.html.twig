@@ -1,7 +1,7 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 {% block mauticContent %}report{% endblock %}
 {% block headerTitle %}
-    {% if report.getId() is defined %}
+    {% if report.id is defined %}
         {{ 'mautic.report.report.header.edit'|trans({'%name%': report.name|trans}) }}
     {% else %}
         {{ 'mautic.report.report.header.new'|trans }}
@@ -9,7 +9,22 @@
 {% endblock %}
 {% set showGraphTab = form.graphs.vars.choices|length > 0 %}
 {% set scheduleTabErrorClass = form_errors(form.toAddress) is not empty ? 'class="text-danger"' : '' %}
-
+{% form_theme form with [
+    'MauticReportBundle:FormTheme:Report/_report_aggregators_entry_column_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_aggregators_entry_function_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_aggregators_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_filters_entry_column_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_filters_entry_condition_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_filters_entry_value_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_filters_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_tableOrder_entry_column_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_tableOrder_entry_direction_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/_report_tableOrder_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/aggregator_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/filter_selector_row.html.twig',
+    'MauticReportBundle:FormTheme:Report/table_order_row.html.twig',
+]
+%}
 {% block content %}
     {{ form_start(form) }}
     {{ form_errors(form) }}

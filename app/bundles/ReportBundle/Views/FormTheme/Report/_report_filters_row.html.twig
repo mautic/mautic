@@ -1,6 +1,6 @@
-{% set hasErrors = form.vars.errors|length %}
-{% set feedbackClass = hasErrors > 0 ? ' has-error' : '' %}
 {% block _report_filters_row %}
+    {% set hasErrors = form.vars.errors|length %}
+    {% set feedbackClass = hasErrors > 0 ? ' has-error' : '' %}
     <div id="filterSelectorContainer" class="row">
         <div class="form-group col-md-12{{ feedbackClass }}">
             {{ form_widget(form) }}

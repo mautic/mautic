@@ -4,39 +4,41 @@
             <h3 class="panel-title">
                 {{ graph.name|trans }}
                 <div class="pull-right">
-                    <span class="fa fa-{{ graph.iconClass is defined ?: '' }}"></span>
+                    <span class="fa {{ graph.iconClass is defined ? graph.iconClass : '' }}"></span>
                 </div>
             </h3>
         </div>
         {% if graph.data|length > 0 %}
             <div class="table-responsive panel-collapse pull out">
-                <?php // We need to dynamically create the table headers based on the result set?>
                 <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
                     <thead>
-                    <tr>
-                        {% for key, value in graph.data.0 %}
-                            {% if 'id' != key %}
-                                <th class="col-report-count">{{ key|capitalize }}</th>
-                            {% endif %}
-                        {% endfor %}
-                    </tr>
+                        <tr>
+                            {% for key, value in attribute(graph.data, 0) %}
+                                {% if 'id' != key %}
+                                    <th class="col-report-count">{{ key|capitalize }}</th>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
                     </thead>
                     <tbody>
                     {% for rowKey, row in graph.data %}
                         <tr>
                             {% for cellName, cell in row %}
-                                {% if graph.data.0.id is defined and 'title' == cellName and graph.link is defined %}
+                                {% if attribute(graph.data.0, 'id') is defined and 'title' == cellName and graph.link is defined %}
                                     <td>
-                                        <a href="{{ path(graph.link, {'objectAction' : 'view', 'objectId', row.id}) }}" data-toggle="ajax">
+                                        <a href="{{ path(graph.link, {'objectAction' : 'view', 'objectId' :  row.id}) }}"
+                                           data-toggle="ajax">
                                             {{ cell }}
                                         </a>
                                     </td>
                                 {% elseif 'id' != cellName %}
-                                    {% if cell is integer %}
-                                        {{ cell }}
-                                    {% else %}
-                                        {{ makeLink(cell) }}
-                                    {% endif %}
+                                    <td>
+                                        {% if cell matches '/^\\d+$/' %}
+                                            {{ cell }}
+                                        {% else %}
+                                            {{ cell }}
+                                        {% endif %}
+                                    </td>
                                 {% endif %}
                             {% endfor %}
                         </tr>

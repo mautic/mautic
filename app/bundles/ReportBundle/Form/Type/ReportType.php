@@ -141,12 +141,12 @@ class ReportType extends AbstractType
                 $columns           = $this->reportModel->getColumnList($source);
                 $groupByColumns    = $this->reportModel->getColumnList($source, true);
                 $filters           = $this->reportModel->getFilterList($source);
-                $filterDefinitions = htmlspecialchars(json_encode($filters->definitions), ENT_QUOTES, 'UTF-8');
-                $operatorHtml      = htmlspecialchars(json_encode($filters->operatorHtml), ENT_QUOTES, 'UTF-8');
+                $filterDefinitions = json_encode($filters->definitions);
+                $operatorHtml      = json_encode($filters->operatorHtml);
 
                 if (is_array($currentColumns)) {
                     $orderColumns = array_values($currentColumns);
-                    $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+                    $order        = json_encode($orderColumns);
                 } else {
                     $order = '[]';
                 }
@@ -271,7 +271,7 @@ class ReportType extends AbstractType
                 $graphList = $this->reportModel->getGraphList($source);
                 if (is_array($currentGraphs)) {
                     $orderColumns = array_values($currentGraphs);
-                    $order        = htmlspecialchars(json_encode($orderColumns), ENT_QUOTES, 'UTF-8');
+                    $order        = json_encode($orderColumns);
                 } else {
                     $order = '[]';
                 }

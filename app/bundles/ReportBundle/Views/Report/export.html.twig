@@ -1,0 +1,64 @@
+{% extends 'MauticCoreBundle:Default:slim.html.twig' %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+{% block headerTitle %}{{ report.name }}{% endblock %}
+{% block mauticContent %}report{% endblock %}
+
+{% set showGraphsAboveTable = report.settings.shoGraphsAboveTable is defined %}
+{% set dataCount = data|length %}
+{% set columnOrder = report.getColumns() %}
+{% set graphOrder = report.getGraphs() %}
+{% set graphContent = include('MauticReportBundle:Report:details_data_graphs.html.twig', {
+    'graphOrder' : graphOrder,
+    'graphs' : graphs,
+    'report' : report
+}) %}
+
+{% block content %}
+    <style>
+        #app-content.content-only.container {
+            overflow-x: scroll;
+        }
+    </style>
+    <div class="pa-md">
+        <h3>{{ report.name }}</h3>
+        <div class="small">
+            {{ dateFrom|date('UTC') ~ ' - ' ~  dateTo|date('UTC') }}
+        </div>
+    </div>
+    {% if showGraphsAboveTable is defined %}
+        {{ graphContent|raw }}
+    {% endif %}
+    {% if columnOrder is defined %}
+        <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+            <thead>
+            <tr>
+                <th class="col-report-count"></th>
+                {% for header in reportDataResult.headers %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% if dataCount|length > 0 %}
+                {% for count, data in reportDataResult.data %}
+                    <tr>
+                        <td>{{ count + 1 }}</td>
+                        {% for k, v in data %}
+                            <td>{{ v|format(reportDataResult.getType(k)) }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td></td>
+                    {% for key in columnOrder %}
+                    {% endfor %}
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    {% endif %}
+    {% if showGraphsAboveTable is not defined %}
+        {{ graphContent|raw }}
+    {% endif %}
+{% endblock %}
