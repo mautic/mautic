@@ -35,7 +35,7 @@
 {% if form.properties is defined and form.properties|length > 0 %}
     {# Only show if there is at least one non-hidden field #}
     {% for property in form.properties %}
-        {% if 'hidden' != property.vars.block_prefixes[1] %}
+        {% if 'hidden' != property.vars.block_prefixes[1] and false is same as property.isRendered %}
             {% set showProperties = true %}
         {% endif %}
     {% endfor %}
