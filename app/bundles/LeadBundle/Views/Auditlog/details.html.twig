@@ -1,77 +1,88 @@
 {#
   Variables
-    - lead
     - event
+    - lead
 #}
-{#
-$details = $event['details'];
-$type    = $event['eventType'];
-$text    = '';
-$objects = isset($details['fields']) ? $details['fields'] : [];
-unset($objects['dateModified']);
-foreach ($details as $key => $value) {
-    if (!array_key_exists($key, $objects) && 'fields' !== $key && 'dateIdentified' !== $key && 'dateModified' !== $key) {
-        $objects[$key] = $value;
-    }
-}
-#}
-{% if 'create' == event.eventType %}
-  <table class="table">
-    <tr>
-      <th>Field/Object</th><th>New Value</th><th>Old Value</th>
-    </tr>
-    {% for field, values in event.details.fields|default([]) %}
+{% set objects = {} %}
+{% for key, value in event.details %}
+    {% if 'fields' != key and 'dateIdentified' != key and 'dateModified' != key %}
+        {% set objects = objects|merge({(key): value}) %}
+    {% endif %}
+{% endfor %}
+{% if objects|length > 0 %}
+    {% if 'create' == event.eventType %}
+        <table class="table">
         <tr>
-          {% if values is iterable %}
-              {% if values|length >= 2 %}
-                  <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values[1])|purify }}</td><td>{{ normalizeStringValue(values[0])|purify }}</td>
-              {% else %}
-                  {% set v = '' %}
-                  {% for k, value in values %}
-                      {% set v = k~': '~value|join(', ')|purify %}
-                  {% endfor %}
-                  <td>{{ field|purify }}</td><td>{{ v|purify }}</td><td>&nbsp;</td>
-              {% endif %}
-          {% else %}
-              <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values)|purify }}</td><td>&nbsp;</td>
-          {% endif %}
+          <th>Field/Object</th>
+          <th>New Value</th>
+          <th>Old Value</th>
         </tr>
-    {% endfor %}
-  </table>
+        {% for field, values in objects %}
+            <tr>
+              {% if values is iterable %}
+                {% if values|length >= 2 %}
+                    <td>{{ field|e }}</td>
+                    <td>{% if values[1] is string %}{{ normalizeStringValue(values[1])|e }}{% endif %}</td>
+                    <td>{% if values[0] is string %}{{ normalizeStringValue(values[0])|e }}{% endif %}</td>
+                {% else %}
+                    {% set v = '' %}
+                    {% for k, value in values %}
+                        {% set v = k ~ ': ' ~ value|join(', ')|e %}
+                    {% endfor %}
+                    <td>{{ field|e }}</td>
+                    <td>{{ v|e }}</td>
+                    <td>&nbsp;</td>
+                {% endif %}
+              {% else %}
+                <td>{{ field|e }}</td>
+                <td>{% if values is string %}{{ normalizeStringValue(values)|e }}{% endif %}</td>
+                <td>&nbsp;</td>
+              {% endif %}
+            </tr>
+        {% endfor %}
+        </table>
+    {% elseif 'delete' == event.eventType %}
+        {{ 'mautic.lead.audit.deleted'|trans }}
+    {% elseif 'update' == event.eventType %}
+      <table class="table">
+        <tr>
+          <th>Field/Object</th>
+          <th>New Value</th>
+          <th>Old Value</th>
+        </tr>
+        {% for field, values in objects %}
+            <tr>
+            {% if values is iterable %}
+                {% if values|length >= 2 %}
+                    <td>{{ field|e }}</td>
+                    <td>{% if values[1] is string %}{{ normalizeStringValue(values[1])|e }}{% endif %}</td>
+                    <td>{% if values[0] is string %}{{ normalizeStringValue(values[0])|e }}{% endif %}</td>
+                {% else %}
+                    {% set v = '' %}
+                    {% for k, value in values %}
+                        {% set v = k ~ ': ' ~ value|join(', ')|e %}
+                    {% endfor %}
+                    <td>{{ field|e }}</td>
+                    <td>{{ v }}</td>
+                    <td>&nbsp;</td>
+                {% endif %}
+            {% else %}
+                <td>{{ field|e }}</td>
+                <td>{% if values is string %}{{ normalizeStringValue(values)|e }}{% endif %}</td>
+                <td>&nbsp;</td>
+            {% endif %}
+            </tr>
+        {% endfor %}
+      </table>
+    {% elseif 'identified' == event.eventType %}
+        {{ 'mautic.lead.audit.identified'|trans }}
+    {% elseif 'ipadded' == event.eventType %}
+        {{ 'mautic.lead.audit.accessed'|trans }} {{ event.details|first|join(',') }}
+    {% elseif 'merged' == event.eventType %}
+        {{ 'mautic.lead.audit.merged'|trans }}
+    {% endif %}
 {% endif %}
-{% if 'delete' == event.eventType %}
-  {{ 'mautic.lead.audit.deleted'|trans }}
-{% endif %}
-{% if 'update' == event.eventType %}
-  <table class="table">
-    <tr>
-      <th>Field/Object</th><th>New Value</th><th>Old Value</th>
-    </tr>
-    {% for field, values in event.details.fields|default([]) %}
-      <tr>
-        {% if values is iterable %}
-          {% if values|length >= 2 %}
-              <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values[1])|purify }}</td><td>{{ normalizeStringValue(values[0])|purify }}</td>
-          {% else %}
-              {% set v = '' %}
-              {% for k, value in values %}
-                  {% set v = k~': '~value|join(', ')|purify %}
-              {% endfor %}
-              <td>{{ field|purify }}</td><td>{{ v }}</td><td>&nbsp;</td>
-          {% endif %}
-        {% else %}
-          <td>{{ field|purify }}</td><td>{{ normalizeStringValue(values)|purify }}</td><td>&nbsp;</td>
-        {% endif %}
-      </tr>
-    {% endfor %}
-  </table>
-{% endif %}
-{% if 'identified' == event.eventType %}
-  {{ 'mautic.lead.audit.identified'|trans }}
-{% endif %}
-{% if 'ipadded' == event.eventType %}
-  {{ 'mautic.lead.audit.accessed'|trans }} {{ event.details[1]|join(', ') }}{#implode(',', array_splice($details, 1))#}
-{% endif %}
-{% if 'merged' == event.eventType %}
-  {{ 'mautic.lead.audit.merged'|trans }}
-{% endif %}
+<!--
+Event Type: "{{ event.eventType }}"
+{{ event.details|json_encode(constant('JSON_PRETTY_PRINT'))|raw }}
+-->

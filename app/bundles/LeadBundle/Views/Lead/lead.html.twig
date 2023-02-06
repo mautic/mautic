@@ -1,6 +1,7 @@
 {#
   Variables
     - lead
+    - events
 #}
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
@@ -14,7 +15,7 @@
   {% endif %}
 {% endset %}
 
-{% set flag = fields.core.country is not empty ? assetGetCountryFlag(fields.core.country.value) : '' %}
+{% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
 {% set groups = fields|keys %}
 
 {% block headerTitle %}
@@ -48,7 +49,7 @@
           'attr': {
               'data-toggle': 'ajaxmodal',
               'data-target': '#MauticSharedModal',
-              'data-header': 'mautic.lead.lead.header.contact.frequency'|trans({'%name%': lead.primaryIdentifier|purify}),
+              'data-header': 'mautic.lead.lead.header.contact.frequency'|trans({'%name%': lead.primaryIdentifier|e}),
               'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'contactFrequency'}),
           },
           'btnText': 'mautic.lead.contact.frequency'|trans,
@@ -57,12 +58,12 @@
     {% endif %}
 
     {# View Campaigns List button #}
-    {% if is_granted('campaign:campaigns:edit') %}
+    {% if securityIsGranted('campaign:campaigns:edit') %}
       {% set buttons = buttons|merge([{
             'attr': {
                 'data-toggle': 'ajaxmodal',
                 'data-target': '#MauticSharedModal',
-                'data-header': 'mautic.lead.lead.header.campaigns'|trans({'%name%': lead.primaryIdentifier|purify}),
+                'data-header': 'mautic.lead.lead.header.campaigns'|trans({'%name%': lead.primaryIdentifier|e}),
                 'data-footer': 'false',
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'campaign'}),
             },
@@ -77,7 +78,7 @@
             'attr': {
                 'data-toggle': 'ajaxmodal',
                 'data-target': '#MauticSharedModal',
-                'data-header': 'mautic.lead.lead.header.merge'|trans({'%name%': lead.primaryIdentifier|purify}),
+                'data-header': 'mautic.lead.lead.header.merge'|trans({'%name%': lead.primaryIdentifier|e}),
                 'href': path('mautic_contact_action', {'objectId': lead.id, 'objectAction': 'merge'}),
             },
             'btnText': 'mautic.lead.merge'|trans,
@@ -160,7 +161,7 @@
                                           {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': lead}) }}
                                         {% endif %}
                                         {% for field in fields[group] %}
-                                            {% if field.value %}
+                                            {% if field.value is not empty %}
                                                 <tr>
                                                     <td width="20%"><span class="fw-b textTitle">{{ field.label|purify }}</span></td>
                                                     <td>
@@ -194,7 +195,7 @@
                     {% endfor %}
                     {% if devices %}
                         <div class="tab-pane fade bdr-w-0" id="devices">
-                            {{ include('MauticLeadBundle:Lead:devices.html.twig', {'devices': devices}) }}
+                            {{ include('MauticLeadBundle:Lead:_devices.html.twig', {'devices': devices}) }}
                         </div>
                     {% endif %}
                     <div class="tab-pane fade bdr-w-0" id="lead-stats" data-target-url="{{ url('mautic_contact_stats', {'objectId': lead.id}) }}">
@@ -346,7 +347,7 @@
             <!-- #place-container -->
             {% if places %}
                 <div class="tab-pane fade bdr-w-0" id="place-container">
-                    {{ include('MauticLeadBundle:Lead:map.html.twig', {'places': places}) }}
+                    {{ include('MauticLeadBundle:Lead:_map.html.twig', {'places': places}) }}
                 </div>
             {% endif %}
             <!--/ #place-container -->
@@ -370,7 +371,7 @@
                         </a>
                     </div>
                     <div class="collapse {% if 'expanded' == avatarPanelState %}in{% endif %}" id="lead-avatar-block">
-                        <img class="img-responsive" src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|purify }}"/>
+                        <img class="img-responsive" src="{{ leadGetAvatar(lead) }}" alt="{{ leadName|e }}"/>
                     </div>
                 </div>
             {% endif %}
@@ -384,10 +385,10 @@
                 {% endif %}
             </div>
             {% if doNotContact %}
-                {{ include('MauticLeadBundle:Lead:dnc_large.html.twig', {'doNotContact': doNotContact}) }}
+                {{ include('MauticLeadBundle:Lead:_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
             {% endif %}
             {% if doNotContactSms %}
-                {{ include('MauticLeadBundle:Lead:dnc_large.html.twig', {'doNotContact': doNotContactSms}) }}
+                {{ include('MauticLeadBundle:Lead:_dnc_large.html.twig', {'doNotContact': doNotContactSms}) }}
             {% endif %}
             <div class="panel-heading">
                 <div class="panel-title">

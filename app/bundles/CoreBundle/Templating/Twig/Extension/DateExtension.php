@@ -81,10 +81,12 @@ class DateExtension extends AbstractExtension
     }
 
     /**
-     * @see DateHelper::formatRange
+     * Format DateInterval into humanly readable format.
+     * Example: 55 minutes 49 seconds.
+     * It doesn't return zero values like 0 years.
      */
-    public function formatRange($range, $format = null)
+    public function formatRange(\DateInterval $range): string
     {
-        return $this->dateHelper->formatRange($range, $format);
+        return $this->dateHelper->formatRange($range);
     }
 }

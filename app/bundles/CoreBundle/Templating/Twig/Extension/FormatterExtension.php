@@ -41,7 +41,7 @@ class FormatterExtension extends AbstractExtension
     /**
      * @see FormatterHelper::normalizeStringValue
      */
-    public function normalizeStringValue($string)
+    public function normalizeStringValue(string $string): string
     {
         return $this->formatterHelper->normalizeStringValue($string);
     }

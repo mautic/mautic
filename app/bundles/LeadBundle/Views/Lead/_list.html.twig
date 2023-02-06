@@ -76,7 +76,7 @@
                     }) }}
 
                     {% for column, label in columns %}
-                        {{ include(['MauticLeadBundle:Lead/header:'~column~'.html.twig', 'MauticLeadBundle:Lead/header:default.html.twig'], {
+                        {{ include([('MauticLeadBundle:Lead:_list_header_'~column~'.html.twig'), 'MauticLeadBundle:Lead:_list_header_default.html.twig'], {
                               'label': label,
                               'column': column,
                               'class': (column in columns|keys) ? 'hidden-xs' : '',
@@ -85,7 +85,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{ include('MauticLeadBundle:Lead:list_rows.html.twig', {
+                {{ include('MauticLeadBundle:Lead:_list_rows.html.twig', {
                     'items': items,
                     'columns': columns,
                     'security': security,
