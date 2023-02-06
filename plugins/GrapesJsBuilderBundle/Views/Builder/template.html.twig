@@ -1,5 +1,5 @@
     {% set templateObject = {
-        'templateHtml': templateHtml|json_encode(),
-        'templateMjml': templateMjml|json_encode(),
+        'templateHtml': templateHtml,
+        'templateMjml': templateMjml,
     } %}
-    {{ templateObject }}
+    {{ templateObject | json_encode() }}
