@@ -27,16 +27,16 @@
 {% block mauticContent %}page{% endblock %}
 
 {% block headerTitle %}
-  {% if isExisting %}
+  {%- if isExisting -%}
     {{ 'mautic.page.header.edit'|trans({'%name%': activePage.title}) }}
-  {% else %}
+  {%- else -%}
     {{ 'mautic.page.header.new'|trans }}
-  {% endif %}
+  {%- endif -%}
   {% if variantParent %}
       <div><span class="small">{{ 'mautic.core.variant_of'|trans({'%name%': activePage.title, '%parent%': variantParent.title}) }}</span></div>
   {% elseif activePage.isVariant(false) %}
       <div><span class="small">{{ 'mautic.page.form.has_variants'|trans }}</span></div>
-  {% endif %}
+  {%- endif -%}
 {% endblock %}
 
 {% block content %}
@@ -44,8 +44,6 @@
   {% set attr = attr|merge({
           'data-submit-callback-async': 'clearThemeHtmlBeforeSave',
   }) %}
-
-  {% set isCodeMode = 'mautic_code_mode' is same as activePage.template %}
 
   {{ form_start(form, {'attr': attr}) }}
   <!-- start: box layout -->
@@ -57,14 +55,10 @@
                   <!-- tabs controls -->
                   <ul class="bg-auto nav nav-tabs pr-md pl-md">
                       <li class="active">
-                          <a href="#theme-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.core.form.theme'|trans }}
-                          </a>
+                          <a href="#theme-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                       </li>
                       <li id="advanced-tab" class="hidden">
-                          <a href="#advanced-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.core.advanced'|trans }}
-                          </a>
+                          <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
                       </li>
                   </ul>
                   <!--/ tabs controls -->
@@ -80,7 +74,7 @@
                               'type': 'page',
                               'themes': themes,
                               'active': form.template.vars.value,
-                          }) }}
+                          }, with_context=false) }}
                       </div>
 
                       <div class="tab-pane fade bdr-w-0" id="advanced-container">
@@ -143,12 +137,12 @@
 
   {{ include('MauticCoreBundle:Helper:builder.html.twig', {
       'type': 'page',
-      'isCodeMode': isCodeMode,
+      'isCodeMode': ('mautic_code_mode' is same as activePage.template),
       'sectionForm': sectionForm,
       'builderAssets': builderAssets,
       'slots': slots,
       'sections': sections,
       'objectId': activePage.sessionId,
       'previewUrl': previewUrl,
-  }) }}
+  }, with_context=false) }}
 {% endblock %}

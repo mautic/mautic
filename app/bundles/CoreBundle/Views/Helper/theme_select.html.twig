@@ -18,7 +18,7 @@
                   <a href="#" type="button" data-theme="{{ codeMode }}" class="select-theme-link btn btn-default {% if isCodeMode %}hide{% endif %}" onclick="mQuery('#dynamic-content-tab').removeClass('hidden')">
                       Select
                   </a>
-                  <button type="button" class="select-theme-selected btn btn-default {% if isCodeMode %}hide{% endif %}" disabled="disabled">
+                  <button type="button" class="select-theme-selected btn btn-default {% if not isCodeMode %}hide{% endif %}" disabled="disabled">
                       Selected
                   </button>
               </div>
