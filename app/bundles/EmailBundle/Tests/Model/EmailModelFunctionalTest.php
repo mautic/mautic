@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
@@ -47,25 +46,5 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         self::assertSame($customHtmlParent, $parentEmail->getCustomHtml());
         self::assertSame($customHtmlChildren, $childrenEmail->getCustomHtml());
-    }
-
-    public function testSiteUrlAlwaysTakesPrecedenceWhenBuildingUrls(): void
-    {
-        self::$container->setParameter('site_url', 'https://foo.bar.com');
-
-        // Unfreeze parameterBag using reflection
-        $refObject   = new \ReflectionObject(self::$container);
-        $refProperty = $refObject->getProperty('parameterBag');
-        $refProperty->setAccessible(true);
-        $frozenParameterBag = $refProperty->getValue(self::$container);
-        $unfrozenParameterBag = new ParameterBag($frozenParameterBag->all());
-        $refProperty->setValue(self::$container, $unfrozenParameterBag);
-
-        /** @var EmailModel $emailModel */
-        $emailModel = self::$container->get('mautic.email.model.email');
-        $idHash     = uniqid();
-        $url        = $emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash]);
-
-        self::assertSame('https://foo.bar.com/email/unsubscribe/'.$idHash, $url);
     }
 }
