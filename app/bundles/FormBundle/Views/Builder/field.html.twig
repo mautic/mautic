@@ -139,7 +139,7 @@
                       <div class="col-md-6">
                           {% set fieldGroups = form.leadField.vars.choices %}
                           {% set data = form.leadField.vars.data %}
-                          <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display:none;">
+                          <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
                               <option value=""></option>
                               {% for object, group in fieldGroups %}
                                 {% set header = object %}
@@ -154,7 +154,7 @@
                                             {% endfor %}
                                             {% set label = field.label %}
                                             {% set value = field.value %}
-                                            <option value="{{ value|e }}" class="segment-filter {{ icon }}" {% if data == value %}selected{% endif %} {{ attrString }}>{{ label }}</option>
+                                            <option value="{{ value|e }}" class="segment-filter {{ icon }}" {% if data == value %}selected{% endif %} {{ attrString|raw }}>{{ label }}</option>
                                         {% endfor %}
                                     {% endfor %}
                                 </optgroup>
@@ -195,21 +195,21 @@
             {% if showProperties %}
               <div role="tabpanel" class="tab-pane" id="properties">
                   {{ form_errors(form.properties) }}
-                  {% if properties.syncList is defined %}
+                  {% if form.properties.syncList is defined %}
                       <div class="row">
                           <div class="col-md-12">
                               {{ form_row(form.properties.syncList) }}
                           </div>
                       </div>
                   {% endif %}
-                  {% if properties.list is defined %}
+                  {% if form.properties.list is defined %}
                     <div class="row">
                         <div class="col-md-12">
                             {{ form_row(form.properties.list) }}
                         </div>
                     </div>
                   {% endif %}
-                  {% if properties.optionlist is defined %}
+                  {% if form.properties.optionlist is defined %}
                       <div class="row">
                           <div class="col-md-12">
                               {{ form_row(form.properties.optionlist)|raw }}
