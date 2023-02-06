@@ -446,9 +446,6 @@ class FormController extends CommonFormController
         /** @var FormFieldHelper $fieldHelper */
         $fieldHelper = $this->get('mautic.helper.form.field_helper');
 
-        $leadFieldModel = $this->getModel('lead.field');
-        \assert($leadFieldModel instanceof FieldModel);
-
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -836,16 +833,6 @@ class FormController extends CommonFormController
             $deletedActions = [];
         }
 
-//        $leadFieldModel = $this->getModel('lead.field');
-//        \assert($leadFieldModel instanceof FieldModel);
-//
-//        $mappedFields  = [];
-//        $mappedObjects = $entity->getMappedFieldObjects();
-//
-//        foreach ($mappedObjects as $mappedObject) {
-//            $mappedFields[$mappedObject] = $this->fieldCollector->getFields($mappedObject);
-//        }
-
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -863,8 +850,6 @@ class FormController extends CommonFormController
                     'activeForm'         => $entity,
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,
-                    // 'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties('lead'),
-                    // 'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'          => true,
                 ],
                 'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
