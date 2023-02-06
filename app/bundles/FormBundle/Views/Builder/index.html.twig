@@ -168,7 +168,7 @@
                                         {% set action = action|merge({
                                               'settings': actionSettings[action.type],
                                         }) %}
-                                        {{ include(template, {
+                                        {{ include(template|replace({'.html.php': '.html.twig'}), {
                                                 'action': action,
                                                 'inForm': true,
                                                 'id': action.id,

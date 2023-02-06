@@ -148,10 +148,9 @@
 
 {% set formName = formName|replace({'_': ''}) %}
 
-{{dump(formName)}}
-{#
+{% if formName is defined and formName is not empty %}
 <script src="{{ url('mautic_social_js_generate', {'formName': formName}) }}" type="text/javascript" charset="utf-8" async="async"></script>
-#}
+{% endif %}
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
   {% if inForm %}
       {{ include('MauticFormBundle:Builder:_actions.html.twig', {
