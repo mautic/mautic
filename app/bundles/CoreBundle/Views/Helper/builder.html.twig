@@ -62,7 +62,7 @@
                     <h4 class="panel-title">{{ 'mautic.core.slot.types'|trans }}</h4>
                 </div>
                 <div class="panel-body">
-                    {#% if slots is defined and slots is iterable %}
+                    {% if slots is defined and slots is iterable %}
                         <div id="slot-type-container" class="col-md-12">
                             {% for slotKey, slot in slots %}
                                 <div class="slot-type-handle btn btn-default btn-lg btn-nospin" data-slot-type="{{ slotKey }}">
@@ -77,7 +77,7 @@
                             {% endfor %}
                             <div class="clearfix"></div>
                         </div>
-                    {% endif %#}
+                    {% endif %}
                     <p class="text-muted pt-md text-center"><i>{{ 'mautic.core.drag.info'|trans }}</i></p>
                 </div>
             </div>
@@ -87,7 +87,7 @@
                     <h4 class="panel-title">{{ 'mautic.core.section.types'|trans }}</h4>
                 </div>
                 <div class="panel-body">
-                    {#% if sections is defined and sections is iterable %}
+                    {% if sections is defined and sections is iterable %}
                         <div id="section-type-container" class="col-md-12">
                             {% for sectionKey, section in sections %}
                                 <div class="section-type-handle btn btn-default btn-lg btn-nospin" data-section-type="{{ sectionKey }}">
@@ -102,7 +102,7 @@
                             {% endfor %}
                             <div class="clearfix"></div>
                         </div>
-                    {% endif %#}
+                    {% endif %}
                     <p class="text-muted pt-md text-center"><i>{{ 'mautic.core.drag.info'|trans }}</i></p>
                 </div>
             </div>
