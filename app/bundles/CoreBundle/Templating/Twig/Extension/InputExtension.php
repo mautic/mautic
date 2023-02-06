@@ -17,6 +17,7 @@ class InputExtension extends AbstractExtension
     {
         return [
             new TwigFunction('inputUrl', [InputHelper::class, 'url']),
+            new TwigFunction('inputClean', [InputHelper::class, 'clean']),
         ];
     }
 }
