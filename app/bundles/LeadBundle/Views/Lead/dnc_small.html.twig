@@ -1,0 +1,9 @@
+{#
+  Variables
+    - dncList
+#}
+{% for channel, reason in dncList %}
+  <span class="label label-danger">
+    <i title="{{ 'mautic.lead.event.donotcontact_channel'|trans({'%channel%': channel}) }}" class="fa fa-ban ico-{{ channel }}"></i>
+  </span>
+{% endfor %}

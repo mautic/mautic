@@ -98,7 +98,7 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
-                $template = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
+                $template = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.twig';
                 $icon     = 'fa-link';
 
                 if (!empty($hit['source'])) {
@@ -200,7 +200,7 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
-                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
+                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.twig';
                 $eventLabel = $eventTypeName;
 
                 $event->addEvent(
