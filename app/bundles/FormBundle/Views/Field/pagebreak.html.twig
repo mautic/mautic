@@ -195,11 +195,6 @@
         'type': 'button',
         'data-mautic-form-pagebreak-button': 'next',
 }) %}
-{% if inForm is defined and inForm is not empty %}
-  {% set nextButtonAttr = nextButtonAttr|merge({
-          'class': nextButtonAttr.class|default([])|merge(['mt-lg']),
-  }) %}
-{% endif %}
 
 {% if inForm is not defined or (inForm is defined and inForm is empty) %}
 
