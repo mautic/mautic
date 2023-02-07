@@ -31,6 +31,7 @@ class AssetExtension extends AbstractExtension
         return [
             new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
             new TwigFunction('includeScript', [$this, 'includeScript'], ['is_safe' => ['all']]),
+            new TwigFunction('includeStylesheet', [$this, 'includeStylesheet'], ['is_safe' => ['all']]),
             new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
             new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
@@ -64,6 +65,11 @@ class AssetExtension extends AbstractExtension
     public function includeScript(string $assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
     {
         return $this->assetsHelper->includeScript($assetFilePath, $onLoadCallback, $alreadyLoadedCallback);
+    }
+
+    public function includeStylesheet(string $assetFilePath): string
+    {
+        return $this->assetsHelper->includeStylesheet($assetFilePath);
     }
 
     /**
