@@ -170,10 +170,11 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input      = new ArrayInput($params);
         $output     = new BufferedOutput();
         $statusCode = $application->run($input, $output);
+        $result     = $output->fetch();
 
-        Assert::assertSame($expectedStatusCode, $statusCode);
+        Assert::assertSame($expectedStatusCode, $statusCode, $result);
 
-        return $output->fetch();
+        return $result;
     }
 
     protected function loginUser(string $username): void

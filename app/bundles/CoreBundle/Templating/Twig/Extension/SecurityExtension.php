@@ -24,6 +24,7 @@ class SecurityExtension extends AbstractExtension
             new TwigFunction('securityGetAuthenticationContext', [$this, 'getContext']),
             new TwigFunction('securityGetCsrfToken', [$this, 'getCsrfToken']),
             new TwigFunction('securityHasEntityAccess', [$this, 'hasEntityAccess']),
+            new TwigFunction('securityIsGranted', [$this, 'isGranted']),
         ];
     }
 
@@ -47,5 +48,13 @@ class SecurityExtension extends AbstractExtension
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
     {
         return $this->securityHelper->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isGranted(string $permission)
+    {
+        return $this->securityHelper->isGranted($permission);
     }
 }

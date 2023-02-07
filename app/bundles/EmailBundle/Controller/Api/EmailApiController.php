@@ -26,6 +26,11 @@ class EmailApiController extends CommonApiController
      */
     protected $model = null;
 
+    /**
+     * @var array<string, mixed>
+     */
+    protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
+
     public function initialize(ControllerEvent $event)
     {
         $emailModel = $this->getModel('email');
@@ -157,6 +162,7 @@ class EmailApiController extends CommonApiController
                     'tokens'            => $cleanTokens,
                     'assetAttachments'  => $assetsIds,
                     'return_errors'     => true,
+                    'ignoreDNC'         => true,
                 ]
             );
 

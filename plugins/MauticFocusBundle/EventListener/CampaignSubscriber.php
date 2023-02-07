@@ -48,7 +48,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description'            => 'mautic.focus.campaign.event.show_focus_descr',
             'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'               => FocusShowType::class,
-            'formTheme'              => 'MauticFocusBundle:FormTheme\FocusShowList',
+            'formTheme'              => 'MauticFocusBundle:FormTheme:FocusShowList/_focusshow_list_row.html.twig',
             'formTypeOptions'        => ['update_select' => 'campaignevent_properties_focus'],
             'connectionRestrictions' => [
                 'anchor' => [
