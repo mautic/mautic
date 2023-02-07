@@ -13,6 +13,13 @@ use PHPUnit\Framework\Assert;
 
 final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
 {
+    public function testFailWhenSegmentDoesNotExist(): void
+    {
+        $output = $this->runCommand(UpdateLeadListsCommand::NAME, ['--list-id' => 999999], null, 1);
+
+        Assert::assertStringContainsString('Segment #999999 does not exist', $output);
+    }
+
     /**
      * @dataProvider provider
      */

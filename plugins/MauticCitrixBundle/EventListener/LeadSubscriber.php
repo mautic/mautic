@@ -106,7 +106,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                         'eventDesc' => $entity->getEventDesc(),
                                         'joinUrl'   => $entity->getJoinUrl(),
                                     ],
-                                    'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.php',
+                                    'contentTemplate' => 'MauticCitrixBundle:SubscribedEvents\Timeline:citrix_event.html.twig',
                                     'contactId'       => $citrixEvent['lead_id'],
                                 ]
                             );
