@@ -357,8 +357,8 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param int  $limit
-     * @param bool $maxLeads
+     * @param int      $limit
+     * @param bool|int $maxLeads
      *
      * @return int
      *
