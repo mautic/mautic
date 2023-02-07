@@ -1,6 +1,7 @@
 {% extends 'MauticCoreBundle:Default:slim.html.twig' %}
 {% block pageTitle %}{{ pageTitle }}{% endblock %}
-{% block headerTitle %}{{ report.name }}{% endblock %}
+{% set headerTitle = report.name %}
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
 {% block mauticContent %}report{% endblock %}
 
 {% set showGraphsAboveTable = report.settings.shoGraphsAboveTable is defined %}
@@ -12,6 +13,17 @@
     'graphs' : graphs,
     'report' : report
 }) %}
+{% set actions =  include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    'item'              : report,
+    'routeBase'         : 'report',
+    'langVar'           : 'report.report'
+}) %}
+{% set toolbar = '' %}
+{% set publishStatus = include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {
+    'entity' : report
+}) %}
+{% set content = block('content') %}
+{% set modal = '' %}
 
 {% block content %}
     <style>

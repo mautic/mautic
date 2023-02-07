@@ -1,7 +1,7 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 {% block mauticContent %}report{% endblock %}
 {% block headerTitle %}
-    {% if report.id is defined %}
+    {% if report.id is defined and report.id is not empty %}
         {{ 'mautic.report.report.header.edit'|trans({'%name%': report.name|trans}) }}
     {% else %}
         {{ 'mautic.report.report.header.new'|trans }}
