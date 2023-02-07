@@ -204,7 +204,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bergwerkweb"><img src="https://avatars.githubusercontent.com/u/29873275?v=4?s=100" width="100px;" alt="bergwerkweb"/><br /><sub><b>bergwerkweb</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=bergwerkweb" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://rembo.me"><img src="https://avatars.githubusercontent.com/u/758957?v=4?s=100" width="100px;" alt="Rembrand"/><br /><sub><b>Rembrand</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=LordRembo" title="Tests">⚠️</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://rembo.me"><img src="https://avatars.githubusercontent.com/u/758957?v=4?s=100" width="100px;" alt="Rembrand"/><br /><sub><b>Rembrand</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=LordRembo" title="Tests">⚠️</a> <a href="#userTesting-LordRembo" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>
