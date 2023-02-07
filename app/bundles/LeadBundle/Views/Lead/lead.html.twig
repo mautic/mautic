@@ -384,6 +384,28 @@
                     {{ lead.stage.name|purify }}<hr>
                 {% endif %}
             </div>
+
+            {% if lead.leagueScores is not empty %}
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        {{ 'mautic.lead.leagues.panel.title'|trans }}
+                    </div>
+                </div>
+
+                <div class="panel-body pt-sm league-points-panel">
+                    {% for leagueScore in lead.leagueScores %}
+                        <div class="row">
+                            <h6 class="fw-sb col-md-6">
+                                {{ leagueScore.league.name }}
+                            </h6>
+                            <p class="text-muted col-md-6">
+                                {{ 'mautic.lead.points.count'|trans({'%count%': leagueScore.score}) }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             {% if doNotContact %}
                 {{ include('MauticLeadBundle:Lead:_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
             {% endif %}
