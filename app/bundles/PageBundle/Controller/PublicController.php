@@ -341,7 +341,7 @@ class PublicController extends CommonFormController
 
             $content = $response->getContent();
         } else {
-            $content = str_replace('</head>', $analytics.$this->renderView('MauticPageBundle:Page:preview_header.html.php')."\n</head>", $content);
+            $content = str_replace('</head>', $analytics.$this->renderView('MauticPageBundle:Page:preview_header.html.twig')."\n</head>", $content);
         }
 
         $dispatcher = $this->get('event_dispatcher');
@@ -581,6 +581,7 @@ class PublicController extends CommonFormController
                 $options['slot']   = $slot;
                 $options['public'] = true;
 
+                // Dead code? Templates do not exist
                 $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
                 $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
