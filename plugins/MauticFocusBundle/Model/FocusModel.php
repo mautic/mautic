@@ -227,7 +227,7 @@ class FocusModel extends FormModel
             $focusContent .= $cached['form'];
         }
 
-        $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.php')->escape($focusContent, 'js');
+        $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.twig')->escape($focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
@@ -251,7 +251,7 @@ class FocusModel extends FormModel
         }
 
         $content = $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:content.html.php',
+            'MauticFocusBundle:Builder:content.html.twig',
             [
                 'focus'    => $focus,
                 'preview'  => $isPreview,
@@ -264,7 +264,7 @@ class FocusModel extends FormModel
         $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
         $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:form.html.php',
+            'MauticFocusBundle:Builder:form.html.twig',
             [
                 'form'           => $form,
                 'pages'          => $pages,
