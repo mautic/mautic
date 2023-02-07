@@ -6,6 +6,7 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -92,7 +93,9 @@ class PublicController extends CommonFormController
                 } elseif ('published' != $status) {
                     $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
                 } else {
-                    $result = $this->getModel('form.submission')->saveSubmission($post, $server, $form, $this->request, true);
+                    $formSubmissionModel = $this->getModel('form.submission');
+                    \assert($formSubmissionModel instanceof SubmissionModel);
+                    $result = $formSubmissionModel->saveSubmission($post, $server, $form, $this->request, true);
                     if (!empty($result['errors'])) {
                         if ($messengerMode || $isAjax) {
                             $error = $result['errors'];
@@ -115,7 +118,7 @@ class PublicController extends CommonFormController
                                 $submissionEvent->setPostSubmitCallback($key, $callbackRequested);
                                 $submissionEvent->setContext($key);
 
-                                $this->get('event_dispatcher')->dispatch($callbackRequested['eventName'], $submissionEvent);
+                                $this->get('event_dispatcher')->dispatch($submissionEvent, $callbackRequested['eventName']);
                             }
 
                             if ($submissionEvent->isPropagationStopped() && $submissionEvent->hasPostSubmitResponse()) {
@@ -279,10 +282,10 @@ class PublicController extends CommonFormController
      */
     public function previewAction($id = 0)
     {
-        /** @var FormModel $model */
+        $model = $this->getModel('form.form');
+        \assert($model instanceof FormModel);
         $objectId          = (empty($id)) ? (int) $this->request->get('id') : $id;
         $css               = InputHelper::string($this->request->get('css'));
-        $model             = $this->getModel('form.form');
         $form              = $model->getEntity($objectId);
         $customStylesheets = (!empty($css)) ? explode(',', $css) : [];
         $template          = null;
@@ -360,12 +363,13 @@ class PublicController extends CommonFormController
         $formId = (int) $this->request->get('id');
 
         $model = $this->getModel('form.form');
+        \assert($model instanceof FormModel);
         $form  = $model->getEntity($formId);
         $js    = '';
 
         if (null !== $form) {
             $status = $form->getPublishStatus();
-            if ('published' == $status) {
+            if ('published' === $status) {
                 $js = $model->getAutomaticJavascript($form);
             }
         }

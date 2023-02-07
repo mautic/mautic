@@ -57,7 +57,6 @@ class SegmentReferenceFilterQueryBuilderTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
         $this->randomParameterMock = $this->createMock(RandomParameterName::class);
         $this->dispatcherMock      = $this->createMock(EventDispatcherInterface::class);
         $this->connectionMock      = $this->createMock(Connection::class);

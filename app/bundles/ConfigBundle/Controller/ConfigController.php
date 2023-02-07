@@ -6,6 +6,7 @@ use Mautic\ConfigBundle\ConfigEvents;
 use Mautic\ConfigBundle\Event\ConfigBuilderEvent;
 use Mautic\ConfigBundle\Event\ConfigEvent;
 use Mautic\ConfigBundle\Form\Type\ConfigType;
+use Mautic\ConfigBundle\Mapper\ConfigMapper;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -31,11 +32,15 @@ class ConfigController extends FormController
         $event      = new ConfigBuilderEvent($this->get('mautic.helper.bundle'));
         $dispatcher = $this->get('event_dispatcher');
         $dispatcher->dispatch($event, ConfigEvents::CONFIG_ON_GENERATE);
-        $fileFields  = $event->getFileFields();
-        $formThemes  = $event->getFormThemes();
-        $formConfigs = $this->get('mautic.config.mapper')->bindFormConfigsWithRealValues($event->getForms());
+        $fileFields      = $event->getFileFields();
+        $formThemes      = $event->getFormThemes();
+        $temporaryFields = $event->getTemporaryFields();
 
-        $this->mergeParamsWithLocal($formConfigs);
+        $configMapper = $this->get(ConfigMapper::class);
+        \assert($configMapper instanceof ConfigMapper);
+        $formConfigs = $configMapper->bindFormConfigsWithRealValues($event->getForms());
+
+        $this->mergeParamsWithLocal($formConfigs, $temporaryFields);
 
         // Create the form
         $action = $this->generateUrl('mautic_config_action', ['objectAction' => 'edit']);
@@ -257,8 +262,10 @@ class ConfigController extends FormController
 
     /**
      * Merges default parameters from each subscribed bundle with the local (real) params.
+     *
+     * @param array<string> $temporaryFields
      */
-    private function mergeParamsWithLocal(array &$forms): void
+    private function mergeParamsWithLocal(array &$forms, array $temporaryFields): void
     {
         $doNotChange = $this->get('mautic.helper.core_parameters')->get('mautic.security.restrictedConfigFields');
         /** @var PathsHelper $pathsHelper */
@@ -277,7 +284,7 @@ class ConfigController extends FormController
             foreach ($form['parameters'] as $key => $value) {
                 if (in_array($key, $doNotChange)) {
                     unset($form['parameters'][$key]);
-                } elseif (array_key_exists($key, $localParams)) {
+                } elseif (array_key_exists($key, $localParams) || array_key_exists($key, $temporaryFields)) {
                     $paramValue               = $localParams[$key];
                     $form['parameters'][$key] = $paramValue;
                 }

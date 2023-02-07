@@ -3,6 +3,8 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\Request;
 
 trait VariantAjaxControllerTrait
@@ -29,6 +31,9 @@ trait VariantAjaxControllerTrait
         if (!empty($type)) {
             //get the HTML for the form
             $model  = $this->getModel($modelName);
+            if (!$model instanceof EmailModel && !$model instanceof PageModel) {
+                throw new \InvalidArgumentException('Model should be either email or page model.');
+            }
             $entity = $model->getEntity($id);
 
             $abTestComponents = $model->getBuilderComponents($entity, 'abTestWinnerCriteria');

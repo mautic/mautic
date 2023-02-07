@@ -7,7 +7,7 @@ use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Form\Type\ActionType;
 
 /**
- * Class ActionModel.
+ * @extends CommonFormModel<Action>
  */
 class ActionModel extends CommonFormModel
 {

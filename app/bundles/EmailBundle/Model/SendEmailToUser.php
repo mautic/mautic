@@ -103,7 +103,7 @@ class SendEmailToUser
                 $this->customFieldValidator->validateFieldType($contactFieldToken->getFieldAlias(), 'email');
 
                 return $this->replaceToken($contactFieldToken->getFullToken(), $lead);
-            } catch (InvalidValueException | RecordException $e) {
+            } catch (InvalidValueException|RecordException $e) {
                 // If the field does not exist or is not type of email then use the default value.
                 return (string) $contactFieldToken->getDefaultValue();
             }

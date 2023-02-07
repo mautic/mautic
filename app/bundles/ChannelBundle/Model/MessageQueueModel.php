@@ -14,10 +14,13 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<MessageQueue>
+ */
 class MessageQueueModel extends FormModel
 {
     /** @var string A default message reschedule interval */
-    const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
+    public const DEFAULT_RESCHEDULE_INTERVAL = 'PT15M';
 
     /**
      * @var LeadModel

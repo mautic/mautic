@@ -13,6 +13,7 @@ use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -25,6 +26,7 @@ use Mautic\PageBundle\Helper\TrackingHelper;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -47,7 +49,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     /** @var Logger */
     private $logger;
 
-    /** @var ModelFactory */
+    /** @var ModelFactory<RedirectModel|PageModel>&MockObject */
     private $modelFactory;
 
     /** @var RedirectModel */
@@ -74,6 +76,9 @@ class PublicControllerTest extends MauticMysqlTestCase
     /** @var PrimaryCompanyHelper */
     private $primaryCompanyHelper;
 
+    /** @var ContactRequestHelper&MockObject */
+    private $contactRequestHelper;
+
     protected function setUp(): void
     {
         $this->controller           = new PublicController();
@@ -88,6 +93,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $this->leadModel            = $this->createMock(LeadModel::class);
         $this->pageModel            = $this->createMock(PageModel::class);
         $this->primaryCompanyHelper = $this->createMock(PrimaryCompanyHelper::class);
+        $this->contactRequestHelper = $this->createMock(ContactRequestHelper::class);
 
         $this->controller->setContainer($this->internalContainer);
         $this->controller->setRequest($this->request);
@@ -98,7 +104,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     /**
      * Test that the appropriate variant is displayed based on hit counts and variant weights.
      */
-    public function testVariantPageWeightsAreAppropriate()
+    public function testVariantPageWeightsAreAppropriate(): void
     {
         // Each of these should return the one with the greatest weight deficit based on
         // A = 50%
@@ -241,10 +247,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $pageModel->method('hitPage')
             ->will($this->returnValue(true));
 
-        $leadModel = $this->getMockBuilder(LeadModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $leadModel->method('getContactFromRequest')
+        $this->contactRequestHelper->method('getContactFromQuery')
             ->will($this->returnValue(new Lead()));
 
         $router = $this->getMockBuilder(Router::class)
@@ -261,7 +264,7 @@ class PublicControllerTest extends MauticMysqlTestCase
                 $this->returnValueMap(
                     [
                         ['page', $pageModel],
-                        ['lead', $leadModel],
+                        ['lead', $this->leadModel],
                     ]
                 )
             );
@@ -281,10 +284,11 @@ class PublicControllerTest extends MauticMysqlTestCase
                         ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $mauticSecurity],
                         ['mautic.helper.template.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
                         ['mautic.page.model.page', Container::EXCEPTION_ON_INVALID_REFERENCE, $pageModel],
-                        ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $leadModel],
+                        ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->leadModel],
                         ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $router],
                         ['event_dispatcher', Container::EXCEPTION_ON_INVALID_REFERENCE, $dispatcher],
                         ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $modelFactory],
+                        ['mautic.lead.helper.contact_request_helper', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->contactRequestHelper],
                     ]
                 )
             );
@@ -309,10 +313,10 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->modelFactory->expects(self::exactly(3))
+        $this->modelFactory->expects(self::exactly(2))
             ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+            ->withConsecutive(['page.redirect'], ['page'])
+            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->pageModel);
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -339,8 +343,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             throw new InvalidDecodedStringException($clickTrough);
         };
 
-        $this->leadModel->expects(self::exactly(2))
-            ->method('getContactFromRequest')
+        $this->contactRequestHelper->expects(self::exactly(2))
+            ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
         $routerMock = $this->createMock(Router::class);
@@ -358,6 +362,7 @@ class PublicControllerTest extends MauticMysqlTestCase
                 ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
                 ['mautic.lead.helper.primary_company', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->primaryCompanyHelper],
                 ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $routerMock],
+                ['mautic.lead.helper.contact_request_helper', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->contactRequestHelper],
             ]);
 
         $this->request->query->set('ct', $clickTrough);
@@ -381,10 +386,10 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->with($redirectId)
             ->willReturn($this->redirect);
 
-        $this->modelFactory->expects(self::exactly(3))
+        $this->modelFactory->expects(self::exactly(2))
             ->method('getModel')
-            ->withConsecutive(['page.redirect'], ['lead'], ['page'])
-            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->leadModel, $this->pageModel);
+            ->withConsecutive(['page.redirect'], ['page'])
+            ->willReturnOnConsecutiveCalls($this->redirectModel, $this->pageModel);
 
         $this->redirect->expects(self::once())
             ->method('isPublished')
@@ -411,8 +416,8 @@ class PublicControllerTest extends MauticMysqlTestCase
             throw new InvalidDecodedStringException($clickThrough);
         };
 
-        $this->leadModel->expects(self::exactly(2))
-            ->method('getContactFromRequest')
+        $this->contactRequestHelper->expects(self::exactly(2))
+            ->method('getContactFromQuery')
             ->willReturnCallback($getContactFromRequestCallback);
 
         $routerMock = $this->createMock(Router::class);
@@ -431,6 +436,7 @@ class PublicControllerTest extends MauticMysqlTestCase
                 ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactory],
                 ['mautic.lead.helper.primary_company', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->primaryCompanyHelper],
                 ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $routerMock],
+                ['mautic.lead.helper.contact_request_helper', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->contactRequestHelper],
             ]);
 
         $this->request->query->set('ct', $clickThrough);

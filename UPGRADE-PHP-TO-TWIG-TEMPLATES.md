@@ -92,3 +92,7 @@ Becomes
     {% set nameGetter = nameGetter|default('getName') %}
 
     ```
+- Regarding the `default` filter: pay special attention to the [documented use case](https://twig.symfony.com/doc/3.x/filters/default.html) where false is treated as an empty value. Consider using `?? true` instead of `|default(true)` when using the default filter on a variable that could already have a boolean value set.
+  
+- [Symfony Best Practices for Templates](https://symfony.com/doc/current/best_practices.html#templates)
+- [Twig for Template Designers](https://twig.symfony.com/doc/3.x/templates.html) is a good overview on creating templates.

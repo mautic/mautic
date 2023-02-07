@@ -77,12 +77,37 @@ $container->loadFromExtension('framework', [
         'fallback' => 'en_US',
     ],
     'session'         => [ //handler_id set to null will use default session handler from php.ini
-        'handler_id'    => null,
-        'name'          => '%env(MAUTIC_SESSION_NAME)%',
-        'cookie_secure' => $secureCookie,
+        'handler_id'           => null,
+        'name'                 => '%env(MAUTIC_SESSION_NAME)%',
+        'cookie_secure'        => $secureCookie,
+        'cookie_samesite'      => 'lax',
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'messenger'            => [
+        'default_bus' => 'email.bus',
+        'buses'       => [
+            'email.bus' => null,
+        ],
+        'transports'  => [
+            'email_transport' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
+                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
+                ],
+                'retry_strategy' => [
+                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
+                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
+                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
+                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                ],
+            ],
+        ],
+        'routing' => [
+            // TODO: Enable this line when you want to merge symfony/mailer
+            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+        ],
+    ],
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
@@ -118,7 +143,23 @@ $dbalSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
+    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
+
+if (!empty($localConfigParameterBag->get('db_host_ro'))) {
+    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['keep_replica']    = true;
+    $dbalSettings['replicas']        = [
+        'replica1' => [
+            'host'                  => '%mautic.db_host_ro%',
+            'port'                  => '%mautic.db_port%',
+            'dbname'                => '%mautic.db_name%',
+            'user'                  => '%mautic.db_user%',
+            'password'              => '%mautic.db_password%',
+            'charset'               => 'utf8mb4',
+        ],
+    ];
+}
 
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,

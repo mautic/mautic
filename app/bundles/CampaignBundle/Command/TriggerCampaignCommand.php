@@ -180,11 +180,9 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @return int|null
-     *
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $quiet              = $input->getOption('quiet');
         $this->output       = $quiet ? new NullOutput() : $output;
@@ -210,9 +208,10 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
-
         $id = $input->getOption('campaign-id');
-        if (!$this->checkRunStatus($input, $this->output, $id)) {
+
+        $moderationKey = sprintf('%s-%s', $id, $threadId);
+        if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
             return 0;
         }
 

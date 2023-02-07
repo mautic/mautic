@@ -4,19 +4,16 @@ namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Security\Core\Exception as Exception;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-/**
- * Class DefaultController.
- */
 class SecurityController extends CommonController
 {
     /**
      * {@inheritdoc}
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationChecker $authChecker */
         $authChecker = $this->get('security.authorization_checker');
@@ -85,12 +82,14 @@ class SecurityController extends CommonController
         $integrationHelper = $this->get('mautic.helper.integration');
         $integrations      = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
+        $templ = $this->request->get('templ') ?? 'twig';
+
         return $this->delegateView([
             'viewParameters' => [
                 'last_username' => $authenticationUtils->getLastUsername(),
                 'integrations'  => $integrations,
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
+            'contentTemplate' => 'MauticUserBundle:Security:login.html.'.$templ,
             'passthroughVars' => [
                 'route'          => $this->generateUrl('login'),
                 'mauticContent'  => 'user',

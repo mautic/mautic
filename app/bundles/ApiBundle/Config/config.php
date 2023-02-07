@@ -73,54 +73,6 @@ return [
                 ],
             ],
         ],
-        'events' => [
-            'mautic.api.subscriber' => [
-                'class'     => \Mautic\ApiBundle\EventListener\ApiSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'translator',
-                ],
-            ],
-            'mautic.api.client.subscriber' => [
-                'class'     => \Mautic\ApiBundle\EventListener\ClientSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                ],
-            ],
-            'mautic.api.configbundle.subscriber' => [
-                'class' => \Mautic\ApiBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.api.search.subscriber' => [
-                'class'     => \Mautic\ApiBundle\EventListener\SearchSubscriber::class,
-                'arguments' => [
-                    'mautic.api.model.client',
-                    'mautic.security',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.api.rate_limit_generate_key.subscriber' => [
-              'class'     => \Mautic\ApiBundle\EventListener\RateLimitGenerateKeySubscriber::class,
-              'arguments' => [
-                'mautic.helper.core_parameters',
-              ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.apiclients' => [
-                'class'     => \Mautic\ApiBundle\Form\Type\ClientType::class,
-                'arguments' => [
-                    'request_stack',
-                    'translator',
-                    'validator',
-                    'session',
-                    'router',
-                ],
-            ],
-            'mautic.form.type.apiconfig' => [
-                'class' => 'Mautic\ApiBundle\Form\Type\ConfigType',
-            ],
-        ],
         'helpers' => [
             'mautic.api.helper.entity_result' => [
                 'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,

@@ -20,8 +20,8 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NotificationModel
- * {@inheritdoc}
+ * @extends FormModel<Notification>
+ * @implements AjaxLookupModelInterface<Notification>
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -67,8 +67,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */

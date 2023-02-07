@@ -8,6 +8,9 @@ use Mautic\PointBundle\Entity\TriggerEventRepository;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
+/**
+ * @extends CommonFormModel<TriggerEvent>
+ */
 class TriggerEventModel extends CommonFormModel
 {
     /**

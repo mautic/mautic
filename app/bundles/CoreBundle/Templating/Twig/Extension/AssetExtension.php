@@ -30,6 +30,7 @@ class AssetExtension extends AbstractExtension
     {
         return [
             new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
+            new TwigFunction('includeScript', [$this, 'includeScript'], ['is_safe' => ['all']]),
             new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
             new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
@@ -37,6 +38,9 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
             new TwigFunction('assetsGetImagesPath', [$this, 'getImagesPath']),
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
+            new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
+            new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
+            new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -52,6 +56,14 @@ class AssetExtension extends AbstractExtension
         $this->assetsHelper->outputSystemStylesheets();
 
         return ob_get_clean();
+    }
+
+    /**
+     * Loads an addon JS script file.
+     */
+    public function includeScript(string $assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
+    {
+        return $this->assetsHelper->includeScript($assetFilePath, $onLoadCallback, $alreadyLoadedCallback);
     }
 
     /**
@@ -106,5 +118,27 @@ class AssetExtension extends AbstractExtension
     public function getAssetPrefix(bool $includeEndingslash = false): string
     {
         return $this->assetsHelper->getAssetPrefix($includeEndingslash);
+    }
+
+    public function addScriptDeclaration(string $script, string $location = 'head'): AssetsHelper
+    {
+        return $this->assetsHelper->addScriptDeclaration($script, $location);
+    }
+
+    /**
+     * @see Mautic\CoreBundle\Templating\Helper\AssetsHelper::getCountryFlag
+     */
+    public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string
+    {
+        return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class);
+    }
+
+    /**
+     * @param array<string> $protocols
+     * @param array<mixed>  $attributes
+     */
+    public function makeLinks(string $text, array $protocols = ['http', 'mail'], array $attributes = []): string
+    {
+        return $this->assetsHelper->makeLinks($text, $protocols, $attributes);
     }
 }

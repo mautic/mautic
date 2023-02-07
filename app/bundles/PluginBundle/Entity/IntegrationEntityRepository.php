@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * IntegrationRepository.
+ * @extends CommonRepository<IntegrationEntity>
  */
 class IntegrationEntityRepository extends CommonRepository
 {

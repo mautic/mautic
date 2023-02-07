@@ -84,13 +84,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($assets as $asset) {
                     $assetResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticAssetBundle:SubscribedEvents\Search:global.html.twig',
                         ['asset' => $asset]
                     )->getContent();
                 }
                 if (count($assets) > 5) {
                     $assetResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticAssetBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -140,7 +141,7 @@ class AjaxController extends CommonController
         $this->get('session')->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-        $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+        $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
 
         $dataArray['newContent'] = $this->renderView(
             'MauticCoreBundle:GlobalSearch:results.html.php',
@@ -186,7 +187,7 @@ class AjaxController extends CommonController
     {
         $dispatcher = $this->get('event_dispatcher');
         $event      = new CommandListEvent();
-        $dispatcher->dispatch(CoreEvents::BUILD_COMMAND_LIST, $event);
+        $dispatcher->dispatch($event, CoreEvents::BUILD_COMMAND_LIST);
         $allCommands = $event->getCommands();
         $translator  = $this->get('translator');
         $dataArray   = [];
@@ -278,6 +279,7 @@ class AjaxController extends CommonController
                         $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
                         $model->getRepository()->saveEntity($entity);
                     } else {
+                        \assert($model instanceof FormModel);
                         $refresh = $model->togglePublishStatus($entity);
                     }
                     if (!empty($refresh)) {
@@ -336,6 +338,7 @@ class AjaxController extends CommonController
             $checkedOut = $entity->getCheckedOutBy();
             if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+                \assert($model instanceof FormModel);
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
             }

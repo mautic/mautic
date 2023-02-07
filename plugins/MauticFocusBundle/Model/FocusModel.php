@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Focus>
+ */
 class FocusModel extends FormModel
 {
     /**
@@ -398,7 +401,7 @@ class FocusModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

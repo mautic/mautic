@@ -33,12 +33,12 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Render row if it exists.
      *
-     * @param       $form
-     * @param       $key
-     * @param null  $template
-     * @param array $variables
+     * @param FormView    $form
+     * @param string      $key
+     * @param string|null $template
+     * @param mixed[]     $variables
      *
-     * @return mixed|string
+     * @return string
      */
     public function rowIfExists($form, $key, $template = null, $variables = [])
     {
