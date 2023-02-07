@@ -185,7 +185,7 @@
     {% if inBuilder %}
       {{ showScriptTags(field.properties.text) }}
     {% else %}
-      {{ field.properties.text }}
+      {{ field.properties.text|raw }}
     {% endif %}
   </div>
 </div>
