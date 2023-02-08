@@ -2,13 +2,13 @@
 <html>
 <head>
     <meta charset="UTF-8" />
-    <title><?php echo $view['slots']->get('pageTitle', 'Mautic'); ?></title>
+    <title>{{ slot('pageTitle', 'Mautic') }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="icon" type="image/x-icon" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico'); ?>" />
-    <link rel="icon" sizes="192x192" href="<?php echo $view['assets']->getUrl('media/images/favicon.ico'); ?>">
-    <link rel="apple-touch-icon" href="<?php echo $view['assets']->getUrl('media/images/apple-touch-icon.png'); ?>" />
+    <link rel="icon" type="image/x-icon" href="{{ getAssetUrl('media/images/favicon.ico') }}" />
+    <link rel="icon" sizes="192x192" href="{{ getAssetUrl('media/images/favicon.ico') }}">
+    <link rel="apple-touch-icon" href="{{ getAssetUrl('media/images/apple-touch-icon.png') }}" />
 
-    <?php echo $view['assets']->outputStyles(); ?>
+    {{ outputStyles() }}
     <script src="/app/bundles/NotificationBundle/Assets/js/popup/usparser.min.js" type="text/javascript"></script>
 </head>
 
@@ -36,7 +36,7 @@
 
                     <p id="mobile-notification-message" class="truncatable short desktop message">Notifications will appear on your device</p>
 
-                    <p id="mobile-notification-url" class="truncatable short desktop message"><?php echo $siteUrl; ?></p>
+                    <p id="mobile-notification-url" class="truncatable short desktop message">{{ siteUrl }}</p>
                 </div>
 
                 <div id="desktop-notification">
@@ -48,7 +48,7 @@
 
                     <p id="desktop-notification-message" class="truncatable mobile message">Notifications will appear on your desktop</p>
 
-                    <p id="desktop-notification-url" class="truncatable mobile message"><?php echo $siteUrl; ?></p>
+                    <p id="desktop-notification-url" class="truncatable mobile message">{{ siteUrl }}</p>
                 </div>
 
                 <p id="mobile-opt-out" class="truncatable opt-out message">(you can unsubscribe anytime in your browser settings)</p>
@@ -111,7 +111,7 @@
             <p> Notifications are already enabled, you may close this window. </p>
 
             <p style="font-size: 12px">If you would like to unsubscribe from all notifications from
-                <span class="domainName"><?php echo $siteUrl; ?></span> click on the lock icon to the left of the address. </p>
+                <span class="domainName">{{ siteUrl }}</span> click on the lock icon to the left of the address. </p>
         </div>
 
     </div>
