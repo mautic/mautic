@@ -1,10 +1,10 @@
-<?php
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'sysinfo');
-$view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.header.index'));
-?>
+{% block mauticContent %}sysinfo{% endblock %}
 
+{% block headerTitle %}{{ 'mautic.sysinfo.header.index'|trans }}{% endblock %}
+
+{% block content %}
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- step container -->
@@ -14,27 +14,27 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.he
             <ul class="list-group list-group-tabs" role="tablist">
                 <li role="presentation" class="list-group-item in active">
                     <a href="#phpinfo" aria-controls="phpinfo" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.phpinfo'); ?>
+                        {{ 'mautic.sysinfo.tab.phpinfo'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
                     <a href="#recommendations" aria-controls="phpinfo" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.recommendations'); ?>
+                        {{ 'mautic.sysinfo.tab.recommendations'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
                     <a href="#folders" aria-controls="folders" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.folders'); ?>
+                        {{ 'mautic.sysinfo.tab.folders'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
                     <a href="#log" aria-controls="log" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.log'); ?>
+                        {{ 'mautic.sysinfo.tab.log'|trans }}
                     </a>
                 </li>
                 <li role="presentation" class="list-group-item">
                     <a href="#dbinfo" aria-controls="dbinfo" role="tab" data-toggle="tab">
-                        <?php echo $view['translator']->trans('mautic.sysinfo.tab.dbinfo'); ?>
+                        {{ 'mautic.sysinfo.tab.dbinfo'|trans }}
                     </a>
                 </li>
             </ul>
@@ -49,81 +49,87 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.he
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane fade in active bdr-w-0" id="phpinfo">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <?php echo $phpInfo; ?>
+                    {{ phpInfo|raw }}
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="recommendations">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <?php if (empty($recommendations) && empty($requirement)) : ?>
+                    {% if recommendations is empty and requirements is empty %}
                         <div class="alert alert-info">
-                            <?php echo $view['translator']->trans('mautic.sysinfo.no.recommendations'); ?>
+                            {{ 'mautic.sysinfo.no.recommendations'|trans }}
                         </div>
-                    <?php endif; ?>
-                    <?php foreach ($requirements as $requirement): ?>
+                    {% endif %}
+                    {% for requirement in requirements %}
                         <div class="alert alert-danger">
-                            <?php echo $requirement; ?>
+                            {{ requirement|raw }}
                         </div>
-                    <?php endforeach; ?>
-                    <?php foreach ($recommendations as $recommendation): ?>
+                    {% endfor %}
+                    {% for recommendation in recommendations %}
                         <div class="alert alert-warning">
-                            <?php echo $recommendation; ?>
+                            {{ recommendation|raw }}
                         </div>
-                    <?php endforeach; ?>
+                    {% endfor %}
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="folders">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <h2 class="pb-md"><?php echo $view['translator']->trans('mautic.sysinfo.folders.title'); ?></h2>
+                    <h2 class="pb-md">{{ 'mautic.sysinfo.folders.title'|trans }}</h2>
                     <table class="table">
                         <thead>
                             <tr>
-                                <th><?php echo $view['translator']->trans('mautic.sysinfo.folder.path'); ?></th>
-                                <th><?php echo $view['translator']->trans('mautic.sysinfo.is.writable'); ?></th>
+                                <th>{{ 'mautic.sysinfo.folder.path'|trans }}</th>
+                                <th>{{ 'mautic.sysinfo.is.writable'|trans }}</th>
                             </tr>
                         </thead>
-                        <?php foreach ($folders as $folder => $isWritable) : ?>
-                            <tr class="<?php echo ($isWritable) ? 'success' : 'danger'; ?>">
-                                <td><?php echo $folder; ?></td>
-                                <td><?php echo ($isWritable) ? $view['translator']->trans('mautic.sysinfo.writable') : $view['translator']->trans('mautic.sysinfo.unwritable'); ?></td>
+                        {% for folder, isWritable in folders %}
+                            <tr class="{% if isWritable %}success{% else %}danger{% endif %}">
+                                <td>{{ folder }}</td>
+                                <td>
+                                    {% if isWritable %}
+                                        {{ 'mautic.sysinfo.writable'|trans }}
+                                    {% else %}
+                                        {{ 'mautic.sysinfo.unwritable'|trans }}
+                                    {% endif %}
+                                </td>
                             </tr>
-                        <?php endforeach; ?>
+                        {% endfor %}
                     </table>
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="log">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <h2 class="pb-md"><?php echo $view['translator']->trans('mautic.sysinfo.log.title'); ?></h2>
-                    <?php if ($log) : ?>
-                        <pre><?php echo $log; ?></pre>
-                    <?php else : ?>
+                    <h2 class="pb-md">{{ 'mautic.sysinfo.log.title'|trans }}</h2>
+                    {% if log is defined and log is not empty %}
+                        <pre>{{ log }}</pre>
+                    {% else %}
                         <div class="alert alert-info" role="alert">
-                            <?php echo $view['translator']->trans('mautic.sysinfo.log.missing'); ?>
+                            {{ 'mautic.sysinfo.log.missing'|trans }}
                         </div>
-                    <?php endif; ?>
+                    {% endif %}
                 </div>
             </div>
             <div role="tabpanel" class="tab-pane fade bdr-w-0" id="dbinfo">
                 <div class="pt-md pr-md pl-md pb-md">
-                    <h2 class="pb-md"><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.title'); ?></h2>
+                    <h2 class="pb-md">{{ 'mautic.sysinfo.dbinfo.title'|trans }}</h2>
                     <table class="table">
                         <thead>
                             <tr>
-                                <th><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.property'); ?></th>
-                                <th><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.value'); ?></th>
+                                <th>{{ 'mautic.sysinfo.dbinfo.property'|trans }}</th>
+                                <th>{{ 'mautic.sysinfo.dbinfo.value'|trans }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.version'); ?></td>
-                                <td id="dbinfo-version"><?php echo $dbInfo['version']; ?></td>
+                                <td>{{ 'mautic.sysinfo.dbinfo.version'|trans }}</td>
+                                <td id="dbinfo-version">{{ dbInfo.version }}</td>
                             </tr>
                             <tr>
-                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.driver'); ?></td>
-                                <td id="dbinfo-driver"><?php echo $dbInfo['driver']; ?></td>
+                                <td>{{ 'mautic.sysinfo.dbinfo.driver'|trans }}</td>
+                                <td id="dbinfo-driver">{{ dbInfo.driver }}</td>
                             </tr>
                             <tr>
-                                <td><?php echo $view['translator']->trans('mautic.sysinfo.dbinfo.platform'); ?></td>
-                                <td id="dbinfo-platform"><?php echo $dbInfo['platform']; ?></td>
+                                <td>{{ 'mautic.sysinfo.dbinfo.platform'|trans }}</td>
+                                <td id="dbinfo-platform">{{ dbInfo.platform }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -133,3 +139,4 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.sysinfo.he
 
     </div>
 </div>
+{% endblock %}
