@@ -340,11 +340,11 @@ class SubmissionModel extends CommonFormModel
                 $validationErrors[$alias] = $isValid;
             }
 
-            $leadField = $f->getLeadField();
-            if (!empty($leadField)) {
+            $mappedField = $f->getMappedField();
+            if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
-                $leadFieldMatches[$leadField] = $leadValue;
+                $leadFieldMatches[$mappedField] = $leadValue;
             }
 
             $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
