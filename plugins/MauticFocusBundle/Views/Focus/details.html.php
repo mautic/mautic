@@ -66,6 +66,14 @@ $view['slots']->set(
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                             <?php echo $view->render('MauticCoreBundle:Helper:details.html.php', ['entity' => $item]); ?>
+                            <tr>
+                                <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.focus.details.views'); ?></span>
+                                </td>
+                                <td>
+                                    <?php echo $totalViews ?? 0; ?>
+                                </td>
+                            </tr>
                             </tbody>
                         </table>
                     </div>
@@ -136,6 +144,7 @@ $view['slots']->set(
                                 'trackables' => $trackables,
                                 'entity'     => $item,
                                 'channel'    => 'focus',
+                                'totalViews' => $totalViews ?? 0,
                         ]); ?>
                     </div>
                 </div>

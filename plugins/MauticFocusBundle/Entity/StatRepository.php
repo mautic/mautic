@@ -39,4 +39,23 @@ class StatRepository extends CommonRepository
 
         return $q->getQuery()->getArrayResult();
     }
+
+    public function getViewsCount(int $id): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('count(s.id) as views_count')
+            ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
+
+        $expr = $q->expr()->and(
+            $q->expr()->eq('s.focus_id', ':id'),
+            $q->expr()->eq('s.type', ':type')
+        );
+
+        $q->where($expr)
+            ->setParameter('id', $id)
+            ->setParameter('type', Stat::TYPE_NOTIFICATION);
+
+        return (int) $q->execute()->fetchOne();
+    }
 }

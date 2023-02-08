@@ -458,4 +458,9 @@ class FocusModel extends FormModel
             ->andWhere('m.created_by = :userId')
             ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
+
+    public function countAllViews(Focus $focus): int
+    {
+        return $this->getStatRepository()->getViewsCount($focus->getId());
+    }
 }
