@@ -1,180 +1,164 @@
-<?php
+{% block _config_coreconfig_widget %}
+{% set fields = form.children %}
+{% set fieldKeys = fields|keys %}
+{% set template = '<div class="col-md-6">{content}</div>' %}
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-$fields    = $form->children;
-$fieldKeys = array_keys($fields);
-$template  = '<div class="col-md-6">{content}</div>';
-?>
+{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.general'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'site_url', template) }}
+              {{ formRowIfExists(fields, 'webroot', template) }}
+              {{ formRowIfExists(fields, '404_page', template) }}
+              {{ formRowIfExists(fields, 'cache_path', template) }}
+              {{ formRowIfExists(fields, 'log_path', template) }}
+              {{ formRowIfExists(fields, 'theme', template) }}
+              {{ formRowIfExists(fields, 'image_path', template) }}
+              {{ formRowIfExists(fields, 'last_shown_tab') }}
+          </div>
+      </div>
+  </div>
+{% endif %}
 
-<?php if (count(array_intersect($fieldKeys, ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.general'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'site_url', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'webroot', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, '404_page', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cache_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'log_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'theme', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'image_path', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'last_shown_tab'); ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+{% if fieldKeys|filter(k => k in ['default_pagelist', 'timezone', 'locale', 'date_format_full', 'date_format_short', 'date_format_dateonly', 'date_format_timeonly'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.defaults'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'default_pagelimit', template) }}
+              {{ formRowIfExists(fields, 'default_timezone', template) }}
+              {{ formRowIfExists(fields, 'locale', template) }}
+              {{ formRowIfExists(fields, 'cached_data_timeout', template) }}
+              {{ formRowIfExists(fields, 'default_daterange_filter', template) }}
+          </div>
 
-<?php if (count(array_intersect($fieldKeys, ['default_pagelist', 'timezone', 'locale', 'date_format_full', 'date_format_short', 'date_format_dateonly', 'date_format_timeonly']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.defaults'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'default_pagelimit', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'default_timezone', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'locale', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cached_data_timeout', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'default_daterange_filter', $template); ?>
-        </div>
+          <hr class="text-muted" />
 
-        <hr class="text-muted" />
+          <div class="row">
+              {{ formRowIfExists(fields, 'date_format_full', template) }}
+              {{ formRowIfExists(fields, 'date_format_short', template) }}
+              {{ formRowIfExists(fields, 'date_format_dateonly', template) }}
+              {{ formRowIfExists(fields, 'date_format_timeonly', template) }}
+          </div>
+      </div>
+  </div>
+{% endif %}
 
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'date_format_full', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'date_format_short', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'date_format_dateonly', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'date_format_timeonly', $template); ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+{% if fieldKeys|filter(k => k in ['cors_restrict_domains'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.cors'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'cors_restrict_domains', template) }}
+              {{ formRowIfExists(fields, 'cors_valid_domains', template) }}
+          </div>
+      </div>
+  </div>
+{% endif %}
 
-<?php if (count(array_intersect($fieldKeys, ['cors_restrict_domains']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.cors'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'cors_restrict_domains', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'cors_valid_domains', $template); ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+{% if fieldKeys|filter(k => k in ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots', 'transliterate_page_title'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.misc'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'trusted_hosts', template) }}
+              {{ formRowIfExists(fields, 'trusted_proxies', template) }}
+          </div>
 
-<?php if (count(array_intersect($fieldKeys, ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots', 'transliterate_page_title']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.misc'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'trusted_hosts', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'trusted_proxies', $template); ?>
-        </div>
+          {% if fields.trusted_hosts is defined %}<hr class="text-muted" />{% endif %}
 
-        <?php if (isset($fields['trusted_hosts'])): ?>
-        <hr class="text-muted" />
-        <?php endif; ?>
+          <div class="row">
+              {{ formRowIfExists(fields, 'ip_lookup_service', template) }}
+              {{ formRowIfExists(fields, 'ip_lookup_auth', template) }}
+              {{ formRowIfExists(fields, 'ip_lookup_create_organization', template) }}
+              <div id="ip_lookup_config_container">
+                  {{ formRowIfExists(fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>') }}
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-sm-12">
+                  <div class="small text-center" id="ip_lookup_attribution">{{ ipLookupAttribution|raw }}</div>
+              </div>
+          </div>
 
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_service', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_auth', $template); ?>
-            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_create_organization', $template); ?>
-            <div id="ip_lookup_config_container">
-            <?php echo $view['form']->rowIfExists($fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>'); ?>
+          {% if fields.do_not_track_ips is defined or fields.do_not_track_bots is defined %}
+              <hr class="text-muted" />
+              <div class="row">
+                  {% if fields.do_not_track_ips is defined %}
+                      {{ formRowIfExists(fields, 'do_not_track_ips', template) }}
+                  {% endif %}
+                  {% if fields.do_not_track_bots is defined %}
+                      {{ formRowIfExists(fields, 'do_not_track_bots', template) }}
+                  {% endif %}
+              </div>
+          {% endif %}
+
+          {% if fields.link_shortener_url is defined %}
+            <hr class="text-muted" />
+            <div class="row">
+                {{ formRowIfExists(fields, 'link_shortener_url', template) }}
             </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="small text-center" id="ip_lookup_attribution"><?php echo $ipLookupAttribution; ?></div>
+          {% endif %}
+
+          {% if fields.max_entity_lock_time is defined %}
+            <hr class="text-muted" />
+            <div class="row">
+                {{ formRowIfExists(fields, 'max_entity_lock_time', template) }}
             </div>
-        </div>
+          {% endif %}
 
-        <?php if (isset($fields['do_not_track_ips']) || isset($fields['do_not_track_bots'])): ?>
-        <hr class="text-muted" />
-        <div class="row">
-            <?php if (isset($fields['do_not_track_ips'])): ?>
-                    <?php echo $view['form']->rowIfExists($fields, 'do_not_track_ips', $template); ?>
-            <?php endif; ?>
-            <?php if (isset($fields['do_not_track_bots'])): ?>
-                    <?php echo $view['form']->rowIfExists($fields, 'do_not_track_bots', $template); ?>
-            <?php endif; ?>
-        </div>
-        <?php endif; ?>
+          {% if fields.transliterate_page_title %}
+            <hr class="text-muted" />
+            <div class="row">
+                {{ formRowIfExists(fields, 'transliterate_page_title', template) }}
+            </div>
+          {% endif %}
+      </div>
+  </div>
+{% endif %}
 
-        <?php if (isset($fields['link_shortener_url'])): ?>
-        <hr class="text-muted" />
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'link_shortener_url', $template); ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if (isset($fields['max_entity_lock_time'])): ?>
-        <hr class="text-muted" />
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'max_entity_lock_time', $template); ?>
-        </div>
-        <?php endif; ?>
-
-        <?php if (isset($fields['transliterate_page_title'])): ?>
-        <hr class="text-muted" />
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'transliterate_page_title', $template); ?>
-        </div>
-        <?php endif; ?>
-    </div>
-</div>
-<?php endif; ?>
-
-<?php if (count(array_intersect($fieldKeys, ['headers_sts']))): ?>
+{% if fieldKeys|filter(k => k in ['headers_sts'])|length > 0 %}
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.response.headers'); ?></h3>
+            <h3 class="panel-title">{{ 'mautic.core.config.header.response.headers'|trans }}</h3>
         </div>
         <div class="panel-body">
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'headers_sts', $template); ?>
+                {{ formRowIfExists(fields, 'headers_sts', template) }}
             </div>
             <div class="row">
-                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_subdomains', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_preload', $template); ?>
-                <?php echo $view['form']->rowIfExists($fields, 'headers_sts_expire_time', $template); ?>
+                {{ formRowIfExists(fields, 'headers_sts_subdomains', template) }}
+                {{ formRowIfExists(fields, 'headers_sts_preload', template) }}
+                {{ formRowIfExists(fields, 'headers_sts_expire_time', template) }}
             </div>
         </div>
     </div>
-<?php endif; ?>
+{% endif %}
 
-<?php if (count(array_intersect($fieldKeys, ['update_stability', 'composer_updates']))): ?>
-<div class="panel panel-primary">
-    <div class="panel-heading">
-        <h3 class="panel-title"><?php echo $view['translator']->trans('mautic.core.config.header.update'); ?></h3>
-    </div>
-    <div class="panel-body">
-        <div class="row">
-            <?php echo $view['form']->rowIfExists($fields, 'update_stability', $template); ?>
-            <?php echo $view['form']->rowIfExists(
-                $fields,
-                'composer_updates',
-                '<div class="col-md-6">{content}<span style="color:red">'.$view['translator']->trans(
-                    'mautic.core.config.form.update.composer.warning',
-                    [
-                        '%url_start%' => '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
-                        '%url_end%'   => '</a>',
-                    ]).'</div>'
-            ); ?>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
+{% if fieldKeys|filter(k => k in ['update_stability', 'composer_updates'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.update'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'update_stability', template) }}
+              {{ formRowIfExists(fields, 'composer_updates',
+                  '<div class="col-md-6">{content}<span style="color:red">' ~
+                  'mautic.core.config.form.update.composer.warning'|trans({'%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">', '%url_end%': '</a>'}) ~
+                  '</div>'
+              ) }}
+          </div>
+      </div>
+  </div>
+{% endif %}
+{% endblock %}

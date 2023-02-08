@@ -33,10 +33,10 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Render row if it exists.
      *
-     * @param FormView    $form
-     * @param string      $key
-     * @param string|null $template
-     * @param mixed[]     $variables
+     * @param FormView|array $form
+     * @param string         $key
+     * @param string|null    $template
+     * @param mixed[]        $variables
      *
      * @return string
      */
