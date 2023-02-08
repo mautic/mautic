@@ -463,6 +463,8 @@ id="{{ id|escape }}" name="{{ full_name|escape }}"
 {% for k,v in attr|filter((v,k) => k not in ['tooltip', 'preaddon', 'preaddon_attr', 'postaddon_attr']) %}
     {% if k in ['placeholder', 'title'] %}
         {{ '%s="%s" '|format(k|escape, v|trans({}, translation_domain)|escape)|raw }}
+    {% elseif k is same as 'data-order' %}
+        {{ k }}="{{ v|raw }}"
     {% elseif v is same as true %}
         {{ '%s="%s" '|format(k|escape, k|escape)|raw }}
     {% elseif v is iterable %}
