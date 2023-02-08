@@ -282,6 +282,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
             ]
         );
         $this->client->submit($configForm);
+        dd($this->client->getResponse()->getContent());
         Assert::assertTrue($this->client->getResponse()->isOk());
         Assert::assertSame('en_US', self::$container->get('session')->get('_locale'));
 
