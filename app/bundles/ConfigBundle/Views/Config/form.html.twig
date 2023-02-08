@@ -22,8 +22,6 @@
 {% block headerTitle %}{{ 'mautic.config.header.index'|trans }}{% endblock %}
 
 {% block content %}
-{% set configKeys = form.children|keys %}
-
 <!-- start: box layout -->
 <div class="box-layout">
     <!-- step container -->
@@ -34,17 +32,17 @@
             {% endif %}
             <!-- Nav tabs -->
             <ul class="list-group list-group-tabs" role="tablist">
-            {% for key in form.children|keys|filter(v => formConfigs[v] is defined and form[v].children|length > 0) %}
-                <li role="presentation" class="list-group-item {% if loop.first %}in active{% endif %}">
-                    {% set containsErrors = formContainsErrors(form[key]) %}
-                    <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
-                        {{ ('mautic.config.tab.' ~ key)|trans }}
-                        {% if formContainsErrors(form[key]) %}
-                            <i class="fa fa-warning"></i>
-                        {% endif %}
-                    </a>
-                </li>
-            {% endfor %}
+                {% for key in form.children|keys|filter(v => formConfigs[v] is defined and form[v].children|length > 0) %}
+                    <li role="presentation" class="list-group-item {% if loop.first %}in active{% endif %}">
+                        {% set containsErrors = formContainsErrors(form[key]) %}
+                        <a href="#{{ key }}" aria-controls="{{ key }}" role="tab" data-toggle="tab" class="steps {% if formContainsErrors(form[key]) %}text-danger{% endif %}">
+                            {{ ('mautic.config.tab.' ~ key)|trans }}
+                            {% if formContainsErrors(form[key]) %}
+                                <i class="fa fa-warning"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     </div>
