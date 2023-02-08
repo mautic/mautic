@@ -18,7 +18,7 @@ class LeagueContactScore extends FormEntity
     private int $score;
 
     /**
-     * @param ORM\ClassMetadata<LeagueCompanyScore> $metadata
+     * @param ORM\ClassMetadata<LeagueContactScore> $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
