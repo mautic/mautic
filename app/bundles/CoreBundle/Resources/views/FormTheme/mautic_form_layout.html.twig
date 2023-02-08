@@ -413,7 +413,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {% endif %}
 <button type="{{ type is defined ? type|escape : 'button' }}"
     {{ block('button_attributes') }}>
-    {% if form.vars.attr.icon is not empty %}
+    {% if form.vars.attr.icon is defined and form.vars.attr.icon is not empty %}
     <i class="{{ form.vars.attr.icon }} "></i>
     {% endif %}
     {{ label|trans({}, translation_domain)|escape }}

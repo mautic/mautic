@@ -168,7 +168,9 @@ class ConfigController extends FormController
                 'viewParameters' => [
                     'tmpl'        => $tmpl,
                     'security'    => $this->get('mautic.security'),
-                    'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.twig', $formThemes),
+                    //'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.twig', $formThemes),
+                    'form'        => $form->createView(),
+                    'formThemes'  => $formThemes,
                     'formConfigs' => $formConfigs,
                     'isWritable'  => $isWritabale,
                 ],
