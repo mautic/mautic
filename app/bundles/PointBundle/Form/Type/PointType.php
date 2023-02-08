@@ -103,7 +103,13 @@ class PointType extends AbstractType
 
         $builder->add(
             'league',
-            LeagueListType::class
+            LeagueListType::class,
+            [
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.point.league.form.league_descr',
+                ],
+            ]
         );
 
         if (!empty($options['data']) && $options['data'] instanceof Point) {
