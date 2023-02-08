@@ -9,6 +9,9 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 /** @var \Mautic\FormBundle\Entity\Form $form */
+
+use Mautic\FormBundle\Collection\MappedObjectCollection;
+
 $formName = '_'.$form->generateFormName().(isset($suffix) ? $suffix : '');
 if (!isset($fields)) {
     $fields = $form->getFields();
@@ -27,8 +30,8 @@ if (!isset($theme)) {
     $theme = '';
 }
 
-if (!isset($contactFields)) {
-    $contactFields = $companyFields = [];
+if (!isset($mappedFields)) {
+    $mappedFields = new MappedObjectCollection();
 }
 
 if (!isset($style)) {
@@ -81,7 +84,14 @@ if (!isset($lead)) {
 
                         $template = $params['template'];
                     else:
-                        if (!$f->isAlwaysDisplay() && !$f->getShowWhenValueExists() && $f->getLeadField() && $f->getIsAutoFill() && $lead && !empty($lead->getFieldValue($f->getLeadField()))) {
+                        if (!$f->isAlwaysDisplay()
+                            && !$f->getShowWhenValueExists()
+                            && $f->getMappedField()
+                            && 'contact' === $f->getMappedObject()
+                            && $f->getIsAutoFill()
+                            && $lead
+                            && !empty($lead->getFieldValue($f->getMappedField()))
+                        ) {
                             $f->setType('hidden');
                         } else {
                             $displayManager->increaseDisplayedFields($f);
@@ -96,8 +106,7 @@ if (!isset($lead)) {
                             'id'            => $f->getAlias(),
                             'formName'      => $formName,
                             'fieldPage'     => ($pageCount - 1), // current page,
-                            'contactFields' => $contactFields,
-                            'companyFields' => $companyFields,
+                            'mappedFields'  => $mappedFields,
                             'inBuilder'     => $inBuilder,
                             'fields'        => $fields,
                         ]
@@ -115,6 +124,15 @@ if (!isset($lead)) {
 
                         $template = $params['template'];
                     else:
+                        if (!$f->getShowWhenValueExists()
+                            && $f->getMappedField()
+                            && 'contact' === $f->getMappedObject()
+                            && $f->getIsAutoFill()
+                            && $lead
+                            && !empty($lead->getFieldValue($f->getMappedField()))
+                        ) {
+                            $f->setType('hidden');
+                        }
                         $template = 'MauticFormBundle:Field:'.$f->getType().'.html.php';
                     endif;
 
@@ -125,8 +143,7 @@ if (!isset($lead)) {
                             'id'            => $f->getAlias(),
                             'formName'      => $formName,
                             'fieldPage'     => ($pageCount - 1), // current page,
-                            'contactFields' => $contactFields,
-                            'companyFields' => $companyFields,
+                            'mappedFields'  => $mappedFields,
                             'inBuilder'     => $inBuilder,
                             'fields'        => $fields,
                         ]
