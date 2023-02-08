@@ -27,6 +27,8 @@ class DateExtension extends AbstractExtension
             new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
             new TwigFunction('dateToFullConcat', [$this, 'toFullConcat'], ['is_safe' => ['all']]),
             new TwigFunction('dateToDate', [$this, 'toDate'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToTime', [$this, 'toTime'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToShort', [$this, 'toShort'], ['is_safe' => ['all']]),
             new TwigFunction('dateFormatRange', [$this, 'formatRange'], ['is_safe' => ['all']]),
         ];
     }
@@ -70,12 +72,10 @@ class DateExtension extends AbstractExtension
      * Returns date only e.g. 2014-08-09.
      *
      * @param \DateTime|string $datetime
-     * @param string           $timezone
-     * @param string           $fromFormat
      *
      * @return string
      */
-    public function toDate($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s')
+    public function toDate($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s')
     {
         return $this->dateHelper->toDate($datetime, $timezone, $fromFormat);
     }
@@ -84,6 +84,27 @@ class DateExtension extends AbstractExtension
      * Format DateInterval into humanly readable format.
      * Example: 55 minutes 49 seconds.
      * It doesn't return zero values like 0 years.
+     * Returns time only e.g. 21:19.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toTime($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
+    }
+
+    /**
+     * Returns short date format eg Sun, Oct 8.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
+    }
+
+    /**
+     * @see DateHelper::formatRange
      */
     public function formatRange(\DateInterval $range): string
     {

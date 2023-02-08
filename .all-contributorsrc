@@ -695,7 +695,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/96085911?v=4",
       "profile": "https://github.com/volha-pivavarchyk",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -940,6 +941,15 @@
       "profile": "https://github.com/bergwerkweb",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "LordRembo",
+      "name": "Rembrand",
+      "avatar_url": "https://avatars.githubusercontent.com/u/758957?v=4",
+      "profile": "http://rembo.me",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
