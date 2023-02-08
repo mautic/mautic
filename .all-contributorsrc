@@ -951,6 +951,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "TechBill",
+      "name": "TechBill",
+      "avatar_url": "https://avatars.githubusercontent.com/u/945103?v=4",
+      "profile": "https://github.com/TechBill",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
