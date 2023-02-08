@@ -168,11 +168,11 @@ class ConfigController extends FormController
                 'viewParameters' => [
                     'tmpl'        => $tmpl,
                     'security'    => $this->get('mautic.security'),
-                    'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.php', $formThemes),
+                    'form'        => $this->setFormTheme($form, 'MauticConfigBundle:Config:form.html.twig', $formThemes),
                     'formConfigs' => $formConfigs,
                     'isWritable'  => $isWritabale,
                 ],
-                'contentTemplate' => 'MauticConfigBundle:Config:form.html.php',
+                'contentTemplate' => 'MauticConfigBundle:Config:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_config_index',
                     'mauticContent' => 'config',
