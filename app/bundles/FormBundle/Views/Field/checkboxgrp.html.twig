@@ -7,8 +7,7 @@
             'formId': formId|default(0),
             'type': 'checkbox',
             'formName': formName|default(''),
-            'contactFields': contactFields|default([]),
-            'companyFields': companyFields|default([]),
+            'mappedFields': mappedFields|default([]),
     })|replace({
             '<input': '<input value="' ~ field.defaultValue ~ '"',
     }) }}
@@ -20,7 +19,6 @@
         'formId': formId|default(0),
         'type': 'checkbox',
         'formName': formName|default(''),
-        'contactFields': contactFields|default([]),
-        'companyFields': companyFields|default([]),
+        'mappedFields': mappedFields|default([]),
         'fields': fields|default(null),
 }) }}

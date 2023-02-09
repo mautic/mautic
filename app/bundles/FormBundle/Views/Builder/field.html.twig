@@ -76,10 +76,10 @@
                 </li>
             {% endif %}
 
-            {% if form.leadField is defined %}
+            {% if form.mappedField is defined %}
               <li role="presentation">
-                  <a href="#leadfields" aria-controls="leadfields" role="tab" data-toggle="tab">
-                      {{ 'mautic.form.field.section.leadfield'|trans }}
+                  <a href="#mappedfields" aria-controls="mappedfields" role="tab" data-toggle="tab">
+                      {{ 'mautic.form.field.section.mappedfield'|trans }}
                   </a>
               </li>
             {% endif %}
@@ -133,35 +133,11 @@
                 </div>
             </div>
 
-            {% if form.leadField is defined %}
-              <div role="tabpanel" class="tab-pane" id="leadfields">
+            {% if form.mappedField is defined %}
+              <div role="tabpanel" class="tab-pane" id="mappedfields">
                   <div class="row">
-                      <div class="col-md-6">
-                          {% set fieldGroups = form.leadField.vars.choices %}
-                          {% set data = form.leadField.vars.data %}
-                          <select id="formfield_leadField" name="formfield[leadField]" class="form-control" autocomplete="false" style="display: none;">
-                              <option value=""></option>
-                              {% for object, group in fieldGroups %}
-                                {% set header = object %}
-                                {% set icon = 'company' == object ? 'builder' : 'user' %}
-                                <optgroup label="{{ ('mautic.lead.' ~ header)|trans }}">
-                                    {% for subGroup, fields in group.choices %}
-                                        {% for field in fields.choices %}
-                                            {% set attr = field.attr|default([]) %}
-                                            {% set attrString = '' %}
-                                            {% for k, v in attr %}
-                                                {% set attrString = attrString ~ k ~ '="' ~ v|replace({'"': '&quot;'}) ~ '" ' %}
-                                            {% endfor %}
-                                            {% set label = field.label %}
-                                            {% set value = field.value %}
-                                            <option value="{{ value|e }}" class="segment-filter {{ icon }}" {% if data == value %}selected{% endif %} {{ attrString|raw }}>{{ label }}</option>
-                                        {% endfor %}
-                                    {% endfor %}
-                                </optgroup>
-                              {% endfor %}
-                          </select>
-                          {% do form.leadField.setRendered() %}
-                      </div>
+                      {{ formRowIfExists(form, 'mappedObject', template) }}
+                      {{ formRowIfExists(form, 'mappedField', template) }}
                   </div>
               </div>
             {% endif %}

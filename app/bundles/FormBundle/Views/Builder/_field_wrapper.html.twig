@@ -1,5 +1,6 @@
 {#
   Variables
+    - isConditional (bool)
     - template
     - field
     - viewOnlyFields
@@ -7,8 +8,7 @@
     - id
     - formId
     - formName
-    - contactFields
-    - companyFields
+    - mappedFields (\Mautic\FormBundle\Collection\MappedObjectCollection)
     - inBuilder
     - fields
     - formFields
@@ -30,8 +30,7 @@
                     'inForm': true,
                     'id': field.id,
                     'formId': formId,
-                    'contactFields': contactFields|default([]),
-                    'companyFields': companyFields|default([]),
+                    'mappedFields': mappedFields,
                     'inBuilder': inBuilder,
             }, with_context=false) -}}
             <!-- end: "{{ template }}" -->
@@ -62,17 +61,14 @@
                     <br>
                 {% endif %}
 
-                {% if field.leadField is defined and field.leadField is not empty %}
-                    {% set icon = field.leadField in companyFields|keys ? 'building' : 'user' %}
+                {% if ((field.mappedObject is defined and field.mappedObject is not empty) and (field.mappedField is defined and field.mappedField is not empty)) and mappedFields.offsetExists(field.mappedObject) %}
+                    {% set icon = 'compress' %}
+                    {% set icon = 'company' is same as field.mappedObject ? 'building' : icon %}
+                    {% set icon = 'contact' is same as field.mappedObject ? 'user' : icon %}
                     <i class="fa fa-{{ icon }}" aria-hidden="true"></i>
                     <span class="inline-spacer">
-                        {% if contactFields[field.leadField].label is defined %}
-                            {{ contactFields[field.leadField].label }}
-                        {% elseif companyFields[field.leadField].label is defined %}
-                            {{ companyFields[field.leadField].label }}
-                        {% else %}
-                            {{ field.leadField|title }}
-                        {% endif %}
+                        {% set fieldCollection = mappedFields.offsetGet(field.mappedObject) %}
+                        {{ field.mappedObject }}: {% if fieldCollection[field.mappedField] is defined %}{{ fieldCollection[field.mappedField].name }}{% else %}{{ field.mappedField|capitalize }}{% endif %}
                     </span>
                 {% endif %}
 
@@ -131,8 +127,7 @@
                       'inForm': true,
                       'id': field2.id,
                       'formId': formId,
-                      'contactFields': contactFields,
-                      'companyFields': companyFields,
+                      'mappedFields': mappedFields|default([]),
                       'inBuilder': inBuilder,
                       'fields': fields,
                       'formFields': formFields,

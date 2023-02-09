@@ -11,9 +11,8 @@
     - tmpl
     - activeForm
     - form
-    - contactFields
-    - companyFields
     - inBuilder
+    - mappedFields
 #}
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
@@ -114,8 +113,7 @@
                                                   'id': field.id,
                                                   'formId': formId,
                                                   'formName': activeForm.generateFormName,
-                                                  'contactFields': contactFields,
-                                                  'companyFields': companyFields,
+                                                  'mappedFields': mappedFields,
                                                   'inBuilder': inBuilder,
                                                   'fields': fields,
                                                   'formFields': formFields,

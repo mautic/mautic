@@ -4,8 +4,6 @@
     - fieldSettings
     - viewOnlyFields
     - fields
-    - contactFields
-    - companyFields
     - theme
     - submissions
     - lead
@@ -14,6 +12,7 @@
     - style
     - inBuilder
     - displayManager
+    - mappedFields (optional)
 #}
 {% set formName = '_' ~ form.generateFormName() ~ suffix|default('') %}
 {% set fields = fields|default(form.fields) %}
@@ -21,8 +20,7 @@
 {% set inBuilder = inBuilder|default(false) %}
 {% set action = action|default(url('mautic_form_postresults', {'formId': form.id})) %}
 {% set theme = theme|default('') %}
-{% set contactFields = contactFields|default([]) %}
-{% set companyFields = companyFields|default([]) %}
+{% set mappedFields = mappedFields|default([]) %}
 {% set style = style|default('') %}
 {% set isAjax = isAjax|default(true) %}
 {% set submissions = submissions|default(null) %}
@@ -53,10 +51,10 @@
                       {%- if
                             not f.isAlwaysDisplay and
                             not f.showWhenValueExists and
-                            f.leadField and
+                            f.mappedField is not empty and
+                            'contact' is same as f.mappedObject and
                             f.isAutoFill and
-                            lead and
-                            lead.getFieldValue(f.leadField) is not empty
+                            (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
                       -%}
                           {%- do f.setType('hidden') -%}
                       {%- else -%}
@@ -71,8 +69,7 @@
                           'id': f.alias,
                           'formName': formName,
                           'fieldPage': (pageCount - 1),
-                          'contactFields': contactFields,
-                          'companyFields': companyFields,
+                          'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
@@ -87,6 +84,15 @@
                       {%- do f.setCustomParameters(params) -%}
                       {%- set template = params.template -%}
                   {%- else -%}
+                      {% if
+                            not f.showWhenValueExists and
+                            f.mappedField is not empty and
+                            'contact' is same as f.mappedObject and
+                            f.isAutoFill and
+                            (lead is defined and lead is not empty and lead.getFieldValue(f.mappedField) is not empty)
+                      %}
+                          {%- do f.setType('hidden') -%}
+                      {% endif %}
                       {%- set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
@@ -96,8 +102,7 @@
                           'id': f.alias,
                           'formName': formName,
                           'fieldPage': (pageCount - 1),
-                          'contactFields': contactFields,
-                          'companyFields': companyFields,
+                          'mappedFields': mappedFields,
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
