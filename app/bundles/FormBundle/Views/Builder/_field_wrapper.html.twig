@@ -61,13 +61,13 @@
                     <br>
                 {% endif %}
 
-                {% if ((field.mappedObject is defined and field.mappedObject is not empty) and (field.mappedField is defined and field.mappedField is not empty)) and mappedFields.offsetExists(field.mappedObject) %}
+                {% if field.mappedObject is not empty and field.mappedField is not empty and mappedFields[field.mappedObject] is defined %}
                     {% set icon = 'compress' %}
                     {% set icon = 'company' is same as field.mappedObject ? 'building' : icon %}
                     {% set icon = 'contact' is same as field.mappedObject ? 'user' : icon %}
                     <i class="fa fa-{{ icon }}" aria-hidden="true"></i>
                     <span class="inline-spacer">
-                        {% set fieldCollection = mappedFields.offsetGet(field.mappedObject) %}
+                        {% set fieldCollection = mappedFields[field.mappedObject] is defined %}
                         {{ field.mappedObject }}: {% if fieldCollection[field.mappedField] is defined %}{{ fieldCollection[field.mappedField].name }}{% else %}{{ field.mappedField|capitalize }}{% endif %}
                     </span>
                 {% endif %}
@@ -127,7 +127,7 @@
                       'inForm': true,
                       'id': field2.id,
                       'formId': formId,
-                      'mappedFields': mappedFields|default([]),
+                      'mappedFields': mappedFields,
                       'inBuilder': inBuilder,
                       'fields': fields,
                       'formFields': formFields,

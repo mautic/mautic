@@ -131,17 +131,17 @@
 
   {%- if
         (field.properties.syncList is defined and field.properties.syncList is not empty) and
-        (field.mappedField is defined and field.mappedField is not empty) and
-        (field.mappedObject is defined and field.mappedObject is not empty) and
+        field.mappedField is not empty and
+        field.mappedObject is not empty and
         mappedFields[field.mappedObject] is defined
   -%}
     {# @var \Mautic\FormBundle\Collection\FieldCollection #}
     {% set fieldCollection = mappedFields[field.mappedObject] %}
-    {% if fieldCollection[field.mappedField] is defined %}
-      {% set mappedField = fieldCollection[field.mappedField] %}
+    {% if fieldCollection.getFieldByKey(field.mappedField, false) is not empty %}
+      {% set mappedField = fieldCollection.getFieldByKey(field.mappedField) %}
       {% set mappedFieldType = mappedField.type %}
 
-      {%- if mappedField.properties.list is not empty -%}
+      {%- if mappedField.properties.list is defined and mappedField.properties.list is not empty -%}
         {%- set parseList = mappedField.properties.list -%}
       {%- elseif 'boolean' == mappedFieldType -%}
         {%- set parseList = {
