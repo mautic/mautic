@@ -1,5 +1,7 @@
+<h1>Test builder template</h1>
+    
     {% set templateObject = {
-        'templateHtml': templateHtml,
-        'templateMjml': templateMjml,
+        'templateHtml': templateHtml | default(''),
+        'templateMjml': templateMjml | default(''),
     } %}
-    {{ templateObject | json_encode() }}
+    {{ templateObject | json_encode(constant('JSON_PRETTY_PRINT')) }}
