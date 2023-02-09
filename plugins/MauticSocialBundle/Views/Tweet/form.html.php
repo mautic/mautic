@@ -38,7 +38,7 @@ echo $view['assets']->includeScript('plugins/MauticSocialBundle/Assets/js/social
 
                 <div class="col-md-8">
                     <?php echo $view['form']->row($form['text']); ?>
-                    
+
                     <div class="row">
                         <div class="col-md-3">
                             <label class="control-label">
