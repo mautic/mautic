@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class NotificationControllerTest extends MauticMysqlTestCase
+final class MobileNotificationControllerTest extends MauticMysqlTestCase
 {
     /**
      * Smoke test to ensure the '/s/mobile_notifications' route loads.
