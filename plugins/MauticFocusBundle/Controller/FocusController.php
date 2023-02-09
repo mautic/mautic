@@ -148,7 +148,7 @@ class FocusController extends AbstractStandardFormController
 
             $args['viewParameters']['stats']         = $stats;
             $args['viewParameters']['dateRangeForm'] = $dateRangeForm->createView();
-            $args['viewParameters']['totalViews']    = $model->countAllViews($item);
+            $args['viewParameters']['totalViews']    = $model->getViewsCount($item);
 
             if ('link' === $item->getType()) {
                 $trackableModel = $this->getModel('page.trackable');

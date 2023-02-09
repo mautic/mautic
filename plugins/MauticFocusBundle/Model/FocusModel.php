@@ -459,7 +459,7 @@ class FocusModel extends FormModel
             ->setParameter('userId', $this->userHelper->getUser()->getId());
     }
 
-    public function countAllViews(Focus $focus): int
+    public function getViewsCount(Focus $focus): int
     {
         return $this->getStatRepository()->getViewsCount($focus->getId());
     }
