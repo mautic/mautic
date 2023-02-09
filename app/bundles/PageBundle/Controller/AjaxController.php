@@ -27,8 +27,8 @@ class AjaxController extends CommonAjaxController
             AbTestPropertiesType::class,
             'page_abtest_settings',
             'page',
-            'MauticPageBundle:AbTest:form.html.php',
-            ['MauticPageBundle:AbTest:form.html.php', 'MauticPageBundle:FormTheme\Page']
+            'MauticPageBundle:AbTest:form.html.twig',
+            ['MauticPageBundle:AbTest:form.html.twig', 'MauticPageBundle:FormTheme\Page']
         );
     }
 
