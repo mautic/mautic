@@ -260,7 +260,7 @@ abstract class SocialIntegration extends AbstractIntegration
      */
     public function getSocialProfileTemplate()
     {
-        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.php";
+        return "MauticSocialBundle:Integration/{$this->getName()}/Profile:view.html.twig";
     }
 
     /**
