@@ -940,6 +940,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setEmailIds($ids);
         $fetchOptions->setCanViewOthers($this->corePermissions->isGranted('email:emails:viewother'));
+        $fetchOptions->setUnit($chart->getUnit());
 
         $chart->setDataset(
             $this->translator->trans('mautic.email.sent.emails'),

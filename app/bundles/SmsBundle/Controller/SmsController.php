@@ -120,7 +120,7 @@ class SmsController extends FormController
                 'security'    => $this->get('mautic.security'),
                 'configured'  => count($this->get('mautic.sms.transport_chain')->getEnabledTransports()) > 0,
             ],
-            'contentTemplate' => 'MauticSmsBundle:Sms:list.html.php',
+            'contentTemplate' => 'MauticSmsBundle:Sms:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
@@ -226,7 +226,7 @@ class SmsController extends FormController
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticSmsBundle:Sms:details.html.php',
+            'contentTemplate' => 'MauticSmsBundle:Sms:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
@@ -350,10 +350,10 @@ class SmsController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form' => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
+                    'form' => $form->createView(),
                     'sms'  => $entity,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.php',
+                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
@@ -513,11 +513,11 @@ class SmsController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'               => $this->setFormTheme($form, 'MauticSmsBundle:Sms:form.html.php', 'MauticSmsBundle:FormTheme\Sms'),
+                    'form'               => $form->createView(),
                     'sms'                => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.php',
+                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
@@ -719,7 +719,7 @@ class SmsController extends FormController
                 'viewParameters' => [
                     'sms' => $sms,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:preview.html.php',
+                'contentTemplate' => 'MauticSmsBundle:Sms:preview.html.twig',
             ]);
         }
 

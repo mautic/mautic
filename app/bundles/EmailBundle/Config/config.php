@@ -421,6 +421,7 @@ return [
                     'event_dispatcher',
                     'monolog.logger.mautic',
                     'mautic.tracker.contact',
+                    'mautic.helper.email.address',
                 ],
             ],
             'mautic.helper.mailer' => [

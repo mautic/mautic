@@ -1,0 +1,9 @@
+{#
+  Variables
+    - event
+#}
+{% set dnc = event.extra.dnc %}
+<p><strong>{{ dnc.reason }}</strong></p>
+{% if dnc.comments is not empty %}
+  <p class="small">{{ dnc.comments }}</p>
+{% endif %}

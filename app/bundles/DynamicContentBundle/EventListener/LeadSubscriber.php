@@ -91,7 +91,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                 'stat' => $stat,
                                 'type' => 'sent',
                             ],
-                            'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
+                            'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.twig',
                             'icon'            => 'fa-puzzle-piece',
                             'contactId'       => $contactId,
                         ]
