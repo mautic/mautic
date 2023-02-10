@@ -218,4 +218,36 @@ class InputHelperTest extends TestCase
         // fragment is not included
         yield ['http://www.mautic.org#abc123', 'http://www.mautic.org', true];
     }
+
+    /**
+     * @dataProvider minifyHTMLProvider
+     */
+    public function testMinifyHTML(string $html, string $expected)
+    {
+        $this->assertEquals($expected, InputHelper::minifyHTML($html));
+    }
+
+    public function minifyHTMLProvider(): array
+    {
+        return [
+            // Test with a simple HTML string with no whitespace
+            ['<p>Hello World</p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple spaces between tags
+            ['<p>    Hello World    </p>', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple newlines between tags
+            ["<p>\n\nHello World\n\n</p>", '<p>Hello World</p>'],
+            // Test with an HTML string with inline CSS
+            ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'],
+            // Test with an empty HTML string
+            ['', ''],
+            // Test with an HTML string with a comment
+            ['<p>Hello World</p><!-- This is a comment -->', '<p>Hello World</p>'],
+            // Test with an HTML string with multiple attributes
+            ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'],
+            // Test with an HTML string with multiple same tag
+            ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'],
+            // Test with an HTML string with multiple same tag but with different attributes
+            ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
+        ];
+    }
 }

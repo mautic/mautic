@@ -332,6 +332,21 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            self::MINIFY_EMAIL_HTML,
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.minify.html',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.mailer.minify.html.tooltip',
+                ],
+                'data'       => $options['data'][self::MINIFY_EMAIL_HTML] ?? false,
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
             'mailer_host',
             TextType::class,
             [
@@ -865,6 +880,8 @@ class ConfigType extends AbstractType
             ]
         );
     }
+
+    public const MINIFY_EMAIL_HTML              = 'minify_email_html';
 
     /**
      * {@inheritdoc}

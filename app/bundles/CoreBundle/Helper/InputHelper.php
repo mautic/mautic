@@ -539,4 +539,87 @@ class InputHelper
 
         return \URLify::transliterate((string) $value);
     }
+
+    public static function minifyHTML(string $html): string
+    {
+        if ('' === trim($html)) {
+            return $html;
+        }
+        // Remove extra white-space(s) between HTML attribute(s)
+        $html = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', function ($matches) {
+            return '<'.$matches[1].preg_replace(
+                    '#([^\s=]+)(\=([\'"]?)(.*?)\3)?(\s+|$)#s',
+                    ' $1$2',
+                    $matches[2]
+                ).$matches[3].'>';
+        }, str_replace("\r", '', $html));
+        // Minify inline CSS declaration(s)
+        if (false !== strpos($html, ' style=')) {
+            $html = preg_replace_callback('#<([^<]+?)\s+style=([\'"])(.*?)\2(?=[\/\s>])#s', function ($matches) {
+                return '<'.$matches[1].' style='.$matches[2].self::minifyCss($matches[3]).$matches[2];
+            }, $html);
+        }
+
+        $html = preg_replace(
+            [
+                // t = text
+                // o = tag open
+                // c = tag close
+                // Keep important white-space(s) after self-closing HTML tag(s)
+                '#<(img|input)(>| .*?>)#s',
+                // Remove a line break and two or more white-space(s) between tag(s)
+                '#(<!--.*?-->)|(>)(?:\n*|\s{2,})(<)|^\s*|\s*$#s',
+                '#(<!--.*?-->)|(?<!\>)\s+(<\/.*?>)|(<[^\/]*?>)\s+(?!\<)#s',
+                // t+c || o+t
+                '#(<!--.*?-->)|(<[^\/]*?>)\s+(<[^\/]*?>)|(<\/.*?>)\s+(<\/.*?>)#s',
+                // o+o || c+c
+                '#(<!--.*?-->)|(<\/.*?>)\s+(\s)(?!\<)|(?<!\>)\s+(\s)(<[^\/]*?\/?>)|(<[^\/]*?\/?>)\s+(\s)(?!\<)#s',
+                // c+t || t+o || o+t -- separated by long white-space(s)
+                '#(<!--.*?-->)|(<[^\/]*?>)\s+(<\/.*?>)#s',
+                // empty tag
+                '#<(img|input)(>| .*?>)<\/\1>#s',
+                // reset previous fix
+                '#(&nbsp;)&nbsp;(?![<\s])#',
+                // clean up ...
+                '#(?<=\>)(&nbsp;)(?=\<)#',
+                // --ibid
+                // Remove HTML comment(s) except IE comment(s)
+                '#\s*<!--(?!\[if\s).*?-->\s*|(?<!\>)\n+(?=\<[^!])#s',
+            ],
+            [
+                '<$1$2</$1>',
+                '$1$2$3',
+                '$1$2$3',
+                '$1$2$3$4$5',
+                '$1$2$3$4$5$6$7',
+                '$1$2$3',
+                '<$1$2',
+                '$1 ',
+                '$1',
+                '',
+            ],
+            $html
+        );
+
+        return str_replace(["\r", "\n"], ' ', $html);
+    }
+
+    private static function minifyCss(string $css): string
+    {
+        $css = preg_replace('/\s*([:;{}])\s*/', '$1', preg_replace('/\s+/', ' ', $css));
+        // Remove comments
+        $css = preg_replace('/\/\*[^*]*\*+([^\/*][^*]*\*+)*\//', '', $css);
+        // Remove whitespace
+        $css = preg_replace('/\s+/', ' ', $css);
+        // Remove leading and trailing whitespace
+        $css = trim($css);
+        // Replace multiple semicolons with one
+        $css = preg_replace('/;(?=;)/', '', $css);
+        // Replace multiple whitespaces with one
+        $css = preg_replace('/(\s+)/', ' ', $css);
+        // Replace 0(px,em,%, etc) with 0
+        $css = preg_replace('/(:| )0(\.\d+)?(%|em|ex|px|in|cm|mm|pt|pc)/i', '${1}0', $css);
+
+        return $css;
+    }
 }

@@ -719,5 +719,6 @@ return [
         'theme_email_default'                 => 'blank',
         'mailer_sparkpost_region'             => 'us',
         'mailer_memory_msg_limit'             => 100,
+        ConfigType::MINIFY_EMAIL_HTML         => false,
     ],
 ];

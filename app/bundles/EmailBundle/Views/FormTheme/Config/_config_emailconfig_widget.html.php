@@ -156,6 +156,7 @@ $template  = '<div class="col-md-6">{content}</div>';
             <?php echo $view['form']->rowIfExists($fields, 'mailer_append_tracking_pixel', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'mailer_convert_embed_images', $template); ?>
             <?php echo $view['form']->rowIfExists($fields, 'disable_trackable_urls', $template); ?>
+            <?php echo $view['form']->rowIfExists($fields, ConfigType::MINIFY_EMAIL_HTML, $template); ?>
         </div>
     </div>
 </div>

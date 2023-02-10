@@ -6,11 +6,13 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
@@ -1362,6 +1364,10 @@ class MailHelper
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
     {
+        if ($this->factory->get('mautic.helper.core_parameters')->get(ConfigType::MINIFY_EMAIL_HTML)) {
+            $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
+        }
+
         $this->email = $email;
 
         $subject = $email->getSubject();
