@@ -57,7 +57,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'MessengerBundle',
             'formAlias'  => 'messengerconfig',
             'formType'   => ConfigType::class,
-            'formTheme'  => 'MauticMessengerBundle:FormTheme\Config',
+            'formTheme'  => 'MauticMessengerBundle:FormTheme:Config/_config_messengerconfig_widget.html.twig',
             'parameters' => $this->getParameters($event),
         ]);
     }
