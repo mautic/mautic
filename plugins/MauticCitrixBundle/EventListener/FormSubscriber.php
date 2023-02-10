@@ -416,8 +416,8 @@ class FormSubscriber implements EventSubscriberInterface
                     // get lead fields
                     $currentLeadFields = [];
                     foreach ($fields as $field) {
-                        $leadField = $field->getLeadField();
-                        if ('' !== $leadField) {
+                        $leadField = $field->getMappedField();
+                        if ('' !== $leadField && 'lead' === $field->getMappedObject()) {
                             $currentLeadFields[$leadField] = $field->getIsRequired();
                         }
                     }
