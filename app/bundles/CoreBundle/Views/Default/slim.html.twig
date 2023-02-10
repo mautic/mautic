@@ -3,11 +3,15 @@
     {% include('MauticCoreBundle:Default:head.html.twig') %}
     <body>
         {{ outputScripts('bodyOpen') }}
+       
         <section id="app-content" class="container content-only">
             {{ include('MauticCoreBundle:Notification:flashes.html.twig', {
                 alertType: 'standard'
             }) }}
-            {{ include('MauticCoreBundle:Default:output.html.twig') }}
+
+            {# {{ include('MauticCoreBundle:Default:output.html.twig') }} #}
+            {% block _content %}{% endblock %}
+
         </section>
         {{ include('MauticCoreBundle:Helper:modal.html.twig', {
             id: 'MauticSharedModal',
