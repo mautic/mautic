@@ -13,7 +13,7 @@
     {{- include(template, {
         content: block('content'),
         modal: block('modal') is defined ? block('modal') : '',
-        headerTitle: block('headerTitle'),
+        headerTitle: block('headerTitle') ?? '',
         pageTitle: block('pageTitle') is defined ? block('pageTitle') : '',
         publishStatus: block('publishStatus') is defined ? block('publishStatus') : '',
         actions: block('actions') is defined ? block('actions') : '',
