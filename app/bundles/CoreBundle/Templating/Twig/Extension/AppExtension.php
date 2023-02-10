@@ -19,6 +19,7 @@ class AppExtension extends AbstractExtension
             new TwigFunction('is_class', fn (string $value) => class_exists($value)),
             new TwigFunction('is_file', fn (string $value) => file_exists($value)),
             new TwigFunction('is_function', fn (string $value) => function_exists($value)),
+            new TwigFunction('is_extension_loaded', fn (string $value) => extension_loaded($value)),
         ];
     }
 

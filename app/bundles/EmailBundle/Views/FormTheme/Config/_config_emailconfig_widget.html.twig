@@ -3,6 +3,11 @@
 {% set fieldKeys = fields|keys %}
 {% set template = '<div class="col-md-6">{content}</div>' %}
 
+{% form_theme form with [
+    'MauticEmailBundle:FormTheme:Config/monitored_email_widget.html.twig',
+    'MauticEmailBundle:FormTheme:Config/monitored_mailboxes_widget.html.twig',
+] %}
+
 {% if fieldKeys|filter(k => k in ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_transport', 'mailer_spool_type'])|length > 0 %}
     <div class="panel panel-primary">
         <div class="panel-heading">
@@ -124,7 +129,6 @@
             <h3 class="panel-title">{{ 'mautic.email.config.header.monitored_email'|trans }}</h3>
         </div>
         <div class="panel-body">
-            <?php if (function_exists('imap_open')): ?>
             {% if 'imap_open' is function %}
                 {{ form_widget(form.monitored_email) }}
             {% else %}
