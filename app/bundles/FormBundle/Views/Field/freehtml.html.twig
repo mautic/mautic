@@ -183,7 +183,7 @@
   {% if field.showLabel %}<h3 {% for attrName, attrValue in labelAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ field.label }}</h3>{% endif %}
   <div {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
     {% if inBuilder %}
-      {{ showScriptTags(field.properties.text) }}
+      {{ showScriptTags(field.properties.text|default('')) }}
     {% else %}
       {{ field.properties.text|raw }}
     {% endif %}
