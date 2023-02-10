@@ -1,5 +1,5 @@
 <ul class="twitter-tags tag-cloud">
-    {% for tag, t in %}
+    {% for tag, t in activity %}
         {% if (t.count / 10) < 1 %}
             {% set fontSize = (t.count / 10) + 1 %}
         {% elseif (t.count / 10) > 2 %}
