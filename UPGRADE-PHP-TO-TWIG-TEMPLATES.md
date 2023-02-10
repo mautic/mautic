@@ -94,10 +94,14 @@ Becomes
 
     ```
 - Regarding the `default` filter: pay special attention to the [documented use case](https://twig.symfony.com/doc/3.x/filters/default.html) where false is treated as an empty value. Consider using `?? true` instead of `|default(true)` when using the default filter on a variable that could already have a boolean value set.
-- You can use the `|trans` filter instead of `{% trans %}` tags for translations. This is especially handy if you need to do text replacements as you can chain filters this way.
+- You can use text replacement with the `{% trans %}` tag as it is built in:
+    ```
+    {% trans with {'%code%': status_code} %}message{% endtrans %}
+    ```
+    Alternatively, you can use the `|trans` filter instead. This is a bit more compact and and handy, since you can chain multiple filters. Combining translation with text replacement becomes:
 
     ````
     {{message | trans | replace({"%code%": status_code})}}
-    ```
+    ```    
 - [Symfony Best Practices for Templates](https://symfony.com/doc/current/best_practices.html#templates)
 - [Twig for Template Designers](https://twig.symfony.com/doc/3.x/templates.html) is a good overview on creating templates.
