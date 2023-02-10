@@ -30,7 +30,7 @@ class SysinfoController extends FormController
                 'log'             => $model->getLogTail(200),
                 'dbInfo'          => $model->getDbInfo(),
             ],
-            'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
+            'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sysinfo_index',
                 'mauticContent' => 'sysinfo',
