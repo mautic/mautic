@@ -102,13 +102,15 @@
 .dropdown-menu > .disabled > a {
   &,
   &:hover,
-  &:focus {
+  &:focus,
+  .dropdown-menu > li > a.disabled {
     color: @dropdown-link-disabled-color;
   }
 
   // Nuke hover/focus effects
   &:hover,
-  &:focus {
+  &:focus,
+  .dropdown-menu > li > a.disabled{
     text-decoration: none;
     background-color: transparent;
     background-image: none; // Remove CSS gradient

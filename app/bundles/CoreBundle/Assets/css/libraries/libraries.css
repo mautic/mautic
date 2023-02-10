@@ -3642,11 +3642,13 @@ tbody.collapse.in {
 }
 .dropdown-menu > .disabled > a,
 .dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu > .disabled > a:focus,
+.dropdown-menu > li > a.disabled {
   color: #a0acb8;
 }
 .dropdown-menu > .disabled > a:hover,
-.dropdown-menu > .disabled > a:focus {
+.dropdown-menu > .disabled > a:focus,
+.dropdown-menu > li > a.disabled {
   text-decoration: none;
   background-color: transparent;
   background-image: none;
