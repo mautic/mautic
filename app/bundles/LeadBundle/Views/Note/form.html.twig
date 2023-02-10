@@ -1,0 +1,21 @@
+{#$view['slots']->set('mauticContent', 'leadnote');#}
+{% set userId = form.vars.data.id %}
+{#
+if (!empty($userId)) {
+    $header = $view['translator']->trans('mautic.lead.note.header.edit');
+} else {
+    $header = $view['translator']->trans('mautic.lead.note.header.new');
+}
+#}
+{{ form_start(form) }}
+{{ form_row(form.text) }}
+<div class="row">
+    <div class="col-xs-6">
+        {{ form_widget(form.type) }}
+    </div>
+    <div class="col-xs-6">
+        {{ form_widget(form.dateTime) }}
+    </div>
+</div>
+{{ form_row(form.buttons) }}
+{{ form_end(form) }}
