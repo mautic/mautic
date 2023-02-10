@@ -9,12 +9,15 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use Mautic\FormBundle\Collection\FieldCollection;
 use Mautic\FormBundle\Enum\ConditionalFieldEnum;
+use Mautic\FormBundle\Exception\FieldNotFoundException;
 
 if (!isset($inBuilder)) {
     $inBuilder = false;
 }
 
+/* @var \Mautic\FormBundle\Collection\MappedObjectCollection $mappedFields */
 ?>
 
 <div class="<?php if (empty($isConditional)): ?>panel<?php else: ?>panel2<?php endif; ?> form-field-wrapper"
@@ -40,8 +43,7 @@ if (!isset($inBuilder)) {
                     'inForm'        => true,
                     'id'            => $field['id'],
                     'formId'        => $formId,
-                    'contactFields' => (isset($contactFields)) ? $contactFields : [],
-                    'companyFields' => (isset($companyFields)) ? $companyFields : [],
+                    'mappedFields'  => $mappedFields,
                     'inBuilder'     => $inBuilder,
                 ]
             );
@@ -56,17 +58,11 @@ if (!isset($inBuilder)) {
             <div class="panel-footer">
                 <?php if (!empty($field['conditions']['expr'])): ?>
                     <span class="inline-spacer">
-                    <span style="text-transform: none"><?php echo $view['translator']->trans(
-                            'mautic.form.field.form.condition.show.on'
-                        ); ?></span>
+                    <span style="text-transform: none"><?php echo $view['translator']->trans('mautic.form.field.form.condition.show.on'); ?></span>
                     <strong><?php echo $formFields[$field['parent']]['label']; ?></strong>
                     <span style="text-transform: none">
-                          <?php echo $view['translator']->trans(
-                              'mautic.core.operator.'.strtolower($field['conditions']['expr'])
-                          ); ?>
-                        <?php echo $view['translator']->trans(
-                            'mautic.form.field.form.condition.select.value'
-                        ); ?>
+                        <?php echo $view['translator']->trans('mautic.core.operator.'.strtolower($field['conditions']['expr'])); ?>
+                        <?php echo $view['translator']->trans('mautic.form.field.form.condition.select.value'); ?>
                     </span>
                     <strong>
                         <?php if ('in' == $field['conditions']['expr'] && !empty($field['conditions']['any'])): ?>
@@ -79,20 +75,22 @@ if (!isset($inBuilder)) {
                     <br>
                 <?php endif; ?>
 
-                <?php if (!empty($field['leadField'])):
-                    $icon = (in_array($field['leadField'], array_keys($companyFields))) ? 'building' : 'user';
-                    ?>
+                <?php if (!empty($field['mappedObject']) && !empty($field['mappedField']) && $mappedFields->offsetExists($field['mappedObject'])): ?>
+                    <?php $icon = 'compress'; ?>
+                    <?php $icon = 'company' === $field['mappedObject'] ? 'building' : $icon; ?>
+                    <?php $icon = 'contact' === $field['mappedObject'] ? 'user' : $icon; ?>
                     <i class="fa fa-<?php echo $icon; ?>" aria-hidden="true"></i>
                     <span class="inline-spacer">
-            <?php
-            if (isset($contactFields[$field['leadField']]['label'])) {
-                echo $contactFields[$field['leadField']]['label'];
-            } elseif ($companyFields[$field['leadField']]['label']) {
-                echo $companyFields[$field['leadField']]['label'];
-            } else {
-                ucfirst($field['leadField']);
-            }
-            ?>
+                        <?php
+                            /** @var FieldCollection $fieldCollection */
+                            $fieldCollection = $mappedFields->offsetGet($field['mappedObject']);
+                            echo $field['mappedObject'].': ';
+                            try {
+                                echo $view->escape($fieldCollection->getFieldByKey($field['mappedField'])->getName());
+                            } catch (FieldNotFoundException $e) {
+                                echo ucfirst($field['mappedField']);
+                            }
+                        ?>
         </span>
             <?php endif; ?>
             <?php if (isset($field['alwaysDisplay']) && $field['alwaysDisplay']): ?>
@@ -180,8 +178,7 @@ if (!isset($inBuilder)) {
                     'inForm'            => true,
                     'id'                => $field2['id'],
                     'formId'            => $formId,
-                    'contactFields'     => $contactFields,
-                    'companyFields'     => $companyFields,
+                    'mappedFields'      => $mappedFields,
                     'inBuilder'         => $inBuilder,
                     'fields'            => $fields,
                     'formFields'        => $formFields,

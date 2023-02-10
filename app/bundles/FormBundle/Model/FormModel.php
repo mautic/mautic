@@ -9,9 +9,11 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
+use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\FormEvent;
 use Mautic\FormBundle\Form\Type\FormType;
@@ -87,8 +89,10 @@ class FormModel extends CommonFormModel
     private $tableSchemaHelper;
 
     /**
-     * FormModel constructor.
+     * @var MappedObjectCollectorInterface
      */
+    private $mappedObjectCollector;
+
     public function __construct(
         RequestStack $requestStack,
         TemplatingHelper $templatingHelper,
@@ -100,25 +104,27 @@ class FormModel extends CommonFormModel
         FormUploader $formUploader,
         ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
-        TableSchemaHelper $tableSchemaHelper
+        TableSchemaHelper $tableSchemaHelper,
+        MappedObjectCollectorInterface $mappedObjectCollector
     ) {
-        $this->requestStack           = $requestStack;
-        $this->templatingHelper       = $templatingHelper;
-        $this->themeHelper            = $themeHelper;
-        $this->formActionModel        = $formActionModel;
-        $this->formFieldModel         = $formFieldModel;
-        $this->fieldHelper            = $fieldHelper;
-        $this->leadFieldModel         = $leadFieldModel;
-        $this->formUploader           = $formUploader;
-        $this->contactTracker         = $contactTracker;
-        $this->columnSchemaHelper     = $columnSchemaHelper;
-        $this->tableSchemaHelper      = $tableSchemaHelper;
+        $this->requestStack          = $requestStack;
+        $this->templatingHelper      = $templatingHelper;
+        $this->themeHelper           = $themeHelper;
+        $this->formActionModel       = $formActionModel;
+        $this->formFieldModel        = $formFieldModel;
+        $this->fieldHelper           = $fieldHelper;
+        $this->leadFieldModel        = $leadFieldModel;
+        $this->formUploader          = $formUploader;
+        $this->contactTracker        = $contactTracker;
+        $this->columnSchemaHelper    = $columnSchemaHelper;
+        $this->tableSchemaHelper     = $tableSchemaHelper;
+        $this->mappedObjectCollector = $mappedObjectCollector;
     }
 
     /**
      * {@inheritdoc}
      *
-     * @return \Mautic\FormBundle\Entity\FormRepository
+     * @return FormRepository
      */
     public function getRepository()
     {
@@ -172,7 +178,7 @@ class FormModel extends CommonFormModel
 
         if ($entity && $entity->getFields()) {
             foreach ($entity->getFields() as $field) {
-                $this->addLeadFieldOptions($field);
+                $this->addMappedFieldOptions($field);
             }
         }
 
@@ -404,6 +410,8 @@ class FormModel extends CommonFormModel
             $entity->setAlias($alias);
         }
 
+        $this->backfillReplacedPropertiesForBc($entity);
+
         //save the form so that the ID is available for the form html
         parent::saveEntity($entity, $unlock);
 
@@ -527,8 +535,7 @@ class FormModel extends CommonFormModel
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
                 'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
                 'fields'         => $fields,
-                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+                'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
                 'form'           => $entity,
                 'theme'          => $theme,
                 'submissions'    => $submissions,
@@ -557,7 +564,6 @@ class FormModel extends CommonFormModel
         $pages = ['open' => [], 'close' => []];
 
         $openFieldId  =
-        $closeFieldId =
         $previousId   =
         $lastPage     = false;
         $pageCount    = 1;
@@ -817,7 +823,7 @@ class FormModel extends CommonFormModel
     }
 
     /**
-     * @param $formHtml
+     * @param string $formHtml
      */
     public function populateValuesWithLead(Form $form, &$formHtml)
     {
@@ -831,7 +837,7 @@ class FormModel extends CommonFormModel
             $isAutoFill = $field->getIsAutoFill();
 
             // we want work just with matched autofill fields
-            if (isset($leadField) && $isAutoFill) {
+            if ($field->getMappedField() && 'contact' === $field->getMappedObject() && $field->getIsAutoFill()) {
                 $autoFillFields[$key] = $field;
             }
         }
@@ -847,7 +853,7 @@ class FormModel extends CommonFormModel
         }
 
         foreach ($autoFillFields as $field) {
-            $value = $lead->getFieldValue($field->getLeadField());
+            $value = $lead->getFieldValue($field->getMappedField());
             // just skip string empty field
             if ('' !== $value) {
                 $this->fieldHelper->populateField($field, $value, $formName, $formHtml);
@@ -1077,16 +1083,16 @@ class FormModel extends CommonFormModel
     /**
      * Finds out whether the.
      */
-    private function addLeadFieldOptions(Field $formField)
+    private function addMappedFieldOptions(Field $formField): void
     {
-        $formFieldProps    = $formField->getProperties();
-        $contactFieldAlias = $formField->getLeadField();
+        $formFieldProps   = $formField->getProperties();
+        $mappedFieldAlias = $formField->getMappedField();
 
-        if (empty($formFieldProps['syncList']) || empty($contactFieldAlias)) {
+        if (empty($formFieldProps['syncList']) || empty($mappedFieldAlias) || 'contact' !== $formField->getMappedObject()) {
             return;
         }
 
-        $list = $this->getContactFieldPropertiesList($contactFieldAlias);
+        $list = $this->getContactFieldPropertiesList($mappedFieldAlias);
 
         if (!empty($list)) {
             $formFieldProps['list'] = ['list' => $list];
@@ -1102,7 +1108,7 @@ class FormModel extends CommonFormModel
      */
     public function getContactFieldPropertiesList(string $contactFieldAlias): ?array
     {
-        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias);
+        $contactField = $this->leadFieldModel->getEntityByAlias($contactFieldAlias); // @todo this must use all objects as well. Not just contact.
 
         if (empty($contactField) || !in_array($contactField->getType(), ContactFieldHelper::getListTypes())) {
             return null;
@@ -1152,5 +1158,20 @@ class FormModel extends CommonFormModel
         }
 
         return null;
+    }
+
+    private function backfillReplacedPropertiesForBc(Form $entity): void
+    {
+        /** @var Field $field */
+        foreach ($entity->getFields() as $field) {
+            if (!$field->getLeadField() && $field->getMappedField()) {
+                $field->setLeadField($field->getMappedField());
+            } elseif ($field->getLeadField() && !$field->getMappedField()) {
+                $field->setMappedField($field->getLeadField());
+                $field->setMappedObject(
+                    'company' === substr($field->getLeadField(), 0, 7) && 'company' !== $field->getLeadField() ? 'company' : 'contact'
+                );
+            }
+        }
     }
 }
