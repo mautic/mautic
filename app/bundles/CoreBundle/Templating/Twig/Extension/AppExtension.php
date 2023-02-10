@@ -13,9 +13,10 @@ class AppExtension extends AbstractExtension
     /**
      * @return TwigFunction[]
      */
-    public function getFunctions(): array
+    public function getFunctions()
     {
         return [
+            new TwigFunction('ini_get', fn ($value) => ini_get($value)),
             new TwigFunction('is_class', fn (string $value) => class_exists($value)),
             new TwigFunction('is_file', fn (string $value) => file_exists($value)),
             new TwigFunction('is_function', fn (string $value) => function_exists($value)),
