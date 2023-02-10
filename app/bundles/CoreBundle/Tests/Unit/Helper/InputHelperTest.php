@@ -222,11 +222,14 @@ class InputHelperTest extends TestCase
     /**
      * @dataProvider minifyHTMLProvider
      */
-    public function testMinifyHTML(string $html, string $expected)
+    public function testMinifyHTML(string $html, string $expected): void
     {
         $this->assertEquals($expected, InputHelper::minifyHTML($html));
     }
 
+    /**
+     * @return array<array<string>>
+     */
     public function minifyHTMLProvider(): array
     {
         return [
