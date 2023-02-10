@@ -1364,7 +1364,7 @@ class MailHelper
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
     {
-        if ($this->factory->get('mautic.helper.core_parameters')->get(ConfigType::MINIFY_EMAIL_HTML)) {
+        if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
             $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
         }
 
