@@ -81,9 +81,6 @@ class DateExtension extends AbstractExtension
     }
 
     /**
-     * Format DateInterval into humanly readable format.
-     * Example: 55 minutes 49 seconds.
-     * It doesn't return zero values like 0 years.
      * Returns time only e.g. 21:19.
      *
      * @param \DateTime|string $datetime
