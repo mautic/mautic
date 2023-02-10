@@ -1,0 +1,18 @@
+{% block _campaignevent_form_field_value_widget %}
+  <div class="row">
+      <div class="col-xs-12">
+          {{ form_row(form.form) }}
+      </div>
+  </div>
+  <div class="row">
+      <div class="col-xs-4">
+          {{ form_row(form.field) }}
+      </div>
+      <div class="col-xs-4">
+          {{ form_row(form.operator) }}
+      </div>
+      <div class="col-xs-4">
+          {{ form_row(form.value) }}
+      </div>
+  </div>
+{% endblock %}
