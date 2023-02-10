@@ -814,6 +814,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         return $chart->render();
     }
 
+    public function getDeliveredCount(Email $email, $includeVariants = false): int
+    {
+        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
+
+        $statRepo = $this->getStatRepository();
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+
+        $failedCount    = (int) $statRepo->getFailedCount($emailIds);
+        $bouncedCount   = (int) $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED);
+        $sentCount      = (int) $email->getSentCount($includeVariants);
+        $deliveredCount = $sentCount - $failedCount - $bouncedCount;
+
+        // we never want to display a negative number of delivered emails
+        return max($deliveredCount, 0);
+    }
+
     /**
      * Get a stats for email by list.
      *

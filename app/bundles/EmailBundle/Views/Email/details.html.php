@@ -219,6 +219,12 @@ if (!$isEmbedded) {
                             </tr>
                             <tr>
                                 <td width="20%">
+                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.delivered'); ?></span>
+                                </td>
+                                <td><?php echo $deliveredCount; ?></td>
+                            </tr>
+                            <tr>
+                                <td width="20%">
                                     <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.read'); ?></span>
                                 </td>
                                 <td><?php echo $email->getReadCount(); ?></td>
