@@ -71,6 +71,9 @@
                     </div>
                 {% else %}
                     <div>
+                        {% set indexRouteParams = indexRouteParams|merge({
+                            'search': 'mautic.lead.lead.searchcommand.import_id'|trans ~ ':' ~ import.id
+                        }) %}
                         <a class="btn btn-success" href="{{ path(indexRoute, indexRouteParams) }}" data-toggle="ajax">
                             {{ 'mautic.lead.list.view'|trans({'%objects%': objectName}) }}
                         </a>
