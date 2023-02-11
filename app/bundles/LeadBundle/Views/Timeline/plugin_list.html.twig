@@ -155,7 +155,7 @@
           {% endif %}
 
           {% set newCount = newCount - 1 %}
-          <div class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} {% if event.featured not empty %}timeline-featured{% endif %} {% if newCount > 0 %}tr-new{% endif %}">
+          <div class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index) }} {% if event.featured is not empty %}timeline-featured{% endif %} {% if newCount > 0 %}tr-new{% endif %}">
               <span class="timeline-row-id hide">{{ dateToText(event.timestamp) }} on {{ event.timestamp|date('Y-m-d H:i:s') }}</span>
               <span class="timeline-row-lead-id hide">{% if event.leadId is defined %}{{ event.leadId }}{% endif %}</span>
               <div class="btn-group" role="group" style="float: right;">
