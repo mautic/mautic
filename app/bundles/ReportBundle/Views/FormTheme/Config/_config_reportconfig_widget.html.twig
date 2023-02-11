@@ -1,13 +1,13 @@
-{% block _config_campaignconfig_widget %}
+{% block _config_reportconfig_widget %}
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title">{{ 'mautic.config.tab.campaignconfig'|trans }}</h3>
+        <h3 class="panel-title">{{ 'mautic.config.tab.reportconfig'|trans }}</h3>
     </div>
     <div class="panel-body">
-        {% for f in form.children %}
+        {% for child in form.children %}
             <div class="row">
                 <div class="col-md-6">
-                    {{ form_row(f) }}
+                    {{ form_row(child) }}
                 </div>
             </div>
         {% endfor %}
