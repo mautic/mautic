@@ -80,7 +80,7 @@
 {% if field.parent and fields[field.parent] is defined %}
   {% set values = field.conditions.values|join('|') %}
 
-  {% if field.conditions.any is not empty and 'notIn' != field.conditions.expr %}
+  {%- if field.conditions.any != false and 'notIn' != field.conditions.expr -%}
     {% set values = '*' %}
   {% endif %}
 
