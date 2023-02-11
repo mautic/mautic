@@ -62,6 +62,21 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
+     * @return LeadField[]
+     */
+    public function getFieldsForObject(string $object): array
+    {
+        $queryBuilder = $this->_em->createQueryBuilder();
+        $queryBuilder->select($this->getTableAlias());
+        $queryBuilder->from($this->_entityName, $this->getTableAlias(), "{$this->getTableAlias()}.id");
+        $queryBuilder->where("{$this->getTableAlias()}.object = :object");
+        $queryBuilder->orderBy("{$this->getTableAlias()}.label");
+        $queryBuilder->setParameter('object', $object);
+
+        return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
      * @return string
      */
     public function getTableAlias()
