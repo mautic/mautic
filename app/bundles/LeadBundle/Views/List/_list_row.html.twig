@@ -52,6 +52,12 @@
                        data-original-title="{{ 'mautic.lead.list.form.config.segment_rebuild_time.message'|trans({'%count%': hoursSinceLastBuilt}) }}">
                     <i class="fa text-danger fa-exclamation-circle"></i></label>
             {% endif %}
+            {% if item.lastBuiltTime >= segmentBuildWarningThreshold %}
+                <label class="control-label" data-toggle="tooltip"
+                       data-container="body" data-placement="top" title=""
+                       data-original-title="{{ 'mautic.lead.list.form.config.segment_build_time.message'|trans({'%count%': item.lastBuiltTime}) }}">
+                    <i class="fa text-danger fa-clock-o"></i></label>
+            {% endif %}
             {{ customContent('segment.name', mauticTemplateVars|default([])) }}
         </div>
         {% if item.description %}
