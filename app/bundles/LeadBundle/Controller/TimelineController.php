@@ -56,7 +56,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'leadTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:list.html.twig',
+                'contentTemplate' => 'MauticLeadBundle:Timeline:_list.html.twig',
             ]
         );
     }
