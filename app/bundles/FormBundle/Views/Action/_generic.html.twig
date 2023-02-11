@@ -15,6 +15,6 @@
     {% endif %}
     <a data-toggle="ajaxmodal" data-target="#formComponentModal" href="{{ path('mautic_formaction_action', {'objectAction': 'edit', 'objectId': id, 'formId': formId}) }}"><span class="action-label">{{ action.name }}</span></a>
     {% if action.description is not empty %}
-      <span class="action-descr">{{ action.description }}</span>
+      <span class="action-descr">{{ action.description|purify }}</span>
     {% endif %}
 </div>
