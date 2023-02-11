@@ -108,7 +108,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.bouncerate',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.twig',
                 ]);
 
                 return;
@@ -160,7 +160,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'page.dwelltime',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.twig',
                 ]);
 
                 return;
