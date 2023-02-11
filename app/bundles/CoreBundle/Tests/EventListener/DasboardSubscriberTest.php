@@ -54,7 +54,7 @@ class DashboardSubscriberTest extends TestCase
     private MockObject $dispatcher;
 
     /**
-     * @var MockObject&ModelFactory<object>
+     * @var MockObject&ModelFactory
      */
     private MockObject $modelFactory;
 
