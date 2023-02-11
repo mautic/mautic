@@ -1,7 +1,0 @@
-<td class="{{ class }}">
-    {% for field in fields %}
-        {% if field[column].value is defined %}
-            {{ normalizeStringValue(field[column].normalizedValue)|purify }}
-        {% endif %}
-    {% endfor %}
-</td>
