@@ -4,21 +4,19 @@
           <h3 class="panel-title">{{ 'mautic.config.tab.formconfig'|trans }}</h3>
       </div>
       <div class="panel-body">
-          {% for name, f in form.children %}
-              {% if 'form_results_data_sources' != name %}
-                  <div class="row">
-                      <div class="col-md-6">
-                          {{ form_row(f) }}
-                      </div>
+          {% for child in form.children|filter((v, k) => 'form_results_data_sources' is not same as k) %}
+              <div class="row">
+                  <div class="col-md-6">
+                      {{ form_row(child) }}
                   </div>
-              {% endif %}
+              </div>
           {% endfor %}
       </div>
       <div class="panel-heading">
           <h3 class="panel-title">{{ 'mautic.config.tab.formresultsconfig'|trans }}</h3>
       </div>
       <div class="panel-body">
-          {% for name, f in form.children %}
+          {% for child in form.children %}
               <div class="row">
                   <div class="col-md-6">
                       {{ form_row(form.form_results_data_sources) }}
