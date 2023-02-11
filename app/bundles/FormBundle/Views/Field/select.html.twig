@@ -110,7 +110,7 @@
           'data-validate': field.alias,
           'data-validation-type': field.type,
   }) -%}
-  {%- if field.properties.multiple != false -%}
+  {%- if field.properties.multiple is defined and field.properties.multiple != false -%}
     {%- set containerAttributes = containerAttributes|merge({
             'data-validate-multiple': 'true',
     }) -%}
