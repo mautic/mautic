@@ -951,6 +951,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "annamunk",
+      "name": "Anna Munk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/102536220?v=4",
+      "profile": "https://github.com/annamunk",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
