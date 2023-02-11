@@ -164,7 +164,9 @@ class TweetController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::indexStandard(1);
+        return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
+            'objectId' => $objectId,
+        ]);
     }
 
     /**
