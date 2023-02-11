@@ -87,6 +87,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
+                Assert::assertNotNull($segment->getLastBuiltTime());
             },
         ];
 
@@ -101,6 +102,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
+                Assert::assertNotNull($segment->getLastBuiltTime());
                 Assert::assertStringNotContainsString('Total time:', $output);
             },
         ];
@@ -116,6 +118,7 @@ final class UpdateLeadListCommandFunctionalTest extends MauticMysqlTestCase
                     new \DateTime('2000-01-01 00:00:00'),
                     $segment->getLastBuiltDate()
                 );
+                Assert::assertNull($segment->getLastBuiltTime());
                 Assert::assertStringContainsString('Total time:', $output);
                 Assert::assertStringContainsString('seconds', $output);
             },
