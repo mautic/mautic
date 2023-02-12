@@ -88,7 +88,7 @@ unset($form['featureSettings']['companyFields']);
         <li class="" id="features-tab">
             <a href="#features-container" role="tab" data-toggle="tab">
                 {{- 'mautic.plugin.integration.tab.features'|trans -}}
-                {%- if (form.supportedFeatures is defined and formContainsErrors(form.supportedFeatures)) or (form.featureSettings is defined and formContainsErrors(form.featureSettings)) -%}
+                {%- if (hasSupportedFeatures and formContainsErrors(form.supportedFeatures)) or (hasFeatureSettings and formContainsErrors(form.featureSettings, ['leadFields'])) -%}
                     <i class="fa fa-fw fa-warning text-danger"></i>
                 {%- endif -%}
             </a>
