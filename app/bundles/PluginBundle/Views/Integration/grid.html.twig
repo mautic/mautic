@@ -7,13 +7,7 @@
 #}
 {% set isIndex = ('index' == tmpl) %}
 {% set tmpl = 'list' %}
-{#
-if ($pluginFilter) {
-    $filterValue = $pluginFilter['id'];
-} else {
-    $filterValue = '';
-}
-#}
+{% set filterValue = pluginFilter.id|default(null) %}
 {% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
 
 {% block mauticContent 'integration' %}
@@ -40,6 +34,26 @@ if ($pluginFilter) {
 
 {% block content %}
   {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        <div class="panel-body">
+            <div class="box-layout">
+                <div class="row">
+                    <div class="col-xs-3 va-m">
+                        <select id="integrationFilter" onchange="Mautic.filterIntegrations(true);"
+                                class="form-control"
+                                data-placeholder="{{ 'mautic.integration.filter.all'|trans }}">
+                            <option value=""></option>
+                            {% for plugin in plugins %}
+                              <option {% if filterValue is same as(plugin.id) %}selected{% endif %} value="{{ plugin.id|e }}">
+                                  {{- plugin.name -}}
+                              </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-list">
   {% endif %}
 
   {% if items|length > 0 %}
@@ -81,5 +95,7 @@ if ($pluginFilter) {
   {% endif %}
 
   {% if isIndex %}
+        </div>
+    </div>
   {% endif %}
 {% endblock %}
