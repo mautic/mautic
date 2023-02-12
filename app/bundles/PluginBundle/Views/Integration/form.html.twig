@@ -18,8 +18,9 @@ if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['
     }
 }
 #}
-{%- set hasSupportedFeatures = (form.supportedFeatures is defined and form.supportedFeatures|length > 0) -%}
-{%- if not hasSupportedFeatures and form.supportedFeatures is defined %}{% do form.supportedFeatures.setRendered() %}{% endif -%}
+{%- set nSupportedFeatures = form.supportedFeatures is defined ? form.supportedFeatures|length : 0 -%}
+{%- set hasSupportedFeatures = nSupportedFeatures > 1 -%}
+{#{%- if not hasSupportedFeatures and form.supportedFeatures is defined %}{% do form.supportedFeatures.setRendered() %}{% endif -%}#}
 
 {#
 if (!$hasFields = (!empty($formSettings['dynamic_contact_fields']) || isset($form['featureSettings']) && count($form['featureSettings']['leadFields']))) {
@@ -29,10 +30,12 @@ if (!$hasFields = (!empty($formSettings['dynamic_contact_fields']) || isset($for
     $hideContactFieldTab = (!empty($formSettings['dynamic_contact_fields']) && !count($form['featureSettings']['leadFields']));
 }
 #}
-{%- set hasFields = ((formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty) or form['featureSettings'] is defined) and form.featureSettings.leadFields|length > 0 -%}
+{%- set nFeatureSettings = form.featureSettings is defined ? form.featureSettings|length : 0 -%}
+{%- set hasFields = ((formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty) or form.featureSettings is defined) and form.featureSettings.leadFields|length > 0
+-%}
 {# Unset if set to prevent features tab from showing when there's no feature to show #}
-{%- if not hasFields %}{% do form.featureSettings.leadFields.setRendered() %}{% endif -%}
-{%- set hideContactFieldTab = (hasFields and formSettings.dynamic_contact_fields is not empty and form.featureSettings.leadFields|length == 0) -%}
+{%- if not hasFields %}{% do form.featureSettings.leadFields.setRendered() %}{% set nFeatureSettings = nFeatureSettings - 1 %}{% endif -%}
+{%- set hideContactFieldTab = (hasFields and formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty and form.featureSettings.leadFields|length == 0) -%}
 {#
 if (!$hasFeatureSettings = (isset($form['featureSettings'])
     && (($hasFields && count($form['featureSettings']) > 1)
@@ -48,9 +51,9 @@ if (!$hasFeatureSettings = (isset($form['featureSettings'])
 {%- set hasFeatureSettings = (
           form.featureSettings is defined
           and (
-            (hasFields and form.featureSettings|length > 1)
+            (hasFields and nFeatureSettings > 1)
             or
-            (not hasFields and form.featureSettings|length > 0)
+            (not hasFields and nFeatureSettings > 0)
           )
 ) -%}
 {%- if not hasFeatureSettings and form.featureSettings is defined %}{% do form.featureSettings.setRendered() %}{% endif -%}
@@ -76,10 +79,6 @@ unset($form['featureSettings']['companyFields']);
 {%- endif -%}
 
 <!-- tabs controls -->
-<pre>
-  hasFields: {{dump(hasFields)}}
-  form.featureSettings|length: {{dump(form.featureSettings|length)}}
-</pre>
 <ul class="nav nav-tabs">
     <li class="{% if 'details-container' == activeTab %}active{% endif %}" id="details-tab">
         <a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.plugin.integration.tab.details'|trans }}</a>
