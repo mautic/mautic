@@ -59,9 +59,9 @@ if (!$hasFeatureSettings = (isset($form['featureSettings'])
 {%- if not hasFeatureSettings and form.featureSettings is defined %}{% do form.featureSettings.setRendered() %}{% endif -%}
 {%- set hasCompanyFields = form.featureSettings.companyFields is defined and form.featureSettings.companyFields|length > 0 -%}
 {%- set companyFieldHtml = hasCompanyFields ? form_row(form.featureSettings.companyFields) : '' -%}
-{%- set fieldHtml = hasFields ? form_row(form.featureSettings.leadFields) : '' -%}
-{%- set fieldLabel = hasFields ? form.featureSettings.leadFields.vars.label : '' -%}
-{%- set fieldTabClass = (hasFields and hideContactFieldTab == false) ? '' : 'hide' -%}
+{%- set fieldHtml = hasFields ? form_row(form.featureSettings.leadFields) -%}
+{%- set fieldLabel = hasFields ? form.featureSettings.leadFields.vars.label -%}
+{%- set fieldTabClass = (hasFields and hideContactFieldTab == false) ?: 'hide' -%}
 {%- set hasLeadFieldErrors    = hasFields and formContainsErrors(form.featureSettings.leadFields) -%}
 {%- set hasCompanyFieldErrors = hasCompanyFields and formContainsErrors(form.featureSettings.companyFields) -%}
 
@@ -180,7 +180,7 @@ unset($form['featureSettings']['companyFields']);
     {%- if hasFields -%}
         <div class="tab-pane fade {% if 'leadFieldsContainer' == activeTab %}in active{% endif %}  bdr-w-0" id="fields-container">
             <h4 class="mb-sm">{{ fieldLabel|trans }}</h4>
-            {{- fieldHtml|purify -}}
+            {{- fieldHtml|raw -}}
         </div>
     {%- endif -%}
 
