@@ -338,12 +338,13 @@ class PluginController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'         => $this->setFormTheme($form, $template, $themes),
+                    'form'         => $form->createView(),
                     'description'  => $integrationObject->getDescription(),
                     'formSettings' => $formSettings,
                     'formNotes'    => $formNotes,
                     'callbackUrl'  => $callbackUrl,
                     'activeTab'    => $activeTab,
+                    'formThemes'   => $themes,
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
