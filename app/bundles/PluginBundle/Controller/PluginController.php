@@ -117,7 +117,7 @@ class PluginController extends FormController
                     'pluginFilter' => ($pluginFilter) ? ['id' => $pluginId, 'name' => $pluginName] : false,
                     'plugins'      => $plugins,
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.php',
+                'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
@@ -299,7 +299,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
-                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
+                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.twig'),
                     ]
                 );
             }
@@ -350,7 +350,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
-                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
+                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.twig'),
                 ],
             ]
         );
@@ -391,7 +391,7 @@ class PluginController extends FormController
                     'bundle' => $bundle,
                     'icon'   => $integrationHelper->getIconPath($bundle),
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.php',
+                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',

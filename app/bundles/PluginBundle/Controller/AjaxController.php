@@ -84,11 +84,11 @@ class AjaxController extends CommonAjaxController
                     );
 
                     $html = $this->render(
-                        'MauticCoreBundle:Helper:blank_form.html.php',
+                        'MauticCoreBundle:Helper:blank_form.html.twig',
                         [
                             'form' => $this->setFormTheme(
                                 $form,
-                                'MauticCoreBundle:Helper:blank_form.html.php',
+                                'MauticCoreBundle:Helper:blank_form.html.twig',
                                 'MauticPluginBundle:FormTheme\Integration'
                             ),
                             'function' => 'row',
@@ -151,9 +151,9 @@ class AjaxController extends CommonAjaxController
                     'campaigns'       => $data,
                 ]);
 
-                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.twig', 'MauticPluginBundle:FormTheme\Integration');
 
-                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
                     'form'      => $form,
                     'function'  => 'widget',
                     'variables' => [
@@ -205,9 +205,9 @@ class AjaxController extends CommonAjaxController
                     'campaignContactStatus' => $statusData,
                 ]);
 
-                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.twig', 'MauticPluginBundle:FormTheme\Integration');
 
-                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
                     'form'      => $form,
                     'function'  => 'widget',
                     'variables' => [
@@ -262,9 +262,9 @@ class AjaxController extends CommonAjaxController
                     'csrf_protection' => false,
                 ]);
 
-                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.php', 'MauticPluginBundle:FormTheme\Integration');
+                $form = $this->setFormTheme($form, 'MauticCoreBundle:Helper:blank_form.html.twig', 'MauticPluginBundle:FormTheme\Integration');
 
-                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.php', [
+                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
                     'form'      => $form,
                     'function'  => 'row',
                     'variables' => [
