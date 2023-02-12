@@ -307,13 +307,18 @@ class PluginController extends FormController
 
         $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
-        $default     = 'MauticPluginBundle:FormTheme\Integration';
-        $themes      = [$default];
+        $themes      = [
+            'MauticPluginBundle:FormTheme:Integration/_integration_fields_row.html.twig',
+            'MauticPluginBundle:FormTheme:Integration/_integration_details_featureSettings_row.html.twig',
+            'MauticPluginBundle:FormTheme:Integration/_integration_company_fields_row.html.twig',
+            'MauticPluginBundle:FormTheme:Integration/_integration_details_supportedFeatures_row.html.twig',
+        ];
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);
-        } elseif ($objectTheme !== $default) {
+        } elseif (is_string($objectTheme)) {
             $themes[] = $objectTheme;
         }
+        $themes = array_unique($themes);
 
         $formSettings = $integrationObject->getFormSettings();
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';

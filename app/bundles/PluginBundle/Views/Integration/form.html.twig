@@ -9,7 +9,7 @@
      - formThemes (array)
          May include one or more form themes that need to be applied
 #}
-{%- form_theme form with formThemes|filter(v => v ends with '.html.twig') -%}
+{%- form_theme form with formThemes -%}
 <!-- form themes: {{ formThemes|join(', ') }} -->
 {#
 if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatures']))) {

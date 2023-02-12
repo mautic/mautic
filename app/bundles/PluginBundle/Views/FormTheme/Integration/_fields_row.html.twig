@@ -35,7 +35,7 @@
         </div>
         {% for child in form.children %}
             {% set selected = false %}
-            {% set isRequired = child.vars.attr['data-required'] is defined and child.vars.attr['data-required'] is not empty %}
+            {% set isRequired = child.vars.attr['data-required'] is defined and child.vars.attr['data-required'] is not same as 0 %}
             {% if rowCount is divisible by(numberOfFields) %}
               <div id="{{ object }}-{{ rowCount }}" class="field-container row {% if 5 == numberOfFields %}pb-md{% endif %}">
             {% endif %}
@@ -106,7 +106,7 @@
             {% endif %}
 
             {% if ('m_' ~ indexCount) == child.vars.name %}
-            <div class="pl-xs pr-xs <?php echo $class; ?>">
+            <div class="pl-xs pr-xs {{ class }}">
                 {% if isRequired %}<div class="has-errors">{% endif %}
                   <select id="{{ child.vars['id'] }}"
                           name="{{ child.vars['full_name'] }}"
@@ -117,7 +117,7 @@
                       {% set mauticChoices = child.vars.attr['data-choices'] %}
                       {% for keyLabel, options in mauticChoices %}
                         {% if options is iterable %}
-                          <optgroup label="<?php echo $keyLabel; ?>">
+                          <optgroup label="{{ keyLabel }}">
                               {% for o, keyValue in options %}
                               <option value="{{ keyValue|e }}"
                                       {% if keyValue == child.vars['data'] %}selected{% set selected = true %}
