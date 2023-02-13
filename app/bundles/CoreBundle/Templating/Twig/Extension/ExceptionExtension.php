@@ -21,7 +21,9 @@ class ExceptionExtension extends AbstractExtension
     }
 
     /**
-     * @param 
+     * Returns path root
+     * 
+     * @return string
      */
     public function getRoot()
     {
