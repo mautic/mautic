@@ -1,4 +1,3 @@
-{% embed 'MauticCoreBundle:Error:base.html.twig' with {
-  message: 'mautic.core.error.403',
-} %}
-{% endembed %}
+{% extends 'MauticCoreBundle:Error:base.html.twig' %}
+
+{% set message = 'mautic.core.error.403' %}
