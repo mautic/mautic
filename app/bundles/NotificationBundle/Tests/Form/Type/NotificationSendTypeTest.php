@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\EntityLookupType;
 use Mautic\NotificationBundle\Form\Type\NotificationSendType;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
@@ -17,21 +18,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class NotificationSendTypeTest extends TypeTestCase
 {
-    private $router;
-    private $translator;
-    private $modelFactory;
-    private $connection;
+    private RouterInterface $router;
+    private TranslatorInterface $translator;
+    private Connection $connection;
+
+    /** @var ModelFactory<object>&MockObject */
+    private ModelFactory $modelFactory;
 
     protected function setUp(): void
     {
-        $this->router        = $this->createMock(RouterInterface::class);
-        $this->translator    = $this->createMock(TranslatorInterface::class);
-        $this->modelFactory  = $this->createMock(ModelFactory::class);
-        $this->connection    = $this->createMock(Connection::class);
+        $this->router       = $this->createMock(RouterInterface::class);
+        $this->translator   = $this->createMock(TranslatorInterface::class);
+        $this->modelFactory = $this->createMock(ModelFactory::class);
+        $this->connection   = $this->createMock(Connection::class);
 
         parent::setup();
     }
 
+    /**
+     * @return array<mixed>
+     */
     protected function getExtensions()
     {
         return [
