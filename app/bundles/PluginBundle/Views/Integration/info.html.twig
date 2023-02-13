@@ -1,3 +1,8 @@
+{#
+  Variables
+    - bundle
+    - icon
+#}
 <div class="row">
     <div class="col-xs-4">
         <img class="img img-responsive" style="margin: auto;" src="{{ getAssetUrl(icon) }}" />
@@ -11,7 +16,7 @@
 {% if bundle.hasSecondaryDescription %}
 <div class="row mt-lg">
     <div class="col-xs-12">
-        {{ bundle.secondaryDescription|purify }}
+        {{ bundle.secondaryDescription|raw }}
     </div>
 </div>
 {% endif %}
