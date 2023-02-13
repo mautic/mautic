@@ -88,7 +88,7 @@ class PointController extends AbstractFormController
                 'permissions' => $permissions,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
-            'contentTemplate' => 'MauticPointBundle:Point:list.html.php',
+            'contentTemplate' => 'MauticPointBundle:Point:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -184,10 +184,10 @@ class PointController extends AbstractFormController
             'viewParameters' => [
                 'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'  => $entity,
-                'form'    => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', $themes),
+                'form'    => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.twig', $themes),
                 'actions' => $actions['actions'],
             ],
-            'contentTemplate' => 'MauticPointBundle:Point:form.html.php',
+            'contentTemplate' => 'MauticPointBundle:Point:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -317,10 +317,10 @@ class PointController extends AbstractFormController
             'viewParameters' => [
                 'tmpl'    => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'entity'  => $entity,
-                'form'    => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.php', $themes),
+                'form'    => $this->setFormTheme($form, 'MauticPointBundle:Point:form.html.twig', $themes),
                 'actions' => $actions['actions'],
             ],
-            'contentTemplate' => 'MauticPointBundle:Point:form.html.php',
+            'contentTemplate' => 'MauticPointBundle:Point:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
