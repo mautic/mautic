@@ -951,6 +951,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "sdoering",
+      "name": "Sven Döring",
+      "avatar_url": "https://avatars.githubusercontent.com/u/765204?v=4",
+      "profile": "https://www.schriftrolle.de/?utm_source=github&utm_medium=profilLink",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
