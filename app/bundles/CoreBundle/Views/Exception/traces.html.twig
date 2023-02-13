@@ -20,14 +20,14 @@
             {% elseif 'null' == item[0] %}
                 {% set formattedValue = '<em>null</em>' %}
             {% elseif 'boolean' == item[0] %}
-                {% set s = dump(item[1]) %}
+                {% set s = item[1] | json_encode | raw %}
                 {% set s = s|lower %}
                 {% set formattedValue = '<em>' ~ s ~ '</em>' %}
             {% elseif 'resource' == item[0] %}
                 {% set formattedValue = '<em>resource</em>' %}
             {% else %}
                 {% set s = item[1]|escape %}
-                {% set s = dump( s|escape ) %}
+                {% set s = s|escape | json_encode | raw %}
                 {% set s = s|replace({"\n" : ''}) %}
                 {% set formattedValue = s %}
             {% endif %}
