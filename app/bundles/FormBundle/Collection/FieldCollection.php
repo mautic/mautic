@@ -27,7 +27,10 @@ final class FieldCollection extends \ArrayIterator
         return $choices;
     }
 
-    public function getFieldByKey(string $key): FieldCrate
+    /**
+     * @return FieldCrate|null
+     */
+    public function getFieldByKey(string $key, bool $throwExceptionIfNotFound = true)
     {
         /** @var FieldCrate $field */
         foreach ($this as $field) {
@@ -36,7 +39,11 @@ final class FieldCollection extends \ArrayIterator
             }
         }
 
-        throw new FieldNotFoundException("Field with key {$key} was not found.");
+        if ($throwExceptionIfNotFound) {
+            throw new FieldNotFoundException("Field with key {$key} was not found.");
+        }
+
+        return null;
     }
 
     /**
