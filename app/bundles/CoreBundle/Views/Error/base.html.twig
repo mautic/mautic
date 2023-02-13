@@ -34,7 +34,7 @@
         <div class="row mt-lg pa-md">
             {% if isInline %}
                 <div class="mautibot-content col-xs-12">
-                    <h1><i class="fa fa-warning fa-fw text-danger"></i>{{message | trans | replace({"%code%": status_code})}}</h1>
+                    <h1><i class="fa fa-warning fa-fw text-danger"></i>{{ message|trans({'%code%': status_code}) }}</h1>
                     <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
                 </div>
             {% else %}
@@ -44,7 +44,7 @@
             </div>
             <div class="mautibot-content col-xs-8 col-md-9">
                 <blockquote class="np break-word">
-                    <h1><i class="fa fa-quote-left"></i> {{message | trans | replace({"%code%": status_code})}} <i class="fa fa-quote-right"></i></h1>
+                    <h1><i class="fa fa-quote-left"></i> {{ message|trans({'%code%': status_code}) }} <i class="fa fa-quote-right"></i></h1>
                     <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
 
                     <footer class="text-right">Mautibot</footer>
