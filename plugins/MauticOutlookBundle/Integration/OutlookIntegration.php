@@ -41,7 +41,7 @@ class OutlookIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return array<string, mixed>
      */
     public function getFormNotes($section)
     {
