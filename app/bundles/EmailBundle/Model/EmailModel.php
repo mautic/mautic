@@ -743,10 +743,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         );
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository(Stat::class);
+        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository(DoNotContact::class);
+        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
 
         /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
         $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
