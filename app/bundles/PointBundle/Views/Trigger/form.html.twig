@@ -1,34 +1,31 @@
-<?php
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-$view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'pointTrigger');
+{% block mauticContent 'pointTrigger' %}
 
-$header = ($entity->getId()) ?
-    $view['translator']->trans('mautic.point.trigger.header.edit',
-        ['%name%' => $view['translator']->trans($entity->getName())]) :
-    $view['translator']->trans('mautic.point.trigger.header.new');
-$view['slots']->set('headerTitle', $header);
-?>
+{%- block headerTitle -%}
+  {%- if entity.id -%}
+    {{ 'mautic.point.trigger.header.edit'|trans({'%name%': entity.name|trans}) }}
+  {%- else -%}
+    {{ 'mautic.point.trigger.header.new'|trans }}
+  {%- endif -%}
+{%- endblock -%}
 
+{% block modal include('MauticCoreBundle:Helper:modal.html.twig', {
+  'id': 'triggerEventModal',
+  'header': 'mautic.point.trigger.form.modalheader'|trans,
+  'footerButtons': true
+}) %}
 
-<?php echo $view['form']->start($form); ?>
-
+{% block content %}
+{{ form_start(form) }}
 <div class="box-layout">
     <div class="col-md-9 bg-white height-auto">
         <div class="row">
             <div class="col-xs-12">
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                    <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.core.details'); ?></a></li>
-                    <li class=""><a href="#events-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans('mautic.point.trigger.tab.events'); ?></a></li>
+                    <li class="active"><a href="#details-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
+                    <li class=""><a href="#events-container" role="tab" data-toggle="tab">{{ 'mautic.point.trigger.tab.events'|trans }}</a></li>
                 </ul>
                 <!--/ tabs controls -->
 
@@ -37,19 +34,15 @@ $view['slots']->set('headerTitle', $header);
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="pa-md">
-                                    <?php
-                                    echo $view['form']->row($form['name']);
-                                    echo $view['form']->row($form['description'], ['attr' => ['class' => 'form-control editor']]);
-                                    ?>
+                                    {{ form_row(form.name) }}
+                                    {{ form_row(form.description, {'attr': {'class': 'form-control editor'}}) }}
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="pa-md">
-                                    <?php
-                                    echo $view['form']->row($form['points']);
-                                    echo $view['form']->row($form['color']);
-                                    echo $view['form']->row($form['triggerExistingLeads']);
-                                    ?>
+                                    {{ form_row(form.points) }}
+                                    {{ form_row(form.color) }}
+                                    {{ form_row(form.triggerExistingLeads) }}
                                 </div>
                             </div>
                         </div>
@@ -58,47 +51,48 @@ $view['slots']->set('headerTitle', $header);
                     <div class="tab-pane fade bdr-w-0" id="events-container">
                         <div id="triggerEvents">
                             <div class="mb-md">
-                                <p><?php echo $view['translator']->trans('mautic.point.trigger.addevent'); ?></p>
+                                <p>{{ 'mautic.point.trigger.addevent'|trans }}</p>
                                 <div class="dropdown">
                                     <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <?php echo $view['translator']->trans('mautic.point.trigger.event.add'); ?>
+                                        {{ 'mautic.point.trigger.event.add'|trans }}
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu" role="menu">
-                                        <?php foreach ($events as $group => $event): ?>
+                                        {% for group, event in events %}
                                             <li role="presentation" class="dropdown-header">
-                                                <?php echo $group; ?>
+                                                {{ group }}
                                             </li>
-                                            <?php foreach ($event as $k => $e): ?>
-                                                <li id="event_<?php echo $k; ?>">
-                                                    <a data-toggle="ajaxmodal" data-target="#triggerEventModal" class="list-group-item" href="<?php echo $view['router']->path('mautic_pointtriggerevent_action', ['objectAction' => 'new', 'type' => $k, 'tmpl' => 'event', 'triggerId' => $sessionId]); ?>">
-                                                        <div data-toggle="tooltip" title="<?php echo $e['description']; ?>">
-                                                            <span><?php echo $e['label']; ?></span>
+                                            {% for k, e in event %}
+                                                <li id="event_{{ k }}">
+                                                    <a data-toggle="ajaxmodal"
+                                                       data-target="#triggerEventModal"
+                                                       class="list-group-item"
+                                                       href="{{ path('mautic_pointtriggerevent_action', {'objectAction': 'new', 'type': k, 'tmpl': 'event', 'triggerId': sessionId}) }}">
+                                                        <div data-toggle="tooltip" title="{{ e.description }}">
+                                                            <span>{{ e.label }}</span>
                                                         </div>
                                                     </a>
                                                 </li>
-                                            <?php endforeach; ?>
-                                        <?php endforeach; ?>
+                                            {% endfor %}
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>
-                            <?php
-                            foreach ($triggerEvents as $event):
-                                $template = (isset($event['settings']['template'])) ? $event['settings']['template'] :
-                                    'MauticPointBundle:Event:generic.html.php';
-                                echo $view->render($template, [
-                                    'event'     => $event,
-                                    'id'        => $event['id'],
-                                    'deleted'   => in_array($event['id'], $deletedEvents),
-                                    'sessionId' => $sessionId,
-                                ]);
-                            endforeach;
-                            ?>
-                            <?php if (!count($triggerEvents)): ?>
+                            {% for event in triggerEvents %}
+                                {% set template = event.settings.template|default('MauticPointBundle:Event:generic.html.twig') %}
+                                <!-- start: "{{ template }}" -->
+                                {{ include(template, {
+                                    'event': event,
+                                    'id': event.id,
+                                    'deleted': event.id in deletedEvents,
+                                    'sessionId': sessionId,
+                                }, with_context=false) }}
+                                <!--/ start: "{{ template }}" -->
+                            {% else %}
                                 <div class="alert alert-info" id="triggerEventPlaceholder">
-                                    <p><?php echo $view['translator']->trans('mautic.point.trigger.addevent'); ?></p>
+                                    <p>{{ 'mautic.point.trigger.addevent'|trans }}</p>
                                 </div>
-                            <?php endif; ?>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -107,21 +101,13 @@ $view['slots']->set('headerTitle', $header);
     </div>
     <div class="col-md-3 bg-white height-auto bdr-l">
         <div class="pr-lg pl-lg pt-md pb-md">
-            <?php
-            echo $view['form']->row($form['category']);
-            echo $view['form']->row($form['isPublished']);
-            echo $view['form']->row($form['publishUp']);
-            echo $view['form']->row($form['publishDown']);
-            ?>
+            {{ form_row(form.category) }}
+            {{ form_row(form.isPublished) }}
+            {{ form_row(form.publishUp) }}
+            {{ form_row(form.publishDown) }}
         </div>
     </div>
 </div>
-<?php echo $view['form']->end($form); ?>
+{{ form_end(form) }}
 
- <?php
-    $view['slots']->append('modal', $view->render('MauticCoreBundle:Helper:modal.html.php', [
-        'id'            => 'triggerEventModal',
-        'header'        => $view['translator']->trans('mautic.point.trigger.form.modalheader'),
-        'footerButtons' => true,
-    ]));
-?>
+{% endblock %}

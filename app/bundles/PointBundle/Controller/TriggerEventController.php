@@ -90,12 +90,12 @@ class TriggerEventController extends CommonFormController
         if ($cancelled || $valid) {
             $closeModal = true;
         } else {
-            $form = (isset($triggerEvent['settings']['formTheme'])) ?
-                $this->setFormTheme($form, 'MauticPointBundle:Event:form.html.twig', $triggerEvent['settings']['formTheme']) :
-                $form->createView();
+            if (isset($triggerEvent['settings']['formTheme'])) {
+                $viewParams['formTheme'] = $triggerEvent['settings']['formTheme'];
+            }
 
             $closeModal                = false;
-            $viewParams['form']        = $form;
+            $viewParams['form']        = $form->createView();
             $header                    = $triggerEvent['settings']['label'];
             $viewParams['eventHeader'] = $this->get('translator')->trans($header);
         }
