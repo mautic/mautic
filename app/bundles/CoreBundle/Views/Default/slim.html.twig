@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
-    
-    {{ include('MauticCoreBundle:Default:head.html.twig') }}
+    {% set headerTitle = headerTitle|default('') %}
+    {% set pageTitle = pageTitle|default('Mautic') %}
+    {{ include('MauticCoreBundle:Default:head.html.twig', {
+            headerTitle: headerTitle|default(''),
+            pageTitle: pageTitle|default('Mautic'),
+        })
+    }}
+
     <body>
         {{ outputScripts('bodyOpen') }}
        

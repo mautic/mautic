@@ -11,25 +11,25 @@
 
 {% set isInline = inline ?? false %}
 {% set isAjax = app.request.isxmlhttprequest ?? false %}
-{% set src = src |default(mautibotGetImage('wave'))  %}
-{% set message = message | default('mautic.core.error.generic') %}
+{% set src = src|default(mautibotGetImage('wave'))  %}
+{% set message = message|default('mautic.core.error.generic') %}
 {% set status_code = status_code | default('') %}
 
 {% if isAjax == false %}
     {% extends baseTemplate %}
+
+    {% set pageTitle = (isInline == false) ? status_text : pageTitle|default('') %}
 {% endif %}
 
-{% block pageTitle %}
-    {% if isAjax == false and isInline == false %}
-        {{ status_text }}
-    {% else %}
-        {% set pageTitle = pageTitle | default('Mautic')|striptags %}
-        {{ pageTitle }}
-    {% endif %}
-{% endblock %}
+{# {% block head %}
+{{ include('MauticCoreBundle:Default:head.html.twig', {
+        headerTitle: headerTitle|default(''),
+        pageTitle: (isInline == false) ? status_text : pageTitle|default(''),
+    })
+}}
+{% endblock %} #}
 
 {% block _content %}
-
     <div class="pa-20 mautibot-error{% if isInline %} inline well{% endif %}">
         <div class="row mt-lg pa-md">
             {% if isInline %}

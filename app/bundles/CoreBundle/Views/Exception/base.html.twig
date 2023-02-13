@@ -45,22 +45,22 @@ return $exceptions;
 
 {% set isInline = inline ?? false %}
 {% set isAjax = app.request.isxmlhttprequest ?? false %}
-{% set src = src |default(mautibotGetImage('wave'))  %}
+{% set src = src|default(mautibotGetImage('wave'))  %}
 
 {% if isAjax == false %}
     {% extends baseTemplate %}
+
+    {% set headerTitle =  (isInline == false) ? "<strong>" ~ status_code ~ "</strong>" ~ status_text : headerTitle|default('') %}
+    {% set pageTitle =  (isInline == false) ? exceptionMessage : pageTitle|default('Mautic') %}
 {% endif %}
 
-{% block pageTitle %}
-    {% if isAjax == false and isInline == false %}
-        {% set pageTitle = pageTitle | default(exceptionMessage) %}
-        {% set header = header | default("<strong>" ~ status_code ~ "</strong>" ~ status_text) %}
-        {% set headerTitle = header %}
-    {% else %}
-        {% set pageTitle = pageTitle | default('Mautic')|striptags %}
-        {{ pageTitle }}
-    {% endif %}
-{% endblock %}
+{# {% block head %}
+{{ include('MauticCoreBundle:Default:head.html.twig', {
+        headerTitle: (isInline == false) ? "<strong>" ~ status_code ~ "</strong>" ~ status_text : headerTitle|default(''),
+        pageTitle: (isInline == false) ? exceptionMessage : pageTitle|default('Mautic'),
+    })
+}}
+{% endblock %} #}
 
 {% block _content %}
 
@@ -142,5 +142,4 @@ return $exceptions;
     <pre>
         {{ dump(exception) }}
     </pre>
-
 {% endblock %}
