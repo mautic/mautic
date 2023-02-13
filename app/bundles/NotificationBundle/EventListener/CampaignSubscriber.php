@@ -71,7 +71,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                     'formType'         => MobileNotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                     'formTheme'        => 'MauticNotificationBundle:FormTheme:NotificationSendList/_notificationsend_list_row.html.twig',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.twig',
                     'channel'          => 'mobile_notification',
                     'channelIdField'   => 'mobile_notification',
                 ]
@@ -87,7 +87,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'formType'         => NotificationSendType::class,
                 'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
                 'formTheme'        => 'MauticNotificationBundle:FormTheme:NotificationSendList/_notificationsend_list_row.html.twig',
-                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.twig',
                 'channel'          => 'notification',
                 'channelIdField'   => 'notification',
             ]

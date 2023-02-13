@@ -27,56 +27,41 @@
       <div class="col-md-9 height-auto bg-white">
           <div class="row">
               <div class="col-xs-12">
+
                   <!-- tabs controls -->
                   <ul class="bg-auto nav nav-tabs pr-md pl-md">
-                      <li class="active">
-                          <a href="#notification-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.core.details'|trans }}
-                          </a>
-                      </li>
-                      <li>
-                          <a href="#data-notification-container" role="tab" data-toggle="tab">
-                              {{ 'mautic.notification.tab.data'|trans }}
-                          </a>
-                      </li>
+                      <li class="active"><a href="#notification-container" role="tab" data-toggle="tab">{{ 'mautic.core.details'|trans }}</a></li>
+                      <li><a href="#data-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.data'|trans }}</a></li>
                       {% if 'ios' in integrationSettings.platforms %}
-                          <li>
-                              <a href="#ios-notification-container" role="tab" data-toggle="tab">
-                                  {{ 'mautic.notification.tab.ios'|trans }}
-                              </a>
-                          </li>
+                          <li><a href="#ios-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.ios'|trans }}</a></li>
                       {% endif %}
                       {% if 'android' in integrationSettings.platforms %}
-                          <li>
-                              <a href="#android-notification-container" role="tab" data-toggle="tab">
-                                  {{ 'mautic.notification.tab.android'|trans }}
-                              </a>
-                          </li>
+                          <li><a href="#android-notification-container" role="tab" data-toggle="tab">{{ 'mautic.notification.tab.android'|trans }}</a></li>
                       {% endif %}
                   </ul>
                   <!--/ tabs controls -->
+
+                  <!-- tabs content -->
                   <div class="tab-content pa-md">
                       <div class="tab-pane fade in active bdr-w-0" id="notification-container">
                           <div class="row">
                               <div class="col-md-6">
-                                  {{ form_row(form.name) }}
-                                  {{ form_row(form.heading) }}
-                                  {{ form_row(form.url) }}
+                                  {{- form_row(form.name) -}}
+                                  {{- form_row(form.heading) -}}
+                                  {{- form_row(form.url) -}}
                               </div>
-                              <div class="col-md-6">
-                                  {{ form_row(form.message) }}
-                              </div>
+                              <div class="col-md-6">{{ form_row(form.message) }}</div>
                           </div>
                       </div>
                       <div class="tab-pane fade in bdr-w-0" id="data-notification-container">
                           <div class="row">
-                              <div class="col-md-6">
-                                  {{ form_row(form.mobileSettings.additional_data) }}
-                              </div>
+                              <div class="col-md-6">{{ form_row(form.mobileSettings.additional_data) }}</div>
                           </div>
                       </div>
                       {{ form_widget(form.mobileSettings, {'integrationSettings': integrationSettings}) }}
                   </div>
+                  <!--/ tabs content -->
+
               </div>
           </div>
       </div>
