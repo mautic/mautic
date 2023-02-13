@@ -201,7 +201,7 @@ class PublicController extends CommonFormController
             } else {
                 $response = json_encode($data);
 
-                return $this->render('MauticFormBundle::messenger.html.php', ['response' => $response]);
+                return $this->render('MauticFormBundle::messenger.html.twig', ['response' => $response]);
             }
         } else {
             if (!empty($error)) {
@@ -261,7 +261,7 @@ class PublicController extends CommonFormController
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.twig');
 
         return $this->render($logicalName, [
             'message'  => $msg,
@@ -325,7 +325,7 @@ class PublicController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
+            $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.twig');
             $assetsHelper = $this->factory->getHelper('template.assets');
             $analytics    = $this->factory->getHelper('template.analytics')->getCode();
 
@@ -347,7 +347,7 @@ class PublicController extends CommonFormController
             return $this->render($logicalName, $viewParams);
         }
 
-        return $this->render('MauticFormBundle::form.html.php', $viewParams);
+        return $this->render('MauticFormBundle::form.html.twig', $viewParams);
     }
 
     /**
@@ -397,7 +397,7 @@ class PublicController extends CommonFormController
             if ('published' === $status) {
                 if ($this->request->get('video')) {
                     return $this->render(
-                        'MauticFormBundle:Public:videoembed.html.php',
+                        'MauticFormBundle:Public:videoembed.html.twig',
                         ['form' => $form, 'fieldSettings' => $model->getCustomComponents()['fields']]
                     );
                 }
