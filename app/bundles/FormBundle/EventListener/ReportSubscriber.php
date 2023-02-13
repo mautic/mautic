@@ -168,7 +168,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $columnsMapped = array_merge($columnsMapped ?? [], $columns, $columnsMapped ?? []);
                 }
 
-                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns);
+                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns, $columnsMapped ?? []);
 
                 $data = [
                     'display_name' => $formEntity->getId().' '.$formEntity->getName(),
