@@ -743,10 +743,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         );
 
         /** @var \Mautic\EmailBundle\Entity\StatRepository $statRepo */
-        $statRepo = $this->em->getRepository('MauticEmailBundle:Stat');
+        $statRepo = $this->em->getRepository(Stat::class);
 
         /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo = $this->em->getRepository(DoNotContact::class);
 
         /** @var \Mautic\PageBundle\Entity\TrackableRepository $trackableRepo */
         $trackableRepo = $this->em->getRepository('MauticPageBundle:Trackable');
@@ -812,24 +812,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         return $chart->render();
-    }
-
-    public function getDeliveredCount(Email $email, $includeVariants = false): int
-    {
-        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
-
-        $statRepo = $this->getStatRepository();
-
-        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
-
-        $failedCount    = (int) $statRepo->getFailedCount($emailIds);
-        $bouncedCount   = (int) $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED);
-        $sentCount      = (int) $email->getSentCount($includeVariants);
-        $deliveredCount = $sentCount - $failedCount - $bouncedCount;
-
-        // we never want to display a negative number of delivered emails
-        return max($deliveredCount, 0);
     }
 
     /**
@@ -1073,6 +1055,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->cacheStorageHelper->set(sprintf('%s|%s|%s', 'email', $email->getId(), 'queued'), $queued);
 
         return $queued;
+    }
+
+    public function getDeliveredCount(Email $email, bool $includeVariants = false): int
+    {
+        $emailIds = ($includeVariants && ($email->isVariant() || $email->isTranslation())) ? $email->getRelatedEntityIds() : [$email->getId()];
+
+        $statRepo = $this->getStatRepository();
+
+        /** @var \Mautic\LeadBundle\Entity\DoNotContactRepository $dncRepo */
+        $dncRepo = $this->em->getRepository(DoNotContact::class);
+
+        $failedCount    = (int) $statRepo->getFailedCount($emailIds);
+        $bouncedCount   = (int) $dncRepo->getCount('email', $emailIds, DoNotContact::BOUNCED);
+        $sentCount      = (int) $email->getSentCount($includeVariants);
+        $deliveredCount = $sentCount - $failedCount - $bouncedCount;
+
+        // we never want to display a negative number of delivered emails
+        return max($deliveredCount, 0);
     }
 
     /**
