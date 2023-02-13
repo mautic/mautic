@@ -19,8 +19,6 @@ class ExceptionExtension extends AbstractExtension
         ];
     }
 
-    /**
-     */
     public function getRoot(): string
     {
         $root = realpath(__DIR__.'/../../../../../../');
