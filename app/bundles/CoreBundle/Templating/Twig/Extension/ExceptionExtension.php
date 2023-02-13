@@ -22,10 +22,10 @@ class ExceptionExtension extends AbstractExtension
 
     /**
      * Returns path root
-     * 
+     *
      * @return string
      */
-    public function getRoot()
+    public function getRoot(): string
     {
         $root = realpath(__DIR__.'/../../../../../../');
 
