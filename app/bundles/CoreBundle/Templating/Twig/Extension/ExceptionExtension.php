@@ -6,7 +6,6 @@ namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use Twig\TwigTest;
 
 class ExceptionExtension extends AbstractExtension
 {
