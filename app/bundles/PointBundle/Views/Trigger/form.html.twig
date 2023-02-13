@@ -84,7 +84,7 @@
                                 {{ include(template, {
                                     'event': event,
                                     'id': event.id,
-                                    'deleted': event.id in deletedEvents,
+                                    'deleted': (event.id in deletedEvents),
                                     'sessionId': sessionId,
                                 }, with_context=false) }}
                                 <!--/ start: "{{ template }}" -->
