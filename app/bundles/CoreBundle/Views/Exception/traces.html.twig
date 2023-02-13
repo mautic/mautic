@@ -56,9 +56,7 @@
 
 {% endmacro %}
 
-
-{# $root = realpath(__DIR__.'/../../../../../'); #}
-{% set root = '/var/www/html/docroot/' %}
+{% set root = getRootPath() %}
 
 <ol>
 {% for trace in traces %}
@@ -66,7 +64,7 @@
     {% if trace.file is defined and trace.file is not empty %}
         {% set traceFile = trace.file|split(root)|join('') %}
         <strong>
-            /{{ traceFile }}{% if trace.file is defined and trace.file is not empty %}:{{ trace.line }}{% endif %}
+            {{ traceFile }}{% if trace.file is defined and trace.file is not empty %}:{{ trace.line }}{% endif %}
         </strong>
         at
     {% endif %}
