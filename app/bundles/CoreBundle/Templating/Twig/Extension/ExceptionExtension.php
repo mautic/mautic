@@ -20,9 +20,6 @@ class ExceptionExtension extends AbstractExtension
     }
 
     /**
-     * Returns path root
-     *
-     * @return string
      */
     public function getRoot(): string
     {
@@ -30,5 +27,4 @@ class ExceptionExtension extends AbstractExtension
 
         return $root;
     }
-    
 }
