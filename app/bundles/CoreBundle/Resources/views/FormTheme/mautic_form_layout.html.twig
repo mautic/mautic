@@ -335,8 +335,8 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 {# Twig version of MauticCoreBundle:Views:FormTheme:Custom:sortablelist_entry_row.html.php #}
 {% block sortablelist_entry_row %}
 <div class="sortable">
-    {{ form_widget(form) }}
-    {{ form_errors(form) }}
+    {{ form_widget(item) }}
+    {{ form_errors(item) }}
 </div>
 {% endblock %}
 
@@ -376,7 +376,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
 <div class="row">
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list" style="overflow:auto">
         {{ form_label(form, label) }}
-        <a  data-prototype="{{ datePrototype|raw }}"
+        <a data-prototype="{{ datePrototype|e }}"
            class="btn btn-warning btn-xs btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ addValueButton|trans }}
         </a>
@@ -386,7 +386,7 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {{ '%s="%s" '|format(k|escape, v|escape)|raw }}
         {% endfor %}>
         {% endif %}
-            {% for key,item in list.children %}
+            {% for item in list.children %}
             {{ block('sortablelist_entry_row') }}
             {% endfor %}
         </div>

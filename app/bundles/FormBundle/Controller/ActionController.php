@@ -91,9 +91,13 @@ class ActionController extends CommonFormController
         } else {
             $closeModal                 = false;
             $viewParams['tmpl']         = 'action';
-            $viewParams['form']         = (isset($formAction['settings']['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:action.html.php', $formAction['settings']['formTheme']) : $form->createView();
+            $viewParams['form']         = $form->createView();
             $header                     = $formAction['settings']['label'];
             $viewParams['actionHeader'] = $this->get('translator')->trans($header);
+
+            if (isset($formAction['settings']['formTheme'])) {
+                $viewParams['formTheme'] = $formAction['settings']['formTheme'];
+            }
         }
 
         $passthroughVars = [
@@ -109,7 +113,7 @@ class ActionController extends CommonFormController
             $formAction = array_merge($blank, $formAction);
 
             $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                'MauticFormBundle:Action:generic.html.php';
+                'MauticFormBundle:Action:_generic.html.twig';
             $passthroughVars['actionId']   = $keyId;
             $passthroughVars['actionHtml'] = $this->renderView($template, [
                 'inForm' => true,
@@ -127,7 +131,7 @@ class ActionController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.php',
+            'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -221,8 +225,12 @@ class ActionController extends CommonFormController
             } else {
                 $closeModal                 = false;
                 $viewParams['tmpl']         = 'action';
-                $viewParams['form']         = (isset($formAction['settings']['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:action.html.php', $formAction['settings']['formTheme']) : $form->createView();
+                $viewParams['form']         = $form->createView();
                 $viewParams['actionHeader'] = $this->get('translator')->trans($formAction['settings']['label']);
+
+                if (isset($formAction['settings']['formTheme'])) {
+                    $viewParams['formTheme'] = $formAction['settings']['formTheme'];
+                }
             }
 
             $passthroughVars = [
@@ -239,7 +247,7 @@ class ActionController extends CommonFormController
                 $blank      = $entity->convertToArray();
                 $formAction = array_merge($blank, $formAction);
                 $template   = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                    'MauticFormBundle:Action:generic.html.php';
+                    'MauticFormBundle:Action:_generic.html.twig';
                 $passthroughVars['actionHtml'] = $this->renderView($template, [
                     'inForm' => true,
                     'action' => $formAction,
@@ -256,7 +264,7 @@ class ActionController extends CommonFormController
             }
 
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.php',
+                'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
                 'viewParameters'  => $viewParams,
                 'passthroughVars' => $passthroughVars,
             ]);
