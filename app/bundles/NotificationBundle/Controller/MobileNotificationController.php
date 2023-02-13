@@ -361,7 +361,6 @@ class MobileNotificationController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    //'form'         => $this->setFormTheme($form, 'MauticNotificationBundle:MobileNotification:form.html.twig', 'MauticNotificationBundle:FormTheme\MobileNotification'),
                     'form'         => $form->createView(),
                     'notification' => $entity,
                     'integration'  => $integration,
@@ -527,7 +526,6 @@ class MobileNotificationController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    //'form'               => $this->setFormTheme($form, 'MauticNotificationBundle:MobileNotification:form.html.twig', 'MauticNotificationBundle:FormTheme\MobileNotification'),
                     'form'               => $form->createView(),
                     'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
