@@ -2092,7 +2092,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
