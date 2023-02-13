@@ -174,7 +174,7 @@
                                         {% endif %}
                                         <div class="col-md-7 va-m">
                                             <h5 class="fw-sb text-primary mb-xs">{{ action.name }}</h5>
-                                            <h6 class="text-white dark-sm">{{ action.description }}</h6>
+                                            <h6 class="text-white dark-sm">{{ action.description|purify }}</h6>
                                         </div>
                                         <div class="col-md-4 va-m text-right">
                                             <em class="text-white dark-sm">{% if availableActions[action.type] is defined %}{{ availableActions[action.type]['label']|trans }}{% else %}{{ action.type }}{% endif %}</em>
