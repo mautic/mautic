@@ -21,28 +21,6 @@
 {% endif %}
 {% set previousExceptions = exception.previous %}
 
-
-{# $previousExceptions = $exception->getAllPrevious();
-
-$exceptionMessage = $exception->getMessage();
-if ($exceptionMessage) {
-    $exceptionMessage = ' - '.$exceptionMessage; #}
-
-{# {% set previousExceptions = getAllPreviousExceptions(exception) %} #}
-{# <pre>{{ dump(previousExceptions) }}</pre>
-<pre>{{ dump(exception) }}</pre> #}
-
-{# $previousExceptions = $exception->getAllPrevious(); #}
-{#
-$exceptions = [];
-$e = $this;
-while ($e = $e->getPrevious()) {
-    $exceptions[] = $e;
-}
-
-return $exceptions;
-#}
-
 {% set isInline = inline ?? false %}
 {% set isAjax = app.request.isxmlhttprequest ?? false %}
 {% set src = src|default(mautibotGetImage('wave'))  %}
@@ -53,14 +31,6 @@ return $exceptions;
     {% set headerTitle =  (isInline == false) ? "<strong>" ~ status_code ~ "</strong>" ~ status_text : headerTitle|default('') %}
     {% set pageTitle =  (isInline == false) ? exceptionMessage : pageTitle|default('Mautic') %}
 {% endif %}
-
-{# {% block head %}
-{{ include('MauticCoreBundle:Default:head.html.twig', {
-        headerTitle: (isInline == false) ? "<strong>" ~ status_code ~ "</strong>" ~ status_text : headerTitle|default(''),
-        pageTitle: (isInline == false) ? exceptionMessage : pageTitle|default('Mautic'),
-    })
-}}
-{% endblock %} #}
 
 {% block _content %}
 
