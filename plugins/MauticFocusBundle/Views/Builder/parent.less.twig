@@ -1,19 +1,14 @@
-<?php
+{%- set less -%}
+  {{- include('MauticFocusBundle:Builder:Bar/parent.less.twig', with_context=false) -}}
+  {{- include('MauticFocusBundle:Builder:Modal/parent.less.twig', with_context=false) -}}
+  {{- include('MauticFocusBundle:Builder:Notification/parent.less.twig', with_context=false) -}}
+  {{- include('MauticFocusBundle:Builder:Page/parent.less.twig', with_context=false) -}}
+{%- endset -%}
 
-ob_start();
-echo $view->render('MauticFocusBundle:Builder\Bar:parent.less.php');
-echo $view->render('MauticFocusBundle:Builder\Modal:parent.less.php');
-echo $view->render('MauticFocusBundle:Builder\Notification:parent.less.php');
-echo $view->render('MauticFocusBundle:Builder\Page:parent.less.php');
+{%- set css = less|less_compile -%}
 
-$less = ob_get_clean();
+{%- if preview is empty and 'dev' is same as app.environment -%}
+    {%- set css = css|css_minify -%}
+{%- endif -%}
 
-require_once __DIR__.'/../../Include/lessc.inc.php';
-$compiler = new \lessc();
-$css      = $compiler->compile($less);
-
-if (empty($preview) && 'dev' != $app->getEnvironment()) {
-    $css = \Minify_CSS::minify($css);
-}
-
-echo $css;
+{{- css|raw -}}

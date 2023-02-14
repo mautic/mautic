@@ -194,14 +194,11 @@ class FocusModel extends FormModel
                 );
             }
 
-            $javascript = $this->templating->getTemplating()->render(
-                'MauticFocusBundle:Builder:generate.js.php',
-                [
-                    'focus'    => $focusArray,
-                    'preview'  => $isPreview,
-                    'clickUrl' => $url,
-                ]
-            );
+            $javascript = $this->templating->getTemplating()->render('MauticFocusBundle:Builder:generate.js.twig', [
+                'focus'    => $focusArray,
+                'preview'  => $isPreview,
+                'clickUrl' => $url,
+            ]);
 
             $content = $this->getContent($focusArray, $isPreview, $url);
             $cached  = [
@@ -227,7 +224,8 @@ class FocusModel extends FormModel
             $focusContent .= $cached['form'];
         }
 
-        $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.twig')->escape($focusContent, 'js');
+        // in twig, this is {{ focusContent|e('js') }}
+        //$focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.twig')->escape($focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
