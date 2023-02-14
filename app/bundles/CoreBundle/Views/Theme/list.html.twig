@@ -11,7 +11,8 @@
 {% extends "MauticCoreBundle:Theme:index.html.twig" %}
 
 {% block mainContent %}
-    {% if items | length %}
+
+    {% if items|length %}
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered theme-list" id="themeTable">
                 <thead>
@@ -42,12 +43,12 @@
                 </thead>
                 <tbody>
                     {% for k, item in items %}
-                       {% if item['config']['onlyForBC'] is defined and item['config']['onlyForBC'] is not empty %}
+                       {% if item['config']['onlyForBC'] is not defined or item['config']['onlyForBC'] is empty %}
                             {% set thumbnailUrl = asset('themes/' ~ k ~ '/thumbnail.png') %}
                             {% set hasThumbnail =  (item['dir'] ~ '/thumbnail.png') is file  %}
                             <tr>
                                 <td>
-                                    {% set itemId = item.key %}
+                                    {% set item = item|merge({id: item.key}) %}
                                     {% set previewButtonSettings = {
                                         'attr': {
                                             'data-toggle': 'modal',
@@ -60,9 +61,9 @@
                                     {% set deleteButton = {
                                         'delete': permissions['core:themes:delete']
                                     } %}
-                                    {% set templateButtons = (k in defaultThemes|keys) ? [] : deleteButton %}
+                                    {% set templateButtons = (k not in defaultThemes) ? deleteButton : {} %}
 
-                                    {{ include ('MauticCoreBundle:Helper:list_actions.html.php',
+                                    {{ include ('MauticCoreBundle:Helper:list_actions.html.twig',
                                         {
                                             'item': item,
                                             'templateButtons': templateButtons,
