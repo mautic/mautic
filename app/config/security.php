@@ -19,9 +19,20 @@ $firewalls = [
         'lazy'    => true,
         'context' => 'mautic',
     ],
+    'open_id' => [
+        'pattern'              => '^/s/open_id',
+        'lazy'                 => true,
+        'provider'             => 'open_id_provider',
+        'context'              => 'mautic',
+        'custom_authenticators' => [
+            'mautic.open_id.security.authentication_handler',
+        ],
+        'entry_point'          => 'mautic.open_id.security.authentication_handler',
+    ],
     'sso_login' => [
         'pattern'            => '^/s/sso_login',
         'lazy'               => true,
+        'provider'           => 'user_provider',
         'mautic_plugin_auth' => true,
         'context'            => 'mautic',
     ],
@@ -124,6 +135,12 @@ $container->loadFromExtension(
         'providers' => [
             'user_provider' => [
                 'id' => 'mautic.user.provider',
+            ],
+            'beefree_provider' => [
+                'id' => 'mautic.beefree.user_provider',
+            ],
+            'open_id_provider' => [
+                'id' => 'mautic.open_id.user_provider',
             ],
         ],
         'password_hashers' => [
