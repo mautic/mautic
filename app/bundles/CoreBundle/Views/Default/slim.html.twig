@@ -14,7 +14,17 @@
             {{ include('MauticCoreBundle:Notification:flashes.html.twig', {
                 alertType: 'standard'
             }) }}
-            {% block _content %}{% endblock %}
+            {% block _content %}
+                {{ include('MauticCoreBundle:Default:output.html.twig', {
+                    publishStatus: publishStatus|default(''),
+                    headerTitle: headerTitle|default(''),
+                    actions: block('actions') is defined ? block('actions') : '',
+                    toolbar: block('toolbar') is defined ? block('toolbar') : '',
+                    mauticTemplateVars: mauticTemplateVars|default([]),
+                    content: block('content'),
+                    modal: block('modal') is defined ? block('modal') : '',
+                }) }}
+            {% endblock %}
         </section>
         {{ include('MauticCoreBundle:Helper:modal.html.twig', {
             id: 'MauticSharedModal',

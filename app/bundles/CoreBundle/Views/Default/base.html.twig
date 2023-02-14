@@ -37,8 +37,17 @@
             <!--/ end: app-footer -->
 
             <section id="app-content">
-                {# {{ include('MauticCoreBundle:Default:output.html.twig') }} #}
-                {% block _content %}{% endblock %}
+                {% block _content %}
+                     {{ include('MauticCoreBundle:Default:output.html.twig', {
+                        publishStatus: publishStatus|default(''),
+                        headerTitle: headerTitle|default(''),
+                        actions: block('actions') is defined ? block('actions') : '',
+                        toolbar: block('toolbar') is defined ? block('toolbar') : '',
+                        mauticTemplateVars: mauticTemplateVars|default([]),
+                        content: block('content'),
+                        modal: block('modal') is defined ? block('modal') : '',
+                     }) }}
+                {% endblock %}
             </section>
 
             <script>
