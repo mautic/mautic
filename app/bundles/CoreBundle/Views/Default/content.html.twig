@@ -15,8 +15,8 @@
             {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
                 publishStatus: publishStatus|default(''),
                 headerTitle: headerTitle,
-                actions: actions|default(''),
-                toolbar: toolbar|default(''),
+                actions: block('actions') is defined ? block('actions') : '',
+                toolbar: block('toolbar') is defined ? block('toolbar') : '',
                 mauticTemplateVars: mauticTemplateVars|default([]),
             }) }}
             {% if block('panel') is defined %}{{ block('panel') }}{% endif %}
@@ -27,27 +27,3 @@
         {% if block('panel') is defined %}{{ block('panel') }}{% endif %}
     {% endif %}
 {% endblock %}
-
-{# load base template #}
-{# {% set template = null %}
-{% if not request.isXmlHttpRequest() and not modalView %}
-    {% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
-{% elseif not modalView %}
-    {% set template = 'MauticCoreBundle:Default:output.html.twig' %}
-{% endif %}
-{{- '' -}}
-{% if template is not empty %}
-    {{- include(template, {
-        content: block('content'),
-        modal: block('modal') is defined ? block('modal') : '',
-        headerTitle: block('headerTitle'),
-        pageTitle: block('pageTitle') is defined ? block('pageTitle') : '',
-        publishStatus: block('publishStatus') is defined ? block('publishStatus') : '',
-        actions: block('actions') is defined ? block('actions') : '',
-        toolbar: block('toolbar') is defined ? block('toolbar') : '',
-        isXmlHttpRequest: request.isXmlHttpRequest
-    }) -}}
-{% else %}
-    {{ block('content') }}
-{% endif %} #}
-
