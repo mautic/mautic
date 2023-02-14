@@ -37,7 +37,7 @@
             {% set selected = false %}
             {% set isRequired = child.vars.attr['data-required'] is defined and child.vars.attr['data-required'] is not same as 0 %}
             {% if rowCount is divisible by(numberOfFields) %}
-              <div id="{{ object }}-{{ rowCount }}" class="field-container row {% if 5 == numberOfFields %}pb-md{% endif %}">
+              <div id="{{ object }}-{{ rowCount }}" class="field-container row {% if 5 != numberOfFields %}pb-md{% endif %}">
             {% endif %}
             {% set rowCount = rowCount + 1 %}
             {% if 'hidden' == child.vars.block_prefixes[1] %}
