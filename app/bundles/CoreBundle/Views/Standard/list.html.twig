@@ -15,16 +15,14 @@
     {% endif %}
 {% endblock %}
 
-{% block headerTitle %}
-    {% if not slot('headerTitle') %}
-        {% if headerTitle is not defined %}
-            {% set headerTitle = 'Mautic' %}
-        {% endif %}
-        {{ headerTitle|trans }}
-        {% else %}
-        {{ slot('headerTitle') }}
+{% if not slot('headerTitle') %}
+    {% if headerTitle is not defined %}
+        {% set headerTitle = 'Mautic' %}
     {% endif %}
-{% endblock %}
+    {% set headerTitle = headerTitle|trans %}
+{% else %}
+    {% set headerTitle = slot('headerTitle') %}
+{% endif %}
 
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig',

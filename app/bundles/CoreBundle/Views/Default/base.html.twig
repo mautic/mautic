@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
-    {{ include('MauticCoreBundle:Default:head.html.twig') }}
+    {% set headerTitle = headerTitle|default('') %}
+    {% set pageTitle = pageTitle|default('Mautic') %}
+    {{ include('MauticCoreBundle:Default:head.html.twig', {
+            headerTitle: headerTitle,
+            pageTitle: pageTitle,
+        })
+    }}
     <body class="header-fixed">
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
