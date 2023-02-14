@@ -1,8 +1,35 @@
 {% set request = app.request %}
 {% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
 {% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
+{% set isAjax = app.request.isxmlhttprequest ?? false %}
+{% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
+
+{% if isAjax == false and not modalView %}
+    {# load base template #}
+    {% if template is not empty %}{% extends template %}{% endif %}
+{% endif %}
+
+{% block _content %}
+    {% if not modalView %}
+        <div class="content-body">
+            {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
+                publishStatus: publishStatus|default(''),
+                headerTitle: headerTitle,
+                actions: actions|default(''),
+                toolbar: toolbar|default(''),
+                mauticTemplateVars: mauticTemplateVars|default([]),
+            }) }}
+            {% if block('panel') is defined %}{{ block('panel') }}{% endif %}
+        </div>
+        {% block modal %}{% endblock %}
+        {{ securityGetAuthenticationContext() }}
+    {% else %}
+        {% if block('panel') is defined %}{{ block('panel') }}{% endif %}
+    {% endif %}
+{% endblock %}
+
 {# load base template #}
-{% set template = null %}
+{# {% set template = null %}
 {% if not request.isXmlHttpRequest() and not modalView %}
     {% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
 {% elseif not modalView %}
@@ -22,4 +49,5 @@
     }) -}}
 {% else %}
     {{ block('content') }}
-{% endif %}
+{% endif %} #}
+

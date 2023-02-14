@@ -7,7 +7,6 @@
             pageTitle: pageTitle|default('Mautic'),
         })
     }}
-
     <body>
         {{ outputScripts('bodyOpen') }}
        
@@ -15,9 +14,7 @@
             {{ include('MauticCoreBundle:Notification:flashes.html.twig', {
                 alertType: 'standard'
             }) }}
-
             {% block _content %}{% endblock %}
-
         </section>
         {{ include('MauticCoreBundle:Helper:modal.html.twig', {
             id: 'MauticSharedModal',
