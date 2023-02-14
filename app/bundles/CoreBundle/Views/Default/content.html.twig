@@ -14,16 +14,19 @@
         <div class="content-body">
             {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
                 publishStatus: publishStatus|default(''),
-                headerTitle: headerTitle,
+                headerTitle: headerTitle|default(''),
                 actions: block('actions') is defined ? block('actions') : '',
                 toolbar: block('toolbar') is defined ? block('toolbar') : '',
                 mauticTemplateVars: mauticTemplateVars|default([]),
             }) }}
-            {% if block('panel') is defined %}{{ block('panel') }}{% endif %}
+
+            {% if block('content') is defined %}
+                {{ block('content') }}
+            {% endif %}
         </div>
         {% block modal %}{% endblock %}
         {{ securityGetAuthenticationContext() }}
     {% else %}
-        {% if block('panel') is defined %}{{ block('panel') }}{% endif %}
+        {% if block('content') is defined %}{{ block('content') }}{% endif %}
     {% endif %}
 {% endblock %}
