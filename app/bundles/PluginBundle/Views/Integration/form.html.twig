@@ -19,7 +19,7 @@ if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['
 }
 #}
 {%- set nSupportedFeatures = form.supportedFeatures is defined ? form.supportedFeatures|length : 0 -%}
-{%- set hasSupportedFeatures = nSupportedFeatures > 1 -%}
+{%- set hasSupportedFeatures = nSupportedFeatures > 0 -%}
 {#{%- if not hasSupportedFeatures and form.supportedFeatures is defined %}{% do form.supportedFeatures.setRendered() %}{% endif -%}#}
 
 {#
