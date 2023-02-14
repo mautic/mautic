@@ -2,7 +2,7 @@
 {% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
 {% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
 {% set isAjax = app.request.isxmlhttprequest ?? false %}
-{% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
+{% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' : 'MauticCoreBundle:Default:base.html.twig' %}
 
 {% if isAjax == false and not modalView %}
     {# load base template #}
