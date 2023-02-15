@@ -308,10 +308,7 @@ class PluginController extends FormController
         $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
         $themes      = [
-            'MauticPluginBundle:FormTheme:Integration/_integration_fields_row.html.twig',
-            'MauticPluginBundle:FormTheme:Integration/_integration_details_featureSettings_row.html.twig',
-            'MauticPluginBundle:FormTheme:Integration/_integration_company_fields_row.html.twig',
-            'MauticPluginBundle:FormTheme:Integration/_integration_details_supportedFeatures_row.html.twig',
+            'MauticPluginBundle:FormTheme:Integration/layout.html.twig',
         ];
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);

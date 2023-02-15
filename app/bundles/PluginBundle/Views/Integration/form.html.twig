@@ -187,7 +187,7 @@ unset($form['featureSettings']['companyFields']);
     {%- if hasCompanyFields -%}
         <div class="tab-pane fade {% if 'companyFieldsContainer' == activeTab %}in active{% endif %} bdr-w-0" id="company-fields-container">
             <h4 class="mb-sm">{{ 'mautic.integration.companyfield_matches'|trans }}</h4>
-            {{- companyFieldHtml|purify -}}
+            {{- companyFieldHtml|raw -}}
         </div>
     {%- endif -%}
 </div>
