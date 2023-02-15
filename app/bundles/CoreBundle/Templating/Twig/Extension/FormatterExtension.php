@@ -58,6 +58,9 @@ class FormatterExtension extends AbstractExtension
         return $this->formatterHelper->normalizeStringValue($string);
     }
 
+    /**
+     * @param array<mixed> $array
+     */
     public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
     {
         return $this->formatterHelper->simpleArrayToHtml($array, $delimeter);
