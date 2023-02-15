@@ -1,54 +1,66 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
-{% block mauticContent %}emailSend{% endblock %}
-{% block headerTitle %}{{ 'mautic.email.send.list'|trans ({'%name%' : email.getName()}) }}{% endblock %}
+{% block mauticContent 'emailSend' %}
 
-{% set percent = (progress.1) ? (progress.0 / progress.1) * 100 |round : 100%}
+{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|raw %}
+
+{% set percent = (progress[1]) ? ((progress[0] / progress[1]) * 100)|round : 100 %}
 {% set id = ('inprogress' != status) ? 'emailSendProgressComplete' : 'emailSendProgress' %}
 
-{% block progressBody %}
-    <div class="row ma-lg email-send-progress" id="<?php echo $id; ?>">
+{% block content %}
+    <div class="row ma-lg email-send-progress" id="{{ id }}">
         <div class="col-sm-offset-3 col-sm-6 text-center">
             <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        {{ 'mautic.email.send.' ~ status|trans ({'%subject%' : toHtml(email.getSubject(), 'short')}) }}
+                        {{ ('mautic.email.send.' ~ status)|trans ({'%subject%' : emoji_to_html(email.getSubject(), 'short')}) }}
                     </h4>
                 </div>
                 <div class="panel-body">
                     {% if 'inprogress' != status %}
-                        <h4>
-                            {{ 'mautic.email.send.stats'|trans ({'%sent%' : stats.sent, '%failed%' : stats.failed}) }}
-                        </h4>
+                        <h4>{{ 'mautic.email.send.stats'|trans({'%sent%': stats.sent, '%failed%': stats.failed}) }}</h4>
                     {% endif %}
                     <div class="progress mt-md" style="height:50px;">
                         <div class="progress-bar-send progress-bar progress-bar-striped{% if 'inprogress' == status %}{{ ' active' }}{% endif %}"
-                             role="progressbar" aria-valuenow="{{ progress.0 }}" aria-valuemin="0" aria-valuemax="{{ progress.1 }}" style="width: {{ percent }}%; height: 50px;" data-batchlimit="{{ batchlimit }}" data-email="{{ email.getId() }}">
+                             role="progressbar"
+                             aria-valuenow="{{ progress[0] }}"
+                             aria-valuemin="0"
+                             aria-valuemax="{{ progress[1] }}"
+                             style="width: {{ percent }}%; height: 50px;"
+                             data-batchlimit="{{ batchlimit }}"
+                             data-email="{{ email.id }}">
                             <span class="sr-only">{{ percent }}%</span>
                         </div>
                     </div>
                 </div>
+
                 {% if stats.failedRecipients is not empty %}
                     <ul class="list-group">
                         {% for leadId, failedEmail in stats.failedRecipients %}
                             <li class="list-group-item">
-                                <a target="_new" class="text-danger" href="{{ path('mautic_contact_action', {'objectAction' : 'view', 'objectId' : leadId}) }}">
-                                    {{ failedEmail }}
+                                <a target="_new" class="text-danger" href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': leadId}) }}">
+                                    {{- failedEmail -}}
                                 </a>
                             </li>
                         {% endfor %}
                     </ul>
                 {% endif %}
-                <div class="panel-footer">
-                    <span class="small"><span class="imported-count">{{ progress.0 }}</span> / <span class="total-count">{{ progress.1 }}</span></span>
 
+                <div class="panel-footer">
+                    <span class="small">
+                      <span class="imported-count">{{ progress[0] }}</span> / <span class="total-count">{{ progress[1] }}</span>
+                    </span>
                     {% if 'inprogress' == status %}
                         <div>
-                            <a class="text-danger mt-md" href="{{ path('mautic_email_action', {'objectAction' : 'send', 'objectId' : email.getId()}) }}" data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
+                            <a class="text-danger mt-md"
+                               href="{{ path('mautic_email_action', {'objectAction': 'send', 'objectId': email.id}) }}"
+                               data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
                         </div>
                     {% else %}
                         <div>
-                            <a class="text-success mt-md" href="{{ path('mautic_email_action', {'objectAction' : 'send', 'objectId' : email.getId()}) }}" data-toggle="ajax">{{ 'mautic.core.form.done'|trans }}</a>
+                            <a class="text-success mt-md"
+                               href="{{ path('mautic_email_action', {'objectAction': 'send', 'objectId': email.id}) }}"
+                               data-toggle="ajax">{{ 'mautic.core.form.done'|trans }}</a>
                         </div>
                     {% endif %}
                 </div>

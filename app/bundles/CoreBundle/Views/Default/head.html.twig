@@ -2,7 +2,7 @@
     <meta charset="UTF-8" />
     <title>
         {% if headerTitle is defined and headerTitle is not empty %}
-            {{ headerTitle|replace({'<': ' <'})|striptags }} |
+            {{ headerTitle|replace({'<': ' <'})|striptags|raw }} |
         {% endif %}
         {{ pageTitle|default('Mautic') }}
     </title>

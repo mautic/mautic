@@ -1,73 +1,59 @@
 {% if template is defined %}
-    {% if template == 'batchdelete' %}
-        {% set confirmText = confirmText is not defined ? 'mautic.core.form.delete'|trans : confirmText %}
-        {% set iconClass = iconClass is not defined ? 'fa fa-trash-o text-danger' : iconClass %}
-        {% set btnText = btnText is not defined ? 'mautic.core.form.delete_selected' : btnText %}
-        {% set btnClass = btnClass is not defined ? '' : btnClass %}
-        {% set confirmCallback = confirmCallback is not defined ? 'executeBatchAction' : confirmCallback %}
-        {% set wrapOpeningTag = wrapOpeningTag is not defined ? '<li>' : wrapOpeningTag %}
-        {% set wrapClosingTag = wrapClosingTag is not defined ? '</li>' : wrapClosingTag %}
-        {% set precheck = precheck is not defined ? 'batchActionPrecheck' : precheck %}
-    {% elseif template == 'delete' %}
-        {% set confirmText = confirmText is not defined ? 'mautic.core.form.delete'|trans : confirmText %}
-        {% set iconClass = iconClass is not defined ? 'fa fa-trash-o text-danger' : iconClass %}
-        {% set btnText = btnText is not defined ? 'mautic.core.form.delete' : btnText %}
+    {% if template is same as 'batchdelete' %}
+        {% set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
+        {% set iconClass = iconClass|default('fa fa-trash-o text-danger') %}
+        {% set btnText = btnText|default('mautic.core.form.delete_selected'|trans) %}
+        {% set btnClass = btnClass|default('') %}
+        {% set confirmCallback = confirmCallback|default('executeBatchAction') %}
+        {% set wrapOpeningTag = wrapOpeningTag|default('<li>') %}
+        {% set wrapClosingTag = wrapClosingTag|default('</li>') %}
+        {% set precheck = precheck|default('batchActionPrecheck') %}
+    {% elseif template is same as 'delete' %}
+        {% set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
+        {% set iconClass = iconClass|default('fa fa-trash-o text-danger') %}
+        {% set btnText = btnText|default('mautic.core.form.delete') %}
     {% endif %}
 {% endif %}
 
-{% if btnClass is not defined %}
-    {% set btnClass = 'btn btn-default' %}
-{% endif %}
+{% set btnClass = btnClass|default('btn btn-default') %}
 
-{% if btnTextAttr is not defined %}
-    {% set btnTextAttr = '' %}
-{% endif %}
+{% set btnTextAttr = btnTextAttr|default('') %}
 
 {% if btnTextClass is defined %}
     {% set btnTextAttr = btnTextAttr ~ ' class="' ~ btnTextClass ~ '"' %}
 {% endif %}
 
-{% if confirmAction is not defined %}
-    {% set confirmAction = 'javascript:void(0);' %}
-{% endif %}
+{% set confirmAction = confirmAction|default('javascript:void(0);') %}
 
 {% if confirmCallback is not defined and confirmAction is not same as 'javascript:void(0);' %}
     {% set confirmCallback = 'executeAction' %}
 {% endif %}
 
-{% if cancelText is not defined %}
-    {% set cancelText = 'mautic.core.form.cancel'|trans %}
+{% set cancelText = cancelText|default('mautic.core.form.cancel'|trans) %}
+
+{% set cancelCallback = cancelCallback|default('dismissConfirmation') %}
+
+{% set attr = attr|default([]) %}
+
+{% if confirmCallback is not empty %}
+    {% set attr = attr|merge(['data-confirm-callback="' ~ confirmCallback ~ '"']) %}
 {% endif %}
 
-{% if cancelCallback is not defined %}
-    {% set cancelCallback = 'dismissConfirmation' %}
-{% endif %}
-
-{% if attr is not defined %}
-    {% set attr = [] %}
-{% endif %}
-
-{% if confirmCallback is defined %}
-    {% set attr = attr | merge(['data-confirm-callback="' ~ confirmCallback ~ '"']) %}
-{% endif %}
-
-{% if cancelText is defined %}
+{% if cancelText is not empty %}
     {% set attr = attr | merge(['data-confirm-text="' ~ cancelText|escape('js') ~ '"']) %}
 {% endif %}
 
-{% if cancelCallback is defined %}
+{% if cancelCallback is not empty %}
     {% set attr = attr | merge(['data-confirm-callback="' ~ cancelCallback ~ '"']) %}
 {% endif %}
 
-{% if target is defined %}
+{% if target is defined and target is not empty %}
     {% set attr = attr | merge(['data-target="' ~ target ~ '"']) %}
 {% endif %}
 
-{% if tag is not defined %}
-    {% set tag = 'a' %}
-{% endif %}
+{% set tag = tag|default('a') %}
 
-{% set buttonType = 'button' is same as tag ? ' type="button"' : '' %}
+{% set buttonType = 'button' is same as tag ? ' type="button"' %}
 
 {% if wrapOpeningTag is not defined %}
     {% set wrapOpeningTag = '' %}
@@ -82,9 +68,7 @@
     {% set tooltipAttr = ' data-toogle="tooltip" title="' ~ tooltip ~ '" data-placement="' ~ tooltipPosition ~ '"' %}
 {% endif %}
 
-{% if precheck is not defined %}
-    {% set precheck = '' %}
-{% endif %}
+{% set precheck = precheck|default('') %}
 
 {{ wrapOpeningTag }}
 <{{ tag }}{{ buttonType }}
@@ -93,9 +77,7 @@
     data-toggle="confirmation"
     data-precheck="{{ precheck }}"
     data-message="{{ message|escape }}"
-    data-confirm-text="{{ confirmText|escape }}"
-    {{ attr|join(' ') }}
->
+    data-confirm-text="{{ confirmText|escape }}" {{ attr|join(' ')|raw }}>
 <span{{ tooltipAttr }}>
     {% if iconClass is defined %}
         <i class="{{ iconClass }}"></i>
