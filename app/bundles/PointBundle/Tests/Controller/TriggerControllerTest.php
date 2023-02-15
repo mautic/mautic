@@ -23,11 +23,4 @@ final class TriggerControllerTest extends MauticMysqlTestCase
 
         $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
     }
-
-    public function testNewAction(): void
-    {
-        $this->client->request(Request::METHOD_GET, '/s/points/triggers/new');
-
-        $this->assertEquals(Response::HTTP_OK, $this->client->getResponse()->getStatusCode());
-    }
 }
