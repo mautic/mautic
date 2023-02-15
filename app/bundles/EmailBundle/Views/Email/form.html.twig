@@ -19,10 +19,8 @@
     'stages'    : 'stage-template',
     'locales'   : 'locale-template',
 } %}
-
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
-
 {% set mauticTemplateVars = mauticTemplateVars|default([]) %}
 
 {% block headerTitle %}
@@ -241,11 +239,22 @@
         'builderAssets' : builderAssets,
         'slots'         : slots,
         'sections'      : sections,
-        'objectId'      : email.getSessionId(),
+        'objectId'      : email.sessionId,
         'previewUrl'    : previewUrl,
     }) -}}
+
     {% set type = email.emailType %}
-    {% if ((updateSelect is not defined and not isExisting and not form_errors(form) and not variantParent) or type is not defined or (forceTypeSelection is defined and forceTypeSelection)) %}
+    {% if (
+            (
+              (updateSelect is not defined or (updateSelect is defined and updateSelect is empty))
+              and not isExisting
+              and not formContainsErrors(form)
+              and not variantParent
+            )
+            or type is empty
+            or (forceTypeSelection is defined and forceTypeSelection is not empty)
+          )
+    %}
         {{- include('MauticCoreBundle:Helper:form_selecttype.html.twig', {
             'item'       : email,
             'mauticLang' : {
