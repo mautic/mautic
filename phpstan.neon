@@ -3,6 +3,7 @@ includes:
 	- vendor/phpstan/phpstan/conf/bleedingEdge.neon
 
 parameters:
+	tmpDir: ./var/cache/phpstan
 	level: 6
 	reportUnmatchedIgnoredErrors: false
 	parallel:
