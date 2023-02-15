@@ -92,8 +92,25 @@ final class Version20230103074925 extends AbstractMauticMigration
 
     public function down(Schema $schema): void
     {
-        $leagueTableName       = $this->generateTableName(League::TABLE_NAME);
-        $contactScoreTableName = $this->generateTableName(LeagueContactScore::TABLE_NAME);
+        $pointsTableName             = $this->generateTableName('points');
+        $pointTriggersTableName      = $this->generateTableName('point_triggers');
+        $leagueTableName             = $this->generateTableName(League::TABLE_NAME);
+        $contactScoreTableName       = $this->generateTableName(LeagueContactScore::TABLE_NAME);
+
+        $contactScoreContactFk = $this->generatePropertyName($contactScoreTableName, 'fk', ['contact_id']);
+        $contactScoreLeagueFk  = $this->generatePropertyName($contactScoreTableName, 'fk', ['league_id']);
+
+        $pointsLeagueFk        = $this->generatePropertyName($pointsTableName, 'fk', ['league_id']);
+        $pointTriggersLeagueFk = $this->generatePropertyName($pointTriggersTableName, 'fk', ['league_id']);
+
+        $this->addSql("ALTER TABLE `{$contactScoreTableName}` DROP FOREIGN KEY `{$contactScoreContactFk}`");
+        $this->addSql("ALTER TABLE `{$contactScoreTableName}` DROP FOREIGN KEY `{$contactScoreLeagueFk}`");
+
+        $this->addSql("ALTER TABLE `{$pointsTableName}` DROP FOREIGN KEY `{$pointsLeagueFk}`");
+        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` DROP FOREIGN KEY `{$pointTriggersLeagueFk}`");
+
+        $this->addSql("ALTER TABLE `{$pointsTableName}` DROP league_id");
+        $this->addSql("ALTER TABLE `{$pointTriggersTableName}` DROP league_id");
 
         $this->addSql("DROP TABLE {$contactScoreTableName}");
         $this->addSql("DROP TABLE {$leagueTableName}");
