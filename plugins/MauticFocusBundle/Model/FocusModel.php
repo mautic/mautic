@@ -261,14 +261,14 @@ class FocusModel extends FormModel
         $form,
         bool $isPreview = false
     ): string {
-        [$pages, $lastPage] = $this->formModel->getPages($form->getFields());
+        [$pages, $lastPage] = $this->formModel->getPages($form->getFields()->toArray());
 
         return $this->templating->getTemplating()->render('MauticFocusBundle:Builder:form.html.twig', [
             'form'           => $form,
             'pages'          => $pages,
             'lastPage'       => $lastPage,
-            'style'          => $focus->getStyle(),
-            'focusId'        => $focus->getId(),
+            'style'          => $entity->getStyle(),
+            'focusId'        => $entity->getId(),
             'preview'        => $isPreview,
             'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
             'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
@@ -307,20 +307,20 @@ class FocusModel extends FormModel
         // will be converted to clickables
         $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
-        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:form.html.twig',
-            [
-                'form'           => $form,
-                'pages'          => $pages,
-                'lastPage'       => $lastPage,
-                'style'          => $focus['style'],
-                'focusId'        => $focus['id'],
-                'preview'        => $isPreview,
-                'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-                'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
-            ]
-        ) : '';
+        //$formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
+        //    'MauticFocusBundle:Builder:form.html.twig',
+        //    [
+        //        'form'           => $form,
+        //        'pages'          => $pages,
+        //        'lastPage'       => $lastPage,
+        //        'style'          => $focus['style'],
+        //        'focusId'        => $focus['id'],
+        //        'preview'        => $isPreview,
+        //        'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+        //        'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+        //        'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
+        //    ]
+        //) : '';
         $formContent = '';
         if (!empty($form)) {
             $formContent = $this->renderFormHtml($entity, $form, $isPreview);
