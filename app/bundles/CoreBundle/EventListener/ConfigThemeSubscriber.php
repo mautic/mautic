@@ -26,7 +26,7 @@ class ConfigThemeSubscriber implements EventSubscriberInterface
                 'bundle'     => 'CoreBundle',
                 'formAlias'  => 'themeconfig',
                 'formType'   => ConfigThemeType::class,
-                'formTheme'  => 'MauticCoreBundle:FormTheme\Config',
+                'formTheme'  => 'MauticCoreBundle:FormTheme:Config/_config_themeconfig_widget.html.twig',
                 'parameters' => [
                     'theme'                           => $event->getParametersFromConfig('MauticCoreBundle')['theme'],
                     'theme_import_allowed_extensions' => $event->getParametersFromConfig('MauticCoreBundle')['theme_import_allowed_extensions'],
