@@ -584,7 +584,8 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.twig', 'MauticEmailBundle:FormTheme\Email'),
+                    //'form'          => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.twig', 'MauticEmailBundle:FormTheme\Email'),
+                    'form'          => $form->createView(),
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
@@ -798,7 +799,8 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.twig', 'MauticEmailBundle:FormTheme\Email'),
+                    //'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.twig', 'MauticEmailBundle:FormTheme\Email'),
+                    'form'               => $form->createView(),
                     'isVariant'          => $entity->isVariant(true),
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'sections'           => $this->buildSlotForms($sections),
