@@ -132,7 +132,7 @@ class GrapesJsController extends CommonController
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
 
         return $this->render(
-            'GrapesJsBuilderBundle:Builder:template.html.php',
+            'GrapesJsBuilderBundle:Builder:template.html.twig',
             [
                 'templateHtml' => $renderedTemplateHtml,
                 'templateMjml' => $renderedTemplateMjml,
