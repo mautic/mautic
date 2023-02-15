@@ -1,5 +1,6 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
-{% block mauticContent %}email{% endblock %}
+
+{% block mauticContent 'email' %}
 
 {% set dynamicContentPrototype = form.dynamicContent.vars.prototype %}
 
@@ -45,16 +46,7 @@
 {% if previewUrl is not defined %}
     {% set previewUrl = '' %}
 {% endif %}
-{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
-{% form_theme form with [
-    'MauticEmailBundle:FormTheme:Email/_email_abtest_settings_properties_row.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_email_variantSettings_properties_row.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_emailform_dynamicContent_entry_content_row.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_emailform_dynamicContent_entry_filters_widget.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_emailform_dynamicContent_rest.html.twig',
-    'MauticEmailBundle:FormTheme:Email/dynamic_content_filter_entry_widget.html.twig',
-    'MauticEmailBundle:FormTheme:Email/dynamic_content_filter_widget.html.twig',
-] %}
+{% set mauticTemplateVars = mauticTemplateVars|default([]) %}
 
 {% block content %}
     {{ form_start(form, {'attr' : attr}) }}
@@ -62,32 +54,26 @@
         <div class="col-md-9 height-auto bg-white">
             <div class="row">
                 <div class="col-xs-12">
+
                     <!-- tabs controls -->
                     <ul class="bg-auto nav nav-tabs pr-md pl-md">
                         <li class="active">
-                            <a href="#email-container" role="tab" data-toggle="tab">
-                                {{ 'mautic.core.form.theme'|trans }}
-                            </a>
+                            <a href="#email-container" role="tab" data-toggle="tab">{{ 'mautic.core.form.theme'|trans }}</a>
                         </li>
                         <li>
-                            <a href="#advanced-container" role="tab" data-toggle="tab">
-                                {{ 'mautic.core.advanced'|trans }}
-                            </a>
+                            <a href="#advanced-container" role="tab" data-toggle="tab">{{ 'mautic.core.advanced'|trans }}</a>
                         </li>
                         <li id="dynamic-content-tab" {{ (isCodeMode) ? '' : 'class="hidden"' }}>
-                            <a href="#dynamic-content-container" role="tab" data-toggle="tab">
-                                {{ 'mautic.core.dynamicContent'|trans }}
-                            </a>
+                            <a href="#dynamic-content-container" role="tab" data-toggle="tab">{{ 'mautic.core.dynamicContent'|trans }}</a>
                         </li>
                         {{ customContent('email.tabs', mauticTemplateVars) }}
                     </ul>
                     <!--/ tabs controls -->
+
                     <div class="tab-content pa-md">
                         <div class="tab-pane fade in active bdr-w-0" id="email-container">
                             <div class="row">
-                                <div class="col-md-12">
-                                    {{ form_row(form.template) }}
-                                </div>
+                                <div class="col-md-12">{{ form_row(form.template) }}</div>
                             </div>
                             {{- include('MauticCoreBundle:Helper:theme_select.html.twig', {
                                 'type'   : 'email',
@@ -162,9 +148,9 @@
                                         {% endfor %}
                                         {% set tabHtml = tabHtml ~ '</ul></div>' %}
                                         {% set tabContentHtml = tabContentHtml ~ '</div>' %}
-
                                         {{ tabHtml |raw }}
                                         {{ tabContentHtml |raw }}
+
                                     </div>
                                 </div>
                             </div>
