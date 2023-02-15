@@ -12,7 +12,7 @@
   <div class="notes-pagination">
       {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
           'totalItems': notes|length,
-          'target': '#notes-container',
+          'target': '#NoteList',
           'page': page,
           'limit': limit,
           'sessionVar': 'lead.'~lead.id~'.note',
