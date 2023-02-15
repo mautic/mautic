@@ -13,13 +13,26 @@ if (!isset($nameGetter)) {
 }
 
 if (count($translations['children']) || ($translations['parent'] && $translations['parent']->getId() !== $activeEntity->getId())): ?>
-    <!-- start: related translations list -->
-    <ul class="list-group">
-        <?php
-        if ($translations['parent']) :
+<!-- start: related translations list -->
+<ul class="list-group">
+    <?php
+    if ($translations['parent']) :
+        echo $view->render('MauticCoreBundle:Translation:row.html.php',
+            [
+                'translation'  => $translations['parent'],
+                'translations' => $translations,
+                'actionRoute'  => $actionRoute,
+                'activeEntity' => $activeEntity,
+                'model'        => $model,
+                'nameGetter'   => $nameGetter,
+            ]
+        );
+    endif;
+    if (count($translations['children'])) :
+        foreach ($translations['children'] as $translation) :
             echo $view->render('MauticCoreBundle:Translation:row.html.php',
                 [
-                    'translation'  => $translations['parent'],
+                    'translation'  => $translation,
                     'translations' => $translations,
                     'actionRoute'  => $actionRoute,
                     'activeEntity' => $activeEntity,
@@ -27,22 +40,9 @@ if (count($translations['children']) || ($translations['parent'] && $translation
                     'nameGetter'   => $nameGetter,
                 ]
             );
-        endif;
-        if (count($translations['children'])) :
-            foreach ($translations['children'] as $translation) :
-                echo $view->render('MauticCoreBundle:Translation:row.html.php',
-                    [
-                        'translation'  => $translation,
-                        'translations' => $translations,
-                        'actionRoute'  => $actionRoute,
-                        'activeEntity' => $activeEntity,
-                        'model'        => $model,
-                        'nameGetter'   => $nameGetter,
-                    ]
-                );
-            endforeach;
-        endif;
-        ?>
-    </ul>
-    <!--/ end: related translations list -->
+    endforeach;
+    endif;
+    ?>
+</ul>
+<!--/ end: related translations list -->
 <?php endif; ?>
