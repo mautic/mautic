@@ -1127,5 +1127,6 @@ return [
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'segment_rebuild_time_warning'                                                          => 30,
+        'segment_build_time_warning'                                                            => 30,
     ],
 ];
