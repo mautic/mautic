@@ -108,22 +108,13 @@
                                data-toggle="ajax">
                                 {{ item.getName() }}
                                 {% if hasVariants %}
-                                    <span data-toggle="tooltip"
-                                          title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}">
-                            <i class="fa fa-fw fa-sitemap"></i>
-                        </span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.ab_test'|trans }}"><i class="fa fa-fw fa-sitemap"></i></span>
                                 {% endif %}
                                 {% if hasTranslations %}
-                                    <span data-toggle="tooltip"
-                                          title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
-                            <i class="fa fa-fw fa-language"></i>
-                        </span>
+                                  <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}"><i class="fa fa-fw fa-language"></i></span>
                                 {% endif %}
                                 {% if 'list' == type %}
-                                    <span data-toggle="tooltip"
-                                          title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}">
-                            <i class="fa fa-fw fa-pie-chart"></i>
-                        </span>
+                                  <span data-toggle="tooltip"title="{{ 'mautic.email.icon_tooltip.list_email'|trans }}"><i class="fa fa-fw fa-pie-chart"></i></span>
                                 {% endif %}
                                 {{ customContent('email.name', mauticTemplateVars) }}
                             </a>
@@ -139,10 +130,9 @@
                         {% set catName  = category ? category.getTitle() : 'mautic.core.form.uncategorized'|trans %}
                         {% set color = (category) ? '#' ~ category.getColor() : 'inherit' %}
                         <span style="white-space: nowrap;">
-                <span class="label label-default pa-4"
-                      style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
-                <span>{{ catName }}</span>
-            </span>
+                            <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
+                            <span>{{ catName }}</span>
+                        </span>
                     </td>
                     <td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
                         {{ customContent('email.stats.above', mauticTemplateVars) }}
@@ -150,51 +140,40 @@
                               id="pending-{{ item.getId() }}"
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.leadcount.tooltip'|trans }}">
-                        <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
-                            {{ 'mautic.email.stat.leadcount'|trans ({'%count%' : item.getPendingCount()}) }}
-                        </a>
-                    </span>
+                          <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_pending'|trans ~ ':' ~ item.getId()}) }}">
+                              {{ 'mautic.email.stat.leadcount'|trans ({'%count%' : item.getPendingCount()}) }}
+                          </a>
+                        </span>
                         <span class="mt-xs label label-default has-click-event clickable-stat{{ item.getQueuedCount() > 0 ? '' : ' hide' }}"
                               id="queued-{{ item.getId() }}"
                               data-toggle="tooltip"
                               title="{{ 'mautic.email.stat.queued.tooltip'|trans }}">
-                        <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
-                            {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
-                        </a>
-                    </span>
-                        <span class="mt-xs label label-warning has-click-event clickable-stat"
-                              id="sent-count-{{ item.getId() }}">
-                        <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_sent'|trans ~ ':' ~ item.getId()}) }}"
-                           data-toggle="tooltip"
-                           title="{{ 'mautic.email.stat.tooltip'|trans }}">
-                            {{ 'mautic.email.stat.sentcount'|trans ({'%count%' : item.getSentCount(true)}) }}
-                        </a>
-                    </span>
-                        <span class="mt-xs label label-success has-click-event clickable-stat"
-                              id="read-count-{{ item.getId() }}">
-                        <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
-                           data-toggle="tooltip"
-                           title="{{ 'mautic.email.stat.tooltip'|trans }}">
-                            {{ 'mautic.email.stat.readcount'|trans ({'%count%' : item.getReadCount(true)}) }}
-                        </a>
-                    </span>
-                        <span class="mt-xs label label-primary has-click-event clickable-stat"
-                              id="read-percent-{{ item.getId() }}">
-                        <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
-                           data-toggle="tooltip"
-                           title="{{ 'mautic.email.stat.tooltip'|trans }}">
-                            {{ 'mautic.email.stat.readpercent'|trans ({'%count%' : item.getReadPercentage(true)}) }}
-                        </a>
-                    </span>
+                          <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_queued'|trans ~ ':' ~ item.getId()}) }}">
+                              {{ 'mautic.email.stat.queued'|trans ({'%count%' : item.getQueuedCount()}) }}
+                          </a>
+                        </span>
+                        <span class="mt-xs label label-warning has-click-event clickable-stat" id="sent-count-{{ item.getId() }}">
+                          <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_sent'|trans ~ ':' ~ item.getId()}) }}"
+                             data-toggle="tooltip"
+                             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.sentcount'|trans ({'%count%' : item.getSentCount(true)}) }}</a>
+                        </span>
+                        <span class="mt-xs label label-success has-click-event clickable-stat" id="read-count-{{ item.getId() }}">
+                          <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
+                             data-toggle="tooltip"
+                             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.readcount'|trans ({'%count%' : item.getReadCount(true)}) }}</a>
+                        </span>
+                        <span class="mt-xs label label-primary has-click-event clickable-stat" id="read-percent-{{ item.getId() }}">
+                          <a href="{{ path('mautic_contact_index', {'search' : 'mautic.lead.lead.searchcommand.email_read'|trans ~ ':' ~ item.getId()}) }}"
+                             data-toggle="tooltip"
+                             title="{{ 'mautic.email.stat.tooltip'|trans }}">{{ 'mautic.email.stat.readpercent'|trans ({'%count%' : item.getReadPercentage(true)}) }}</a>
+                        </span>
                         {{ customContent('email.stats', mauticTemplateVars) }}
                         {{ customContent('email.stats.below', mauticTemplateVars) }}
                     </td>
-                    <td class="visible-lg"
-                        title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
+                    <td class="visible-lg" title="{{ item.getDateAdded() ? dateToFullConcat(item.getDateAdded()) : '' }}">
                         {{ item.getDateAdded() ? dateToDate(item.getDateAdded()) : '' }}
                     </td>
-                    <td class="visible-lg"
-                        title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
+                    <td class="visible-lg" title="{{ item.getDateModified() ? dateToFullConcat(item.getDateModified()) : '' }}">
                         {{ item.getDateModified() ? dateToDate(item.getDateModified()) : '' }}
                     </td>
                     <td class="visible-lg">{{ item.getCreatedByUser()|escape }}</td>

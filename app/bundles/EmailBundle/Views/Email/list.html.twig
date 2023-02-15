@@ -1,6 +1,7 @@
 {% set isIndex = tmpl == 'index' %}
 {% set tmpl = 'list' %}
 {% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+
 {% block mauticContent 'email' %}
 
 {% block headerTitle 'mautic.email.emails'|trans %}

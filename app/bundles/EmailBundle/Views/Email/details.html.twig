@@ -1,16 +1,17 @@
-{% if not isEmbedded %}
-    {% extends "MauticCoreBundle:Default:content.html.twig" %}
-{% endif %}
+{% extends isEmbedded ? 'MauticCoreBundle:Default:raw_output.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %}
+
 {% block headerTitle %}
     {% if not isEmbedded %}
         {{ email.getName() }}
     {% endif %}
 {% endblock %}
+
 {% block mauticContent %}
     {% if not isEmbedded %}
         email
     {% endif %}
 {% endblock %}
+
 {% set variantContent = include('MauticCoreBundle:Variant:index.html.twig',
     {
         'activeEntity'      : email,
