@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-99-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -168,7 +168,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/nick-vanpraet"><img src="https://avatars.githubusercontent.com/u/7923739?v=4?s=100" width="100px;" alt="nick-vanpraet"/><br /><sub><b>nick-vanpraet</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=nick-vanpraet" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/volha-pivavarchyk"><img src="https://avatars.githubusercontent.com/u/96085911?v=4?s=100" width="100px;" alt="Volha Pivavarchyk"/><br /><sub><b>Volha Pivavarchyk</b></sub></a><br /><a href="#userTesting-volha-pivavarchyk" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/volha-pivavarchyk"><img src="https://avatars.githubusercontent.com/u/96085911?v=4?s=100" width="100px;" alt="Volha Pivavarchyk"/><br /><sub><b>Volha Pivavarchyk</b></sub></a><br /><a href="#userTesting-volha-pivavarchyk" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/commits?author=volha-pivavarchyk" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/J-Light"><img src="https://avatars.githubusercontent.com/u/2544660?v=4?s=100" width="100px;" alt="Nish Joseph"/><br /><sub><b>Nish Joseph</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=J-Light" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Damzoneuh"><img src="https://avatars.githubusercontent.com/u/44919863?v=4?s=100" width="100px;" alt="Damzoneuh"/><br /><sub><b>Damzoneuh</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Damzoneuh" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/alinmbb"><img src="https://avatars.githubusercontent.com/u/86683952?v=4?s=100" width="100px;" alt="alinmbb"/><br /><sub><b>alinmbb</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alinmbb" title="Code">💻</a></td>
@@ -204,6 +204,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bergwerkweb"><img src="https://avatars.githubusercontent.com/u/29873275?v=4?s=100" width="100px;" alt="bergwerkweb"/><br /><sub><b>bergwerkweb</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=bergwerkweb" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://rembo.me"><img src="https://avatars.githubusercontent.com/u/758957?v=4?s=100" width="100px;" alt="Rembrand"/><br /><sub><b>Rembrand</b></sub></a><br /><a href="#userTesting-LordRembo" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/TechBill"><img src="https://avatars.githubusercontent.com/u/945103?v=4?s=100" width="100px;" alt="TechBill"/><br /><sub><b>TechBill</b></sub></a><br /><a href="#userTesting-TechBill" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://stackoverflow.com/users/902161/irfan"><img src="https://avatars.githubusercontent.com/u/4272642?v=4?s=100" width="100px;" alt="Irfan Hanfi"/><br /><sub><b>Irfan Hanfi</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=irfanhanfi" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/annamunk"><img src="https://avatars.githubusercontent.com/u/102536220?v=4?s=100" width="100px;" alt="Anna Munk"/><br /><sub><b>Anna Munk</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=annamunk" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.schriftrolle.de/?utm_source=github&utm_medium=profilLink"><img src="https://avatars.githubusercontent.com/u/765204?v=4?s=100" width="100px;" alt="Sven Döring"/><br /><sub><b>Sven Döring</b></sub></a><br /><a href="#userTesting-sdoering" title="User Testing">📓</a></td>
     </tr>
   </tbody>
 </table>

@@ -1,0 +1,45 @@
+{% set style = saveprefsbutton.style|default('display:inline-block;text-decoration:none;border-color:#4e5d9d;border-width: 10px 20px;border-style:solid; text-decoration: none; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background-color: #4e5d9d; display: inline-block;font-size: 16px; color: #ffffff;') %}
+{% set background = saveprefsbutton.background|default('') %}
+
+{% if form is defined %}
+    {# add form tag #}
+    <script src="{{ getAssetUrl('app/bundles/PageBundle/Assets/js/prefcenter.js') }}"></script>
+{% endif %}
+
+    <a href="javascript:void(null)"
+        class="button btn btn-default btn-save"
+        {% if form is defined %}onclick="saveUnsubscribePreferences('{{ form.vars.id }}')"{% endif %}
+        style="{{ style }}"
+        background="{{ background }}">
+        {{ 'mautic.page.form.saveprefs'|trans }}
+    </a>
+    <div style="clear:both"></div>
+
+{% if form is defined %}
+    unset($form['subscribed_channels'], $form['buttons']['save'], $form['buttons']['cancel']);
+    if (!$showContactCategories) {
+        unset($form['global_categories']);
+    }
+    if (!$showContactSegments) {
+        unset($form['lead_lists']);
+    }
+    if (!$showContactPauseDates) {
+        unset($form['lead_channels']['contact_pause_start_date_email'], $form['lead_channels']['contact_pause_end_date_email']);
+    }
+    if (!$showContactFrequency) {
+        unset($form['lead_channels']['frequency_number_email'], $form['lead_channels']['frequency_time_email']);
+    }
+    if (!$showContactPreferredChannels) {
+        unset($form['lead_channels']['preferred_channel']);
+    }
+    unset($form['lead_channels']);
+    // add close form tag before the custom tag to prevent cascading forms
+    // in case there is already an unsubscribe form on the page
+    // that's why we can't use the bodyclose customdeclaration
+    if (isset($custom_tag)) {
+        echo $custom_tag;
+        $view['assets']->addCustomDeclaration($view['form']->end($form), 'customTag');
+    } else {
+        $view['assets']->addCustomDeclaration($view['form']->end($form), 'bodyClose');
+    }
+{% endif %}

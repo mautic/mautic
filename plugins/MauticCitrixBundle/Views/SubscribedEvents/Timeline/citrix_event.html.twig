@@ -1,0 +1,23 @@
+<div class="wrapper citrix-event">
+	<div class="panel">
+	    <div class="panel-body">
+	    	<h3>{{ event['eventLabel']|e }}</h3>
+            <p class="mb-0">
+                {{ 'mautic.core.timeline.event.time'|trans({
+                    '%date%': dateToFullConcat(event['timestamp']),
+                    '%event%': event['eventLabel'],
+                })|e }}
+			</p>
+	    </div>
+		<div class="panel-footer">
+			<p>
+                <span class="event-name-slot"><strong>ID:</strong> {{ event['extra']['eventId']|e }}</span><br/>
+                <span class="event-name-slot"><strong>Name:</strong> {{ event['extra']['eventName']|e }}</span><br/>
+                <span class="event-name-slot"><strong>Description:</strong> {{ event['extra']['eventDesc']|e }}</span><br/>
+                {% if event.extra.joinUrl is defined and event.extra.joinUrl is not empty %}
+                    <span class="event-desc-slot"><strong>Join URL:</strong> <a href="{{ event['extra']['joinUrl']|e }}">{{ event['extra']['joinUrl']|e }}</a></span>
+                {% endif %}
+			</p>
+		</div>
+	</div>
+</div>

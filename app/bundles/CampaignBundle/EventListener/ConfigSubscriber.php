@@ -28,7 +28,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                 'bundle'     => 'CampaignBundle',
                 'formAlias'  => 'campaignconfig',
                 'formType'   => ConfigType::class,
-                'formTheme'  => 'MauticCampaignBundle:FormTheme\Config',
+                'formTheme'  => 'MauticCampaignBundle:FormTheme:Config/_config_campaignconfig_widget.html.twig',
                 'parameters' => $event->getParametersFromConfig('MauticCampaignBundle'),
             ]
         );

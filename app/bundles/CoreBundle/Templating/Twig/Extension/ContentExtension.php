@@ -24,6 +24,7 @@ class ContentExtension extends AbstractExtension
     {
         return [
             new TwigFunction('customContent', [$this, 'getCustomContent'], ['is_safe' => ['all']]),
+            new TwigFunction('showScriptTags', [$this, 'showScriptTags'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -37,5 +38,14 @@ class ContentExtension extends AbstractExtension
     public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string
     {
         return $this->contentHelper->getCustomContent($context, $vars, $viewName);
+    }
+
+    /**
+     * Replaces HTML script tags with non HTML tags so the JS inside them won't
+     * execute and will be readable.
+     */
+    public function showScriptTags(string $html): string
+    {
+        return $this->contentHelper->showScriptTags($html);
     }
 }
