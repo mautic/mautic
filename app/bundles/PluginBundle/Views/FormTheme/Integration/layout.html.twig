@@ -2,14 +2,14 @@
   {%- set containerId = 'companyFieldsContainer' -%}
   {%- set numberOfFields = (form.offsetExists('update_mautic_company1')) ? 5 : 4 -%}
   {%- set object = 'company' -%}
-  {{- block('__integration_fields_row') -}}
+  {{- block('fields_row') -}}
 {% endblock %}
 
 {% block integration_fields_row %}
   {%- set containerId = 'leadFieldsContainer' -%}
   {%- set numberOfFields = (form.offsetExists('update_mautic1')) ? 5 : 4 -%}
   {%- set object = 'lead' -%}
-  {{- block('__integration_fields_row') -}}
+  {{- block('fields_row') -}}
 {% endblock %}
 
 {% block _integration_details_supportedFeatures_row %}
@@ -59,7 +59,7 @@
 </div>
 {% endblock %}
 
-{% block __integration_fields_row %}
+{% block fields_row %}
 {#
   Variables
     - containerId (required, string)
