@@ -169,6 +169,30 @@ class FocusModel extends FormModel
     }
 
     /**
+     * Returns a trackable URL for the focus passed in. It will return an empty
+     * string if there is no url.
+     */
+    private function getTrackableUrl(Focus $focus): string
+    {
+        if ('link' == $focus->getType() && !empty($focus->getProperties()['content']['link_url'])) {
+            $trackable = $this->trackableModel->getTrackableByUrl(
+                $focus->getProperties()['content']['link_url'],
+                'focus',
+                $focus->getId()
+            );
+
+            return $this->trackableModel->generateTrackableUrl(
+                $trackable,
+                ['channel' => ['focus', $focus->getId()]],
+                false,
+                $focus->getUtmTags()
+            );
+        }
+
+        return '';
+    }
+
+    /**
      * @return string
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
@@ -176,31 +200,15 @@ class FocusModel extends FormModel
         // If cached is not an array, rebuild to support the new format
         $cached = json_decode($focus->getCache(), true);
         if ($isPreview || $byPassCache || empty($cached) || !isset($cached['js'])) {
-            $focusArray = $focus->toArray();
-
-            $url = '';
-            if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
-                $trackable = $this->trackableModel->getTrackableByUrl(
-                    $focusArray['properties']['content']['link_url'],
-                    'focus',
-                    $focusArray['id']
-                );
-
-                $url = $this->trackableModel->generateTrackableUrl(
-                    $trackable,
-                    ['channel' => ['focus', $focusArray['id']]],
-                    false,
-                    $focus->getUtmTags()
-                );
-            }
+            $url = $this->getTrackableUrl($focus);
 
             $javascript = $this->templating->getTemplating()->render('MauticFocusBundle:Builder:generate.js.twig', [
-                'focus'    => $focusArray,
+                'focus'    => $focus,
                 'preview'  => $isPreview,
                 'clickUrl' => $url,
             ]);
 
-            $content = $this->getContent($focusArray, $isPreview, $url);
+            $content = $this->getContent($focus->toArray(), $isPreview, $url);
             $cached  = [
                 'js'    => \Minify_HTML::minify($javascript),
                 'focus' => \Minify_HTML::minify($content['focus']),
@@ -218,7 +226,10 @@ class FocusModel extends FormModel
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
         $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
         $focusContent = $tokenEvent->getContent();
+
+        // NOTE: {focus_form} may appear in the focus->getEditor() or focus->getHtml() data
         $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
+
         if (!$formReplaced && !empty($cached['form'])) {
             // Form token missing so just append the form
             $focusContent .= $cached['form'];
@@ -230,7 +241,44 @@ class FocusModel extends FormModel
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
 
+    public function renderContentHtml(Focus $entity, bool $isPreview = false, string $url = '#'): string
+    {
+        return $this->templating->getTemplating()->render('MauticFocusBundle:Builder:content.html.twig', [
+                'focus'    => $entity,
+                'preview'  => $isPreview,
+                'htmlMode' => $entity->getHtmlMode(), // @todo remove
+                'clickUrl' => $url,
+        ]);
+    }
+
     /**
+     * This is used to generate `{focus_form}` raw html.
+     *
+     * @param \Mautic\FormBundle\Entity\Form $form
+     */
+    public function renderFormHtml(
+        Focus $entity,
+        $form,
+        bool $isPreview = false
+    ): string {
+        [$pages, $lastPage] = $this->formModel->getPages($form->getFields());
+
+        return $this->templating->getTemplating()->render('MauticFocusBundle:Builder:form.html.twig', [
+            'form'           => $form,
+            'pages'          => $pages,
+            'lastPage'       => $lastPage,
+            'style'          => $focus->getStyle(),
+            'focusId'        => $focus->getId(),
+            'preview'        => $isPreview,
+            'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
+            'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
+            'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
+        ]);
+    }
+
+    /**
+     * @todo $focus should be Focus entity
+     *
      * @param bool   $isPreview
      * @param string $url
      *
@@ -238,27 +286,25 @@ class FocusModel extends FormModel
      */
     public function getContent(array $focus, $isPreview = false, $url = '#')
     {
-        $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
+        $entity = $this->getEntity($focus['id']);
+
+        $form = null;
+        if ('form' === $focus['type'] && !empty($focus['form'])) {
+            $form = $this->formModel->getEntity($focus['form']);
+        }
 
         if (isset($focus['html_mode'])) {
-            $htmlMode = $focus['html_mode'];
+            $htmlMode = $focus['htmlMode'] = $focus['html_mode'];
         } elseif (isset($focus['htmlMode'])) {
             $htmlMode = $focus['htmlMode'];
         } else {
             $htmlMode = 'basic';
         }
 
-        $content = $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:content.html.twig',
-            [
-                'focus'    => $focus,
-                'preview'  => $isPreview,
-                'htmlMode' => $htmlMode,
-                'clickUrl' => $url,
-            ]
-        );
+        $content = $this->renderContentHtml($entity, $isPreview, $url);
 
-        // Form has to be generated outside of the content or else the form src will be converted to clickables
+        // Form has to be generated outside of the content or else the form src
+        // will be converted to clickables
         $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
         $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
@@ -275,6 +321,10 @@ class FocusModel extends FormModel
                 'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
             ]
         ) : '';
+        $formContent = '';
+        if (!empty($form)) {
+            $formContent = $this->renderFormHtml($entity, $form, $isPreview);
+        }
 
         if ($isPreview) {
             $content = str_replace('{focus_form}', $formContent, $content, $formReplaced);

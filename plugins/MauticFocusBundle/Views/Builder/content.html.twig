@@ -1,9 +1,12 @@
 {#
   Variables
-    - focus
+    - focus (MauticPlugin\MauticFocusBundle\Entity\Focus)
     - preview (optional)
     - clickUrl
     - htmlMode
+
+  Notes
+    - focus.htmlMode === htmlMode? is this always true?
 #}
 {% set templateBase = 'MauticFocusBundle:Builder:' ~ focus.style|capitalize ~ '/index.html.twig'  %}
 {% set preview = preview|default(false) %}

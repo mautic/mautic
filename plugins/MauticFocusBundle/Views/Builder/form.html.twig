@@ -1,3 +1,15 @@
+{#
+  Variables
+    - form
+    - pages
+    - lastPage
+    - style
+    - focusId
+    - preview
+    - contactFields
+    - companyFields
+    - viewOnlyFields
+#}
 {% set formName = '_' ~ inputAlphanum(inputTransliterate(form.name))|lower ~ '_focus' %}
 {% set jsFormName = formName|trim('_', 'left') %}
 {% set fields = form.fields %}
