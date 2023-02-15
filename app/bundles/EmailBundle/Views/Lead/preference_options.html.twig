@@ -50,7 +50,7 @@
                                                name="lead_contact_frequency_rules[lead_channels][subscribed_channels][{{ key }}]"
                                                onclick="togglePreferredChannel(this.value);"
                                                value="{{ channel.value|escape }}" {{ checked }}>
-                                        <label for="<?php echo $channel->value; ?>" id="is-contactable-{{ channel.value }}">
+                                        <label for="{{ channel.value }}" id="is-contactable-{{ channel.value }}">
                                             {{ 'mautic.lead.contact.me.label'|trans({'%channel%' : channelName}) }}
                                         </label>
                                     </div>

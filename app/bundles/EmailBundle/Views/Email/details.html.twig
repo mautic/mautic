@@ -278,7 +278,7 @@
               {% if showVariants %}
                   <!-- #variants-container -->
                   <div class="tab-pane bdr-w-0" id="variants-container">
-                      {{ showVariants }}
+                      {{ variantContent|raw }}
                   </div>
                   <!--/ #variants-container -->
               {% endif %}
@@ -286,7 +286,7 @@
               <!-- #translation-container -->
               {% if showTranslations %}
                   <div class="tab-pane bdr-w-0" id="translation-container">
-                      {{ showTranslations }}
+                      {{ translationContent|raw }}
                   </div>
               {% endif %}
               <!--/ #translation-container -->
