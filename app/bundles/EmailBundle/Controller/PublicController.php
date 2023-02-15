@@ -29,11 +29,6 @@ class PublicController extends CommonFormController
 {
     use FrequencyRuleTrait;
 
-    public function __construct(\Mautic\LeadBundle\Model\DoNotContact $doNotContactModel)
-    {
-        $this->doNotContactModel = $doNotContactModel;
-    }
-
     /**
      * @param $idHash
      *
@@ -383,7 +378,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
+        $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
         $theme = $this->factory->getTheme($template);
 

@@ -71,7 +71,7 @@ class ClearbitController extends FormController
                         )->createView(),
                         'lookupItem' => $lead->getEmail(),
                     ],
-                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:lookup.html.php',
+                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -217,7 +217,7 @@ class ClearbitController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupEmails),
                     ],
-                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:batchLookup.html.php',
+                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -324,7 +324,7 @@ class ClearbitController extends FormController
                         )->createView(),
                         'lookupItem' => $parse['host'],
                     ],
-                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:lookup.html.php',
+                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -469,7 +469,7 @@ class ClearbitController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupWebsites),
                     ],
-                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:batchLookup.html.php',
+                    'contentTemplate' => 'MauticClearbitBundle:Clearbit:batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',

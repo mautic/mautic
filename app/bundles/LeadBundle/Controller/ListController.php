@@ -132,6 +132,7 @@ class ListController extends FormController
             'currentUser'                    => $this->user,
             'searchValue'                    => $search,
             'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
+            'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
         ];
 
         return $this->delegateView(

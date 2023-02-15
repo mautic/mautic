@@ -104,7 +104,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'stat'   => $stat,
                             'type'   => $state,
                         ],
-                        'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-message-o' : 'fa-commenting',
                         'contactId'       => $contactId,
                     ]

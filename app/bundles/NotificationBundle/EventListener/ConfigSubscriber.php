@@ -27,7 +27,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'NotificationBundle',
             'formAlias'  => 'notification_config',
             'formType'   => NotificationConfigType::class,
-            'formTheme'  => 'MauticNotificationBundle:FormTheme\Config',
+            'formTheme'  => 'MauticNotificationBundle:FormTheme:Config/_config_notification_config_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticNotificationBundle'),
         ]);
     }

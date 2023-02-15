@@ -37,6 +37,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -275,7 +276,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Example:
      *  'cloud_storage' => 'mautic.integration.form.features.cloud_storage.tooltip'
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getSupportedFeatureTooltips()
     {
@@ -2091,7 +2092,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
@@ -2118,8 +2119,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param FormBuilder $builder
-     * @param array       $options
+     * @param FormBuilderInterface $builder
+     * @param array<mixed>         $options
      */
     public function modifyForm($builder, $options)
     {

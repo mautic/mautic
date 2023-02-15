@@ -26,38 +26,46 @@ jobs:
     name: PHPUnit ${{ matrix.php-versions }} ${{ matrix.db-types }}
 
     services:
-      mysql:
-        image: mysql:5.7
+      database:
+        image: ${{ matrix.db-types == 'mysql' && 'mysql:5.7' || 'mariadb:10.3' }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: mautictest
         ports:
           - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-
-      mariadb:
-        image: mariadb:10.3
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-          MYSQL_DATABASE: mautictest
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --shm-size=2gb
+          --name=${{ matrix.db-types }}
+          --tmpfs=/var/lib/mysql
+          --health-cmd="mysqladmin ping" 
+          --health-interval=10s 
+          --health-timeout=5s 
+          --health-retries=3
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       # Codecov needs access to previous commits, so we add fetch-depth: 0
       with:
         fetch-depth: 0
-    
+
+    - name: PHPUnit cache
+      if: ${{matrix.php-versions == '8.0' && matrix.db-types == 'mariadb'}}
+      uses: actions/cache@v3
+      with:
+        path: ./var/cache/phpunit
+        key: ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-phpunit-${{ hashFiles('**/composer.lock') }}
+          ${{ runner.os }}-phpunit-
+
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
         coverage: pcov
-        ini-values: pcov.directory=., pcov.exclude="~tests|themes|vendor~"
-    
+        ini-values: pcov.enabled=0, pcov.directory=., pcov.exclude="~tests|themes|vendor~"
+
     - name: add MySQL config file
       run: |
         mysqldump --version
@@ -77,21 +85,17 @@ jobs:
 
     - name: Run tests - database = ${{ matrix.db-types }}
       run: |
-        export DB_PORT_STRING="${{ matrix.db-types }}_port"
-        export DB_PORT=${!DB_PORT_STRING}
+        export DB_PORT="${{ job.services.database.ports[3306] }}"
 
         if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
-          composer test -- --coverage-clover=coverage.xml
+          php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
         else
           composer test
         fi
-      env:
-        mysql_port: ${{ job.services.mysql.ports[3306] }}
-        mariadb_port: ${{ job.services.mariadb.ports[3306] }}
 
     - name: Upload coverage report
       if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mariadb' && github.repository == 'mautic/mautic' }}
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
       with:
         files: ./coverage.xml
         fail_ci_if_error: true
@@ -105,7 +109,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: logs-${{ matrix.php-versions }}-${{ matrix.db-types }}
         path: ./var/logs/*
@@ -124,20 +128,33 @@ jobs:
     name: ${{ matrix.commands }} - ${{ matrix.php-versions }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
     - name: Rector Cache
+      if: ${{matrix.commands == 'Rector'}}
       uses: actions/cache@v3
       with:
         path: ./var/cache/rector
-        key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
-        restore-keys: ${{ runner.os }}-rector-
+        key: ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-rector-${{ hashFiles('**/composer.lock') }}
+          ${{ runner.os }}-rector-
+
+    - name: PHPStan Cache
+      if: ${{matrix.commands == 'PHPSTAN'}}
+      uses: actions/cache@v3
+      with:
+        path: ./var/cache/phpstan
+        key: ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-phpstan-${{ hashFiles('**/composer.lock') }}
+          ${{ runner.os }}-phpstan-
 
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v18.7
+      uses: tj-actions/changed-files@v35
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2

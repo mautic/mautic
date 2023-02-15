@@ -36,7 +36,7 @@ class ConfigSubscriber implements EventSubscriberInterface
                     'bundle'     => 'UserBundle',
                     'formAlias'  => 'userconfig',
                     'formType'   => ConfigType::class,
-                    'formTheme'  => 'MauticUserBundle:FormTheme\Config',
+                    'formTheme'  => 'MauticUserBundle:FormTheme:Config/_config_userconfig_widget.html.twig',
                     'parameters' => $event->getParametersFromConfig('MauticUserBundle'),
                 ]
             );
