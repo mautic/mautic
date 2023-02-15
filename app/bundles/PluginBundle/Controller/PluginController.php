@@ -10,6 +10,8 @@ use Mautic\PluginBundle\Form\Type\DetailsType;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
 use Mautic\PluginBundle\Model\PluginModel;
 use Mautic\PluginBundle\PluginEvents;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -129,8 +131,13 @@ class PluginController extends FormController
 
     /**
      * @param string $name
+     * @param string $activeTab
+     * @param int    $page
      *
      * @return JsonResponse|Response
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function configAction($name, $activeTab = 'details-container', $page = 1)
     {

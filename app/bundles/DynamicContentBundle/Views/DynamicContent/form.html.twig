@@ -1,0 +1,199 @@
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% set id = form.vars.data.id %}
+{% set fields = form.vars.fields %}
+{% set index = form.filters.vars.value|length ? max(form.filters.vars.value|keys) : 0 %}
+{% set templates = {
+    countries: 'country-template',
+    regions: 'region-template',
+    timezones: 'timezone-template',
+    select: 'select-template',
+    lists: 'leadlist-template',
+    campaign: 'campaign-template',
+    deviceTypes: 'device_type-template',
+    deviceBrands: 'device_brand-template',
+    deviceOs: 'device_os-template',
+    emails: 'lead_email_received-template',
+    tags: 'tags-template',
+    stage: 'stage-template',
+    locales: 'locale-template',
+    globalcategory: 'globalcategory-template',
+}
+%}
+
+{% block headerTitle %}
+    {% if id is not empty %}
+        {% trans with {'%name%': form.vars.data.name} %}mautic.dynamicContent.header.edit{% endtrans %}
+    {% else %}
+        {% trans %}mautic.dynamicContent.header.new{% endtrans %}
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+{% set mainErrors = form.vars.errors.form.getErrors(true) ? 'class="text-danger"' : '' %}
+{% set filterErrors = form.vars.errors.form.filters.getErrors(true) ? 'class="text-danger"' : '' %}
+{% form_theme form with [
+    'MauticDynamicContentBundle:FormTheme:Filter/_dwc_filters_entry_widget.html.twig',
+    'MauticDynamicContentBundle:FormTheme:Filter/_dwc_filters_widget.html.twig'
+]
+%}
+{{ form_start(form) }}
+<div class="box-layout">
+    <div class="col-md-9 bg-white height-auto">
+        <div class="row">
+            <div class="col-xs-12">
+                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                    <li class="active">
+                        <a href="#details" role="tab" data-toggle="tab" {{ mainErrors }}>
+                        {% trans %}mautic.core.details{% endtrans %}
+                            {% if mainErrors is not empty %}
+                                <i class="fa fa-warning"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="{% if form.vars.value.isCampaignBased() or form.updateSelect is defined %}hide{% endif %}" id="dwcFiltersTab">
+                        <a href="#filters" role="tab" data-toggle="tab" {{ filterErrors }}>
+                            {% trans %}mautic.core.filters{% endtrans %}
+                            {% if filterErrors is not empty %}
+                                <i class="fa fa-warning"></i>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- start: tab-content -->
+                <div class="tab-content pa-md">
+                    <div class="tab-pane fade in active bdr-w-0" id="details">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form_row(form.name) }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {{ form_row(form.content) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade bdr-w-0" id="filters">
+                        {% if filterErrors and '' != form_errors(form.filters) %}
+                            <div class="has-error alert alert-danger" role="alert" style="padding:5px 10px 0 10px;">
+                                {{ form_errors(form.filters) }}
+                            </div>
+                        {% endif %}
+                        <div class="dwc-filter bdr-w-0" id="{{ form.vars.id }}">
+                            <div class="row">
+                                <div class="col-xs-7">
+                                    <label>{% trans %}Filters{% endtrans %}</label>
+                                </div>
+                                <div class="col-xs-5">
+                                    <div class="form-group">
+                                        <div class="available-filters mb-md pl-0"
+                                             data-prototype="{{ form_widget(form['filters'].vars['prototype'])|escape }}"
+                                             data-index="{{ index + 1 }}">
+                                            <select class="chosen form-control" id="available_filters">
+                                                <option value=""></option>
+                                                {% for object, field in fields %}
+                                                    {% set header = object %}
+                                                    {% set icon   = ('company' == object) ? 'building' : 'user' %}
+                                                    <optgroup label="{{ "mautic.lead.#{ header }"|trans }}">
+                                                        {% for value, params in field %}
+                                                            {% set list = params.properties.list is defined ? params.properties.list : [] %}
+                                                            {% set choices = 'boolean' == params.properties.type ? list|parseBooleanList|reverse : list|parseListForChoices %}
+                                                            {% set list = choices|json_encode() %}
+                                                            {% set callback = params.properties.callback is defined and params.properties.callback is not empty ? params.properties.callback : '' %}
+                                                            {% set operators = params.operators is not empty ? params.operators|json_encode() : '{}' %}
+                                                            <option value="{{ value|escape }}"
+                                                                    id="available_{{ object ~ '_' ~ value }}"
+                                                                    data-field-object="{{ object }}"
+                                                                    data-field-type="{{ params.properties.type }}"
+                                                                    data-field-list="{{ list|escape }}"
+                                                                    data-field-callback="{{ callback }}"
+                                                                    data-field-operators="{{ operators }}"
+                                                                    class="segment-filter {{ icon }}">
+                                                                {{ params.label|trans }}
+                                                            </option>
+                                                        {% endfor %}
+                                                            
+                                                    </optgroup>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="selected-filters" id="dwc_filters" data-filter-container>
+                                        {{ form_widget(form.filters) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 bg-white height-auto bdr-l">
+        <div class="pr-lg pl-lg pt-md pb-md">
+            {{ form_row(form.category )}}
+            {{ form_row(form.language )}}
+            {{ form_row(form.translationParent )}}
+           
+            <div id="publishStatus">
+                {{ form_row(form.isPublished )}}
+            </div>
+
+            {% if form.updateSelect is not defined %}
+                {{ form_row(form.isCampaignBased )}}
+            {% endif %}
+            <div id="slotNameDiv" class="{% if form.vars.value.isCampaignBased() %}hide{% endif %}">
+                {{ form_row(form.slotName )}}
+            </div>
+            <hr />
+            <h5>{% trans %}mautic.email.utm_tags{% endtrans %}</h5>
+            <br />
+            {% for utmTag in form.utmTags %}
+                {{ form_row(utmTag)}}
+            {% endfor %}
+            
+            <div class="hide">
+                {{ form_row(form.publishUp) }}
+                {{ form_row(form.publishDown) }}
+                {{ form_rest(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+
+<div class="hide" id="templates">
+    {% for dataKey, template in templates %}
+        {% set select_or_create = 'mautic.lead.tags.select_or_create'|trans %}
+        {% set enter_to_create = 'mautic.lead.tags.enter_to_create'|trans %}
+        {% set attr = ('tags' == dataKey) ? " data-placeholder=\"#{select_or_create}\" data-no-results-text=\"#{enter_to_create}\" data-allow-add=\"true\" onchange=\"Mautic.createLeadTag(this)\"" : "" %}
+        <select class="form-control not-chosen {{ template }}" name="dwc[filters][__name__][filter]" id="dwc_filters___name___filter" {{ attr }}>
+            {% if form.vars[dataKey] is defined %}
+                {% for value, label in form.vars[dataKey] %}
+                    {% if label is iterable %}
+                        <optgroup label="{{ value}}">
+                        {% for optionValue, optionLabel in label %}
+                            <option value="{{ optionValue }}">{{ optionLabel }}</option>
+                        {% endfor %}
+                        </optgroup>
+                    {% else %}
+                        {% if 'lists' == dataKey and currentListId is defined and value == currentListId %}
+                            
+                        {% else %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </select>
+    {% endfor %}
+</div>
+{% endblock %}

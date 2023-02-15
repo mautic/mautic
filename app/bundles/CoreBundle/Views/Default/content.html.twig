@@ -11,7 +11,7 @@
 {{- '' -}}
 {% if template is not empty %}
     {{- include(template, {
-        content: block('content'),
+        content: block('content') is defined ? block('content'): '',
         modal: block('modal') is defined ? block('modal') : '',
         headerTitle: block('headerTitle'),
         pageTitle: block('pageTitle') is defined ? block('pageTitle') : '',

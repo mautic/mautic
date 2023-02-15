@@ -1,0 +1,354 @@
+{% if not isEmbedded %}
+    {% extends "MauticCoreBundle:Default:content.html.twig" %}
+{% endif %}
+{% block headerTitle %}
+    {% if not isEmbedded %}
+        {{ email.getName() }}
+    {% endif %}
+{% endblock %}
+{% block mauticContent %}
+    {% if not isEmbedded %}
+        email
+    {% endif %}
+{% endblock %}
+{% set variantContent = include('MauticCoreBundle:Variant:index.html.twig',
+    {
+        'activeEntity'      : email,
+        'variants'          : variants,
+        'abTestResults'     : abTestResults,
+        'model'             : 'email',
+        'actionRoute'       : 'mautic_email_action',
+    }
+) %}
+
+{% set showVariants = variantContent is defined and variantContent|trim is not empty %}
+
+{% set translationContent = include('MauticCoreBundle:Translation:index.html.twig',
+    {
+        'activeEntity'      : email,
+        'translations'      : translations,
+        'model'             : 'email',
+        'actionRoute'       : 'mautic_email_action',
+    }
+) %}
+
+{% set showTranslations = translationContent|trim is not empty %}
+{% set emailType = email.emailType %}
+
+{% if emailType is not defined %}
+    {% set emailType = 'template' %}
+{% endif %}
+{% set customButtons = [] %}
+
+{% if not isEmbedded %}
+    {% if 'list' == emailType %}
+        {% set sendButton = {
+            'attr'      : {
+                'data-toggle' : 'ajax',
+                'href'        : email.isBackgroundSending() ? 'javascript:void(0);' : path('mautic_email_action', {'objectAction' : 'send', 'objectId' : email.getId()}),
+            },
+            'iconClass' : 'fa fa-send-o',
+            'btnText'   : 'mautic.email.send',
+            'primary'   : true,
+        } %}
+        {% if email.isBackgroundSending() %}
+            {% set sendButton = sendButton|merge({'tooltip' : 'mautic.email.send.disabled'}) %}
+            {% set sendButton = sendButton|merge({'attr' : {'disabled' : true}}) %}
+        {% endif %}
+
+        {% set customButtons = customButtons|merge([sendButton]) %}
+    {% endif %}
+    {% set sendExampleButton = {
+        'attr' : {
+            'class'       : 'btn btn-default btn-nospin',
+            'data-toggle' : 'ajaxmodal',
+            'data-target' : '#MauticSharedModal',
+            'href'        : path('mautic_email_action', {'objectAction' : 'sendExample', 'objectId' : email.getId()}),
+            'data-header' : 'mautic.email.send.example'|trans,
+        },
+        'iconClass' : 'fa fa-send',
+        'btnText'   : 'mautic.email.send.example',
+        'primary'   : true,
+    } %}
+    {% set customButtons = customButtons|merge([sendExampleButton]) %}
+{% endif %}
+
+
+{# Only show A/B test button if not already a translation of an a/b test #}
+{% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
+
+{% block actions %}
+    {% if not isEmbedded %}
+        {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+            'item'            : email,
+            'templateButtons' : {
+                'edit' : securityHasEntityAccess(
+                    permissions['email:emails:editown'],
+                    permissions['email:emails:editother'],
+                    email.getCreatedBy(),
+                ),
+                'clone'  : permissions['email:emails:create'],
+                'abtest' : (allowAbTest and permissions['email:emails:create']),
+                'delete' : securityHasEntityAccess(
+                    permissions['email:emails:deleteown'],
+                    permissions['email:emails:deleteother'],
+                    email.getCreatedBy()
+                ),
+                'close' : securityHasEntityAccess(
+                    permissions['email:emails:viewown'],
+                    permissions['email:emails:viewother'],
+                    email.getCreatedBy()
+                ),
+            },
+            'routeBase'     : 'email',
+            'customButtons' : customButtons,
+        }) -}}
+    {% endif %}
+{% endblock %}
+{% block publishStatus %}
+    {% if not isEmbedded %}
+        {{- include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {
+            'entity' : email
+        }) -}}
+    {% endif %}
+{% endblock %}
+
+
+{# start: box layout #}
+{% block content %}
+    <div class="box-layout">
+        <!-- left section -->
+        <div class="col-md-9 bg-white height-auto">
+            <div class="bg-auto">
+                <!-- email detail header -->
+                <div class="pr-md pl-md pt-lg pb-lg">
+                    <div class="box-layout">
+                        <div class="col-xs-10">
+                            <div>
+                                {{ toHtml(email.getSubject(), 'short') }}
+                            </div>
+                            {% if email.isVariant(true) %}
+                                <div class="small">
+                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : variants['parent'].getId()}) }}"
+                                       data-toggle="ajax">
+                                        {{ 'mautic.core.variant_of'|trans ({'%parent%' : variants['parent'].getName()}) }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                            {% if email.isTranslation(true) %}
+                                <div class="small">
+                                    <a href="{{ path('mautic_email_action', {'objectAction' : 'view', 'objectId' : translations['parent'].getId()}) }}"
+                                       data-toggle="ajax">
+                                        {{ 'mautic.core.translation_of'|trans({'%parent%' : translations['parent'].getName()}) }}
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!--/ email detail header -->
+
+                <!-- email detail collapseable -->
+                <div class="collapse" id="email-details">
+                    <div class="pr-md pl-md pb-md">
+                        <div class="panel shd-none mb-0">
+                            <table class="table table-bordered table-striped mb-0">
+                                <tbody>
+                                {{- include('MauticCoreBundle:Helper:details.html.twig', {
+                                    'entity' : email
+                                }) -}}
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b">{{ 'mautic.core.form.theme'|trans }}</span>
+                                    </td>
+                                    <td>{{ email.getTemplate() }}</td>
+                                </tr>
+                                {% if email.getFromName() %}
+                                    <tr>
+                                        <td width="20%">
+                                            <span class="fw-b">{{ 'mautic.email.from_name'|trans }}</span>
+                                        </td>
+                                        <td>{{ email.getFromName() }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% if email.getFromAddress() %}
+                                    <tr>
+                                        <td width="20%">
+                                            <span class="fw-b">{{ 'mautic.email.from_email'|trans }}</span>
+                                        </td>
+                                        <td>{{ email.getFromAddress() }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% if email.getReplyToAddress() %}
+                                    <tr>
+                                        <td width="20%">
+                                            <span class="fw-b">{{ 'mautic.email.reply_to_email'|trans }}</span>
+                                        </td>
+                                        <td>{{ email.getReplyToAddress() }}</td>
+                                    </tr>
+                                {% endif %}
+                                {% if email.getBccAddress() %}
+                                    <tr>
+                                        <td width="20%">
+                                            <span class="fw-b">{{ 'mautic.email.bcc'|trans }}</span>
+                                        </td>
+                                        <td>{{ email.getBccAddress() }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                {% if email.getHeaders() %}
+                                    <tr>
+                                        <td width="20%">
+                                            <span class="fw-b">{{ 'mautic.email.custom_headers'|trans }}</span>
+                                        </td>
+                                        <td>{{ format(email.getHeaders()) }}</td>
+                                    </tr>
+                                {% endif %}
+
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b">{{ 'mautic.email.stat.sent'|trans }}</span>
+                                    </td>
+                                    <td>{{ email.getSentCount() }}</td>
+                                </tr>
+                                <tr>
+                                    <td width="20%">
+                                        <span class="fw-b">{{ 'mautic.email.stat.read'|trans }}</span>
+                                    </td>
+                                    <td>{{ email.getReadCount() }}</td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!--/ email detail collapseable -->
+            </div>
+
+            <div class="bg-auto bg-dark-xs">
+                <!-- email detail collapseable toggler -->
+                <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="{{ 'mautic.core.details'|trans }}">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#email-details">
+                        <span class="caret"></span> {{ 'mautic.core.details'|trans }}
+                    </a>
+                </span>
+                </div>
+                <!--/ email detail collapseable toggler -->
+
+                {% set isVariant = showTranslations or showVariants ?: 0 %}
+                {% set dateFrom = dateRangeForm.children['date_from'].vars['data'] %}
+                {% set dateTo = dateRangeForm.children['date_to'].vars['data'] %}
+
+                <div id="emailGraphStats"
+                     data-graph-url="{{ path('mautic_email_graph_stats', {'objectId' : email.getId(), 'isVariant' : isVariant, 'dateFrom' : dateFrom|date('Y-m-d'), 'dateTo' : dateTo|date('Y-m-d')}) }}">
+                    <div class="spinner">
+                        <i class="fa fa-spin fa-spinner"></i>
+                    </div>
+                </div>
+
+                {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ?: []) }}
+
+                <!-- tabs controls -->
+                <ul class="nav nav-tabs pr-md pl-md">
+                    <li class="active">
+                        <a href="#clicks-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.trackable.click_counts'|trans }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#contacts-container" role="tab" data-toggle="tab">
+                            {{ 'mautic.email.associated.contacts'|trans }}
+                        </a>
+                    </li>
+                    {% if showVariants %}
+                        <li>
+                            <a href="#variants-container" role="tab" data-toggle="tab">
+                                {{ 'mautic.core.variants'|trans }}
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if showTranslations %}
+                        <li>
+                            <a href="#translation-container" role="tab" data-toggle="tab">
+                                {{ 'mautic.core.translations'|trans }}
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+                <!--/ tabs controls -->
+            </div>
+
+            <!-- start: tab-content -->
+            <div class="tab-content pa-md">
+                <div class="tab-pane active bdr-w-0" id="clicks-container">
+                    {{- include('MauticPageBundle:Trackable:click_counts.html.twig', {
+                        'trackables'  : trackables,
+                        'entity'      : email,
+                        'channel'     : 'email',
+                    }) -}}
+                </div>
+
+                <div class="tab-pane bdr-w-0 page-list" id="contacts-container">
+                    {{ contacts | raw }}
+                </div>
+
+                {% if showVariants %}
+                    <!-- #variants-container -->
+                    <div class="tab-pane bdr-w-0" id="variants-container">
+                        {{ showVariants }}
+                    </div>
+                    <!--/ #variants-container -->
+                {% endif %}
+
+                <!-- #translation-container -->
+                {% if showTranslations %}
+                    <div class="tab-pane bdr-w-0" id="translation-container">
+                        {{ showTranslations }}
+                    </div>
+                {% endif %}
+                <!--/ #translation-container -->
+            </div>
+        </div>
+        <!--/ left section -->
+
+        <!-- right section -->
+        <div class="col-md-3 bg-white bdr-l height-auto">
+            <!-- preview URL -->
+            <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+                <div class="panel-heading">
+                    <div class="panel-title">{{ 'mautic.email.preview.url'|trans }}</div>
+                </div>
+                <div class="panel-body pt-xs">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            {{- include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {
+                                'item'  : email,
+                                'model' : 'email',
+                                'query' : 'customToggle=publicPreview'
+                            }) -}}
+                        </div>
+                        <input onclick="this.setSelectionRange(0, this.value.length);" type="text" class="form-control"
+                               readonly
+                               value="{{ previewUrl|escape }}"/>
+                        <span class="input-group-btn">
+                        <button class="btn btn-default btn-nospin" onclick="window.open('{{ previewUrl }}', '_blank');">
+                            <i class="fa fa-external-link"></i>
+                        </button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- activity feed -->
+            {{- include('MauticCoreBundle:Helper:recentactivity.html.twig', {
+                'logs' : logs
+            }) -}}
+        </div>
+        <!--/ right section -->
+        <input name="entityId" id="entityId" type="hidden" value="{{ email.getId()|escape }}"/>
+    </div>
+{% endblock %}
+

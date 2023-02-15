@@ -1,0 +1,65 @@
+{% block dynamic_content_filter_entry_widget %}
+    <div class="tab-pane dynamic-content-filter bdr-w-0" id="{{ form.vars.id }}">
+        <div class="row form-group">
+            <div class="col-xs-10">
+                {{ form_label(form.content) }}
+            </div>
+            <div class="col-xs-2">
+                {% if id is not same as 'emailform_dynamicContent_0_filters_0' %}
+                    <a class="remove-item remove-filter btn btn-default text-danger"><i class="fa fa-trash-o"></i></a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-xs-12">
+                {{ form_widget(form.content) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-7">
+                <label>{{ 'Filters'|trans }}</label>
+            </div>
+            <div class="col-xs-5">
+                <div class="form-group">
+                    <div class="available-filters pl-0">
+                        <select class="chosen form-control" data-mautic="available_filters">
+                            <option value=""></option>
+                            {% for object, field in fields %}
+                                {% set header = object %}
+                                {% set icon = ('company' == object) ? 'fa-building' : 'fa-user' %}
+
+                                <optgroup label="{{ ('mautic.lead.' ~ header)|trans }}">
+                                    {% for value, params in field %}
+                                        {% set list = (params.properties.list is defined) ? params.properties.list : [] %}
+                                        {% set choices = (params.properties.type is same as 'boolean') ?
+                                            parseBooleanList(list) : parseListForChoices(list) %}
+                                        {% set list = choices|json_encode %}
+                                        {% set callback = (params.properties.callback is defined) ? params.properties.callback : '' %}
+                                        {% set operators = (params.operators is defined) ? (params.operators|json_encode)|escape : '{}' %}
+                                        <option value="{{ value|escape }}" data-mautic="available_{{ value }}"
+                                                data-field-object="{{ object }}"
+                                                data-field-type="{{ params.properties.type }}"
+                                                data-field-list="{{ list|escape }}" data-field-callback="{{ callback }}"
+                                                data-field-operators='{{ operators }}'
+                                                class="segment-filter fa {{ icon }}">{{ params.label|trans }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+        <div data-filter-container data-index="{{ form.filters|length }}">
+            {% for i, filter in form.filters %}
+                {% set isPrototype = ('__name__' == filter.vars.name) %}
+                {% set valueObject = filter.vars.value.object %}
+                {% set valueField = filter.vars.value.field %}
+                {% if isPrototype or form.vars.fields.valueObject.valueObject.valueField is defined %}
+                    {{ form_widget(filter, {'first' : (i is same as 0)}) }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

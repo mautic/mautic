@@ -1,0 +1,233 @@
+{% if isEmbedded is empty %}
+    {% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% endif %}
+
+{% block mauticContent %}dynamicContent{% endblock %}
+{% block headerTitle %}{{ entity.getName() }}{% endblock %}
+
+{% set translationContent = include(
+    'MauticCoreBundle:Translation:index.html.twig',
+    {
+        activeEntity: entity,
+        translations: translations,
+        model: 'dynamicContent',
+        actionRoute: 'mautic_dynamicContent_action',
+    }
+) %}
+
+{% set showTranslations = translationContent|trim is not empty %}
+{% set customButtons = [] %}
+
+{% block actions %}
+    {% if isEmbedded is empty %}
+        {{- include(
+            'MauticCoreBundle:Helper:page_actions.html.twig',
+            {
+                'item': entity,
+                'customButtons': customButtons is defined ? customButtons : [],
+                'templateButtons': {
+                    'edit': securityHasEntityAccess(
+                        permissions['dynamiccontent:dynamiccontents:editown'],
+                        permissions['dynamiccontent:dynamiccontents:editother'],
+                        entity.getCreatedBy()
+                    ),
+                    'clone': permissions['dynamiccontent:dynamiccontents:create'],
+                    'delete': securityHasEntityAccess(
+                        permissions['dynamiccontent:dynamiccontents:deleteown'],
+                        permissions['dynamiccontent:dynamiccontents:deleteother'],
+                        entity.getCreatedBy()
+                    ),
+                    'close': securityHasEntityAccess(
+                        permissions['dynamiccontent:dynamiccontents:viewown'],
+                        permissions['dynamiccontent:dynamiccontents:viewother'],
+                        entity.getCreatedBy()
+                    ),
+                },
+                'routeBase':'dynamicContent',
+            }
+        )}}
+    {% endif %}
+{% endblock %}
+
+{% block publishStatus %}
+    {% if isEmbedded is empty %}
+        {{- include(
+            'MauticCoreBundle:Helper:publishstatus_badge.html.twig',
+            {'entity': entity}
+        )}}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- start: box layout -->
+<div class="box-layout">
+    <!-- left section -->
+    <div class="col-md-9 bg-white height-auto">
+        <div class="bg-auto">
+            <!-- page detail header -->
+            <div class="pr-md pl-md pt-lg pb-lg">
+                <div class="box-layout">
+                    <div class="col-xs-10">
+                        <div class="text-muted">{{ entity.getDescription() }}</div>
+                        {% if entity.isVariant(true) %}
+                            <div class="small">
+                                <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': variants.parent.getId()}) }}" data-toggle="ajax">
+                                    {% trans with {'%parent%': variants.parent.getName()} %}mautic.core.variant_of{% endtrans %}
+                                </a>
+                            </div>
+                        {% endif %}
+                        {% if entity.isTranslation(true) %}
+                            <div class="small">
+                                <a href="{{ path('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': translations.parent.getId()}) }}" data-toggle="ajax">
+                                    {% trans with {'%parent%': translations.parent.getName()} %}mautic.core.translation_of{% endtrans %} ?>
+                                </a>
+                            </div>
+                        {% endif %}
+                        {% if entity.getIsCampaignBased() is empty %}
+                            <div class="small">
+                                {% trans with {'%slot%': entity.getSlotName()}%}mautic.dynamicContent.header.is_filter_based{% endtrans %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!--/ page detail header -->
+            <!-- page detail collapseable -->
+            <div class="collapse" id="page-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                                {{- include(
+                                    'MauticCoreBundle:Helper:details.html.twig',
+                                    {
+                                        entity: entity
+                                    })
+                                }}
+                                <tr>
+                                    <td width="20%"><span class="fw-b textTitle">
+                                            {% trans %}mautic.dynamicContent.slot.campaign{% endtrans %}
+                                    </td>
+                                    <td>
+                                        {{ entity.getIsCampaignBased() ? 'Yes' : 'No' }}
+                                    </td>
+                                </tr>
+                                {% if entity.getIsCampaignBased() is empty %}
+                                    <tr>
+                                        <td width="20%"><span class="fw-b textTitle">
+                                                {% trans %}mautic.dynamicContent.label.slot_name{% endtrans %}
+                                        </td>
+                                        <td>
+                                            {{ entity.getSlotName() }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--/ page detail collapseable -->
+        </div>
+        <div class="bg-auto bg-dark-xs">
+            <!-- page detail collapseable toggler -->
+            <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#page-details">
+                        <span class="caret"></span> {% trans %}mautic.core.details{% endtrans %}
+                    </a>
+                </span>
+            </div>
+            <!--/ page detail collapseable toggler -->
+
+            <!-- some stats -->
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel">
+                            <div class="panel-body box-layout">
+                                <div class="col-md-3 va-m">
+                                    <h5 class="text-white dark-md fw-sb mb-xs">
+                                        <span class="fa fa-line-chart"></span>
+                                        {% trans %}mautic.dynamicContent.views{% endtrans %}
+                                    </h5>
+                                </div>
+                                <div class="col-md-9 va-m">
+                                    {{- include(
+                                        'MauticCoreBundle:Helper:graph_dateselect.html.twig', 
+                                        {
+                                            dateRangeForm: dateRangeForm, 
+                                            class: 'pull-right'
+                                        })
+                                    }}
+                                </div>
+                            </div>
+                            <div class="pt-0 pl-15 pb-10 pr-15">
+                                {{- include(
+                                        'MauticCoreBundle:Helper:chart.html.twig', 
+                                        {
+                                            chartData: entityViews,
+                                            chartType: 'line',
+                                            chartHeight: 300,
+                                        })
+                                    }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--/ stats -->
+        
+            {{ content.getCustomContent('details.stats.graph.below', _context) }}
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#clicks-container" role="tab" data-toggle="tab">
+                        {% trans %}mautic.trackable.click_counts{% endtrans %}
+                    </a>
+                </li>
+                {% if showTranslations is defined and showTranslations is not empty %}
+                    <li class>
+                        <a href="#translation-container" role="tab" data-toggle="tab">
+                            {% trans %}mautic.core.translations{% endtrans %}
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+            <!--/ tabs controls -->
+        </div>
+        <!-- start: tab-content -->
+        <div class="tab-content pa-md">
+            <div class="tab-pane active active bdr-w-0" id="clicks-container">
+                {{- include(
+                    'MauticPageBundle:Trackable:click_counts.html.twig',
+                    {
+                        trackables: trackables,
+                        entity: entity,
+                        channel: 'dynamicContent',
+                        content: content,
+                    })
+                }}
+            </div>
+            <!-- #translation-container -->
+            {% if showTranslations is defined and showTranslations is not empty %}
+                <div class="tab-pane bdr-w-0" id="translation-container">
+                    {{ translationContent|raw }}
+                </div>
+            {% endif %}
+            <!--/ #translation-container -->
+        </div>
+        <!-- end: tab-content -->
+    </div>
+    <!--/ left section -->
+
+    <!-- right section -->
+    <div class="col-md-3 bg-white bdr-l height-auto">
+        <hr class="hr-w-2" style="width:50%">
+        <!-- recent activity -->
+        {{- include('MauticCoreBundle:Helper:recentactivity.html.twig', { logs: logs }) }}
+    </div>
+    <!--/ right section -->
+</div>
+{% endblock %}
