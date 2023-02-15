@@ -5,7 +5,7 @@
 {% block _leadlist_filters_widget %}
   {% for i, filter in form %}
     {% set isPrototype = '__name__' == filter.vars.name %}
-    {% set filterType = filter['field'].vars['value'] %}
+    {% set filterType = filter.field.vars.value %}
     {% for object, objectfields in form.parent.vars.fields %}
       {% set isField = objectfields[filter.vars.value.field] is defined %}
       {% set isBehavior = form.parent.vars.fields.behaviors[filter.vars.value.field] is defined %}

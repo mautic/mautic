@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
-use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator) {
@@ -35,5 +34,5 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\EmailBundle\\Entity\\', '../Entity/*Repository.php');
 
-    $services->alias(GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
+    $services->alias(\Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProvider::class);
 };

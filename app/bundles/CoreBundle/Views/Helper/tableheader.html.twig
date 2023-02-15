@@ -47,7 +47,7 @@
 {% set order = order|default(app.session.get('mautic.' ~ sessionVar ~ '.orderby', defaultOrder)) %}
 {% set dir = dir|default(app.session.get('mautic.' ~ sessionVar ~ '.orderbydir', 'ASC')) %}
 {% set filters = filters|default(app.session.get('mautic.' ~ sessionVar ~ '.filters', [])) %}
-{% set tmpl = 'list' %}
+{% set tmpl = tmpl|default('list') %}
 <th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
     <div class="thead-filter">
         {% if orderBy is defined and orderBy is not empty %}
