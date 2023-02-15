@@ -9,6 +9,7 @@
     - contactFields
     - companyFields
     - viewOnlyFields
+    - displayManager
 #}
 {% set formName = '_' ~ inputAlphanum(inputTransliterate(form.name))|lower ~ '_focus' %}
 {% set jsFormName = formName|trim('_', 'left') %}
@@ -113,5 +114,6 @@
         'contactFields': contactFields,
         'companyFields': companyFields,
         'viewOnlyFields': viewOnlyFields,
+        'displayManager': displayManager,
 }, with_context=false) }}
 <!-- END FOCUS FORM -->
