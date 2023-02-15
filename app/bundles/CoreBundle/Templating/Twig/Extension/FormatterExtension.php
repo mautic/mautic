@@ -60,11 +60,6 @@ class FormatterExtension extends AbstractExtension
 
     public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
     {
-        $pairs = [];
-        foreach ($array as $key => $value) {
-            $pairs[] = "$key: $value";
-        }
-
-        return implode($delimeter, $pairs);
+        $this->formatterHelper->simpleArrayToHtml($array, $delimeter);
     }
 }
