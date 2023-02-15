@@ -59,6 +59,7 @@
     'MauticEmailBundle:FormTheme:Email/dynamic_content_filter_widget.html.twig',
 ] %}
 {% block content %}
+    <div id="grapesjsbuilder_assets" class="hide" data-assets="{{ url('grapesjsbuilder_assets') }}" data-upload="{{ url('grapesjsbuilder_upload') }}" data-delete="{{ url('grapesjsbuilder_delete') }}"></div>
     {{ form_start(form, {'attr' : attr}) }}
     <div class="box-layout">
         <div class="col-md-9 height-auto bg-white">
