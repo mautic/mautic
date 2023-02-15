@@ -1,38 +1,16 @@
+{% form_theme form 'MauticEmailBundle:FormTheme:Email/layout.html.twig' %}
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
 {% block mauticContent 'email' %}
 
 {% set dynamicContentPrototype = form.dynamicContent.vars.prototype %}
+{% set filterBlockPrototype = form.dynamicContent.children[0].filters.vars.prototype|default(null) %}
+{% set filterSelectPrototype = form.dynamicContent.children[0].filters.children[0].filters.vars.prototype|default(null) %}
 
-{% if form.dynamicContent.children[0]['filters'].vars.prototype is empty %}
-    {% set filterBlockPrototype = null %}
-{% else %}
-    {% set filterBlockPrototype = form.dynamicContent.children[0]['filters'].vars.prototype %}
-{% endif %}
-
-{% if form.dynamicContent.children[0]['filters'].children[0]['filters'].vars.prototype is empty %}
-    {% set filterSelectPrototype = null %}
-{% else %}
-    {% set filterSelectPrototype = form.dynamicContent.children[0]['filters'].children[0]['filters'].vars.prototype %}
-{% endif %}
-
-{% set variantParent = email.getVariantParent() %}
-{% set isExisting    = email.id is not empty %}
-
-{% set subheader = variantParent is defined and variantParent is not empty ? '<div><span class="small">' ~ 'mautic.core.variant_of'|trans({'%name%' : email.getName(), '%parent%' : variantParent.name}) ~ '</span></div>' : '' %}
-
-{% set header = isExisting ? 'mautic.email.header.edit'|trans({'%name%' : email.getName()}) : 'mautic.email.header.new'|trans %}
-
-{% block headerTitle %}
-{{ (header ~ subheader)|raw }}
-{% endblock %}
-
+{% set variantParent = email.variantParent %}
+{% set isExisting = email.id is not empty %}
 {% set emailType = form.emailType.vars.data %}
-
-{% if attachmentSize is not defined %}
-    {% set attachmentSize = 0 %}
-{% endif %}
-
+{% set attachmentSize = attachmentSize|default(0) %}
 {% set templates = {
     'select'    : 'select-template',
     'countries' : 'country-template',
@@ -42,25 +20,27 @@
     'locales'   : 'locale-template',
 } %}
 
-{% set attr = form.vars.attr %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
+{% set previewUrl = previewUrl|default('') %}
 
-{% if previewUrl is not defined %}
-    {% set previewUrl = '' %}
-{% endif %}
 {% set mauticTemplateVars = mauticTemplateVars|default([]) %}
-{% form_theme form with [
-    'MauticEmailBundle:FormTheme:Email/_email_abtest_settings_properties_row.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_email_variantSettings_properties_row.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_emailform_dynamicContent_entry_content_row.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_emailform_dynamicContent_entry_filters_widget.html.twig',
-    'MauticEmailBundle:FormTheme:Email/_emailform_dynamicContent_rest.html.twig',
-    'MauticEmailBundle:FormTheme:Email/dynamic_content_filter_entry_widget.html.twig',
-    'MauticEmailBundle:FormTheme:Email/dynamic_content_filter_widget.html.twig',
-] %}
+
+{% block headerTitle %}
+  {% if email.id is not empty %}
+    {{ 'mautic.email.header.edit'|trans({'%name%': email.name}) }}
+  {% else %}
+    {{ 'mautic.email.header.new'|trans }}
+  {% endif %}
+
+  {% if email.variantParent %}
+    <div><span class="small">{{ 'mautic.core.variant_of'|trans({'%name%': email.name, '%parent%' : variantParent.name}) }}</span></div>
+  {% endif %}
+{% endblock %}
+
+
 {% block content %}
     <div id="grapesjsbuilder_assets" class="hide" data-assets="{{ url('grapesjsbuilder_assets') }}" data-upload="{{ url('grapesjsbuilder_upload') }}" data-delete="{{ url('grapesjsbuilder_delete') }}"></div>
-    {{ form_start(form, {'attr' : attr}) }}
+    {{ form_start(form) }}
     <div class="box-layout">
         <div class="col-md-9 height-auto bg-white">
             <div class="row">

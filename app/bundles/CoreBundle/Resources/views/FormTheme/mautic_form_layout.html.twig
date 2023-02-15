@@ -372,11 +372,11 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
     {% set list = form.parent.children.properties.list %}
 {% endif %}
 {% set feedbackClass = form_errors(list) ? ' has-error' : '' %}
-{% set datePrototype = list.vars.prototype is defined ? ('<div class="sortable">' ~ form_widget(list.vars.prototype) ~ '</div>') : '' %}
+{% set datePrototype = list.vars.prototype is defined ? ('<div class="sortable">' ~ form_widget(list.vars.prototype|raw) ~ '</div>')|e : '' %}
 <div class="row">
     <div data-toggle="sortablelist" data-prefix="{{ form.vars.id }}" class="form-group col-xs-12 {{ feedbackClass }}" id="{{ form.vars.id }}_list" style="overflow:auto">
         {{ form_label(form, label) }}
-        <a data-prototype="{{ datePrototype|e }}"
+        <a data-prototype="{{ datePrototype|raw }}"
            class="btn btn-warning btn-xs btn-add-item" href="#" id="{{ form.vars.id }}_additem">
             {{ addValueButton|trans }}
         </a>
