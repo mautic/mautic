@@ -145,9 +145,9 @@ id="{{ id|escape }}" name="{{ full_name|escape }}" {{ disabled ? 'disabled="disa
         {% if isSortable %}
         <div class="list-sortable">
         {% endif %}
-            {% for item in list %}
-            {{ block('sortablelist_entry_row') }}
-            {% endfor %}
+        {% for item in list.children %}
+          {{ block('sortablelist_entry_row') }}
+        {% endfor %}
         </div>
         {{ form_errors(list) }}
         {% if isSortable %}
