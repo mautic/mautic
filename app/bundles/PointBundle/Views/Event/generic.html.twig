@@ -11,7 +11,7 @@
         'deleted': deleted,
         'id': id,
         'route': 'mautic_pointtriggerevent_action',
-        'sessionId': sessionId,
+        'sessionId': sessionId|default(''),
     }) }}
     <span class="trigger-event-label">{{ event.name }}</span>
     {% if event.description is not empty %}
