@@ -112,7 +112,7 @@
                                 <td>
                                     <div>
                                         {% if item['config']['authorUrl'] is defined and item['config']['authorUrl'] is not empty and item['config']['author'] is defined %}
-                                            <a href="\Mautic\CoreBundle\Helper\InputHelper::url({{ item['config']['authorUrl'] }}); ?>" target="_blank">
+                                            <a href="{{ inputUrl(item['config']['authorUrl']) }}" target="_blank">
                                                 {{ item['config']['author']|e }}
                                             </a>
                                         {% elseif item['config']['author'] is defined and item['config']['author'] is not empty %}
