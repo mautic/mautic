@@ -106,12 +106,13 @@ class LeadController extends FormController
         }
 
         $results = $model->getEntities([
-            'start'          => $start,
-            'limit'          => $limit,
-            'filter'         => $filter,
-            'orderBy'        => $orderBy,
-            'orderByDir'     => $orderByDir,
-            'withTotalCount' => true,
+            'start'           => $start,
+            'limit'           => $limit,
+            'filter'          => $filter,
+            'orderBy'         => $orderBy,
+            'orderByDir'      => $orderByDir,
+            'withTotalCount'  => true,
+            'joinIpAddresses' => false,
         ]);
 
         $count = $results['count'];
