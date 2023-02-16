@@ -326,10 +326,9 @@ class FormModel extends AbstractCommonModel
     /**
      * Creates the appropriate form per the model.
      *
-     * @param object                              $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use function Symfony\Component\DependencyInjection\Loader\Configurator\ref;
 
 return function (ContainerConfigurator $configurator) {
     $services = $configurator->services()
@@ -13,7 +14,6 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'Doctrine',
         'Model/IteratorExportDataModel.php',
         'Form/EventListener/FormExitSubscriber.php',
@@ -37,12 +37,20 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\CoreBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
+    $services->load('Mautic\\CoreBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
+
+    // To be removed in M5. Used for autowiring.
+    $services->get(\Mautic\CoreBundle\Templating\Helper\FormHelper::class)->arg('$renderer', ref('twig.form.renderer'));
+
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set('mautic.http.client', \GuzzleHttp\Client::class)->autowire();
 
     $services->alias(\GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(\Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
+    $services->alias('mautic.factory', \Mautic\CoreBundle\Factory\MauticFactory::class);
+    $services->alias(\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class, 'argument_resolver');
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);

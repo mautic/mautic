@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Test\EventListener;
+namespace Mautic\CoreBundle\Tests\EventListener;
 
-use Mautic\CoreBundle\Controller\MauticController;
+use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
@@ -15,19 +15,19 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CoreSubscriberTest extends TestCase
 {
@@ -72,7 +72,7 @@ class CoreSubscriberTest extends TestCase
     private $dispatcher;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translator;
 
@@ -119,7 +119,7 @@ class CoreSubscriberTest extends TestCase
         $this->securityContext      = $this->createMock(AuthorizationChecker::class);
         $this->userModel            = $this->createMock(UserModel::class);
         $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createMock(Translator::class);
         $this->requestStack         = $this->createMock(RequestStack::class);
 
         $this->formRepository = $this->createMock(FormRepository::class);
@@ -166,15 +166,15 @@ class CoreSubscriberTest extends TestCase
 
     public function testOnKernelController(): void
     {
-        $user = null;
+        $user = $this->createMock(User::class);
 
         $this->userHelper->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
         $request    = $this->createMock(Request::class);
-        $controller = $this->getMockBuilder(MauticController::class)
-            ->onlyMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag'])
+        $controller = $this->getMockBuilder(CommonController::class)
+            ->onlyMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag', 'setModelFactory'])
             ->getMock();
         $controllers = [$controller];
 

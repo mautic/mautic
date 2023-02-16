@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\IconEvent;
@@ -12,7 +11,6 @@ use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -22,7 +20,6 @@ use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
 use Mautic\UserBundle\Model\UserModel;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -107,10 +104,6 @@ class CoreSubscriber implements EventSubscriberInterface
      */
     private $flashBag;
 
-    private ContainerBagInterface $parametersContainer;
-
-    private TemplatingHelper $templatingHelper;
-
     /**
      * @param ModelFactory<object> $modelFactory
      */
@@ -128,9 +121,7 @@ class CoreSubscriber implements EventSubscriberInterface
         FormRepository $formRepository,
         MauticFactory $factory,
         ModelFactory $modelFactory,
-        FlashBag $flashBag,
-        ContainerBagInterface $parametersContainer,
-        TemplatingHelper $templatingHelper
+        FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
         $this->menuHelper           = $menuHelper;
@@ -146,8 +137,6 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->factory              = $factory;
         $this->modelFactory         = $modelFactory;
         $this->flashBag             = $flashBag;
-        $this->parametersContainer  = $parametersContainer;
-        $this->templatingHelper  = $templatingHelper;
     }
 
     /**
@@ -266,12 +255,6 @@ class CoreSubscriber implements EventSubscriberInterface
 
             // and the flash bag
             $controller[0]->setFlashBag($this->flashBag);
-
-            $controller[0]->setParametersContainer($this->parametersContainer);
-
-            if ($controller[0] instanceof CommonController) {
-                $controller[0]->setTemplatingHelper($this->templatingHelper);
-            }
 
             //run any initialize functions
             $controller[0]->initialize($event);
