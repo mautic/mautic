@@ -51,12 +51,16 @@ class AmazonCallback
             throw new HttpException(400, 'AmazonCallback: Invalid JSON Payload');
         }
 
-        if (!isset($payload['Type']) && !isset($payload['eventType'])) {
-            throw new HttpException(400, "Key 'Type' not found in payload ");
-        }
-
         // determine correct key for message type (global or via ConfigurationSet)
-        $type = (array_key_exists('Type', $payload) ? $payload['Type'] : $payload['eventType']);
+        if (isset($payload['Type'])) {
+            $type = $payload['Type'];
+        } elseif (isset($payload['eventType'])) {
+            $type = $payload['eventType'];
+        } elseif ($payload['notificationType']) {
+            $type = $payload['notificationType'];
+        } else {
+            throw new HttpException(400, 'AmazonCallback: type not found in payload');
+        }
 
         $this->logger->debug('Receiving webhook from Amazon', ['Type'=>$type]);
 
