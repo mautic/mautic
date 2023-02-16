@@ -56,7 +56,7 @@ class AmazonCallback
             $type = $payload['Type'];
         } elseif (isset($payload['eventType'])) {
             $type = $payload['eventType'];
-        } elseif ($payload['notificationType']) {
+        } elseif (isset($payload['notificationType'])) {
             $type = $payload['notificationType'];
         } else {
             throw new HttpException(400, 'AmazonCallback: type not found in payload');
