@@ -1,0 +1,9 @@
+<html>
+    <head>
+        <script type="text/javascript">
+            parent.postMessage("{{ response|e('js') }}", '*');
+        </script>
+        {{ analyticsGetCode() }}
+    </head>
+    <body></body>
+</html>

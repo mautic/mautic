@@ -1,4 +1,4 @@
-{# TODO this is not being used yet, only when the ConfigBundle is migrated to Twig as well #}
+{% block _config_webhookconfig_widget %}
 <div class="panel panel-primary">
     <div class="panel-heading">
         <h3 class="panel-title">{{ 'mautic.config.tab.webhookconfig'|trans }}</h3>
@@ -13,3 +13,4 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}

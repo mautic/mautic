@@ -71,7 +71,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $lead->getEmail(),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -217,7 +217,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupEmails),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -324,7 +324,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $parse['host'],
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -469,7 +469,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupWebsites),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',

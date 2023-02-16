@@ -1,0 +1,23 @@
+{# @var item \Mautic\SmsBundle\Entity\Sms #}
+{% set type = item.getSmsType() %}
+<td class="visible-sm visible-md visible-lg col-stats" data-stats="{{ item.getId() }}">
+    {% if 'list' == type %}
+        <span class="mt-xs label label-default has-click-event clickable-stat{{ item.getPendingCount() > 0 and 'list' == item.getSmsType() ? '' : ' hide' }}"
+              id="pending-{{ item.getId() }}"
+              data-toggle="tooltip"
+              title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+            <a href="{{ path('mautic_contact_index', { 'search' : 'mautic.lead.lead.searchcommand.sms_pending'|trans ~ ':' ~ item.getId() }) }}">
+                {{ 'mautic.sms.stat.leadcount'|trans({'%count%' : item.getPendingCount()}) }}
+            </a>
+        </span>
+    {% endif %}
+
+    <span class="mt-xs label label-warning has-click-event clickable-stat"
+          id="sent-count-{{ item.getId() }}"
+          data-toggle="tooltip"
+          title="{{ 'mautic.channel.stat.leadcount.tooltip'|trans }}">
+        <a href="{{ path('mautic_contact_index',{'search' : 'mautic.lead.lead.searchcommand.sms_sent'|trans ~ ':' ~ item.getId()}) }}">
+            {{ 'mautic.sms.stat.sentcount'|trans({'%count%' : item.getSentCount(true)}) }}
+        </a>
+    </span>
+</td>

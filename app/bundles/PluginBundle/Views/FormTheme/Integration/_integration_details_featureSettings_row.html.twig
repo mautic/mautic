@@ -1,0 +1,15 @@
+{% block _integration_details_featureSettings_row %}
+<div class="row">
+    <div class="col-sm-12">
+        <h4 class="mb-sm mt-lg">
+            {{ form.vars['label']|trans }}
+        </h4>
+        {% if formNotes.features is defined and formNotes.features is not empty %}
+            <div class="alert alert-{{ formNotes['features']['type'] }}">
+                {{ formNotes['features']['note']|trans }}
+            </div>
+        {% endif %}
+        {{ form_widget(form) }}
+    </div>
+</div>
+{% endblock %}
