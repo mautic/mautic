@@ -1,12 +1,12 @@
 <div class="content-body">
     {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
-        publishStatus: publishStatus|default(''),
-        headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
-        actions: block('actions') is defined ? block('actions') : '',
-        toolbar: block('toolbar') is defined ? block('toolbar') : '',
-        mauticTemplateVars: mauticTemplateVars|default([]),
+        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
+        headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
+        actions: block('actions') is defined ? block('actions') : actions|default(''),
+        toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
+        mauticTemplateVars: mauticTemplateVars|default({}),
     }) }}
-    {{ content|raw }}
+    {{ content|default('')|raw }}
 </div>
-{{ modal|raw }}
+{{ modal|default('')|raw }}
 {{ securityGetAuthenticationContext() }}

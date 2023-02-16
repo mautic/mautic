@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     {{ include('MauticCoreBundle:Default:head.html.twig', {
-            headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
+            headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
             pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
         })
     }}
@@ -37,12 +37,12 @@
             <section id="app-content">
                 {% block _content %}
                      {{ include('MauticCoreBundle:Default:output.html.twig', {
-                        publishStatus: publishStatus|default(''),
-                        headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
+                        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
+                        headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
                         actions: block('actions') is defined ? block('actions') : '',
                         toolbar: block('toolbar') is defined ? block('toolbar') : '',
-                        mauticTemplateVars: mauticTemplateVars|default([]),
-                        content: block('content'),
+                        mauticTemplateVars: mauticTemplateVars|default({}),
+                        content: block('content') is defined ? block('content') : content|default(''),
                         modal: block('modal') is defined ? block('modal') : '',
                      }) }}
                 {% endblock %}
