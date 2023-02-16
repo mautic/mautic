@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle;
 
 use Mautic\CoreBundle\DependencyInjection\Compiler;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -20,13 +12,22 @@ class MauticCoreBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new Compiler\ConfiguratorPass());
-        $container->addCompilerPass(new Compiler\TemplatingPass());
-        $container->addCompilerPass(new Compiler\TranslationsPass());
-        $container->addCompilerPass(new Compiler\ModelPass());
-        $container->addCompilerPass(new Compiler\UpdateStepPass());
-        $container->addCompilerPass(new Compiler\PermissionsPass());
+        $container->addCompilerPass(new Compiler\ConfiguratorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\DbalPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\TemplatingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\TranslationsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -100);
+        $container->addCompilerPass(new Compiler\TranslationLoaderPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 100);
+        $container->addCompilerPass(new Compiler\ModelPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\UpdateStepPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1020);
+        $container->addCompilerPass(new Compiler\PermissionsPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\PreUpdateCheckPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new Compiler\ServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 1000);
+        $container->addCompilerPass(new Compiler\ORMPurgerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $container->addCompilerPass(new Compiler\TestPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        }
     }
 }

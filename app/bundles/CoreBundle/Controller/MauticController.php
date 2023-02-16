@@ -1,29 +1,22 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Interface MauticController.
- *
- * A dummy interface to ensure that only Mautic bundles are affected by Mautic onKernelController events
+ * A dummy interface to ensure that only Mautic bundles are affected by Mautic onKernelController events.
  */
 interface MauticController
 {
     /**
-     * Initialize the controller.
-     *
      * @return mixed
      */
-    public function initialize(FilterControllerEvent $event);
+    public function initialize(ControllerEvent $event);
+
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
+    public function setModelFactory(ModelFactory $modelFactory): void;
 }

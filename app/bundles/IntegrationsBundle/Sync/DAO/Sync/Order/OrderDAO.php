@@ -2,17 +2,10 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Sync\Order;
 
+use DateTime;
+use DateTimeInterface;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Exception\UnexpectedValueException;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\RemappedObjectDAO;
@@ -21,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 class OrderDAO
 {
     /**
-     * @var \DateTimeInterface
+     * @var DateTimeInterface
      */
     private $syncDateTime;
 
@@ -36,19 +29,19 @@ class OrderDAO
     private $integration;
 
     /**
-     * @var array
+     * @var ObjectChangeDAO[][]
      */
     private $identifiedObjects = [];
 
     /**
-     * @var array
+     * @var ObjectChangeDAO[][]
      */
     private $unidentifiedObjects = [];
 
     /**
      * Array of all changed objects.
      *
-     * @var ObjectChangeDAO[]
+     * @var ObjectChangeDAO[][]
      */
     private $changedObjects = [];
 
@@ -93,7 +86,7 @@ class OrderDAO
      * @param bool   $isFirstTimeSync
      * @param string $integration
      */
-    public function __construct(\DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
+    public function __construct(DateTimeInterface $syncDateTime, $isFirstTimeSync, $integration, array $options = [])
     {
         $this->syncDateTime    = $syncDateTime;
         $this->isFirstTimeSync = $isFirstTimeSync;
@@ -139,11 +132,17 @@ class OrderDAO
         throw new UnexpectedValueException("There are no change objects for object type '$objectType'");
     }
 
+    /**
+     * @return ObjectChangeDAO[][]
+     */
     public function getIdentifiedObjects(): array
     {
         return $this->identifiedObjects;
     }
 
+    /**
+     * @return ObjectChangeDAO[][]
+     */
     public function getUnidentifiedObjects(): array
     {
         return $this->unidentifiedObjects;
@@ -159,10 +158,10 @@ class OrderDAO
         ObjectChangeDAO $objectChangeDAO,
         $integrationObjectName,
         $integrationObjectId,
-        ?\DateTimeInterface $objectModifiedDate = null
+        ?DateTimeInterface $objectModifiedDate = null
     ): void {
         if (null === $objectModifiedDate) {
-            $objectModifiedDate = new \DateTime();
+            $objectModifiedDate = new DateTime();
         }
 
         $objectMapping = new ObjectMapping();
@@ -196,10 +195,10 @@ class OrderDAO
     /**
      * Update the last sync date of an existing mapping.
      */
-    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?\DateTimeInterface $objectModifiedDate = null): void
+    public function updateLastSyncDate(ObjectChangeDAO $objectChangeDAO, ?DateTimeInterface $objectModifiedDate = null): void
     {
         if (null === $objectModifiedDate) {
-            $objectModifiedDate = new \DateTime();
+            $objectModifiedDate = new DateTime();
         }
 
         $this->updatedObjectMappings[] = new UpdatedObjectMappingDAO(
@@ -283,12 +282,7 @@ class OrderDAO
     {
         $synced = [];
         foreach ($this->changedObjects as $objectChanges) {
-            /** @var ObjectChangeDAO $objectChange */
             foreach ($objectChanges as $objectChange) {
-                if (isset($this->retryTheseLater[$objectChange->getMappedObject()])) {
-                    continue;
-                }
-
                 if (isset($this->retryTheseLater[$objectChange->getMappedObject()][$objectChange->getMappedObjectId()])) {
                     continue;
                 }
@@ -310,9 +304,9 @@ class OrderDAO
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
-    public function getSyncDateTime(): \DateTimeInterface
+    public function getSyncDateTime(): DateTimeInterface
     {
         return $this->syncDateTime;
     }

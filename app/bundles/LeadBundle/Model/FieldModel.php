@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Model;
 
 use Doctrine\DBAL\DBALException;
@@ -16,8 +7,12 @@ use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadFieldEvent;
+use Mautic\LeadBundle\Exception\NoListenerException;
 use Mautic\LeadBundle\Field\CustomFieldColumn;
 use Mautic\LeadBundle\Field\Dispatcher\FieldSaveDispatcher;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
@@ -28,11 +23,13 @@ use Mautic\LeadBundle\Field\LeadFieldSaver;
 use Mautic\LeadBundle\Field\SchemaDefinition;
 use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\LeadBundle\LeadEvents;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class FieldModel.
+ * @extends FormModel<LeadField>
  */
 class FieldModel extends FormModel
 {
@@ -765,15 +762,18 @@ class FieldModel extends FormModel
     /**
      * Get list of custom field values for autopopulate fields.
      *
-     * @param $type
-     * @param $filter
-     * @param $limit
+     * @param string $type
+     * @param string $filter
+     * @param int    $limit
      *
      * @return array
      */
     public function getLookupResults($type, $filter = '', $limit = 10)
     {
-        return $this->em->getRepository('MauticLeadBundle:Lead')->getValueList($type, $filter, $limit);
+        /** @var LeadRepository $contactRepository */
+        $contactRepository = $this->em->getRepository(Lead::class);
+
+        return $contactRepository->getValueList($type, $filter, $limit);
     }
 
     /**
@@ -838,11 +838,34 @@ class FieldModel extends FormModel
      */
     protected function dispatchEvent($action, &$entity, $isNew = false, Event $event = null)
     {
+        switch ($action) {
+            case 'pre_save':
+                $action = LeadEvents::FIELD_PRE_SAVE;
+                break;
+            case 'post_save':
+                $action = LeadEvents::FIELD_POST_SAVE;
+                break;
+            case 'pre_delete':
+                $action = LeadEvents::FIELD_PRE_DELETE;
+                break;
+            case 'post_delete':
+                $action = LeadEvents::FIELD_POST_DELETE;
+                break;
+        }
+
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
         }
 
-        return $this->fieldSaveDispatcher->dispatchEventBc($action, $entity, $isNew, $event);
+        if (null !== $event && !$event instanceof LeadFieldEvent) {
+            throw new RuntimeException('Event should be LeadFieldEvent|null.');
+        }
+
+        try {
+            return $this->fieldSaveDispatcher->dispatchEvent($action, $entity, $isNew, $event);
+        } catch (NoListenerException $exception) {
+            return $event;
+        }
     }
 
     /**
@@ -919,6 +942,7 @@ class FieldModel extends FormModel
                 'group_label'  => $this->translator->trans('mautic.lead.field.group.'.$contactField['group']),
                 'defaultValue' => $contactField['defaultValue'],
                 'properties'   => $contactField['properties'],
+                'isPublished'  => $contactField['isPublished'],
             ];
         }
 

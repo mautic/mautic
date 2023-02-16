@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -17,13 +8,12 @@ use Mautic\CoreBundle\Security\Exception\PermissionBadFormatException;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CorePermissions
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -240,11 +230,11 @@ class CorePermissions
     /**
      * Determines if the user has permission to access the given area.
      *
-     * @param array|string $requestedPermission
-     * @param string       $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
-     * @param User         $userEntity
-     * @param bool         $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
-     *                                          exception will be thrown
+     * @param string[]|string $requestedPermission
+     * @param string          $mode                MATCH_ALL|MATCH_ONE|RETURN_ARRAY
+     * @param User            $userEntity
+     * @param bool            $allowUnknown        If the permission is not recognized, false will be returned.  Otherwise an
+     *                                             exception will be thrown
      *
      * @return mixed
      *
@@ -450,7 +440,7 @@ class CorePermissions
     }
 
     /**
-     * @return \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @return TranslatorInterface
      */
     protected function getTranslator()
     {

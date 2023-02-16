@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticOutlookBundle\Integration;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
@@ -50,13 +41,13 @@ class OutlookIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticOutlookBundle:Integration:form.html.php',
+                'template'   => 'MauticOutlookBundle:Integration:form.html.twig',
                 'parameters' => [
                     'mauticUrl' => UrlHelper::rel2abs('/index.php'),
                 ],

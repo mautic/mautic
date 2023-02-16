@@ -2,26 +2,18 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\OwnerProvider;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\RouteHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserHelper;
+use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationBuilder;
 use Mautic\IntegrationsBundle\Sync\Notification\Helper\UserNotificationHelper;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserNotificationHelperTest extends TestCase
 {
@@ -62,13 +54,13 @@ class UserNotificationHelperTest extends TestCase
         $this->ownerProvider = $this->createMock(OwnerProvider::class);
         $this->routeHelper   = $this->createMock(RouteHelper::class);
         $this->translator    = $this->createMock(TranslatorInterface::class);
-        $this->helper        = new UserNotificationHelper(
-            $this->writer,
-            $this->userHelper,
+
+        $userNotificationBuilder = new UserNotificationBuilder($this->userHelper,
             $this->ownerProvider,
             $this->routeHelper,
             $this->translator
         );
+        $this->helper = new UserNotificationHelper($this->writer, $userNotificationBuilder);
     }
 
     public function testNotificationSentToOwner(): void

@@ -2925,7 +2925,7 @@ ul.line-legend li {
   content: "";
   position: absolute;
   left: -18px;
-  top: 32px / 2;
+  top: 16px;
   height: 1px;
   width: 18px;
   background-color: #a0acb8;
@@ -4788,5 +4788,12 @@ ul.media-list.media-list-feed div.media-object {
 }
 #globalSearchDropdown .list-group-item > a {
   padding-top: 10px;
+}
+.characters-count {
+  z-index: 100;
+  top: 20px;
+  float: right;
+  position: relative;
+  right: 10px;
 }
 /*# sourceMappingURL=app.css.map */

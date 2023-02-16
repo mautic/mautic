@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Event;
 
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadTimelineEvent extends Event
 {
@@ -55,7 +46,7 @@ class LeadTimelineEvent extends Event
     protected $lead;
 
     /**
-     * @var int
+     * @var array<string, int>
      */
     protected $totalEvents = [];
 
@@ -244,7 +235,7 @@ class LeadTimelineEvent extends Event
             return [];
         }
 
-        $events = call_user_func_array('array_merge', $this->events);
+        $events = call_user_func_array('array_merge', array_values($this->events));
 
         foreach ($events as &$e) {
             if (!$e['timestamp'] instanceof \DateTime) {

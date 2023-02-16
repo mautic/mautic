@@ -1,18 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 class DateTimeHelper
 {
+    public const FORMAT_DB = 'Y-m-d H:i:s';
+
     /**
      * @var string
      */
@@ -48,19 +41,17 @@ class DateTimeHelper
      * @param string                    $fromFormat Format the string is in
      * @param string                    $timezone   Timezone the string is in
      */
-    public function __construct($string = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'UTC')
+    public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
     {
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
     /**
-     * Sets date/time.
-     *
      * @param \DateTimeInterface|string $datetime
      * @param string                    $fromFormat
      * @param string                    $timezone
      */
-    public function setDateTime($datetime = '', $fromFormat = 'Y-m-d H:i:s', $timezone = 'local')
+    public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
     {
         $localTimezone = date_default_timezone_get();
         if ('local' == $timezone) {
@@ -69,7 +60,7 @@ class DateTimeHelper
             $timezone = 'UTC';
         }
 
-        $this->format   = (empty($fromFormat)) ? 'Y-m-d H:i:s' : $fromFormat;
+        $this->format   = (empty($fromFormat)) ? self::FORMAT_DB : $fromFormat;
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
@@ -113,7 +104,8 @@ class DateTimeHelper
     public function toUtcString($format = null)
     {
         if ($this->datetime) {
-            $utc = ('UTC' == $this->timezone) ? $this->datetime : $this->datetime->setTimezone($this->utc);
+            $dateTime = clone $this->datetime;
+            $utc      = ('UTC' == $this->timezone) ? $dateTime : $dateTime->setTimezone($this->utc);
             if (empty($format)) {
                 $format = $this->format;
             }
@@ -160,7 +152,7 @@ class DateTimeHelper
     }
 
     /**
-     * @param null $format
+     * @param string|null $format
      *
      * @return string
      */
@@ -373,7 +365,7 @@ class DateTimeHelper
         // Sanitize input
         $offset = (int) $offset;
 
-        $timezone = timezone_name_from_abbr('', $offset, false);
+        $timezone = timezone_name_from_abbr('', $offset, 0);
 
         // In case http://bugs.php.net/44780 bug happens
         if (empty($timezone)) {

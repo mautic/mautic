@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -143,10 +134,5 @@ class MonitoringType extends AbstractType
 
         // allow the specific network type - single
         $resolver->setDefined(['networkType']);
-    }
-
-    public function getBlockPrefix()
-    {
-        return 'monitoring';
     }
 }

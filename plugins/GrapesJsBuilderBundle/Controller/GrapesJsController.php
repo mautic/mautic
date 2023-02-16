@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GrapesJsController extends CommonController
 {
-    const OBJECT_TYPE = ['email', 'page'];
+    public const OBJECT_TYPE = ['email', 'page'];
 
     /**
      * @var Logger
@@ -132,7 +132,7 @@ class GrapesJsController extends CommonController
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
 
         return $this->render(
-            'GrapesJsBuilderBundle:Builder:template.html.php',
+            'GrapesJsBuilderBundle:Builder:template.html.twig',
             [
                 'templateHtml' => $renderedTemplateHtml,
                 'templateMjml' => $renderedTemplateMjml,

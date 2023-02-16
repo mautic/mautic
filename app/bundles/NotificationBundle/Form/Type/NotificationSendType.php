@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
@@ -77,7 +68,11 @@ class NotificationSendType extends AbstractType
                 ]
             );
 
-            $notification = $options['data']['notification'];
+            if (array_key_exists('data', $options)) {
+                if (is_array($options['data']) && array_key_exists('notification', $options['data'])) {
+                    $notification = $options['data']['notification'];
+                }
+            }
 
             // create button edit notification
             $windowUrlEdit = $this->router->generate('mautic_notification_action', [

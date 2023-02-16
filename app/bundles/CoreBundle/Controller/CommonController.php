@@ -1,45 +1,32 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use Sonata\Exporter\Source\ArraySourceIterator;
-use Sonata\Exporter\Source\IteratorSourceIterator;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CommonController.
- */
-class CommonController extends Controller implements MauticController
+class CommonController extends AbstractController implements MauticController
 {
     use FormThemeTrait;
 
@@ -47,6 +34,11 @@ class CommonController extends Controller implements MauticController
      * @var MauticFactory
      */
     protected $factory;
+
+    /**
+     * @var ModelFactory<object>
+     */
+    protected ModelFactory $modelFactory;
 
     /**
      * @var \Symfony\Component\HttpFoundation\Request
@@ -88,6 +80,15 @@ class CommonController extends Controller implements MauticController
         $this->factory = $factory;
     }
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     * @required
+     */
+    public function setModelFactory(ModelFactory $modelFactory): void
+    {
+        $this->modelFactory = $modelFactory;
+    }
+
     public function setUser(User $user)
     {
         $this->user = $user;
@@ -113,7 +114,7 @@ class CommonController extends Controller implements MauticController
         $this->flashBag = $flashBag;
     }
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
     }
 
@@ -143,9 +144,9 @@ class CommonController extends Controller implements MauticController
     /**
      * Get a model instance from the service container.
      *
-     * @param $modelNameKey
+     * @param string $modelNameKey
      *
-     * @return AbstractCommonModel
+     * @return AbstractCommonModel<object>
      */
     protected function getModel($modelNameKey)
     {
@@ -256,7 +257,7 @@ class CommonController extends Controller implements MauticController
      */
     public function redirectSecureRootAction()
     {
-        return $this->redirect($this->generateUrl('mautic_dashboard_index'), 301);
+        return $this->redirectToRoute('mautic_dashboard_index', [], 301);
     }
 
     /**
@@ -266,7 +267,7 @@ class CommonController extends Controller implements MauticController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function postActionRedirect($args = [])
+    public function postActionRedirect(array $args = [])
     {
         $returnUrl = array_key_exists('returnUrl', $args) ? $args['returnUrl'] : $this->generateUrl('mautic_dashboard_index');
         $flashes   = array_key_exists('flashes', $args) ? $args['flashes'] : [];
@@ -435,11 +436,10 @@ class CommonController extends Controller implements MauticController
      */
     public function renderException(\Exception $e)
     {
-        $exception  = FlattenException::create($e, $e->getCode(), $this->request->headers->all());
-        $parameters = ['request' => $this->request, 'exception' => $exception];
+        $parameters = ['request' => $this->request, 'exception' => $e];
         $query      = ['ignoreAjax' => true, 'request' => $this->request, 'subrequest' => true];
 
-        return $this->forward('MauticCoreBundle:Exception:show', $parameters, $query);
+        return $this->forward('Mautic\CoreBundle\Controller\ExceptionController::showAction', $parameters, $query);
     }
 
     /**
@@ -499,7 +499,8 @@ class CommonController extends Controller implements MauticController
         $page_404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page_404)) {
             $pageModel = $this->getModel('page');
-            $page      = $pageModel->getEntity($page_404);
+            \assert($pageModel instanceof PageModel);
+            $page = $pageModel->getEntity($page_404);
             if (!empty($page) && $page->getIsPublished() && !empty($page->getCustomHtml())) {
                 $slug = $pageModel->generateSlug($page);
 
@@ -535,7 +536,7 @@ class CommonController extends Controller implements MauticController
     /**
      * Updates list filters, order, limit.
      *
-     * @param null $name
+     * @param string|null $name
      */
     protected function setListFilters($name = null)
     {
@@ -546,10 +547,14 @@ class CommonController extends Controller implements MauticController
         }
         $name = 'mautic.'.$name;
 
+        if (false === $this->request->query->has('orderby') && false === $session->has("$name.orderbydir")) {
+            $session->set("$name.orderbydir", $this->getDefaultOrderDirection());
+        }
+
         if ($this->request->query->has('orderby')) {
             $orderBy = InputHelper::clean($this->request->query->get('orderby'), true);
             $dir     = $session->get("$name.orderbydir", 'ASC');
-            $dir     = ('ASC' == $dir) ? 'DESC' : 'ASC';
+            $dir     = $orderBy === $session->get("$name.orderby") || false == $session->has("$name.orderby") ? (('ASC' == $dir) ? 'DESC' : 'ASC') : $dir;
             $session->set("$name.orderby", $orderBy);
             $session->set("$name.orderbydir", $dir);
         }
@@ -609,7 +614,7 @@ class CommonController extends Controller implements MauticController
         /** @var \Mautic\CoreBundle\Model\NotificationModel $model */
         $model = $this->getModel('core.notification');
 
-        list($notifications, $showNewIndicator, $updateMessage) = $model->getNotificationContent($afterId, false, 200);
+        [$notifications, $showNewIndicator, $updateMessage] = $model->getNotificationContent($afterId, false, 200);
 
         $lastNotification = reset($notifications);
 
@@ -646,8 +651,6 @@ class CommonController extends Controller implements MauticController
      * @param string|null $level
      * @param string|null $domain
      * @param bool|null   $addNotification
-     *
-     * @deprecated Will be removed in Mautic 3.0. Use CommonController::flashBag->addFlash() instead.
      */
     public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
@@ -677,11 +680,11 @@ class CommonController extends Controller implements MauticController
             //message is already translated
             $translatedMessage = $message;
         } else {
-            if (isset($messageVars['pluralCount'])) {
-                $translatedMessage = $translator->transChoice($message, $messageVars['pluralCount'], $messageVars, $domain);
-            } else {
-                $translatedMessage = $translator->trans($message, $messageVars, $domain);
+            if (isset($messageVars['pluralCount']) && empty($messageVars['%count%'])) {
+                $messageVars['%count%'] = $messageVars['pluralCount'];
             }
+
+            $translatedMessage = $translator->trans($message, $messageVars, $domain);
         }
 
         if (null !== $title) {
@@ -760,14 +763,22 @@ class CommonController extends Controller implements MauticController
      *
      * Overwrite in your controller if required.
      *
-     * @param int|null $start
+     * @param AbstractCommonModel<object> $model
      *
      * @return array
      */
-    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, $start = 0)
+    protected function getDataForExport(AbstractCommonModel $model, array $args, callable $resultsCallback = null, ?int $start = 0)
     {
         $data = new DataExporterHelper();
 
         return $data->getDataForExport($start, $model, $args, $resultsCallback);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDefaultOrderDirection()
+    {
+        return 'ASC';
     }
 }

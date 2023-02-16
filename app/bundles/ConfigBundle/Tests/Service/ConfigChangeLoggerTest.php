@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Service;
 
 use Mautic\ConfigBundle\Service\ConfigChangeLogger;
@@ -17,7 +8,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 
 class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
 {
-    public function testSetOriginalNormData()
+    public function testSetOriginalNormData(): void
     {
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $auditLogModel  = $this->createMock(AuditLogModel::class);
@@ -26,7 +17,7 @@ class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($logger, $logger->setOriginalNormData([]));
     }
 
-    public function testOriginalNormDataExpected()
+    public function testOriginalNormDataExpected(): void
     {
         $this->expectException(\RuntimeException::class);
 
@@ -38,7 +29,7 @@ class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
         $logger->log([]);
     }
 
-    public function testNothingToLog()
+    public function testNothingToLog(): void
     {
         $ipLookupHelper = $this->createMock(IpLookupHelper::class);
         $ipLookupHelper->expects($this->never())->method('getIpAddressFromRequest');
@@ -56,7 +47,7 @@ class ConfigChangeLoggerTest extends \PHPUnit\Framework\TestCase
         $logger->log($postData);
     }
 
-    public function testLog()
+    public function testLog(): void
     {
         $change = [
             'key2' => 'changedValue',

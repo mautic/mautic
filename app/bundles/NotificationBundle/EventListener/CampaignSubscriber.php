@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\NotificationBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -79,8 +70,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                     'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                     'formType'         => MobileNotificationSendType::class,
                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                    'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                    'formTheme'        => 'MauticNotificationBundle:FormTheme:NotificationSendList/_notificationsend_list_row.html.twig',
+                    'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.twig',
                     'channel'          => 'mobile_notification',
                     'channelIdField'   => 'mobile_notification',
                 ]
@@ -95,8 +86,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'        => NotificationEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'         => NotificationSendType::class,
                 'formTypeOptions'  => ['update_select' => 'campaignevent_properties_notification'],
-                'formTheme'        => 'MauticNotificationBundle:FormTheme\NotificationSendList',
-                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.php',
+                'formTheme'        => 'MauticNotificationBundle:FormTheme:NotificationSendList/_notificationsend_list_row.html.twig',
+                'timelineTemplate' => 'MauticNotificationBundle:SubscribedEvents\Timeline:index.html.twig',
                 'channel'          => 'notification',
                 'channelIdField'   => 'notification',
             ]
@@ -164,18 +155,18 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         /** @var TokenReplacementEvent $tokenEvent */
         $tokenEvent = $this->dispatcher->dispatch(
-            NotificationEvents::TOKEN_REPLACEMENT,
             new TokenReplacementEvent(
                 $notification->getMessage(),
                 $lead,
                 ['channel' => ['notification', $notification->getId()]]
-            )
+            ),
+            NotificationEvents::TOKEN_REPLACEMENT
         );
 
         /** @var NotificationSendEvent $sendEvent */
         $sendEvent = $this->dispatcher->dispatch(
-            NotificationEvents::NOTIFICATION_ON_SEND,
-            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead)
+            new NotificationSendEvent($tokenEvent->getContent(), $notification->getHeading(), $lead),
+            NotificationEvents::NOTIFICATION_ON_SEND
         );
 
         // prevent rewrite notification entity

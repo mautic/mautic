@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Helper;
 
 use Symfony\Component\Form\FormView;
@@ -42,14 +33,12 @@ class FormHelper extends \Symfony\Bundle\FrameworkBundle\Templating\Helper\FormH
     /**
      * Render row if it exists.
      *
-     * @param       $form
-     * @param       $key
-     * @param null  $template
-     * @param array $variables
+     * @param FormView|array<string> $form
+     * @param mixed[]                $variables
      *
-     * @return mixed|string
+     * @return string
      */
-    public function rowIfExists($form, $key, $template = null, $variables = [])
+    public function rowIfExists($form, string $key, string $template = null, array $variables = [])
     {
         $content = (isset($form[$key])) ? $this->row($form[$key], $variables) : '';
 

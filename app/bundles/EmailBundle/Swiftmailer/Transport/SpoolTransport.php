@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool;
@@ -61,6 +52,8 @@ class SpoolTransport extends \Swift_Transport_SpoolTransport
             $evt->setResult($count ? $successResult : \Swift_Events_SendEvent::RESULT_FAILED);
             $this->eventDispatcher->dispatchEvent($evt, 'sendPerformed');
         }
+
+        $message->generateId(); //Make sure a new Message ID is used
 
         return $count;
     }

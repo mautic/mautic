@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticSocialBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -35,7 +26,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->addForm(
             [
                 'formAlias'  => 'social_config',
-                'formTheme'  => 'MauticSocialBundle:FormTheme\Config',
+                'formTheme'  => 'MauticSocialBundle:FormTheme:Config/_config_social_config_widget.html.twig',
                 'formType'   => ConfigType::class,
                 'parameters' => $event->getParametersFromConfig('MauticSocialBundle'),
             ]

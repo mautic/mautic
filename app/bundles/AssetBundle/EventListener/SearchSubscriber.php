@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\EventListener;
 
 use Mautic\AssetBundle\Model\AssetModel;
@@ -93,13 +84,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($assets as $asset) {
                     $assetResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticAssetBundle:SubscribedEvents\Search:global.html.twig',
                         ['asset' => $asset]
                     )->getContent();
                 }
                 if (count($assets) > 5) {
                     $assetResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticAssetBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticAssetBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

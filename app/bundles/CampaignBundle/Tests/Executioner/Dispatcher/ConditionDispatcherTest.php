@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Executioner\Dispatcher;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -49,8 +40,8 @@ class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->withConsecutive(
-                ['something', $this->isInstanceOf(ConditionEvent::class)],
-                [CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $this->isInstanceOf(ConditionEvent::class)]
+                [$this->isInstanceOf(ConditionEvent::class), 'something'],
+                [$this->isInstanceOf(ConditionEvent::class), CampaignEvents::ON_EVENT_CONDITION_EVALUATION]
             );
 
         (new ConditionDispatcher($this->dispatcher))->dispatchEvent($this->config, new LeadEventLog());

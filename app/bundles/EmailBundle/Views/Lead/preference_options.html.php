@@ -13,20 +13,23 @@ $leadName      = $lead->getPrimaryIdentifier();
 $channelNumber = 0;
 $js            = <<<'JS'
 function togglePreferredChannel(channel){
-       var status = document.getElementById(channel).checked;
-       if(status)
-           {
-                document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = false;
-                document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = false;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = false;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = false;
-            } else {
-                document.getElementById('lead_contact_frequency_rules_frequency_number_' + channel).disabled = true;
-                document.getElementById('lead_contact_frequency_rules_frequency_time_' + channel).disabled = true;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_start_date_' + channel).disabled = true;
-                document.getElementById('lead_contact_frequency_rules_contact_pause_end_date_' + channel).disabled = true;
-            }
-        }
+  const status = document.getElementById(channel).checked;
+  
+  const fields = [
+    'lead_contact_frequency_rules_lead_channels_frequency_number_' + channel,
+    'lead_contact_frequency_rules_lead_channels_frequency_time_' + channel,
+    'lead_contact_frequency_rules_lead_channels_contact_pause_start_date_' + channel,
+    'lead_contact_frequency_rules_lead_channels_contact_pause_end_date_' + channel
+  ];
+      
+  // disable the input fields if the main checkbox is disabled
+  for (let index = 0; index < fields.length; index++) {
+    const field = document.getElementById(fields[index]);
+    if (field) {
+      field.disabled = !status;
+    }
+  }
+}
 JS;
 
 ?>
@@ -54,7 +57,7 @@ JS;
                     <tr>
                         <td>
                             <div class="text-left">
-                                <input type="hidden" id="<?php echo $channel->value; ?>"
+                                <input type="hidden" id="<?php echo $channel->value; ?>-hidden"
                                        name="lead_contact_frequency_rules[lead_channels][subscribed_channels][<?php echo $key; ?>]"
                                        value="">
                                 <input type="checkbox" id="<?php echo $channel->value; ?>"
@@ -147,6 +150,13 @@ JS;
                     unset($form['global_categories']);
                 endif;
                 ?>
+
+                <?php if (!empty($successMessage)):?>
+                    <hr />
+                    <div id="success-message-text">
+                        <?php echo $successMessage; ?>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="panel-footer text-left">
                 <?php echo $view['form']->row($form['buttons']['save']); unset($form['buttons']['cancel']); ?></div>

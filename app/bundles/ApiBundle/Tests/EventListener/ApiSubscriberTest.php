@@ -1,25 +1,16 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Tests\EventListener;
 
 use Mautic\ApiBundle\EventListener\ApiSubscriber;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use Mautic\CoreBundle\Translation\Translator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class ApiSubscriberTest extends CommonMocks
 {
@@ -29,17 +20,17 @@ class ApiSubscriberTest extends CommonMocks
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface|MockObject
+     * @var Translator&MockObject
      */
     private $translator;
 
     /**
-     * @var Request|MockObject
+     * @var Request&MockObject
      */
     private $request;
 
     /**
-     * @var GetResponseEvent|MockObject
+     * @var RequestEvent&MockObject
      */
     private $event;
 
@@ -53,17 +44,17 @@ class ApiSubscriberTest extends CommonMocks
         parent::setUp();
 
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createMock(Translator::class);
         $this->request              = $this->createMock(Request::class);
         $this->request->headers     = new ParameterBag();
-        $this->event                = $this->createMock(GetResponseEvent::class);
+        $this->event                = $this->createMock(RequestEvent::class);
         $this->subscriber           = new ApiSubscriber(
             $this->coreParametersHelper,
             $this->translator
         );
     }
 
-    public function testOnKernelRequestWhenNotMasterRequest()
+    public function testOnKernelRequestWhenNotMasterRequest(): void
     {
         $this->event->expects($this->once())
             ->method('isMasterRequest')
@@ -75,7 +66,7 @@ class ApiSubscriberTest extends CommonMocks
         $this->assertNull($this->subscriber->onKernelRequest($this->event));
     }
 
-    public function testOnKernelRequestOnApiRequestWhenApiDisabled()
+    public function testOnKernelRequestOnApiRequestWhenApiDisabled(): void
     {
         $this->event->expects($this->once())
             ->method('isMasterRequest')
@@ -106,7 +97,7 @@ class ApiSubscriberTest extends CommonMocks
         $this->subscriber->onKernelRequest($this->event);
     }
 
-    public function testOnKernelRequestOnApiRequestWhenApiEnabled()
+    public function testOnKernelRequestOnApiRequestWhenApiEnabled(): void
     {
         $this->event->expects($this->once())
             ->method('isMasterRequest')

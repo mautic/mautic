@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Executioner\Dispatcher;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -135,7 +126,7 @@ class LegacyEventDispatcher
 
                 // Dispatch new events for legacy processed logs
                 if ($this->isFailed($result)) {
-                    $this->processFailedLog($result, $log, $pendingEvent);
+                    $this->processFailedLog($log, $pendingEvent);
 
                     $rescheduleFailures->set($log->getId(), $log);
 
@@ -182,7 +173,6 @@ class LegacyEventDispatcher
             $event = $log->getEvent();
 
             $legacyDecisionEvent = $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_DECISION_TRIGGER,
                 new CampaignDecisionEvent(
                     $log->getLead(),
                     $event->getType(),
@@ -191,7 +181,8 @@ class LegacyEventDispatcher
                     $this->getLegacyEventsConfigArray($event, $decisionEvent->getEventConfig()),
                     0 === $event->getOrder(),
                     [$log]
-                )
+                ),
+                CampaignEvents::ON_EVENT_DECISION_TRIGGER
             );
 
             if ($legacyDecisionEvent->wasDecisionTriggered()) {
@@ -221,7 +212,7 @@ class LegacyEventDispatcher
             $log
         );
 
-        $this->dispatcher->dispatch($eventName, $campaignEvent);
+        $this->dispatcher->dispatch($campaignEvent, $eventName);
 
         if ($channel = $campaignEvent->getChannel()) {
             $log->setChannel($channel)
@@ -282,7 +273,6 @@ class LegacyEventDispatcher
         $eventArray = $this->getEventArray($log->getEvent());
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTION,
             new CampaignExecutionEvent(
                 [
                     'eventSettings'   => $config->getConfig(),
@@ -294,30 +284,31 @@ class LegacyEventDispatcher
                 ],
                 $result,
                 $log
-            )
+            ),
+            CampaignEvents::ON_EVENT_EXECUTION
         );
     }
 
     private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED,
-            new ExecutedEvent($config, $log)
+            new ExecutedEvent($config, $log),
+            CampaignEvents::ON_EVENT_EXECUTED
         );
 
         $collection = new ArrayCollection();
         $collection->set($log->getId(), $log);
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
-            new ExecutedBatchEvent($config, $log->getEvent(), $collection)
+            new ExecutedBatchEvent($config, $log->getEvent(), $collection),
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH
         );
     }
 
     private function dispatchFailedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_FAILED,
-            new FailedEvent($config, $log)
+            new FailedEvent($config, $log),
+            CampaignEvents::ON_EVENT_FAILED
         );
 
         $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());
@@ -335,10 +326,7 @@ class LegacyEventDispatcher
             || (is_array($result) && isset($result['result']) && false === $result['result']);
     }
 
-    /**
-     * @param $result
-     */
-    private function processFailedLog($result, LeadEventLog $log, PendingEvent $pendingEvent)
+    private function processFailedLog(LeadEventLog $log, PendingEvent $pendingEvent)
     {
         $this->logger->debug(
             'CAMPAIGN: '.ucfirst($log->getEvent()->getEventType()).' ID# '.$log->getEvent()->getId().' for contact ID# '.$log->getLead()->getId()

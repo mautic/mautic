@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -34,7 +25,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'FormBundle',
             'formAlias'  => 'formconfig',
             'formType'   => ConfigFormType::class,
-            'formTheme'  => 'MauticFormBundle:FormTheme\Config',
+            'formTheme'  => 'MauticFormBundle:FormTheme:Config/_config_formconfig_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticFormBundle'),
         ]);
     }

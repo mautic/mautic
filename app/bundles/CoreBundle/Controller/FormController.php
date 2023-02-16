@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 /**
@@ -116,21 +107,13 @@ class FormController extends AbstractStandardFormController
      */
     protected function getSessionBase($objectId = null)
     {
-        return $this->deprecatedSessionBase;
+        return null !== $this->deprecatedSessionBase ? $this->deprecatedSessionBase : parent::getSessionBase($objectId);
     }
 
     /**
      * @return mixed
      */
     protected function getTemplateBase()
-    {
-        return $this->deprecatedTemplateBase;
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function getControllerBase()
     {
         return $this->deprecatedTemplateBase;
     }

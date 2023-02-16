@@ -1,0 +1,9 @@
+{
+    "subtree-splits": [
+        {
+            "name": "theme-trulypersonal",
+            "directory": "themes/trulypersonal",
+            "target": "git@github.com:mautic/theme-trulypersonal.git"
+        }
+    ]
+}

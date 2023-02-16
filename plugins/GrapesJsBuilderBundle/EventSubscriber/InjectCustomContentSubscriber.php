@@ -6,11 +6,9 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
-use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -30,11 +28,6 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
     private $grapesJsBuilderModel;
 
     /**
-     * @var FileManager
-     */
-    private $fileManager;
-
-    /**
      * @var TemplatingHelper
      */
     private $templatingHelper;
@@ -52,11 +45,10 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
     /**
      * InjectCustomContentSubscriber constructor.
      */
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, FileManager $fileManager, TemplatingHelper $templatingHelper, RequestStack $requestStack, RouterInterface $router)
+    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, TemplatingHelper $templatingHelper, RequestStack $requestStack, RouterInterface $router)
     {
         $this->config               = $config;
         $this->grapesJsBuilderModel = $grapesJsBuilderModel;
-        $this->fileManager          = $fileManager;
         $this->templatingHelper     = $templatingHelper;
         $this->requestStack         = $requestStack;
         $this->router               = $router;
@@ -106,19 +98,19 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                 }
             }
             $content = $this->templatingHelper->getTemplating()->render(
-                'GrapesJsBuilderBundle:Setting:fields.html.php',
+                'GrapesJsBuilderBundle:Setting:fields.html.twig',
                 $passParams
             );
 
             $customContentEvent->addContent($content);
         } elseif ('page.header.left' === $customContentEvent->getContext()) {
-            // Inject fileManager URL and list of images within all pages
-            $passParams['assets']     = json_encode($this->fileManager->getImages());
-            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], true);
-            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], true);
+            // Inject fileManager URL
+            $passParams['dataAssets'] = $this->router->generate('grapesjsbuilder_assets', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
 
             $content = $this->templatingHelper->getTemplating()->render(
-                'GrapesJsBuilderBundle:Setting:vars.html.php',
+                'GrapesJsBuilderBundle:Setting:vars.html.twig',
                 $passParams
             );
 

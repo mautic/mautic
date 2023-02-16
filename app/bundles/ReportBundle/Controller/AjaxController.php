@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
+use Mautic\ReportBundle\Model\ReportModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -26,8 +18,8 @@ class AjaxController extends CommonAjaxController
      */
     public function getSourceDataAction(Request $request)
     {
-        /* @type \Mautic\ReportBundle\Model\ReportModel $model */
-        $model   = $this->getModel('report');
+        $model = $this->getModel('report');
+        \assert($model instanceof ReportModel);
         $context = $request->get('context');
 
         $graphs  = $model->getGraphList($context);

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Templating\Engine;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -25,6 +16,7 @@ use Symfony\Component\Templating\Loader\LoaderInterface;
 use Symfony\Component\Templating\Storage\FileStorage;
 use Symfony\Component\Templating\Storage\Storage;
 use Symfony\Component\Templating\TemplateNameParserInterface;
+use Twig\Environment;
 
 /**
  * PhpEngine is an engine able to render PHP templates.
@@ -63,6 +55,8 @@ class PhpEngine extends BasePhpEngine
      */
     private $request;
 
+    private Environment $twig;
+
     private $jsLoadMethodPrefix;
 
     /**
@@ -94,6 +88,11 @@ class PhpEngine extends BasePhpEngine
         $this->request = $requestStack->getCurrentRequest();
     }
 
+    public function setTwig(Environment $twig): void
+    {
+        $this->twig = $twig;
+    }
+
     /**
      * @param string|\Symfony\Component\Templating\TemplateReferenceInterface $name
      *
@@ -111,8 +110,8 @@ class PhpEngine extends BasePhpEngine
         defined('MAUTIC_RENDERING_TEMPLATE') || define('MAUTIC_RENDERING_TEMPLATE', 1);
         if ($this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE)) {
             $event = $this->dispatcher->dispatch(
-                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE,
-                new CustomTemplateEvent($this->request, $name, $parameters)
+                new CustomTemplateEvent($this->request, $name, $parameters),
+                CoreEvents::VIEW_INJECT_CUSTOM_TEMPLATE
             );
 
             $name       = $event->getTemplate();
@@ -125,7 +124,11 @@ class PhpEngine extends BasePhpEngine
             $e = $this->stopwatch->start(sprintf('template.php (%s)', $name), 'template');
         }
 
-        $content = parent::render($name, $parameters);
+        if (str_ends_with($name, '.twig') && $this->twig->getLoader()->exists($name)) {
+            $content = $this->twig->render($name, $parameters);
+        } else {
+            $content = parent::render($name, $parameters);
+        }
 
         if ($this->stopwatch) {
             $e->stop();

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -16,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * ClientRepository.
+ * @extends CommonRepository<Client>
  */
 class ClientRepository extends CommonRepository
 {

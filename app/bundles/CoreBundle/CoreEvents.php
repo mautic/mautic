@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle;
 
 /**
@@ -23,7 +14,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const BUILD_MENU = 'mautic.build_menu';
+    public const BUILD_MENU = 'mautic.build_menu';
 
     /**
      * The mautic.build_route event is thrown to build Mautic bundle routes.
@@ -32,7 +23,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const BUILD_ROUTE = 'mautic.build_route';
+    public const BUILD_ROUTE = 'mautic.build_route';
 
     /**
      * The mautic.global_search event is thrown to build global search results from applicable bundles.
@@ -41,7 +32,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const GLOBAL_SEARCH = 'mautic.global_search';
+    public const GLOBAL_SEARCH = 'mautic.global_search';
 
     /**
      * The mautic.list_stats event is thrown to build statistical results from applicable bundles/database tables.
@@ -50,7 +41,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const LIST_STATS = 'mautic.list_stats';
+    public const LIST_STATS = 'mautic.list_stats';
 
     /**
      * The mautic.build_command_list event is thrown to build global search's autocomplete list.
@@ -59,7 +50,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const BUILD_COMMAND_LIST = 'mautic.build_command_list';
+    public const BUILD_COMMAND_LIST = 'mautic.build_command_list';
 
     /**
      * The mautic.on_fetch_icons event is thrown to fetch icons of menu items.
@@ -68,7 +59,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const FETCH_ICONS = 'mautic.on_fetch_icons';
+    public const FETCH_ICONS = 'mautic.on_fetch_icons';
 
     /**
      * The mautic.build_canvas_content event is dispatched to populate the content for the right panel.
@@ -76,8 +67,10 @@ final class CoreEvents
      * The event listener receives a Mautic\CoreBundle\Event\SidebarCanvasEvent instance.
      *
      * @var string
+     *
+     * @deprecated Deprecated in Mautic 4.3. Will be removed in Mautic 5.0
      */
-    const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
+    public const BUILD_CANVAS_CONTENT = 'mautic.build_canvas_content';
 
     /**
      * The mautic.pre_upgrade is dispatched before an upgrade.
@@ -86,7 +79,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const PRE_UPGRADE = 'mautic.pre_upgrade';
+    public const PRE_UPGRADE = 'mautic.pre_upgrade';
 
     /**
      * The mautic.post_upgrade is dispatched after an upgrade.
@@ -95,7 +88,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const POST_UPGRADE = 'mautic.post_upgrade';
+    public const POST_UPGRADE = 'mautic.post_upgrade';
 
     /**
      * The mautic.build_embeddable_js event is dispatched to allow plugins to extend the mautic tracking js.
@@ -104,7 +97,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const BUILD_MAUTIC_JS = 'mautic.build_embeddable_js';
+    public const BUILD_MAUTIC_JS = 'mautic.build_embeddable_js';
 
     /**
      * The mautic.maintenance_cleanup_data event is dispatched to purge old data.
@@ -113,7 +106,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const MAINTENANCE_CLEANUP_DATA = 'mautic.maintenance_cleanup_data';
+    public const MAINTENANCE_CLEANUP_DATA = 'mautic.maintenance_cleanup_data';
 
     /**
      * The mautic.view_inject_custom_buttons event is dispatched to inject custom buttons into Mautic's UI by plugins/other bundles.
@@ -122,7 +115,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const VIEW_INJECT_CUSTOM_BUTTONS = 'mautic.view_inject_custom_buttons';
+    public const VIEW_INJECT_CUSTOM_BUTTONS = 'mautic.view_inject_custom_buttons';
 
     /**
      * The mautic.view_inject_custom_content event is dispatched by views to collect custom content to be injected in UIs.
@@ -131,7 +124,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const VIEW_INJECT_CUSTOM_CONTENT = 'mautic.view_inject_custom_content';
+    public const VIEW_INJECT_CUSTOM_CONTENT = 'mautic.view_inject_custom_content';
 
     /**
      * The mautic.view_inject_custom_template event is dispatched when a template is to be rendered giving opportunity to change template or
@@ -141,7 +134,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const VIEW_INJECT_CUSTOM_TEMPLATE = 'mautic.view_inject_custom_template';
+    public const VIEW_INJECT_CUSTOM_TEMPLATE = 'mautic.view_inject_custom_template';
 
     /**
      * The mautic.view_inject_custom_assets event is dispatched when assets are rendered.
@@ -150,7 +143,7 @@ final class CoreEvents
      *
      * @var string
      */
-    const VIEW_INJECT_CUSTOM_ASSETS = 'mautic.view_inject_custom_assets';
+    public const VIEW_INJECT_CUSTOM_ASSETS = 'mautic.view_inject_custom_assets';
 
     /**
      * The mautic.on_form_type_build event is dispatched by views to inject custom fields into any form.
@@ -158,8 +151,10 @@ final class CoreEvents
      * The event listener receives a Mautic\CoreBundle\Event\CustomFormEvent instance.
      *
      * @var string
+     *
+     * @deprecated since Mautic 4 because it is not used anywhere
      */
-    const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
+    public const ON_FORM_TYPE_BUILD = 'mautic.on_form_type_build';
 
     /**
      * The mautic.on_generated_columns_build event is dispatched when a list of generated columns is being built.
@@ -168,5 +163,5 @@ final class CoreEvents
      *
      * @var string
      */
-    const ON_GENERATED_COLUMNS_BUILD = 'mautic.on_generated_columns_build';
+    public const ON_GENERATED_COLUMNS_BUILD = 'mautic.on_generated_columns_build';
 }

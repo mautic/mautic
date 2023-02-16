@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFullContactBundle\Controller;
 
 use Mautic\FormBundle\Controller\FormController;
@@ -80,7 +71,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $lead->getEmail(),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -95,7 +86,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -227,7 +217,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupEmails),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -257,7 +247,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.lead.batch_leads_affected',
                         [
-                            'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
                     );
@@ -335,7 +324,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $parse['host'],
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
@@ -350,7 +339,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => 1,
                             '%count%'     => 1,
                         ]
                     );
@@ -481,7 +469,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupWebsites),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.php',
+                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',
@@ -511,7 +499,6 @@ class FullContactController extends FormController
                     $this->addFlash(
                         'mautic.company.batch_companies_affected',
                         [
-                            'pluralCount' => $count,
                             '%count%'     => $count,
                         ]
                     );

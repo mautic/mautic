@@ -1,24 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Event>
+ */
 class EventRepository extends CommonRepository
 {
     /**
      * Get a list of entities.
      *
-     * @return \Doctrine\ORM\Tools\Pagination\Paginator
+     * @param mixed[] $args
+     *
+     * @return \Doctrine\ORM\Tools\Pagination\Paginator<object>|object[]|mixed[]
      */
     public function getEntities(array $args = [])
     {

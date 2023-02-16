@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -38,8 +29,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_IDENTIFIED,
-                $event
+                $event,
+                LeadEvents::LEAD_IDENTIFIED
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -62,8 +53,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_POINTS_CHANGE,
-                $pointsEvent
+                $pointsEvent,
+                LeadEvents::LEAD_POINTS_CHANGE
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -128,8 +119,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_POINTS_CHANGE,
-                $pointsEvent
+                $pointsEvent,
+                LeadEvents::LEAD_POINTS_CHANGE
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -172,8 +163,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LEAD_UTMTAGS_ADD,
-                $utmTagsEvent
+                $utmTagsEvent,
+                LeadEvents::LEAD_UTMTAGS_ADD
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);
@@ -198,8 +189,8 @@ class LeadChangeEventDispatcherTest extends \PHPUnit\Framework\TestCase
         $dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED,
-                $dncEvent
+                $dncEvent,
+                LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED
             );
 
         $leadEventDispatcher = new LeadChangeEventDispatcher($dispatcher);

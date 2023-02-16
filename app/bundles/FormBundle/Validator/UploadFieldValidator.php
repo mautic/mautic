@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Validator;
 
 use Mautic\CoreBundle\Exception\FileInvalidException;
@@ -46,12 +37,8 @@ class UploadFieldValidator
             throw new NoFileGivenException();
         }
 
-        /** @var UploadedFile $file */
         $file = $files[$field->getAlias()];
-
-        if (!$file instanceof UploadedFile) {
-            throw new NoFileGivenException();
-        }
+        \assert($file instanceof UploadedFile);
 
         $properties = $field->getProperties();
 

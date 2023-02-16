@@ -15,21 +15,15 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
 
 ?>
 <div class="row">
-    <div class="col-sm-offset-3 col-sm-6">
+    <div class="col-sm-offset-2 col-sm-8 col-md-offset-3 col-md-6">
         <div class="ml-lg mr-lg mt-md pa-lg">
             <div class="panel panel-info">
-                <div class="panel-heading">
-                    <div class="panel-title">
-                        <p><?php echo $view['translator']->trans('mautic.email.send.instructions'); ?></p>
-                    </div>
-                </div>
                 <div class="panel-body">
                     <?php echo $view['form']->start($form); ?>
-                    <div class="col-xs-8 col-xs-offset-2">
+                    <div class="col-xs-offset-1 col-xs-10 col-lg-offset-2 col-lg-8">
                         <div class="well mt-lg">
                             <div class="input-group">
-                                <?php echo $view['form']->widget($form['batchlimit']); ?>
-                                <span class="input-group-btn">
+                                <span class="input-group-btn text-center">
                                     <?php echo $view->render('MauticCoreBundle:Helper:confirm.html.php', [
                                         'message'         => $view['translator']->trans('mautic.email.form.confirmsend', ['%name%' => $email->getName()]),
                                         'confirmText'     => $view['translator']->trans('mautic.email.send'),
@@ -41,9 +35,11 @@ $view['slots']->set('headerTitle', $view['translator']->trans('mautic.email.send
                                     ?>
                                 </span>
                             </div>
-                            <?php echo $view['form']->errors($form['batchlimit']); ?>
                             <div class="text-center">
-                                <span class="label label-primary mt-lg"><?php echo $view['translator']->transChoice('mautic.email.send.pending', $pending, ['%pending%' => $pending]); ?></span>
+                                <span class="label label-primary mt-lg"><?php echo $view['translator']->trans(
+                                        'mautic.email.send.pending',
+                                        ['%count%' => $pending]
+                                    ); ?></span>
                                 <div class="mt-sm">
                                     <a class="text-danger mt-md" href="<?php echo $view['router']->path('mautic_email_action', ['objectAction' => 'view', 'objectId' => $email->getId()]); ?>" data-toggle="ajax"><?php echo $view['translator']->trans('mautic.core.form.cancel'); ?></a>
                                 </div>

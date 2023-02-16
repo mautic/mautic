@@ -1,17 +1,7 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
-use DateTime;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -56,6 +46,7 @@ class Log
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('webhook_logs')
             ->setCustomRepositoryClass(LogRepository::class)
+            ->addIndex(['webhook_id', 'date_added'], 'webhook_id_date_added')
             ->addId();
 
         $builder->createManyToOne('webhook', 'Webhook')
@@ -146,7 +137,7 @@ class Log
     }
 
     /**
-     * Strips tags and keeps first 254 characters so it would fit in the varchar 191 limit.
+     * Strips tags and keeps first 191 characters so it would fit in the varchar 191 limit.
      *
      * @param string $note
      *

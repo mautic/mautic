@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -108,7 +99,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -151,7 +142,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 );
             }
 
-            $event->setTemplate('MauticEmailBundle:SubscribedEvents:Dashboard/Sent.email.to.contacts.html.php');
+            $event->setTemplate('MauticEmailBundle:SubscribedEvents:Dashboard/Sent.email.to.contacts.html.twig');
             $event->stopPropagation();
         }
 
@@ -180,7 +171,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticEmailBundle:SubscribedEvents:Dashboard/Most.hit.email.redirects.html.php');
+            $event->setTemplate('MauticEmailBundle:SubscribedEvents:Dashboard/Most.hit.email.redirects.html.twig');
             $event->stopPropagation();
         }
 
@@ -196,7 +187,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
 
@@ -208,7 +199,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
 
             $upcomingEmails = $this->emailModel->getUpcomingEmails($limit, $canViewOthers);
 
-            $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.php');
+            $event->setTemplate('MauticDashboardBundle:Dashboard:upcomingemails.html.twig');
             $event->setTemplateData(['upcomingEmails' => $upcomingEmails]);
             $event->stopPropagation();
         }
@@ -253,7 +244,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
 
@@ -297,7 +288,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
 
@@ -343,7 +334,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
             $event->stopPropagation();
         }
         if ('device.granularity.email' == $event->getType()) {
@@ -362,7 +353,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.php');
+            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
             $event->stopPropagation();
         }
     }

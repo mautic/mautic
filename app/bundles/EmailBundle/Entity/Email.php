@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -26,6 +17,7 @@ use Mautic\CoreBundle\Entity\TranslationEntityTrait;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityTrait;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
@@ -132,7 +124,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var bool
      */
-    private $publicPreview = 1;
+    private $publicPreview = 0;
 
     /**
      * @var int
@@ -245,6 +237,8 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
         $this->translationChildren = new ArrayCollection();
         $this->variantChildren     = new ArrayCollection();
         $this->assetAttachments    = new ArrayCollection();
+        $this->setDateAdded(new \DateTime());
+        $this->setDateModified(new \DateTime());
     }
 
     /**
@@ -1120,8 +1114,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * Check all links in content and decode &amp;
-     * This even works with double encoded ampersands.
+     * Check all links in content and decode ampersands.
      *
      * @param $content
      */
@@ -1129,13 +1122,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     {
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
-                $newUrl = $url;
-
-                while (false !== strpos($newUrl, '&amp;')) {
-                    $newUrl = str_replace('&amp;', '&', $newUrl);
-                }
-
-                $content = str_replace($url, $newUrl, $content);
+                $content = str_replace($url, UrlHelper::decodeAmpersands($url), $content);
             }
         }
     }
@@ -1226,5 +1213,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     public function getClonedId(): ?int
     {
         return $this->clonedId;
+    }
+
+    public function isBackgroundSending(): bool
+    {
+        return $this->isPublished() && !empty($this->getPublishUp()) && ($this->getPublishUp() < new \DateTime());
     }
 }

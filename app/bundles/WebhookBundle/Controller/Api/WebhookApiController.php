@@ -1,31 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\WebhookBundle\Entity\Webhook;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\WebhookBundle\Model\WebhookModel;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class WebhookApiController.
+ * @extends CommonApiController<Webhook>
  */
 class WebhookApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var WebhookModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('webhook');
+        $webhookModel = $this->getModel('webhook');
+        \assert($webhookModel instanceof WebhookModel);
+
+        $this->model            = $webhookModel;
         $this->entityClass      = Webhook::class;
         $this->entityNameOne    = 'hook';
         $this->entityNameMulti  = 'hooks';
@@ -36,13 +33,8 @@ class WebhookApiController extends CommonApiController
 
     /**
      * Gives child controllers opportunity to analyze and do whatever to an entity before going through serializer.
-     *
-     * @param        $entity
-     * @param string $action
-     *
-     * @return mixed
      */
-    protected function preSerializeEntity(&$entity, $action = 'view')
+    protected function preSerializeEntity(object $entity, string $action = 'view'): void
     {
         // We have to use this hack to have a simple array instead of the one the serializer gives us
         $entity->buildTriggers();

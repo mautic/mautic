@@ -1,0 +1,20 @@
+{#
+  Variables
+    - pages
+#}
+{% set count = pages|length %}
+<div class="page-lang-bar">
+    {% for page in pages %}
+      {% set active = app.request.requestUri == page.url %}
+      <span>
+          {% if not active %}
+              <a href="{{ page.url }}">
+          {% endif %}
+          {{ page.lang }}
+          {% if not active %}
+              </a>
+          {% endif %}
+      </span>
+      {% set count = count - 1 %}
+    {% endfor %}
+</div>

@@ -1,22 +1,13 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailGraphStatsController extends Controller
+class EmailGraphStatsController extends AbstractController
 {
     /**
      * Loads a specific form into the detailed panel.
@@ -52,10 +43,10 @@ class EmailGraphStatsController extends Controller
         }
 
         //get A/B test information
-        list($parent, $children) = $email->getVariants();
+        [$parent, $children] = $email->getVariants();
 
         //get related translations
-        list($translationParent, $translationChildren) = $email->getTranslations();
+        [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Prepare stats for bargraph
         if ($chartStatsSource = $request->query->get('stats', false)) {

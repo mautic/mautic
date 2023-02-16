@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Model;
 
 use Doctrine\Common\Collections\Criteria;
@@ -31,19 +22,24 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
+/**
+ * @extends FormModel<Webhook>
+ */
 class WebhookModel extends FormModel
 {
     /**
      *  2 possible types of the processing of the webhooks.
      */
-    const COMMAND_PROCESS   = 'command_process';
-    const IMMEDIATE_PROCESS = 'immediate_process';
+    public const COMMAND_PROCESS   = 'command_process';
+    public const IMMEDIATE_PROCESS = 'immediate_process';
 
     private const DELETE_BATCH_LIMIT = 5000;
+
+    public const WEBHOOK_LOG_MAX = 1000;
 
     /**
      * Whet queue mode is turned on.
@@ -205,7 +201,7 @@ class WebhookModel extends FormModel
             //build them
             $events = [];
             $event  = new Events\WebhookBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_ON_BUILD);
             $events = $event->getEvents();
         }
 
@@ -284,7 +280,7 @@ class WebhookModel extends FormModel
         // fire events for when the queues are created
         if ($this->dispatcher->hasListeners(WebhookEvents::WEBHOOK_QUEUE_ON_ADD)) {
             $webhookQueueEvent = $event = new Events\WebhookQueueEvent($queue, $webhook, true);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_QUEUE_ON_ADD, $webhookQueueEvent);
+            $this->dispatcher->dispatch($webhookQueueEvent, WebhookEvents::WEBHOOK_QUEUE_ON_ADD);
         }
 
         return $queue;
@@ -360,7 +356,7 @@ class WebhookModel extends FormModel
             }
 
             // log any errors but allow the script to keep running
-            $this->logger->addError($message);
+            $this->logger->error($message);
 
             // log that the request failed to display it to the user
             $this->addLog($webhook, 'N/A', (microtime(true) - $start), $message);
@@ -423,7 +419,7 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
 
         $event = new WebhookEvent($webhook, false, $reason);
-        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
+        $this->eventDispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
     }
 
     /**
@@ -432,25 +428,26 @@ class WebhookModel extends FormModel
      * @param int    $statusCode
      * @param float  $runtime    in seconds
      * @param string $note
+     *                           $runtime variable unit is in seconds
      */
     public function addLog(Webhook $webhook, $statusCode, $runtime, $note = null)
     {
-        $log = new Log();
-
-        if ($webhook->getId()) {
-            $log->setWebhook($webhook);
-            $this->getLogRepository()->removeOldLogs($webhook->getId(), $this->logMax);
+        if (!$webhook->getId()) {
+            return;
         }
 
+        if (!$this->coreParametersHelper->get('clean_webhook_logs_in_background')) {
+            $this->getLogRepository()->removeLimitExceedLogs($webhook->getId(), $this->logMax);
+        }
+
+        $log = new Log();
+        $log->setWebhook($webhook);
         $log->setNote($note);
         $log->setRuntime($runtime);
         $log->setStatusCode($statusCode);
         $log->setDateAdded(new \DateTime());
         $webhook->addLog($log);
-
-        if ($webhook->getId()) {
-            $this->saveEntity($webhook);
-        }
+        $this->saveEntity($webhook);
     }
 
     /**
@@ -614,7 +611,7 @@ class WebhookModel extends FormModel
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -676,7 +673,7 @@ class WebhookModel extends FormModel
         $this->webhookTimeLimit = (int) $coreParametersHelper->get('webhook_time_limit', 600);
         $this->disableLimit     = (int) $coreParametersHelper->get('webhook_disable_limit', 100);
         $this->webhookTimeout   = (int) $coreParametersHelper->get('webhook_timeout', 15);
-        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', 1000);
+        $this->logMax           = (int) $coreParametersHelper->get('webhook_log_max', self::WEBHOOK_LOG_MAX);
         $this->queueMode        = $coreParametersHelper->get('queue_mode');
         $this->eventsOrderByDir = $coreParametersHelper->get('events_orderby_dir', Criteria::ASC);
     }

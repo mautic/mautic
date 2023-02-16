@@ -1,38 +1,29 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'routes' => [
         'main' => [
             'mautic_dashboard_index' => [
                 'path'       => '/dashboard',
-                'controller' => 'MauticDashboardBundle:Dashboard:index',
+                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::indexAction',
             ],
             'mautic_dashboard_widget' => [
                 'path'       => '/dashboard/widget/{widgetId}',
-                'controller' => 'MauticDashboardBundle:Dashboard:widget',
+                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::widgetAction',
             ],
             'mautic_dashboard_action' => [
                 'path'       => '/dashboard/{objectAction}/{objectId}',
-                'controller' => 'MauticDashboardBundle:Dashboard:execute',
+                'controller' => 'Mautic\DashboardBundle\Controller\DashboardController::executeAction',
             ],
         ],
         'api' => [
             'mautic_widget_types' => [
                 'path'       => '/data',
-                'controller' => 'MauticDashboardBundle:Api\WidgetApi:getTypes',
+                'controller' => 'Mautic\DashboardBundle\Controller\Api\WidgetApiController::getTypesAction',
             ],
             'mautic_widget_data' => [
                 'path'       => '/data/{type}',
-                'controller' => 'MauticDashboardBundle:Api\WidgetApi:getData',
+                'controller' => 'Mautic\DashboardBundle\Controller\Api\WidgetApiController::getDataAction',
             ],
         ],
     ],
@@ -49,15 +40,6 @@ return [
         ],
     ],
     'services' => [
-        'forms' => [
-            'mautic.dashboard.form.type.widget' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.security',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.dashboard.model.dashboard' => [
                 'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',
@@ -80,7 +62,7 @@ return [
         ],
     ],
     'parameters' => [
-        'dashboard_import_dir'      => '%kernel.root_dir%/../media/dashboards',
+        'dashboard_import_dir'      => '%kernel.project_dir%/media/dashboards',
         'dashboard_import_user_dir' => null,
     ],
 ];

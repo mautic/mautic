@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: Sam
- * Date: 05/04/2017
- * Time: 16:58.
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Model\AbstractCommonModel;
@@ -18,7 +11,9 @@ class DataExporterHelper
      *
      * Overwrite in your controller if required.
      *
-     * @param int|null $start
+     * @param int|null               $start
+     * @param AbstractCommonModel<T> $model
+     * @template T of object
      *
      * @return array
      */

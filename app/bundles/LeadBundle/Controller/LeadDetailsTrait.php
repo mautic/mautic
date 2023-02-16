@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Entity\AuditLogRepository;
@@ -152,7 +143,7 @@ trait LeadDetailsTrait
     {
         // Get Places from IP addresses
         $places = [];
-        if ($lead->getIpAddresses()) {
+        if ($lead->getIpAddresses()->count() > 0) {
             foreach ($lead->getIpAddresses() as $ip) {
                 if ($details = $ip->getIpDetails()) {
                     if (!empty($details['latitude']) && !empty($details['longitude'])) {

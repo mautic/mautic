@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticCrmBundle\Integration;
 
 use Doctrine\ORM\EntityManager;
@@ -36,8 +27,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
@@ -113,10 +104,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        //Version 6.x supports all features
-        if (isset($this->keys['version']) && '6' == $this->keys['version']) {
-            return ['push_lead', 'get_leads', 'push_leads'];
-        }
         //Only push_lead is currently supported for version 7
         return ['push_lead', 'get_leads', 'push_leads'];
     }
@@ -1597,7 +1584,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param      $mauticData
      * @param      $availableFields
      * @param      $object
      * @param      $lead

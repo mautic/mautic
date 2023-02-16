@@ -1,19 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
+use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -56,7 +48,7 @@ class AjaxController extends CommonAjaxController
 
         $widget   = new Widget();
         $form     = $this->get('form.factory')->create(WidgetType::class, $widget);
-        $formHtml = $this->render('MauticDashboardBundle::Widget\\form.html.php',
+        $formHtml = $this->render('MauticDashboardBundle::Widget\\form.html.twig',
             ['form' => $form->submit($data)->createView()]
         )->getContent();
 
@@ -73,8 +65,10 @@ class AjaxController extends CommonAjaxController
      */
     protected function updateWidgetOrderingAction(Request $request)
     {
-        $data = $request->request->get('ordering');
-        $repo = $this->getModel('dashboard')->getRepository();
+        $data           = $request->request->get('ordering');
+        $dashboardModel = $this->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
+        $repo = $dashboardModel->getRepository();
         $repo->updateOrdering(array_flip($data), $this->user->getId());
         $dataArray = ['success' => 1];
 

@@ -1,24 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\Form\Type\CampaignEventFormFieldValueType;
 use Mautic\FormBundle\Form\Type\CampaignEventFormSubmitType;
 use Mautic\FormBundle\FormEvents;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -40,11 +33,17 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $realTimeExecutioner;
 
-    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, RealTimeExecutioner $realTimeExecutioner)
+    /**
+     * @var FormFieldHelper
+     */
+    private $formFieldHelper;
+
+    public function __construct(FormModel $formModel, SubmissionModel $formSubmissionModel, RealTimeExecutioner $realTimeExecutioner, FormFieldHelper $formFieldHelper)
     {
         $this->formModel           = $formModel;
         $this->formSubmissionModel = $formSubmissionModel;
         $this->realTimeExecutioner = $realTimeExecutioner;
+        $this->formFieldHelper     = $formFieldHelper;
     }
 
     /**
@@ -77,7 +76,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
             'formType'    => CampaignEventFormFieldValueType::class,
-            'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
+            'formTheme'   => 'MauticFormBundle:FormTheme:FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
             'eventName'   => FormEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('form.field_value', $trigger);
@@ -127,12 +126,15 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $field = $this->formModel->findFormFieldByAlias($form, $event->getConfig()['field']);
 
+        $filter = $this->formFieldHelper->getFieldFilter($field->getType());
+        $value  = InputHelper::_($event->getConfig()['value'], $filter);
+
         $result = $this->formSubmissionModel->getRepository()->compareValue(
             $lead->getId(),
             $form->getId(),
             $form->getAlias(),
             $event->getConfig()['field'],
-            $event->getConfig()['value'],
+            $value,
             $operators[$event->getConfig()['operator']]['expr'],
             $field ? $field->getType() : null
         );

@@ -1,19 +1,14 @@
 <?php
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Segment\Stat\ChartQuery;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 
 class SegmentContactsLineChartQuery extends ChartQuery
@@ -123,18 +118,19 @@ class SegmentContactsLineChartQuery extends ChartQuery
      */
     public function getDataFromLeadEventLog($action)
     {
-        return $this->loadAndBuildTimeData(
-            $this->prepareTimeDataQuery(
-                'lead_event_log',
-                'date_added',
-                [
-                    'object'    => 'segment',
-                    'bundle'    => 'lead',
-                    'action'    => $action,
-                    'object_id' => $this->segmentId,
-                ]
-            )
+        $qb = $this->prepareTimeDataQuery(
+            'lead_event_log',
+            'date_added',
+            [
+                'object'    => 'segment',
+                'bundle'    => 'lead',
+                'action'    => $action,
+                'object_id' => $this->segmentId,
+            ]
         );
+        $qb = $this->optimizeSearchInLeadEventLog($qb);
+
+        return $this->loadAndBuildTimeData($qb);
     }
 
     /**
@@ -148,8 +144,9 @@ class SegmentContactsLineChartQuery extends ChartQuery
         if ($this->firstEventLog) {
             $q->andWhere($q->expr()->lt('t.date_added', $q->expr()->literal($this->firstEventLog)));
         }
+        $q = $this->optimizeListLeadQuery($q);
 
-        return  $this->loadAndBuildTimeData($q);
+        return $this->loadAndBuildTimeData($q);
     }
 
     /**
@@ -158,15 +155,18 @@ class SegmentContactsLineChartQuery extends ChartQuery
     private function getFirstDateAddedSegmentEventLog()
     {
         $subQuery = $this->connection->createQueryBuilder();
-        $subQuery->select('MIN(el.date_added) - INTERVAL 10 SECOND')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
+        $subQuery->select('el.date_added - INTERVAL 10 SECOND')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log el FORCE INDEX ('.MAUTIC_TABLE_PREFIX.'IDX_SEARCH)')
             ->where(
                 $subQuery->expr()->andX(
                     $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
                     $subQuery->expr()->eq('el.bundle', $subQuery->expr()->literal('lead')),
                     $subQuery->expr()->eq('el.object_id', $this->segmentId)
                 )
-            );
+            )
+            ->orderBy('el.date_added')
+            ->setFirstResult(0)
+            ->setMaxResults(1);
 
         return $subQuery->execute()->fetchColumn();
     }
@@ -217,5 +217,46 @@ class SegmentContactsLineChartQuery extends ChartQuery
             && (!empty(array_filter($this->addedEventLogStats))
             || !empty(array_filter($this->removedEventLogStats)))
         );
+    }
+
+    private function optimizeListLeadQuery(QueryBuilder $qb): QueryBuilder
+    {
+        if (
+            // Remove unwanted self join with lead_lists_leads table
+            false !== ($key = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('from'), 'table'))) &&
+            false !== ($joinKey = array_search(MAUTIC_TABLE_PREFIX.ListLead::TABLE_NAME, array_column($qb->getQueryPart('join')[$tableAlias = $qb->getQueryPart('from')[$key]['alias']], 'joinTable')))
+        ) {
+            $joinAlias = $qb->getQueryPart('join')[$tableAlias][$joinKey]['joinAlias'];
+            $qb->resetQueryPart('join');
+            $compositeExpression = $qb->getQueryPart('where');
+            $this->removeUnwantedWhereClause($compositeExpression, $joinAlias);
+        }
+
+        return $qb;
+    }
+
+    private function removeUnwantedWhereClause(CompositeExpression $compositeExpression, string $joinAlias): void
+    {
+        // CompositeExpression class has no way to remove members of it's 'parts' property, and we have
+        // to resort on Reflection here.
+        $compositeExpressionReflection      = new \ReflectionClass(CompositeExpression::class);
+        $compositeExpressionReflectionParts = $compositeExpressionReflection->getProperty('parts');
+        $compositeExpressionReflectionParts->setAccessible(true);
+        $parts    = $compositeExpressionReflectionParts->getValue($compositeExpression);
+        $newParts = array_filter($parts, function ($val) use ($joinAlias) {
+            return 0 !== strpos($val, "$joinAlias.");
+        });
+        $compositeExpressionReflectionParts->setValue($compositeExpression, $newParts);
+        $compositeExpressionReflectionParts->setAccessible(false);
+    }
+
+    private function optimizeSearchInLeadEventLog(QueryBuilder $qb): QueryBuilder
+    {
+        $fromPart             = $qb->getQueryPart('from');
+        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], MAUTIC_TABLE_PREFIX.LeadEventLog::INDEX_SEARCH);
+        $qb->resetQueryPart('from');
+        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+
+        return $qb;
     }
 }

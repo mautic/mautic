@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    {% set headerTitle = headerTitle|default('') %}
+    {% set pageTitle = pageTitle|default('Mautic') %}
+    {{ include('MauticCoreBundle:Default:head.html.twig', {
+            headerTitle: headerTitle|default(''),
+            pageTitle: pageTitle|default('Mautic'),
+        })
+    }}
+
+    <body>
+        {{ outputScripts('bodyOpen') }}
+       
+        <section id="app-content" class="container content-only">
+            {{ include('MauticCoreBundle:Notification:flashes.html.twig', {
+                alertType: 'standard'
+            }) }}
+
+            {% block _content %}{% endblock %}
+
+        </section>
+        {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+            id: 'MauticSharedModal',
+            footerButtons: true
+        }) }}
+        {{ outputScripts('bodyClose') }}
+        <script>
+            Mautic.onPageLoad('body');
+        </script>
+    </body>
+</html>

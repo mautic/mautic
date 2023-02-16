@@ -1,18 +1,9 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Event;
 
 use Mautic\ReportBundle\Entity\Report;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class AbstractReportEvent extends Event
 {
@@ -58,8 +49,12 @@ class AbstractReportEvent extends Event
         }
 
         if (is_array($context)) {
-            return in_array($this->context, $context);
+            $res = array_filter($context, fn ($elem) => 0 === stripos($this->context, $elem));
+
+            return count($res) > 0;
         } elseif ($this->context == $context) {
+            return true;
+        } elseif (0 === stripos($this->context, $context)) {
             return true;
         } else {
             return false;

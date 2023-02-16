@@ -2,13 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic. All rights reserved
- *
- * @link        https://mautic.org
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CacheBundle\Cache\Adapter;
 
 use Mautic\CacheBundle\Exceptions\InvalidArgumentException;

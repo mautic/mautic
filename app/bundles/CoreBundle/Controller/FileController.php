@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -19,8 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FileController extends AjaxController
 {
-    const EDITOR_FROALA   = 'froala';
-    const EDITOR_CKEDITOR = 'ckeditor';
+    public const EDITOR_FROALA   = 'froala';
+    public const EDITOR_CKEDITOR = 'ckeditor';
 
     protected $imageMimes = [
         'image/gif',

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -97,13 +88,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($pages as $page) {
                     $pageResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPageBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticPageBundle:SubscribedEvents\Search:global.html.twig',
                         ['page' => $page]
                     )->getContent();
                 }
                 if (count($pages) > 5) {
                     $pageResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPageBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticPageBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

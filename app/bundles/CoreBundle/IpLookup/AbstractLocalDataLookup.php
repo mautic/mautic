@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\IpLookup;
 
 use Mautic\CoreBundle\Form\Type\IpLookupDownloadDataStoreButtonType;
@@ -24,12 +15,12 @@ abstract class AbstractLocalDataLookup extends AbstractLookup implements IpLooku
     /**
      * @const TAR_CACHE_FOLDER
      */
-    const TAR_CACHE_FOLDER = 'unpack';
+    public const TAR_CACHE_FOLDER = 'unpack';
 
     /**
      * @const TAR_TEMP_FILE
      */
-    const TAR_TEMP_FILE = 'temp.tar.gz';
+    public const TAR_TEMP_FILE = 'temp.tar.gz';
 
     /**
      * Path to the local data store.

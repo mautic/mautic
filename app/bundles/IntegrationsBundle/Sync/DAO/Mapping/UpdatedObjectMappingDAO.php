@@ -2,16 +2,9 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\DAO\Mapping;
+
+use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 
 class UpdatedObjectMappingDAO
 {
@@ -34,6 +27,11 @@ class UpdatedObjectMappingDAO
      * @var \DateTime
      */
     private $objectModifiedDate;
+
+    /**
+     * @var ObjectMapping|null
+     */
+    private $objectMapping;
 
     /**
      * @param string $integration
@@ -76,5 +74,18 @@ class UpdatedObjectMappingDAO
     public function getObjectModifiedDate(): \DateTimeInterface
     {
         return $this->objectModifiedDate;
+    }
+
+    public function setObjectMapping(ObjectMapping $objectMapping): void
+    {
+        $this->objectMapping = $objectMapping;
+    }
+
+    /**
+     * This is set after the ObjectMapping entity has been persisted to the database with the updates from this object.
+     */
+    public function getObjectMapping(): ?ObjectMapping
+    {
+        return $this->objectMapping;
     }
 }

@@ -1,31 +1,28 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\PageBundle\Entity\Page;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class PageApiController.
+ * @extends CommonApiController<Page>
  */
 class PageApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var PageModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('page');
+        $pageModel = $this->getModel('page');
+        \assert($pageModel instanceof PageModel);
+
+        $this->model            = $pageModel;
         $this->entityClass      = Page::class;
         $this->entityNameOne    = 'page';
         $this->entityNameMulti  = 'pages';
@@ -54,13 +51,5 @@ class PageApiController extends CommonApiController
         ];
 
         return parent::getEntitiesAction();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function preSerializeEntity(&$entity, $action = 'view')
-    {
-        $entity->url = $this->model->generateUrl($entity);
     }
 }

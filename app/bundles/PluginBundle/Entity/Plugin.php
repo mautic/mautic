@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -21,7 +12,7 @@ use Mautic\CoreBundle\Entity\CommonEntity;
  */
 class Plugin extends CommonEntity
 {
-    const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
+    public const DESCRIPTION_DELIMITER_REGEX = "/\R---\R/";
 
     /**
      * @var int

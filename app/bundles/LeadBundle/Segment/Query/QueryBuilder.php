@@ -1,21 +1,4 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Mautic\LeadBundle\Segment\Query;
 
@@ -45,16 +28,16 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /*
      * The query types.
      */
-    const SELECT = 0;
-    const DELETE = 1;
-    const UPDATE = 2;
-    const INSERT = 3;
+    public const SELECT = 0;
+    public const DELETE = 1;
+    public const UPDATE = 2;
+    public const INSERT = 3;
 
     /*
      * The builder states.
      */
-    const STATE_DIRTY = 0;
-    const STATE_CLEAN = 1;
+    public const STATE_DIRTY = 0;
+    public const STATE_CLEAN = 1;
 
     /**
      * The DBAL Connection.
@@ -1533,14 +1516,14 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function guessPrimaryLeadContactIdColumn()
     {
         $parts     = $this->getQueryParts();
-
         $leadTable = $parts['from'][0]['alias'];
-        if (!isset($parts['join'][$leadTable])) {
-            return $leadTable.'.id';
+
+        if ('orp' === $leadTable) {
+            return 'orp.lead_id';
         }
 
-        if ('orp' == $leadTable) {
-            return 'orp.lead_id';
+        if (!isset($parts['join'][$leadTable])) {
+            return $leadTable.'.id';
         }
 
         $joins     = $parts['join'][$leadTable];
@@ -1610,8 +1593,13 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         $params = $this->getParameters();
         $sql    = $this->getSQL();
         foreach ($params as $key=>$val) {
-            if (!is_int($val) and !is_float($val)) {
+            if (!is_int($val) && !is_float($val) && !is_array($val)) {
                 $val = "'$val'";
+            } elseif (is_array($val)) {
+                if (Connection::PARAM_STR_ARRAY === $this->getParameterType($key)) {
+                    $val = array_map(fn ($value) => "'$value'", $val);
+                }
+                $val = join(', ', $val);
             }
             $sql = str_replace(":{$key}", $val, $sql);
         }
@@ -1707,5 +1695,17 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         }
 
         return $this;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder(Connection $connection = null)
+    {
+        if (null === $connection) {
+            $connection = $this->getConnection();
+        }
+
+        return new self($connection);
     }
 }

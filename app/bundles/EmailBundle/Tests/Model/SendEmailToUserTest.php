@@ -1,116 +1,196 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use Mautic\CoreBundle\Exception\RecordNotPublishedException;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use Mautic\UserBundle\Entity\User;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var MockObject|EmailModel
+     */
+    private $emailModel;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var MockObject|CustomFieldValidator
+     */
+    private $customFieldValidator;
+
+    /**
+     * @var MockObject|EmailValidator
+     */
+    private $emailValidator;
+
+    /**
+     * @var SendEmailToUser
+     */
+    private $sendEmailToUser;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->emailModel           = $this->createMock(EmailModel::class);
+        $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $this->customFieldValidator = $this->createMock(CustomFieldValidator::class);
+        $this->emailValidator       = $this->createMock(EmailValidator::class);
+        $this->sendEmailToUser      = new SendEmailToUser(
+            $this->emailModel,
+            $this->dispatcher,
+            $this->customFieldValidator,
+            $this->emailValidator
+        );
+    }
+
     public function testEmailNotFound()
     {
         $lead = new Lead();
 
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel->expects($this->once())
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with(100)
-            ->will($this->returnValue(null));
-
-        $sendEmailToUser = new SendEmailToUser($mockEmailModel);
+            ->willReturn(null);
 
         $config                       = [];
         $config['useremail']['email'] = 100;
 
         $this->expectException(EmailCouldNotBeSentException::class);
 
-        $sendEmailToUser->sendEmailToUsers($config, $lead);
+        $this->sendEmailToUser->sendEmailToUsers($config, $lead);
     }
 
     public function testEmailNotPublished()
     {
-        $lead = new Lead();
-
+        $lead  = new Lead();
         $email = new Email();
         $email->setIsPublished(false);
 
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel->expects($this->once())
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with(100)
-            ->will($this->returnValue($email));
-
-        $sendEmailToUser = new SendEmailToUser($mockEmailModel);
+            ->willREturn($email);
 
         $config                       = [];
         $config['useremail']['email'] = 100;
 
         $this->expectException(EmailCouldNotBeSentException::class);
 
-        $sendEmailToUser->sendEmailToUsers($config, $lead);
+        $this->sendEmailToUser->sendEmailToUsers($config, $lead);
     }
 
     public function testSendEmailWithNoError()
     {
-        $lead = new Lead();
+        $lead  = new Lead();
+        $owner = new class() extends User {
+            public function getId()
+            {
+                return 10;
+            }
+        };
 
-        $mockOwner = $this->getMockBuilder(User::class)
-            ->getMock();
-
-        $mockOwner->expects($this->exactly(3))
-            ->method('getId')
-            ->will($this->returnValue(10));
-
-        $lead->setOwner($mockOwner);
+        $lead->setOwner($owner);
 
         $email = new Email();
         $email->setIsPublished(true);
 
-        $mockEmailModel = $this->getMockBuilder(EmailModel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $mockEmailModel->expects($this->once())
+        $this->emailModel->expects($this->once())
             ->method('getEntity')
             ->with(33)
-            ->will($this->returnValue($email));
+            ->willReturn($email);
 
-        // Token for Email
-        $mockEmailSendEvent = $this->getMockBuilder(EmailSendEvent::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $emailSendEvent                           = new class() extends EmailSendEvent {
+            public int $getTokenMethodCallCounter = 0;
 
-        $mockEmailSendEvent->expects($this->once())
-            ->method('getTokens')
-            ->will($this->returnValue([]));
+            public function __construct()
+            {
+            }
 
-        $mockEmailModel->expects($this->once())
+            /**
+             * @param bool $includeGlobal
+             *
+             * @return string[]
+             */
+            public function getTokens($includeGlobal = true)
+            {
+                ++$this->getTokenMethodCallCounter;
+
+                return [];
+            }
+        };
+
+        // Global token for Email
+        $this->emailModel->expects($this->once())
             ->method('dispatchEmailSendEvent')
-            ->will($this->returnValue($mockEmailSendEvent));
+            ->willReturn($emailSendEvent);
 
+        // Different handling of tokens in the To, BC, BCC fields.
+        $this->customFieldValidator->expects($this->exactly(3))
+            ->method('validateFieldType')
+            ->withConsecutive(
+                ['unpublished-field', 'email'],
+                ['unpublished-field', 'email'],
+                ['active-field', 'email']
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new RecordNotPublishedException()),
+                $this->throwException(new RecordNotPublishedException()),
+                null
+            );
+
+        // The event is dispatched only for valid tokens.
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(
+                    function (TokenReplacementEvent $event) use ($lead) {
+                        Assert::assertSame('{contactfield=active-field}', $event->getContent());
+                        Assert::assertSame($lead, $event->getLead());
+
+                        // Emulate a subscriber.
+                        $event->setContent('replaced.token@email.address');
+
+                        return true;
+                    }
+                ),
+                EmailEvents::ON_EMAIL_ADDRESS_TOKEN_REPLACEMENT,
+            );
+
+        $this->emailValidator->expects($this->exactly(4))
+            ->method('validate')
+            ->withConsecutive(
+                ['hello@there.com'],
+                ['bob@bobek.cz'],
+                ['hidden@translation.in'],
+                ['{invalid-token}']
+            )
+            ->willReturnOnConsecutiveCalls(
+                null,
+                null,
+                null,
+                $this->throwException(new InvalidEmailException('{invalid-token}'))
+            );
         //Send email method
 
-        $mockEmailModel
+        $this->emailModel
             ->expects($this->once())
             ->method('sendEmailToUser')
             ->will($this->returnCallback(function ($email, $users, $leadCredentials, $tokens, $assetAttachments, $saveStat, $to, $cc, $bcc) {
@@ -122,12 +202,10 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
                 $this->assertInstanceOf(Email::class, $email);
                 $this->assertEquals($expectedUsers, $users);
                 $this->assertFalse($saveStat);
-                $this->assertEquals(['hello@there.com', 'bob@bobek.cz'], $to);
+                $this->assertEquals(['hello@there.com', 'bob@bobek.cz', 'default@email.com'], $to);
                 $this->assertEquals([], $cc);
-                $this->assertEquals(['hidden@translation.in'], $bcc);
+                $this->assertEquals([0 => 'hidden@translation.in', 2 => 'replaced.token@email.address'], $bcc);
             }));
-
-        $sendEmailToUser = new SendEmailToUser($mockEmailModel);
 
         $config = [
             'useremail' => [
@@ -135,10 +213,12 @@ class SendEmailToUserTest extends \PHPUnit\Framework\TestCase
             ],
             'user_id'  => [6, 7],
             'to_owner' => true,
-            'to'       => 'hello@there.com, bob@bobek.cz',
-            'bcc'      => 'hidden@translation.in',
+            'to'       => 'hello@there.com, bob@bobek.cz, {contactfield=unpublished-field|default@email.com}, {contactfield=unpublished-field}',
+            'bcc'      => 'hidden@translation.in,{invalid-token}, {contactfield=active-field}',
         ];
 
-        $sendEmailToUser->sendEmailToUsers($config, $lead);
+        $this->sendEmailToUser->sendEmailToUsers($config, $lead);
+
+        Assert::assertSame(1, $emailSendEvent->getTokenMethodCallCounter);
     }
 }

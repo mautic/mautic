@@ -2,27 +2,18 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://www.mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Mautic\IntegrationsBundle\Entity\ObjectMapping;
 use Mautic\IntegrationsBundle\Sync\DAO\Mapping\UpdatedObjectMappingDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
-use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
-use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\Logger\DebugLogger;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -88,11 +79,13 @@ class ContactObjectHelper implements ObjectHelperInterface
             $pseudoFields = [];
             foreach ($fields as $field) {
                 if (in_array($field->getName(), $availableFields)) {
-                    $this->addUpdatedFieldToContact($contact, $field);
+                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
                 } else {
                     $pseudoFields[$field->getName()] = $field;
                 }
             }
+
+            $contact->setManipulator(new LeadManipulator('integrations', 'create'));
 
             // Create the contact before processing pseudo fields
             $this->model->saveEntity($contact);
@@ -156,11 +149,13 @@ class ContactObjectHelper implements ObjectHelperInterface
             $pseudoFields = [];
             foreach ($fields as $field) {
                 if (in_array($field->getName(), $availableFields)) {
-                    $this->addUpdatedFieldToContact($contact, $field);
+                    $contact->addUpdatedField($field->getName(), $field->getValue()->getNormalizedValue());
                 } else {
                     $pseudoFields[$field->getName()] = $field;
                 }
             }
+
+            $contact->setManipulator(new LeadManipulator('integrations', 'update'));
 
             // Create the contact before processing pseudo fields
             $this->model->saveEntity($contact);
@@ -191,36 +186,13 @@ class ContactObjectHelper implements ObjectHelperInterface
         return $updatedMappedObjects;
     }
 
-    private function addUpdatedFieldToContact(Lead $contact, FieldDAO $field): void
-    {
-        $value = $field->getValue()->getNormalizedValue();
-
-        if ($value instanceof ReferenceValueDAO) {
-            $value = $this->getReferenceValueForField($value);
-        }
-
-        $contact->addUpdatedField($field->getName(), $value);
-    }
-
-    private function getReferenceValueForField(ReferenceValueDAO $value): ?string
-    {
-        if (MauticSyncDataExchange::OBJECT_COMPANY === $value->getType() && 0 < $value->getValue()) {
-            try {
-                return $this->getCompanyNameById($value->getValue());
-            } catch (ObjectNotFoundException $e) {
-            }
-        }
-
-        return null;
-    }
-
     /**
      * Unfortunately the LeadRepository doesn't give us what we need so we have to write our own queries.
      *
      * @param int $start
      * @param int $limit
      */
-    public function findObjectsBetweenDates(\DateTimeInterface $from, \DateTimeInterface $to, $start, $limit): array
+    public function findObjectsBetweenDates(DateTimeInterface $from, DateTimeInterface $to, $start, $limit): array
     {
         $qb = $this->connection->createQueryBuilder();
         $qb->select('*')
@@ -320,26 +292,6 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
 
         return $qb->execute()->fetchAll();
-    }
-
-    /**
-     * @throws ObjectNotFoundException
-     */
-    private function getCompanyNameById(int $id): string
-    {
-        $qb = $this->connection->createQueryBuilder();
-        $qb->select('c.companyname');
-        $qb->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
-        $qb->where('c.id = :id');
-        $qb->setParameter('id', $id);
-
-        $name = $qb->execute()->fetchColumn();
-
-        if (false === $name) {
-            throw new ObjectNotFoundException("Company with ID {$id} was not found.");
-        }
-
-        return $name;
     }
 
     private function getAvailableFields(): array

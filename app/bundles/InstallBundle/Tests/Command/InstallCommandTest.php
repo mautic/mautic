@@ -1,21 +1,14 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Exception;
 use Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper;
 use Mautic\InstallBundle\Command\InstallCommand;
 use Mautic\InstallBundle\Install\InstallService;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -23,22 +16,29 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\DependencyInjection\Container;
 
 class InstallCommandTest extends TestCase
 {
-    private $container;
+    /**
+     * @var MockObject&InstallService
+     */
     private $installer;
+
+    /**
+     * @var MockObject&Registry
+     */
+    private $doctrineRegistry;
+
     private InstallCommand $command;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->container = $this->createMock(Container::class);
-        $this->installer = $this->createMock(InstallService::class);
-        $application     = $this->createMock(Application::class);
-        $inputDefinition = $this->createMock(InputDefinition::class);
-        $command         = $this->createMock(Command::class);
+        $this->installer        = $this->createMock(InstallService::class);
+        $this->doctrineRegistry = $this->createMock(Registry::class);
+        $application            = $this->createMock(Application::class);
+        $inputDefinition        = $this->createMock(InputDefinition::class);
+        $command                = $this->createMock(Command::class);
 
         $inputDefinition->method('getOptions')->willReturn([]);
 
@@ -46,18 +46,13 @@ class InstallCommandTest extends TestCase
         $application->method('getDefinition')->willReturn($inputDefinition);
         $application->method('find')->willReturn($command);
 
-        $this->command = new InstallCommand();
-        $this->command->setContainer($this->container);
+        $this->command = new InstallCommand($this->installer, $this->doctrineRegistry);
         $this->command->setApplication($application);
     }
 
-    /**
-     * @throws Exception
-     */
     public function testCommandWhenSiteInstalled(): void
     {
         $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(true);
-        $this->container->method('get')->with('mautic.install.service')->willReturn($this->installer);
 
         $input  = new ArrayInput(['site_url' => 'localhost']);
         $output = new BufferedOutput();
@@ -66,19 +61,11 @@ class InstallCommandTest extends TestCase
         $this->assertSame('Mautic already installed'.PHP_EOL, $output->fetch());
     }
 
-    /**
-     * @throws Exception
-     */
     public function testCommandWhenSiteNotInstalled(): void
     {
         $this->installer->method('checkIfInstalled')->willReturnOnConsecutiveCalls(false);
 
-        $registryMock = $this->createMock(Registry::class);
-        $registryMock->method('getConnection')->willReturn($this->createMock(ConnectionWrapper::class));
-
-        $this->container->method('get')
-            ->withConsecutive(['mautic.install.service'], ['doctrine'])
-            ->willReturnOnConsecutiveCalls($this->installer, $registryMock);
+        $this->doctrineRegistry->method('getConnection')->willReturn($this->createMock(ConnectionWrapper::class));
 
         $input = new ArrayInput(
             [

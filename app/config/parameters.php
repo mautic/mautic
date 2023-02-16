@@ -1,15 +1,6 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 include __DIR__.'/paths_helper.php';
 
 //load default parameters from bundle files
@@ -34,6 +25,13 @@ foreach ($mauticParams as $k => $v) {
             $type = 'bool:';
             break;
         case is_int($v):
+            // some configuration entries require processor to return explicit int, instead of string|int type,
+            // which is returned by \Mautic\CoreBundle\DependencyInjection\EnvProcessor\IntNullableProcessor
+            if ('rememberme_lifetime' === $k) {
+                $type = 'int:';
+                break;
+            }
+
             $type = 'intNullable:';
             break;
         case is_array($v):

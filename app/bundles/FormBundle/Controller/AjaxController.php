@@ -1,29 +1,38 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\FieldCollectorInterface;
+use Mautic\FormBundle\Crate\FieldCrate;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
-/**
- * Class AjaxController.
- */
 class AjaxController extends CommonAjaxController
 {
     /**
+     * @var FieldCollectorInterface
+     */
+    private $fieldCollector;
+
+    /**
+     * @var AlreadyMappedFieldCollectorInterface
+     */
+    private $mappedFieldCollector;
+
+    public function initialize(ControllerEvent $event)
+    {
+        $this->fieldCollector       = $this->container->get('mautic.form.collector.field');
+        $this->mappedFieldCollector = $this->container->get('mautic.form.collector.already.mapped.field');
+    }
+
+    /**
      * @param string $name
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function reorderFieldsAction(Request $request, $bundle, $name = 'fields')
     {
@@ -48,7 +57,35 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
+     */
+    protected function getFieldsForObjectAction(Request $request)
+    {
+        $formId       = $request->get('formId');
+        $mappedObject = $request->get('mappedObject');
+        $mappedField  = $request->get('mappedField');
+        $mappedFields = $this->mappedFieldCollector->getFields($formId, $mappedObject);
+        $fields       = $this->fieldCollector->getFields($mappedObject);
+        $fields       = $fields->removeFieldsWithKeys($mappedFields, $mappedField);
+
+        return $this->sendJsonResponse(
+            [
+                'fields' => array_map(
+                    function (FieldCrate $field) {
+                        return [
+                            'label'      => $field->getName(),
+                            'value'      => $field->getKey(),
+                            'isListType' => $field->isListType(),
+                        ];
+                    },
+                    $fields->getArrayCopy()
+                ),
+            ]
+        );
+    }
+
+    /**
+     * @return JsonResponse
      */
     protected function reorderActionsAction(Request $request)
     {
@@ -56,7 +93,7 @@ class AjaxController extends CommonAjaxController
     }
 
     /**
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     protected function updateFormFieldsAction(Request $request)
     {
@@ -113,11 +150,11 @@ class AjaxController extends CommonAjaxController
     /**
      * Ajax submit for forms.
      *
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
     public function submitAction()
     {
-        $response     = $this->forwardWithPost('MauticFormBundle:Public:submit', $this->request->request->all(), [], ['ajax' => true]);
+        $response     = $this->forwardWithPost('Mautic\FormBundle\Controller\PublicController::submitAction', $this->request->request->all(), [], ['ajax' => true]);
         $responseData = json_decode($response->getContent(), true);
         $success      = (!in_array($response->getStatusCode(), [404, 500]) && empty($responseData['errorMessage'])
             && empty($responseData['validationErrors']));

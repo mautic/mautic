@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Form;
 
 use Mautic\CoreBundle\Form\Type\BooleanType;
@@ -30,7 +21,12 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 trait RequestTrait
 {
-    protected function prepareParametersFromRequest(Form $form, array &$params, $entity = null, $masks = [], $fields = [])
+    /**
+     * @param array<mixed> $params
+     * @param array<mixed> $masks
+     * @param array<mixed> $fields
+     */
+    protected function prepareParametersFromRequest(Form $form, array &$params, object $entity = null, array $masks = [], array $fields = []): void
     {
         // ungroup fields if need it
         foreach ($fields as $key=>$field) {
@@ -164,10 +160,10 @@ trait RequestTrait
     }
 
     /**
-     * @param $fieldData
-     * @param $leadField
+     * @param array<mixed> $fieldData
+     * @param array<mixed> $leadField
      */
-    public function cleanFields(&$fieldData, $leadField)
+    public function cleanFields(array &$fieldData, array $leadField): void
     {
         // This will catch null values or non-existent values to prevent null from converting to false/0
         if (!isset($fieldData[$leadField['alias']])) {
@@ -175,9 +171,8 @@ trait RequestTrait
         }
 
         switch ($leadField['type']) {
-            // Adjust the boolean values from text to boolean. Do not convert null to false.
             case 'boolean':
-                $fieldData[$leadField['alias']] = (int) filter_var($fieldData[$leadField['alias']], FILTER_VALIDATE_BOOLEAN);
+                $fieldData[$leadField['alias']] = InputHelper::boolean($fieldData[$leadField['alias']]);
                 break;
             // Ensure date/time entries match what symfony expects
             case 'datetime':

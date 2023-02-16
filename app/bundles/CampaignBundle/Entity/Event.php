@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,18 +14,18 @@ use Mautic\LeadBundle\Entity\Lead as Contact;
  */
 class Event implements ChannelInterface
 {
-    const TYPE_DECISION  = 'decision';
-    const TYPE_ACTION    = 'action';
-    const TYPE_CONDITION = 'condition';
+    public const TYPE_DECISION  = 'decision';
+    public const TYPE_ACTION    = 'action';
+    public const TYPE_CONDITION = 'condition';
 
-    const PATH_INACTION = 'no';
-    const PATH_ACTION   = 'yes';
+    public const PATH_INACTION = 'no';
+    public const PATH_ACTION   = 'yes';
 
-    const TRIGGER_MODE_DATE      = 'date';
-    const TRIGGER_MODE_INTERVAL  = 'interval';
-    const TRIGGER_MODE_IMMEDIATE = 'immediate';
+    public const TRIGGER_MODE_DATE      = 'date';
+    public const TRIGGER_MODE_INTERVAL  = 'interval';
+    public const TRIGGER_MODE_IMMEDIATE = 'immediate';
 
-    const CHANNEL_EMAIL = 'email';
+    public const CHANNEL_EMAIL = 'email';
 
     /**
      * @var int
@@ -498,7 +489,7 @@ class Event implements ChannelInterface
      *
      * @return Event
      */
-    public function setCampaign(\Mautic\CampaignBundle\Entity\Campaign $campaign)
+    public function setCampaign(Campaign $campaign)
     {
         $this->campaign = $campaign;
 

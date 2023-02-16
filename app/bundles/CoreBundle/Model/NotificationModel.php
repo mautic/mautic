@@ -1,19 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Model;
 
-use Debril\RssAtomBundle\Protocol\FeedReader;
-use Debril\RssAtomBundle\Protocol\Parser\FeedContent;
-use Debril\RssAtomBundle\Protocol\Parser\Item;
+use DateTime;
 use Mautic\CoreBundle\Entity\Notification;
 use Mautic\CoreBundle\Entity\NotificationRepository;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -24,6 +13,9 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * @extends FormModel<Notification>
+ */
 class NotificationModel extends FormModel
 {
     /**
@@ -85,13 +77,16 @@ class NotificationModel extends FormModel
     /**
      * Write a notification.
      *
-     * @param string    $message   Message of the notification
-     * @param string    $type      Optional $type to ID the source of the notification
-     * @param bool|true $isRead    Add unread indicator
-     * @param string    $header    Header for message
-     * @param string    $iconClass Font Awesome CSS class for the icon (e.g. fa-eye)
-     * @param \DateTime $datetime  Date the item was created
-     * @param User|null $user      User object; defaults to current user
+     * @param string        $message                 Message of the notification
+     * @param string|null   $type                    Optional $type to ID the source of the notification
+     * @param bool|true     $isRead                  Add unread indicator
+     * @param string|null   $header                  Header for message
+     * @param string|null   $iconClass               Font Awesome CSS class for the icon (e.g. fa-eye)
+     * @param DateTime|null $datetime                Date the item was created
+     * @param User|null     $user                    User object; defaults to current user
+     * @param string|null   $deduplicateValue        When supplied, notification will not be added if another notification with tha same $deduplicateValue exists within last 24 hours
+     * @param DateTime|null $deduplicateDateTimeFrom This argument is applied only when $deduplicateValue is supplied. If default deduplication time span (last 24 hours) does not fit your needs you can change it here.
+     *                                               E.g. $deduplicateDateTimeFrom = new DateTime('-3 hours') means that the notification is considered duplicate only if there is a notification with the same $deduplicateValue and is not older than 3 hours.
      */
     public function addNotification(
         $message,
@@ -99,8 +94,10 @@ class NotificationModel extends FormModel
         $isRead = false,
         $header = null,
         $iconClass = null,
-        \DateTime $datetime = null,
-        User $user = null
+        DateTime $datetime = null,
+        User $user = null,
+        string $deduplicateValue = null,
+        DateTime $deduplicateDateTimeFrom = null
     ) {
         if (null === $user) {
             $user = $this->userHelper->getUser();
@@ -111,6 +108,14 @@ class NotificationModel extends FormModel
             return;
         }
 
+        if (null !== $deduplicateValue) {
+            $deduplicateValue = md5($deduplicateValue);
+
+            if ($this->isDuplicate($user->getId(), $deduplicateValue, $deduplicateDateTimeFrom)) {
+                return;
+            }
+        }
+
         $notification = new Notification();
         $notification->setType($type);
         $notification->setIsRead($isRead);
@@ -119,9 +124,10 @@ class NotificationModel extends FormModel
         $notification->setIconClass($iconClass);
         $notification->setUser($user);
         if (null == $datetime) {
-            $datetime = new \DateTime();
+            $datetime = new DateTime();
         }
         $notification->setDateAdded($datetime);
+        $notification->setDeduplicate($deduplicateValue);
         $this->saveAndDetachEntity($notification);
     }
 
@@ -213,5 +219,10 @@ class NotificationModel extends FormModel
         }
 
         return [$notifications, $showNewIndicator, ['isNew' => $newUpdate, 'message' => $updateMessage]];
+    }
+
+    private function isDuplicate(int $userId, string $deduplicate, DateTime $from = null): bool
+    {
+        return $this->getRepository()->isDuplicate($userId, $deduplicate, $from ?? new DateTime('-1 day'));
     }
 }

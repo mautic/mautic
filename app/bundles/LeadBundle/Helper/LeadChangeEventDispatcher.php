@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -59,7 +50,7 @@ class LeadChangeEventDispatcher
             return;
         }
 
-        $this->dispatcher->dispatch(LeadEvents::LEAD_IDENTIFIED, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LEAD_IDENTIFIED);
     }
 
     private function dispatchPointChangeEvent(Events\LeadEvent $event)
@@ -81,7 +72,7 @@ class LeadChangeEventDispatcher
         }
 
         $pointsEvent = new Events\PointsChangeEvent($this->lead, $this->changes['points'][0], $this->changes['points'][1]);
-        $this->dispatcher->dispatch(LeadEvents::LEAD_POINTS_CHANGE, $pointsEvent);
+        $this->dispatcher->dispatch($pointsEvent, LeadEvents::LEAD_POINTS_CHANGE);
     }
 
     private function dispatchUtmTagsChangeEvent()
@@ -91,7 +82,7 @@ class LeadChangeEventDispatcher
         }
 
         $utmTagsEvent = new Events\LeadUtmTagsEvent($this->lead, $this->changes['utmtags']);
-        $this->dispatcher->dispatch(LeadEvents::LEAD_UTMTAGS_ADD, $utmTagsEvent);
+        $this->dispatcher->dispatch($utmTagsEvent, LeadEvents::LEAD_UTMTAGS_ADD);
     }
 
     private function dispatchDncChangeEvent()
@@ -105,7 +96,7 @@ class LeadChangeEventDispatcher
             $newStatus = $status['reason'];
 
             $event = new Events\ChannelSubscriptionChange($this->lead, $channel, $oldStatus, $newStatus);
-            $this->dispatcher->dispatch(LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::CHANNEL_SUBSCRIPTION_CHANGED);
         }
     }
 }

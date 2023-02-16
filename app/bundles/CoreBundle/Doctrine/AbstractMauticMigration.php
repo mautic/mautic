@@ -1,21 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\AbortMigration;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -46,11 +36,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
      * @var string
      */
     protected $platform;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
 
     /**
      * @throws DBALException
@@ -88,7 +73,6 @@ abstract class AbstractMauticMigration extends AbstractMigration implements Cont
         $this->container     = $container;
         $this->prefix        = $container->getParameter('mautic.db_table_prefix');
         $this->platform      = $this->connection->getDatabasePlatform()->getName();
-        $this->entityManager = $this->container->get('doctrine')->getManager();
     }
 
     /**

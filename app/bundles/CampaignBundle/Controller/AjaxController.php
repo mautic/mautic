@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -125,7 +116,8 @@ class AjaxController extends CommonAjaxController
                                     [
                                         'lead'  => $contactId,
                                         'event' => $eventId,
-                                    ]
+                                    ],
+                                    ['dateTriggered' => 'desc']
                                 );
 
                 if ($log && ($log->getTriggerDate() > new \DateTime())) {

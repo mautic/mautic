@@ -1,15 +1,5 @@
 <?php
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- *
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Transport;
 
 use Aws\CommandPool;
@@ -18,12 +8,11 @@ use Aws\Exception\AwsException;
 use Aws\ResultInterface;
 use Aws\SesV2\Exception\SesV2Exception;
 use Aws\SesV2\SesV2Client;
-use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
@@ -68,7 +57,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
     private $concurrency;
 
     /**
-     * @var Aws\CommandInterface | Psr\Http\Message\RequestInterface
+     * @var Aws\CommandInterface|Psr\Http\Message\RequestInterface
      */
     private $handler;
 
@@ -194,7 +183,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 throw new \Exception('Your AWS SES quota is currently exceeded');
             }
 
-            $this->concurrency   = floor($account->get('SendQuota')['MaxSendRate']);
+            $this->concurrency   = (int) floor($account->get('SendQuota')['MaxSendRate']);
 
             $this->started = true;
         }
@@ -246,7 +235,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 return 0;
             }
         }
-        $count = $this->getBatchRecipientCount($toSendMessage);
 
         try {
             $this->start();
@@ -258,7 +246,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 'concurrency' => $this->concurrency,
                 'fulfilled'   => function (ResultInterface $result, $iteratorId) use ($evt, $failedRecipients) {
                     if ($evt) {
-                        // $this->logger->info("SES Result: " . $result->get('MessageId'));
                         $evt->setResult(\Swift_Events_SendEvent::RESULT_SUCCESS);
                         $evt->setFailedRecipients($failedRecipients);
                         $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
@@ -295,11 +282,9 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             array_keys((array) $this->message->getBcc())
         );
 
-        if ($evt) {
-            $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
-            $evt->setFailedRecipients($failedRecipients);
-            $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
-        }
+        $evt->setResult(\Swift_Events_SendEvent::RESULT_FAILED);
+        $evt->setFailedRecipients($failedRecipients);
+        $this->getDispatcher()->dispatchEvent($evt, 'sendPerformed');
     }
 
     /*
@@ -338,7 +323,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             $fromEmail = current(array_keys($from));
             $fromName  = $from[$fromEmail];
 
-            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? mb_encode_mimeheader($fromName).' <'.$fromEmail.'>' : $fromEmail;
+            $sesArray['FromEmailAddress'] =  (!empty($fromName)) ? '"'.mb_encode_mimeheader($fromName).'" <'.$fromEmail.'>' : $fromEmail;
             $to                           = $message->getTo();
             if (!empty($to)) {
                 $sesArray['Destination']['ToAddresses'] = array_keys($to);
@@ -354,7 +339,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             }
             $replyTo = $message->getReplyTo();
             if (!empty($replyTo)) {
-                $sesArray['ReplyToAddresses'] = [key($replyTo)];
+                $sesArray['ReplyToAddresses'] = [key((array) $replyTo)];
             }
             $headers            = $message->getHeaders();
             if ($headers->has('X-SES-CONFIGURATION-SET')) {
@@ -367,7 +352,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             /**
              * This is a message with tokens.
              */
-            $mauticTokens  = [];
             $metadataSet   = reset($metadata);
             $tokens        = (!empty($metadataSet['tokens'])) ? $metadataSet['tokens'] : [];
             $mauticTokens  = array_keys($tokens);
@@ -381,7 +365,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 $toSendMessage                                   = (new \Swift_Message());
                 $toSendMessage->setSubject($tokenizedMessage['subject']);
                 $toSendMessage->setFrom([$tokenizedMessage['from']['email'] => $tokenizedMessage['from']['name']]);
-                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? mb_encode_mimeheader($tokenizedMessage['from']['name']).' <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
+                $sesArray['FromEmailAddress'] =  (!empty($tokenizedMessage['from']['name'])) ? '"'.mb_encode_mimeheader($tokenizedMessage['from']['name']).'" <'.$tokenizedMessage['from']['email'].'>' : $tokenizedMessage['from']['email'];
                 $toSendMessage->setTo([$recipient]);
                 $sesArray['Destination']['ToAddresses'] = [$recipient];
                 if (isset($tokenizedMessage['text']) && strlen($tokenizedMessage['text']) > 0) {
@@ -394,6 +378,11 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 if (isset($tokenizedMessage['headers'])) {
                     $headers = $toSendMessage->getHeaders();
                     foreach ($tokenizedMessage['headers'] as $key => $value) {
+                        if ('List-Unsubscribe' === $key) {
+                            $listUnsubscribe = array_map('trim', explode(',', $value));
+                            $listUnsubscribe = array_filter($listUnsubscribe, fn ($el) => strpos($el, $mailData['hashId']));
+                            $value           = implode(',', $listUnsubscribe);
+                        }
                         $headers->addTextHeader($key, $value);
                     }
                 }
@@ -414,6 +403,12 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                     $toSendMessage->setReplyTo([$tokenizedMessage['replyTo']['email']]);
                     $sesArray['ReplyToAddresses'] = [$tokenizedMessage['replyTo']['email']];
                 }
+
+                if (isset($tokenizedMessage['returnPath'])) {
+                    $toSendMessage->setReturnPath($tokenizedMessage['returnPath']);
+                    $sesArray['ReturnPath'] = $tokenizedMessage['returnPath'];
+                }
+
                 if (isset($tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'])) {
                     $sesArray['ConfigurationSetName'] = $tokenizedMessage['headers']['X-SES-CONFIGURATION-SET'];
                 }
@@ -440,10 +435,8 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
 
     /**
      * Set plain text to a message.
-     *
-     * @return bool
      */
-    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text)
+    private function setPlainTextToMessage(\Swift_Mime_SimpleMessage $message, $text): void
     {
         $children = (array) $message->getChildren();
 
@@ -455,32 +448,29 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         }
     }
 
-    /**
-     * @return int
-     */
     public function getMaxBatchLimit()
     {
         return 0;
     }
 
     /**
+     * Get the count for the max number of recipients per batch.
+     *
      * @param int    $toBeAdded
      * @param string $type
      */
-    public function getBatchRecipientCount(\Swift_Message $toSendMessage, $toBeAdded = 1, $type = 'to'): int
+    public function getBatchRecipientCount(\Swift_Message $message, $toBeAdded = 1, $type = 'to'): int
     {
         // These getters could return null
-        $toCount  = $toSendMessage->getTo() ? count($toSendMessage->getTo()) : 0;
-        $ccCount  = $toSendMessage->getCc() ? count($toSendMessage->getCc()) : 0;
-        $bccCount = $toSendMessage->getBcc() ? count($toSendMessage->getBcc()) : 0;
+        $toCount  = $message->getTo() ? count($message->getTo()) : 0;
+        $ccCount  = $message->getCc() ? count($message->getCc()) : 0;
+        $bccCount = $message->getBcc() ? count($message->getBcc()) : 0;
 
         return $toCount + $ccCount + $bccCount + $toBeAdded;
     }
 
     /**
      * Returns a "transport" string to match the URL path /mailer/{transport}/callback.
-     *
-     * @return mixed
      */
     public function getCallbackPath()
     {
@@ -495,9 +485,6 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
         $this->amazonCallback->processCallbackRequest($request);
     }
 
-    /**
-     * @return bool
-     */
     public function ping()
     {
         return true;

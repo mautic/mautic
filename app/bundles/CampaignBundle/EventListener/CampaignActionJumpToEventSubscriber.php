@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -21,11 +12,11 @@ use Mautic\CampaignBundle\Event\PendingEvent;
 use Mautic\CampaignBundle\Executioner\EventExecutioner;
 use Mautic\CampaignBundle\Form\Type\CampaignEventJumpToEventType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
 {
-    const EVENT_NAME = 'campaign.jump_to_event';
+    public const EVENT_NAME = 'campaign.jump_to_event';
 
     /**
      * @var EventRepository
@@ -77,7 +68,7 @@ class CampaignActionJumpToEventSubscriber implements EventSubscriberInterface
             'label'                  => 'mautic.campaign.event.jump_to_event',
             'description'            => 'mautic.campaign.event.jump_to_event_descr',
             'formType'               => CampaignEventJumpToEventType::class,
-            'template'               => 'MauticCampaignBundle:Event:jump.html.php',
+            'template'               => 'MauticCampaignBundle:Event:jump.html.twig',
             'batchEventName'         => CampaignEvents::ON_EVENT_JUMP_TO_EVENT,
             'connectionRestrictions' => [
                 'target' => [

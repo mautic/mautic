@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -49,7 +40,7 @@ class SecurityController extends CommonController
         }
 
         return $this->render(
-            'MauticApiBundle:Security:login.html.php',
+            'MauticApiBundle:Security:login.html.twig',
             [
                 'last_username' => $session->get(Security::LAST_USERNAME),
                 'route'         => 'mautic_oauth2_server_auth_login_check',

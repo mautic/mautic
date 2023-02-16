@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
@@ -29,7 +20,7 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,7 +35,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $sessionMock;
 
     /**
-     * @var MockObject|ModelFactory
+     * @var MockObject|ModelFactory<EmailModel>
      */
     private $modelFactoryMock;
 

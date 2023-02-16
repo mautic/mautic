@@ -1,24 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\PageBundle\Entity\Redirect;
+use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\PageEvents;
 
 /**
- * Class RedirectModel.
+ * @extends FormModel<Redirect>
  */
 class RedirectModel extends FormModel
 {
@@ -35,14 +27,12 @@ class RedirectModel extends FormModel
         $this->urlHelper = $urlHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return \Mautic\PageBundle\Entity\RedirectRepository
-     */
-    public function getRepository()
+    public function getRepository(): RedirectRepository
     {
-        return $this->em->getRepository('MauticPageBundle:Redirect');
+        $result = $this->em->getRepository(Redirect::class);
+        \assert($result instanceof RedirectRepository);
+
+        return $result;
     }
 
     /**
@@ -68,7 +58,7 @@ class RedirectModel extends FormModel
     {
         if ($this->dispatcher->hasListeners(PageEvents::ON_REDIRECT_GENERATE)) {
             $event = new RedirectGenerationEvent($redirect, $clickthrough);
-            $this->dispatcher->dispatch(PageEvents::ON_REDIRECT_GENERATE, $event);
+            $this->dispatcher->dispatch($event, PageEvents::ON_REDIRECT_GENERATE);
 
             $clickthrough = $event->getClickthrough();
         }
@@ -77,8 +67,7 @@ class RedirectModel extends FormModel
             'mautic_url_redirect',
             ['redirectId' => $redirect->getRedirectId()],
             true,
-            $clickthrough,
-            $shortenUrl
+            $clickthrough
         );
 
         if (!empty($utmTags)) {
@@ -114,16 +103,14 @@ class RedirectModel extends FormModel
      *
      * Use Mautic\PageBundle\Model\TrackableModel::getTrackableByUrl() if associated with a channel
      *
-     * @param  $url
+     * @param $url
      *
      * @return Redirect|null
      */
     public function getRedirectByUrl($url)
     {
         // Ensure the URL saved to the database does not have encoded ampersands
-        while (false !== strpos($url, '&amp;')) {
-            $url = str_replace('&amp;', '&', $url);
-        }
+        $url = UrlHelper::decodeAmpersands($url);
 
         $repo     = $this->getRepository();
         $redirect = $repo->findOneBy(['url' => $url]);

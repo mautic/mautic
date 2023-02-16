@@ -1,34 +1,43 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Controller\Api;
 
 use Doctrine\ORM\EntityNotFoundException;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\RandomHelper\RandomHelperInterface;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Email>
+ */
 class EmailApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var EmailModel|null
+     */
+    protected $model = null;
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $extraGetEntitiesArguments = ['ignoreListJoin' => true];
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('email');
-        $this->entityClass      = 'Mautic\EmailBundle\Entity\Email';
+        $emailModel = $this->getModel('email');
+        \assert($emailModel instanceof EmailModel);
+
+        $this->model            = $emailModel;
+        $this->entityClass      = Email::class;
         $this->entityNameOne    = 'email';
         $this->entityNameMulti  = 'emails';
         $this->serializerGroups = ['emailDetails', 'categoryList', 'publishDetails', 'assetList', 'formList', 'leadListList'];
@@ -140,6 +149,10 @@ class EmailApiController extends CommonApiController
             }
 
             $leadFields = array_merge(['id' => $leadId], $lead->getProfileFields());
+            // Set owner_id to support the "Owner is mailer" feature
+            if ($lead->getOwner()) {
+                $leadFields['owner_id'] = $lead->getOwner()->getId();
+            }
 
             $result = $this->model->sendEmail(
                 $entity,
@@ -149,6 +162,8 @@ class EmailApiController extends CommonApiController
                     'tokens'            => $cleanTokens,
                     'assetAttachments'  => $assetsIds,
                     'return_errors'     => true,
+                    'ignoreDNC'         => true,
+                    'email_type'        => 'transactional',
                 ]
             );
 

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright  2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Integration;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -88,7 +79,7 @@ class ClearbitIntegration extends AbstractIntegration
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticClearbitBundle:Integration:form.html.php',
+                'template'   => 'MauticClearbitBundle:Integration:form.html.twig',
                 'parameters' => [
                     'mauticUrl' => $this->router->generate(
                         'mautic_plugin_clearbit_index', [], UrlGeneratorInterface::ABSOLUTE_URL

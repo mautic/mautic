@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
@@ -40,9 +31,9 @@ class AjaxController extends CommonAjaxController
      */
     protected function getIntegrationFieldsAction(Request $request)
     {
-        $integration = $request->request->get('integration');
-        $settings    = $request->request->get('settings');
-        $page        = $request->request->get('page');
+        $integration = $request->query->get('integration');
+        $settings    = $request->query->get('settings');
+        $page        = $request->query->get('page');
 
         $dataArray = ['success' => 0];
 
@@ -132,8 +123,8 @@ class AjaxController extends CommonAjaxController
      */
     protected function getIntegrationConfigAction(Request $request)
     {
-        $integration = $request->request->get('integration');
-        $settings    = $request->request->get('settings');
+        $integration = $request->query->get('integration');
+        $settings    = $request->query->get('settings');
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
@@ -189,9 +180,9 @@ class AjaxController extends CommonAjaxController
 
     protected function getIntegrationCampaignStatusAction(Request $request)
     {
-        $integration = $request->request->get('integration');
-        $campaign    = $request->request->get('campaign');
-        $settings    = $request->request->get('settings');
+        $integration = $request->query->get('integration');
+        $campaign    = $request->query->get('campaign');
+        $settings    = $request->query->get('settings');
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
@@ -249,7 +240,7 @@ class AjaxController extends CommonAjaxController
      */
     protected function getIntegrationCampaignsAction(Request $request)
     {
-        $integration = $request->request->get('integration');
+        $integration = $request->query->get('integration');
         $dataArray   = ['success' => 0];
 
         if (!empty($integration)) {
@@ -337,7 +328,9 @@ class AjaxController extends CommonAjaxController
         }
         $entity->setFeatureSettings($featureSettings);
 
-        $this->getModel('plugin')->saveFeatureSettings($entity);
+        $pluginModel = $this->getModel('plugin');
+        \assert($pluginModel instanceof PluginModel);
+        $pluginModel->saveFeatureSettings($entity);
 
         return $this->sendJsonResponse($dataArray);
     }

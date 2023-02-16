@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ConfigBundle\Tests\Mapper;
 
 use Mautic\ConfigBundle\Exception\BadFormConfigException;
@@ -23,31 +14,37 @@ class ConfigMapperTest extends \PHPUnit\Framework\TestCase
             'formAlias'  => 'emailconfig',
             'formTheme'  => 'MauticEmailBundle:FormTheme\\Config',
             'parameters' => [
-                'mailer_api_key'               => null,
-                'mailer_from_name'             => 'Mautic',
-                'mailer_from_email'            => 'email@yoursite.com',
-                'mailer_return_path'           => null,
-                'mailer_transport'             => 'mail',
-                'mailer_append_tracking_pixel' => true,
-                'mailer_convert_embed_images'  => false,
-                'mailer_host'                  => '',
-                'mailer_port'                  => null,
-                'mailer_user'                  => null,
-                'mailer_password'              => null,
-                'mailer_encryption'            => null,
-                'mailer_auth_mode'             => null,
-                'mailer_amazon_region'         => 'email-smtp.us-east-1.amazonaws.com',
-                'mailer_spool_type'            => 'memory',
-                'mailer_spool_path'            => '%kernel.root_dir%/../var/spool',
-                'mailer_spool_msg_limit'       => null,
-                'mailer_spool_time_limit'      => null,
-                'mailer_spool_recover_timeout' => 900,
-                'mailer_spool_clear_timeout'   => 1800,
-                'unsubscribe_text'             => null,
-                'webview_text'                 => null,
-                'unsubscribe_message'          => null,
-                'resubscribe_message'          => null,
-                'monitored_email'              => [
+                'mailer_api_key'                        => null,
+                'mailer_from_name'                      => 'Mautic',
+                'mailer_from_email'                     => 'email@yoursite.com',
+                'mailer_return_path'                    => null,
+                'mailer_transport'                      => 'mail',
+                'mailer_append_tracking_pixel'          => true,
+                'mailer_convert_embed_images'           => false,
+                'mailer_host'                           => '',
+                'mailer_port'                           => null,
+                'mailer_user'                           => null,
+                'mailer_password'                       => null,
+                'mailer_encryption'                     => null,
+                'mailer_auth_mode'                      => null,
+                'mailer_amazon_region'                  => 'email-smtp.us-east-1.amazonaws.com',
+                'mailer_spool_type'                     => 'memory',
+                'mailer_spool_path'                     => '%kernel.project_dir%/var/spool',
+                'mailer_spool_msg_limit'                => null,
+                'mailer_spool_time_limit'               => null,
+                'mailer_spool_recover_timeout'          => 900,
+                'mailer_spool_clear_timeout'            => 1800,
+                'messenger_type'                        => 'async',
+                'messenger_dsn'                         => 'doctrine://default',
+                'messenger_retry_strategy_max_retries'  => 3,
+                'messenger_retry_strategy_delay'        => 1000,
+                'messenger_retry_strategy_multiplier'   => 2,
+                'messenger_retry_strategy_max_delay'    => 0,
+                'unsubscribe_text'                      => null,
+                'webview_text'                          => null,
+                'unsubscribe_message'                   => null,
+                'resubscribe_message'                   => null,
+                'monitored_email'                       => [
                     'general' => [
                         'address'    => null,
                         'host'       => null,

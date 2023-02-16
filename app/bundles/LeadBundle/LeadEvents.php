@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle;
 
 /**
@@ -25,7 +16,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_PRE_SAVE = 'mautic.lead_pre_save';
+    public const LEAD_PRE_SAVE = 'mautic.lead_pre_save';
 
     /**
      * The mautic.lead_post_save event is dispatched right after a lead is persisted.
@@ -35,7 +26,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_POST_SAVE = 'mautic.lead_post_save';
+    public const LEAD_POST_SAVE = 'mautic.lead_post_save';
 
     /**
      * The mautic.lead_points_change event is dispatched if a lead's points changes.
@@ -45,7 +36,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_POINTS_CHANGE = 'mautic.lead_points_change';
+    public const LEAD_POINTS_CHANGE = 'mautic.lead_points_change';
 
     /**
      * The mautic.lead_points_change event is dispatched if a lead's points changes.
@@ -55,7 +46,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_UTMTAGS_ADD = 'mautic.lead_utmtags_add';
+    public const LEAD_UTMTAGS_ADD = 'mautic.lead_utmtags_add';
 
     /**
      * The mautic.lead_company_change event is dispatched if a lead's company changes.
@@ -65,7 +56,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_COMPANY_CHANGE = 'mautic.lead_company_change';
+    public const LEAD_COMPANY_CHANGE = 'mautic.lead_company_change';
 
     /**
      * The mautic.lead_list_change event is dispatched if a lead's lists changes.
@@ -75,7 +66,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_LIST_CHANGE = 'mautic.lead_list_change';
+    public const LEAD_LIST_CHANGE = 'mautic.lead_list_change';
 
     /**
      * The mautic.lead_category_change event is dispatched if a lead's subscribed categories change.
@@ -85,7 +76,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_CATEGORY_CHANGE = 'mautic.lead_category_change';
+    public const LEAD_CATEGORY_CHANGE = 'mautic.lead_category_change';
 
     /**
      * The mautic.lead_list_batch_change event is dispatched if a batch of leads are changed from ListModel::rebuildListLeads().
@@ -95,7 +86,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_LIST_BATCH_CHANGE = 'mautic.lead_list_batch_change';
+    public const LEAD_LIST_BATCH_CHANGE = 'mautic.lead_list_batch_change';
 
     /**
      * The mautic.lead_pre_delete event is dispatched before a lead is deleted.
@@ -105,7 +96,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_PRE_DELETE = 'mautic.lead_pre_delete';
+    public const LEAD_PRE_DELETE = 'mautic.lead_pre_delete';
 
     /**
      * The mautic.lead_post_delete event is dispatched after a lead is deleted.
@@ -115,7 +106,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_POST_DELETE = 'mautic.lead_post_delete';
+    public const LEAD_POST_DELETE = 'mautic.lead_post_delete';
 
     /**
      * The mautic.lead_pre_merge event is dispatched before two leads are merged.
@@ -125,7 +116,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_PRE_MERGE = 'mautic.lead_pre_merge';
+    public const LEAD_PRE_MERGE = 'mautic.lead_pre_merge';
 
     /**
      * The mautic.lead_post_merge event is dispatched after two leads are merged.
@@ -135,7 +126,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_POST_MERGE = 'mautic.lead_post_merge';
+    public const LEAD_POST_MERGE = 'mautic.lead_post_merge';
 
     /**
      * The mautic.lead_identified event is dispatched when a lead first becomes known, i.e. name, email, company.
@@ -145,7 +136,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_IDENTIFIED = 'mautic.lead_identified';
+    public const LEAD_IDENTIFIED = 'mautic.lead_identified';
 
     /**
      * The mautic.lead_channel_subscription_changed event is dispatched when a lead's DNC status changes.
@@ -155,7 +146,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const CHANNEL_SUBSCRIPTION_CHANGED = 'mautic.lead_channel_subscription_changed';
+    public const CHANNEL_SUBSCRIPTION_CHANGED = 'mautic.lead_channel_subscription_changed';
 
     /**
      * The mautic.lead_build_search_commands event is dispatched when the search commands are built.
@@ -165,7 +156,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_BUILD_SEARCH_COMMANDS = 'mautic.lead_build_search_commands';
+    public const LEAD_BUILD_SEARCH_COMMANDS = 'mautic.lead_build_search_commands';
 
     /**
      * The mautic.company_build_search_commands event is dispatched when the search commands are built.
@@ -175,7 +166,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const COMPANY_BUILD_SEARCH_COMMANDS = 'mautic.company_build_search_commands';
+    public const COMPANY_BUILD_SEARCH_COMMANDS = 'mautic.company_build_search_commands';
 
     /**
      * The mautic.current_lead_changed event is dispatched when the current lead is changed to another such as when
@@ -186,7 +177,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const CURRENT_LEAD_CHANGED = 'mautic.current_lead_changed';
+    public const CURRENT_LEAD_CHANGED = 'mautic.current_lead_changed';
 
     /**
      * The mautic.lead_list_pre_save event is dispatched right before a lead_list is persisted.
@@ -196,7 +187,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_PRE_SAVE = 'mautic.lead_list_pre_save';
+    public const LIST_PRE_SAVE = 'mautic.lead_list_pre_save';
 
     /**
      * The mautic.lead_list_post_save event is dispatched right after a lead_list is persisted.
@@ -206,7 +197,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_POST_SAVE = 'mautic.lead_list_post_save';
+    public const LIST_POST_SAVE = 'mautic.lead_list_post_save';
 
     /**
      * The mautic.lead_list_pre_unpublish event is dispatched before a lead_list is unpublished.
@@ -216,7 +207,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_PRE_UNPUBLISH = 'mautic.lead_list_pre_unpublish';
+    public const LIST_PRE_UNPUBLISH = 'mautic.lead_list_pre_unpublish';
 
     /**
      * The mautic.lead_list_pre_delete event is dispatched before a lead_list is deleted.
@@ -226,7 +217,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_PRE_DELETE = 'mautic.lead_list_pre_delete';
+    public const LIST_PRE_DELETE = 'mautic.lead_list_pre_delete';
 
     /**
      * The mautic.lead_list_post_delete event is dispatched after a lead_list is deleted.
@@ -236,7 +227,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_POST_DELETE = 'mautic.lead_list_post_delete';
+    public const LIST_POST_DELETE = 'mautic.lead_list_post_delete';
 
     /**
      * The mautic.lead_field_pre_save event is dispatched right before a lead_field is persisted.
@@ -246,7 +237,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const FIELD_PRE_SAVE = 'mautic.lead_field_pre_save';
+    public const FIELD_PRE_SAVE = 'mautic.lead_field_pre_save';
 
     /**
      * The mautic.lead_field_post_save event is dispatched right after a lead_field is persisted.
@@ -256,7 +247,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const FIELD_POST_SAVE = 'mautic.lead_field_post_save';
+    public const FIELD_POST_SAVE = 'mautic.lead_field_post_save';
 
     /**
      * The mautic.lead_field_pre_delete event is dispatched before a lead_field is deleted.
@@ -266,7 +257,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const FIELD_PRE_DELETE = 'mautic.lead_field_pre_delete';
+    public const FIELD_PRE_DELETE = 'mautic.lead_field_pre_delete';
 
     /**
      * The mautic.lead_field_post_delete event is dispatched after a lead_field is deleted.
@@ -276,7 +267,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const FIELD_POST_DELETE = 'mautic.lead_field_post_delete';
+    public const FIELD_POST_DELETE = 'mautic.lead_field_post_delete';
 
     /**
      * The mautic.lead_timeline_on_generate event is dispatched when generating a lead's timeline view.
@@ -286,7 +277,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const TIMELINE_ON_GENERATE = 'mautic.lead_timeline_on_generate';
+    public const TIMELINE_ON_GENERATE = 'mautic.lead_timeline_on_generate';
 
     /**
      * The mautic.lead_note_pre_save event is dispatched right before a lead note is persisted.
@@ -296,7 +287,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const NOTE_PRE_SAVE = 'mautic.lead_note_pre_save';
+    public const NOTE_PRE_SAVE = 'mautic.lead_note_pre_save';
 
     /**
      * The mautic.lead_note_post_save event is dispatched right after a lead note is persisted.
@@ -306,7 +297,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const NOTE_POST_SAVE = 'mautic.lead_note_post_save';
+    public const NOTE_POST_SAVE = 'mautic.lead_note_post_save';
 
     /**
      * The mautic.lead_note_pre_delete event is dispatched before a lead note is deleted.
@@ -316,7 +307,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const NOTE_PRE_DELETE = 'mautic.lead_note_pre_delete';
+    public const NOTE_PRE_DELETE = 'mautic.lead_note_pre_delete';
 
     /**
      * The mautic.lead_note_post_delete event is dispatched after a lead note is deleted.
@@ -326,7 +317,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const NOTE_POST_DELETE = 'mautic.lead_note_post_delete';
+    public const NOTE_POST_DELETE = 'mautic.lead_note_post_delete';
 
     /**
      * The mautic.lead_import_pre_save event is dispatched right before an import is persisted.
@@ -336,7 +327,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_PRE_SAVE = 'mautic.lead_import_pre_save';
+    public const IMPORT_PRE_SAVE = 'mautic.lead_import_pre_save';
 
     /**
      * The mautic.lead_import_post_save event is dispatched right after an import is persisted.
@@ -346,7 +337,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_POST_SAVE = 'mautic.lead_import_post_save';
+    public const IMPORT_POST_SAVE = 'mautic.lead_import_post_save';
 
     /**
      * The mautic.lead_import_pre_delete event is dispatched before an import is deleted.
@@ -356,7 +347,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_PRE_DELETE = 'mautic.lead_import_pre_delete';
+    public const IMPORT_PRE_DELETE = 'mautic.lead_import_pre_delete';
 
     /**
      * The mautic.lead_import_post_delete event is dispatched after an import is deleted.
@@ -366,7 +357,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
+    public const IMPORT_POST_DELETE = 'mautic.lead_import_post_delete';
 
     /**
      * The mautic.lead_import_on_initialize event is dispatched when the import is being initialized.
@@ -376,7 +367,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_ON_INITIALIZE = 'mautic.lead_import_on_initialize';
+    public const IMPORT_ON_INITIALIZE = 'mautic.lead_import_on_initialize';
 
     /**
      * The mautic.lead_import_on_field_mapping event is dispatched when the import needs the list of fields for mapping.
@@ -386,7 +377,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_ON_FIELD_MAPPING = 'mautic.lead_import_on_field_mapping';
+    public const IMPORT_ON_FIELD_MAPPING = 'mautic.lead_import_on_field_mapping';
 
     /**
      * The mautic.lead_import_on_process event is dispatched when the import batch is processing.
@@ -396,7 +387,15 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
+    public const IMPORT_ON_PROCESS = 'mautic.lead_import_on_process';
+
+    /**
+     * The mautic.lead_import_on_validate event is dispatched when the import form is being validated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ImportEvent instance
+     */
+    public const IMPORT_ON_VALIDATE = 'mautic.lead_import_on_validate';
 
     /**
      * The mautic.lead_import_batch_processed event is dispatched after an import batch is processed.
@@ -406,7 +405,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const IMPORT_BATCH_PROCESSED = 'mautic.lead_import_batch_processed';
+    public const IMPORT_BATCH_PROCESSED = 'mautic.lead_import_batch_processed';
 
     /**
      * The mautic.lead_device_pre_save event is dispatched right before a lead device is persisted.
@@ -416,7 +415,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const DEVICE_PRE_SAVE = 'mautic.lead_device_pre_save';
+    public const DEVICE_PRE_SAVE = 'mautic.lead_device_pre_save';
 
     /**
      * The mautic.lead_device_post_save event is dispatched right after a lead device is persisted.
@@ -426,7 +425,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const DEVICE_POST_SAVE = 'mautic.lead_device_post_save';
+    public const DEVICE_POST_SAVE = 'mautic.lead_device_post_save';
 
     /**
      * The mautic.lead_device_pre_delete event is dispatched before a lead device is deleted.
@@ -436,7 +435,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const DEVICE_PRE_DELETE = 'mautic.lead_device_pre_delete';
+    public const DEVICE_PRE_DELETE = 'mautic.lead_device_pre_delete';
 
     /**
      * The mautic.lead_device_post_delete event is dispatched after a lead device is deleted.
@@ -446,7 +445,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const DEVICE_POST_DELETE = 'mautic.lead_device_post_delete';
+    public const DEVICE_POST_DELETE = 'mautic.lead_device_post_delete';
 
     /**
      * The mautic.lead_tag_pre_save event is dispatched right before a lead tag is persisted.
@@ -456,7 +455,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const TAG_PRE_SAVE = 'mautic.lead_tag_pre_save';
+    public const TAG_PRE_SAVE = 'mautic.lead_tag_pre_save';
 
     /**
      * The mautic.lead_tag_post_save event is dispatched right after a lead tag is persisted.
@@ -466,7 +465,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const TAG_POST_SAVE = 'mautic.lead_tag_post_save';
+    public const TAG_POST_SAVE = 'mautic.lead_tag_post_save';
 
     /**
      * The mautic.lead_tag_pre_delete event is dispatched before a lead tag is deleted.
@@ -476,7 +475,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const TAG_PRE_DELETE = 'mautic.lead_tag_pre_delete';
+    public const TAG_PRE_DELETE = 'mautic.lead_tag_pre_delete';
 
     /**
      * The mautic.lead_tag_post_delete event is dispatched after a lead tag is deleted.
@@ -486,7 +485,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
+    public const TAG_POST_DELETE = 'mautic.lead_tag_post_delete';
 
     /**
      * The mautic.filter_choice_fields event is dispatched when the list filter dropdown is populated.
@@ -496,7 +495,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
+    public const FILTER_CHOICE_FIELDS = 'mautic.filter_choice_fields';
 
     /**
      * The mautic.lead.on_campaign_trigger_action event is fired when the campaign action triggers.
@@ -506,7 +505,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.lead.on_campaign_trigger_action';
 
     /**
      * The mautic.lead.on_campaign_action_delete_contact event is dispatched when the campaign action to delete a contact is executed.
@@ -515,7 +514,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
+    public const ON_CAMPAIGN_ACTION_DELETE_CONTACT = 'mautic.lead.on_campaign_action_delete_contact';
 
     /**
      * The mautic.lead.on_campaign_action_add_donotcontact event is dispatched when the campaign action to add a donotcontact is executed.
@@ -524,7 +523,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT = 'mautic.lead.on_campaign_action_add_donotcontact';
+    public const ON_CAMPAIGN_ACTION_ADD_DONOTCONTACT = 'mautic.lead.on_campaign_action_add_donotcontact';
 
     /**
      * The mautic.lead.on_campaign_action_remove_donotcontact event is dispatched when the campaign action to remove a donotcontact is executed.
@@ -533,7 +532,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT = 'mautic.lead.on_campaign_action_remove_donotcontact';
+    public const ON_CAMPAIGN_ACTION_REMOVE_DONOTCONTACT = 'mautic.lead.on_campaign_action_remove_donotcontact';
 
     /**
      * The mautic.lead.on_campaign_trigger_condition event is fired when the campaign condition triggers.
@@ -543,7 +542,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
+    public const ON_CAMPAIGN_TRIGGER_CONDITION = 'mautic.lead.on_campaign_trigger_condition';
 
     /**
      * The mautic.company_pre_save event is thrown right before a form is persisted.
@@ -552,7 +551,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const COMPANY_PRE_SAVE = 'mautic.company_pre_save';
+    public const COMPANY_PRE_SAVE = 'mautic.company_pre_save';
 
     /**
      * The mautic.company_post_save event is thrown right after a form is persisted.
@@ -561,7 +560,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const COMPANY_POST_SAVE = 'mautic.company_post_save';
+    public const COMPANY_POST_SAVE = 'mautic.company_post_save';
 
     /**
      * The mautic.company_pre_delete event is thrown before a form is deleted.
@@ -570,7 +569,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const COMPANY_PRE_DELETE = 'mautic.company_pre_delete';
+    public const COMPANY_PRE_DELETE = 'mautic.company_pre_delete';
 
     /**
      * The mautic.company_post_delete event is thrown after a form is deleted.
@@ -579,7 +578,27 @@ final class LeadEvents
      *
      * @var string
      */
-    const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+    public const COMPANY_POST_DELETE = 'mautic.company_post_delete';
+
+    /**
+     * The mautic.company_pre_merge event is dispatched before two companies are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyMergeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_PRE_MERGE = 'mautic.company_pre_merge';
+
+    /**
+     * The mautic.company_post_merge event is dispatched after two companies are merged.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\CompanyMergeEvent instance.
+     *
+     * @var string
+     */
+    public const COMPANY_POST_MERGE = 'mautic.company_post_merge';
 
     /**
      * The mautic.list_filters_choices_on_generate event is dispatched when the choices for list filters are generated.
@@ -589,7 +608,14 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_FILTERS_CHOICES_ON_GENERATE = 'mautic.list_filters_choices_on_generate';
+    public const LIST_FILTERS_CHOICES_ON_GENERATE = 'mautic.list_filters_choices_on_generate';
+
+    /**
+     * The event is dispatched to allow inserting segment filters translations.
+     *
+     * The listener receives SegmentDictionaryGenerationEvent
+     */
+    public const SEGMENT_DICTIONARY_ON_GENERATE = 'mautic.list_dictionary_on_generate';
 
     /**
      * The mautic.list_filters_operators_on_generate event is dispatched when the operators for list filters are generated.
@@ -599,7 +625,55 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_FILTERS_OPERATORS_ON_GENERATE = 'mautic.list_filters_operators_on_generate';
+    public const LIST_FILTERS_OPERATORS_ON_GENERATE = 'mautic.list_filters_operators_on_generate';
+
+    /**
+     * The mautic.collect_filter_choices_for_list_field_type event is dispatched when some filter based on a list type needs to load its choices.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\ListFieldChoicesEvent
+     *
+     * @var string
+     */
+    public const COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE = 'mautic.collect_filter_choices_for_list_field_type';
+
+    /**
+     * The mautic.collect_operators_for_field_type event is dispatched when some filter needs operators for a field type.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TypeOperatorsEvent
+     *
+     * @var string
+     */
+    public const COLLECT_OPERATORS_FOR_FIELD_TYPE = 'mautic.collect_operators_for_field_type';
+
+    /**
+     * The mautic.collect_operators_for_field event is dispatched when some filter needs operators for a specific field.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\TypeOperatorsEvent
+     *
+     * @var string
+     */
+    public const COLLECT_OPERATORS_FOR_FIELD = 'mautic.collect_operators_for_field';
+
+    /**
+     * The mautic.adjust_filter_form_type_for_field event is dispatched when the segment filter form is built so events can add new or modify existing fields.
+     *
+     * The event listener receives a
+     * Symfony\Component\Form\FormEvent
+     *
+     * @var string
+     */
+    public const ADJUST_FILTER_FORM_TYPE_FOR_FIELD = 'mautic.adjust_filter_form_type_for_field';
+
+    /**
+     * The mautic.list_filters_delegate_decorator event id dispatched when decorator is delegated for segment filter.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent instance.
+     */
+    public const SEGMENT_ON_DECORATOR_DELEGATE = 'mautic.list_filters_delegate_decorator';
 
     /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
@@ -609,7 +683,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
+    public const LIST_FILTERS_ON_FILTERING = 'mautic.list_filters_on_filtering';
 
     /**
      * The mautic.list_filters_querybuilder_generated event is dispatched when the queryBuilder for segment was generated.
@@ -619,7 +693,17 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_FILTERS_QUERYBUILDER_GENERATED = 'mautic.list_filters_querybuilder_generated';
+    public const LIST_FILTERS_QUERYBUILDER_GENERATED = 'mautic.list_filters_querybuilder_generated';
+
+    /**
+     * The mautic.list_filters_operator_querybuilder_on_generate event is dispatched when the queryBuilder for segment filter operators is being generated.
+     *
+     * The event listener receives a
+     * Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent instance.
+     *
+     * @var string
+     */
+    public const LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE = 'mautic.list_filters_operator_querybuilder_on_generate';
 
     /**
      * The mautic.list_filters_on_filtering event is dispatched when the lists are updated.
@@ -629,7 +713,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
+    public const LIST_PRE_PROCESS_LIST = 'mautic.list_pre_process_list';
 
     /**
      * The mautic.clickthrough_contact_identification event is dispatched when a clickthrough array is parsed from a tracking
@@ -639,7 +723,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
+    public const ON_CLICKTHROUGH_IDENTIFICATION = 'mautic.clickthrough_contact_identification';
 
     /**
      * The mautic.lead_field_pre_add_column event is dispatched before adding a new column to lead_fields table.
@@ -649,7 +733,7 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_FIELD_PRE_ADD_COLUMN = 'mautic.lead_field_pre_add_column';
+    public const LEAD_FIELD_PRE_ADD_COLUMN = 'mautic.lead_field_pre_add_column';
 
     /**
      * The mautic.lead_field_pre_add_column_background_job event is dispatched before adding a new column to lead_fields table
@@ -660,5 +744,5 @@ final class LeadEvents
      *
      * @var string
      */
-    const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
+    public const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
 }

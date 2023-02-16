@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic, Na. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\AssetBundle\Entity;
 
 use Doctrine\ORM\NonUniqueResultException;
@@ -17,7 +8,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class AssetRepository.
+ * @extends CommonRepository<Asset>
  */
 class AssetRepository extends CommonRepository
 {
@@ -53,7 +44,7 @@ class AssetRepository extends CommonRepository
 
         if (!empty($search)) {
             $q->andWhere($q->expr()->like('a.title', ':search'))
-                ->setParameter('search', "{$search}%");
+                ->setParameter('search', "%{$search}%");
         }
 
         if (!$viewOther) {
@@ -151,7 +142,7 @@ class AssetRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

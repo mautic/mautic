@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\StageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -75,7 +66,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('stage:stages:edit');
                 foreach ($items as $item) {
                     $stagesResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticStageBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticStageBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -84,7 +75,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($stageCount > 5) {
                     $stagesResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticStageBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticStageBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

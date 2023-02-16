@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticClearbitBundle\Services;
 
 /**
@@ -16,8 +7,8 @@ namespace MauticPlugin\MauticClearbitBundle\Services;
  */
 class Clearbit_Base
 {
-    const REQUEST_LATENCY = 0.2;
-    const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
+    public const REQUEST_LATENCY = 0.2;
+    public const USER_AGENT      = 'mautic/clearbit-php-0.1.0';
 
     private $_next_req_time;
 

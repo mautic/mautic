@@ -64,26 +64,17 @@ $extraMenu = $view['menu']->render('extra');
 </div>
 <!--/ end: sidebar-header -->
 
-<!-- start: sidebar-content -->
 <div class="sidebar-content">
-    <!-- scroll-content -->
     <div class="scroll-content slimscroll">
-        <!-- start: navigation -->
         <nav class="nav-sidebar">
             <?php echo $view['content']->getCustomContent('menu.above', $mauticTemplateVars); ?>
             <?php echo $view['menu']->render('main'); ?>
 
-            <!-- start: left nav -->
             <ul class="nav sidebar-left-dark">
                 <li class="hidden-xs">
                     <a href="javascript:void(0)" data-toggle="minimize" class="sidebar-minimizer"><span class="direction icon pull-left fa"></span><span class="nav-item-name pull-left text"><?php echo $view['translator']->trans('mautic.core.menu.left.collapse'); ?></span></a>
                 </li>
             </ul>
-            <!--/ end: left nav -->
-
         </nav>
-        <!--/ end: navigation -->
     </div>
-    <!--/ scroll-content -->
 </div>
-<!--/ end: sidebar-content -->

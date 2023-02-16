@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Tests\Tracker;
 
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -20,6 +11,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -213,9 +205,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
             ->method('getIpAddress')
             ->willReturn(new IpAddress());
 
-        $this->leadRepositoryMock->expects($this->once())
-            ->method('getFieldValues');
-
         $this->contactTrackingServiceMock->expects($this->once())
             ->method('getTrackedLead')
             ->willReturn(null);
@@ -249,16 +238,6 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
         $lead2->method('getId')
             ->willReturn(2);
 
-        $this->dispatcherMock->expects($this->once())
-            ->method('hasListeners')
-            ->withConsecutive([LeadEvents::CURRENT_LEAD_CHANGED])
-            ->willReturn(true);
-
-        $this->dispatcherMock->expects($this->once())
-            ->method('dispatch')
-            ->withConsecutive([LeadEvents::CURRENT_LEAD_CHANGED, $this->anything()])
-            ->willReturn(true);
-
         $leadDevice1 = new LeadDevice();
         $leadDevice2 = new LeadDevice();
 
@@ -267,6 +246,16 @@ class ContactTrackerTest extends \PHPUnit\Framework\TestCase
 
         $this->deviceTrackerMock->method('getTrackedDevice')
             ->willReturnOnConsecutiveCalls($leadDevice1, $leadDevice2);
+
+        $this->dispatcherMock->expects($this->once())
+            ->method('hasListeners')
+            ->with(LeadEvents::CURRENT_LEAD_CHANGED)
+            ->willReturn(true);
+
+        $this->dispatcherMock->expects($this->once())
+            ->method('dispatch')
+            ->with(new LeadChangeEvent($lead, 'def456', $lead2, null), LeadEvents::CURRENT_LEAD_CHANGED)
+            ->willReturn(true);
 
         $contactTracker->setTrackedContact($lead);
         $contactTracker->setTrackedContact($lead2);

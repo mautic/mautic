@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Security\Provider;
 
 use Mautic\CoreBundle\Helper\EncryptionHelper;
@@ -27,9 +18,6 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-/**
- * Class UserProvider.
- */
 class UserProvider implements UserProviderInterface
 {
     /**
@@ -126,8 +114,7 @@ class UserProvider implements UserProviderInterface
      */
     public function supportsClass($class)
     {
-        return $this->userRepository->getClassName() === $class
-        || is_subclass_of($class, $this->userRepository->getClassName());
+        return User::class === $class || is_subclass_of($class, User::class);
     }
 
     /**
@@ -184,13 +171,13 @@ class UserProvider implements UserProviderInterface
         $event = new UserEvent($user, $isNew);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
-            $event = $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+            $event = $this->dispatcher->dispatch($event, UserEvents::USER_PRE_SAVE);
         }
 
         $this->userRepository->saveEntity($user);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
-            $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
         }
 
         return $user;

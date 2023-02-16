@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
@@ -70,7 +61,7 @@ class PublicController extends CommonController
                 $stat = $model->addStat($focus, Stat::TYPE_NOTIFICATION, $this->request, $lead);
                 if ($stat && $this->dispatcher->hasListeners(FocusEvents::FOCUS_ON_VIEW)) {
                     $event = new FocusViewEvent($stat);
-                    $this->dispatcher->dispatch(FocusEvents::FOCUS_ON_VIEW, $event);
+                    $this->dispatcher->dispatch($event, FocusEvents::FOCUS_ON_VIEW);
                     unset($event);
                 }
             }

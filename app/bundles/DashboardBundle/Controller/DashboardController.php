@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DashboardBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -38,8 +29,8 @@ class DashboardController extends AbstractFormController
      */
     public function indexAction()
     {
-        /** @var DashboardModel $model */
         $model   = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $widgets = $model->getWidgets();
 
         // Apply the default dashboard if no widget exists
@@ -90,7 +81,7 @@ class DashboardController extends AbstractFormController
                     'version'    => PhpVersionHelper::getCurrentSemver(),
                 ],
             ],
-            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.php',
+            'contentTemplate' => 'MauticDashboardBundle:Dashboard:index.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_dashboard_index',
                 'mauticContent' => 'dashboard',
@@ -118,7 +109,7 @@ class DashboardController extends AbstractFormController
         }
 
         $response = $this->render(
-            'MauticDashboardBundle:Dashboard:widget.html.php',
+            'MauticDashboardBundle:Dashboard:widget.html.twig',
             ['widget' => $widget]
         );
 
@@ -142,6 +133,7 @@ class DashboardController extends AbstractFormController
         $widget = new Widget();
 
         $model  = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'new']);
 
         //get the user form factory
@@ -175,7 +167,7 @@ class DashboardController extends AbstractFormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
-                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', [
+                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.twig', [
                     'widget' => $widget,
                 ]);
                 $passthroughVars['widgetId']     = $widget->getId();
@@ -189,7 +181,7 @@ class DashboardController extends AbstractFormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
+                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.twig',
             ]);
         }
     }
@@ -204,6 +196,7 @@ class DashboardController extends AbstractFormController
     public function editAction($objectId)
     {
         $model  = $this->getModel('dashboard');
+        \assert($model instanceof DashboardModel);
         $widget = $model->getEntity($objectId);
         $action = $this->generateUrl('mautic_dashboard_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
 
@@ -237,7 +230,7 @@ class DashboardController extends AbstractFormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['upWidgetCount'] = 1;
-                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.php', [
+                $passthroughVars['widgetHtml']    = $this->renderView('MauticDashboardBundle:Widget:detail.html.twig', [
                     'widget' => $widget,
                 ]);
                 $passthroughVars['widgetId']     = $widget->getId();
@@ -251,7 +244,7 @@ class DashboardController extends AbstractFormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.php',
+                'contentTemplate' => 'MauticDashboardBundle:Widget:form.html.twig',
             ]);
         }
     }
@@ -361,13 +354,15 @@ class DashboardController extends AbstractFormController
      */
     public function exportAction()
     {
+        $dashboardModel = $this->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
         $filename = InputHelper::filename($this->getNameFromRequest(), 'json');
-        $response = new JsonResponse($this->getModel('dashboard')->toArray($filename));
+        $response = new JsonResponse($dashboardModel->toArray($filename));
         $response->setEncodingOptions($response->getEncodingOptions() | JSON_PRETTY_PRINT);
         $response->headers->set('Content-Type', 'application/force-download');
         $response->headers->set('Content-Type', 'application/octet-stream');
         $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-        $response->headers->set('Expires', 0);
+        $response->headers->set('Expires', '0');
         $response->headers->set('Cache-Control', 'must-revalidate');
         $response->headers->set('Pragma', 'public');
 
@@ -394,7 +389,7 @@ class DashboardController extends AbstractFormController
             unlink($path);
         }
 
-        return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+        return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
     }
 
     /**
@@ -420,7 +415,7 @@ class DashboardController extends AbstractFormController
         if (!file_exists($path) || !is_readable($path)) {
             $this->addFlash('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
 
-            return $this->redirect($this->generateUrl('mautic_dashboard_action', ['objectAction' => 'import']));
+            return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
         }
 
         $widgets = json_decode(file_get_contents($path), true);
@@ -559,7 +554,7 @@ class DashboardController extends AbstractFormController
                     'widgets'    => $widgets,
                     'preview'    => $preview,
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.php',
+                'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dashboard_index',
                     'mauticContent' => 'dashboardImport',

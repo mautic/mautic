@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
@@ -24,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CampaignType.
@@ -35,9 +27,15 @@ class CampaignType extends AbstractType
      */
     private $security;
 
-    public function __construct(CorePermissions $security)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(CorePermissions $security, TranslatorInterface $translator)
     {
         $this->security   = $security;
+        $this->translator = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -73,9 +71,20 @@ class CampaignType extends AbstractType
             'bundle' => 'campaign',
         ]);
 
+        $attr = [];
         if (!empty($options['data']) && $options['data']->getId()) {
             $readonly = !$this->security->isGranted('campaign:campaigns:publish');
             $data     = $options['data']->isPublished(false);
+            $attr     = [
+                'onchange'              => 'Mautic.showCampaignConfirmation(mQuery(this));',
+                'data-toggle'           => 'confirmation',
+                'data-message'          => $this->translator->trans('mautic.campaign.form.confirmation.message'),
+                'data-confirm-text'     => $this->translator->trans('mautic.campaign.form.confirmation.confirm_text'),
+                'data-confirm-callback' => 'dismissConfirmation',
+                'data-cancel-text'      => $this->translator->trans('mautic.campaign.form.confirmation.cancel_text'),
+                'data-cancel-callback'  => 'setPublishedButtonToYes',
+                'class'                 => 'btn btn-default',
+            ];
         } elseif (!$this->security->isGranted('campaign:campaigns:publish')) {
             $readonly = true;
             $data     = false;
@@ -84,11 +93,11 @@ class CampaignType extends AbstractType
             $data     = false;
         }
 
+        $attr['readonly'] = $readonly;
+
         $builder->add('isPublished', YesNoButtonGroupType::class, [
             'data' => $data,
-            'attr' => [
-                'readonly' => $readonly,
-            ],
+            'attr' => $attr,
         ]);
 
         $builder->add('publishUp', DateTimeType::class, [
@@ -143,10 +152,5 @@ class CampaignType extends AbstractType
         $resolver->setDefaults([
             'data_class' => 'Mautic\CampaignBundle\Entity\Campaign',
         ]);
-    }
-
-    public function getBlockPrefix()
-    {
-        return 'campaign';
     }
 }

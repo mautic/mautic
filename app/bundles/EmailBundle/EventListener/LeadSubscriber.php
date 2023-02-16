@@ -1,29 +1,20 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\EventListener;
 
-use Mautic\EmailBundle\Entity\EmailReplyRepositoryInterface;
+use Mautic\EmailBundle\Entity\EmailReplyRepository;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var EmailReplyRepositoryInterface
+     * @var EmailReplyRepository
      */
     private $emailReplyRepository;
 
@@ -43,7 +34,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $router;
 
     public function __construct(
-        EmailReplyRepositoryInterface $emailReplyRepository,
+        EmailReplyRepository $emailReplyRepository,
         StatRepository $statRepository,
         TranslatorInterface $translator,
         RouterInterface $router
@@ -146,7 +137,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'stat' => $stat,
                             'type' => $state,
                         ],
-                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.php',
+                        'contentTemplate' => 'MauticEmailBundle:SubscribedEvents\Timeline:index.html.twig',
                         'icon'            => ('read' == $state) ? 'fa-envelope-o' : 'fa-envelope',
                         'contactId'       => $contactId,
                     ]

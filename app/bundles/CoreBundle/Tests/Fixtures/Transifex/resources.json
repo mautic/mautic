@@ -1,0 +1,52 @@
+{
+    "data": [
+        {
+            "attributes": {
+                "accept_translations": true,
+                "categories": [],
+                "datetime_created": "XXXX-XX-XXTXX:XX:XXZ",
+                "datetime_modified": "XXXX-XX-XXTXX:XX:XXZ",
+                "i18n_options": {
+                    "allow_duplicate_strings": true
+                },
+                "i18n_version": 1,
+                "mp4_url": "https://some.host.net/some_mp4_url",
+                "name": "Resource Name",
+                "ogg_url": "https://some.host.net/some_ogg_url",
+                "priority": "normal",
+                "slug": "webhookbundle-messages",
+                "string_count": 0,
+                "webm_url": "https://some.host.net/some_webm_url",
+                "word_count": 0,
+                "youtube_url": "https://www.youtube.com/"
+            },
+            "id": "o:mautic:p:mautic:r:webhookbundle-messages",
+            "links": {
+                "self": "/resources/o:mautic:p:mautic:r:webhookbundle-messages"
+            },
+            "relationships": {
+                "i18n_format": {
+                    "data": {
+                        "id": "YML_KEY",
+                        "type": "i18n_formats"
+                    }
+                },
+                "project": {
+                    "data": {
+                        "id": "o:mautic:p:mautic",
+                        "type": "projects"
+                    },
+                    "links": {
+                        "related": "/projects/o:mautic:p:mautic"
+                    }
+                }
+            },
+            "type": "resources"
+        }
+    ],
+    "links": {
+        "next": "/resources?filter[project]=o:mautic:p:mautic&page[cursor]=XXX",
+        "previous": "/resources?filter[project]=o:mautic:p:mautic&page[cursor]=XXX",
+        "self": "/resources?filter[project]=o:mautic:p:mautic"
+    }
+}

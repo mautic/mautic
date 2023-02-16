@@ -1,21 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\ORM\Query\Expr\Join;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FormRepository.
+ * @extends CommonRepository<Form>
  */
 class FormRepository extends CommonRepository
 {
@@ -210,6 +201,14 @@ class FormRepository extends CommonRepository
     public function getResultsTableName($formId, $formAlias)
     {
         return MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_'.$formAlias;
+    }
+
+    public function getFormTableIdViaResults(string $resultsTableName): ?string
+    {
+        $regexp = '/.*'.MAUTIC_TABLE_PREFIX.'form_results_([0-9]+)_(.*)/i';
+        preg_match($regexp, $resultsTableName, $matches);
+
+        return $matches[1] ?? null;
     }
 
     /**

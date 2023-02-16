@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Callback;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
@@ -18,21 +9,21 @@ use Mautic\LeadBundle\Entity\DoNotContact;
  */
 class CallbackEnum
 {
-    const BOUNCE           = 'bounce';
-    const OUT_OF_BAND      = 'out_of_band';
-    const POLICY_REJECTION = 'policy_rejection';
-    const SPAM_COMPLAINT   = 'spam_complaint';
-    const LIST_UNSUBSCRIBE = 'list_unsubscribe';
-    const LINK_UNSUBSCRIBE = 'link_unsubscribe';
+    public const BOUNCE           = 'bounce';
+    public const OUT_OF_BAND      = 'out_of_band';
+    public const POLICY_REJECTION = 'policy_rejection';
+    public const SPAM_COMPLAINT   = 'spam_complaint';
+    public const LIST_UNSUBSCRIBE = 'list_unsubscribe';
+    public const LINK_UNSUBSCRIBE = 'link_unsubscribe';
 
-    const BOUNCE_CLASS_INVALID_RECIPIENT     = 10;
-    const BOUNCE_CLASS_GENERIC               = 30;
-    const BOUNCE_CLASS_MAIL_BLOCK            = 50;
-    const BOUNCE_CLASS_SPAM_BLOCK            = 51;
-    const BOUNCE_CLASS_SPAM_CONTENT          = 52;
-    const BOUNCE_CLASS_PROHIBITED_ATTACHMENT = 53;
-    const BOUNCE_CLASS_RELAYING_DENIED       = 54;
-    const BOUNCE_CLASS_UNSUBSCRIBE           = 90;
+    public const BOUNCE_CLASS_INVALID_RECIPIENT     = 10;
+    public const BOUNCE_CLASS_GENERIC               = 30;
+    public const BOUNCE_CLASS_MAIL_BLOCK            = 50;
+    public const BOUNCE_CLASS_SPAM_BLOCK            = 51;
+    public const BOUNCE_CLASS_SPAM_CONTENT          = 52;
+    public const BOUNCE_CLASS_PROHIBITED_ATTACHMENT = 53;
+    public const BOUNCE_CLASS_RELAYING_DENIED       = 54;
+    public const BOUNCE_CLASS_UNSUBSCRIBE           = 90;
 
     /**
      * @param string $event

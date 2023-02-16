@@ -41,7 +41,7 @@ $indexCount = 1;
             ?>
             <?php $isRequired = !empty($child->vars['attr']['data-required']); ?>
             <?php if (0 == $rowCount % $numberOfFields):  ?>
-            <div id="<?php echo $object; ?>-<?php echo $rowCount; ?>" class="field-container row<?php if (5 !== $numberOfFields): echo ' pb-md'; endif; ?>">
+            <div id="<?php echo $object; ?> - <?php echo $rowCount; ?>" class="field-container row<?php if (5 !== $numberOfFields): echo ' pb-md'; endif; ?>">
             <?php endif; ?>
             <?php ++$rowCount; ?>
             <?php
@@ -138,8 +138,8 @@ $indexCount = 1;
 
                     </optgroup>
                     <?php else : ?>
-                    <option value="<?php echo $view->escape($keyLabel); ?>" <?php if ($keyLabel === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $keyLabel): echo 'selected'; endif; ?>>
-                        <?php echo $options; ?>
+                    <option value="<?php echo $view->escape($options); ?>" <?php if ($options === $child->vars['data']): echo 'selected'; $selected = true; elseif (empty($selected) && '-1' == $options): echo 'selected'; endif; ?>>
+                        <?php echo $view['translator']->trans($keyLabel); ?>
                     </option>
                     <?php endif; ?>
                     <?php endforeach; ?>

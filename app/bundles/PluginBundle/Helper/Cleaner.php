@@ -1,23 +1,14 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\Helper;
 
 class Cleaner
 {
-    const FIELD_TYPE_STRING   = 'string';
-    const FIELD_TYPE_BOOL     = 'boolean';
-    const FIELD_TYPE_NUMBER   = 'number';
-    const FIELD_TYPE_DATETIME = 'datetime';
-    const FIELD_TYPE_DATE     = 'date';
+    public const FIELD_TYPE_STRING   = 'string';
+    public const FIELD_TYPE_BOOL     = 'boolean';
+    public const FIELD_TYPE_NUMBER   = 'number';
+    public const FIELD_TYPE_DATETIME = 'datetime';
+    public const FIELD_TYPE_DATE     = 'date';
 
     /**
      * @param $value

@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -229,10 +220,17 @@ JS;
             null,
             true
         );
+        $froogaloop2       = $this->assetsHelper->getUrl(
+            'app/bundles/CoreBundle/Assets/js/libraries/froogaloop2.min.js',
+            null,
+            null,
+            true
+        );
 
         $mauticBaseUrl   = str_replace('/index_dev.php', '', $mauticBaseUrl);
         $mediaElementCss = str_replace('/index_dev.php', '', $mediaElementCss);
         $jQueryUrl       = str_replace('/index_dev.php', '', $jQueryUrl);
+        $froogaloop2     = str_replace('/index_dev.php', '', $froogaloop2);
 
         $mediaElementJs = <<<'JS'
 /*!
@@ -282,7 +280,7 @@ MauticJS.initGatedVideo = function () {
     }
 
     if ("undefined" == typeof Froogaloop && "undefined" == typeof MauticJS.mauticInsertedScripts.Froogaloop) {
-        MauticJS.insertScript('https://f.vimeocdn.com/js/froogaloop2.min.js');
+        MauticJS.insertScript('{$froogaloop2}');
         MauticJS.mauticInsertedScripts.Froogaloop = true;
     }
     
@@ -446,7 +444,7 @@ MauticJS.processGatedVideos = function (videoElements) {
                                     }
                                     
                                     // Set a cookie to prevent showing the same form again
-                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7; 
+                                    document.cookie = cookieName+"=true; max-age=" + 60 * 60 * 24 * 7+"; secure"; 
                                 } 
                                 
                                 if (data.message) {

@@ -1,29 +1,7 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 return [
     'services' => [
-        'events' => [
-            'mautic.queue.rabbitmq.subscriber' => [
-                'class'     => \Mautic\QueueBundle\EventListener\RabbitMqSubscriber::class,
-                'arguments' => 'service_container',
-            ],
-            'mautic.queue.beanstalkd.subscriber' => [
-                'class'     => \Mautic\QueueBundle\EventListener\BeanstalkdSubscriber::class,
-                'arguments' => [
-                    'service_container',
-                    'mautic.queue.service',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.queue.service' => [
                 'class'     => \Mautic\QueueBundle\Queue\QueueService::class,

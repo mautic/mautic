@@ -1,33 +1,21 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Entity;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * UserRepository.
+ * @extends CommonRepository<User>
  */
 class UserRepository extends CommonRepository
 {
     /**
      * Find user by username or email.
-     *
-     * @param $identifier
-     *
-     * @return array|null
      */
-    public function findByIdentifier($identifier)
+    public function findByIdentifier(string $identifier): ?User
     {
         $q = $this->createQueryBuilder('u')
             ->where('u.username = :identifier OR u.email = :identifier')
@@ -35,7 +23,7 @@ class UserRepository extends CommonRepository
 
         $result = $q->getQuery()->getResult();
 
-        return (null != $result) ? $result[0] : null;
+        return (null !== $result) ? $result[0] : null;
     }
 
     /**
@@ -294,11 +282,19 @@ class UserRepository extends CommonRepository
                 $returnParameter = true;
                 break;
             case $this->translator->trans('mautic.core.searchcommand.name'):
-                case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
-                $expr = $q->expr()->orX(
-                    $q->expr()->like('u.firstName', ':'.$unique),
-                    $q->expr()->like('u.lastName', ':'.$unique)
-                );
+            case $this->translator->trans('mautic.core.searchcommand.name', [], null, 'en_US'):
+                // This if/else can be removed once we upgrade to Dotrine 2.11 as both builders have the or() method there.
+                if ($q instanceof QueryBuilder) {
+                    $expr = $q->expr()->or(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                } else {
+                    $expr = $q->expr()->orX(
+                        $q->expr()->like('u.firstName', ':'.$unique),
+                        $q->expr()->like('u.lastName', ':'.$unique)
+                    );
+                }
                 $returnParameter = true;
                 break;
         }

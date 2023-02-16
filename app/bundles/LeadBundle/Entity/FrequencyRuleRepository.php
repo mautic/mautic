@@ -1,20 +1,11 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FrequecyRuleRepository.
+ * @extends CommonRepository<FrequencyRule>
  */
 class FrequencyRuleRepository extends CommonRepository
 {
@@ -44,7 +35,7 @@ class FrequencyRuleRepository extends CommonRepository
 
         $violations = $this->getCustomFrequencyRuleViolations($channel, $leadIds, $statTable, $statContactColumn, $statSentColumn);
 
-        if ($defaultFrequencyTime && $defaultFrequencyTime) {
+        if ($defaultFrequencyNumber && $defaultFrequencyTime) {
             $violations = array_merge(
                 $violations,
                 $this->getDefaultFrequencyRuleViolations(

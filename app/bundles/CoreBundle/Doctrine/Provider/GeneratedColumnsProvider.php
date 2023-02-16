@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Doctrine\Provider;
 
 use Mautic\CoreBundle\CoreEvents;
@@ -25,14 +16,14 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
      *
      * @see https://dev.mysql.com/doc/refman/5.7/en/innodb-foreign-key-constraints.html#innodb-foreign-key-generated-columns
      */
-    const MYSQL_MINIMUM_VERSION = '5.7.14';
+    public const MYSQL_MINIMUM_VERSION = '5.7.14';
 
     /**
      * @var string
      *
      * @see https://mariadb.com/kb/en/library/generated-columns
      */
-    const MARIADB_MINIMUM_VERSION = '10.2.6';
+    public const MARIADB_MINIMUM_VERSION = '10.2.6';
 
     /**
      * @var VersionProviderInterface
@@ -65,7 +56,7 @@ final class GeneratedColumnsProvider implements GeneratedColumnsProviderInterfac
 
         if ($this->generatedColumnsAreSupported()) {
             $event = new GeneratedColumnsEvent();
-            $this->dispatcher->dispatch(CoreEvents::ON_GENERATED_COLUMNS_BUILD, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::ON_GENERATED_COLUMNS_BUILD);
             $this->generatedColumns = $event->getGeneratedColumns();
         } else {
             $this->generatedColumns = new GeneratedColumns();

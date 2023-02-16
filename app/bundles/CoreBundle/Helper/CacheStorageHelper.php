@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -22,9 +13,9 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class CacheStorageHelper
 {
-    const ADAPTOR_DATABASE = 'db';
+    public const ADAPTOR_DATABASE = 'db';
 
-    const ADAPTOR_FILESYSTEM = 'fs';
+    public const ADAPTOR_FILESYSTEM = 'fs';
 
     /**
      * @var array

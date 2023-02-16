@@ -1,18 +1,10 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
 use Swift_Transport;
@@ -32,18 +24,19 @@ class ProcessEmailQueueCommand extends ModeratedCommand
     private EventDispatcherInterface $eventDispatcher;
     private CoreParametersHelper $parametersHelper;
 
-    public function __construct(Swift_Transport $swiftTransport, EventDispatcherInterface $eventDispatcher, CoreParametersHelper $parametersHelper)
-    {
-        parent::__construct();
+    public function __construct(
+        Swift_Transport $swiftTransport,
+        EventDispatcherInterface $eventDispatcher,
+        CoreParametersHelper $parametersHelper,
+        PathsHelper $pathsHelper
+    ) {
+        parent::__construct($pathsHelper);
 
         $this->swiftTransport   = $swiftTransport;
         $this->eventDispatcher  = $eventDispatcher;
         $this->parametersHelper = $parametersHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -65,10 +58,7 @@ EOT
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $options     = $input->getOptions();
         $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
@@ -129,7 +119,7 @@ EOT
                         $tryAgain = false;
                         if ($this->eventDispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
                             $event = new QueueEmailEvent($message);
-                            $this->eventDispatcher->dispatch(EmailEvents::EMAIL_RESEND, $event);
+                            $this->eventDispatcher->dispatch($event, EmailEvents::EMAIL_RESEND);
                             $tryAgain = $event->shouldTryAgain();
                         }
 
@@ -138,7 +128,7 @@ EOT
                         } catch (\Swift_TransportException $e) {
                             if (!$tryAgain && $this->eventDispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
                                 $event = new QueueEmailEvent($message);
-                                $this->eventDispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+                                $this->eventDispatcher->dispatch($event, EmailEvents::EMAIL_FAILED);
                             }
                         }
                     } else {
@@ -197,7 +187,7 @@ EOT
         $this->completeRun();
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         return 0;

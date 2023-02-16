@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\EmailBundle\Tests\Model;
 
 use Doctrine\ORM\EntityManager;
@@ -382,7 +373,7 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, EmailSendEvent $event) {
+                function (EmailSendEvent $event, $eventName) {
                     $lead = $event->getLead();
 
                     $tokens = [];

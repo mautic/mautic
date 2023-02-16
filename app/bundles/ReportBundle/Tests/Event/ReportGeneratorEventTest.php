@@ -2,21 +2,16 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\Tests\Event;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
@@ -44,8 +39,6 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->report               = $this->createMock(Report::class);
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
@@ -295,5 +288,33 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
       ->method('leftJoin');
 
         $this->reportGeneratorEvent->addCompanyLeftJoin($this->queryBuilder, ReportGeneratorEvent::COMPANY_PREFIX);
+    }
+
+    public function testApplyTagFilter(): void
+    {
+        $connection           = $this->createMock(Connection::class);
+        $connection->method('createQueryBuilder')->willReturn(new QueryBuilder($connection));
+        $connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($connection));
+        $this->queryBuilder->method('getConnection')->willReturn($connection);
+
+        $groupExpr = new CompositeExpression(CompositeExpression::TYPE_AND);
+        $filters   = [
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['1', '2'],
+                'condition' => 'in',
+            ],
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
+        ];
+
+        $this->reportGeneratorEvent->applyTagFilter($groupExpr, $filters[0]);
+        $this->reportGeneratorEvent->applyTagFilter($groupExpr, $filters[1]);
+        Assert::assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
     }
 }

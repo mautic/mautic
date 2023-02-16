@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CampaignBundle\Tests\Event;
 
 use Mautic\AssetBundle\Form\Type\PointActionAssetDownloadType;
@@ -84,7 +75,7 @@ class CampaignBuilderEventTest extends CampaignTestAbstract
             'label'       => 'mautic.form.campaign.event.field_value',
             'description' => 'mautic.form.campaign.event.field_value_descr',
             'formType'    => CampaignEventFormFieldValueType::class,
-            'formTheme'   => 'MauticFormBundle:FormTheme\FieldValueCondition',
+            'formTheme'   => 'MauticFormBundle:FormTheme:FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
             'eventName'   => 'mautic.form.on_campaign_trigger_condition',
         ];
         $event = $this->initEvent();

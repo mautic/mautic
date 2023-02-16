@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\InstallBundle\Configurator\Step;
 
 use Mautic\CoreBundle\Configurator\Configurator;
@@ -143,7 +134,7 @@ class DoctrineStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:doctrine.html.php';
+        return 'MauticInstallBundle:Install:doctrine.html.twig';
     }
 
     /**

@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
@@ -55,7 +55,7 @@ if (defined('MAUTIC_INSTALLER')) {
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
     'router' => [
-        'resource'            => '%kernel.root_dir%/config/routing.php',
+        'resource'            => '%kernel.project_dir%/app/config/routing.php',
         'strict_requirements' => null,
     ],
     'form'            => null,
@@ -77,12 +77,37 @@ $container->loadFromExtension('framework', [
         'fallback' => 'en_US',
     ],
     'session'         => [ //handler_id set to null will use default session handler from php.ini
-        'handler_id'    => null,
-        'name'          => '%env(MAUTIC_SESSION_NAME)%',
-        'cookie_secure' => $secureCookie,
+        'handler_id'           => null,
+        'name'                 => '%env(MAUTIC_SESSION_NAME)%',
+        'cookie_secure'        => $secureCookie,
+        'cookie_samesite'      => 'lax',
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'messenger'            => [
+        'default_bus' => 'email.bus',
+        'buses'       => [
+            'email.bus' => null,
+        ],
+        'transports'  => [
+            'email_transport' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
+                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
+                ],
+                'retry_strategy' => [
+                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
+                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
+                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
+                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                ],
+            ],
+        ],
+        'routing' => [
+            // TODO: Enable this line when you want to merge symfony/mailer
+            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+        ],
+    ],
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
@@ -118,7 +143,23 @@ $dbalSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
+    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
+
+if (!empty($localConfigParameterBag->get('db_host_ro'))) {
+    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['keep_replica']    = true;
+    $dbalSettings['replicas']        = [
+        'replica1' => [
+            'host'                  => '%mautic.db_host_ro%',
+            'port'                  => '%mautic.db_port%',
+            'dbname'                => '%mautic.db_name%',
+            'user'                  => '%mautic.db_user%',
+            'password'              => '%mautic.db_password%',
+            'charset'               => 'utf8mb4',
+        ],
+    ];
+}
 
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
@@ -126,16 +167,21 @@ $container->loadFromExtension('doctrine', [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
         'mappings'                    => $bundleMetadataBuilder->getOrmConfig(),
+        'dql'                         => [
+            'string_functions' => [
+                'match' => \DoctrineExtensions\Query\Mysql\MatchAgainst::class,
+            ],
+        ],
     ],
 ]);
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'        => '%kernel.root_dir%/migrations',
+    'dir_name'        => '%kernel.project_dir%/app/migrations',
     'namespace'       => 'Mautic\\Migrations',
     'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
     'name'            => 'Mautic Migrations',
-    'custom_template' => '%kernel.root_dir%/migrations/Migration.template',
+    'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
 // Swiftmailer Configuration
@@ -296,7 +342,7 @@ $container->loadFromExtension('fm_elfinder', [
     'assets_path' => 'media/assets',
     'instances'   => [
         'default' => [
-            'locale'          => 'LANG',
+            'locale'          => '%mautic.locale%',
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
@@ -321,15 +367,12 @@ $container->loadFromExtension('fm_elfinder', [
                 ],
                 'roots' => [
                     'local' => [
-                        'driver'    => 'Flysystem',
-                        'path'      => '',
-                        'flysystem' => [
-                            'type'    => 'local',
-                            'options' => [
-                                'local' => [
-                                    'path' => '%env(resolve:MAUTIC_EL_FINDER_PATH)%',
-                                ],
-                            ],
+                        'driver'        => 'Flysystem',
+                        'path'          => '',
+                        'flysystem'     => [
+                            'type'            => 'custom',
+                            'adapter_service' => 'mautic.core.service.local_file_adapter',
+                            'options'         => [],
                         ],
                         'upload_allow'  => ['image/png', 'image/jpg', 'image/jpeg', 'image/gif'],
                         'upload_deny'   => ['all'],

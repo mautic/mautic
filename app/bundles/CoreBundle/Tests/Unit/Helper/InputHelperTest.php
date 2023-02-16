@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -34,6 +25,12 @@ class InputHelperTest extends TestCase
         $html5DoctypeWithContent = '<!DOCTYPE html>
         <html>
         </html>';
+        $html5DoctypeWithUnicodeContent = '<!DOCTYPE html>
+        <html>
+        <body>
+            <a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>
+        </body>
+        </html>';
         $xhtml1Doctype = '<!DOCTYPE html PUBLIC
   "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
@@ -42,14 +39,15 @@ class InputHelperTest extends TestCase
         $unicode = '<a href="https://m3.mautibox.com/3.x/media/images/testá.png">test with unicode</a>';
 
         $samples = [
-            $outlookXML                => $outlookXML,
-            $html5Doctype              => $html5Doctype,
-            $html5DoctypeWithContent   => $html5DoctypeWithContent,
-            $xhtml1Doctype             => $xhtml1Doctype,
-            $cdata                     => $cdata,
-            $script                    => $script,
-            $unicode                   => $unicode,
-            '<applet>content</applet>' => 'content',
+            $outlookXML                     => $outlookXML,
+            $html5Doctype                   => $html5Doctype,
+            $html5DoctypeWithContent        => $html5DoctypeWithContent,
+            $html5DoctypeWithUnicodeContent => $html5DoctypeWithUnicodeContent,
+            $xhtml1Doctype                  => $xhtml1Doctype,
+            $cdata                          => $cdata,
+            $script                         => $script,
+            $unicode                        => $unicode,
+            '<applet>content</applet>'      => 'content',
         ];
 
         foreach ($samples as $sample => $expected) {
@@ -67,7 +65,7 @@ class InputHelperTest extends TestCase
     {
         $clean = InputHelper::email('john..doe@email.com');
 
-        $this->assertEquals('john.doe@email.com', $clean);
+        $this->assertEquals('john..doe@email.com', $clean);
     }
 
     /**

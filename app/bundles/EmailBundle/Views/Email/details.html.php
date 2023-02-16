@@ -46,8 +46,8 @@ if (empty($emailType)) {
 $customButtons = [];
 if (!$isEmbedded) {
     if ('list' == $emailType) {
-        $customButtons[] = [
-            'attr' => [
+        $sendButton             = [
+            'attr'      => [
                 'data-toggle' => 'ajax',
                 'href'        => $view['router']->path(
                     'mautic_email_action',
@@ -58,6 +58,14 @@ if (!$isEmbedded) {
             'btnText'   => 'mautic.email.send',
             'primary'   => true,
         ];
+
+        if ($email->isBackgroundSending()) {
+            $sendButton['attr']['href']     = 'javascript:void(0);';
+            $sendButton['attr']['disabled'] = true;
+            $sendButton['tooltip']          = 'mautic.email.send.disabled';
+        }
+
+        $customButtons[] = $sendButton;
     }
 
     $customButtons[] = [
@@ -203,14 +211,6 @@ if (!$isEmbedded) {
                                 </tr>
                             <?php endif; ?>
 
-                            <?php if (!empty($pending)): ?>
-                            <tr>
-                                <td width="20%">
-                                    <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.pending'); ?></span>
-                                </td>
-                                <td><?php echo $pending; ?></td>
-                            </tr>
-                            <?php endif; ?>
                             <tr>
                                 <td width="20%">
                                     <span class="fw-b"><?php echo $view['translator']->trans('mautic.email.stat.sent'); ?></span>

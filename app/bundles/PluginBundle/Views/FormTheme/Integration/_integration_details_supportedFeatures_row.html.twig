@@ -1,0 +1,30 @@
+{% block _integration_details_supportedFeatures_row %}
+  {% set attr = form.vars.attr %}
+  {% set builtin = formSettings.builtin_features|default([]) %}
+  {% set showLabel = builtin|length != form.children|length %}
+  <div class="row">
+      <div class="col-sm-12">
+          {% if showLabel %}
+              <h4 class="mb-sm">{{ form.vars['label']|trans }}</h4>
+          {% endif %}
+          {% if formNotes.supported_features is defined and formNotes.supported_features is not empty %}
+              <div class="alert alert-{{ formNotes['supported_features']['type'] }}">
+                  {{ formNotes['supported_features']['note']|trans }}
+              </div>
+          {% endif %}
+          {% for child in form.children %}
+              {% if child.vars.value not in builtin %}
+                <div class="checkbox" >
+                    <label>
+                        {{ form_widget(child, {'attr': attr}) }}
+                        {{ child.vars.label|trans }}
+                    </label>
+                </div>
+              {% else %}
+                  {{ child.isRendered() }}
+                  <input type="hidden" id="{{ child.vars['id'] }}" name="{{ child.vars['full_name'] }}" value="{{ child.vars['value']|e }}" />
+              {% endif %}
+          {% endfor %}
+      </div>
+  </div>
+{% endblock %}

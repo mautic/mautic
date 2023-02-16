@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2017 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -57,7 +48,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description'            => 'mautic.focus.campaign.event.show_focus_descr',
             'eventName'              => FocusEvents::ON_CAMPAIGN_TRIGGER_ACTION,
             'formType'               => FocusShowType::class,
-            'formTheme'              => 'MauticFocusBundle:FormTheme\FocusShowList',
+            'formTheme'              => 'MauticFocusBundle:FormTheme:FocusShowList/_focusshow_list_row.html.twig',
             'formTypeOptions'        => ['update_select' => 'campaignevent_properties_focus'],
             'connectionRestrictions' => [
                 'anchor' => [

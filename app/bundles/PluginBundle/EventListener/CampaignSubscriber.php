@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\PluginBundle\EventListener;
 
 use Mautic\CampaignBundle\CampaignEvents;
@@ -39,7 +30,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
             'formType'    => IntegrationsListType::class,
-            'formTheme'   => 'MauticPluginBundle:FormTheme\Integration',
+            'formTheme'   => 'MauticPluginBundle:FormTheme:Integration/campaign_builder_layout.html.twig',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
 

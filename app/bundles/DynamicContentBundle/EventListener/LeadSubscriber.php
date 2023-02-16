@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2016 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\DynamicContentBundle\EventListener;
 
 use Mautic\DynamicContentBundle\Entity\StatRepository;
@@ -17,7 +8,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -64,7 +55,7 @@ class LeadSubscriber implements EventSubscriberInterface
     {
         // Set available event types
         $eventTypeKey      = 'dynamic.content.sent';
-        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.sent');
+        $eventTypeNameSent = $this->translator->trans('mautic.dynamic.content.triggered');
         $event->addEventType($eventTypeKey, $eventTypeNameSent);
         $event->addSerializerGroup('dwcList');
 
@@ -100,8 +91,8 @@ class LeadSubscriber implements EventSubscriberInterface
                                 'stat' => $stat,
                                 'type' => 'sent',
                             ],
-                            'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
-                            'icon'            => 'fa-envelope',
+                            'contentTemplate' => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.twig',
+                            'icon'            => 'fa-puzzle-piece',
                             'contactId'       => $contactId,
                         ]
                     );

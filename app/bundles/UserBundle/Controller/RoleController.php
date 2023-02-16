@@ -1,19 +1,12 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\UserBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\UserBundle\Entity as Entity;
+use Mautic\UserBundle\Model\RoleModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
 
 class RoleController extends FormController
@@ -44,7 +37,8 @@ class RoleController extends FormController
         $filter     = $this->request->get('search', $this->get('session')->get('mautic.role.filter', ''));
         $tmpl       = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
         $model      = $this->getModel('user.role');
-        $items      = $model->getEntities(
+        \assert($model instanceof RoleModel);
+        $items = $model->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -68,7 +62,7 @@ class RoleController extends FormController
                     'page' => $lastPage,
                     'tmpl' => $tmpl,
                 ],
-                'contentTemplate' => 'MauticUserBundle:Role:index',
+                'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_role_index',
                     'mauticContent' => 'role',
@@ -98,7 +92,7 @@ class RoleController extends FormController
                     'delete' => $this->get('mautic.security')->isGranted('user:roles:delete'),
                 ],
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:list.html.php',
+            'contentTemplate' => 'MauticUserBundle:Role:list.html.twig',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_role_index', ['page' => $page]),
                 'mauticContent' => 'role',
@@ -120,6 +114,7 @@ class RoleController extends FormController
         //retrieve the entity
         $entity = new Entity\Role();
         $model  = $this->getModel('user.role');
+        \assert($model instanceof RoleModel);
 
         //set the return URL for post actions
         $returnUrl = $this->generateUrl('mautic_role_index');
@@ -156,11 +151,11 @@ class RoleController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticUserBundle:Role:index',
+                    'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_role_index',
                         'mauticContent' => 'role',
@@ -173,10 +168,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_new',
                 'route'          => $this->generateUrl('mautic_role_action', ['objectAction' => 'new']),
@@ -213,7 +208,7 @@ class RoleController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'mauticContent' => 'role',
@@ -254,7 +249,7 @@ class RoleController extends FormController
                     $model->setRolePermissions($entity, $permissions);
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
@@ -270,7 +265,7 @@ class RoleController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect($postActionVars);
             } else {
                 //the form has to be rebuilt because the permissions were updated
@@ -284,10 +279,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.php',
+            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_index',
                 'route'          => $action,
@@ -371,7 +366,7 @@ class RoleController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'success'       => $success,
@@ -379,9 +374,10 @@ class RoleController extends FormController
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             try {
-                $model  = $this->getModel('user.role');
+                $model = $this->getModel('user.role');
+                \assert($model instanceof RoleModel);
                 $entity = $model->getEntity($objectId);
 
                 if (null === $entity) {
@@ -433,18 +429,19 @@ class RoleController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticUserBundle:Role:index',
+            'contentTemplate' => 'Mautic\UserBundle\Controller\RoleController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_role_index',
                 'mauticContent' => 'role',
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model       = $this->getModel('user.role');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            /** @var RoleModel $model */
+            $model = $this->getModel('user.role');
+            \assert($model instanceof RoleModel);
             $ids         = json_decode($this->request->query->get('ids', ''));
             $deleteIds   = [];
-            $currentUser = $this->user;
 
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {

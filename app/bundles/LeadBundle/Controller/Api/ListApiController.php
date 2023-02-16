@@ -1,29 +1,33 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<LeadList>
+ */
 class ListApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var ListModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('lead.list');
+        $listModel = $this->getModel('lead.list');
+        \assert($listModel instanceof ListModel);
+
+        $this->model            = $listModel;
         $this->entityClass      = LeadList::class;
         $this->entityNameOne    = 'list';
         $this->entityNameMulti  = 'lists';
@@ -33,13 +37,43 @@ class ListApiController extends CommonApiController
     }
 
     /**
+     * @deprecated This conversion won't be needed in couple of years.
+     *
+     * The 'filter' and 'display' fields used to be part of each segment filter root array.
+     * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
+     * from filter root array so Symfony forms would not fail with unknown field error.
+     */
+    protected function prepareParametersForBinding($parameters, $entity, $action)
+    {
+        if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
+            return $parameters;
+        }
+
+        foreach ($parameters['filters'] as $key => $filter) {
+            $bcFilterValue                                       = $filter['filter'] ?? null;
+            $filterValue                                         = $filter['properties']['filter'] ?? $bcFilterValue;
+            $parameters['filters'][$key]['properties']['filter'] = $filterValue;
+
+            if (!empty($filter['display']) && !isset($filter['properties']['display'])) {
+                $parameters['filters'][$key]['properties']['display'] = $filter['display'];
+            }
+
+            unset($parameters['filters'][$key]['filter'], $parameters['filters'][$key]['display']);
+        }
+
+        return $parameters;
+    }
+
+    /**
      * Obtains a list of smart lists for the user.
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getListsAction()
     {
-        $lists   = $this->getModel('lead.list')->getUserLists();
+        $listModel = $this->getModel('lead.list');
+        \assert($listModel instanceof ListModel);
+        $lists   = $listModel->getUserLists();
         $view    = $this->view($lists, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['leadListList']);
         $view->setContext($context);
@@ -76,7 +110,9 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->addToLists($leadId, $entity);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $leadModel->addToLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 
@@ -117,8 +153,10 @@ class ListApiController extends CommonApiController
             if ($contact instanceof Response) {
                 $responseDetail[$contactId] = ['success' => false];
             } else {
+                $leadModel = $this->getModel('lead');
+                \assert($leadModel instanceof LeadModel);
                 /* @var \Mautic\LeadBundle\Entity\Lead $contact */
-                $this->getModel('lead')->addToLists($contact, $entity);
+                $leadModel->addToLists($contact, $entity);
                 $responseDetail[$contact->getId()] = ['success' => true];
             }
         }
@@ -157,7 +195,9 @@ class ListApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $this->getModel('lead')->removeFromLists($leadId, $entity);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $leadModel->removeFromLists($leadId, $entity);
 
         $view = $this->view(['success' => 1], Response::HTTP_OK);
 

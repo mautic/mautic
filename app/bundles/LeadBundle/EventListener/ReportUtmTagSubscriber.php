@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -20,7 +11,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportUtmTagSubscriber implements EventSubscriberInterface
 {
-    const UTM_TAG = 'lead.utmTag';
+    public const UTM_TAG = 'lead.utmTag';
 
     /**
      * @var FieldsBuilder
@@ -62,6 +53,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
 
         $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
         $companyColumns = $this->companyReportData->getCompanyData();
+        $filters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $utmTagColumns = [
             'utm.utm_campaign' => [
@@ -89,6 +81,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
         $data = [
             'display_name' => 'mautic.lead.report.utm.utm_tag',
             'columns'      => array_merge($columns, $companyColumns, $utmTagColumns),
+            'filters'      => $filters,
         ];
         $event->addTable(self::UTM_TAG, $data, ReportSubscriber::GROUP_CONTACTS);
     }
@@ -117,6 +110,10 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
         if ($this->companyReportData->eventHasCompanyColumns($event)) {
             $qb->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', 'l.id = companies_lead.lead_id');
             $qb->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', 'comp', 'companies_lead.company_id = comp.id');
+        }
+
+        if ($event->hasFilter('s.leadlist_id')) {
+            $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
         }
 
         $event->setQueryBuilder($qb);

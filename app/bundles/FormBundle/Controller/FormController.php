@@ -1,29 +1,42 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\FormBundle\Collector\AlreadyMappedFieldCollectorInterface;
+use Mautic\FormBundle\Collector\MappedObjectCollector;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Exception\ValidationException;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class FormController extends CommonFormController
 {
+    /**
+     * @var AlreadyMappedFieldCollectorInterface
+     */
+    private $alreadyMappedFieldCollector;
+
+    /**
+     * @var MappedObjectCollector
+     */
+    private $mappedObjectCollector;
+
+    public function initialize(ControllerEvent $event)
+    {
+        $this->alreadyMappedFieldCollector = $this->get('mautic.form.collector.already.mapped.field');
+        $this->mappedObjectCollector       = $this->get('mautic.form.collector.mapped.object');
+    }
+
     /**
      * @param int $page
      *
@@ -68,8 +81,8 @@ class FormController extends CommonFormController
             $filter['force'][] = ['column' => 'f.createdBy', 'expr' => 'eq', 'value' => $this->user->getId()];
         }
 
-        $orderBy    = $session->get('mautic.form.orderby', 'f.name');
-        $orderByDir = $session->get('mautic.form.orderbydir', 'ASC');
+        $orderBy    = $session->get('mautic.form.orderby', 'f.dateModified');
+        $orderByDir = $session->get('mautic.form.orderbydir', $this->getDefaultOrderDirection());
         $forms      = $this->getModel('form.form')->getEntities(
             [
                 'start'      => $start,
@@ -92,7 +105,7 @@ class FormController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_form_index',
                         'mauticContent' => 'form',
@@ -115,7 +128,7 @@ class FormController extends CommonFormController
                     'security'    => $this->get('mautic.security'),
                     'tmpl'        => $this->request->get('tmpl', 'index'),
                 ],
-                'contentTemplate' => 'MauticFormBundle:Form:list.html.php',
+                'contentTemplate' => 'MauticFormBundle:Form:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -149,7 +162,7 @@ class FormController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_form_index',
                         'mauticContent' => 'form',
@@ -188,15 +201,19 @@ class FormController extends CommonFormController
         );
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('form', $objectId, $activeForm->getDateAdded());
+        $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('form', $objectId, $activeForm->getDateAdded());
 
         // Init the date range filter form
         $dateRangeValues = $this->request->get('daterange', []);
         $action          = $this->generateUrl('mautic_form_action', ['objectAction' => 'view', 'objectId' => $objectId]);
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
+        $formSubmissionModel = $this->getModel('form.submission');
+        \assert($formSubmissionModel instanceof SubmissionModel);
         // Submission stats per time period
-        $timeStats = $this->getModel('form.submission')->getSubmissionsLineChartData(
+        $timeStats = $formSubmissionModel->getSubmissionsLineChartData(
             null,
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
@@ -226,7 +243,7 @@ class FormController extends CommonFormController
             $activeFormFields[] = $field;
         }
 
-        $submissionCounts = $this->getModel('form.submission')->getRepository()->getSubmissionCounts($activeForm);
+        $submissionCounts = $formSubmissionModel->getRepository()->getSubmissionCounts($activeForm);
 
         return $this->delegateView(
             [
@@ -246,7 +263,7 @@ class FormController extends CommonFormController
                     'formContent'       => htmlspecialchars($model->getContent($activeForm, false), ENT_QUOTES, 'UTF-8'),
                     'availableActions'  => $customComponents['actions'],
                 ],
-                'contentTemplate' => 'MauticFormBundle:Form:details.html.php',
+                'contentTemplate' => 'MauticFormBundle:Form:details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -330,7 +347,7 @@ class FormController extends CommonFormController
                             $model->setActions($entity, $actions);
 
                             // Save and trigger listeners
-                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                            $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                             $this->addFlash(
                                 'mautic.core.notice.created',
@@ -347,13 +364,13 @@ class FormController extends CommonFormController
                                 ]
                             );
 
-                            if ($form->get('buttons')->get('save')->isClicked()) {
+                            if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                                 $viewParameters = [
                                     'objectAction' => 'view',
                                     'objectId'     => $entity->getId(),
                                 ];
                                 $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
-                                $template  = 'MauticFormBundle:Form:view';
+                                $template  = 'Mautic\FormBundle\Controller\FormController::viewAction';
                             } else {
                                 //return edit view so that all the session stuff is loaded
                                 return $this->editAction($entity->getId(), true);
@@ -380,10 +397,10 @@ class FormController extends CommonFormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_form_index', $viewParameters);
-                $template       = 'MauticFormBundle:Form:index';
+                $template       = 'Mautic\FormBundle\Controller\FormController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 //clear temporary fields
                 $this->clearSessionComponents($sessionId);
 
@@ -432,20 +449,20 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'         => $fieldHelper->getChoiceList($customComponents['fields']),
+                    'formFields'     => $modifiedFields,
+                    'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                    'deletedFields'  => $deletedFields,
+                    'viewOnlyFields' => $customComponents['viewOnlyFields'],
                     'actions'        => $customComponents['choices'],
                     'actionSettings' => $customComponents['actions'],
-                    'formFields'     => $modifiedFields,
                     'formActions'    => $modifiedActions,
-                    'deletedFields'  => $deletedFields,
                     'deletedActions' => $deletedActions,
                     'tmpl'           => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'activeForm'     => $entity,
                     'form'           => $form->createView(),
-                    'contactFields'  => $this->getModel('lead.field')->getFieldListWithProperties(),
-                    'companyFields'  => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'      => true,
                 ],
-                'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
+                'contentTemplate' => 'MauticFormBundle:Builder:index.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -477,6 +494,10 @@ class FormController extends CommonFormController
         $formData         = $this->request->request->get('mauticform');
         $sessionId        = isset($formData['sessionId']) ? $formData['sessionId'] : null;
         $customComponents = $model->getCustomComponents();
+        $modifiedFields   = [];
+        $deletedFields    = [];
+        $modifiedActions  = [];
+        $deletedActions   = [];
 
         if ($objectId instanceof Form) {
             $entity   = $objectId;
@@ -502,7 +523,7 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
@@ -604,7 +625,7 @@ class FormController extends CommonFormController
                             $model->deleteActions($entity, $deletedActions);
 
                             // Persist and execute listeners
-                            $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                            $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                             // Reset objectId to entity ID (can be session ID in case of cloned entity)
                             $objectId = $entity->getId();
@@ -624,13 +645,13 @@ class FormController extends CommonFormController
                                 ]
                             );
 
-                            if ($form->get('buttons')->get('save')->isClicked()) {
+                            if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                                 $viewParameters = [
                                     'objectAction' => 'view',
                                     'objectId'     => $entity->getId(),
                                 ];
                                 $returnUrl = $this->generateUrl('mautic_form_action', $viewParameters);
-                                $template  = 'MauticFormBundle:Form:view';
+                                $template  = 'Mautic\FormBundle\Controller\FormController::viewAction';
                             }
                         } catch (ValidationException $ex) {
                             $form->addError(
@@ -648,10 +669,10 @@ class FormController extends CommonFormController
 
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_form_index', $viewParameters);
-                $template       = 'MauticFormBundle:Form:index';
+                $template       = 'Mautic\FormBundle\Controller\FormController::indexAction';
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 //remove fields from session
                 $this->clearSessionComponents($objectId);
 
@@ -699,13 +720,12 @@ class FormController extends CommonFormController
         if ($cleanSlate) {
             //clean slate
             $this->clearSessionComponents($objectId);
+            $this->alreadyMappedFieldCollector->removeAllForForm($objectId);
 
             //load existing fields into session
-            $modifiedFields    = [];
-            $usedLeadFields    = [];
-            $usedCompanyFields = [];
-            $existingFields    = $entity->getFields()->toArray();
-            $submitButton      = false;
+            $modifiedFields   = [];
+            $existingFields   = $entity->getFields()->toArray();
+            $submitButton     = false;
 
             foreach ($existingFields as $formField) {
                 // Check to see if the field still exists
@@ -732,14 +752,15 @@ class FormController extends CommonFormController
                     // Set the custom parameters
                     $field['customParameters'] = $customComponents['fields'][$field['type']];
                 }
-                $field['formId'] = $objectId;
 
+                $field['formId']     = $objectId;
                 $modifiedFields[$id] = $field;
 
-                if (!empty($field['leadField'])) {
-                    $usedLeadFields[$id] = $field['leadField'];
+                if (!empty($field['mappedObject']) && !empty($field['mappedField']) && empty($field['parent'])) {
+                    $this->alreadyMappedFieldCollector->addField($objectId, $field['mappedObject'], $field['mappedField']);
                 }
             }
+
             if (!$submitButton) { //means something deleted the submit button from the form
                 //add a submit button
                 $keyId = 'new'.hash('sha1', uniqid(mt_rand()));
@@ -755,13 +776,16 @@ class FormController extends CommonFormController
                 $modifiedFields[$keyId]['formId']          = $objectId;
                 unset($modifiedFields[$keyId]['form']);
             }
-            $session->set('mautic.form.'.$objectId.'.fields.leadfields', $usedLeadFields);
 
             if (!empty($reorder)) {
                 uasort(
                     $modifiedFields,
                     function ($a, $b) {
-                        return $a['order'] > $b['order'];
+                        if ($a['order'] == $b['order']) {
+                            return 0;
+                        }
+
+                        return $a['order'] < $b['order'] ? -1 : 1;
                     }
                 );
             }
@@ -795,7 +819,11 @@ class FormController extends CommonFormController
                 uasort(
                     $modifiedActions,
                     function ($a, $b) {
-                        return $a['order'] > $b['order'];
+                        if ($a['order'] == $b['order']) {
+                            return 0;
+                        }
+
+                        return $a['order'] < $b['order'] ? -1 : 1;
                     }
                 );
             }
@@ -808,22 +836,22 @@ class FormController extends CommonFormController
             [
                 'viewParameters' => [
                     'fields'             => $availableFields,
+                    'formFields'         => $modifiedFields,
+                    'deletedFields'      => $deletedFields,
+                    'mappedFields'       => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                    'formActions'        => $modifiedActions,
+                    'deletedActions'     => $deletedActions,
+                    'viewOnlyFields'     => $customComponents['viewOnlyFields'],
                     'actions'            => $customComponents['choices'],
                     'actionSettings'     => $customComponents['actions'],
-                    'formFields'         => $modifiedFields,
                     'fieldSettings'      => $customComponents['fields'],
-                    'formActions'        => $modifiedActions,
-                    'deletedFields'      => $deletedFields,
-                    'deletedActions'     => $deletedActions,
                     'tmpl'               => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'activeForm'         => $entity,
                     'form'               => $form->createView(),
                     'forceTypeSelection' => $forceTypeSelection,
-                    'contactFields'      => $this->getModel('lead.field')->getFieldListWithProperties('lead'),
-                    'companyFields'      => $this->getModel('lead.field')->getFieldListWithProperties('company'),
                     'inBuilder'          => true,
                 ],
-                'contentTemplate' => 'MauticFormBundle:Builder:index.html.php',
+                'contentTemplate' => 'MauticFormBundle:Builder:index.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_form_index',
                     'mauticContent' => 'form',
@@ -948,7 +976,7 @@ class FormController extends CommonFormController
         $viewParams['template'] = $template;
 
         if (!empty($template)) {
-            $logicalName     = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':form.html.php');
+            $logicalName     = $this->get('mautic.helper.theme')->checkForTwigTemplate(':'.$template.':form.html.twig');
             $assetsHelper    = $this->get('templating.helper.assets');
             $slotsHelper     = $this->get('templating.helper.slots');
             $analyticsHelper = $this->get('mautic.helper.template.analytics');
@@ -967,7 +995,7 @@ class FormController extends CommonFormController
             return $this->render($logicalName, $viewParams);
         }
 
-        return $this->render('MauticFormBundle::form.html.php', $viewParams);
+        return $this->render('MauticFormBundle::form.html.twig', $viewParams);
     }
 
     /**
@@ -986,15 +1014,16 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model  = $this->getModel('form.form');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('form.form');
+            \assert($model instanceof FormModel);
             $entity = $model->getEntity($objectId);
 
             if (null === $entity) {
@@ -1051,15 +1080,16 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
             ],
         ];
 
-        if ('POST' == $this->request->getMethod()) {
-            $model     = $this->getModel('form');
+        if (Request::METHOD_POST === $this->request->getMethod()) {
+            $model = $this->getModel('form');
+            \assert($model instanceof FormModel);
             $ids       = json_decode($this->request->query->get('ids', ''));
             $deleteIds = [];
 
@@ -1120,10 +1150,10 @@ class FormController extends CommonFormController
         $session = $this->get('session');
         $session->remove('mautic.form.'.$sessionId.'.fields.modified');
         $session->remove('mautic.form.'.$sessionId.'.fields.deleted');
-        $session->remove('mautic.form.'.$sessionId.'.fields.leadfields');
-
         $session->remove('mautic.form.'.$sessionId.'.actions.modified');
         $session->remove('mautic.form.'.$sessionId.'.actions.deleted');
+
+        $this->alreadyMappedFieldCollector->removeAllForForm((string) $sessionId);
     }
 
     public function batchRebuildHtmlAction()
@@ -1135,7 +1165,7 @@ class FormController extends CommonFormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticFormBundle:Form:index',
+            'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_form_index',
                 'mauticContent' => 'form',
@@ -1176,7 +1206,6 @@ class FormController extends CommonFormController
                 'type'    => 'notice',
                 'msg'     => 'mautic.form.notice.batch_html_generated',
                 'msgVars' => [
-                    'pluralCount' => $count,
                     '%count%'     => $count,
                 ],
             ];
@@ -1190,5 +1219,15 @@ class FormController extends CommonFormController
                 ]
             )
         );
+    }
+
+    public function getModelName(): string
+    {
+        return 'form';
+    }
+
+    protected function getDefaultOrderDirection(): string
+    {
+        return 'DESC';
     }
 }

@@ -1,17 +1,9 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\WebhookBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -25,6 +17,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class Webhook extends FormEntity
 {
+    public const LOGS_DISPLAY_LIMIT = 100;
     /**
      * @var int
      */
@@ -124,7 +117,7 @@ class Webhook extends FormEntity
             ->cascadeDetach()
             ->build();
 
-        $builder->addNamedField('webhookUrl', Types::STRING, 'webhook_url');
+        $builder->addNamedField('webhookUrl', Types::TEXT, 'webhook_url');
         $builder->addField('secret', Types::STRING);
         $builder->addNullableField('eventsOrderbyDir', Types::STRING, 'events_orderby_dir');
     }
@@ -442,6 +435,17 @@ class Webhook extends FormEntity
     public function getLogs()
     {
         return $this->logs;
+    }
+
+    /**
+     * @return Collection<int,self>
+     */
+    public function getLimitedLogs(): Collection
+    {
+        $criteria = Criteria::create()
+            ->setMaxResults(self::LOGS_DISPLAY_LIMIT);
+
+        return $this->logs->matching($criteria);
     }
 
     /**

@@ -1,23 +1,16 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\FormBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\FormModel;
+use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Model\SubmissionResultLoader;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -59,7 +52,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -139,7 +132,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticFormBundle:Result:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'formresult',
@@ -168,7 +161,7 @@ class ResultController extends CommonFormController
                         $form->getCreatedBy()
                     ),
                 ],
-                'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
+                'contentTemplate' => 'MauticFormBundle:Result:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_form_index',
                     'mauticContent' => 'formresult',
@@ -258,7 +251,7 @@ class ResultController extends CommonFormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $formPage],
-                    'contentTemplate' => 'MauticFormBundle:Form:index',
+                    'contentTemplate' => 'Mautic\FormBundle\Controller\FormController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_form_index',
                         'mauticContent' => 'form',
@@ -312,8 +305,9 @@ class ResultController extends CommonFormController
         $page     = $session->get("mautic.formresult.{$formId}.page", 1);
         $flashes  = [];
 
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             $model = $this->getModel('form.submission');
+            \assert($model instanceof SubmissionModel);
 
             // Find the result
             $entity = $model->getEntity($objectId);
@@ -349,7 +343,7 @@ class ResultController extends CommonFormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_form_results', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticFormBundle:Result:index',
+                'contentTemplate' => 'Mautic\FormBundle\Controller\ResultController::indexAction',
                 'passthroughVars' => [
                     'mauticContent' => 'formresult',
                 ],

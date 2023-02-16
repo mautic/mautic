@@ -1,16 +1,8 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -34,11 +26,14 @@ class UpdateController extends CommonController
         /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
         $updateHelper = $this->container->get('mautic.helper.update');
         $updateData   = $updateHelper->fetchData();
+        /** @var CoreParametersHelper $coreParametersHelper */
+        $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
 
         return $this->delegateView([
             'viewParameters' => [
-                'updateData'     => $updateData,
-                'currentVersion' => MAUTIC_VERSION,
+                'updateData'        => $updateData,
+                'currentVersion'    => MAUTIC_VERSION,
+                'isComposerEnabled' => $coreParametersHelper->get('composer_updates', false),
             ],
             'contentTemplate' => 'MauticCoreBundle:Update:index.html.php',
             'passthroughVars' => [
@@ -60,7 +55,7 @@ class UpdateController extends CommonController
         $result       = 0;
         $failed       = false;
         $noMigrations = true;
-        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
@@ -77,7 +72,7 @@ class UpdateController extends CommonController
             $minExecutionTime = 300;
             $maxExecutionTime = (int) ini_get('max_execution_time');
             if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-                ini_set('max_execution_time', $minExecutionTime);
+                ini_set('max_execution_time', "$minExecutionTime");
             }
 
             $result = $application->run($input, $output);
@@ -97,7 +92,7 @@ class UpdateController extends CommonController
             $failed = true;
         } elseif ($this->request->get('update', 0)) {
             // This was a retry from the update so call up the finalizeAction to finish the process
-            $this->forward('MauticCoreBundle:Ajax:updateFinalization',
+            $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
                 [
                     'request' => $this->request,
                 ]

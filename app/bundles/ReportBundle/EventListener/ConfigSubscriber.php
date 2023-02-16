@@ -1,14 +1,5 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\ReportBundle\EventListener;
 
 use Mautic\ConfigBundle\ConfigEvents;
@@ -34,7 +25,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'ReportBundle',
             'formAlias'  => 'reportconfig',
             'formType'   => ConfigType::class,
-            'formTheme'  => 'MauticReportBundle:FormTheme\Config',
+            'formTheme'  => 'MauticReportBundle:FormTheme:Config/_config_reportconfig_widget.html.twig',
             'parameters' => $event->getParametersFromConfig('MauticReportBundle'),
         ]);
     }

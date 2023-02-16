@@ -1,21 +1,17 @@
 <?php
 
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Crate\FieldCrate;
+use Mautic\FormBundle\Crate\ObjectCrate;
+use Mautic\FormBundle\Event\FieldCollectEvent;
 use Mautic\FormBundle\Event\FormBuilderEvent;
+use Mautic\FormBundle\Event\ObjectCollectEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Entity\UtmTag;
 use Mautic\LeadBundle\Form\Type\ActionAddUtmTagsType;
@@ -50,16 +46,23 @@ class FormSubscriber implements EventSubscriberInterface
      */
     protected $ipLookupHelper;
 
+    /**
+     * @var LeadFieldRepository
+     */
+    protected $leadFieldRepository;
+
     public function __construct(
         EmailModel $emailModel,
         LeadModel $leadModel,
         ContactTracker $contactTracker,
-        IpLookupHelper $ipLookupHelper
+        IpLookupHelper $ipLookupHelper,
+        LeadFieldRepository $leadFieldRepository
     ) {
-        $this->emailModel     = $emailModel;
-        $this->leadModel      = $leadModel;
-        $this->contactTracker = $contactTracker;
-        $this->ipLookupHelper = $ipLookupHelper;
+        $this->emailModel          = $emailModel;
+        $this->leadModel           = $leadModel;
+        $this->contactTracker      = $contactTracker;
+        $this->ipLookupHelper      = $ipLookupHelper;
+        $this->leadFieldRepository = $leadFieldRepository;
     }
 
     /**
@@ -69,6 +72,8 @@ class FormSubscriber implements EventSubscriberInterface
     {
         return [
             FormEvents::FORM_ON_BUILD            => ['onFormBuilder', 0],
+            FormEvents::ON_OBJECT_COLLECT        => ['onObjectCollect', 0],
+            FormEvents::ON_FIELD_COLLECT         => ['onFieldCollect', 0],
             FormEvents::ON_EXECUTE_SUBMIT_ACTION => [
                 ['onFormSubmitActionChangePoints', 0],
                 ['onFormSubmitActionChangeList', 1],
@@ -90,7 +95,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => FormSubmitActionPointsChangeType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\\FormActionChangePoints',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:FormActionChangePoints/_formaction_properties_row.html.twig',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
@@ -115,7 +120,6 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.addutmtags',
             'description'       => 'mautic.lead.lead.events.addutmtags_descr',
             'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionAddUtmTags',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -125,7 +129,6 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.removedonotcontact',
             'description'       => 'mautic.lead.lead.events.removedonotcontact_descr',
             'formType'          => ActionRemoveDoNotContact::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme\\ActionRemoveDoNotContact',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -137,6 +140,29 @@ class FormSubscriber implements EventSubscriberInterface
             'formType'    => CompanyChangeScoreActionType::class,
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
+    }
+
+    public function onObjectCollect(ObjectCollectEvent $event): void
+    {
+        $event->appendObject(new ObjectCrate('contact', 'mautic.lead.contact'));
+        $event->appendObject(new ObjectCrate('company', 'mautic.core.company'));
+    }
+
+    public function onFieldCollect(FieldCollectEvent $event): void
+    {
+        $object = 'contact' === $event->getObject() ? 'lead' : $event->getObject(); // BC conversion.
+        $fields = $this->leadFieldRepository->getFieldsForObject($object);
+
+        foreach ($fields as $field) {
+            $event->appendField(
+                new FieldCrate(
+                    $field->getAlias(),
+                    $field->getLabel(),
+                    $field->getType(),
+                    $field->getProperties()
+                )
+            );
+        }
     }
 
     public function onFormSubmitActionChangePoints(SubmissionEvent $event): void
@@ -170,6 +196,8 @@ class FormSubscriber implements EventSubscriberInterface
         $contact->addPointsChangeLog($pointsChangeLog);
 
         $this->leadModel->saveEntity($contact, false);
+
+        $event->getSubmission()->getLead()->setPoints($contact->getPoints());
     }
 
     public function onFormSubmitActionChangeList(SubmissionEvent $event): void
