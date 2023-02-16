@@ -48,7 +48,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                             {% endif %}
                         </a>
                     </li>
-                    <li class="{% if form.vars.value.isCampaignBased or form.updateSelect is defined %}hide{% endif %}" id="dwcFiltersTab">
+                    <li class="{% if not form.vars.value.isCampaignBased or form.updateSelect is defined %}hide{% endif %}" id="dwcFiltersTab">
                         <a href="#filters" role="tab" data-toggle="tab" class="{% if hasFilterErrors %}text-danger{% endif %}">
                             {{ 'mautic.core.filters'|trans }}
                             {% if hasFilterErrors %}
