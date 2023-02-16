@@ -244,17 +244,22 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $applicationTester = new ApplicationTester($application);
 
         $leagueA    = $this->createLeague('A');
+        $this->em->flush();
+
         $contactIds = $this->createContacts();
 
         /** @var Lead $contactB */
         $contactB = $this->contactRepository->getEntity($contactIds[1]);
         $this->addLeagueContactScore($contactB, $leagueA, 0);
+        $this->em->persist($contactB);
 
         /** @var Lead $contactC */
         $contactC = $this->contactRepository->getEntity($contactIds[2]);
         $this->addLeagueContactScore($contactC, $leagueA, 1);
+        $this->em->persist($contactC);
+        $this->em->flush();
 
-        $campaign   = $this->createCampaignWithPointEvents($contactIds);
+        $campaign   = $this->createCampaignWithPointEvents($contactIds, $leagueA->getId());
 
         // Force Doctrine to re-fetch the entities otherwise the campaign won't know about any events.
         $this->em->clear();
@@ -279,6 +284,18 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals(0, $contactA->getPoints());
         $this->assertEquals(0, $contactB->getPoints());
         $this->assertEquals(2, $contactC->getPoints());
+
+        $contactALeagueScores = $contactA->getLeagueScores();
+        $contactBLeagueScores = $contactB->getLeagueScores();
+        $contactCLeagueScores = $contactC->getLeagueScores();
+
+        $this->assertEmpty($contactALeagueScores);
+        $this->assertNotEmpty($contactBLeagueScores);
+        $this->assertNotEmpty($contactCLeagueScores);
+
+        $this->assertEquals(0, $contactA->getPoints());
+        $this->assertEquals(0, $contactBLeagueScores->first()->getScore());
+        $this->assertEquals(2, $contactCLeagueScores->first()->getScore());
     }
 
     /**
@@ -811,6 +828,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 'anchor'                     => 'yes',
                 'properties'                 => [
                     'points'                     => 1,
+                    'league'                     => $pointLeague,
                 ],
                 'type'                       => 'lead.changepoints',
                 'eventType'                  => 'action',
@@ -819,6 +837,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
                 '_token'                     => 'HgysZwvH_n0uAp47CcAcsGddRnRk65t-3crOnuLx28Y',
                 'buttons'                    => ['save' => ''],
                 'points'                     => 1,
+                'league'                     => $pointLeague,
             ]
         );
 

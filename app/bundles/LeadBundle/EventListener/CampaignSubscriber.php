@@ -36,6 +36,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\PointBundle\Model\LeagueModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
@@ -73,6 +74,11 @@ class CampaignSubscriber implements EventSubscriberInterface
     private $campaignModel;
 
     /**
+     * @var LeagueModel
+     */
+    private $leagueModel;
+
+    /**
      * @var CoreParametersHelper
      */
     private $coreParametersHelper;
@@ -94,6 +100,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         ListModel $listModel,
         CompanyModel $companyModel,
         CampaignModel $campaignModel,
+        LeagueModel $leagueModel,
         CoreParametersHelper $coreParametersHelper,
         FilterOperatorProvider $filterOperatorProvider
     ) {
@@ -103,6 +110,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $this->listModel              = $listModel;
         $this->companyModel           = $companyModel;
         $this->campaignModel          = $campaignModel;
+        $this->leagueModel            = $leagueModel;
         $this->coreParametersHelper   = $coreParametersHelper;
         $this->filterOperatorProvider = $filterOperatorProvider;
     }
@@ -280,13 +288,21 @@ class CampaignSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $lead   = $event->getLead();
-        $points = $event->getConfig()['points'];
-
+        $lead              = $event->getLead();
+        $points            = $event->getConfig()['points'];
         $somethingHappened = false;
 
         if (null !== $lead && !empty($points)) {
             $lead->adjustPoints($points);
+
+            $pointsChangeLogEntryName = $event->getEvent()['id'].': '.$event->getEvent()['name'];
+            $pointLeagueId            = $event->getConfig()['league'];
+            $pointLeague              = $pointLeagueId ? $this->leagueModel->getEntity($pointLeagueId) : null;
+            if (!empty($pointLeague)) {
+                $scoreRepository = $this->leadModel->getLeagueContactScoreRepository();
+                $scoreRepository->adjustPoints($lead, $pointLeague, $points);
+                $pointsChangeLogEntryName .= ' ('.$pointLeague->getName().')';
+            }
 
             //add a lead point change log
             $log = new PointsChangeLog();
@@ -294,7 +310,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $log->setLead($lead);
             $log->setType('campaign');
             $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
-            $log->setActionName("{$event->getEvent()['id']}: {$event->getEvent()['name']}");
+            $log->setActionName($pointsChangeLogEntryName);
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
             $lead->addPointsChangeLog($log);

@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Provider\FilterOperatorProvider;
+use Mautic\PointBundle\Model\LeagueModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -41,6 +42,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockLeagueModel    = $this->createMock(LeagueModel::class);
         $companyEntityFrom  = $this->createMock(Company::class);
 
         $filterOperatorProvider = new FilterOperatorProvider(
@@ -90,6 +92,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
+            $mockLeagueModel,
             $mockCoreParametersHelper,
             $filterOperatorProvider
         );
