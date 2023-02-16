@@ -25,11 +25,14 @@
 {% set isAjax = app.request.isxmlhttprequest ?? false %}
 {% set src = src|default(mautibotGetImage('wave'))  %}
 
+ {% set headerTitle = headerTitle|default('') %}
+{% set pageTitle = pageTitle|default('Mautic') %}
+
 {% if isAjax == false %}
     {% extends baseTemplate %}
 
-    {% set headerTitle = (isInline == false) ? status_code ~ " " ~ status_text : headerTitle|default('') %}
-    {% set pageTitle = (isInline == false) ? exceptionMessage : pageTitle|default('Mautic') %}
+    {% set headerTitle = (isInline == false) ? status_code ~ " " ~ status_text : headerTitle %}
+    {% set pageTitle = (isInline == false) ? exceptionMessage : pageTitle %}
 {% endif %}
 
 {% block headerTitle %}{{ headerTitle }}{% endblock %}
