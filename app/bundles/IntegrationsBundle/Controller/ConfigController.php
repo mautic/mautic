@@ -184,7 +184,7 @@ class ConfigController extends AbstractFormController
     private function showForm(Form $form)
     {
         $integrationObject = $this->integrationObject;
-        $form              = $this->setFormTheme($form, 'IntegrationsBundle:Config:form.html.twig');
+        $form              = $form->createView();
         $formHelper        = $this->get('templating.helper.form');
 
         $showFeaturesTab =
