@@ -1,32 +1,26 @@
 {% set request = app.request %}
 {% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
 {% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
-{% set isAjax = app.request.isxmlhttprequest ?? false %}
-{% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' : 'MauticCoreBundle:Default:base.html.twig' %}
-
-{% if isAjax == false and not modalView %}
-    {# load base template #}
-    {% if template is not empty %}{% extends template %}{% endif %}
+{# load base template #}
+{% set template = null %}
+{% if not request.isXmlHttpRequest() and not modalView %}
+    {% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
+{% elseif not modalView %}
+    {% set template = 'MauticCoreBundle:Default:output.html.twig' %}
 {% endif %}
-
-{% block _content %}
-    {% if not modalView %}
-        <div class="content-body">
-            {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
-                publishStatus: publishStatus|default(''),
-                headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
-                actions: block('actions') is defined ? block('actions') : '',
-                toolbar: block('toolbar') is defined ? block('toolbar') : '',
-                mauticTemplateVars: mauticTemplateVars|default([]),
-            }) }}
-            
-            {% if block('content') is defined %}
-                {{ block('content') }}
-            {% endif %}
-        </div>
-        {% block modal %}{% endblock %}
-        {{ securityGetAuthenticationContext() }}
-    {% else %}
-        {% if block('content') is defined %}{{ block('content') }}{% endif %}
-    {% endif %}
-{% endblock %}
+{{- '' -}}
+{% if template is not empty %}
+    {{- include(template, {
+        content: block('content') is defined ? block('content') : content|default(''),
+        modal: block('modal') is defined ? block('modal') : modal|default(''),
+        headerTitle: block('headerTitle'),
+        pageTitle: block('pageTitle') is defined ? block('pageTitle') : pageTitle|default(''),
+        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
+        actions: block('actions') is defined ? block('actions') : actions|default(''),
+        toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
+        mauticTemplateVars: mauticTemplateVars|default({}),
+        isXmlHttpRequest: request.isXmlHttpRequest,
+    }) -}}
+{% else %}
+    {{ block('content') }}
+{% endif %}
