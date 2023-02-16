@@ -146,7 +146,7 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
             <div id="publishStatus">
                 {{ form_row(form.isPublished) }}
             </div>
-            {% if form.updateSelect is defined %}
+            {% if form.updateSelect is not defined %}
                 {{ form_row(form.isCampaignBased) }}
             {% endif %}
             <div id="slotNameDiv" class="{% if form.vars.value.isCampaignBased %}hide{% endif %}">
