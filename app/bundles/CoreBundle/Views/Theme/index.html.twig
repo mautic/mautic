@@ -14,6 +14,8 @@
 {% set mauticContent = 'theme' %}
 {% set headerTitle = 'mautic.core.themes'|trans %}
 
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+
 {% block actions %}
   {% include "MauticCoreBundle:Theme:form.html.twig" with {
       form: form

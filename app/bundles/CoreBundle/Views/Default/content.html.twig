@@ -14,12 +14,12 @@
         <div class="content-body">
             {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
                 publishStatus: publishStatus|default(''),
-                headerTitle: headerTitle|default(''),
+                headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
                 actions: block('actions') is defined ? block('actions') : '',
                 toolbar: block('toolbar') is defined ? block('toolbar') : '',
                 mauticTemplateVars: mauticTemplateVars|default([]),
             }) }}
-
+            
             {% if block('content') is defined %}
                 {{ block('content') }}
             {% endif %}

@@ -18,6 +18,8 @@
     {% endif %}
 {% endif %}
 
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+
 {% if entity is not defined %}
     {% set entity = form.vars.data %}
 {% endif %}

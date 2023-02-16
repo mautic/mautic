@@ -21,6 +21,8 @@
     {% set pageTitle = (isInline == false) ? status_text : pageTitle|default('') %}
 {% endif %}
 
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
 {% block _content %}
     <div class="pa-20 mautibot-error{% if isInline %} inline well{% endif %}">
         <div class="row mt-lg pa-md">

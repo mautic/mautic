@@ -28,9 +28,12 @@
 {% if isAjax == false %}
     {% extends baseTemplate %}
 
-    {% set headerTitle =  (isInline == false) ? "<strong>" ~ status_code ~ "</strong>" ~ status_text : headerTitle|default('') %}
-    {% set pageTitle =  (isInline == false) ? exceptionMessage : pageTitle|default('Mautic') %}
+    {% set headerTitle = (isInline == false) ? status_code ~ " " ~ status_text : headerTitle|default('') %}
+    {% set pageTitle = (isInline == false) ? exceptionMessage : pageTitle|default('Mautic') %}
 {% endif %}
+
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
 
 {% block _content %}
 

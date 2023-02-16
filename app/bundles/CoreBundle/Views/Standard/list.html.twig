@@ -24,6 +24,8 @@
     {% set headerTitle = slot('headerTitle') %}
 {% endif %}
 
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
+
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig',
     {

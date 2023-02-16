@@ -1,10 +1,8 @@
 <!DOCTYPE html>
 <html>
-    {% set headerTitle = headerTitle|default('') %}
-    {% set pageTitle = pageTitle|default('Mautic') %}
     {{ include('MauticCoreBundle:Default:head.html.twig', {
-            headerTitle: headerTitle,
-            pageTitle: pageTitle,
+            headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
+            pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
         })
     }}
     <body class="header-fixed">
@@ -40,7 +38,7 @@
                 {% block _content %}
                      {{ include('MauticCoreBundle:Default:output.html.twig', {
                         publishStatus: publishStatus|default(''),
-                        headerTitle: headerTitle|default(''),
+                        headerTitle: block('headerTitle') is defined ? block('headerTitle') : '',
                         actions: block('actions') is defined ? block('actions') : '',
                         toolbar: block('toolbar') is defined ? block('toolbar') : '',
                         mauticTemplateVars: mauticTemplateVars|default([]),
