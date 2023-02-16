@@ -296,7 +296,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             $lead->adjustPoints($points);
 
             $pointsChangeLogEntryName = $event->getEvent()['id'].': '.$event->getEvent()['name'];
-            $pointLeagueId            = $event->getConfig()['league'];
+            $pointLeagueId            = $event->getConfig()['league'] ?? null;
             $pointLeague              = $pointLeagueId ? $this->leagueModel->getEntity($pointLeagueId) : null;
             if (!empty($pointLeague)) {
                 $scoreRepository = $this->leadModel->getLeagueContactScoreRepository();
@@ -551,7 +551,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             }
         } elseif ($event->checkContext('lead.points')) {
             $operators    = $this->filterOperatorProvider->getAllOperators();
-            $league       = $event->getConfig()['league'];
+            $league       = $event->getConfig()['league'] ?? null;
             $score        = $event->getConfig()['score'];
             $operatorExpr = $operators[$event->getConfig()['operator']]['expr'];
 
