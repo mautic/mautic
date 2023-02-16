@@ -4,10 +4,6 @@
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 {% form_theme form 'MauticDynamicContentBundle:FormTheme:Filter/layout.html.twig' %}
 
-{#
-$view->addGlobal('translationBase', 'mautic.dynamicContent');
-$view->addGlobal('mauticContent', 'dynamicContent');
-#}
 {% block mauticContent 'dynamicContent' %}
 {% block translationBase 'mautic.dynamicContent' %}
 
@@ -20,17 +16,8 @@ $view->addGlobal('mauticContent', 'dynamicContent');
 {% endblock %}
 
 {% block content %}
-{#
-$fields = $form->vars['fields'];
-$index  = count($form['filters']->vars['value']) ? max(array_keys($form['filters']->vars['value'])) : 0;
-#}
 {%- set fields = form.vars.fields -%}
 {%- set index = form.filters.vars.value|keys|length -%}
-
-{#
-$mainErrors   = ($view['form']->containsErrors($form, ['filters'])) ? 'class="text-danger"' : '';
-$filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text-danger"' : '';
-#}
 {%- set hasMainErrors = formContainsErrors(form, ['filters']) -%}
 {%- set hasFilterErrors = formContainsErrors(form.filters) -%}
 
@@ -96,16 +83,10 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                                                         {% for value, params in field %}
                                                             {% set list = params.properties.list|default([]) %}
                                                             {% if 'boolean' is same as params.properties.type %}
-                                                              {# array_flip(\Mautic\LeadBundle\Helper\FormFieldHelper::parseBooleanList($list)) #}
                                                               {% set choices = formFieldParseBooleanList(list)|reverse %}
                                                             {% else %}
-                                                                {# \Mautic\LeadBundle\Helper\FormFieldHelper::parseListForChoices($list); #}
                                                               {% set choices = leadFormFieldParseListForChoices(list) %}
                                                             {% endif %}
-                                                            {#
-                                                            $callback = (!empty($params['properties']['callback'])) ? $params['properties']['callback'] : '';
-                                                            $operators = (!empty($params['operators'])) ? $view->escape(json_encode($params['operators'])) : '{}';
-                                                            #}
                                                             {% set callback = params.properties.callback|default('') %}
                                                             {% set operators = params.operators %}
                                                             <option value="{{ value|e }}"
@@ -202,9 +183,6 @@ $filterErrors = ($view['form']->containsErrors($form['filters'])) ? 'class="text
                         {% endfor %}
                         </optgroup>
                     {% elseif 'lists' != dataKey or (currentListId is defined and value != currentListId)  %}
-                        {#if ('lists' == $dataKey && (isset($currentListId) && (int) $value === (int) $currentListId)) {
-                            continue;
-                        }#}
                         <option value="{{ value }}">{{ label }}</option>
                     {% endif %}
                 {% endfor %}
