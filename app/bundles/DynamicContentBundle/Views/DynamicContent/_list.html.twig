@@ -86,7 +86,7 @@
                     </td>
                     <td class="visible-md visible-lg">{{ item.slotName }}</td>
                     <td class="visible-md visible-lg">
-                        {% set catName = item.category is not empty ? category.title : 'mautic.core.form.uncategorized'|trans %}
+                        {% set catName = item.category is not empty ? item.category.title : 'mautic.core.form.uncategorized'|trans %}
                         {% set color = item.category is not empty ? '#' ~ item.category.color : 'inherit' %}
                         <span style="white-space: nowrap;">
                           <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
