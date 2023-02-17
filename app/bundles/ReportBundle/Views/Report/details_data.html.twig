@@ -147,7 +147,7 @@
                           'baseUrl': path('mautic_report_view', {'objectId': report.id}),
                           'sessionVar': 'report.' ~ report.id,
                           'target': '.report-content',
-                      }) }}
+                      }, with_context=false) }}
                   </div>
               </div>
           </div>
