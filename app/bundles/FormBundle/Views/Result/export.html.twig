@@ -12,7 +12,8 @@
       <table class="table table-hover table-striped table-bordered formresult-list">
           <thead>
             <tr>
-                <th class="col-formresult-id"></th>
+                <th class="col-formresult-id">{{ 'mautic.form.report.submission.id'|trans }}</th>
+                <th class="col-formresult-id">{{ 'mautic.lead.report.contact_id'|trans }}></th>
                 <th class="col-formresult-date">{{ 'mautic.form.result.thead.date'|trans }}</th>
                 <th class="col-formresult-ip">{{ 'mautic.core.ipaddress'|trans }}</th>
                 {% set fields = form.fields %}
@@ -27,6 +28,7 @@
           {% for item in results %}
               <tr>
                   <td>{{ item['id'] }}</td>
+                  <td>{{ $item['leadId'] }}</td>
                   <td>{{ dateToFull(item['dateSubmitted'], 'UTC') }}</td>
                   <td>{{ item['ipAddress'] }}</td>
                   {% for r in item.results %}
