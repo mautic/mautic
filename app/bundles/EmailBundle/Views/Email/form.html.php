@@ -195,12 +195,7 @@ if (!isset($previewUrl)) {
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['subject']); ?>
             <?php echo $view['form']->row($form['name']); ?>
-            <?php if ($isVariant): ?>
-                <?php echo $view['form']->row($form['variantSettings']); ?>
-                <?php echo $view['form']->row($form['isPublished']); ?>
-                <?php echo $view['form']->row($form['publishUp']); ?>
-                <?php echo $view['form']->row($form['publishDown']); ?>
-            <?php else: ?>
+            <?php if (!$isVariant): ?>
             <div id="leadList"<?php echo ('template' == $emailType) ? ' class="hide"' : ''; ?>>
                 <?php echo $view['form']->row($form['lists']); ?>
             </div>
@@ -214,16 +209,28 @@ if (!isset($previewUrl)) {
             </div>
             <?php endif; ?>
 
-            <?php if (!$isVariant): ?>
-                <?php echo $view['form']->row($form['isPublished']); ?>
-                <?php echo $view['form']->row($form['publishUp']); ?>
-                <?php echo $view['form']->row($form['publishDown']); ?>
-            <?php endif; ?>
+            <?php echo $view['form']->row($form['isPublished']); ?>
+            <?php echo $view['form']->row($form['publishUp']); ?>
+            <?php echo $view['form']->row($form['publishDown']); ?>
 
             <?php echo $view['form']->row($form['unsubscribeForm']); ?>
             <?php if (!(empty($permissions['page:preference_center:viewown']) &&
                         empty($permissions['page:preference_center:viewother']))): ?>
                 <?php echo $view['form']->row($form['preferenceCenter']); ?>
+            <?php endif; ?>
+            <hr />
+            <h5><?php echo $view['translator']->trans('mautic.core.ab_test.form.abtest_settings'); ?></h5>
+            <br />
+            <?php if (!$isExisting && !$isVariant): ?>
+                <?php echo $view['form']->row($form['variantSettings']['enableAbTest']); ?>
+            <?php endif; ?>
+
+            <?php if ($isVariant): ?>
+                <?php echo $view['form']->row($form['variantSettings']['weight']); ?>
+            <?php else: ?>
+                <?php echo $view['form']->row($form['variantSettings']['winnerCriteria']); ?>
+                <?php echo $view['form']->row($form['variantSettings']['totalWeight']); ?>
+                <?php echo $view['form']->row($form['variantSettings']['sendWinnerDelay']); ?>
             <?php endif; ?>
             <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
