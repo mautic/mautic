@@ -210,16 +210,6 @@ return [
                 'tag' => 'validator.constraint_validator',
             ],
         ],
-        'command' => [
-            'mautic.report.command.export_scheduler' => [
-                'class'     => \Mautic\ReportBundle\Scheduler\Command\ExportSchedulerCommand::class,
-                'arguments' => [
-                    'mautic.report.model.report_exporter',
-                    'translator',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
     ],
 
     'parameters' => [

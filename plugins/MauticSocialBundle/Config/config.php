@@ -193,34 +193,6 @@ return [
                 ],
             ],
         ],
-        'command' => [
-            'mautic.social.command.twitter_hashtags' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterHashtagsCommand::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.helper.integration',
-                    'mautic.social.helper.twitter_command',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.social.command.twitter_mentions' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterMentionsCommand::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.helper.integration',
-                    'mautic.social.helper.twitter_command',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.social.command.social_monitoring' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MauticSocialMonitoringCommand::class,
-                'arguments' => [
-                    'mautic.social.model.monitoring',
-                ],
-            ],
-        ],
     ],
     'menu' => [
         'main' => [
