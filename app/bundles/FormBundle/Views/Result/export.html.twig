@@ -28,7 +28,7 @@
           {% for item in results %}
               <tr>
                   <td>{{ item['id'] }}</td>
-                  <td>{{ $item['leadId'] }}</td>
+                  <td>{{ item['leadId'] }}</td>
                   <td>{{ dateToFull(item['dateSubmitted'], 'UTC') }}</td>
                   <td>{{ item['ipAddress'] }}</td>
                   {% for r in item.results %}
