@@ -260,7 +260,9 @@ class FocusModel extends FormModel
             $htmlMode = 'basic';
         }
 
-        $focus[$htmlMode] = htmlspecialchars_decode($focus[$htmlMode]);
+        if (isset($focus[$htmlMode])) {
+            $focus[$htmlMode] = htmlspecialchars_decode($focus[$htmlMode]);
+        }
 
         $content = $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:content.html.twig',
