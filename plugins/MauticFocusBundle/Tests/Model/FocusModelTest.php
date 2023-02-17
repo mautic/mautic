@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -49,7 +50,7 @@ class FocusModelTest extends TestCase
     private $trackableModel;
 
     /**
-     * @var Environment&MockObject
+     * @var Environment|MockObject
      */
     private $twig;
 
