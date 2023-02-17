@@ -1,5 +1,5 @@
 {% set props = focus.properties %}
-{% set color = (props.colors.primary is color light) ? '000000' : 'ffffff' %}
+{% set color = (props.colors.primary is not empty and props.colors.primary is color light) ? '000000' : 'ffffff' %}
 {% set animate = preview is not empty and props.animate is not empty ? ' mf-animate' : '' %}
 
 <div class="mautic-focus mf-bar mf-bar-{{ props.bar.size }} mf-bar-{{ props.bar.placement }} {% if props.bar.sticky %}mf-bar-sticky{% endif %} {{ animate }}" style="background-color: #{{ props.colors.primary }};">
