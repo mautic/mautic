@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-104-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -105,7 +105,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/patrykgruszka"><img src="https://avatars.githubusercontent.com/u/8580942?v=4?s=100" width="100px;" alt="Patryk Gruszka"/><br /><sub><b>Patryk Gruszka</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=patrykgruszka" title="Code">💻</a> <a href="https://github.com/mautic/mautic/commits?author=patrykgruszka" title="Documentation">📖</a> <a href="https://github.com/mautic/mautic/commits?author=patrykgruszka" title="Tests">⚠️</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3Apatrykgruszka" title="Reviewed Pull Requests">👀</a> <a href="#userTesting-patrykgruszka" title="User Testing">📓</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://hartmut.io"><img src="https://avatars.githubusercontent.com/u/20030306?v=4?s=100" width="100px;" alt="Alex Hammerschmied"/><br /><sub><b>Alex Hammerschmied</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alexhammerschmied" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://hartmut.io"><img src="https://avatars.githubusercontent.com/u/20030306?v=4?s=100" width="100px;" alt="Alex Hammerschmied"/><br /><sub><b>Alex Hammerschmied</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=alexhammerschmied" title="Code">💻</a> <a href="#userTesting-alexhammerschmied" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.twentyzen.com"><img src="https://avatars.githubusercontent.com/u/1241376?v=4?s=100" width="100px;" alt="Dirk Spannaus"/><br /><sub><b>Dirk Spannaus</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3Adsp76" title="Bug reports">🐛</a> <a href="#userTesting-dsp76" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.linkedin.com/in/rehannischal"><img src="https://avatars.githubusercontent.com/u/43839944?v=4?s=100" width="100px;" alt="Rehan Nischal"/><br /><sub><b>Rehan Nischal</b></sub></a><br /><a href="https://github.com/mautic/mautic/issues?q=author%3ARehanNischal" title="Bug reports">🐛</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Christophe9880"><img src="https://avatars.githubusercontent.com/u/82932885?v=4?s=100" width="100px;" alt="Christophe9880"/><br /><sub><b>Christophe9880</b></sub></a><br /><a href="#userTesting-Christophe9880" title="User Testing">📓</a></td>

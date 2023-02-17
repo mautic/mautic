@@ -2925,7 +2925,7 @@ ul.line-legend li {
   content: "";
   position: absolute;
   left: -18px;
-  top: 32px / 2;
+  top: 16px;
   height: 1px;
   width: 18px;
   background-color: #a0acb8;
