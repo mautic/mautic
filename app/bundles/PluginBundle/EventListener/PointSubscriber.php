@@ -26,7 +26,7 @@ class PointSubscriber implements EventSubscriberInterface
             'group'     => 'mautic.plugin.point.action',
             'label'     => 'mautic.plugin.actions.push_lead',
             'formType'  => IntegrationsListType::class,
-            'formTheme' => 'MauticPluginBundle:FormTheme\Integration',
+            //'formTheme' => 'MauticPluginBundle:FormTheme:Integration',
             'callback'  => [EventHelper::class, 'pushLead'],
         ];
 
