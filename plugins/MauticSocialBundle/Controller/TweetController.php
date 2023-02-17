@@ -103,7 +103,6 @@ class TweetController extends FormController
     protected function getFormView(Form $form, $action)
     {
         return $form->createView();
-        //return $this->setFormTheme($form, 'MauticSocialBundle:Tweet:form.html.twig', ['MauticSocialBundle:FormTheme']);
     }
 
     /**
