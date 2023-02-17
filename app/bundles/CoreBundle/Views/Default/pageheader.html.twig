@@ -9,9 +9,11 @@
 		</div>
 		<div class="col-xs-7 col-sm-6 col-md-7 va-m">
 			<div class="toolbar text-right" id="toolbar">
-                {{ actions|raw }}
-                
-                <div class="toolbar-bundle-buttons pull-left">{{ toolbar }}</div>
+				{# only print if it's a string beause that contains HTML,
+						eg. in PointsBundle and FormBundle's 'new' pages it's outputting an Array #}
+				{{ actions is not iterable ? actions|raw }}
+				
+				<div class="toolbar-bundle-buttons pull-left">{{ toolbar }}</div>
 				<div class="toolbar-form-buttons hide pull-right">
 					<div class="btn-group toolbar-standard hidden-xs hidden-sm "></div>
 					<div class="btn-group toolbar-dropdown hidden-md hidden-lg">
