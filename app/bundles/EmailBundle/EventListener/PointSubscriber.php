@@ -73,7 +73,7 @@ class PointSubscriber implements EventSubscriberInterface
             'callback'        => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'],
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
-            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'formTheme'       => 'MauticEmailBundle:FormTheme:EmailSendList/emailsend_list_row.html.twig',
         ];
 
         $event->addEvent('email.send', $sendEvent);
@@ -83,7 +83,7 @@ class PointSubscriber implements EventSubscriberInterface
           'label'           => 'mautic.email.point.trigger.send_email_to_user',
           'formType'        => EmailToUserType::class,
           'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_useremail_email'],
-          'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+          'formTheme'       => 'MauticEmailBundle:FormTheme:EmailSendList/email_to_user_row.html.twig',
           'eventName'       => EmailEvents::ON_SENT_EMAIL_TO_USER,
         ];
 
