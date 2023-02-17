@@ -1,0 +1,10 @@
+<ul class="list-group">
+     {% for item in activity %}
+        {% set border = 'bdr-b bdr-l-wdh-0 bdr-r-wdh-0' %}
+        {% if loop.first or loop.last %}{% set border = 'bdr-w-0' %}{% endif %}
+        <li class="{{ border }} pa-15 list-group-item">
+            <p>{{ item.tweet }}</p>
+            <span class="text-muted"><i class="fa fa-clock-o"></i> {{ dateToFull(item.published) }}</span>
+        </li>
+    {% endfor %}
+</ul>

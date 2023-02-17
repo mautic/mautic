@@ -1,0 +1,26 @@
+{% set locale = app.request.locale %}
+{% set settings = field.properties|default([]) %}
+{% set layout = settings.layout|default('standard') %}
+{% set action = settings.action|default('like') %}
+{% set showFaces = settings.showFaces is not empty ? 'true' : 'false' %}
+{% set showShare = settings.showShare is not empty ? 'true' : 'false' %}
+{% set clientId = settings.keys.clientId|default('') %}
+
+{# add FB's required OG tag #}
+<meta property="og:type" content="website" />
+<div class="fb-{% if 'share' == action %}share-button{% else %}like{% endif %} share-button facebook-share-button layout-{{ layout }} action-{{ action }}"
+     data-{% if 'share' == action %}type{% else %}layout{% endif %}="{{ layout }}"
+     {% if 'share' != action %}
+       data-action="{{ action }}"
+       data-show-faces="{{ showFaces }}"
+       data-share="{{ showShare }}"
+     {% endif %}
+</div>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = '//connect.facebook.net/{$locale}/sdk.js#xfbml=1&appId={{ clientId }}&version=v2.0';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
