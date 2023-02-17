@@ -9,9 +9,8 @@ use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 use ZipArchive;
 
 /**
@@ -63,15 +62,16 @@ class ExportHelper
             throw new \Exception('No or invalid data given');
         }
 
-        if (self::EXPORT_TYPE_EXCEL === $type) {
-            return $this->exportAsExcel($data, $filename);
-        }
+        switch ($type) {
+            case self::EXPORT_TYPE_CSV:
+                return $this->exportAsCsv($data, $filename);
 
-        if (self::EXPORT_TYPE_CSV === $type) {
-            return $this->exportAsCsv($data, $filename);
-        }
+            case self::EXPORT_TYPE_EXCEL:
+                return $this->exportAsExcel($data, $filename);
 
-        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
+            default:
+                throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        }
     }
 
     public function zipFile(string $filePath, string $fileName): string

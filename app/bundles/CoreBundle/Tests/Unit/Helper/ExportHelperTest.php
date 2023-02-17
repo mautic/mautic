@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use Exception;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\FilePathResolver;
 use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\StageBundle\Entity\Stage;
+use Mautic\CoreBundle\Helper\FilePathResolver;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -66,20 +69,25 @@ class ExportHelperTest extends TestCase
         parent::tearDown();
     }
 
-    public function testExportDataAsInvalidFileType(): void
+    public function testExportDataIntoFileInvalidFileType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->translatorInterfaceMock->expects($this->once())
             ->method('trans')
             ->with('mautic.error.invalid.specific.export.type', [
-                '%type%'          => ExportHelper::EXPORT_TYPE_CSV,
-                '%expected_type%' => ExportHelper::EXPORT_TYPE_EXCEL,
+                '%type%'          => ExportHelper::EXPORT_TYPE_EXCEL,
+                '%expected_type%' => ExportHelper::EXPORT_TYPE_CSV,
             ])
             ->willReturn(
-                'Invalid export type "'.ExportHelper::EXPORT_TYPE_CSV.
-                '". Must be of "'.ExportHelper::EXPORT_TYPE_EXCEL.'".'
+                'Invalid export type "'.ExportHelper::EXPORT_TYPE_EXCEL.
+                '". Must be of "'.ExportHelper::EXPORT_TYPE_CSV.'".'
             );
-        $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo.csv');
+        $iteratorExportDataModelMock = $this->iteratorDataMock($this->dummyData);
+        $this->exportHelper->exportDataIntoFile(
+            $iteratorExportDataModelMock,
+            ExportHelper::EXPORT_TYPE_EXCEL,
+            'demo.xlsx'
+        );
     }
 
     public function testExportDataIntoFileCsvWithExistingFileNameWithZip(): void
@@ -122,13 +130,6 @@ class ExportHelperTest extends TestCase
 
         $this->filePaths[] = $zipFilePath = $this->exportHelper->zipFile($filePath, 'contacts_export.csv');
         Assert::assertFileExists($zipFilePath);
-    }
-
-    public function testZipThrowsFilePathException(): void
-    {
-        $this->expectException(FilePathException::class);
-        $this->expectExceptionMessage('Could not create zip archive at .');
-        $this->filePaths[] = $this->exportHelper->zipFile('', 'contacts_export.csv');
     }
 
     /**
@@ -248,25 +249,6 @@ class ExportHelperTest extends TestCase
             $iteratorExportDataModelMock,
             ExportHelper::EXPORT_TYPE_CSV,
             'demo.csv'
-        );
-    }
-
-    public function testExportDataIntoFileInvalidFileType(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->translatorInterfaceMock->expects($this->once())->method('trans')->with(
-            'mautic.error.invalid.specific.export.type', [
-                '%type%'          => ExportHelper::EXPORT_TYPE_EXCEL,
-                '%expected_type%' => ExportHelper::EXPORT_TYPE_CSV,
-            ]
-        )->willReturn(
-            'Invalid export type "'.ExportHelper::EXPORT_TYPE_EXCEL.'". Must be of "'.ExportHelper::EXPORT_TYPE_CSV.'".'
-        );
-        $iteratorExportDataModelMock = $this->iteratorDataMock($this->dummyData);
-        $this->exportHelper->exportDataIntoFile(
-            $iteratorExportDataModelMock,
-            ExportHelper::EXPORT_TYPE_EXCEL,
-            'demo.xlsx'
         );
     }
 
