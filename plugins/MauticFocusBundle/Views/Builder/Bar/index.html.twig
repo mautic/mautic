@@ -5,7 +5,7 @@
 <div class="mautic-focus mf-bar mf-bar-{{ props.bar.size }} mf-bar-{{ props.bar.placement }} {% if props.bar.sticky %}mf-bar-sticky{% endif %} {{ animate }}" style="background-color: #{{ props.colors.primary }};">
     <div class="mf-content">
         {% if htmlMode in ['editor', 'html'] %}
-            {{ focus[htmlMode]|e }}
+            {{ focus[htmlMode]|raw }}
         {% else %}
             <div class="mf-headline">{{ props.content.headline }}</div>
             {% if 'form' == focus.type %}

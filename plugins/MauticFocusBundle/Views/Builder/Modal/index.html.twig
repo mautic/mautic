@@ -14,7 +14,7 @@
         </div>
         <div class="mf-content">
             {% if htmlMode in ['editor', 'html'] %}
-                {{ focus[htmlMode] }}
+                {{ focus[htmlMode]|raw }}
             {% else %}
               <div class="mf-headline">{{ props['content']['headline'] }}</div>
               {% if props['content']['tagline'] is defined %}
