@@ -38,6 +38,9 @@ class Stat
      */
     private $dateAdded;
 
+    /**
+     * @var Lead
+     */
     private $lead;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)

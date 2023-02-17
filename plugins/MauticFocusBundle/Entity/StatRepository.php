@@ -39,4 +39,27 @@ class StatRepository extends CommonRepository
 
         return $q->getQuery()->getArrayResult();
     }
+
+    /**
+     * @return array<int, Stat>
+     */
+    public function getStatsViewByLead(int $leadId, array $options = []): array
+    {
+        $q = $this->createQueryBuilder('s');
+        $q
+            ->select('partial s.{id, lead, dateAdded}, partial f.{id, name}')
+            ->leftJoin('s.focus', 'f');
+
+        $expr = $q->expr()->andX(
+            $q->expr()->eq('IDENTITY(s.lead)', (int) $leadId),
+            $q->expr()->eq('s.type', ':type')
+        );
+
+        $q->where($expr)
+            ->setParameter('type', Stat::TYPE_NOTIFICATION);
+
+        $result = $q->getQuery()->getArrayResult();
+
+        return ['result' => $result, 'total' => count($result)];
+    }
 }
