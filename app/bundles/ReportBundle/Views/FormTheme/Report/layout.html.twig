@@ -91,7 +91,7 @@
 
 {% block _report_tableOrder_entry_column_row %}
 <div class="choice-wrapper col-xs-6" data-form-block="_report_tableOrder_entry_column_row">
-    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label }}</label>
+    <label class="{{ form.vars.label_attr.class }}" for="{{ form.vars.id }}">{{ form.vars.label|trans }}</label>
     <select id="{{ form.vars.id }}" name="{{ form.vars.full_name }}" class="{{ form.vars.attr.class }}">
         {% for column in form.vars.choices %}
           <option value="{{ column.value|e }}" {% if column.value == form.vars.data %}selected{% endif %}>
