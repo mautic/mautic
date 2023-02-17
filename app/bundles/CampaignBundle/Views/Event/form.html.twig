@@ -12,7 +12,7 @@
     <div class="bundle-form-header mb-10">
         <h3>{{ eventHeader }}</h3>
         {% if eventDescription is defined %}
-          <h6 class="text-muted">{{ eventDescription }}</h6>
+          <h6 class="text-muted">{{ eventDescription|purify }}</h6>
         {% endif %}
     </div>
 
