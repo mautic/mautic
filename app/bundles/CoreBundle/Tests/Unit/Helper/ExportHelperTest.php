@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use Exception;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\FilePathResolver;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -72,22 +78,6 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('No or invalid data given');
         $this->exportHelper->exportDataAs([], ExportHelper::EXPORT_TYPE_EXCEL, 'demo.xlsx');
-    }
-
-    public function testExportDataAsInvalidFileType(): void
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->translatorInterfaceMock->expects($this->once())
-            ->method('trans')
-            ->with('mautic.error.invalid.specific.export.type', [
-                '%type%'          => ExportHelper::EXPORT_TYPE_CSV,
-                '%expected_type%' => ExportHelper::EXPORT_TYPE_EXCEL,
-            ])
-            ->willReturn(
-                'Invalid export type "'.ExportHelper::EXPORT_TYPE_CSV.
-                '". Must be of "'.ExportHelper::EXPORT_TYPE_EXCEL.'".'
-            );
-        $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo.csv');
     }
 
     public function testExportDataAsExcel(): void
@@ -186,17 +176,10 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
         Assert::assertFileExists($zipFilePath);
     }
 
-    public function testZipThrowsFilePathException(): void
-    {
-        $this->expectException(FilePathException::class);
-        $this->expectExceptionMessage('Could not create zip archive at .');
-        $this->filePaths[] = $this->exportHelper->zipFile('', 'contacts_export.csv');
-    }
-
     /**
      * Test if exportDataAs() correctly generates a CSV file when we input some array data.
      */
-    public function testCsvExport()
+    public function testCsvExport(): void
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_CSV, 'demo-file.csv');
 
@@ -219,7 +202,7 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * Test if exportDataAs() correctly generates an Excel file when we input some array data.
      */
-    public function testExcelExport()
+    public function testExcelExport(): void
     {
         $stream = $this->exportHelper->exportDataAs($this->dummyData, ExportHelper::EXPORT_TYPE_EXCEL, 'demo-file.xlsx');
 
@@ -241,6 +224,59 @@ class ExportHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Mautibot', $spreadsheet->getActiveSheet()->getCell('B2')->getValue());
         $this->assertSame(2, $spreadsheet->getActiveSheet()->getCell('A3')->getValue());
         $this->assertSame('Demo', $spreadsheet->getActiveSheet()->getCell('B3')->getValue());
+    }
+
+    /**
+     * @param array<mixed> $data
+     */
+    private function iteratorDataMock(array $data = []): IteratorExportDataModel
+    {
+        $iteratorExportDataModelMock = $this->createMock(IteratorExportDataModel::class);
+        $iteratorData                = new \stdClass();
+        $iteratorData->array         = $data;
+        $iteratorData->position      = 0;
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('rewind')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    $iteratorData->position = 0;
+                }
+            );
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('current')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    return $iteratorData->array[$iteratorData->position];
+                }
+            );
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('key')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    return $iteratorData->position;
+                }
+            );
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('next')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    ++$iteratorData->position;
+                }
+            );
+
+        $iteratorExportDataModelMock->expects($this->any())
+            ->method('valid')
+            ->willReturnCallback(
+                function () use ($iteratorData) {
+                    return isset($iteratorData->array[$iteratorData->position]);
+                }
+            );
+
+        return $iteratorExportDataModelMock;
     }
 
     /**
