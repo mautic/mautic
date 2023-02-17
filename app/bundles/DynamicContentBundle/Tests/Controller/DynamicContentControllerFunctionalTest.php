@@ -115,4 +115,20 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
 
         return $user;
     }
+
+    public function testIndexActionIsSuccessful(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/dwc');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testNewActionIsSuccessful(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
 }
