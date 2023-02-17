@@ -89,7 +89,7 @@ class MonitoringController extends FormController
                     'tmpl'        => $tmpl,
                     'page'        => $page,
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:list.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -205,7 +205,7 @@ class MonitoringController extends FormController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -356,7 +356,7 @@ class MonitoringController extends FormController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -472,7 +472,7 @@ class MonitoringController extends FormController
                     )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:'.$tmpl.'.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:'.$tmpl.'.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
