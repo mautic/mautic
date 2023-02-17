@@ -200,12 +200,12 @@
     </div>
     {{ form_end(form) }}
 
-    <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|escape }}"></div>
-    {% if get_class(filterBlockPrototype) == "FormView" %}
-        <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|escape }}"></div>
+    <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|e }}"></div>
+    {% if '\\Symfony\\Component\\Form\\FormView' is instanceof(filterBlockPrototype) %}
+        <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|e }}"></div>
     {% endif %}
-    {% if get_class(filterSelectPrototype) == "FormView" %}
-        <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|escape }}"></div>
+    {% if '\\Symfony\\Component\\Form\\FormView' is instanceof(filterSelectPrototype) %}
+        <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|e }}"></div>
     {% endif %}
 
     <div class="hide" id="templates">
