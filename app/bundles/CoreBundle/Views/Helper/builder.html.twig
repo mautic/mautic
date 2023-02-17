@@ -69,9 +69,9 @@
                                     <i class="fa fa-{{ slot.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ slot.header|raw }}</span>
-                                    <!-- slot template: "{{ slot.content|replace({'.html.php': '.html.twig'}) }}" -->
+                                    <!-- slot template: "{{ slot.content }}" -->
                                     <script type="text/html">
-                                        {{- include(slot.content|replace({'.html.php': '.html.twig'}), slot.params|default([]), with_context=false) -}}
+                                        {{- include(slot.content, slot.params|default([]), with_context=false) -}}
                                     </script>
                                 </div>
                             {% endfor %}
@@ -94,9 +94,9 @@
                                     <i class="fa fa-{{ section.icon }}" aria-hidden="true"></i>
                                     <br>
                                     <span class="slot-caption">{{ section.header }}</span>
-                                    <!-- section template: "{{ section.content|replace({'.html.php': '.html.twig'}) }}" -->
+                                    <!-- section template: "{{ section.content }}" -->
                                     <script type="text/html">
-                                        {{- include(section.content|replace({'.html.php': '.html.twig'}), with_context=false)|e -}}
+                                        {{- include(section.content, with_context=false)|e -}}
                                     </script>
                                 </div>
                             {% endfor %}
