@@ -36,15 +36,7 @@
 
             <section id="app-content">
                 {% block _content %}
-                     {{ include('MauticCoreBundle:Default:output.html.twig', {
-                        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
-                        headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
-                        actions: block('actions') is defined ? block('actions') : '',
-                        toolbar: block('toolbar') is defined ? block('toolbar') : '',
-                        mauticTemplateVars: mauticTemplateVars|default({}),
-                        content: block('content') is defined ? block('content') : content|default(''),
-                        modal: block('modal') is defined ? block('modal') : '',
-                     }) }}
+                    {{ include('MauticCoreBundle:Default:output.html.twig') }}
                 {% endblock %}
             </section>
 
