@@ -231,23 +231,18 @@ class FocusModel extends FormModel
         $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
         $focusContent = $tokenEvent->getContent();
 
-        // NOTE: {focus_form} may appear in the focus->getEditor() or focus->getHtml() data
         $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
         if (!$formReplaced && !empty($cached['form'])) {
             // Form token missing so just append the form
             $focusContent .= $cached['form'];
         }
 
-        // in twig, this is {{ focusContent|e('js') }}
-        //$focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.twig')->escape($focusContent, 'js');
         $focusContent = twig_escape_filter($this->twig, $focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
 
     /**
-     * @todo $focus should be Focus entity
-     *
      * @param bool   $isPreview
      * @param string $url
      *
