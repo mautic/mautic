@@ -72,7 +72,7 @@ class IntegrationsListType extends AbstractType
             $statusChoices   = [];
             $campaignChoices = [];
 
-            if (isset($data['integration'])) {
+            if (!empty($data['integration'])) {
                 $integrationObject = $this->integrationHelper->getIntegrationObject($data['integration']);
                 if (method_exists($integrationObject, 'getCampaigns')) {
                     $campaigns = $integrationObject->getCampaigns();
