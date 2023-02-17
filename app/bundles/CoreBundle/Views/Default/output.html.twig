@@ -1,11 +1,5 @@
 <div class="content-body">
-    {{ include('MauticCoreBundle:Default:pageheader.html.twig', {
-        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
-        headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
-        actions: block('actions') is defined ? block('actions') : actions|default(''),
-        toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
-        mauticTemplateVars: mauticTemplateVars|default({}),
-    }) }}
+    {{ include('MauticCoreBundle:Default:pageheader.html.twig') }}
     {{ content|default('')|raw }}
 </div>
 {{ modal|default('')|raw }}
