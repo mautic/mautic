@@ -356,7 +356,7 @@
                             <div class="focus-hide visible-focus-type-form">
                                 <div class="col-sm-12" id="focusFormAlert" data-hide-on='{"focus_html_mode_0":"checked"}'>
                                     <div class="alert alert-info">
-                                        {{ 'mautic.focus.form_token.instructions'|trans }}
+                                        {{ 'mautic.focus.form_token.instructions'|trans|raw }}
                                     </div>
                                 </div>
                                 {{ form_row(form.form) }}
