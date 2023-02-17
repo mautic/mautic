@@ -51,3 +51,5 @@ parameters:
 		- '#Return type of call to static method Doctrine\\DBAL\\DriverManager::getConnection\(\) contains unresolvable type\.#'
 	scanFiles:
 		- plugins/MauticFocusBundle/Include/lessc.inc.php
+		# This is here because a few functions in the global namespace are defined in this file
+		- vendor/twig/twig/src/Extension/EscaperExtension.php
