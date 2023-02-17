@@ -22,6 +22,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
  * @extends FormModel<Focus>
@@ -59,6 +60,11 @@ class FocusModel extends FormModel
     protected $contactTracker;
 
     /**
+     * @var Environment
+     */
+    protected $twig;
+
+    /**
      * FocusModel constructor.
      */
     public function __construct(
@@ -67,7 +73,8 @@ class FocusModel extends FormModel
         TemplatingHelper $templating,
         EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        Environment $twig
     ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
@@ -75,6 +82,7 @@ class FocusModel extends FormModel
         $this->dispatcher     = $dispatcher;
         $this->leadFieldModel = $leadFieldModel;
         $this->contactTracker = $contactTracker;
+        $this->twig           = $twig;
     }
 
     /**
@@ -170,30 +178,6 @@ class FocusModel extends FormModel
     }
 
     /**
-     * Returns a trackable URL for the focus passed in. It will return an empty
-     * string if there is no url.
-     */
-    //private function getTrackableUrl(Focus $focus): string
-    //{
-    //    if ('link' == $focus->getType() && !empty($focus->getProperties()['content']['link_url'])) {
-    //        $trackable = $this->trackableModel->getTrackableByUrl(
-    //            $focus->getProperties()['content']['link_url'],
-    //            'focus',
-    //            $focus->getId()
-    //        );
-
-    //        return $this->trackableModel->generateTrackableUrl(
-    //            $trackable,
-    //            ['channel' => ['focus', $focus->getId()]],
-    //            false,
-    //            $focus->getUtmTags()
-    //        );
-    //    }
-
-    //    return '';
-    //}
-
-    /**
      * @return string
      */
     public function generateJavascript(Focus $focus, $isPreview = false, $byPassCache = false)
@@ -204,16 +188,16 @@ class FocusModel extends FormModel
             $focusArray = $focus->toArray();
 
             $url = '';
-            if ('link' == $focus->getType() && !empty($focus->getProperties()['content']['link_url'])) {
+            if ('link' == $focusArray['type'] && !empty($focusArray['properties']['content']['link_url'])) {
                 $trackable = $this->trackableModel->getTrackableByUrl(
-                    $focus->getProperties()['content']['link_url'],
+                    $focusArray['properties']['content']['link_url'],
                     'focus',
-                    $focus->getId()
+                    $focusArray['id']
                 );
 
-                return $this->trackableModel->generateTrackableUrl(
+                $url = $this->trackableModel->generateTrackableUrl(
                     $trackable,
-                    ['channel' => ['focus', $focus->getId()]],
+                    ['channel' => ['focus', $focusArray['id']]],
                     false,
                     $focus->getUtmTags()
                 );
@@ -249,7 +233,6 @@ class FocusModel extends FormModel
 
         // NOTE: {focus_form} may appear in the focus->getEditor() or focus->getHtml() data
         $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
-
         if (!$formReplaced && !empty($cached['form'])) {
             // Form token missing so just append the form
             $focusContent .= $cached['form'];
@@ -257,47 +240,10 @@ class FocusModel extends FormModel
 
         // in twig, this is {{ focusContent|e('js') }}
         //$focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.twig')->escape($focusContent, 'js');
+        $focusContent = twig_escape_filter($this->twig, $focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
-
-    /**
-     * Renders the focus item.
-     */
-    //public function renderContentHtml(Focus $entity, bool $isPreview = false, string $url = '#'): string
-    //{
-    //    return $this->templating->getTemplating()->render('MauticFocusBundle:Builder:content.html.twig', [
-    //            'focus'    => $entity,
-    //            'preview'  => $isPreview,
-    //            'htmlMode' => $entity->getHtmlMode(), // @todo remove
-    //            'clickUrl' => $url,
-    //    ]);
-    //}
-
-    /**
-     * This is used to generate `{focus_form}` raw html.
-     *
-     * @param \Mautic\FormBundle\Entity\Form $form
-     */
-    //public function renderFormHtml(
-    //    Focus $entity,
-    //    $form,
-    //    bool $isPreview = false
-    //): string {
-    //    [$pages, $lastPage] = $this->formModel->getPages($form->getFields()->toArray());
-
-    //    return $this->templating->getTemplating()->render('MauticFocusBundle:Builder:form.html.twig', [
-    //        'form'           => $form,
-    //        'pages'          => $pages,
-    //        'lastPage'       => $lastPage,
-    //        'style'          => $entity->getStyle(),
-    //        'focusId'        => $entity->getId(),
-    //        'preview'        => $isPreview,
-    //        'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
-    //        'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-    //        'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
-    //    ]);
-    //}
 
     /**
      * @todo $focus should be Focus entity
@@ -319,7 +265,6 @@ class FocusModel extends FormModel
             $htmlMode = 'basic';
         }
 
-        //$content = $this->renderContentHtml($this->getEntity($focus['id']), $isPreview, $url);
         $content = $this->templating->getTemplating()->render(
             'MauticFocusBundle:Builder:content.html.twig',
             [
@@ -334,7 +279,7 @@ class FocusModel extends FormModel
         // will be converted to clickables
         $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
-        $displayManager     = $viewOnlyFields     = null;
+        $displayManager     = $viewOnlyFields = null;
         if ($form) {
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);

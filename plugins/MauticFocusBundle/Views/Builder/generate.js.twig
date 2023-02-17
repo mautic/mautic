@@ -270,7 +270,7 @@
                     if (Focus.debug)
                         console.log('insertStyleIntoHead()');
 
-                    var css = "{{- parentCssContent|raw|e('js') -}}",
+                    var css = "{{- parentCssContent|e('js') -}}",
                         head = document.head || document.getElementsByTagName('head')[0],
                         style = document.createElement('style');
 
@@ -292,7 +292,7 @@
                 var frameDoc = Focus.iframe.contentDocument;
                 var frameHead = frameDoc.getElementsByTagName('head').item(0);
 
-                var css = "{{- cssContent|raw|e('js') -}}";
+                var css = "{{- cssContent|e('js') -}}";
                 var style = frameDoc.createElement('style');
 
                 style.type = 'text/css';
