@@ -1,17 +1,5 @@
-<?php
-
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-?>
-
-<?php echo $view->render('MauticFocusBundle:Builder\Modal:animations.less.php'); ?>
-<?php echo $view->render('MauticFocusBundle:Builder\Modal:overlay.less.php'); ?>
+{{ include('MauticFocusBundle:Builder:Modal/animations.less.twig', with_context=false) }}
+{{ include('MauticFocusBundle:Builder:Modal/overlay.less.twig', with_context=false) }}
 .mf-modal-iframe {
     position: fixed;
     z-index: 21003;

@@ -15,7 +15,7 @@
                     {% set totalClicks       = 0 %}
                     {% set totalUniqueClicks = 0 %}
                     {% for link in trackables %}
-                        {% set totalClicks = totalClicks + linkhits %}
+                        {% set totalClicks = totalClicks + link.hits %}
                         {% set totalUniqueClicks = totalUniqueClicks + link.unique_hits %}
                         <tr>
                             <td class="long-text"><a href="{{ link.url }}">{{ link.url }}</a></td>

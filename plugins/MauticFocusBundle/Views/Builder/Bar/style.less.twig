@@ -1,15 +1,3 @@
-<?php
-
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-?>
-
 .mf-bar {
     width: 100%;
     position: fixed;
@@ -111,7 +99,7 @@
     }
 }
 
-<?php echo $view->render('MauticFocusBundle:Builder\Bar:collapser.less.php'); ?>
+{{ include('MauticFocusBundle:Builder:Bar/collapser.less.twig', with_context=false) }}
 
 @media only screen and (max-width: 667px) {
     & .mf-bar-collapse, & .mf-bar-collapser {
@@ -119,9 +107,9 @@
     }
 }
 
-<?php if (!empty($preview)): ?>
-<?php echo $view->render('MauticFocusBundle:Builder\Bar:animations.less.php'); ?>
-<?php echo $view->render('MauticFocusBundle:Builder\Bar:shared.less.php'); ?>
+{% if preview is not empty %}
+{{ include('MauticFocusBundle:Builder:Bar/animations.less.twig', with_context=false) }}
+{{ include('MauticFocusBundle:Builder:Bar/shared.less.twig', with_context=false) }}
 .mf-bar {
     &.mf-animate {
         .barAnimate();
@@ -131,5 +119,4 @@
 .mf-bar, .mf-bar-collapser, .mf-bar-collapser-sticky {
     position: absolute !important;
 }
-
-<?php endif; ?>
+{% endif %}
