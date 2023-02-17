@@ -86,7 +86,7 @@ class TriggerController extends FormController
                 'permissions' => $permissions,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
-            'contentTemplate' => 'MauticPointBundle:Trigger:list.html.php',
+            'contentTemplate' => 'MauticPointBundle:Trigger:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -147,7 +147,7 @@ class TriggerController extends FormController
                 'page'        => $page,
                 'permissions' => $permissions,
             ],
-            'contentTemplate' => 'MauticPointBundle:Trigger:details.html.php',
+            'contentTemplate' => 'MauticPointBundle:Trigger:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -266,7 +266,7 @@ class TriggerController extends FormController
                 'form'          => $form->createView(),
                 'sessionId'     => $sessionId,
             ],
-            'contentTemplate' => 'MauticPointBundle:Trigger:form.html.php',
+            'contentTemplate' => 'MauticPointBundle:Trigger:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -432,7 +432,7 @@ class TriggerController extends FormController
                 'form'          => $form->createView(),
                 'sessionId'     => $objectId,
             ],
-            'contentTemplate' => 'MauticPointBundle:Trigger:form.html.php',
+            'contentTemplate' => 'MauticPointBundle:Trigger:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
