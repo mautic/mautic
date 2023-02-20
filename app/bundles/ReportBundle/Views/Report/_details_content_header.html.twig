@@ -1,7 +1,7 @@
 {#$showDynamicFilters  = (true === !empty($report->getSettings()['showDynamicFilters']));
 $hideDateRangeFilter = (true === !empty($report->getSettings()['hideDateRangeFilter']));#}
-{%- set showDynamicFilters = (report.settings.showDynamicFilters is defined) -%}
-{%- set hideDateRangeFilter = (report.settings.hideDateRangeFilter is defined) -%}
+{%- set showDynamicFilters = (report.settings.showDynamicFilters is defined and report.settings.showDynamicFilters) -%}
+{%- set hideDateRangeFilter = (report.settings.hideDateRangeFilter is defined and report.settings.hideDateRangeFilter) -%}
 
 <!-- report detail header -->
 {% if report.description %}
