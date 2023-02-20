@@ -65,7 +65,7 @@ class MenuExtension extends AbstractExtension
      */
     public function buildMenuClasses($item, $matcher, $options, $extra)
     {
-        $isAncestor = $matcher->isAncestor($item, (int)$options['matchingDepth']);
+        $isAncestor = $matcher->isAncestor($item, (int) $options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);
 
         $class   = $item->getAttribute('class');
