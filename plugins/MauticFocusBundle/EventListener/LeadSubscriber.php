@@ -3,8 +3,6 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
-use Mautic\LeadBundle\Event\LeadChangeEvent;
-use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
@@ -74,8 +72,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $eventViewTypeName = $this->translator->trans('mautic.focus.event.view');
         $event->addEventType($eventViewTypeKey, $eventViewTypeName);
         $eventViewApplicable = $event->isApplicable($eventViewTypeKey);
-        // Add to counter
-//        $event->addToCounter($eventTypeKey, $statsViewsByLead);
 
         $eventClickTypeKey  = 'focus.click';
         $eventClickTypeName = $this->translator->trans('mautic.focus.event.click');
@@ -93,12 +89,11 @@ class LeadSubscriber implements EventSubscriberInterface
             $icon     = 'fa-search';
 
             $counter = [Stat::TYPE_NOTIFICATION=>0, Stat::TYPE_CLICK=>0];
-            //dump($eventViewApplicable, $eventClickApplicable);
             // Add the view to the event array
             foreach ($statsViewsByLead['result'] as $statsView) {
-                if (((Stat::TYPE_CLICK == $statsView['type']) && !$eventViewApplicable)
+                if (((Stat::TYPE_CLICK == $statsView['type']) && !$eventClickApplicable)
                     ||
-                    ((Stat::TYPE_NOTIFICATION == $statsView['type']) && !$eventClickApplicable)) {
+                    ((Stat::TYPE_NOTIFICATION == $statsView['type']) && !$eventViewApplicable)) {
                     continue;
                 } else {
                     ++$counter[$statsView['type']];
@@ -129,71 +124,4 @@ class LeadSubscriber implements EventSubscriberInterface
             $event->addToCounter($eventClickTypeKey, $counter[Stat::TYPE_CLICK]);
         }
     }
-
-    /**
-     * Compile events for the lead timeline.
-     */
-//    public function onTimelineGenerateVideo(LeadTimelineEvent $event)
-//    {
-//        // Set available event types
-//        $eventTypeKey  = 'page.videohit';
-//        $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
-//        $event->addEventType($eventTypeKey, $eventTypeName);
-//        $event->addSerializerGroup('pageList', 'hitDetails');
-//
-//        if (!$event->isApplicable($eventTypeKey)) {
-//            return;
-//        }
-//
-//        $hits = $this->pageVideoModel->getHitRepository()->getTimelineStats(
-//            $event->getLeadId(),
-//            $event->getQueryOptions()
-//        );
-//
-//        $event->addToCounter($eventTypeKey, $hits);
-//
-//        if (!$event->isEngagementCount()) {
-//            // Add the hits to the event array
-//            foreach ($hits['results'] as $hit) {
-//                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
-//                $eventLabel = $eventTypeName;
-//
-//                $event->addEvent(
-//                    [
-//                        'event'      => $eventTypeKey,
-//                        'eventLabel' => $eventLabel,
-//                        'eventType'  => $eventTypeName,
-//                        'timestamp'  => $hit['date_hit'],
-//                        'extra'      => [
-//                            'hit' => $hit,
-//                        ],
-//                        'contentTemplate' => $template,
-//                        'icon'            => 'fa-video-camera',
-//                    ]
-//                );
-//            }
-//        }
-//    }
-
-//    public function onLeadChange(LeadChangeEvent $event)
-//    {
-//        $this->pageModel->getHitRepository()->updateLeadByTrackingId(
-//            $event->getNewLead()->getId(),
-//            $event->getNewTrackingId(),
-//            $event->getOldTrackingId()
-//        );
-//    }
-//
-//    public function onLeadMerge(LeadMergeEvent $event)
-//    {
-//        $this->pageModel->getHitRepository()->updateLead(
-//            $event->getLoser()->getId(),
-//            $event->getVictor()->getId()
-//        );
-//
-//        $this->pageVideoModel->getHitRepository()->updateLead(
-//            $event->getLoser()->getId(),
-//            $event->getVictor()->getId()
-//        );
-//    }
 }
