@@ -78,7 +78,7 @@ class AuthController extends FormController
      */
     public function authStatusAction($integration)
     {
-        $postAuthTemplate = 'MauticPluginBundle:Auth:postauth.html.php';
+        $postAuthTemplate = 'MauticPluginBundle:Auth:postauth.html.twig';
 
         $session     = $this->get('session');
         $postMessage = $session->get('mautic.integration.postauth.message');
