@@ -240,7 +240,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/20030306?v=4",
       "profile": "https://hartmut.io",
       "contributions": [
-        "code"
+        "code",
+        "userTesting"
       ]
     },
     {
@@ -695,7 +696,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/96085911?v=4",
       "profile": "https://github.com/volha-pivavarchyk",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "code"
       ]
     },
     {
@@ -940,6 +942,51 @@
       "profile": "https://github.com/bergwerkweb",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "LordRembo",
+      "name": "Rembrand",
+      "avatar_url": "https://avatars.githubusercontent.com/u/758957?v=4",
+      "profile": "http://rembo.me",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "TechBill",
+      "name": "TechBill",
+      "avatar_url": "https://avatars.githubusercontent.com/u/945103?v=4",
+      "profile": "https://github.com/TechBill",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "irfanhanfi",
+      "name": "Irfan Hanfi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4272642?v=4",
+      "profile": "https://stackoverflow.com/users/902161/irfan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "annamunk",
+      "name": "Anna Munk",
+      "avatar_url": "https://avatars.githubusercontent.com/u/102536220?v=4",
+      "profile": "https://github.com/annamunk",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "sdoering",
+      "name": "Sven Döring",
+      "avatar_url": "https://avatars.githubusercontent.com/u/765204?v=4",
+      "profile": "https://www.schriftrolle.de/?utm_source=github&utm_medium=profilLink",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],
