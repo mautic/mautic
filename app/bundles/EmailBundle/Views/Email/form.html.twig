@@ -201,10 +201,10 @@
     {{ form_end(form) }}
 
     <div id="dynamicContentPrototype" data-prototype="{{ form_widget(dynamicContentPrototype)|e }}"></div>
-    {% if '\\Symfony\\Component\\Form\\FormView' is instanceof(filterBlockPrototype) %}
+    {% if filterBlockPrototype is instanceof('\\Symfony\\Component\\Form\\FormView') %}
         <div id="filterBlockPrototype" data-prototype="{{ form_widget(filterBlockPrototype)|e }}"></div>
     {% endif %}
-    {% if '\\Symfony\\Component\\Form\\FormView' is instanceof(filterSelectPrototype) %}
+    {% if filterSelectPrototype is instanceof('\\Symfony\\Component\\Form\\FormView') %}
         <div id="filterSelectPrototype" data-prototype="{{ form_widget(filterSelectPrototype)|e }}"></div>
     {% endif %}
 
