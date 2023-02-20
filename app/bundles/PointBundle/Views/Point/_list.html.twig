@@ -29,6 +29,13 @@
 
                 {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
                         'sessionVar': 'point',
+                        'orderBy': 'pl.name',
+                        'text': 'mautic.point.thead.league',
+                        'class': 'visible-md visible-lg col-point-league',
+                }) }}
+
+                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                        'sessionVar': 'point',
                         'orderBy': 'p.delta',
                         'text': 'mautic.point.thead.delta',
                         'class': 'visible-md visible-lg col-point-delta',
@@ -83,6 +90,11 @@
                           <span class="label label-default pa-4" style="border: 1px solid #d5d5d5; background: {{ color }};"> </span>
                           <span>{{ catName }}</span>
                         </span>
+                    </td>
+                    <td class="visible-md visible-lg">
+                        {% set league = item.league %}
+                        {% set leagueName = league.name|default('mautic.point.league.form.noleague'|trans) %}
+                        {{ leagueName }}
                     </td>
                     <td class="visible-md visible-lg">{{ item.delta }}</td>
                     <td>{{ actions[item.type].label|default('')|trans }}</td>
