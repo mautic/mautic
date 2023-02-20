@@ -50,7 +50,7 @@ abstract class EmailAbstractIntegration extends AbstractIntegration
      */
     public function getFormTheme()
     {
-        return 'MauticEmailMarketingBundle:FormTheme\EmailMarketing';
+        return 'MauticEmailMarketingBundle:FormTheme:EmailMarketing/layout.html.twig';
     }
 
     /**

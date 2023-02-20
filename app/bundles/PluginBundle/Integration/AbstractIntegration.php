@@ -300,7 +300,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getFormTemplate()
     {
-        return 'MauticPluginBundle:Integration:form.html.php';
+        return 'MauticPluginBundle:Integration:form.html.twig';
     }
 
     /**
@@ -310,7 +310,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getFormTheme()
     {
-        return 'MauticPluginBundle:FormTheme\Integration';
+        return 'MauticPluginBundle:FormTheme:Integration/layout.html.twig';
     }
 
     /**
