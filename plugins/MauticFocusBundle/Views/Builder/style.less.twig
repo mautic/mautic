@@ -1,19 +1,7 @@
-<?php
-
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-if (!isset($preview)) {
-    $preview = false;
-}
-
-ob_start();
-?>
+{#
+#}
+{% set preview = preview|default(false) %}
+{% set less %}
 .mf-bar-iframe {
     z-index: 19000;
 }
@@ -48,12 +36,11 @@ ob_start();
 }
 
 .mautic-focus {
-    <?php if ($preview): ?>
-
+    {% if preview %}
     .mauticform-row {
         min-height: 0px;
     }
-    <?php endif; ?>
+    {% endif %}
 
     .mauticform_wrapper form {
         padding: 0;
@@ -73,44 +60,27 @@ ob_start();
     }
 }
 
-<?php
+{{ include('MauticFocusBundle:Builder:Bar/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
 
-echo $view->render(
-    'MauticFocusBundle:Builder\Bar:style.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
+{{ include('MauticFocusBundle:Builder:Modal/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
 
-echo $view->render(
-    'MauticFocusBundle:Builder\Modal:style.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
+{{ include('MauticFocusBundle:Builder:Notification/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
 
-echo $view->render(
-    'MauticFocusBundle:Builder\Notification:style.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
+{{ include('MauticFocusBundle:Builder:Page/style.less.twig', {
+        'preview': preview,
+}, with_context=false) }}
+{% endset %}
 
-echo $view->render(
-    'MauticFocusBundle:Builder\Page:style.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
+{% set css = less|less_compile %}
 
-$less = ob_get_clean();
+{% if preview is empty and 'dev' is same as app.environment %}
+    {% set css = css|css_minify %}
+{% endif %}
 
-require_once __DIR__.'/../../Include/lessc.inc.php';
-$compiler = new \lessc();
-$css      = $compiler->compile($less);
-
-if (empty($preview) && 'dev' != $app->getEnvironment()) {
-    $css = \Minify_CSS::minify($css);
-}
-
-echo $css;
+{{ css|raw }}
