@@ -295,13 +295,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         if (null !== $lead && !empty($points)) {
             $lead->adjustPoints($points);
 
-            $pointsChangeLogEntryName = $event->getEvent()['id'].': '.$event->getEvent()['name'];
+            $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
+            $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
             $pointLeagueId            = $event->getConfig()['league'] ?? null;
             $pointLeague              = $pointLeagueId ? $this->leagueModel->getEntity($pointLeagueId) : null;
             if (!empty($pointLeague)) {
                 $scoreRepository = $this->leadModel->getLeagueContactScoreRepository();
                 $scoreRepository->adjustPoints($lead, $pointLeague, $points);
-                $pointsChangeLogEntryName .= ' ('.$pointLeague->getName().')';
+                $pointsLogEventName .= ' ('.$pointLeague->getName().')';
             }
 
             //add a lead point change log
@@ -309,8 +310,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             $log->setDelta($points);
             $log->setLead($lead);
             $log->setType('campaign');
-            $log->setEventName("{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}");
-            $log->setActionName($pointsChangeLogEntryName);
+            $log->setEventName($pointsLogEventName);
+            $log->setActionName($pointsLogActionName);
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
             $lead->addPointsChangeLog($log);
