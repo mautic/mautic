@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
+use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -69,115 +70,130 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
-        $eventTypeKey  = 'focus.view';
-        $eventTypeName = $this->translator->trans('mautic.focus.event.view');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('focusList');
+        $eventViewTypeKey  = 'focus.view';
+        $eventViewTypeName = $this->translator->trans('mautic.focus.event.view');
+        $event->addEventType($eventViewTypeKey, $eventViewTypeName);
+        $eventViewApplicable = $event->isApplicable($eventViewTypeKey);
+        // Add to counter
+//        $event->addToCounter($eventTypeKey, $statsViewsByLead);
 
-        if (!$event->isApplicable($eventTypeKey)) {
-            return;
-        }
+        $eventClickTypeKey  = 'focus.click';
+        $eventClickTypeName = $this->translator->trans('mautic.focus.event.click');
+        $event->addEventType($eventClickTypeKey, $eventClickTypeName);
+        $eventClickApplicable = $event->isApplicable($eventClickTypeKey);
+
+        $event->addSerializerGroup('focusList');
 
         $contactId        = $event->getLead()->getId();
         $statsViewsByLead = $this->focusModel->getStatRepository()->getStatsViewByLead($contactId, $event->getQueryOptions());
-
-        // Add to counter
-        $event->addToCounter($eventTypeKey, $statsViewsByLead);
+        //dump($statsViewsByLead);
 
         if (!$event->isEngagementCount()) {
+            $template = 'MauticFocusBundle:SubscribedEvents\Timeline:index.html.php';
+            $icon     = 'fa-search';
+
+            $counter = [Stat::TYPE_NOTIFICATION=>0, Stat::TYPE_CLICK=>0];
+            //dump($eventViewApplicable, $eventClickApplicable);
             // Add the view to the event array
             foreach ($statsViewsByLead['result'] as $statsView) {
-                $template = 'MauticFocusBundle:SubscribedEvents\Timeline:index.html.php';
-                $icon     = 'fa-search';
+                if (((Stat::TYPE_CLICK == $statsView['type']) && !$eventViewApplicable)
+                    ||
+                    ((Stat::TYPE_NOTIFICATION == $statsView['type']) && !$eventClickApplicable)) {
+                    continue;
+                } else {
+                    ++$counter[$statsView['type']];
 
-                $eventLabel = [
-                    'label' => $statsView['focus']['name'],
-                    'href'  => $this->router->generate('mautic_focus_action', ['objectAction' => 'view', 'objectId' => $statsView['focus']['id']]),
-                ];
+                    $eventLabel = [
+                        'label' => $statsView['focus']['name'],
+                        'href'  => $this->router->generate('mautic_focus_action', ['objectAction' => 'view', 'objectId' => $statsView['focus']['id']]),
+                    ];
 
-                $event->addEvent(
-                    [
-                        'event'      => $eventTypeKey,
-                        'eventId'    => $statsView['id'],
-                        'eventLabel' => $eventLabel,
-                        'eventType'  => $eventTypeName,
-                        'timestamp'  => $statsView['dateAdded'],
-//                        'extra' => [
-//                            'view' => $statsView,
-//                        ],
-                        'contentTemplate' => $template,
-                        'icon'            => $icon,
-                        'contactId'       => $contactId,
-                    ]
-                );
+                    $event->addEvent(
+                        [
+                            'event'           => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeKey : $eventClickTypeKey,
+                            'eventId'         => $statsView['id'],
+                            'eventLabel'      => $eventLabel,
+                            'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
+                            'timestamp'       => $statsView['dateAdded'],
+                            'contentTemplate' => $template,
+                            'icon'            => $icon,
+                            'contactId'       => $contactId,
+                        ]
+                    );
+                }
             }
+
+            // Add to counter view
+            $event->addToCounter($eventViewTypeKey, $counter[Stat::TYPE_NOTIFICATION]);
+            // Add to counter click
+            $event->addToCounter($eventClickTypeKey, $counter[Stat::TYPE_CLICK]);
         }
     }
 
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerateVideo(LeadTimelineEvent $event)
-    {
-        // Set available event types
-        $eventTypeKey  = 'page.videohit';
-        $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
-        $event->addEventType($eventTypeKey, $eventTypeName);
-        $event->addSerializerGroup('pageList', 'hitDetails');
+//    public function onTimelineGenerateVideo(LeadTimelineEvent $event)
+//    {
+//        // Set available event types
+//        $eventTypeKey  = 'page.videohit';
+//        $eventTypeName = $this->translator->trans('mautic.page.event.videohit');
+//        $event->addEventType($eventTypeKey, $eventTypeName);
+//        $event->addSerializerGroup('pageList', 'hitDetails');
+//
+//        if (!$event->isApplicable($eventTypeKey)) {
+//            return;
+//        }
+//
+//        $hits = $this->pageVideoModel->getHitRepository()->getTimelineStats(
+//            $event->getLeadId(),
+//            $event->getQueryOptions()
+//        );
+//
+//        $event->addToCounter($eventTypeKey, $hits);
+//
+//        if (!$event->isEngagementCount()) {
+//            // Add the hits to the event array
+//            foreach ($hits['results'] as $hit) {
+//                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
+//                $eventLabel = $eventTypeName;
+//
+//                $event->addEvent(
+//                    [
+//                        'event'      => $eventTypeKey,
+//                        'eventLabel' => $eventLabel,
+//                        'eventType'  => $eventTypeName,
+//                        'timestamp'  => $hit['date_hit'],
+//                        'extra'      => [
+//                            'hit' => $hit,
+//                        ],
+//                        'contentTemplate' => $template,
+//                        'icon'            => 'fa-video-camera',
+//                    ]
+//                );
+//            }
+//        }
+//    }
 
-        if (!$event->isApplicable($eventTypeKey)) {
-            return;
-        }
-
-        $hits = $this->pageVideoModel->getHitRepository()->getTimelineStats(
-            $event->getLeadId(),
-            $event->getQueryOptions()
-        );
-
-        $event->addToCounter($eventTypeKey, $hits);
-
-        if (!$event->isEngagementCount()) {
-            // Add the hits to the event array
-            foreach ($hits['results'] as $hit) {
-                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
-                $eventLabel = $eventTypeName;
-
-                $event->addEvent(
-                    [
-                        'event'      => $eventTypeKey,
-                        'eventLabel' => $eventLabel,
-                        'eventType'  => $eventTypeName,
-                        'timestamp'  => $hit['date_hit'],
-                        'extra'      => [
-                            'hit' => $hit,
-                        ],
-                        'contentTemplate' => $template,
-                        'icon'            => 'fa-video-camera',
-                    ]
-                );
-            }
-        }
-    }
-
-    public function onLeadChange(LeadChangeEvent $event)
-    {
-        $this->pageModel->getHitRepository()->updateLeadByTrackingId(
-            $event->getNewLead()->getId(),
-            $event->getNewTrackingId(),
-            $event->getOldTrackingId()
-        );
-    }
-
-    public function onLeadMerge(LeadMergeEvent $event)
-    {
-        $this->pageModel->getHitRepository()->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
-        );
-
-        $this->pageVideoModel->getHitRepository()->updateLead(
-            $event->getLoser()->getId(),
-            $event->getVictor()->getId()
-        );
-    }
+//    public function onLeadChange(LeadChangeEvent $event)
+//    {
+//        $this->pageModel->getHitRepository()->updateLeadByTrackingId(
+//            $event->getNewLead()->getId(),
+//            $event->getNewTrackingId(),
+//            $event->getOldTrackingId()
+//        );
+//    }
+//
+//    public function onLeadMerge(LeadMergeEvent $event)
+//    {
+//        $this->pageModel->getHitRepository()->updateLead(
+//            $event->getLoser()->getId(),
+//            $event->getVictor()->getId()
+//        );
+//
+//        $this->pageVideoModel->getHitRepository()->updateLead(
+//            $event->getLoser()->getId(),
+//            $event->getVictor()->getId()
+//        );
+//    }
 }

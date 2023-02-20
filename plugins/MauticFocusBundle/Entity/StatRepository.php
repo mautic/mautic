@@ -47,16 +47,16 @@ class StatRepository extends CommonRepository
     {
         $q = $this->createQueryBuilder('s');
         $q
-            ->select('partial s.{id, lead, dateAdded}, partial f.{id, name}')
+            ->select('partial s.{id, lead, type, dateAdded}, partial f.{id, name}')
             ->leftJoin('s.focus', 'f');
 
         $expr = $q->expr()->andX(
             $q->expr()->eq('IDENTITY(s.lead)', (int) $leadId),
-            $q->expr()->eq('s.type', ':type')
+            $q->expr()->in('s.type', ':type')
         );
 
         $q->where($expr)
-            ->setParameter('type', Stat::TYPE_NOTIFICATION);
+            ->setParameter('type', [Stat::TYPE_NOTIFICATION, Stat::TYPE_CLICK]);
 
         $result = $q->getQuery()->getArrayResult();
 
