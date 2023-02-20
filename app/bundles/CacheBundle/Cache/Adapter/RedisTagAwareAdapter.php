@@ -14,7 +14,7 @@ namespace Mautic\CacheBundle\Cache\Adapter;
 
 use Mautic\CacheBundle\Exceptions\InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
-use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter as TagAwareAdapter;
 
 class RedisTagAwareAdapter extends TagAwareAdapter
 {
@@ -28,9 +28,6 @@ class RedisTagAwareAdapter extends TagAwareAdapter
 
         $client  = RedisAdapter::createConnection($servers['dsn'], $options);
 
-        parent::__construct(
-            new RedisAdapter($client, $namespace, $lifetime),
-            new RedisAdapter($client, $namespace.'.tags.', $lifetime)
-        );
+        parent::__construct($client, $namespace, $lifetime);
     }
 }
