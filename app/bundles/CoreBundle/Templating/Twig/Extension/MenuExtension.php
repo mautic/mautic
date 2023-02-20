@@ -56,11 +56,11 @@ class MenuExtension extends AbstractExtension
     /**
      * Concats the appropriate classes for menu links.
      *
-     * @param ItemInterface|null        $item
-     * @param MatcherInterface|null     $matcher
-     * @param array<string,string>      $options
-     * @param string                    $extra
-     * 
+     * @param ItemInterface|null    $item
+     * @param MatcherInterface|null $matcher
+     * @param array<string,string>  $options
+     * @param string                $extra
+     *
      * @return array<mixed>
      */
     public function buildMenuClasses($item, $matcher, $options, $extra)
