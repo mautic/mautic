@@ -11,43 +11,14 @@
 #}
 {%- form_theme form with formThemes -%}
 <!-- form themes: {{ formThemes|join(', ') }} -->
-{#
-if (!$hasSupportedFeatures = (isset($form['supportedFeatures']) && count($form['supportedFeatures']))) {
-    if (isset($form['supportedFeatures'])) {
-        $form['supportedFeatures']->setRendered();
-    }
-}
-#}
 {%- set nSupportedFeatures = form.supportedFeatures is defined ? form.supportedFeatures|length : 0 -%}
 {%- set hasSupportedFeatures = nSupportedFeatures > 0 -%}
-{#{%- if not hasSupportedFeatures and form.supportedFeatures is defined %}{% do form.supportedFeatures.setRendered() %}{% endif -%}#}
-
-{#
-if (!$hasFields = (!empty($formSettings['dynamic_contact_fields']) || isset($form['featureSettings']) && count($form['featureSettings']['leadFields']))) {
-    // Unset if set to prevent features tab from showing when there's no feature to show
-    unset($form['featureSettings']['leadFields']);
-} else {
-    $hideContactFieldTab = (!empty($formSettings['dynamic_contact_fields']) && !count($form['featureSettings']['leadFields']));
-}
-#}
 {%- set nFeatureSettings = form.featureSettings is defined ? form.featureSettings|length : 0 -%}
 {%- set hasFields = ((formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty) or form.featureSettings is defined) and form.featureSettings.leadFields|length > 0
 -%}
 {# Unset if set to prevent features tab from showing when there's no feature to show #}
 {%- if not hasFields %}{% do form.featureSettings.leadFields.setRendered() %}{% set nFeatureSettings = nFeatureSettings - 1 %}{% endif -%}
 {%- set hideContactFieldTab = (hasFields and formSettings.dynamic_contact_fields is defined and formSettings.dynamic_contact_fields is not empty and form.featureSettings.leadFields|length == 0) -%}
-{#
-if (!$hasFeatureSettings = (isset($form['featureSettings'])
-    && (($hasFields && count($form['featureSettings']) > 1)
-        || (!$hasFields
-            && count($form['featureSettings'])
-            )))
-) {
-    if (isset($form['featureSettings'])) {
-        $form['featureSettings']->setRendered();
-    }
-}
-#}
 {%- set hasFeatureSettings = (
           form.featureSettings is defined
           and (
@@ -64,11 +35,6 @@ if (!$hasFeatureSettings = (isset($form['featureSettings'])
 {%- set fieldTabClass = (hasFields and hideContactFieldTab == false) ?: 'hide' -%}
 {%- set hasLeadFieldErrors    = hasFields and formContainsErrors(form.featureSettings.leadFields) -%}
 {%- set hasCompanyFieldErrors = hasCompanyFields and formContainsErrors(form.featureSettings.companyFields) -%}
-
-{#
-unset($form['featureSettings']['leadFields']);
-unset($form['featureSettings']['companyFields']);
-#}
 {%- if form.featureSettings.leadFields is defined %}{% do form.featureSettings.leadFields.setRendered() %}{% endif -%}
 {%- if form.featureSettings.companyFields is defined %}{% do form.featureSettings.companyFields.setRendered() %}{% endif -%}
 
