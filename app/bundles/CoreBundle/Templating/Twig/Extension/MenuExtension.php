@@ -54,7 +54,10 @@ class MenuExtension extends AbstractExtension
     /**
      * Concats the appropriate classes for menu links.
      *
+     * @param ItemInterface $item
+     * @param MatcherInterface $matcher
      * @param array $options
+     * @param array $extra
      */
     public function buildMenuClasses($item, $matcher, $options, $extra): array
     {
@@ -67,7 +70,7 @@ class MenuExtension extends AbstractExtension
         $classes .= ($extra) ? " {$extra}" : '';
         $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
         $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';
-        $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
+        $classes .= ($isAncestor && $this->menuHelper->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
         $classes .= ($item->actsLikeFirst()) ? " {$options['firstClass']}" : '';
         $classes .= ($item->actsLikeLast()) ? " {$options['lastClass']}" : '';
 
