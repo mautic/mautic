@@ -37,7 +37,7 @@ class AjaxController extends CommonAjaxController
             $form = $this->get('form.factory')->create($formType, [], ['label' => false, 'csrf_protection' => false]);
 
             $html = $this->renderView(
-                'MauticSocialBundle:FormTheme:'.$type.'_widget.html.php',
+                'MauticSocialBundle:FormTheme:'.$type.'_widget.html.twig',
                 ['form' => $form->createView()]
             );
 
