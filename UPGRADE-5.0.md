@@ -30,6 +30,7 @@
     * Two French regions were updates based on ISO_3166-2 (Val-d\'Oise, La Réunion). If you use it in API, please change values to Val d\'Oise or Réunion
     * `AbstractMauticTestCase::loadFixtures` and `AbstractMauticTestCase::loadFixtureFiles` now accept only two arguments: `array $fixtures` and `bool $append`. If you need to use old parameters - refer to the documentation of `LiipTestFixturesBundle`
     * Transactional emails in campaigns ignore the DNC setting.
+    * There are no unsubscribe headers in transactional emails.
 
 # Dependency injection improvements
 

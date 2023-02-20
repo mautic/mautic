@@ -31,8 +31,10 @@ class AssetExtension extends AbstractExtension
         return [
             new TwigFunction('outputScripts', [$this, 'outputScripts'], ['is_safe' => ['all']]),
             new TwigFunction('includeScript', [$this, 'includeScript'], ['is_safe' => ['all']]),
+            new TwigFunction('includeStylesheet', [$this, 'includeStylesheet'], ['is_safe' => ['all']]),
             new TwigFunction('outputHeadDeclarations', [$this, 'outputHeadDeclarations'], ['is_safe' => ['all']]),
             new TwigFunction('getAssetUrl', [$this, 'getAssetUrl'], ['is_safe' => ['html']]),
+            new TwigFunction('addAssetScript', [$this, 'addScript'], ['is_safe' => ['html']]),
             new TwigFunction('outputStyles', [$this, 'outputStyles'], ['is_safe' => ['html']]),
             new TwigFunction('outputSystemScripts', [$this, 'outputSystemScripts'], ['is_safe' => ['html']]),
             new TwigFunction('outputSystemStylesheets', [$this, 'outputSystemStylesheets'], ['is_safe' => ['html']]),
@@ -40,6 +42,7 @@ class AssetExtension extends AbstractExtension
             new TwigFunction('assetsGetPrefix', [$this, 'getAssetPrefix']),
             new TwigFunction('assetAddScriptDeclaration', [$this, 'addScriptDeclaration']),
             new TwigFunction('assetGetCountryFlag', [$this, 'getCountryFlag']),
+            new TwigFunction('assetGetBaseUrl', [$this, 'getBaseUrl'], ['is_safe' => ['html']]),
             new TwigFunction('assetMakeLinks', [$this, 'makeLinks'], ['is_safe' => ['html']]),
         ];
     }
@@ -64,6 +67,11 @@ class AssetExtension extends AbstractExtension
     public function includeScript(string $assetFilePath, string $onLoadCallback = '', string $alreadyLoadedCallback = ''): string
     {
         return $this->assetsHelper->includeScript($assetFilePath, $onLoadCallback, $alreadyLoadedCallback);
+    }
+
+    public function includeStylesheet(string $assetFilePath): string
+    {
+        return $this->assetsHelper->includeStylesheet($assetFilePath);
     }
 
     /**
@@ -105,6 +113,11 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
+    public function addScript(string $script, string $location = 'head', bool $async = false, string $name = null): AssetsHelper
+    {
+        return $this->assetsHelper->addScript($script, $location, $async, $name);
+    }
+
     public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
@@ -131,6 +144,11 @@ class AssetExtension extends AbstractExtension
     public function getCountryFlag(string $country, bool $urlOnly = true, string $class = ''): string
     {
         return $this->assetsHelper->getCountryFlag($country, $urlOnly, $class);
+    }
+
+    public function getBaseUrl(): string
+    {
+        return (string) $this->assetsHelper->getBaseUrl();
     }
 
     /**
