@@ -30,7 +30,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.plugin.actions.push_lead',
             'description' => 'mautic.plugin.actions.tooltip',
             'formType'    => IntegrationsListType::class,
-            'formTheme'   => 'MauticPluginBundle:FormTheme:Integration/campaign_builder_layout.html.twig',
+            'formTheme'   => 'MauticPluginBundle:FormTheme:Integration/layout.html.twig',
             'eventName'   => PluginEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
 
