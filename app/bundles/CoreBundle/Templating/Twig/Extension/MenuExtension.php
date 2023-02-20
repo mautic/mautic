@@ -56,14 +56,16 @@ class MenuExtension extends AbstractExtension
     /**
      * Concats the appropriate classes for menu links.
      *
-     * @param ItemInterface|null    $item
-     * @param MatcherInterface|null $matcher
-     * @param array<string,string>  $options
-     * @param string                $extra
+     * @param ItemInterface|null        $item
+     * @param MatcherInterface|null     $matcher
+     * @param array<string,string>      $options
+     * @param string                    $extra
+     * 
+     * @return array<mixed>
      */
-    public function buildMenuClasses($item, $matcher, $options, $extra): array
+    public function buildMenuClasses($item, $matcher, $options, $extra)
     {
-        $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
+        $isAncestor = $matcher->isAncestor($item, (int)$options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);
 
         $class   = $item->getAttribute('class');
