@@ -1,85 +1,57 @@
-<?php
+{#
+  Variables
+    - focus (MauticPlugin\MauticFocusBundle\Entity\Focus)
+    - preview (bool, default: false)
+    - clickUrl (string)
+#}
+{%- set style = focus.style -%}
+{%- set props = focus.properties -%}
+{%- set useScrollEvent = (props.when in ['scroll_slight', 'scroll_middle', 'scroll_bottom']) -%}
+{%- set useUnloadEvent = ('leave' == props.when) -%}
+{%- set useTimeout = props.timeout|default(0) -%}
+{%- set animate = props.animate is not defined or (props.animate is defined and props.animate is not empty) -%}
+{%- set linkActivation = props.link_activation is not defined or (props.link_activation is defined and props.link_activation is not empty) -%}
+{%- set clickUrl = clickUrl|default(props.content.link_url) -%}
 
-/*
- * @copyright   2016 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-$style          = $focus['style'];
-$props          = $focus['properties'];
-$useScrollEvent = in_array($props['when'], ['scroll_slight', 'scroll_middle', 'scroll_bottom']);
-$useUnloadEvent = ('leave' == $props['when']);
-$useTimeout     = (int) $props['timeout'];
-if ('5seconds' == $props['when']) {
-    $useTimeout = 5;
-} elseif ('minute' == $props['when']) {
-    $useTimeout = 60;
-}
-if ($useTimeout) {
-    $timeout = $useTimeout * 1000;
-}
+{%- if '5seconds' == props.when -%}
+    {%- set useTimeout = 5 -%}
+{%- elseif 'minute' == props.when -%}
+    {%- set useTimeout = 60 -%}
+{%- endif -%}
 
-$debug          = ('dev' == $app->getEnvironment()) ? 'true' : 'false';
-$animate        = (!isset($props['animate']) || !empty($props['animate']));
-$linkActivation = (!isset($props['link_activation']) || !empty($props['link_activation']));
+{%- if useTimeout > 0 -%}
+    {%- set timeout = useTimeout * 1000 -%}
+{%- endif -%}
 
-if (!isset($preview)) {
-    $preview = false;
-}
+{%- set cssContent = include('MauticFocusBundle:Builder:style.less.twig', {
+        'preview': preview,
+        'focus': focus,
+}, with_context=false) -%}
 
-if (!isset($clickUrl)) {
-    $clickUrl = $props['content']['link_url'];
-}
+{%- set parentCssContent = include('MauticFocusBundle:Builder:parent.less.twig', {
+        'preview': preview,
+}, with_context=false) -%}
 
-$cssContent = $view->render(
-    'MauticFocusBundle:Builder:style.less.php',
-    [
-        'preview' => $preview,
-        'focus'   => $focus,
-    ]
-);
-$cssContent = $view->escape($cssContent, 'js');
-
-$parentCssContent = $view->render(
-    'MauticFocusBundle:Builder:parent.less.php',
-    [
-        'preview' => $preview,
-    ]
-);
-$parentCssContent = $view->escape($parentCssContent, 'js');
-
-switch ($style) {
-    case 'bar':
-        $iframeClass = "mf-bar-iframe mf-bar-iframe-{$props['bar']['placement']} mf-bar-iframe-{$props['bar']['size']}";
-        if ($props['bar']['sticky']) {
-            $iframeClass .= ' mf-bar-iframe-sticky';
-        }
-        break;
-
-    case 'modal':
-    case 'notification':
-        $placement   = str_replace('_', '-', $props[$style]['placement']);
-        $iframeClass = "mf-{$style}-iframe mf-{$style}-iframe-{$placement}";
-        break;
-
-    default:
-        $iframeClass = 'mf-'.$style.'-iframe';
-        break;
-}
-?>
+{%- if 'bar' is same as style -%}
+  {%- set iframeClass = 'mf-bar-iframe mf-bar-iframe-' ~ props.bar.placement ~ ' mf-bar-iframe-' ~ props.bar.size -%}
+  {%- if props.bar.sticky -%}
+      {% set iframeClass = iframeClass ~ ' mf-bar-iframe-sticky' -%}
+  {%- endif -%}
+{%- elseif 'modal' is same as style or 'notification' is same as style -%}
+  {%- set iframeClass = 'mf-' ~ style ~ '-iframe mf-' ~ style ~ '-iframe-' ~ props[style].placement|replace({'_': '-'})  -%}
+{%- else -%}
+  {%- set iframeClass = 'mf-' ~ style ~ '-iframe' -%}
+{%- endif -%}
 (function (window) {
     if (typeof window.MauticFocusParentHeadStyleInserted == 'undefined') {
         window.MauticFocusParentHeadStyleInserted = false;
     }
 
-    window.MauticFocus<?php echo $focus['id']; ?> = function () {
+    window.MauticFocus{{ focus.id }} = function () {
         var Focus = {
-            debug: <?php echo $debug; ?>,
+            debug: {{ ('dev' == app.environment) ? 'true' : 'false' }},
             modalsDismissed: {},
-            ignoreConverted: <?php echo ('notification' !== $focus['type'] && !empty($props['stop_after_conversion'])) ? 'true' : 'false'; ?>,
+            ignoreConverted: {% if 'notification' is not same as focus.type and props.stop_after_conversion is defined and props.stop_after_conversion is not empty %}true{% else %}false{% endif %},
 
             // Initialize the focus
             initialize: function () {
@@ -90,27 +62,26 @@ switch ($style) {
                 Focus.registerFocusEvent();
 
                 // Add class to body
-                Focus.addClass(document.getElementsByTagName('body')[0], 'MauticFocus<?php echo ucfirst($style); ?>');
+                Focus.addClass(document.getElementsByTagName('body')[0], 'MauticFocus{{ style|capitalize }}');
             },
 
             // Register click events for toggling bar, closing windows, etc
             registerClickEvents: function () {
-                <?php if ('bar' == $style): ?>
+                {% if 'bar' == style %}
                 var isTop = Focus.hasClass(Focus.iframeFocus, 'mf-bar-top');
                 Focus.setDefaultBarPosition(isTop);
 
-                var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
+                var collapser = document.getElementsByClassName('mf-bar-collapser-{{ focus.id }}');
 
                 if (collapser[0]) {
                     collapser[0].addEventListener('click', function () {
                         Focus.toggleBarCollapse(collapser[0], false);
                     });
                 }
-
-                <?php else: ?>
-                var closer = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>-close');
+                {% else %}
+                var closer = Focus.iframeDoc.getElementsByClassName('mf-{{ style }}-close');
                 var aTag = closer[0].getElementsByTagName('a');
-                var container = Focus.iframeDoc.getElementsByClassName('mf-<?php echo $style; ?>');
+                var container = Focus.iframeDoc.getElementsByClassName('mf-{{ style }}');
 
                 container.onclick = function(e) {
                     if (e) { e.stopPropagation(); }
@@ -122,35 +93,35 @@ switch ($style) {
 
                 aTag[0].addEventListener('click', function (event) {
                     // Prevent multiple engagements for link clicks on exit intent
-                    Focus.modalsDismissed["<?php echo $focus['id']; ?>"] = true;
+                    Focus.modalsDismissed["{{ focus.id }}"] = true;
 
                     // Remove iframe
                     if (Focus.iframe.parentNode) {
                         Focus.iframe.parentNode.removeChild(Focus.iframe);
                     }
 
-                    var overlays = document.getElementsByClassName('mf-modal-overlay-<?php echo $focus['id']; ?>');
+                    var overlays = document.getElementsByClassName('mf-modal-overlay-{{ focus.id }}');
                     if (overlays.length) {
                         overlays[0].parentNode.removeChild(overlays[0]);
                     }
                 });
-                <?php endif; ?>
+                {% endif %}
 
-                <?php if ('link' == $focus['type']): ?>
+                {% if 'link' == focus.type %}
                 var links = Focus.iframeDoc.getElementsByClassName('mf-link');
                 if (links.length) {
                     links[0].addEventListener('click', function (event) {
                         Focus.convertVisitor();
                     });
                 }
-                <?php elseif ('form' == $focus['type']): ?>
+                {% elseif 'form' == focus.type %}
                 var buttons = Focus.iframeDoc.getElementsByClassName('mauticform-button');
                 if (buttons.length) {
                     buttons[0].addEventListener('click', function (event) {
                         Focus.convertVisitor();
                     });
                 }
-                <?php endif; ?>
+                {% endif %}
             },
             setDefaultBarPosition: function (isTop) {
                 if (isTop) {
@@ -167,8 +138,8 @@ switch ($style) {
                 var currentScale = svg[0].getAttribute('data-transform-scale');
 
                 if (useCookie) {
-                    if (Focus.cookies.hasItem('mf-bar-collapser-<?php echo $focus['id']; ?>')) {
-                        var newDirection = Focus.cookies.getItem('mf-bar-collapser-<?php echo $focus['id']; ?>');
+                    if (Focus.cookies.hasItem('mf-bar-collapser-{{ focus.id }}')) {
+                        var newDirection = Focus.cookies.getItem('mf-bar-collapser-{{ focus.id }}');
                         if (isNaN(newDirection)) {
                             var newDirection = currentDirection;
                         }
@@ -178,7 +149,7 @@ switch ($style) {
                     }
                 } else {
                     var newDirection = (parseInt(currentDirection) * -1);
-                    Focus.cookies.setItem('mf-bar-collapser-<?php echo $focus['id']; ?>', newDirection);
+                    Focus.cookies.setItem('mf-bar-collapser-{{ focus.id }}', newDirection);
                 }
 
                 setTimeout(function () {
@@ -215,44 +186,44 @@ switch ($style) {
                 if (Focus.debug)
                     console.log('registerFocusEvent()');
 
-                <?php if ($useScrollEvent): ?>
+                {% if useScrollEvent %}
                 if (Focus.debug)
                     console.log('scroll event registered');
 
-                <?php if ($useTimeout): ?>
+                {% if useTimeout %}
                 if (Focus.debug)
                     console.log('timeout event registered');
 
                 setTimeout(function () {
                     window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
-                }, <?php echo $timeout; ?>);
+                }, {{ timeout }});
 
-                <?php else: ?>
+                {% else %}
 
                 window.addEventListener('scroll', Focus.engageVisitorAtScrollPosition);
 
-                <?php endif; ?>
+                {% endif %}
 
-                <?php elseif ($useUnloadEvent): ?>
+                {% elseif useUnloadEvent %}
                 if (Focus.debug)
                     console.log('show when visitor leaves');
 
-                <?php if ($useTimeout): ?>
+                {% if useTimeout %}
                 if (Focus.debug)
                     console.log('timeout event registered');
 
                 setTimeout(function () {
                     document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
-                }, <?php echo $timeout; ?>);
+                }, {{ timeout }});
 
-                <?php else: ?>
+                {% else %}
 
                 document.documentElement.addEventListener('mouseleave', Focus.engageVisitor);
 
-                <?php endif; ?>
+                {% endif %}
 
                 // Add a listener to every link
-                <?php if ($linkActivation): ?>
+                {% if linkActivation %}
 
                 var elements = document.getElementsByTagName('a');
 
@@ -260,7 +231,7 @@ switch ($style) {
                     var href = elements[i].getAttribute('href');
                     if (href && href.indexOf('#') != 0 && href.indexOf('javascript:') != 0) {
                         elements[i].onclick = function (event) {
-                            if (typeof Focus.modalsDismissed["<?php echo $focus['id']; ?>"] == 'undefined') {
+                            if (typeof Focus.modalsDismissed["{{ focus.id }}"] == 'undefined') {
                                 if (Focus.engageVisitor()) {
                                     event.preventDefault();
                                 }
@@ -268,29 +239,29 @@ switch ($style) {
                         }
                     }
                 }
-                <?php endif; ?>
+                {% endif %}
 
-                <?php else: ?>
+                {% else %}
                 if (Focus.debug)
                     console.log('show immediately');
 
-                <?php if ($useTimeout): ?>
+                {% if useTimeout %}
                 if (Focus.debug)
                     console.log('timeout event registered');
 
                 setTimeout(function () {
                     // Give a slight delay to allow browser to process style injection into header
                     Focus.engageVisitor();
-                }, <?php echo $timeout; ?>);
+                }, {{ timeout }});
 
-                <?php else: ?>
+                {% else %}
 
                 // Give a slight delay to allow browser to process style injection into header
                 Focus.engageVisitor();
 
-                <?php endif; ?>
+                {% endif %}
 
-                <?php endif; ?>
+                {% endif %}
             },
 
             // Insert global style into page head
@@ -299,7 +270,7 @@ switch ($style) {
                     if (Focus.debug)
                         console.log('insertStyleIntoHead()');
 
-                    var css = "<?php echo $parentCssContent; ?>",
+                    var css = "{{- parentCssContent|e('js') -}}",
                         head = document.head || document.getElementsByTagName('head')[0],
                         style = document.createElement('style');
 
@@ -321,7 +292,7 @@ switch ($style) {
                 var frameDoc = Focus.iframe.contentDocument;
                 var frameHead = frameDoc.getElementsByTagName('head').item(0);
 
-                var css = "<?php echo $cssContent; ?>";
+                var css = "{{- cssContent|e('js') -}}";
                 var style = frameDoc.createElement('style');
 
                 style.type = 'text/css';
@@ -342,12 +313,12 @@ switch ($style) {
             engageVisitor: function () {
                 var now = Math.floor(Date.now() / 1000);
 
-                if (Focus.cookies.hasItem('mautic_focus_<?php echo $focus['id']; ?>')) {
+                if (Focus.cookies.hasItem('mautic_focus_{{ focus.id }}')) {
                     if (Focus.debug)
                         console.log('Cookie exists thus checking frequency');
 
-                    var lastEngaged = parseInt(Focus.cookies.getItem('mautic_focus_<?php echo $focus['id']; ?>')),
-                        frequency = '<?php echo $props['frequency']; ?>',
+                    var lastEngaged = parseInt(Focus.cookies.getItem('mautic_focus_{{ focus.id }}')),
+                        frequency = '{{ props.frequency }}',
                         engage;
 
                     if (Focus.ignoreConverted && lastEngaged == -1) {
@@ -441,7 +412,7 @@ switch ($style) {
                 Focus.iframeDoc.write("{focus_content}");
                 Focus.iframeDoc.close();
 
-                var animate = <?php echo ($animate) ? 'true' : 'false'; ?>;
+                var animate = {% if animate %}true{% else %}false{% endif %};
 
                 Focus.iframe.onload = function() {
                     if (Focus.debug)
@@ -471,7 +442,7 @@ switch ($style) {
                 var move = Focus.iframeDoc.getElementsByClassName('mf-move-to-parent');
                 for (var i = 0; i < move.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
-                    Focus.addClass(move[i], 'mf-moved-<?php echo $focus['id']; ?>');
+                    Focus.addClass(move[i], 'mf-moved-{{ focus.id }}');
                     bodyFirstChild.parentNode.insertBefore(move[i], Focus.iframe);
                 }
 
@@ -480,7 +451,7 @@ switch ($style) {
                 for (var i = 0; i < copy.length; i++) {
                     var bodyFirstChild = document.body.firstChild;
                     var clone = copy[i].cloneNode(true);
-                    Focus.addClass(clone, 'mf-moved-<?php echo $focus['id']; ?>');
+                    Focus.addClass(clone, 'mf-moved-{{ focus.id }}');
                     bodyFirstChild.parentNode.insertBefore(clone, Focus.iframe);
                 }
 
@@ -494,20 +465,20 @@ switch ($style) {
                 // Register events
                 Focus.registerClickEvents();
 
-                <?php if ('leave' == $props['when']): ?>
+                {% if 'leave' == props.when %}
                 // Ensure user can leave
                 document.documentElement.removeEventListener('mouseleave', Focus.engageVisitor);
-                <?php endif; ?>
+                {% endif %}
 
                 // Add cookie of last engagement
                 if (Focus.debug)
-                    console.log('mautic_focus_<?php echo $focus['id']; ?> cookie set for ' + now);
+                    console.log('mautic_focus_{{ focus.id }} cookie set for ' + now);
 
-                Focus.cookies.removeItem('mautic_focus_<?php echo $focus['id']; ?>');
-                Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', now, Infinity, '/');
+                Focus.cookies.removeItem('mautic_focus_{{ focus.id }}');
+                Focus.cookies.setItem('mautic_focus_{{ focus.id }}', now, Infinity, '/');
 
-                <?php if ('bar' == $style): ?>
-                var collapser = document.getElementsByClassName('mf-bar-collapser-<?php echo $focus['id']; ?>');
+                {% if 'bar' == style %}
+                var collapser = document.getElementsByClassName('mf-bar-collapser-{{ focus.id }}');
 
                 if (animate) {
                     // Give iframe chance to resize
@@ -517,7 +488,7 @@ switch ($style) {
                 } else {
                     Focus.toggleBarCollapse(collapser[0], true);
                 }
-                <?php endif; ?>
+                {% endif %}
 
                 return true;
             },
@@ -528,7 +499,7 @@ switch ($style) {
                     return true;
                 }
 
-                <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
+                {% if style in ['modal', 'notification', 'bar'] %}
                 Focus.iframeHeight = 0;
                 Focus.iframeWidth = 0;
                 Focus.iframeResizeInterval = setInterval(function () {
@@ -549,7 +520,7 @@ switch ($style) {
                         Focus.iframeHeight = useHeight;
                     }
 
-                    <?php if (in_array($style, ['modal', 'notification'])): ?>
+                    {% if style in ['modal', 'notification'] %}
                     if (Focus.iframeWidth !== Focus.iframe.style.width) {
                         if (Focus.debug) {
                             console.log('window inner width = ' + window.innerWidth);
@@ -577,16 +548,16 @@ switch ($style) {
 
                         Focus.iframeWidth = Focus.iframe.style.width;
                     }
-                    <?php endif; ?>
+                    {% endif %}
                 }, 35);
 
                 Focus.iframeResizerEnabled = true;
 
                 return true;
-                <?php else: ?>
+                {% else %}
 
                 return false;
-                <?php endif; ?>
+                {% endif %}
             },
 
             // Disable iframe resizer
@@ -595,9 +566,9 @@ switch ($style) {
                     delete(Focus.iframeResizerEnabled);
                 }
 
-                <?php if (in_array($style, ['modal', 'notification', 'bar'])): ?>
+                {% if style in ['modal', 'notification', 'bar'] %}
                 clearInterval(Focus.iframeResizeInterval);
-                <?php endif; ?>
+                {% endif %}
             },
 
             // Create iframe to load into body
@@ -611,7 +582,7 @@ switch ($style) {
                 Focus.iframe.style.height = "100%";
                 Focus.iframe.src = "about:blank";
                 Focus.iframe.scrolling = "no";
-                Focus.iframe.className = "<?php echo $iframeClass; ?>";
+                Focus.iframe.className = "{{ iframeClass|raw }}";
 
                 var bodyFirstChild = document.body.firstChild;
                 bodyFirstChild.parentNode.insertBefore(Focus.iframe, bodyFirstChild);
@@ -628,22 +599,15 @@ switch ($style) {
                 var scrollPos = window.pageYOffset,
                     atPos = 0;
 
-                <?php switch ($props['when']):
-                case 'scroll_slight': ?>
+                {% if 'scroll_slight' is same as props.when %}
                 atPos = 10;
-                <?php break; ?>
-
-                <?php case 'scroll_middle': ?>
+                {% elseif 'scroll_middle' is same as props.when %}
                 scrollPos += (visualHeight / 2);
                 atPos = (document.body.scrollHeight / 2);
-                <?php break; ?>
-
-                <?php case 'scroll_bottom': ?>
+                {% elseif 'scroll_bottom' is same as props.when %}
                 scrollPos += visualHeight;
                 atPos = document.body.scrollHeight;
-                <?php break; ?>
-
-                <?php endswitch; ?>
+                {% endif %}
 
                 if (Focus.debug)
                     console.log('scrolling: ' + scrollPos + ' >= ' + atPos);
@@ -660,7 +624,7 @@ switch ($style) {
                     if (Focus.debug)
                         console.log('Visitor converted');
 
-                    Focus.cookies.setItem('mautic_focus_<?php echo $focus['id']; ?>', -1, Infinity, '/');
+                    Focus.cookies.setItem('mautic_focus_{{ focus.id }}', -1, Infinity, '/');
                 } else if (Focus.debug) {
                     console.log('Visitor converted but ignoreConverted not enabled');
                 }
@@ -747,5 +711,5 @@ switch ($style) {
     }
 
     // Initialize
-    MauticFocus<?php echo $focus['id']; ?>().initialize();
+    MauticFocus{{ focus.id }}().initialize();
 })(window);
