@@ -45,7 +45,6 @@ class MenuExtension extends AbstractExtension
      *
      * @param $attributes
      * @param $overrides
-     *
      */
     public function parseMenuAttributes($attributes, $overrides = []): string
     {
@@ -62,10 +61,10 @@ class MenuExtension extends AbstractExtension
         $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);
 
-        $class   = $item->getAttribute('class');        
+        $class   = $item->getAttribute('class');
 
         $classes = ($class) ? " {$class}" : '';
-        $classes .= ($extra) ?  " {$extra}" : '';        
+        $classes .= ($extra) ? " {$extra}" : '';
         $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
         $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';
         $classes .= ($isAncestor && $this->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
