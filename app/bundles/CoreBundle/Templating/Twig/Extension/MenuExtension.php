@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
+use Knp\Menu\ItemInterface;
+use Knp\Menu\Matcher\MatcherInterface;
 use Mautic\CoreBundle\Templating\Helper\MenuHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -43,8 +45,8 @@ class MenuExtension extends AbstractExtension
     /**
      * Parses attributes for the menu view.
      *
-     * @param $attributes
-     * @param $overrides
+     * @param array<string> $attributes
+     * @param array<string> $overrides
      */
     public function parseMenuAttributes($attributes, $overrides = []): string
     {
@@ -54,10 +56,10 @@ class MenuExtension extends AbstractExtension
     /**
      * Concats the appropriate classes for menu links.
      *
-     * @param ItemInterface    $item
-     * @param MatcherInterface $matcher
-     * @param array            $options
-     * @param array            $extra
+     * @param ItemInterface|null    $item
+     * @param MatcherInterface|null $matcher
+     * @param array<string,string>  $options
+     * @param string                $extra
      */
     public function buildMenuClasses($item, $matcher, $options, $extra): array
     {
@@ -66,13 +68,19 @@ class MenuExtension extends AbstractExtension
 
         $class   = $item->getAttribute('class');
 
-        $classes = ($class) ? " {$class}" : '';
+        $classes = '';
+
+        $classes .= ($class) ? " {$class}" : '';
         $classes .= ($extra) ? " {$extra}" : '';
         $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
         $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';
         $classes .= ($isAncestor && $this->menuHelper->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
         $classes .= ($item->actsLikeFirst()) ? " {$options['firstClass']}" : '';
         $classes .= ($item->actsLikeLast()) ? " {$options['lastClass']}" : '';
+
+        if (empty($classes)) {
+            return [];
+        }
 
         return ['class' => trim($classes)];
     }
