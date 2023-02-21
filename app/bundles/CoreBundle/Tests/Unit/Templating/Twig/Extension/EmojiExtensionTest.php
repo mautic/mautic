@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class EmojiExtensionTest extends TestCase
 {
-    public function testItContainsAtLeastOneFilter(): void
+    public function testItContainsAtLeastOneFunction(): void
     {
         $extension = new EmojiExtension(new EmojiHelper());
 
