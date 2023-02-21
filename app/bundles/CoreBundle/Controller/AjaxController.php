@@ -356,7 +356,7 @@ class AjaxController extends CommonController
     {
         $dataArray = [
             'success' => 1,
-            'content' => $this->renderView('MauticCoreBundle:Update:update.html.php'),
+            'content' => $this->renderView('MauticCoreBundle:Update:update.html.twig'),
         ];
 
         // A way to keep the upgrade from failing if the session is lost after
