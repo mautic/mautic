@@ -208,15 +208,15 @@ final class TagController extends FormController
         if (!$cancelled = $this->isFormCancelled($form)) {
             if ($valid = $this->isFormValid($form)) {
                 // form is valid so process the data
-                $found = $this->tagRepository->countOccurrences($tag->getTag());
-                if (0 !== $found) {
+                $existingTag = $this->tagRepository->getTagByName($tag->getTag());
+                if (null !== $existingTag) {
                     $valid = false;
-                    $this->addFlashMessage('mautic.core.notice.updated', [
-                        '%name%'      => $tag->getTag(),
+                    $this->addFlashMessage('mautic.tagmanager.tag.already.exists', [
+                        '%name%'      => $existingTag->getTag(),
                         '%menu_link%' => 'mautic_tagmanager_index',
                         '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
                             'objectAction' => 'edit',
-                            'objectId'     => $tag->getId(),
+                            'objectId'     => $existingTag->getId(),
                         ]),
                     ]);
                 } else {

@@ -244,4 +244,17 @@ class TagRepository extends CommonRepository
             $alias.'.description',
         ]);
     }
+
+    public function getTagByName(string $tagName): ?Tag
+    {
+        $qb = $this->createQueryBuilder('t');
+        $qb->select('t')
+            ->where(
+                $qb->expr()->eq('t.tag', ':tagName')
+            );
+
+        return $qb->setParameter('tagName', $tagName)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
