@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
@@ -11,7 +12,6 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -28,7 +28,7 @@ class LeadSubscriber implements EventSubscriberInterface
     private $pageVideoModel;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -42,7 +42,7 @@ class LeadSubscriber implements EventSubscriberInterface
     public function __construct(
         PageModel $pageModel,
         VideoModel $pageVideoModel,
-        TranslatorInterface $translator,
+        Translator $translator,
         RouterInterface $router,
         FocusModel $focusModel
     ) {
