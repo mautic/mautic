@@ -1,0 +1,49 @@
+{#
+  Variables
+    - permissions
+    - permissionBase
+    - translationBase
+    - actionRoute
+    - indexRoute
+    - currentRoute
+    - searchValue
+    - mauticTemplateVars (optional)
+    - searchHelp (optional)
+    - toolBarButtons (optional)
+    - filters (optional)
+#}
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block actions %}
+  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+        'templateButtons': {
+          'new': permissions[permissionBase ~ ':create'],
+        },
+        'actionRoute': actionRoute,
+        'indexRoute': indexRoute,
+        'translationBase': translationBase,
+  }) }}
+{% endblock %}
+
+{% block content %}
+<div class="panel panel-default bdr-t-wdh-0 mb-0">
+    {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'searchHelp': searchHelp|default(''),
+            'action': currentRoute,
+            'actionRoute': actionRoute,
+            'indexRoute': indexRoute,
+            'translationBase': translationBase,
+            'preCustomButtons': toolBarButtons|default(null),
+            'templateButtons': {
+                'delete': permissions[permissionBase ~ ':delete'],
+            },
+            'filters': filters|default([]),
+    }) }}
+    <div class="page-list">
+        {{ customContent('content.above', mauticTemplateVars|default([])) }}
+        {{ block('_content') }}
+        {{ customContent('content.below', mauticTemplateVars|default([])) }}
+    </div>
+</div>
+{% endblock %}

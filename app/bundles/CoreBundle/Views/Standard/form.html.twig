@@ -1,0 +1,17 @@
+{% extends'MauticCoreBundle:FormTheme:form_simple.html.twig' %}
+
+{% block rightFormContent %}
+  {# Parse standard fields #}
+  {%- if form.category is defined %}{{ form_row(form.category) }}{% endif %}
+  {%- if form.language is defined %}{{ form_row(form.language) }}{% endif %}
+  {%- if form.isPublished is defined %}{{ form_row(form.isPublished) }}{% endif %}
+  {%- if form.publishUp is defined %}{{ form_row(form.publishUp) }}{% endif %}
+  {%- if form.publishDown is defined %}{{ form_row(form.publishDown) }}{% endif %}
+
+  {# Put toggles on right side #}
+  {%- for child in form|filter(f => f.vars.name not in ['category', 'language', 'isPublished', 'publishUp', 'publishDown'] and 'yesno_button_group' in f.vars.block_prefixes) %}
+      {{- form_row(child) }}
+  {%- endfor %}
+{% endblock %}
+
+{% block primaryFormContent form_rest(form) %}
