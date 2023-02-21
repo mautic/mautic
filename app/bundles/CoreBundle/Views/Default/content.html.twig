@@ -11,14 +11,15 @@
 {{- '' -}}
 {% if template is not empty %}
     {{- include(template, {
-        content: block('content'),
-        modal: block('modal') is defined ? block('modal') : '',
+        content: block('content') is defined ? block('content') : content|default(''),
+        modal: block('modal') is defined ? block('modal') : modal|default(''),
         headerTitle: block('headerTitle'),
-        pageTitle: block('pageTitle') is defined ? block('pageTitle') : '',
-        publishStatus: block('publishStatus') is defined ? block('publishStatus') : '',
-        actions: block('actions') is defined ? block('actions') : '',
-        toolbar: block('toolbar') is defined ? block('toolbar') : '',
-        isXmlHttpRequest: request.isXmlHttpRequest
+        pageTitle: block('pageTitle') is defined ? block('pageTitle') : pageTitle|default(''),
+        publishStatus: block('publishStatus') is defined ? block('publishStatus') : publishStatus|default(''),
+        actions: block('actions') is defined ? block('actions') : actions|default(''),
+        toolbar: block('toolbar') is defined ? block('toolbar') : toolbar|default(''),
+        mauticTemplateVars: mauticTemplateVars|default({}),
+        isXmlHttpRequest: request.isXmlHttpRequest,
     }) -}}
 {% else %}
     {{ block('content') }}
