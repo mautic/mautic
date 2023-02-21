@@ -21,7 +21,7 @@
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
-{% set mauticTemplateVars = mauticTemplateVars|default([]) %}
+{% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': 'MauticEmailBundle:Email:form.html.twig', 'email': email}) %}
 
 {% block headerTitle %}
   {% if email.id is not empty %}
@@ -36,7 +36,6 @@
 {% endblock %}
 
 {% block content %}
-    <div id="grapesjsbuilder_assets" class="hide" data-assets="{{ url('grapesjsbuilder_assets') }}" data-upload="{{ url('grapesjsbuilder_upload') }}" data-delete="{{ url('grapesjsbuilder_delete') }}"></div>
     {{ form_start(form) }}
     <div class="box-layout">
         <div class="col-md-9 height-auto bg-white">
@@ -77,7 +76,6 @@
                                     {{ form_row(form.replyToAddress) }}
                                     {{ form_row(form.bccAddress) }}
                                     {{ customContent('email.settings.advanced', mauticTemplateVars) }}
-                                    <textarea id="grapesjsbuilder_customMjml" class="form-control builder-mjml" name="grapesjsbuilder[customMjml]"></textarea>
                                     <div>
                                         <div class="pull-left">
                                             {{ form_label(form.assetAttachments) }}
