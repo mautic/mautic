@@ -47,7 +47,7 @@ class FormatterExtension extends AbstractExtension
      */
     public function _($val, string $type = 'html', bool $textOnly = false, int $round = 1): string
     {
-        return $this->formatterHelper->_($val, $type, $textOnly, $round);
+        return (string) $this->formatterHelper->_($val, $type, $textOnly, $round);
     }
 
     /**
