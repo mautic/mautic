@@ -26,7 +26,7 @@ final class ReportControllerTest extends MauticMysqlTestCase
      */
     public function testNewRouteSuccessfullyLoads(): void
     {
-        $this->client->request(Request::METHOD_GET, '/s/reports');
+        $this->client->request(Request::METHOD_GET, '/s/reports/new');
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
