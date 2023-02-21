@@ -8,7 +8,8 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Helper\FormFieldHelper;
@@ -16,32 +17,32 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
-use Mautic\FormBundle\Tests\FormTestAbstract;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class DeleteFormTest extends FormTestAbstract
+class DeleteFormTest extends \PHPUnit\Framework\TestCase
 {
     public function testDelete(): void
     {
-        $requestStack         = $this->createMock(RequestStack::class);
-        $templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $themeHelper          = $this->createMock(ThemeHelper::class);
-        $formActionModel      = $this->createMock(ActionModel::class);
-        $formFieldModel       = $this->createMock(FieldModel::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
-        $leadFieldModel       = $this->createMock(LeadFieldModel::class);
-        $formUploaderMock     = $this->createMock(FormUploader::class);
-        $contactTracker       = $this->createMock(ContactTracker::class);
-        $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
-        $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
-        $entityManager        = $this->createMock(EntityManager::class);
-        $dispatcher           = $this->createMock(EventDispatcher::class);
-        $formRepository       = $this->createMock(FormRepository::class);
-        $form                 = $this->createMock(Form::class);
-        $formModel            = new FormModel(
+        $requestStack          = $this->createMock(RequestStack::class);
+        $templatingHelperMock  = $this->createMock(TemplatingHelper::class);
+        $themeHelper           = $this->createMock(ThemeHelperInterface::class);
+        $formActionModel       = $this->createMock(ActionModel::class);
+        $formFieldModel        = $this->createMock(FieldModel::class);
+        $fieldHelper           = $this->createMock(FormFieldHelper::class);
+        $leadFieldModel        = $this->createMock(LeadFieldModel::class);
+        $formUploaderMock      = $this->createMock(FormUploader::class);
+        $contactTracker        = $this->createMock(ContactTracker::class);
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $dispatcher            = $this->createMock(EventDispatcher::class);
+        $formRepository        = $this->createMock(FormRepository::class);
+        $form                  = $this->createMock(Form::class);
+        $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
+        $formModel             = new FormModel(
             $requestStack,
             $templatingHelperMock,
             $themeHelper,
@@ -52,7 +53,8 @@ class DeleteFormTest extends FormTestAbstract
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
-            $tableSchemaHelper
+            $tableSchemaHelper,
+            $mappedObjectCollector
         );
 
         $dispatcher->expects($this->exactly(2))

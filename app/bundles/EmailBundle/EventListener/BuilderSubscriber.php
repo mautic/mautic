@@ -3,6 +3,7 @@
 namespace Mautic\EmailBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
 use Mautic\CoreBundle\Form\Type\SlotDynamicContentType;
@@ -23,7 +24,7 @@ use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
@@ -322,10 +323,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $event->addToken('{subject}', EmojiHelper::toHtml($event->getSubject()));
     }
 
-    /**
-     * @return array
-     */
-    public function convertUrlsToTokens(EmailSendEvent $event)
+    public function convertUrlsToTokens(EmailSendEvent $event): void
     {
         if ($event->isInternalSend() || $this->coreParametersHelper->get('disable_trackable_urls')) {
             // Don't convert urls
@@ -343,8 +341,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $trackables   = $this->parseContentForUrls($event, $emailId);
 
         /**
-         * @var string
-         * @var Trackable $trackable
+         * @var Trackable|Redirect $trackable
          */
         foreach ($trackables as $token => $trackable) {
             $url = ($trackable instanceof Trackable)
@@ -360,11 +357,13 @@ class BuilderSubscriber implements EventSubscriberInterface
     /**
      * Parses content for URLs and tokens.
      *
-     * @param $emailId
+     * @param int|null $emailId
      *
-     * @return mixed
+     * @return array<mixed>
+     *
+     * @throws MappingException
      */
-    private function parseContentForUrls(EmailSendEvent $event, $emailId)
+    private function parseContentForUrls(EmailSendEvent $event, $emailId): array
     {
         static $convertedContent = [];
 

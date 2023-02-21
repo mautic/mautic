@@ -232,7 +232,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.php',
+                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.twig',
                 'timelineTemplateVars'   => [
                     'messageSettings' => [],
                 ],
@@ -242,7 +242,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $pendingEvent = new PendingEvent($config, $event, $logs);
 
-        $this->dispatcher->dispatch(ChannelEvents::ON_CAMPAIGN_BATCH_ACTION, $pendingEvent);
+        $this->dispatcher->dispatch($pendingEvent, ChannelEvents::ON_CAMPAIGN_BATCH_ACTION);
 
         $this->assertCount(0, $pendingEvent->getFailures());
 

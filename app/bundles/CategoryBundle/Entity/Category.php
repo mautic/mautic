@@ -134,6 +134,7 @@ class Category extends FormEntity
      */
     public function setTitle($title)
     {
+        $this->isChanged('title', $title);
         $this->title = $title;
 
         return $this;
@@ -158,6 +159,7 @@ class Category extends FormEntity
      */
     public function setAlias($alias)
     {
+        $this->isChanged('alias', $alias);
         $this->alias = $alias;
 
         return $this;
@@ -182,6 +184,7 @@ class Category extends FormEntity
      */
     public function setDescription($description)
     {
+        $this->isChanged('description', $description);
         $this->description = $description;
 
         return $this;
@@ -206,6 +209,7 @@ class Category extends FormEntity
      */
     public function setColor($color)
     {
+        $this->isChanged('color', $color);
         $this->color = $color;
     }
 
@@ -228,6 +232,7 @@ class Category extends FormEntity
      */
     public function setBundle($bundle)
     {
+        $this->isChanged('bundle', $bundle);
         $this->bundle = $bundle;
     }
 

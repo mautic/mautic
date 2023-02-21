@@ -24,7 +24,7 @@ class JsController extends CommonController
         $event      = new BuildJsEvent($this->getJsHeader(), $debug);
 
         if ($dispatcher->hasListeners(CoreEvents::BUILD_MAUTIC_JS)) {
-            $dispatcher->dispatch(CoreEvents::BUILD_MAUTIC_JS, $event);
+            $dispatcher->dispatch($event, CoreEvents::BUILD_MAUTIC_JS);
         }
 
         return new Response($event->getJs(), 200, ['Content-Type' => 'application/javascript']);

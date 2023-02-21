@@ -41,7 +41,7 @@ class CampaignHelper
         $url     = rawurldecode(TokenHelper::findLeadTokens($config['url'], $this->getContactValues($contact), true));
 
         $webhookRequestEvent = new WebhookRequestEvent($contact, $url, $headers, $payload);
-        $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_REQUEST, $webhookRequestEvent);
+        $this->dispatcher->dispatch($webhookRequestEvent, WebhookEvents::WEBHOOK_ON_REQUEST);
 
         $this->makeRequest(
             $webhookRequestEvent->getUrl(),

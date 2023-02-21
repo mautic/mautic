@@ -4,7 +4,7 @@ namespace Mautic\EmailBundle\Helper;
 
 class PlainTextHelper
 {
-    const ENCODING = 'UTF-8';
+    public const ENCODING = 'UTF-8';
 
     /**
      * Contains the HTML content to convert.
@@ -498,7 +498,7 @@ class PlainTextHelper
     private function toupper($str)
     {
         // string can contain HTML tags
-        $chunks = preg_split('/(<[^>]*>)/', $str, null, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $chunks = preg_split('/(<[^>]*>)/', $str, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         // convert toupper only the text between HTML tags
         foreach ($chunks as $i => $chunk) {

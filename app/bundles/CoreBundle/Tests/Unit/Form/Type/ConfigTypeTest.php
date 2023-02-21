@@ -13,8 +13,8 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigTypeTest extends TypeTestCase
 {

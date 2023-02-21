@@ -1,0 +1,9 @@
+{% if formTheme is defined %}
+  {% form_theme form formTheme %}
+{% endif %}
+<div class="bundle-form">
+    <div class="bundle-form-header">
+        <h3>{{ eventHeader }}</h3>
+    </div>
+    {{ form(form) }}
+</div>

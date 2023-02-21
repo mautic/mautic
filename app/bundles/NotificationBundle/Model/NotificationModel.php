@@ -15,12 +15,13 @@ use Mautic\NotificationBundle\Form\Type\MobileNotificationType;
 use Mautic\NotificationBundle\Form\Type\NotificationType;
 use Mautic\NotificationBundle\NotificationEvents;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class NotificationModel
- * {@inheritdoc}
+ * @extends FormModel<Notification>
+ * @implements AjaxLookupModelInterface<Notification>
  */
 class NotificationModel extends FormModel implements AjaxLookupModelInterface
 {
@@ -66,8 +67,8 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */
@@ -102,10 +103,10 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param Notification|null $entity
+     * @param FormFactory       $formFactory
+     * @param string|null       $action
+     * @param array             $options
      *
      * @return mixed
      *
@@ -190,7 +191,7 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $name = NotificationEvents::NOTIFICATION_POST_DELETE;
                 break;
             default:
-                return;
+                return null;
         }
 
         if ($this->dispatcher->hasListeners($name)) {
@@ -199,12 +200,12 @@ class NotificationModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
-        } else {
-            return;
         }
+
+        return null;
     }
 
     /**

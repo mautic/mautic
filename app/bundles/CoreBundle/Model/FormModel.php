@@ -4,9 +4,13 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @template T of object
+ * @extends AbstractCommonModel<T>
+ */
 class FormModel extends AbstractCommonModel
 {
     /**
@@ -90,6 +94,8 @@ class FormModel extends AbstractCommonModel
      *
      * @param object $entity
      * @param bool   $unlock
+     *
+     * @phpstan-param T $entity
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -119,8 +125,8 @@ class FormModel extends AbstractCommonModel
     /**
      * Save an array of entities.
      *
-     * @param array $entities
-     * @param bool  $unlock
+     * @param iterable<T> $entities
+     * @param bool        $unlock
      *
      * @return array
      */
@@ -442,7 +448,7 @@ class FormModel extends AbstractCommonModel
                 throw $ex;
             }
 
-            $this->logger->addError(
+            $this->logger->error(
                 $ex->getMessage(),
                 ['exception' => $ex]
             );

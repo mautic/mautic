@@ -19,7 +19,9 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\PageBundle\Entity\Page;
+use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -35,7 +37,9 @@ class PageController extends FormController
      */
     public function indexAction($page = 1)
     {
-        $model = $this->getModel('page.page');
+        $pageModel = $this->getModel('page.page');
+        \assert($pageModel instanceof PageModel);
+        $model = $pageModel;
 
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted([
@@ -117,12 +121,14 @@ class PageController extends FormController
         $orderByDir = $this->get('session')->get('mautic.page.orderbydir', $this->getDefaultOrderDirection());
         $pages      = $model->getEntities(
             [
-                'start'      => $start,
-                'limit'      => $limit,
-                'filter'     => $filter,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-            ]);
+                'start'           => $start,
+                'limit'           => $limit,
+                'filter'          => $filter,
+                'orderBy'         => $orderBy,
+                'orderByDir'      => $orderByDir,
+                'submissionCount' => true,
+            ]
+        );
 
         $count = count($pages);
         if ($count && $count < ($start + 1)) {
@@ -133,7 +139,7 @@ class PageController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $lastPage],
-                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -147,7 +153,7 @@ class PageController extends FormController
             'viewParameters' => [
                 'searchValue' => $search,
                 'items'       => $pages,
-                'categories'  => $this->getModel('page.page')->getLookupResults('category', '', 0),
+                'categories'  => $pageModel->getLookupResults('category', '', 0),
                 'page'        => $page,
                 'limit'       => $limit,
                 'permissions' => $permissions,
@@ -155,7 +161,7 @@ class PageController extends FormController
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'security'    => $this->get('mautic.security'),
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:list.html.php',
+            'contentTemplate' => 'MauticPageBundle:Page:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -188,7 +194,7 @@ class PageController extends FormController
             return $this->postActionRedirect([
                 'returnUrl'       => $returnUrl,
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'MauticPageBundle:Page:index',
+                'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_page_index',
                     'mauticContent' => 'page',
@@ -261,8 +267,8 @@ class PageController extends FormController
 
                 $event = new DetermineWinnerEvent($args);
                 $this->dispatcher->dispatch(
-                    $testSettings['event'],
-                    $event
+                    $event,
+                    $testSettings['event']
                 );
 
                 $abTestResults = $event->getAbTestResults();
@@ -275,7 +281,9 @@ class PageController extends FormController
         $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
+        $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('page', $activePage->getId(), $activePage->getDateAdded());
 
         $pageviews = $model->getHitsLineChartData(
             null,
@@ -332,7 +340,7 @@ class PageController extends FormController
                 'logs'          => $logs,
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:details.html.php',
+            'contentTemplate' => 'MauticPageBundle:Page:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -391,13 +399,13 @@ class PageController extends FormController
                         ]),
                     ]);
 
-                    if ($form->get('buttons')->get('save')->isClicked()) {
+                    if ($this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
                         $viewParameters = [
                             'objectAction' => 'view',
                             'objectId'     => $entity->getId(),
                         ];
                         $returnUrl = $this->generateUrl('mautic_page_action', $viewParameters);
-                        $template  = 'MauticPageBundle:Page:view';
+                        $template  = 'Mautic\PageBundle\Controller\PageController::viewAction';
                     } else {
                         //return edit view so that all the session stuff is loaded
                         return $this->editAction($entity->getId(), true);
@@ -406,12 +414,12 @@ class PageController extends FormController
             } else {
                 $viewParameters = ['page' => $page];
                 $returnUrl      = $this->generateUrl('mautic_page_index', $viewParameters);
-                $template       = 'MauticPageBundle:Page:index';
+                $template       = 'Mautic\PageBundle\Controller\PageController::indexAction';
                 //clear any modified content
                 $session->remove('mautic.pagebuilder.'.$entity->getSessionId().'.content');
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => $viewParameters,
@@ -439,7 +447,7 @@ class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'form'          => $form->createView(),
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
@@ -450,7 +458,7 @@ class PageController extends FormController
                 'sectionForm'   => $sectionForm->createView(),
                 'permissions'   => $permissions,
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
+            'contentTemplate' => 'MauticPageBundle:Page:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -485,7 +493,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -530,7 +538,7 @@ class PageController extends FormController
                     $entity->setCustomHtml($content);
 
                     //form is valid so process the data
-                    $model->saveEntity($entity, $form->get('buttons')->get('save')->isClicked());
+                    $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $entity->getTitle(),
@@ -548,7 +556,7 @@ class PageController extends FormController
                 $model->unlockEntity($entity);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 $viewParameters = [
                     'objectAction' => 'view',
                     'objectId'     => $entity->getId(),
@@ -558,7 +566,7 @@ class PageController extends FormController
                     array_merge($postActionVars, [
                         'returnUrl'       => $this->generateUrl('mautic_page_action', $viewParameters),
                         'viewParameters'  => $viewParameters,
-                        'contentTemplate' => 'MauticPageBundle:Page:view',
+                        'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::viewAction',
                     ])
                 );
             }
@@ -589,7 +597,7 @@ class PageController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'          => $this->setFormTheme($form, 'MauticPageBundle:Page:form.html.php', 'MauticPageBundle:FormTheme\Page'),
+                'form'          => $form->createView(),
                 'isVariant'     => $entity->isVariant(true),
                 'tokens'        => $model->getBuilderComponents($entity, 'tokens'),
                 'activePage'    => $entity,
@@ -608,7 +616,7 @@ class PageController extends FormController
                 ),
                 'security'      => $security,
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:form.html.php',
+            'contentTemplate' => 'MauticPageBundle:Page:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -676,7 +684,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -737,7 +745,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -909,7 +917,7 @@ class PageController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticPageBundle:Page:index',
+            'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_page_index',
                 'mauticContent' => 'page',
@@ -953,7 +961,7 @@ class PageController extends FormController
                 'objectId'     => $objectId,
             ];
             $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
-            $postActionVars['contentTemplate'] = 'MauticPageBundle:Page:view';
+            $postActionVars['contentTemplate'] = 'Mautic\PageBundle\Controller\PageController::viewAction';
         } //else don't do anything
 
         return $this->postActionRedirect(
@@ -1032,7 +1040,7 @@ class PageController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $pageListPage],
-                    'contentTemplate' => 'MauticPageBundle:Page:index',
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'page',
@@ -1110,7 +1118,7 @@ class PageController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticPageBundle:Page:results',
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::resultsAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'pageresult',
@@ -1135,7 +1143,7 @@ class PageController extends FormController
                     'limit'      => $limit,
                     'tmpl'       => $tmpl,
                 ],
-                'contentTemplate' => 'MauticPageBundle:Result:list.html.php',
+                'contentTemplate' => 'MauticPageBundle:Result:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_page_index',
                     'mauticContent' => 'pageresult',
@@ -1175,7 +1183,7 @@ class PageController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $pageListPage],
-                    'contentTemplate' => 'MauticPageBundle:Page:index',
+                    'contentTemplate' => 'Mautic\PageBundle\Controller\PageController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => 'mautic_page_index',
                         'mauticContent' => 'page',

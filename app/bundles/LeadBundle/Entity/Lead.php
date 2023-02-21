@@ -9,21 +9,23 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Lead extends FormEntity implements CustomFieldEntityInterface
+class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS     = '';
-    const POINTS_ADD      = 'plus';
-    const POINTS_SUBTRACT = 'minus';
-    const POINTS_MULTIPLY = 'times';
-    const POINTS_DIVIDE   = 'divide';
-    const DEFAULT_ALIAS   = 'l';
+    public const FIELD_ALIAS     = '';
+    public const POINTS_ADD      = 'plus';
+    public const POINTS_SUBTRACT = 'minus';
+    public const POINTS_MULTIPLY = 'times';
+    public const POINTS_DIVIDE   = 'divide';
+    public const DEFAULT_ALIAS   = 'l';
 
     /**
      * Used to determine social identity.
@@ -452,6 +454,21 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
                 ]
             )
             ->build();
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'lead']));
+    }
+
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'firstname',
+            'lastname',
+            'company',
+            'email',
+        ];
     }
 
     /**
@@ -1401,7 +1418,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface
     /**
      * Get stage.
      *
-     * @return \Mautic\StageBundle\Entity\Stage
+     * @return \Mautic\StageBundle\Entity\Stage|null
      */
     public function getStage()
     {

@@ -10,23 +10,23 @@ return [
         'main' => [
             'mautic_social_index' => [
                 'path'       => '/monitoring/{page}',
-                'controller' => 'MauticSocialBundle:Monitoring:index',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
             ],
             'mautic_social_action' => [
                 'path'       => '/monitoring/{objectAction}/{objectId}',
-                'controller' => 'MauticSocialBundle:Monitoring:execute',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::executeAction',
             ],
             'mautic_social_contacts' => [
                 'path'       => '/monitoring/view/{objectId}/contacts/{page}',
-                'controller' => 'MauticSocialBundle:Monitoring:contacts',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::contactsAction',
             ],
             'mautic_tweet_index' => [
                 'path'       => '/tweets/{page}',
-                'controller' => 'MauticSocialBundle:Tweet:index',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\TweetController::indexAction',
             ],
             'mautic_tweet_action' => [
                 'path'       => '/tweets/{objectAction}/{objectId}',
-                'controller' => 'MauticSocialBundle:Tweet:execute',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\TweetController::executeAction',
             ],
         ],
         'api' => [
@@ -34,101 +34,18 @@ return [
                 'standard_entity' => true,
                 'name'            => 'tweets',
                 'path'            => '/tweets',
-                'controller'      => 'MauticSocialBundle:Api\TweetApi',
+                'controller'      => 'MauticPlugin\MauticSocialBundle\Controller\Api\TweetApiController',
             ],
         ],
         'public' => [
             'mautic_social_js_generate' => [
                 'path'       => '/social/generate/{formName}.js',
-                'controller' => 'MauticSocialBundle:Js:generate',
+                'controller' => 'MauticPlugin\MauticSocialBundle\Controller\JsController::generateAction',
             ],
         ],
     ],
 
     'services' => [
-        'events' => [
-            'mautic.social.formbundle.subscriber' => [
-                'class' => \MauticPlugin\MauticSocialBundle\EventListener\FormSubscriber::class,
-            ],
-            'mautic.social.campaignbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.social.helper.campaign',
-                    'mautic.helper.integration',
-                    'translator',
-                ],
-            ],
-            'mautic.social.configbundle.subscriber' => [
-                'class' => \MauticPlugin\MauticSocialBundle\EventListener\ConfigSubscriber::class,
-            ],
-            'mautic.social.subscriber.channel' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\ChannelSubscriber::class,
-                'arguments' => [
-                    'mautic.helper.integration',
-                ],
-            ],
-            'mautic.social.stats.subscriber' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.social.sociallogin' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\SocialLoginType',
-                'arguments' => [
-                    'mautic.helper.integration',
-                    'mautic.form.model.form',
-                    'mautic.helper.core_parameters',
-                    ],
-            ],
-            'mautic.form.type.social.facebook' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\FacebookType',
-            ],
-            'mautic.form.type.social.twitter' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterType',
-            ],
-            'mautic.form.type.social.linkedin' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\LinkedInType',
-            ],
-            'mautic.social.form.type.twitter.tweet' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetType',
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.social.form.type.monitoring' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType',
-                'arguments' => [
-                    'mautic.social.model.monitoring',
-                ],
-            ],
-            'mautic.social.form.type.network.twitter.abstract' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterAbstractType',
-            ],
-            'mautic.social.form.type.network.twitter.hashtag' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType',
-            ],
-            'mautic.social.form.type.network.twitter.mention' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType',
-            ],
-            'mautic.social.form.type.network.twitter.custom' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TwitterCustomType',
-            ],
-            'mautic.social.config' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\ConfigType',
-                'arguments' => 'mautic.lead.model.field',
-            ],
-            'mautic.social.tweet.list' => [
-                'class' => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetListType',
-            ],
-            'mautic.social.tweetsend_list' => [
-                'class'     => 'MauticPlugin\MauticSocialBundle\Form\Type\TweetSendType',
-                'arguments' => 'router',
-            ],
-        ],
         'models' => [
             'mautic.social.model.monitoring' => [
                 'class' => 'MauticPlugin\MauticSocialBundle\Model\MonitoringModel',
@@ -273,28 +190,6 @@ return [
                     'mautic.plugin.model.integration_entity',
                     'mautic.lead.model.dnc',
                     'mautic.helper.integration',
-                ],
-            ],
-        ],
-        'command' => [
-            'mautic.social.command.twitter_hashtags' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterHashtagsCommand::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.helper.integration',
-                    'mautic.social.helper.twitter_command',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'mautic.social.command.twitter_mentions' => [
-                'class'     => \MauticPlugin\MauticSocialBundle\Command\MonitorTwitterMentionsCommand::class,
-                'arguments' => [
-                    'event_dispatcher',
-                    'translator',
-                    'mautic.helper.integration',
-                    'mautic.social.helper.twitter_command',
-                    'mautic.helper.core_parameters',
                 ],
             ],
         ],

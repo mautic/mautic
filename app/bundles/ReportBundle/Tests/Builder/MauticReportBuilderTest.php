@@ -40,11 +40,13 @@ final class MauticReportBuilderTest extends TestCase
         $this->connection        = $this->createMock(Connection::class);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
 
-        $this->connection->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
+            new QueryBuilder($this->connection),
+            new QueryBuilder($this->connection),
+            new QueryBuilder($this->connection),
+        );
         $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
-        $this->connection->method('quote')->willReturnMap([
-            ['', null, "''"],
-        ]);
+        $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
     }
 
     public function testColumnSanitization(): void
@@ -147,6 +149,121 @@ final class MauticReportBuilderTest extends TestCase
                 AND ((a.emptyString IS NULL) OR (a.emptyString = ''))
                 AND (a.notEmptyString IS NOT NULL) AND (a.notEmptyString <> '')
         ")), $query->getSql());
+    }
+
+    public function testFiltersWithEmptyAndNotEmptyDateTypes2(): void
+    {
+        $report = new Report();
+        $report->setColumns(['a.someField']);
+        $report->setFilters([
+            [
+                'column'    => 'a.notEqualString',
+                'glue'      => 'and',
+                'value'     => '',
+                'condition' => 'neq',
+            ],
+        ]);
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => ['a.someField' => []],
+            'filters' => [
+                'a.notEqualString' => [
+                    'label' => 'Not equal string',
+                    'type'  => 'string',
+                    'alias' => 'notEqualString',
+                ],
+            ],
+        ]);
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`someField` WHERE (a.notEqualString IS NULL) OR (a.notEqualString <> :i0canotEqualString)
+        ')), $query->getSql());
+    }
+
+    public function testReportWithPreciseAvg(): void
+    {
+        $report = new Report();
+        $report->setColumns(['a.id']);
+        $report->setGroupBy(['a.id']);
+        $report->setAggregators([
+            [
+                'column'    => 'a.bounced',
+                'function'  => 'AVG',
+            ],
+        ]);
+
+        $builder = $this->buildBuilder($report);
+        $query   = $builder->getQuery([
+            'columns' => [
+                'a.id'      => [],
+                'a.bounced' => [
+                    'formula' => 'IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)',
+                ],
+            ],
+            'aggregators' => [
+                'a.bounced' => [
+                    'label' => 'AVG bounced',
+                    'type'  => 'float',
+                    'alias' => 'avgBounced',
+                ],
+            ],
+            'groupBy' => ['a.id'],
+        ]);
+
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `a`.`id`, AVG(IF(dnc.id IS NOT NULL AND dnc.reason=2, 1, 0)) AS \'AVG a.bounced\' GROUP BY a.id
+        ')), $query->getSql());
+    }
+
+    public function testFiltersWithTag(): void
+    {
+        $report = new Report();
+        $report->setSource('leads');
+        $report->setColumns([
+            'l.id',
+            'l.email',
+        ]);
+        $report->setFilters([
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['1', '2'],
+                'condition' => 'in',
+            ],
+            [
+                'column'    => 'tag',
+                'glue'      => 'and',
+                'value'     => ['3'],
+                'condition' => 'notIn',
+            ],
+        ]);
+        $builder = $this->buildBuilder($report);
+
+        $query   = $builder->getQuery([
+            'columns' => [
+                'l.id'    => [],
+                'l.email' => [],
+            ],
+            'filters' => [
+                'tag' => [
+                    'label' => 'Tag',
+                    'type'  => 'multiselect',
+                    'list'  => [
+                            1 => 'A',
+                            2 => 'B',
+                            3 => 'C',
+                        ],
+                    'operators' => [
+                            'in'    => 'mautic.core.operator.in',
+                            'notIn' => 'mautic.core.operator.notin',
+                        ],
+                    'alias' => 'tag',
+                ],
+            ],
+        ]);
+
+        Assert::assertSame(trim(preg_replace('/\s{2,}/', ' ', '
+            SELECT `l`.`id`, `l`.`email` WHERE (l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))
+        ')), $query->getSql());
     }
 
     private function buildBuilder(Report $report): MauticReportBuilder

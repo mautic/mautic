@@ -10,10 +10,12 @@ use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -43,7 +45,7 @@ class PageType extends AbstractType
     private $model;
 
     /**
-     * @var \Mautic\UserBundle\Model\UserModel
+     * @var User
      */
     private $user;
 
@@ -52,16 +54,23 @@ class PageType extends AbstractType
      */
     private $canViewOther = false;
 
+    /**
+     * @var ThemeHelperInterface
+     */
+    private $themeHelper;
+
     public function __construct(
         EntityManager $entityManager,
         PageModel $pageModel,
         CorePermissions $corePermissions,
-        UserHelper $userHelper
+        UserHelper $userHelper,
+        ThemeHelperInterface $themeHelper
     ) {
         $this->em           = $entityManager;
         $this->model        = $pageModel;
         $this->canViewOther = $corePermissions->isGranted('page:pages:viewother');
         $this->user         = $userHelper->getUser();
+        $this->themeHelper  = $themeHelper;
     }
 
     /**
@@ -98,6 +107,10 @@ class PageType extends AbstractType
             ]
         );
 
+        $template = $options['data']->getTemplate() ?? 'blank';
+        // If theme does not exist, set empty
+        $template = $this->themeHelper->getCurrentTheme($template, 'page');
+
         $builder->add(
             'template',
             ThemeListType::class,
@@ -108,7 +121,7 @@ class PageType extends AbstractType
                     'tooltip' => 'mautic.page.form.template.help',
                 ],
                 'placeholder' => 'mautic.core.none',
-                'data'        => $options['data']->getTemplate() ? $options['data']->getTemplate() : 'blank',
+                'data'        => $template,
             ]
         );
 
@@ -380,13 +393,5 @@ class PageType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Page::class,
         ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'page';
     }
 }

@@ -17,26 +17,15 @@ use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CreateCustomFieldCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom-field:create-column';
 
-    /**
-     * @var BackgroundService
-     */
-    private $backgroundService;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var LeadFieldRepository
-     */
-    private $leadFieldRepository;
+    private BackgroundService $backgroundService;
+    private TranslatorInterface $translator;
+    private LeadFieldRepository $leadFieldRepository;
 
     public function __construct(
         BackgroundService $backgroundService,
@@ -59,7 +48,7 @@ class CreateCustomFieldCommand extends ModeratedCommand
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(
                 <<<'EOT'
-The <info>%command.name%</info> command will create a column in a lead_fields table if the proces should run in background.
+The <info>%command.name%</info> command will create a column in a lead_fields table if the process should run in background.
 
 <info>php %command.full_name%</info>
 EOT

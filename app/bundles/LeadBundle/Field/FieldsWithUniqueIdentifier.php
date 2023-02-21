@@ -22,7 +22,7 @@ class FieldsWithUniqueIdentifier
     }
 
     /**
-     * Retrieves a list of published fields that are unique identifers.
+     * Retrieves a list of published fields that are unique identifiers.
      *
      * @return mixed
      */

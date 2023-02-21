@@ -1,0 +1,164 @@
+{% block _config_coreconfig_widget %}
+{% set fields = form.children %}
+{% set fieldKeys = fields|keys %}
+{% set template = '<div class="col-md-6">{content}</div>' %}
+
+{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.general'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'site_url', template) }}
+              {{ formRowIfExists(fields, 'webroot', template) }}
+              {{ formRowIfExists(fields, '404_page', template) }}
+              {{ formRowIfExists(fields, 'cache_path', template) }}
+              {{ formRowIfExists(fields, 'log_path', template) }}
+              {{ formRowIfExists(fields, 'theme', template) }}
+              {{ formRowIfExists(fields, 'image_path', template) }}
+              {{ formRowIfExists(fields, 'last_shown_tab') }}
+          </div>
+      </div>
+  </div>
+{% endif %}
+
+{% if fieldKeys|filter(k => k in ['default_pagelist', 'timezone', 'locale', 'date_format_full', 'date_format_short', 'date_format_dateonly', 'date_format_timeonly'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.defaults'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'default_pagelimit', template) }}
+              {{ formRowIfExists(fields, 'default_timezone', template) }}
+              {{ formRowIfExists(fields, 'locale', template) }}
+              {{ formRowIfExists(fields, 'cached_data_timeout', template) }}
+              {{ formRowIfExists(fields, 'default_daterange_filter', template) }}
+          </div>
+
+          <hr class="text-muted" />
+
+          <div class="row">
+              {{ formRowIfExists(fields, 'date_format_full', template) }}
+              {{ formRowIfExists(fields, 'date_format_short', template) }}
+              {{ formRowIfExists(fields, 'date_format_dateonly', template) }}
+              {{ formRowIfExists(fields, 'date_format_timeonly', template) }}
+          </div>
+      </div>
+  </div>
+{% endif %}
+
+{% if fieldKeys|filter(k => k in ['cors_restrict_domains'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.cors'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'cors_restrict_domains', template) }}
+              {{ formRowIfExists(fields, 'cors_valid_domains', template) }}
+          </div>
+      </div>
+  </div>
+{% endif %}
+
+{% if fieldKeys|filter(k => k in ['trusted_hosts', 'trusted_proxies', 'ip_lookup_service', 'do_not_track_ips', 'do_not_track_bots', 'transliterate_page_title'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.misc'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'trusted_hosts', template) }}
+              {{ formRowIfExists(fields, 'trusted_proxies', template) }}
+          </div>
+
+          {% if fields.trusted_hosts is defined %}<hr class="text-muted" />{% endif %}
+
+          <div class="row">
+              {{ formRowIfExists(fields, 'ip_lookup_service', template) }}
+              {{ formRowIfExists(fields, 'ip_lookup_auth', template) }}
+              {{ formRowIfExists(fields, 'ip_lookup_create_organization', template) }}
+              <div id="ip_lookup_config_container">
+                  {{ formRowIfExists(fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>') }}
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-sm-12">
+                  <div class="small text-center" id="ip_lookup_attribution">{{ ipLookupAttribution|raw }}</div>
+              </div>
+          </div>
+
+          {% if fields.do_not_track_ips is defined or fields.do_not_track_bots is defined %}
+              <hr class="text-muted" />
+              <div class="row">
+                  {% if fields.do_not_track_ips is defined %}
+                      {{ formRowIfExists(fields, 'do_not_track_ips', template) }}
+                  {% endif %}
+                  {% if fields.do_not_track_bots is defined %}
+                      {{ formRowIfExists(fields, 'do_not_track_bots', template) }}
+                  {% endif %}
+              </div>
+          {% endif %}
+
+          {% if fields.link_shortener_url is defined %}
+            <hr class="text-muted" />
+            <div class="row">
+                {{ formRowIfExists(fields, 'link_shortener_url', template) }}
+            </div>
+          {% endif %}
+
+          {% if fields.max_entity_lock_time is defined %}
+            <hr class="text-muted" />
+            <div class="row">
+                {{ formRowIfExists(fields, 'max_entity_lock_time', template) }}
+            </div>
+          {% endif %}
+
+          {% if fields.transliterate_page_title %}
+            <hr class="text-muted" />
+            <div class="row">
+                {{ formRowIfExists(fields, 'transliterate_page_title', template) }}
+            </div>
+          {% endif %}
+      </div>
+  </div>
+{% endif %}
+
+{% if fieldKeys|filter(k => k in ['headers_sts'])|length > 0 %}
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">{{ 'mautic.core.config.header.response.headers'|trans }}</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                {{ formRowIfExists(fields, 'headers_sts', template) }}
+            </div>
+            <div class="row">
+                {{ formRowIfExists(fields, 'headers_sts_subdomains', template) }}
+                {{ formRowIfExists(fields, 'headers_sts_preload', template) }}
+                {{ formRowIfExists(fields, 'headers_sts_expire_time', template) }}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% if fieldKeys|filter(k => k in ['update_stability', 'composer_updates'])|length > 0 %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.core.config.header.update'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          <div class="row">
+              {{ formRowIfExists(fields, 'update_stability', template) }}
+              {{ formRowIfExists(fields, 'composer_updates',
+                  '<div class="col-md-6">{content}<span style="color:red">' ~
+                  'mautic.core.config.form.update.composer.warning'|trans({'%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">', '%url_end%': '</a>'}) ~
+                  '</div>'
+              ) }}
+          </div>
+      </div>
+  </div>
+{% endif %}
+{% endblock %}
