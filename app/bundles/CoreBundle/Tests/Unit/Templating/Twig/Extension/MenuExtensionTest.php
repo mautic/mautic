@@ -16,15 +16,13 @@ class MenuExtensionTest extends AbstractMauticTestCase
         \assert($menuExtension instanceof MenuExtension);
 
         $menuAttributes = [
-            'id' => 'myId',
-            'class' => 'test-a-class test-another-class'
+            'id'    => 'myId',
+            'class' => 'test-a-class test-another-class',
         ];
 
         Assert::assertStringStartsWith(' id=', $menuExtension->parseMenuAttributes($menuAttributes));
         Assert::assertStringContainsString('myId', $menuExtension->parseMenuAttributes($menuAttributes));
         Assert::assertStringContainsString(' class=', $menuExtension->parseMenuAttributes($menuAttributes));
         Assert::assertStringContainsString('test-a-class test-another-class', $menuExtension->parseMenuAttributes($menuAttributes));
-    
     }
-
 }
