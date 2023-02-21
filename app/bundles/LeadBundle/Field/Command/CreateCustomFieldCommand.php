@@ -7,20 +7,22 @@ namespace Mautic\LeadBundle\Field\Command;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
 use Mautic\LeadBundle\Field\Exception\ColumnAlreadyCreatedException;
 use Mautic\LeadBundle\Field\Exception\CustomFieldLimitException;
 use Mautic\LeadBundle\Field\Exception\LeadFieldWasNotFoundException;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CreateCustomFieldCommand extends ContainerAwareCommand
+class CreateCustomFieldCommand extends ModeratedCommand
 {
+    public const COMMAND_NAME = 'mautic:custom-field:create-column';
+
     /**
      * @var BackgroundService
      */
@@ -51,7 +53,7 @@ class CreateCustomFieldCommand extends ContainerAwareCommand
     {
         parent::configure();
 
-        $this->setName('mautic:custom-field:create-column')
+        $this->setName(self::COMMAND_NAME)
             ->setDescription('Create custom field column in the background')
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
@@ -69,6 +71,11 @@ EOT
         $leadFieldId = (int) $input->getOption('id');
         $userId      = (int) $input->getOption('user');
 
+        $moderationKey = sprintf('%s-%s-%s', self::COMMAND_NAME, $leadFieldId, $userId);
+
+        if (!$this->checkRunStatus($input, $output, $moderationKey)) {
+            return 0;
+        }
         if (!$leadFieldId) {
             $leadField = $this->leadFieldRepository->getFieldThatIsMissingColumn();
 
@@ -120,6 +127,7 @@ EOT
 
         $output->writeln('');
         $output->writeln('<info>'.$this->translator->trans('mautic.lead.field.column_was_created', ['%id%' => $leadFieldId]).'</info>');
+        $this->completeRun();
 
         return 0;
     }
