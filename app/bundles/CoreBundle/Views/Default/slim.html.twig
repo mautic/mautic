@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html>
-    {% set headerTitle = headerTitle|default('') %}
-    {% set pageTitle = pageTitle|default('Mautic') %}
     {{ include('MauticCoreBundle:Default:head.html.twig', {
-            headerTitle: headerTitle|default(''),
-            pageTitle: pageTitle|default('Mautic'),
+            headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
+            pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
         })
     }}
-
     <body>
         {{ outputScripts('bodyOpen') }}
        
@@ -16,8 +13,9 @@
                 alertType: 'standard'
             }) }}
 
-            {% block _content %}{% endblock %}
-
+            {% block _content %}
+                {{ include('MauticCoreBundle:Default:output.html.twig') }}
+            {% endblock %}
         </section>
         {{ include('MauticCoreBundle:Helper:modal.html.twig', {
             id: 'MauticSharedModal',
