@@ -163,6 +163,7 @@ class EmailApiController extends CommonApiController
                     'assetAttachments'  => $assetsIds,
                     'return_errors'     => true,
                     'ignoreDNC'         => true,
+                    'email_type'        => 'transactional',
                 ]
             );
 

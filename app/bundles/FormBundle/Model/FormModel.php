@@ -20,6 +20,7 @@ use Mautic\FormBundle\Form\Type\FormType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
@@ -512,7 +513,7 @@ class FormModel extends CommonFormModel
 
         if ($entity->getRenderStyle()) {
             $templating = $this->templatingHelper->getTemplating();
-            $styleTheme = $theme.'MauticFormBundle:Builder:style.html.php';
+            $styleTheme = $theme.'MauticFormBundle:Builder:_style.html.twig';
             $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
         }
 
@@ -528,12 +529,14 @@ class FormModel extends CommonFormModel
             return ($a->getOrder() < $b->getOrder()) ? -1 : 1;
         });
 
+        $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
+        $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
         $html               = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.php',
+            $theme.'MauticFormBundle:Builder:form.html.twig',
             [
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $this->getCustomComponents()['viewOnlyFields'],
+                'viewOnlyFields' => $viewOnlyFields,
                 'fields'         => $fields,
                 'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
                 'form'           => $entity,
@@ -544,6 +547,7 @@ class FormModel extends CommonFormModel
                 'lastFormPage'   => $lastPage,
                 'style'          => $style,
                 'inBuilder'      => false,
+                'displayManager' => $displayManager,
             ]
         );
 
@@ -758,7 +762,7 @@ class FormModel extends CommonFormModel
         $script = '
             var scr  = document.currentScript;
             var html = "'.$html.'";
-            
+
             if (scr !== undefined) {
                 scr.insertAdjacentHTML("afterend", html);
                 '.$newFormScript.'
@@ -782,7 +786,7 @@ class FormModel extends CommonFormModel
         }
 
         $script = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:script.html.php',
+            $theme.'MauticFormBundle:Builder:_script.html.twig',
             [
                 'form'  => $form,
                 'theme' => $theme,
