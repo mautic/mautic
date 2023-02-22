@@ -9,6 +9,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
+use MauticPlugin\MauticFocusBundle\FocusEventTypes;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -64,15 +65,13 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     public function onTimelineGenerate(LeadTimelineEvent $event)
     {
-        $eventViewTypeKey  = 'focus.view';
         $eventViewTypeName = $this->translator->trans('mautic.focus.event.view');
-        $event->addEventType($eventViewTypeKey, $eventViewTypeName);
-        $eventViewApplicable = $event->isApplicable($eventViewTypeKey);
+        $event->addEventType(FocusEventTypes::FOCUS_ON_VIEW, $eventViewTypeName);
+        $eventViewApplicable = $event->isApplicable(FocusEventTypes::FOCUS_ON_VIEW);
 
-        $eventClickTypeKey  = 'focus.click';
         $eventClickTypeName = $this->translator->trans('mautic.focus.event.click');
-        $event->addEventType($eventClickTypeKey, $eventClickTypeName);
-        $eventClickApplicable = $event->isApplicable($eventClickTypeKey);
+        $event->addEventType(FocusEventTypes::FOCUS_ON_CLICK, $eventClickTypeName);
+        $eventClickApplicable = $event->isApplicable(FocusEventTypes::FOCUS_ON_CLICK);
 
         $event->addSerializerGroup('focusList');
 
@@ -98,7 +97,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'href'  => $this->router->generate('mautic_focus_action', ['objectAction' => 'view', 'objectId' => $statsView['focus']['id']]),
                     ];
 
-                    $eventType = (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeKey : $eventClickTypeKey;
+                    $eventType = (Stat::TYPE_NOTIFICATION == $statsView['type']) ? FocusEventTypes::FOCUS_ON_VIEW : FocusEventTypes::FOCUS_ON_CLICK;
 
                     $event->addEvent(
                         [
@@ -116,9 +115,9 @@ class LeadSubscriber implements EventSubscriberInterface
             }
 
             // Add to counter view
-            $event->addToCounter($eventViewTypeKey, $counter[Stat::TYPE_NOTIFICATION]);
+            $event->addToCounter(FocusEventTypes::FOCUS_ON_VIEW, $counter[Stat::TYPE_NOTIFICATION]);
             // Add to counter click
-            $event->addToCounter($eventClickTypeKey, $counter[Stat::TYPE_CLICK]);
+            $event->addToCounter(FocusEventTypes::FOCUS_ON_CLICK, $counter[Stat::TYPE_CLICK]);
         }
     }
 }
