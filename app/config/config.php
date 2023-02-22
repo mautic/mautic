@@ -67,7 +67,9 @@ $container->loadFromExtension('framework', [
         'engines' => $engines,
         'form'    => [
             'resources' => [
-                'MauticCoreBundle:FormTheme\\Custom',
+                // Custom form theme has been moved into CoreBundle/Resources/views/FormTheme/mautic_form_layout.html.tiwg
+                // Once PHP engine has been removed, these no longer apply
+                //'MauticCoreBundle:FormTheme\\Custom',
             ],
         ],
     ],
