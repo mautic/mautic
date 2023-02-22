@@ -56,7 +56,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'leadTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Timeline:_list.html.twig',
             ]
         );
     }
@@ -118,7 +118,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.php', $tmpl),
+                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.twig', $tmpl),
             ]
         );
     }
@@ -180,7 +180,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.php', $tmpl),
+                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.twig', $tmpl),
             ]
         );
     }

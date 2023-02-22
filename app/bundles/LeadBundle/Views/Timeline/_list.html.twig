@@ -1,53 +1,3 @@
-{#
-  Variables
-    - lead
-    - events
-#}
-<!-- filter form -->
-<form method="post" action="{{ path('mautic_contacttimeline_action', {'leadId': lead.id}) }}" class="panel" id="timeline-filters">
-    <div class="form-control-icon pa-xs">
-        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}"
-               value="{{ events['filters']['search']|purify }}">
-        <span class="the-icon fa fa-search text-muted mt-xs"></span>
-    </div>
-    {% if events.types is defined and events.types is iterable %}
-        <div class="history-search panel-footer text-muted">
-            <div class="row">
-                <div class="col-sm-5">
-                    <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}">
-                        {% for typeKey, typeName in events.types %}
-                            <option value="{{ typeKey|purify }}" {% if typeKey in events.filters.includeEvents %}selected{% endif %}>
-                                {{ typeName }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-sm-5">
-                    <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.exclude.placeholder'|trans }}">
-                        {% for typeKey, typeName in events.types %}
-                            <option value="{{ typeKey|purify }}" {% if typeKey in events.filters.excludeEvents %}selected{% endif %}>
-                                {{ typeName }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-sm-2">
-                    <a class="btn btn-default btn-block" href="{{ url('mautic_contact_timeline_export_action', {'leadId': lead.id}) }}" data-toggle="download">
-                        <span>
-                            <i class="fa fa-download"></i> <span class="hidden-xs hidden-sm">{{ 'mautic.core.export'|trans }}</span>
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-    <input type="hidden" name="leadId" id="leadId" value="{{ lead.id }}" />
-</form>
-<script>
-    mauticLang['showMore'] = '{{ 'mautic.core.more.show'|trans }}';
-    mauticLang['hideMore'] = '{{ 'mautic.core.more.hide'|trans }}';
-</script>
-<div id="timeline-table">
 <!-- timeline -->
 <div class="table-responsive">
     <table class="table table-hover table-bordered" id="contact-timeline">
@@ -62,7 +12,7 @@
                 'orderBy': 'eventLabel',
                 'text': 'mautic.lead.timeline.event_name',
                 'class': 'timeline-name',
-                'sessionVar': 'lead.'~lead.id~'.timeline',
+                'sessionVar': 'lead.' ~ lead.id ~ '.timeline',
                 'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
                 'target': '#timeline-table',
             }) }}
@@ -71,7 +21,7 @@
                 'orderBy': 'eventType',
                 'text': 'mautic.lead.timeline.event_type',
                 'class': 'visible-md visible-lg timeline-type',
-                'sessionVar': 'lead.'~lead.id~'.timeline',
+                'sessionVar': 'lead.' ~ lead.id ~ '.timeline',
                 'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
                 'target': '#timeline-table',
             }) }}
@@ -80,38 +30,47 @@
                 'orderBy': 'timestamp',
                 'text': 'mautic.lead.timeline.event_timestamp',
                 'class': 'visible-md visible-lg timeline-timestamp',
-                'sessionVar': 'lead.'~lead.id~'.timeline',
+                'sessionVar': 'lead.' ~ lead.id ~ '.timeline',
                 'baseUrl': path('mautic_contacttimeline_action', {'leadId': lead.id}),
                 'target': '#timeline-table',
             }) }}
         </tr>
         <tbody>
         {% for event in events.events %}
-            {% set counter = loop.index %}
-            {% set icon = event.icon|default('fa-history') %}
-            {% set eventLabel = event.eventLabel|default(event.eventType) %}
+            {% set icon = event.icon is defined ? event.icon : 'fa-history' %}
+            {% set eventLabel = event.eventLabel is defined ? event.eventLabel : event.eventType %}
             {% if eventLabel is iterable %}
-                {% set linkType = eventLabel.isExternal is defined ? 'data-toggle="ajax"' : 'target="_new"' %}
-                {% set eventLabel = '<a href="'~eventLabel.href~'" '~linkType~'>'~eventLabel.label~'</a>' %}
+                {% set eventLabel %}
+                  <a href="{{ eventLabel.href }}" {% if eventLabel.isExternal is not defined %}data-toggle="ajax"{% else %}target="_new"{% endif %}>
+                    {{- eventLabel.label -}}
+                  </a>
+                {% endset %}
             {% endif %}
-            <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index0) }} {% if event.featured is defined %}timeline-featured{% endif %}">
+
+            {% set details = '' %}
+            {% if event.contentTemplate is defined %}
+                {% set details = include(event.contentTemplate, {'event': event, 'lead': lead}, with_context=false, ignore_missing=true)|trim %}
+            {% endif %}
+
+            <tr class="timeline-row {% if loop.index is divisible by(2) %}timeline-row-highlighted{% endif %} {% if event.featured is defined and event.featured is not empty %}timeline-featured{% endif %}">
                 <td class="timeline-icon">
                     <a href="javascript:void(0);"
-                       data-activate-details="{{ counter }}"
-                       class="btn btn-sm btn-nospin btn-default {% if event.contentTemplate is not defined %}disabled{% endif %}"
-                       data-toggle="tooltip"
-                       title="{{ 'mautic.lead.timeline.toggle_details'|trans }}"><span class="fa fa-fw {{ icon }}"></span></a>
+                       data-activate-details="{{ loop.index }}"
+                       class="btn btn-sm btn-nospin btn-default {% if details is empty %}disabled{% endif %}"
+                       data-toggle="tooltip" title="{{ 'mautic.lead.timeline.toggle_details'|trans }}">
+                        <span class="fa fa-fw {{ icon }}"></span>
+                    </a>
                 </td>
-                <td class="timeline-name">{{ eventLabel|purify }}</td>
-                <td class="timeline-type">{{ event.eventType|default('') }}</td>
+                <td class="timeline-name">{{ eventLabel }}</td>
+                <td class="timeline-type">{% if event.eventType is defined %}{{ event.eventType }}{% endif %}</td>
                 <td class="timeline-timestamp">{{ dateToText(event.timestamp, 'local', 'Y-m-d H:i:s', true) }}</td>
             </tr>
-            {% if event.contentTemplate is defined %}
-                <!-- contentTemplate: "{{ event.contentTemplate }}" -->
-                <tr class="timeline-row {{ cycle(['', 'timeline-row-highlighted'], loop.index0) }} timeline-details hide" id="timeline-details-{{ counter }}">
+            {% if details is not empty %}
+                <tr class="timeline-row {% if loop.index is divisible by(2) %}timeline-row-highlighted{% endif %} timeline-details hide" id="timeline-details-{{ loop.index }}">
                     <td colspan="4">
-                        {# quick hack, not sure where the templates are being defined #}
-                        {{ include([event.contentTemplate|replace({'.html.php': '.html.twig'}), event.contentTemplate], {'event': event, 'lead': lead}) }}
+                        <!-- template: "{{ event.contentTemplate }}" -->
+                        {{ details|raw }}
+                        <!--/ template: "{{ event.contentTemplate }}" -->
                     </td>
                 </tr>
             {% endif %}
@@ -128,4 +87,3 @@
         'totalItems': events.total,
 }) }}
 <!--/ timeline -->
-</div>
