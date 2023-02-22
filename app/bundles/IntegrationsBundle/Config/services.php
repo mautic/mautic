@@ -13,7 +13,6 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'Helper/FieldFilterHelper.php',
         'Helper/FieldMergerHelper.php',
         'Auth/Support/Oauth2/Token',
@@ -28,4 +27,7 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\IntegrationsBundle\\Entity\\', '../Entity/*Repository.php');
+
+    $services->load('Mautic\\IntegrationsBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
 };
