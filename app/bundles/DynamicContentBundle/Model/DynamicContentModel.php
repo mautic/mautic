@@ -95,7 +95,6 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param             $entity
-     * @param FormFactoryInterface $formFactory
      * @param string|null $action
      * @param array       $options
      *
