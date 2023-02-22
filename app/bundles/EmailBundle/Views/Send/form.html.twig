@@ -2,7 +2,7 @@
 
 {% block mauticContent 'emailSend' %}
 
-{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|raw %}
+{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|purify %}
 
 {% block content %}
     <div class="row">
