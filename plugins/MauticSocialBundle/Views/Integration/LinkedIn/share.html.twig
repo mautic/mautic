@@ -1,0 +1,8 @@
+{% set locale = app.request.locale %}
+{% set counter = settings.counter|default('none') %}
+<div class="share-button linkedin-share-button layout-{{ counter }}">
+<script type="IN/Share" {% if 'none' != counter %}data-counter="{{ settings.counter }}"{% endif %}></script>
+</div>
+<script src="//platform.linkedin.com/in.js" type="text/javascript">
+    lang: {{ locale }}
+</script>

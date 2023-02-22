@@ -1,0 +1,12 @@
+{% block _formaction_properties_row %}
+<div class="row">
+    <div class="col-xs-6">
+        {% for child in form.children %}
+            <div class="form-group col-xs-6">
+                {{ form_label(child) }}
+                {{ form_widget(child) }}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
