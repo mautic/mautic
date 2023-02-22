@@ -2,7 +2,7 @@
 
 {% block mauticContent 'emailSend' %}
 
-{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|raw %}
+{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|purify %}
 
 {% set percent = (progress[1]) ? ((progress[0] / progress[1]) * 100)|round : 100 %}
 {% set id = ('inprogress' != status) ? 'emailSendProgressComplete' : 'emailSendProgress' %}
@@ -13,7 +13,7 @@
             <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
                 <div class="panel-heading">
                     <h4 class="panel-title">
-                        {{ ('mautic.email.send.' ~ status)|trans ({'%subject%' : emoji_to_html(email.getSubject(), 'short')}) }}
+                        {{ ('mautic.email.send.' ~ status)|trans({'%subject%' : emoji_to_html(email.getSubject(), 'short')})|purify }}
                     </h4>
                 </div>
                 <div class="panel-body">
