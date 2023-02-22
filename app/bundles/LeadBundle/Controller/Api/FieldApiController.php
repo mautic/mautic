@@ -31,9 +31,10 @@ class FieldApiController extends CommonApiController
     {
         $fieldModel = $this->getModel('lead.field');
         \assert($fieldModel instanceof FieldModel);
+        $request = $event->getRequest();
 
         $this->model           = $fieldModel;
-        $this->fieldObject     = $this->request->get('object');
+        $this->fieldObject     = $request->get('object');
         $this->entityClass     = LeadField::class;
         $this->entityNameOne   = 'field';
         $this->entityNameMulti = 'fields';
@@ -89,7 +90,7 @@ class FieldApiController extends CommonApiController
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         $parameters['object'] = $this->fieldObject;
         // Workaround for mispelled isUniqueIdentifer.
@@ -114,7 +115,7 @@ class FieldApiController extends CommonApiController
             $result = $this->model->setFieldProperties($entity, $parameters['properties']);
 
             if (true !== $result) {
-                return $this->returnError($this->get('translator')->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
+                return $this->returnError($this->translator->trans($result, [], 'validators'), Response::HTTP_BAD_REQUEST);
             }
         }
     }

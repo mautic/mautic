@@ -67,7 +67,6 @@ class NoteModel extends FormModel
      * {@inheritdoc}
      *
      * @param             $entity
-     * @param FormFactoryInterface $formFactory
      * @param string|null $action
      * @param array       $options
      *

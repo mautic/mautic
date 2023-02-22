@@ -781,7 +781,6 @@ class FieldModel extends FormModel
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param FormFactoryInterface $formFactory
      * @param null  $action
      * @param array $options
      *
@@ -805,7 +804,7 @@ class FieldModel extends FormModel
     /**
      * @param $properties
      *
-     * @return bool
+     * @return string|true
      */
     public function setFieldProperties(LeadField $entity, array $properties)
     {

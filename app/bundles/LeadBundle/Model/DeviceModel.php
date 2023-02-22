@@ -71,7 +71,6 @@ class DeviceModel extends FormModel
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param FormFactoryInterface $formFactory
      * @param null  $action
      * @param array $options
      *

@@ -194,8 +194,7 @@ class ListModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param FormFactoryInterface $formFactory
+     * @param             $entity
      * @param string|null $action
      * @param array       $options
      *

@@ -47,7 +47,7 @@ class CompanyApiController extends CommonApiController
     public function newEntityAction(Request $request)
     {
         // Check for an email to see if the lead already exists
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         if (empty($parameters['force'])) {
             $leadCompanyModel = $this->getModel('lead.company');
@@ -55,11 +55,11 @@ class CompanyApiController extends CommonApiController
             list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {
-                return $this->editEntityAction($company['id']);
+                return $this->editEntityAction($request, $company['id']);
             }
         }
 
-        return parent::newEntityAction();
+        return parent::newEntityAction($request);
     }
 
     /**
