@@ -13,10 +13,12 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'Helper/SchemaHelper.php',
     ];
 
     $services->load('Mautic\\InstallBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('Mautic\\InstallBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
 };
