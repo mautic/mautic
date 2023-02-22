@@ -40,14 +40,10 @@ class LeadSubscriber implements EventSubscriberInterface
     private FocusModel $focusModel;
 
     public function __construct(
-        PageModel $pageModel,
-        VideoModel $pageVideoModel,
         Translator $translator,
         RouterInterface $router,
         FocusModel $focusModel
     ) {
-        $this->pageModel      = $pageModel;
-        $this->pageVideoModel = $pageVideoModel;
         $this->translator     = $translator;
         $this->router         = $router;
         $this->focusModel     = $focusModel;
@@ -82,7 +78,6 @@ class LeadSubscriber implements EventSubscriberInterface
 
         $contactId        = $event->getLead()->getId();
         $statsViewsByLead = $this->focusModel->getStatRepository()->getStatsViewByLead($contactId, $event->getQueryOptions());
-        //dump($statsViewsByLead);
 
         if (!$event->isEngagementCount()) {
             $template = 'MauticFocusBundle:SubscribedEvents\Timeline:index.html.php';
@@ -103,10 +98,12 @@ class LeadSubscriber implements EventSubscriberInterface
                         'href'  => $this->router->generate('mautic_focus_action', ['objectAction' => 'view', 'objectId' => $statsView['focus']['id']]),
                     ];
 
+                    $eventType = (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeKey : $eventClickTypeKey;
+
                     $event->addEvent(
                         [
-                            'event'           => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeKey : $eventClickTypeKey,
-                            'eventId'         => $statsView['id'],
+                            'event'           => $eventType,
+                            'eventId'         => $eventType.'.'.$statsView['id'],
                             'eventLabel'      => $eventLabel,
                             'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
                             'timestamp'       => $statsView['dateAdded'],
