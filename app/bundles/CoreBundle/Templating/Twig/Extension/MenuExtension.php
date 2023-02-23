@@ -44,6 +44,9 @@ class MenuExtension extends AbstractExtension
 
     /**
      * Parses attributes for the menu view.
+     *
+     * @param array<string,string> $attributes
+     * @param array<string,string> $overrides
      */
     public function parseMenuAttributes(array $attributes, array $overrides = []): string
     {
@@ -54,16 +57,15 @@ class MenuExtension extends AbstractExtension
      * Concats the appropriate classes for menu links.
      *
      * @param array<string,string> $options
-     * @param string               $extra
      *
      * @return array<mixed>
      */
-    public function buildMenuClasses(ItemInterface $item, MatcherInterface $matcher, array $options, ?string $extraClasses)
+    public function buildMenuClasses(ItemInterface $item, MatcherInterface|null $matcher, array $options, ?string $extraClasses)
     {
         $isAncestor = (null !== $matcher) ? $matcher->isAncestor($item, (int) $options['matchingDepth']) : false;
         $isCurrent  = (null !== $matcher) ? $matcher->isCurrent($item) : false;
 
-        $class = !empty($item) ? $item->getAttribute('class') : '';
+        $class = $item->getAttribute('class');
 
         $classes      = '';
         $classesArray = [];
