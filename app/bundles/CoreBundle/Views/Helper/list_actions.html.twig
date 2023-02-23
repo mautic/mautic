@@ -8,7 +8,7 @@
 {# Workaround to get variables from action_button_helper here #}
 {{ restore('action_button_helper') }}
 
-{% if item is iterable and item[0] is not defined %}
+{% if item is iterable and item.id is defined and item.name is defined %}
     {% set id, name = item.id, item.name %}
 {% else %}
     {% set id, name = item.getId(), attribute(item, nameGetter) %}
