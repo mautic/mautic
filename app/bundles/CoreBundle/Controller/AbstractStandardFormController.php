@@ -493,7 +493,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'edit'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.twig'),
+            'contentTemplate' => $this->getTemplateName('form.html.php'),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $this->generateUrl(
@@ -708,9 +708,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
     /**
      * Get template base different than MauticCoreBundle:Standard.
      *
-     * NOTE: This should be abstract method or removed. All the Bundles that extend this
-     * Controller define a template base so the "Standard" templates are never used.
-     *
      * @return string
      */
     protected function getTemplateBase()
@@ -730,15 +727,14 @@ abstract class AbstractStandardFormController extends AbstractFormController
         $originalFile = $file;
         if (self::ENGINE_TWIG === $engine && strpos($file, '.php')) {
             $file = str_replace('.php', '.twig', $file);
-            trigger_deprecation('mautic', '5.x', 'Using PHP Templates is deprecated, use Twig Templates instead.');
         }
         if ($this->get('templating')->exists($this->getTemplateBase().':'.$file)) {
             return $this->getTemplateBase().':'.$file;
         } elseif ($this->get('templating')->exists($this->getTemplateBase().':'.$originalFile)) {
             // If no Twig file is found, try to find a PHP file before falling back to standard files.
             return $this->getTemplateBase().':'.$originalFile;
-        //} elseif ($this->get('templating')->exists('MauticCoreBundle:Standard:'.$file)) {
-        //    return 'MauticCoreBundle:Standard:'.$file;
+        } elseif ($this->get('templating')->exists('MauticCoreBundle:Standard:'.$file)) {
+            return 'MauticCoreBundle:Standard:'.$file;
         } elseif (self::ENGINE_TWIG === $engine) {
             return $this->getTemplateName(str_replace('.twig', '.php', $file), self::ENGINE_PHP);
         }
@@ -958,7 +954,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.twig'),
+                    'contentTemplate' => $this->getTemplateName('list.html.php'),
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
@@ -1072,7 +1068,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.twig'),
+            'contentTemplate' => $this->getTemplateName('form.html.php'),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $this->generateUrl(
@@ -1184,7 +1180,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     true
                 ),
             ],
-            'contentTemplate' => $this->getTemplateName('details.html.twig'),
+            'contentTemplate' => $this->getTemplateName('details.html.php'),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $route,
