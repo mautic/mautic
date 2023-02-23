@@ -18,6 +18,7 @@ final class FormFieldExtension extends AbstractExtension
         return [
             new TwigFunction('formFieldParseBooleanList', [FormFieldHelper::class, 'parseBooleanList']),
             new TwigFunction('formFieldParseList', [FormFieldHelper::class, 'parseList']),
+            new TwigFunction('formFieldParseListForChoices', [FormFieldHelper::class, 'parseListForChoices']),
         ];
     }
 }
