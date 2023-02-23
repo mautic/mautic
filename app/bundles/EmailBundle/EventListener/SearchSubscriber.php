@@ -87,13 +87,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($emails as $email) {
                     $emailResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticEmailBundle:SubscribedEvents\Search:global.html.twig',
                         ['email' => $email]
                     )->getContent();
                 }
                 if (count($emails) > 5) {
                     $emailResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticEmailBundle:SubscribedEvents\Search:global.html.php',
+                        'MauticEmailBundle:SubscribedEvents\Search:global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
