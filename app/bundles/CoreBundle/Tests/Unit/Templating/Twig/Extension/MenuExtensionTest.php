@@ -38,8 +38,6 @@ class MenuExtensionTest extends AbstractMauticTestCase
         $menu    = $factory->createItem('My menu');
         $menu->addChild('First item', ['uri' => '/']);
         $menu->addChild('Second item', ['uri' => '/', 'attributes' => ['class' => 'test-class']]);
-        // $renderer = new ListRenderer(new \Knp\Menu\Matcher\Matcher());
-        // echo $renderer->render($menu);
 
         $matcher        = null;
         $options        = [];
