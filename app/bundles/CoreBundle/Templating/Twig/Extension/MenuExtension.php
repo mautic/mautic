@@ -56,32 +56,32 @@ class MenuExtension extends AbstractExtension
     /**
      * Concats the appropriate classes for menu links.
      *
-     * @param ItemInterface|null    $item
-     * @param MatcherInterface|null $matcher
-     * @param array<string,string>  $options
-     * @param string                $extra
+     * @param ItemInterface        $item
+     * @param MatcherInterface     $matcher
+     * @param array<string,string> $options
+     * @param string               $extra
      *
      * @return array<mixed>
      */
-    public function buildMenuClasses($item, $matcher, $options, $extra)
+    public function buildMenuClasses($item, $matcher, $options, $extraClasses)
     {
-        $isAncestor = $matcher !== null ? $matcher->isAncestor($item, (int) $options['matchingDepth']) : false;
-        $isCurrent  = $matcher !== null ? $matcher->isCurrent($item) : false;
+        $isAncestor = (null !== $matcher) ? $matcher->isAncestor($item, (int) $options['matchingDepth']) : false;
+        $isCurrent  = (null !== $matcher) ? $matcher->isCurrent($item) : false;
 
         $class = !empty($item) ? $item->getAttribute('class') : '';
 
-        $classes = '';
+        $classes      = '';
         $classesArray = [];
 
         $classes .= ($class) ? " {$class}" : '';
-        $classes .= ($extra) ? " {$extra}" : '';
+        $classes .= ($extraClasses) ? " {$extraClasses}" : '';
         $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
         $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';
         $classes .= ($isAncestor && $this->menuHelper->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
         $classes .= ($item->actsLikeFirst() && isset($options['firstClass'])) ? " {$options['firstClass']}" : '';
         $classes .= ($item->actsLikeLast() && isset($options['lastClass'])) ? " {$options['lastClass']}" : '';
 
-        if ($classes !== '' ) {
+        if ('' !== $classes) {
             $classesArray = ['class' => trim($classes)];
         }
 
