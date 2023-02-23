@@ -27,6 +27,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public const EMAIL_VARIANT_PREFIX = 'vp';
     public const DNC_PREFIX           = 'dnc';
     public const CLICK_PREFIX         = 'cut';
+    public const TRACKABLE_PREFIX     = 'tr';
+    public const REDIRECT_PREFIX      = 'pr';
 
     public const DNC_COLUMNS = [
         'unsubscribed' => [
@@ -257,6 +259,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->addTable(self::CONTEXT_EMAILS, $data);
         $context = self::CONTEXT_EMAILS;
         $event->addGraph($context, 'pie', 'mautic.email.graph.pie.read.ingored.unsubscribed.bounced');
+        $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
 
         if ($event->checkContext(self::CONTEXT_EMAIL_STATS)) {
             // Ratios are not applicable for individual stats
@@ -314,6 +317,7 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.unsubscribed');
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.bounced');
             $event->addGraph($context, 'table', 'mautic.email.table.most.emails.failed');
+            $event->addGraph($context, 'table', 'mautic.email.table.most.emails.clicks');
         }
     }
 
@@ -448,10 +452,6 @@ class ReportSubscriber implements EventSubscriberInterface
         $graphs = $event->getRequestedGraphs();
 
         if (!$event->checkContext([self::CONTEXT_EMAIL_STATS, self::CONTEXT_EMAILS])) {
-            return;
-        }
-
-        if ($event->checkContext(self::CONTEXT_EMAILS) && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)) {
             return;
         }
 
@@ -660,6 +660,22 @@ class ReportSubscriber implements EventSubscriberInterface
                     $graphData['link']      = 'mautic_email_action';
                     $event->setGraph($g, $graphData);
                     break;
+
+                case 'mautic.email.table.most.emails.clicks':
+                    $this->addTrackableTablesForEmailStats($queryBuilder);
+                    $queryBuilder->select('e.id, e.subject as `title`, tr.hits as `hits`, tr.unique_hits as `unique hits`, pr.url as `URL`')
+                        ->groupBy('tr.redirect_id, tr.hits')
+                        ->orderBy('tr.hits', 'DESC')
+                        ->setMaxResults(10);
+
+                    $items                  = $queryBuilder->execute()->fetchAllAssociative();
+                    $graphData              = [];
+                    $graphData['data']      = $items;
+                    $graphData['name']      = $g;
+                    $graphData['iconClass'] = 'fa-external-link-square';
+                    $graphData['link']      = 'mautic_email_action';
+                    $event->setGraph($g, $graphData);
+                    break;
             }
             unset($queryBuilder);
         }
@@ -685,6 +701,29 @@ class ReportSubscriber implements EventSubscriberInterface
                 $table,
                 self::DNC_PREFIX,
                 'e.id = dnc.channel_id AND dnc.channel=\'email\''
+            );
+        }
+    }
+
+    private function addTrackableTablesForEmailStats(QueryBuilder $qb): void
+    {
+        $trTable = MAUTIC_TABLE_PREFIX.'channel_url_trackables';
+        $prTable = MAUTIC_TABLE_PREFIX.'page_redirects';
+
+        if (!$this->isJoined($qb, $trTable, self::EMAILS_PREFIX, self::TRACKABLE_PREFIX)) {
+            $qb->leftJoin(
+                self::EMAILS_PREFIX,
+                $trTable,
+                self::TRACKABLE_PREFIX,
+                'e.id = tr.channel_id AND tr.channel = \'email\''
+            );
+        }
+        if (!$this->isJoined($qb, $prTable, self::TRACKABLE_PREFIX, self::REDIRECT_PREFIX)) {
+            $qb->leftJoin(
+                self::TRACKABLE_PREFIX,
+                $prTable,
+                self::REDIRECT_PREFIX,
+                'tr.redirect_id = pr.id'
             );
         }
     }
