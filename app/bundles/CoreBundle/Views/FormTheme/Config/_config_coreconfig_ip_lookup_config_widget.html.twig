@@ -1,18 +1,9 @@
-<?php
-
-/*
- * @copyright   2015 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-?>
+{% block _config_coreconfig_ip_lookup_config_widget %}
 <div class="row">
-<?php foreach ($form as $child): ?>
+  {% for child in form %}
     <div class="col-sm-6">
-        <?php echo $view['form']->row($child); ?>
+        {{ form_row(child) }}
     </div>
-<?php endforeach; ?>
+  {% endfor %}
 </div>
+{% endblock %}
