@@ -21,7 +21,7 @@
                 {% if (extras.divider is defined and extras.divider is not empty) %}
                     <li role="separator" class="divider"></li>
                 {% elseif (extras.header is defined and extras.header is not empty) %}
-                    <li class="dropdown-header">{{ extras.header|trans|raw }}</li>
+                    <li class="dropdown-header">{{ extras.header|trans|purify }}</li>
                 {% else %}
                     {# save default classes for the item #}
                     {% set liClasses = (liAttributes.class is defined) ? liAttributes.class : '' %}
@@ -47,7 +47,7 @@
                             {% set labelClasses = (labelAttributes.class is not defined) ? 'text' : labelAttributes.class ~ ' text' %}
                             {% set labelAttributes = labelAttributes|merge({'class': labelClasses|trim }) %}
 
-                            <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | raw }}</span>
+                            <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
                         </a>
                     </li>
 

@@ -59,7 +59,7 @@
                     {% set labelClasses = labelClasses ~ ' text' ~ labelPull %}
                     {% set labelAttributes = labelAttributes|merge({'class': labelClasses|trim }) %}
                     
-                        <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | raw }}</span>
+                        <span{{ parseMenuAttributes(labelAttributes) }}>{{ child.getLabel() | trans | purify }}</span>
 
                     </a>
                 {# Menu link end #}
