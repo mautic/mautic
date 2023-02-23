@@ -162,7 +162,7 @@ class PublicController extends CommonFormController
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.twig');
         if (!empty($stat)) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
@@ -273,7 +273,7 @@ class PublicController extends CommonFormController
 
                 if (empty($html)) {
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
-                        'MauticEmailBundle:Lead:preference_options.html.php',
+                        'MauticEmailBundle:Lead:preference_options.html.twig',
                         array_merge(
                             $viewParameters,
                             [
@@ -307,7 +307,7 @@ class PublicController extends CommonFormController
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
-                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
+                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.twig');
             } else {
                 $viewParams['content'] = '';
                 $viewParams['message'] = $message.$formContent;
@@ -398,7 +398,7 @@ class PublicController extends CommonFormController
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.twig');
 
         return $this->render(
             $logicalName,
@@ -479,7 +479,7 @@ class PublicController extends CommonFormController
 
             $this->processSlots($slots, $emailEntity);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.twig');
 
             $response = $this->render(
                 $logicalName,
