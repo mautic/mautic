@@ -6,6 +6,7 @@ namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 class FormatterExtension extends AbstractExtension
@@ -20,11 +21,22 @@ class FormatterExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
+    public function getFilters()
+    {
+        return [
+            new TwigFilter('formatter_simple_array_to_html', [$this, 'simpleArrayToHtml'], ['is_safe' => ['html']]),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getFunctions()
     {
         return [
             new TwigFunction('format', [$this, '_'], ['is_safe' => ['all']]),
             new TwigFunction('normalizeStringValue', [$this, 'normalizeStringValue']),
+            new TwigFunction('formatter_simple_array_to_html', [$this, 'simpleArrayToHtml'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -44,5 +56,13 @@ class FormatterExtension extends AbstractExtension
     public function normalizeStringValue(string $string): string
     {
         return $this->formatterHelper->normalizeStringValue($string);
+    }
+
+    /**
+     * @param array<mixed> $array
+     */
+    public function simpleArrayToHtml(array $array, string $delimeter = '<br />'): string
+    {
+        return $this->formatterHelper->simpleArrayToHtml($array, $delimeter);
     }
 }
