@@ -65,25 +65,26 @@ class MenuExtension extends AbstractExtension
      */
     public function buildMenuClasses($item, $matcher, $options, $extra)
     {
-        $isAncestor = $matcher->isAncestor($item, (int) $options['matchingDepth']);
-        $isCurrent  = $matcher->isCurrent($item);
+        $isAncestor = $matcher !== null ? $matcher->isAncestor($item, (int) $options['matchingDepth']) : false;
+        $isCurrent  = $matcher !== null ? $matcher->isCurrent($item) : false;
 
-        $class   = $item->getAttribute('class');
+        $class = !empty($item) ? $item->getAttribute('class') : '';
 
         $classes = '';
+        $classesArray = [];
 
         $classes .= ($class) ? " {$class}" : '';
         $classes .= ($extra) ? " {$extra}" : '';
         $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
         $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';
         $classes .= ($isAncestor && $this->menuHelper->invisibleChildSelected($item, $matcher)) ? " {$options['currentClass']}" : '';
-        $classes .= ($item->actsLikeFirst()) ? " {$options['firstClass']}" : '';
-        $classes .= ($item->actsLikeLast()) ? " {$options['lastClass']}" : '';
+        $classes .= ($item->actsLikeFirst() && isset($options['firstClass'])) ? " {$options['firstClass']}" : '';
+        $classes .= ($item->actsLikeLast() && isset($options['lastClass'])) ? " {$options['lastClass']}" : '';
 
-        if (empty($classes)) {
-            return [];
+        if ($classes !== '' ) {
+            $classesArray = ['class' => trim($classes)];
         }
 
-        return ['class' => trim($classes)];
+        return $classesArray;
     }
 }
