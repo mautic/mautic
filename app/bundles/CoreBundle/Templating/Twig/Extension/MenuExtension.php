@@ -60,7 +60,7 @@ class MenuExtension extends AbstractExtension
      *
      * @return array<mixed>
      */
-    public function buildMenuClasses(ItemInterface $item, MatcherInterface|null $matcher, array $options, ?string $extraClasses)
+    public function buildMenuClasses(ItemInterface $item, ?MatcherInterface $matcher, array $options, ?string $extraClasses)
     {
         $isAncestor = (null !== $matcher) ? $matcher->isAncestor($item, (int) $options['matchingDepth']) : false;
         $isCurrent  = (null !== $matcher) ? $matcher->isCurrent($item) : false;
