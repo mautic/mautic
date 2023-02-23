@@ -54,7 +54,7 @@ class DetailController extends CommonController
             return $this->notFound($e->getMessage());
         }
 
-        $security = $this->get('mautic.security');
+        $security = $this->security;
 
         return $this->delegateView(
             [
