@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Twig\Extension;
 
 use Knp\Menu\MenuFactory;
-use Knp\Menu\Renderer\ListRenderer;
 use Mautic\CoreBundle\Templating\Twig\Extension\MenuExtension;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use PHPUnit\Framework\Assert;
