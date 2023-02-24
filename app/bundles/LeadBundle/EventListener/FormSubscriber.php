@@ -120,6 +120,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.addutmtags',
             'description'       => 'mautic.lead.lead.events.addutmtags_descr',
             'formType'          => ActionAddUtmTagsType::class,
+            'formTheme'         => 'MauticLeadBundle:FormTheme:ActionAddUtmTags/_formaction_properties_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
