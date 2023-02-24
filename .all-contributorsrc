@@ -989,6 +989,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "pedrodejesus",
+      "name": "Pedro de Jesus",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42081152?v=4",
+      "profile": "https://www.linkedin.com/in/pedro-de-jesus-a60527167",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
