@@ -102,7 +102,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         // Default content template
-        return 'MauticReportBundle:Report:details_data.html.php';
+        return 'MauticReportBundle:Report:details.html.twig';
     }
 
     /**

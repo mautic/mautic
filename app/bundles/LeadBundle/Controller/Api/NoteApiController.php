@@ -27,6 +27,10 @@ class NoteApiController extends CommonApiController
         $this->entityNameMulti  = 'notes';
         $this->serializerGroups = ['leadNoteDetails', 'leadList'];
 
+        // When a user passes in a note like "This is <strong>text</strong>", this will
+        // keep the HTML that was passed in.
+        $this->dataInputMasks = ['text' => 'html'];
+
         parent::initialize($event);
     }
 
