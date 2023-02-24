@@ -132,7 +132,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param FormFactoryInterface $formFactory
      * @param null  $action
      * @param array $options
      *
