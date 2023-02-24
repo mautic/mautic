@@ -1,96 +1,82 @@
-<?php
-
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-$timeFrames = [
-    'i' => $view['translator']->trans('mautic.core.time.minutes'),
-    'H' => $view['translator']->trans('mautic.core.time.hours'),
-    'd' => $view['translator']->trans('mautic.core.time.days'),
-];
-
-?>
+{% block pointaction_urlhit_widget %}
+{%- set timeFrames = {
+    'i': 'mautic.core.time.minutes'|trans,
+    'H': 'mautic.core.time.hours'|trans,
+    'd': 'mautic.core.time.days'|trans,
+} %}
 
 <div class="row">
     <div class="col-xs-12">
-        <?php echo $view['form']->row($form['page_url']); ?>
+        {{ form_row(form['page_url']) }}
     </div>
 </div>
 
 <div class="row">
     <div class="col-xs-12">
-        <?php echo $view['form']->row($form['page_hits']); ?>
+        {{ form_row(form['page_hits']) }}
     </div>
-    <!-- <div class="col-xs-6">
-        <?php //echo $view['form']->row($form['first_time']);?>
-    </div> -->
 </div>
 
 <div class="row">
     <div class="col-xs-12 form-group ">
-        <?php echo $view['form']->label($form['returns_within']); ?>
+        {{ form_label(form['returns_within']) }}
         <div class="input-group">
-            <?php echo $view['form']->widget($form['returns_within']); ?>
-            <?php $default = $form['returns_within_unit']->vars['data']; ?>
+            {{ form_widget(form['returns_within']) }}
+            {%- set default = form.returns_within_unit.vars.data %}
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    <span class="returns_within_label"><?php echo $timeFrames[$default]; ?></span> <span class="caret"></span>
+                    <span class="returns_within_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu time-dropdown">
-                    <?php foreach ($timeFrames as $abbr => $label): ?>
-                    <li><a href="#" data-time="<?php echo $abbr; ?>" data-field="returns_within"><?php echo $label; ?></a></li>
-                    <?php endforeach; ?>
+                    {%- for abbr, label in timeFrames %}
+                    <li><a href="#" data-time="{{ abbr }}" data-field="returns_within">{{ label }}</a></li>
+                    {%- endfor %}
                 </ul>
             </div>
         </div>
-        <?php echo $view['form']->errors($form['returns_within']); ?>
-        <?php echo $view['form']->widget($form['returns_within_unit']); ?>
+        {{ form_errors(form['returns_within']) }}
+        {{ form_widget(form['returns_within_unit']) }}
     </div>
 
     <div class="col-xs-12 form-group ">
-        <?php echo $view['form']->label($form['returns_after']); ?>
+        {{ form_label(form['returns_after']) }}
         <div class="input-group">
-            <?php echo $view['form']->widget($form['returns_after']); ?>
-            <?php $default = $form['returns_after_unit']->vars['data']; ?>
+            {{ form_widget(form['returns_after']) }}
+            {%- set default = form['returns_after_unit'].vars['data'] %}
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    <span class="returns_after_label"><?php echo $timeFrames[$default]; ?></span> <span class="caret"></span>
+                    <span class="returns_after_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu time-dropdown">
-                    <?php foreach ($timeFrames as $abbr => $label): ?>
-                        <li><a href="#" data-time="<?php echo $abbr; ?>" data-field="returns_after"><?php echo $label; ?></a></li>
-                    <?php endforeach; ?>
+                    {%- for abbr, label in timeFrames %}
+                        <li><a href="#" data-time="{{ abbr }}" data-field="returns_after">{{ label }}</a></li>
+                    {%- endfor %}
                 </ul>
             </div>
         </div>
-        <?php echo $view['form']->errors($form['returns_after']); ?>
-        <?php echo $view['form']->widget($form['returns_after_unit']); ?>
+        {{ form_errors(form['returns_after']) }}
+        {{ form_widget(form['returns_after_unit']) }}
     </div>
 
 
     <div class="col-xs-12 form-group ">
-        <?php echo $view['form']->label($form['accumulative_time']); ?>
+        {{ form_label(form['accumulative_time']) }}
         <div class="input-group">
-            <?php echo $view['form']->widget($form['accumulative_time']); ?>
-            <?php $default = $form['accumulative_time_unit']->vars['data']; ?>
+            {{ form_widget(form['accumulative_time']) }}
+            {%- set default = form['accumulative_time_unit'].vars['data'] %}
             <div class="input-group-btn">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                    <span class="accumulative_time_label"><?php echo $timeFrames[$default]; ?></span> <span class="caret"></span>
+                    <span class="accumulative_time_label">{{ timeFrames[default] }}</span> <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu time-dropdown">
-                    <?php foreach ($timeFrames as $abbr => $label): ?>
-                        <li><a href="#" data-time="<?php echo $abbr; ?>" data-field="accumulative_time"><?php echo $label; ?></a></li>
-                    <?php endforeach; ?>
+                    {%- for abbr, label in timeFrames %}
+                        <li><a href="#" data-time="{{ abbr }}" data-field="accumulative_time">{{ label }}</a></li>
+                    {%- endfor %}
                 </ul>
             </div>
         </div>
-        <?php echo $view['form']->errors($form['accumulative_time']); ?>
-        <?php echo $view['form']->widget($form['accumulative_time_unit']); ?>
+        {{ form_errors(form['accumulative_time']) }}
+        {{ form_widget(form['accumulative_time_unit']) }}
     </div>
 </div>
 
@@ -105,3 +91,4 @@ $timeFrames = [
         mQuery('.' + field + '_label').html(label);
     });
 </script>
+{% endblock %}
