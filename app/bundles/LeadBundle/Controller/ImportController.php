@@ -25,17 +25,17 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ImportController extends FormController
 {
     // Steps of the import
-    const STEP_UPLOAD_CSV      = 1;
-    const STEP_MATCH_FIELDS    = 2;
-    const STEP_PROGRESS_BAR    = 3;
-    const STEP_IMPORT_FROM_CSV = 4;
+    public const STEP_UPLOAD_CSV      = 1;
+    public const STEP_MATCH_FIELDS    = 2;
+    public const STEP_PROGRESS_BAR    = 3;
+    public const STEP_IMPORT_FROM_CSV = 4;
 
     /**
      * @var LoggerInterface
@@ -52,7 +52,7 @@ class ImportController extends FormController
      */
     private $importModel;
 
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         /** @var ImportModel $model */
         $model = $this->getModel($this->getModelName());
@@ -162,7 +162,7 @@ class ImportController extends FormController
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
         $fullPath    = $this->getFullCsvPath($object);
-        $import      = $$this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
+        $import      = $this->importModel->getEntity($this->session->get('mautic.lead.import.id', null));
 
         if ($import) {
             $import->setStatus($import::QUEUED);
@@ -184,7 +184,7 @@ class ImportController extends FormController
     public function newAction($objectId = 0, $ignorePost = false)
     {
         //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', true);
+        ini_set('auto_detect_line_endings', '1');
 
         $dispatcher = $this->container->get('event_dispatcher');
 
@@ -235,8 +235,8 @@ class ImportController extends FormController
                 break;
             case self::STEP_MATCH_FIELDS:
                 $mappingEvent = $dispatcher->dispatch(
-                    LeadEvents::IMPORT_ON_FIELD_MAPPING,
-                    new ImportMappingEvent($this->request->get('object'))
+                    new ImportMappingEvent($this->request->get('object')),
+                    LeadEvents::IMPORT_ON_FIELD_MAPPING
                 );
 
                 try {
@@ -395,7 +395,7 @@ class ImportController extends FormController
                 case self::STEP_MATCH_FIELDS:
                     $validateEvent = new ImportValidateEvent($this->request->get('object'), $form);
 
-                    $dispatcher->dispatch(LeadEvents::IMPORT_ON_VALIDATE, $validateEvent);
+                    $dispatcher->dispatch($validateEvent, LeadEvents::IMPORT_ON_VALIDATE);
 
                     if ($validateEvent->hasErrors()) {
                         break;
@@ -461,13 +461,13 @@ class ImportController extends FormController
         }
 
         if (self::STEP_UPLOAD_CSV === $step || self::STEP_MATCH_FIELDS === $step) {
-            $contentTemplate = 'MauticLeadBundle:Import:new.html.php';
+            $contentTemplate = 'MauticLeadBundle:Import:new.html.twig';
             $viewParameters  = [
                 'form'       => $form->createView(),
                 'objectName' => $initEvent->objectName,
             ];
         } else {
-            $contentTemplate = 'MauticLeadBundle:Import:progress.html.php';
+            $contentTemplate = 'MauticLeadBundle:Import:progress.html.twig';
             $viewParameters  = [
                 'progress'         => $progress,
                 'import'           => $import,
@@ -535,7 +535,7 @@ class ImportController extends FormController
 
         if ($browserImportLimit && $this->getLineCount($object) < $browserImportLimit) {
             return true;
-        } elseif (!$browserImportLimit && $form->get('buttons')->get('save')->isClicked()) {
+        } elseif (!$browserImportLimit && $this->getFormButton($form, ['buttons', 'save'])->isClicked()) {
             return true;
         }
 
@@ -757,7 +757,7 @@ class ImportController extends FormController
     {
         $event = new ImportInitEvent($this->request->get('object'));
 
-        $this->container->get('event_dispatcher')->dispatch(LeadEvents::IMPORT_ON_INITIALIZE, $event);
+        $this->container->get('event_dispatcher')->dispatch($event, LeadEvents::IMPORT_ON_INITIALIZE);
 
         return $event;
     }

@@ -27,7 +27,7 @@ use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -416,8 +416,8 @@ class FormSubscriber implements EventSubscriberInterface
                     // get lead fields
                     $currentLeadFields = [];
                     foreach ($fields as $field) {
-                        $leadField = $field->getLeadField();
-                        if ('' !== $leadField) {
+                        $leadField = $field->getMappedField();
+                        if ('' !== $leadField && 'lead' === $field->getMappedObject()) {
                             $currentLeadFields[$leadField] = $field->getIsRequired();
                         }
                     }

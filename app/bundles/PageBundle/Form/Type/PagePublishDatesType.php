@@ -74,12 +74,4 @@ class PagePublishDatesType extends AbstractType
             'data_class' => Page::class,
         ]);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'page_publish_dates';
-    }
 }

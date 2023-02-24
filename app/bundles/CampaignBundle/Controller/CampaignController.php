@@ -246,7 +246,7 @@ class CampaignController extends AbstractStandardFormController
                     [
                         'returnUrl'       => $returnUrl,
                         'viewParameters'  => ['page' => $lastPage],
-                        'contentTemplate' => 'MauticCampaignBundle:Campaign:index',
+                        'contentTemplate' => 'Mautic\CampaignBundle\Controller\CampaignController::indexAction',
                         'passthroughVars' => [
                             'mauticContent' => 'campaign',
                         ],
@@ -281,7 +281,7 @@ class CampaignController extends AbstractStandardFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.php'),
+                    'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.twig',
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
@@ -330,11 +330,11 @@ class CampaignController extends AbstractStandardFormController
                         if (method_exists($this, 'viewAction')) {
                             $viewParameters = ['objectId' => $campaign->getId(), 'objectAction' => 'view'];
                             $returnUrl      = $this->generateUrl('mautic_campaign_action', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:view';
+                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::viewAction';
                         } else {
                             $viewParameters = ['page' => $page];
                             $returnUrl      = $this->generateUrl('mautic_campaign_index', $viewParameters);
-                            $template       = 'MauticCampaignBundle:Campaign:index';
+                            $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
                         }
                     }
                 }
@@ -342,8 +342,8 @@ class CampaignController extends AbstractStandardFormController
                 $this->afterFormProcessed($valid, $campaign, $form, 'new');
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl('c', $viewParameters);
-                $template       = 'MauticCampaignBundle:Campaign:index';
+                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
+                $template       = 'Mautic\CampaignBundle\Controller\CampaignController::indexAction';
             }
 
             $passthrough = [
@@ -393,7 +393,7 @@ class CampaignController extends AbstractStandardFormController
                 'entity'          => $campaign,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl(
@@ -688,10 +688,7 @@ class CampaignController extends AbstractStandardFormController
         return $sessionId;
     }
 
-    /**
-     * @return string
-     */
-    protected function getControllerBase()
+    protected function getTemplateBase(): string
     {
         return 'MauticCampaignBundle:Campaign';
     }
@@ -1047,7 +1044,10 @@ class CampaignController extends AbstractStandardFormController
         if (is_array($campaignSources)) {
             foreach ($campaignSources as $type => $sources) {
                 if (!empty($sources)) {
-                    $sourceList                   = $this->getModel('campaign')->getSourceLists($type);
+                    $campaignModel = $this->getModel('campaign');
+                    \assert($campaignModel instanceof CampaignModel);
+
+                    $sourceList                   = $campaignModel->getSourceLists($type);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,

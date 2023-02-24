@@ -277,12 +277,4 @@ class FocusType extends AbstractType
         );
         $resolver->setDefined(['update_select']);
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'focus';
-    }
 }

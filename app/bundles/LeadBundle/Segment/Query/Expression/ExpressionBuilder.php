@@ -16,14 +16,14 @@ use Mautic\LeadBundle\Segment\Exception\SegmentQueryException;
  */
 class ExpressionBuilder
 {
-    const EQ      = '=';
-    const NEQ     = '<>';
-    const LT      = '<';
-    const LTE     = '<=';
-    const GT      = '>';
-    const GTE     = '>=';
-    const REGEXP  = 'REGEXP';
-    const BETWEEN = 'BETWEEN';
+    public const EQ      = '=';
+    public const NEQ     = '<>';
+    public const LT      = '<';
+    public const LTE     = '<=';
+    public const GT      = '>';
+    public const GTE     = '>=';
+    public const REGEXP  = 'REGEXP';
+    public const BETWEEN = 'BETWEEN';
 
     /**
      * The DBAL Connection.

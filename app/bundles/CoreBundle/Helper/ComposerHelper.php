@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper;
 
 use Composer\Console\Application;
-use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
+use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -32,7 +32,7 @@ class ComposerHelper
      * @param bool   $dryRun      Whether to dry-run the installation. Comes in handy during automated tests
      *                            and to test whether an installation would succeed or not.
      */
-    public function install(string $packageName, bool $dryRun = false): ConsoleOutputModel
+    public function install(string $packageName, bool $dryRun = false): ConsoleOutput
     {
         $input = [
             'command'  => 'require',
@@ -53,7 +53,7 @@ class ComposerHelper
      * @param bool   $dryRun      Whether to dry-run the removal. Comes in handy during automated tests
      *                            and to test whether an removal would succeed or not.
      */
-    public function remove(string $packageName, bool $dryRun = false): ConsoleOutputModel
+    public function remove(string $packageName, bool $dryRun = false): ConsoleOutput
     {
         /**
          * "composer remove package-name" also triggers an update of all other Mautic dependencies.
@@ -90,7 +90,7 @@ class ComposerHelper
             $secondOutput = $this->runCommand($input);
 
             // Let's merge the output so that we return all the output we have.
-            return new ConsoleOutputModel(
+            return new ConsoleOutput(
                 $secondOutput->exitCode,
                 $firstOutput->output."\n".$secondOutput->output
             );
@@ -122,7 +122,7 @@ class ComposerHelper
     /**
      * Updates one or multiple Composer packages.
      */
-    public function update(?string $packageName = null, bool $dryRun = false): ConsoleOutputModel
+    public function update(?string $packageName = null, bool $dryRun = false): ConsoleOutput
     {
         $input = [
             'command'  => 'update',
@@ -142,7 +142,7 @@ class ComposerHelper
     /**
      * @param array<string,mixed> $input
      */
-    private function runCommand(array $input): ConsoleOutputModel
+    private function runCommand(array $input): ConsoleOutput
     {
         $arrayInput = new ArrayInput(array_merge(
             $input, [
@@ -168,6 +168,6 @@ class ComposerHelper
 
         $this->logger->info('Composer command output: '.$output->fetch());
 
-        return new ConsoleOutputModel($exitCode, $output->fetch());
+        return new ConsoleOutput($exitCode, $output->fetch());
     }
 }

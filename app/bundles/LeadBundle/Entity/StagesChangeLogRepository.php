@@ -4,6 +4,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<StagesChangeLog>
+ */
 class StagesChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;

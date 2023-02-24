@@ -3,6 +3,7 @@
 namespace Mautic\CampaignBundle\Controller;
 
 use Mautic\CampaignBundle\Form\Type\CampaignLeadSourceType;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -49,7 +50,9 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
+        $campaignModel = $this->getModel('campaign');
+        \assert($campaignModel instanceof CampaignModel);
+        $sourceList = $campaignModel->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
             CampaignLeadSourceType::class,
             $source,
@@ -83,7 +86,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['sourceHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.php',
+                    'MauticCampaignBundle:Source:_index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -105,7 +108,7 @@ class SourceController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -154,7 +157,9 @@ class SourceController extends CommonFormController
             return $this->modalAccessDenied();
         }
 
-        $sourceList = $this->getModel('campaign')->getSourceLists($sourceType);
+        $campaignModel = $this->getModel('campaign');
+        \assert($campaignModel instanceof CampaignModel);
+        $sourceList = $campaignModel->getSourceLists($sourceType);
         $form       = $this->get('form.factory')->create(
             CampaignLeadSourceType::class,
             $source,
@@ -188,7 +193,7 @@ class SourceController extends CommonFormController
         if ($cancelled || $valid) {
             if ($valid) {
                 $passthroughVars['updateHtml'] = $this->renderView(
-                    'MauticCampaignBundle:Source:index.html.php',
+                    'MauticCampaignBundle:Source:_index.html.twig',
                     [
                         'sourceType' => $sourceType,
                         'campaignId' => $objectId,
@@ -211,7 +216,7 @@ class SourceController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.php',
+                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]

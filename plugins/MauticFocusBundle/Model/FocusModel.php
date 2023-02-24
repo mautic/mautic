@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
@@ -17,16 +18,19 @@ use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
+/**
+ * @extends FormModel<Focus>
+ */
 class FocusModel extends FormModel
 {
     /**
-     * @var ContainerAwareEventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $dispatcher;
 
@@ -56,6 +60,11 @@ class FocusModel extends FormModel
     protected $contactTracker;
 
     /**
+     * @var Environment
+     */
+    protected $twig;
+
+    /**
      * FocusModel constructor.
      */
     public function __construct(
@@ -64,7 +73,8 @@ class FocusModel extends FormModel
         TemplatingHelper $templating,
         EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        Environment $twig
     ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
@@ -72,6 +82,7 @@ class FocusModel extends FormModel
         $this->dispatcher     = $dispatcher;
         $this->leadFieldModel = $leadFieldModel;
         $this->contactTracker = $contactTracker;
+        $this->twig           = $twig;
     }
 
     /**
@@ -95,7 +106,7 @@ class FocusModel extends FormModel
      *
      * @param object                              $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
+     * @param string|null                         $action
      * @param array                               $options
      *
      * @throws NotFoundHttpException
@@ -193,9 +204,9 @@ class FocusModel extends FormModel
             }
 
             $javascript = $this->templating->getTemplating()->render(
-                'MauticFocusBundle:Builder:generate.js.php',
+                'MauticFocusBundle:Builder:generate.js.twig',
                 [
-                    'focus'    => $focusArray,
+                    'focus'    => $focus,
                     'preview'  => $isPreview,
                     'clickUrl' => $url,
                 ]
@@ -217,15 +228,16 @@ class FocusModel extends FormModel
         // Replace tokens to ensure clickthroughs, lead tokens etc are appropriate
         $lead       = $this->contactTracker->getContact();
         $tokenEvent = new TokenReplacementEvent($cached['focus'], $lead, ['focus_id' => $focus->getId()]);
-        $this->dispatcher->dispatch(FocusEvents::TOKEN_REPLACEMENT, $tokenEvent);
+        $this->dispatcher->dispatch($tokenEvent, FocusEvents::TOKEN_REPLACEMENT);
         $focusContent = $tokenEvent->getContent();
+
         $focusContent = str_replace('{focus_form}', $cached['form'], $focusContent, $formReplaced);
         if (!$formReplaced && !empty($cached['form'])) {
             // Form token missing so just append the form
             $focusContent .= $cached['form'];
         }
 
-        $focusContent = $this->templating->getTemplating()->getEngine('MauticFocusBundle:Builder:content.html.php')->escape($focusContent, 'js');
+        $focusContent = twig_escape_filter($this->twig, $focusContent, 'js');
 
         return str_replace('{focus_content}', $focusContent, $cached['js']);
     }
@@ -241,15 +253,19 @@ class FocusModel extends FormModel
         $form = (!empty($focus['form']) && 'form' === $focus['type']) ? $this->formModel->getEntity($focus['form']) : null;
 
         if (isset($focus['html_mode'])) {
-            $htmlMode = $focus['html_mode'];
+            $htmlMode = $focus['htmlMode'] = $focus['html_mode'];
         } elseif (isset($focus['htmlMode'])) {
             $htmlMode = $focus['htmlMode'];
         } else {
             $htmlMode = 'basic';
         }
 
+        if (isset($focus[$htmlMode])) {
+            $focus[$htmlMode] = htmlspecialchars_decode($focus[$htmlMode]);
+        }
+
         $content = $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:content.html.php',
+            'MauticFocusBundle:Builder:content.html.twig',
             [
                 'focus'    => $focus,
                 'preview'  => $isPreview,
@@ -258,11 +274,17 @@ class FocusModel extends FormModel
             ]
         );
 
-        // Form has to be generated outside of the content or else the form src will be converted to clickables
+        // Form has to be generated outside of the content or else the form src
+        // will be converted to clickables
         $fields             = $form ? $form->getFields()->toArray() : [];
         [$pages, $lastPage] = $this->formModel->getPages($fields);
+        $displayManager     = $viewOnlyFields = null;
+        if ($form) {
+            $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
+            $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
+        }
         $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:form.html.php',
+            'MauticFocusBundle:Builder:form.html.twig',
             [
                 'form'           => $form,
                 'pages'          => $pages,
@@ -272,7 +294,8 @@ class FocusModel extends FormModel
                 'preview'        => $isPreview,
                 'contactFields'  => $this->leadFieldModel->getFieldListWithProperties(),
                 'companyFields'  => $this->leadFieldModel->getFieldListWithProperties('company'),
-                'viewOnlyFields' => $this->formModel->getCustomComponents()['viewOnlyFields'],
+                'viewOnlyFields' => $viewOnlyFields,
+                'displayManager' => $displayManager,
             ]
         ) : '';
 
@@ -314,28 +337,26 @@ class FocusModel extends FormModel
     /**
      * Add a stat entry.
      *
-     * @param      $type
-     * @param null $data
-     * @param null $lead
-     *
-     * @return Stat
+     * @param mixed                                         $type
+     * @param null                                          $data
+     * @param array<int|string|array<int|string>>|Lead|null $lead
      */
-    public function addStat(Focus $focus, $type, $data = null, $lead = null)
+    public function addStat(Focus $focus, $type, $data = null, $lead = null): ?Stat
     {
         if (empty($lead)) {
-            return;
+            return null;
         }
 
         if ($lead instanceof Lead && !$lead->getId()) {
-            return;
+            return null;
         }
 
         if (is_array($lead)) {
             if (empty($lead['id'])) {
-                return;
+                return null;
             }
 
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+            $lead = $this->em->getReference(Lead::class, $lead['id']);
         }
 
         switch ($type) {
@@ -368,7 +389,7 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @return bool|FocusEvent|void
+     * @return Event|void|null
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
@@ -401,7 +422,7 @@ class FocusModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

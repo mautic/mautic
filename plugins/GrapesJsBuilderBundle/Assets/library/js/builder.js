@@ -13,12 +13,11 @@ import './grapesjs-custom.css';
  * Launch builder
  *
  * @param formName
- * @param actionName
  */
 function launchBuilderGrapesjs(formName) {
-  const assets = AssetService.getAssets();
-
-  const builder = new BuilderService(assets);
+  if (useBuilderForCodeMode() === false) {
+    return;
+  }
 
   Mautic.showChangeThemeWarning = true;
 
@@ -29,8 +28,31 @@ function launchBuilderGrapesjs(formName) {
   mQuery('.builder-panel').css('display', 'block');
   mQuery('.builder').addClass('builder-active').removeClass('hide');
 
+  const assetsConfig = AssetService.getAssetsConfig();
+  const builder = new BuilderService(assetsConfig);
   // Initialize GrapesJS
   builder.initGrapesJS(formName);
+
+  // Load and add assets
+  AssetService.getAssetsXhr(function(result) {
+    builder.editor.AssetManager.add(result.data);
+  });
+}
+
+/**
+ * The user acknowledges the risk before editing an email or landing page created in Code Mode in the Builder
+ */
+function useBuilderForCodeMode() {
+  const theme = mQuery('.theme-selected').find('[data-theme]').attr('data-theme');
+  const isCodeMode = theme === 'mautic_code_mode';
+
+  if (isCodeMode) {
+    if (confirm(Mautic.translate('grapesjsbuilder.builder.warning.code_mode')) === false) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 /**

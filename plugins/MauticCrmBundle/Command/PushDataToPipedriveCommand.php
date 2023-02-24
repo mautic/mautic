@@ -12,13 +12,13 @@ use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\LeadExport;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class PushDataToPipedriveCommand extends ContainerAwareCommand
+class PushDataToPipedriveCommand extends Command
 {
     private SymfonyStyle $io;
     private IntegrationHelper $integrationHelper;
@@ -43,9 +43,6 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this->setName('mautic:integration:pipedrive:push')
@@ -60,10 +57,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var PipeDriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper
@@ -75,7 +69,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
             $this->io->note('Pipedrive integration is disabled.');
 
-            return;
+            return 0;
         }
 
         if ($input->getOption('restart')) {
@@ -113,5 +107,7 @@ class PushDataToPipedriveCommand extends ContainerAwareCommand
         $this->io->text('Pushed '.$pushed);
 
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+
+        return 0;
     }
 }

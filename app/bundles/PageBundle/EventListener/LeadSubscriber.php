@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\ChannelTrait;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\LeadBundle\Event\LeadChangeEvent;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
@@ -12,7 +13,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\VideoModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
@@ -38,16 +39,22 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         PageModel $pageModel,
         VideoModel $pageVideoModel,
         TranslatorInterface $translator,
-        RouterInterface $router
+        RouterInterface $router,
+        ModelFactory $modelFactory
     ) {
         $this->pageModel      = $pageModel;
         $this->pageVideoModel = $pageVideoModel;
         $this->translator     = $translator;
         $this->router         = $router;
+
+        $this->setModelFactory($modelFactory);
     }
 
     /**
@@ -91,7 +98,7 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
-                $template = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.php';
+                $template = 'MauticPageBundle:SubscribedEvents\Timeline:index.html.twig';
                 $icon     = 'fa-link';
 
                 if (!empty($hit['source'])) {
@@ -193,7 +200,7 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             // Add the hits to the event array
             foreach ($hits['results'] as $hit) {
-                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.php';
+                $template   = 'MauticPageBundle:SubscribedEvents\Timeline:videohit.html.twig';
                 $eventLabel = $eventTypeName;
 
                 $event->addEvent(

@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -21,11 +22,11 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CoreSubscriberTest extends TestCase
 {
@@ -90,6 +91,11 @@ class CoreSubscriberTest extends TestCase
     private $factory;
 
     /**
+     * @var ModelFactory<object>&MockObject
+     */
+    private $modelFactory;
+
+    /**
      * @var FlashBag|MockObject
      */
     private $flashBag;
@@ -114,6 +120,7 @@ class CoreSubscriberTest extends TestCase
 
         $this->formRepository = $this->createMock(FormRepository::class);
         $this->factory        = $this->createMock(MauticFactory::class);
+        $this->modelFactory   = $this->createMock(ModelFactory::class);
         $this->flashBag       = $this->createMock(FlashBag::class);
 
         $this->subscriber = new CoreSubscriber(
@@ -129,6 +136,7 @@ class CoreSubscriberTest extends TestCase
             $this->requestStack,
             $this->formRepository,
             $this->factory,
+            $this->modelFactory,
             $this->flashBag
         );
 
@@ -152,7 +160,7 @@ class CoreSubscriberTest extends TestCase
         );
     }
 
-    public function testOnKernelController()
+    public function testOnKernelController(): void
     {
         $user = null;
 
@@ -166,7 +174,7 @@ class CoreSubscriberTest extends TestCase
             ->getMock();
         $controllers = [$controller];
 
-        $event = $this->createMock(FilterControllerEvent::class);
+        $event = $this->createMock(ControllerEvent::class);
         $event->expects(self::once())
             ->method('getController')
             ->willReturn($controllers);
@@ -180,6 +188,9 @@ class CoreSubscriberTest extends TestCase
         $controller->expects(self::once())
             ->method('setFactory')
             ->with($this->factory);
+        $controller->expects(self::once())
+            ->method('setModelFactory')
+            ->with($this->modelFactory);
         $controller->expects(self::once())
             ->method('setUser')
             ->with($user);

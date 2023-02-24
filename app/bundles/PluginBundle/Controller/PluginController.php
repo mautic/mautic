@@ -117,7 +117,7 @@ class PluginController extends FormController
                     'pluginFilter' => ($pluginFilter) ? ['id' => $pluginId, 'name' => $pluginName] : false,
                     'plugins'      => $plugins,
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.php',
+                'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
@@ -258,7 +258,7 @@ class PluginController extends FormController
                             $this->get('monolog.logger.mautic')->info('Event dispatcher has integration config save listeners.');
                             $event = new PluginIntegrationEvent($integrationObject);
 
-                            $dispatcher->dispatch(PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE, $event);
+                            $dispatcher->dispatch($event, PluginEvents::PLUGIN_ON_INTEGRATION_CONFIG_SAVE);
 
                             $entity = $event->getEntity();
                         }
@@ -271,11 +271,11 @@ class PluginController extends FormController
                         //redirect to the oauth URL
                         /** @var \Mautic\PluginBundle\Integration\AbstractIntegration $integrationObject */
                         $event = $this->dispatcher->dispatch(
-                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT,
                             new PluginIntegrationAuthRedirectEvent(
                                 $integrationObject,
                                 $integrationObject->getAuthLoginUrl()
-                            )
+                            ),
+                            PluginEvents::PLUGIN_ON_INTEGRATION_AUTH_REDIRECT
                         );
                         $oauthUrl = $event->getAuthUrl();
 
@@ -299,7 +299,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
-                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
+                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.twig'),
                     ]
                 );
             }
@@ -307,13 +307,15 @@ class PluginController extends FormController
 
         $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
-        $default     = 'MauticPluginBundle:FormTheme\Integration';
-        $themes      = [$default];
+        $themes      = [
+            'MauticPluginBundle:FormTheme:Integration/layout.html.twig',
+        ];
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);
-        } elseif ($objectTheme !== $default) {
+        } elseif (is_string($objectTheme)) {
             $themes[] = $objectTheme;
         }
+        $themes = array_unique($themes);
 
         $formSettings = $integrationObject->getFormSettings();
         $callbackUrl  = !empty($formSettings['requires_callback']) ? $integrationObject->getAuthCallbackUrl() : '';
@@ -338,19 +340,20 @@ class PluginController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'         => $this->setFormTheme($form, $template, $themes),
+                    'form'         => $form->createView(),
                     'description'  => $integrationObject->getDescription(),
                     'formSettings' => $formSettings,
                     'formNotes'    => $formNotes,
                     'callbackUrl'  => $callbackUrl,
                     'activeTab'    => $activeTab,
+                    'formThemes'   => $themes,
                 ],
                 'contentTemplate' => $template,
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
-                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.php'),
+                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.twig'),
                 ],
             ]
         );
@@ -391,7 +394,7 @@ class PluginController extends FormController
                     'bundle' => $bundle,
                     'icon'   => $integrationHelper->getIconPath($bundle),
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.php',
+                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
@@ -425,7 +428,7 @@ class PluginController extends FormController
             [
                 'returnUrl'       => $this->generateUrl('mautic_plugin_index', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'MauticPluginBundle:Plugin:index',
+                'contentTemplate' => 'Mautic\PluginBundle\Controller\PluginController::indexAction',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'plugin',

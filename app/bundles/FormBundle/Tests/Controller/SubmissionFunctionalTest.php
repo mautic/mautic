@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -44,10 +47,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
 
         // Add conditional state field dependent on the country field:
         $patchPayload = [
@@ -298,6 +302,122 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
+    }
+
+    public function testProgressiveFormsWithMaximumFieldsDisplayedAtTime(): void
+    {
+        // Create the test form via API.
+        $payload = [
+            'name'                      => 'Submission test form',
+            'description'               => 'Form created via submission test',
+            'formType'                  => 'standalone',
+            'isPublished'               => true,
+            'progressiveProfilingLimit' => 2,
+            'fields'                    => [
+                [
+                    'label'                  => 'Email',
+                    'type'                   => 'email',
+                    'alias'                  => 'email',
+                    'leadField'              => 'email',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Firstname',
+                    'type'                   => 'text',
+                    'alias'                  => 'firstname',
+                    'leadField'              => 'firstname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Lastname',
+                    'type'                   => 'text',
+                    'alias'                  => 'lastname',
+                    'leadField'              => 'lastname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        // show just one text field
+        $this->assertSame(1, $formCrawler->filter('.mauticform-text')->count());
+    }
+
+    public function testAddContactToCampaignByForm(): void
+    {
+        // Create the test form via API.
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'campaign',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $campaignSources = ['forms' => [$formId => $formId]];
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->getContainer()->get('mautic.campaign.model.campaign');
+
+        $publishedCampaign = new Campaign();
+        $publishedCampaign->setName('Published');
+        $publishedCampaign->setIsPublished(true);
+        $campaignModel->setLeadSources($publishedCampaign, $campaignSources, []);
+
+        $unpublishedCampaign =  new Campaign();
+        $unpublishedCampaign->setName('Unpublished');
+        $unpublishedCampaign->setIsPublished(false);
+        $campaignModel->setLeadSources($unpublishedCampaign, $campaignSources, []);
+
+        $this->em->persist($publishedCampaign);
+        $this->em->persist($unpublishedCampaign);
+        $this->em->flush();
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[email]' => 'xx@xx.com',
+        ]);
+        $this->client->submit($form);
+
+        $submissions = $this->em->getRepository(Lead::class)->findAll();
+        Assert::assertCount(1, $submissions);
     }
 
     protected function tearDown(): void

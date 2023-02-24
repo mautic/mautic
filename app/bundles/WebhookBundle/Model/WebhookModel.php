@@ -22,17 +22,20 @@ use Mautic\WebhookBundle\Event\WebhookEvent;
 use Mautic\WebhookBundle\Form\Type\WebhookType;
 use Mautic\WebhookBundle\Http\Client;
 use Mautic\WebhookBundle\WebhookEvents;
-use Symfony\Component\EventDispatcher\Event as SymfonyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event as SymfonyEvent;
 
+/**
+ * @extends FormModel<Webhook>
+ */
 class WebhookModel extends FormModel
 {
     /**
      *  2 possible types of the processing of the webhooks.
      */
-    const COMMAND_PROCESS   = 'command_process';
-    const IMMEDIATE_PROCESS = 'immediate_process';
+    public const COMMAND_PROCESS   = 'command_process';
+    public const IMMEDIATE_PROCESS = 'immediate_process';
 
     private const DELETE_BATCH_LIMIT = 5000;
 
@@ -198,7 +201,7 @@ class WebhookModel extends FormModel
             //build them
             $events = [];
             $event  = new Events\WebhookBuilderEvent($this->translator);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_ON_BUILD, $event);
+            $this->dispatcher->dispatch($event, WebhookEvents::WEBHOOK_ON_BUILD);
             $events = $event->getEvents();
         }
 
@@ -277,7 +280,7 @@ class WebhookModel extends FormModel
         // fire events for when the queues are created
         if ($this->dispatcher->hasListeners(WebhookEvents::WEBHOOK_QUEUE_ON_ADD)) {
             $webhookQueueEvent = $event = new Events\WebhookQueueEvent($queue, $webhook, true);
-            $this->dispatcher->dispatch(WebhookEvents::WEBHOOK_QUEUE_ON_ADD, $webhookQueueEvent);
+            $this->dispatcher->dispatch($webhookQueueEvent, WebhookEvents::WEBHOOK_QUEUE_ON_ADD);
         }
 
         return $queue;
@@ -353,7 +356,7 @@ class WebhookModel extends FormModel
             }
 
             // log any errors but allow the script to keep running
-            $this->logger->addError($message);
+            $this->logger->error($message);
 
             // log that the request failed to display it to the user
             $this->addLog($webhook, 'N/A', (microtime(true) - $start), $message);
@@ -416,7 +419,7 @@ class WebhookModel extends FormModel
         $this->saveEntity($webhook);
 
         $event = new WebhookEvent($webhook, false, $reason);
-        $this->eventDispatcher->dispatch(WebhookEvents::WEBHOOK_KILL, $event);
+        $this->eventDispatcher->dispatch($event, WebhookEvents::WEBHOOK_KILL);
     }
 
     /**
@@ -608,7 +611,7 @@ class WebhookModel extends FormModel
                 $event = new WebhookEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

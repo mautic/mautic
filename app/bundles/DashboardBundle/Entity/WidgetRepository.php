@@ -5,7 +5,7 @@ namespace Mautic\DashboardBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * WidgetRepository.
+ * @extends CommonRepository<Widget>
  */
 class WidgetRepository extends CommonRepository
 {

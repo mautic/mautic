@@ -102,8 +102,9 @@ class CommonApiControllerTest extends CampaignTestAbstract
     {
         $controller = new class() extends CommonApiController {
             /**
-             * @param mixed[] $parameters
-             * @param mixed[] $errors
+             * @param mixed[]                   $parameters
+             * @param mixed[]                   $errors
+             * @param AbstractCommonModel<User> $model
              *
              * @return mixed[]
              */
@@ -172,7 +173,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $repository->expects($this->once())
             ->method('getTableAlias')
             ->willReturn('user');
-        $model      = $this->createMock(UserModel::class);
+        $model = $this->createMock(UserModel::class);
         $model->expects($this->once())
             ->method('getRepository')
             ->willReturn($repository);

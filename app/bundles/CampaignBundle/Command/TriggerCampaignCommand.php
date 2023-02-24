@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Command;
 
+use Exception;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
@@ -11,79 +12,38 @@ use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
 use Mautic\CampaignBundle\Executioner\KickoffExecutioner;
 use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
+use Mautic\LeadBundle\Model\ListModel;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerCampaignCommand extends ModeratedCommand
 {
     use WriteCountTrait;
 
-    /**
-     * @var CampaignRepository
-     */
-    private $campaignRepository;
-
-    /**
-     * @var EventDispatcher
-     */
-    private $dispatcher;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var KickoffExecutioner
-     */
-    private $kickoffExecutioner;
-
-    /**
-     * @var ScheduledExecutioner
-     */
-    private $scheduledExecutioner;
-
-    /**
-     * @var InactiveExecutioner
-     */
-    private $inactiveExecutioner;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
+    private CampaignRepository $campaignRepository;
+    private EventDispatcherInterface $dispatcher;
+    private TranslatorInterface $translator;
+    private KickoffExecutioner $kickoffExecutioner;
+    private ScheduledExecutioner $scheduledExecutioner;
+    private InactiveExecutioner $inactiveExecutioner;
+    private LoggerInterface $logger;
+    private FormatterHelper $formatterHelper;
+    private bool $kickoffOnly  = false;
+    private bool $inactiveOnly = false;
+    private bool $scheduleOnly = false;
 
     /**
      * @var OutputInterface
      */
     protected $output;
-
-    /**
-     * @var bool
-     */
-    private $kickoffOnly = false;
-
-    /**
-     * @var bool
-     */
-    private $inactiveOnly = false;
-
-    /**
-     * @var bool
-     */
-    private $scheduleOnly = false;
 
     /**
      * @var ContactLimiter
@@ -95,6 +55,16 @@ class TriggerCampaignCommand extends ModeratedCommand
      */
     private $campaign;
 
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
+     * @var SegmentCountCacheHelper
+     */
+    private $segmentCountCacheHelper;
+
     public function __construct(
         CampaignRepository $campaignRepository,
         EventDispatcherInterface $dispatcher,
@@ -103,23 +73,25 @@ class TriggerCampaignCommand extends ModeratedCommand
         ScheduledExecutioner $scheduledExecutioner,
         InactiveExecutioner $inactiveExecutioner,
         LoggerInterface $logger,
-        FormatterHelper $formatterHelper
+        FormatterHelper $formatterHelper,
+        ListModel $listModel,
+        SegmentCountCacheHelper $segmentCountCacheHelper,
+        PathsHelper $pathsHelper
     ) {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
-        $this->campaignRepository   = $campaignRepository;
-        $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
-        $this->kickoffExecutioner   = $kickoffExecutioner;
-        $this->scheduledExecutioner = $scheduledExecutioner;
-        $this->inactiveExecutioner  = $inactiveExecutioner;
-        $this->logger               = $logger;
-        $this->formatterHelper      = $formatterHelper;
+        $this->campaignRepository        = $campaignRepository;
+        $this->dispatcher                = $dispatcher;
+        $this->translator                = $translator;
+        $this->kickoffExecutioner        = $kickoffExecutioner;
+        $this->scheduledExecutioner      = $scheduledExecutioner;
+        $this->inactiveExecutioner       = $inactiveExecutioner;
+        $this->logger                    = $logger;
+        $this->formatterHelper           = $formatterHelper;
+        $this->listModel                 = $listModel;
+        $this->segmentCountCacheHelper   = $segmentCountCacheHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure()
     {
         $this
@@ -208,11 +180,9 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @return int|null
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $quiet              = $input->getOption('quiet');
         $this->output       = $quiet ? new NullOutput() : $output;
@@ -238,9 +208,10 @@ class TriggerCampaignCommand extends ModeratedCommand
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
 
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
-
         $id = $input->getOption('campaign-id');
-        if (!$this->checkRunStatus($input, $this->output, $id)) {
+
+        $moderationKey = sprintf('%s-%s', $id, $threadId);
+        if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
             return 0;
         }
 
@@ -284,8 +255,8 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($this->dispatcher->hasListeners(CampaignEvents::CAMPAIGN_ON_TRIGGER)) {
             /** @var CampaignTriggerEvent $event */
             $event = $this->dispatcher->dispatch(
-                CampaignEvents::CAMPAIGN_ON_TRIGGER,
-                new CampaignTriggerEvent($campaign)
+                new CampaignTriggerEvent($campaign),
+                CampaignEvents::CAMPAIGN_ON_TRIGGER
             );
 
             return $event->shouldTrigger();
@@ -295,7 +266,7 @@ class TriggerCampaignCommand extends ModeratedCommand
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function triggerCampaign(Campaign $campaign)
     {
@@ -334,13 +305,16 @@ class TriggerCampaignCommand extends ModeratedCommand
             if (!$this->scheduleOnly && !$this->kickoffOnly) {
                 $this->executeInactive();
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             if ('prod' !== MAUTIC_ENV) {
                 // Throw the exception for dev/test mode
                 throw $exception;
             }
 
             $this->logger->error('CAMPAIGN: '.$exception->getMessage());
+        } finally {
+            // Update campaign linked segment cache count.
+            $this->updateCampaignSegmentContactCount($campaign);
         }
 
         // Don't detach in tests since this command will be ran multiple times in the same process
@@ -395,5 +369,18 @@ class TriggerCampaignCommand extends ModeratedCommand
         $counter = $this->inactiveExecutioner->execute($this->campaign, $this->limiter, $this->output);
 
         $this->writeCounts($this->output, $this->translator, $counter);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function updateCampaignSegmentContactCount(Campaign $campaign): void
+    {
+        $segmentIds = $this->campaignRepository->getCampaignListIds((int) $campaign->getId());
+
+        foreach ($segmentIds as $segmentId) {
+            $totalLeadCount = $this->listModel->getRepository()->getLeadCount($segmentId);
+            $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
+        }
     }
 }

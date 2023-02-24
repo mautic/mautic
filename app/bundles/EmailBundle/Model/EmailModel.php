@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Model;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
@@ -13,7 +14,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
@@ -48,9 +49,13 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Email>
+ * @implements AjaxLookupModelInterface<Email>
+ */
 class EmailModel extends FormModel implements AjaxLookupModelInterface
 {
     use VariantModelTrait;
@@ -64,7 +69,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     protected $ipLookupHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     protected $themeHelper;
 
@@ -155,7 +160,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        ThemeHelper $themeHelper,
+        ThemeHelperInterface $themeHelper,
         Mailbox $mailboxHelper,
         MailHelper $mailHelper,
         LeadModel $leadModel,
@@ -170,7 +175,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         ContactTracker $contactTracker,
         DNC $doNotContact,
         StatsCollectionHelper $statsCollectionHelper,
-        CorePermissions $corePermissions
+        CorePermissions $corePermissions,
+        Connection $connection
     ) {
         $this->ipLookupHelper           = $ipLookupHelper;
         $this->themeHelper              = $themeHelper;
@@ -189,6 +195,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->doNotContact             = $doNotContact;
         $this->statsCollectionHelper    = $statsCollectionHelper;
         $this->corePermissions          = $corePermissions;
+        $this->connection               = $connection;
     }
 
     /**
@@ -302,8 +309,8 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param $entities
+     * @param $unlock
      *
      * @return array
      */
@@ -350,10 +357,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param             $formFactory
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
@@ -459,7 +466,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -540,7 +547,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
             $event = new EmailOpenEvent($stat, $request, $firstTime);
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_OPEN, $event);
+            $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_OPEN);
         }
 
         if ($email) {
@@ -576,7 +583,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function getBuilderComponents(Email $email = null, $requestedComponents = 'all', $tokenFilter = null, $withBC = true)
     {
         $event = new EmailBuilderEvent($this->translator, $email, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_BUILD);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
@@ -680,7 +687,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     /**
      * @param $idHash
      *
-     * @return Stat
+     * @return Stat|null
      */
     public function getEmailStatus($idHash)
     {
@@ -933,6 +940,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $fetchOptions = new EmailStatOptions();
         $fetchOptions->setEmailIds($ids);
         $fetchOptions->setCanViewOthers($this->corePermissions->isGranted('email:emails:viewother'));
+        $fetchOptions->setUnit($chart->getUnit());
 
         $chart->setDataset(
             $this->translator->trans('mautic.email.sent.emails'),
@@ -1493,7 +1501,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             foreach ($translatedEmails as $translatedId => $contacts) {
                 $emailEntity = ($translatedId === $parentId) ? $useSettings['entity'] : $useSettings['translations'][$translatedId];
 
-                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments)
+                $this->sendModel->setEmail($emailEntity, $channel, $customHeaders, $assetAttachments, $emailType)
                     ->setListId($listId);
 
                 foreach ($contacts as $contact) {
@@ -1735,7 +1743,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
         return $event;
     }
@@ -2343,5 +2351,36 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     public function isUpdatingTranslationChildren(): bool
     {
         return $this->updatingTranslationChildren;
+    }
+
+    /**
+     * @param string                                   $route
+     * @param array<string, string>|array<string, int> $routeParams
+     * @param bool                                     $absolute
+     * @param array<array<string>>                     $clickthrough
+     *
+     * @return string
+     */
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [])
+    {
+        $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
+
+        $context         = $this->router->getContext();
+        $original_host   = $context->getHost();
+        $original_scheme = $context->getScheme();
+
+        if (!empty($parts['host'])) {
+            $this->router->getContext()->setHost($parts['host']);
+        }
+        if (!empty($parts['scheme'])) {
+            $this->router->getContext()->setScheme($parts['scheme']);
+        }
+
+        $url = parent::buildUrl($route, $routeParams, $absolute, $clickthrough);
+
+        $context->setHost($original_host);
+        $context->setScheme($original_scheme);
+
+        return $url;
     }
 }

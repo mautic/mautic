@@ -5,6 +5,7 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use MauticPlugin\MauticSocialBundle\Entity\Monitoring;
 
@@ -64,7 +65,7 @@ class MonitoringController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
+                    'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_social_index',
                         'mauticContent' => 'monitoring',
@@ -88,7 +89,7 @@ class MonitoringController extends FormController
                     'tmpl'        => $tmpl,
                     'page'        => $page,
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:list.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -143,7 +144,7 @@ class MonitoringController extends FormController
         ///Check for a submitted form and process it
         if ('POST' == $method) {
             $viewParameters = ['page' => $page];
-            $template       = 'MauticSocialBundle:Monitoring:index';
+            $template       = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction';
             $valid          = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
@@ -177,7 +178,7 @@ class MonitoringController extends FormController
                         'objectAction' => 'view',
                         'objectId'     => $entity->getId(),
                     ];
-                    $template = 'MauticSocialBundle:Monitoring:view';
+                    $template = 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::viewAction';
                 }
             }
             $returnUrl = $this->generateUrl('mautic_social_index', $viewParameters);
@@ -204,7 +205,7 @@ class MonitoringController extends FormController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -338,7 +339,7 @@ class MonitoringController extends FormController
                         [
                             'returnUrl'       => $this->generateUrl('mautic_social_action', $viewParameters),
                             'viewParameters'  => $viewParameters,
-                            'contentTemplate' => 'MauticSocialBundle:Monitoring:view',
+                            'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::viewAction',
                         ]
                     )
                 );
@@ -355,7 +356,7 @@ class MonitoringController extends FormController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -408,7 +409,7 @@ class MonitoringController extends FormController
                 [
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
-                    'contentTemplate' => 'MauticSocialMonitoringBundle:Monitoring:index',
+                    'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_social_index',
                         'mauticContent' => 'monitoring',
@@ -425,7 +426,9 @@ class MonitoringController extends FormController
         }
 
         // Audit Log
-        $logs = $this->getModel('core.auditlog')->getLogForObject('monitoring', $objectId);
+        $auditLogModel = $this->getModel('core.auditlog');
+        \assert($auditLogModel instanceof AuditLogModel);
+        $logs = $auditLogModel->getLogForObject('monitoring', $objectId);
 
         $returnUrl = $this->generateUrl(
             'mautic_social_action',
@@ -460,7 +463,7 @@ class MonitoringController extends FormController
                     'security'         => $security,
                     'leadStats'        => $chart->render(),
                     'monitorLeads'     => $this->forward(
-                        'MauticSocialBundle:Monitoring:contacts',
+                        'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::contactsAction',
                         [
                             'objectId'   => $monitoringEntity->getId(),
                             'page'       => $page,
@@ -469,7 +472,7 @@ class MonitoringController extends FormController
                     )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:'.$tmpl.'.html.php',
+                'contentTemplate' => 'MauticSocialBundle:Monitoring:'.$tmpl.'.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -499,7 +502,7 @@ class MonitoringController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
+            'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => 'mautic_social_index',
                 'mauticContent' => 'monitoring',
@@ -566,7 +569,7 @@ class MonitoringController extends FormController
         $postActionVars = [
             'returnUrl'       => $returnUrl,
             'viewParameters'  => ['page' => $page],
-            'contentTemplate' => 'MauticSocialBundle:Monitoring:index',
+            'contentTemplate' => 'MauticPlugin\MauticSocialBundle\Controller\MonitoringController::indexAction',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_social_index',
                 'mauticContent' => 'monitoring',
@@ -654,6 +657,8 @@ class MonitoringController extends FormController
             'ipAddress' => $this->container->get('mautic.helper.ip_lookup')->getIpAddressFromRequest(),
         ];
 
-        $this->getModel('core.auditlog')->writeToLog($log);
+        $auditLog = $this->getModel('core.auditlog');
+        \assert($auditLog instanceof AuditLogModel);
+        $auditLog->writeToLog($log);
     }
 }

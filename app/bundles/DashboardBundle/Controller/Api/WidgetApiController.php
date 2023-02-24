@@ -8,18 +8,27 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\DashboardBundle\DashboardEvents;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Event\WidgetTypeListEvent;
+use Mautic\DashboardBundle\Model\DashboardModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class WidgetApiController.
+ * @extends CommonApiController<Widget>
  */
 class WidgetApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var DashboardModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('dashboard');
-        $this->entityClass      = 'Mautic\DashboardBundle\Entity\Widget';
+        $dashboardModel = $this->getModel('dashboard');
+        \assert($dashboardModel instanceof DashboardModel);
+
+        $this->model            = $dashboardModel;
+        $this->entityClass      = Widget::class;
         $this->entityNameOne    = 'widget';
         $this->entityNameMulti  = 'widgets';
         $this->serializerGroups = [];
@@ -37,7 +46,7 @@ class WidgetApiController extends CommonApiController
         $dispatcher = $this->dispatcher;
         $event      = new WidgetTypeListEvent();
         $event->setTranslator($this->get('translator'));
-        $dispatcher->dispatch(DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE, $event);
+        $dispatcher->dispatch($event, DashboardEvents::DASHBOARD_ON_MODULE_LIST_GENERATE);
         $view = $this->view(['success' => 1, 'types' => $event->getTypes()], Response::HTTP_OK);
 
         return $this->handleView($view);
