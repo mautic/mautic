@@ -1,3 +1,5 @@
+{% form_theme form with formThemes %}
+<pre>{{ formThemes|json_encode }}</pre>
 {% for child in form %}
     {{ form_row(child) }}
 {% endfor %}
