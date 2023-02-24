@@ -3,12 +3,20 @@
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @extends CommonApiController<User>
@@ -19,6 +27,22 @@ class UserApiController extends CommonApiController
      * @var UserModel|null
      */
     protected $model = null;
+
+    private UserPasswordEncoderInterface $encoder;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        UserPasswordEncoderInterface $encoder,
+        RequestStack $requestStack
+    ) {
+        $this->encoder = $encoder;
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+    }
 
     public function initialize(ControllerEvent $event)
     {
@@ -56,7 +80,7 @@ class UserApiController extends CommonApiController
     {
         $entity = $this->model->getEntity();
 
-        if (!$this->get('mautic.security')->isGranted('user:users:create')) {
+        if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
 
@@ -64,8 +88,7 @@ class UserApiController extends CommonApiController
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $encoder           = $this->get('security.password_encoder');
-            $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
+            $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
         }
 
         return $this->processForm($request, $entity, $parameters, 'POST');
@@ -86,13 +109,13 @@ class UserApiController extends CommonApiController
         $parameters = $request->request->all();
         $method     = $request->getMethod();
 
-        if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
+        if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
 
         if (null === $entity) {
             if ('PATCH' === $method ||
-                ('PUT' === $method && !$this->get('mautic.security')->isGranted('user:users:create'))
+                ('PUT' === $method && !$this->security->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
@@ -100,8 +123,7 @@ class UserApiController extends CommonApiController
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $encoder           = $this->get('security.password_encoder');
-                    $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
+                    $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
                 }
             }
         } else {
@@ -139,8 +161,7 @@ class UserApiController extends CommonApiController
                     }
                 }
 
-                $encoder = $this->get('security.password_encoder');
-                $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
+                $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword, true));
                 break;
         }
     }
@@ -170,7 +191,7 @@ class UserApiController extends CommonApiController
             $permissions = [$permissions];
         }
 
-        $return = $this->get('mautic.security')->isGranted($permissions, 'RETURN_ARRAY', $entity);
+        $return = $this->security->isGranted($permissions, 'RETURN_ARRAY', $entity);
         $view   = $this->view($return, Response::HTTP_OK);
 
         return $this->handleView($view);
@@ -183,7 +204,7 @@ class UserApiController extends CommonApiController
      */
     public function getRolesAction(Request $request)
     {
-        if (!$this->get('mautic.security')->isGranted(
+        if (!$this->security->isGranted(
             ['user:users:create', 'user:users:edit'],
             'MATCH_ONE'
         )

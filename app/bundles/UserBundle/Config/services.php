@@ -13,7 +13,6 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        //'Controller/*.php', // Enabling this will require to refactor all controllers to use DI.
     ];
 
     $services->load('Mautic\\UserBundle\\', '../')
