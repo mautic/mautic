@@ -98,7 +98,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                 }
             }
             $content = $this->templatingHelper->getTemplating()->render(
-                'GrapesJsBuilderBundle:Setting:fields.html.php',
+                'GrapesJsBuilderBundle:Setting:fields.html.twig',
                 $passParams
             );
 
@@ -110,7 +110,7 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
             $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
 
             $content = $this->templatingHelper->getTemplating()->render(
-                'GrapesJsBuilderBundle:Setting:vars.html.php',
+                'GrapesJsBuilderBundle:Setting:vars.html.twig',
                 $passParams
             );
 

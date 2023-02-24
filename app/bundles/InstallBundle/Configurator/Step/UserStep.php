@@ -61,7 +61,7 @@ class UserStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:user.html.php';
+        return 'MauticInstallBundle:Install:user.html.twig';
     }
 
     /**

@@ -99,7 +99,7 @@ class ThemeController extends FormController
                 'permissions'   => $permissions,
                 'security'      => $this->get('mautic.security'),
             ],
-            'contentTemplate' => 'MauticCoreBundle:Theme:list.html.php',
+            'contentTemplate' => 'MauticCoreBundle:Theme:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_themes_index',
                 'mauticContent' => 'theme',

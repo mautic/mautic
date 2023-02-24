@@ -72,9 +72,10 @@ class FormExtension extends AbstractExtension
     /**
      * Render row if it exists.
      *
-     * @param mixed[] $variables
+     * @param FormView|array<string> $form
+     * @param mixed[]                $variables
      */
-    public function rowIfExists(FormView $form, string $key, string $template = null, array $variables = []): string
+    public function rowIfExists($form, string $key, string $template = null, array $variables = []): string
     {
         return $this->formHelper->rowIfExists($form, $key, $template, $variables);
     }

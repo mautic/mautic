@@ -356,7 +356,7 @@ class AjaxController extends CommonController
     {
         $dataArray = [
             'success' => 1,
-            'content' => $this->renderView('MauticCoreBundle:Update:update.html.php'),
+            'content' => $this->renderView('MauticCoreBundle:Update:update.html.twig'),
         ];
 
         // A way to keep the upgrade from failing if the session is lost after
@@ -804,13 +804,14 @@ class AjaxController extends CommonController
                 if ($ipService instanceof IpLookupFormInterface) {
                     if ($formType = $ipService->getConfigFormService()) {
                         $themes   = $ipService->getConfigFormThemes();
-                        $themes[] = 'MauticCoreBundle:FormTheme\Config';
+                        $themes[] = 'MauticCoreBundle:FormTheme:Config/config_layout.html.twig';
 
                         $form = $this->get('form.factory')->create($formType, [], ['ip_lookup_service' => $ipService]);
                         $html = $this->renderView(
-                            'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php',
+                            'MauticCoreBundle:FormTheme:Config/ip_lookup_config_row.html.twig',
                             [
-                                'form' => $this->setFormTheme($form, 'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php', $themes),
+                                'form'       => $form->createView(),
+                                'formThemes' => $themes,
                             ]
                         );
 

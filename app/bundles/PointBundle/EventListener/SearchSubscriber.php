@@ -74,7 +74,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('point:points:edit');
                 foreach ($items as $item) {
                     $pointsResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents\Search:global_point.html.php',
+                        'MauticPointBundle:SubscribedEvents:Search/global_point.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -83,7 +83,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($pointCount > 5) {
                     $pointsResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents\Search:global_point.html.php',
+                        'MauticPointBundle:SubscribedEvents:Search/global_point.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -113,7 +113,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit = $this->security->isGranted('point:triggers:edit');
                 foreach ($items as $item) {
                     $results[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents\Search:global_trigger.html.php',
+                        'MauticPointBundle:SubscribedEvents:Search/global_trigger.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -122,7 +122,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($count > 5) {
                     $results[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents\Search:global_trigger.html.php',
+                        'MauticPointBundle:SubscribedEvents:Search/global_trigger.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
