@@ -41,7 +41,9 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @return array<string, array|int>
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
      */
     public function getStatsViewByLead(int $leadId, array $options = []): array
     {

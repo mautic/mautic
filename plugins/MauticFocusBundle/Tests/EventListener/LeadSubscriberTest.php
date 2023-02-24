@@ -32,7 +32,7 @@ class LeadSubscriberTest extends CommonMocks
     private $router;
 
     /**
-     * @var FocusModel
+     * @var FocusModel|(FocusModel&MockObject)|MockObject
      */
     private $focusModel;
 
@@ -158,6 +158,9 @@ class LeadSubscriberTest extends CommonMocks
         return $lead;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function getTimelineEvent(string $eventType, string $eventTypeName, string $focusName, DateTime $date, Lead $lead): array
     {
         $leadEventLogId = 1;

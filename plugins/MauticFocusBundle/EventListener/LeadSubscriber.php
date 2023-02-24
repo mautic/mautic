@@ -6,8 +6,6 @@ use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\PageBundle\Model\PageModel;
-use Mautic\PageBundle\Model\VideoModel;
 use MauticPlugin\MauticFocusBundle\Entity\Stat;
 use MauticPlugin\MauticFocusBundle\FocusEventTypes;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
@@ -19,16 +17,6 @@ class LeadSubscriber implements EventSubscriberInterface
     use ChannelTrait;
 
     /**
-     * @var PageModel
-     */
-    private $pageModel;
-
-    /**
-     * @var VideoModel
-     */
-    private $pageVideoModel;
-
-    /**
      * @var Translator
      */
     private $translator;
@@ -38,6 +26,9 @@ class LeadSubscriber implements EventSubscriberInterface
      */
     private $router;
 
+    /*
+     * @var FocusModel
+     */
     private FocusModel $focusModel;
 
     public function __construct(
@@ -63,7 +54,7 @@ class LeadSubscriber implements EventSubscriberInterface
     /**
      * Compile events for the lead timeline.
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $eventViewTypeName = $this->translator->trans('mautic.focus.event.view');
         $event->addEventType(FocusEventTypes::FOCUS_ON_VIEW, $eventViewTypeName);
