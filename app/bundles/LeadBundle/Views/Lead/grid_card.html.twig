@@ -46,7 +46,6 @@
                         <i class="fa fa-fw fa-globe mr-xs"></i>{{ fields.core.country.value|default('') }}
                     </div>
                     {% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
-
                     {% if flag is not empty %}
                         <div style="position: absolute; right: 30px; bottom: 30px">
                             <img src="{{ flag }}" style="max-height: 24px;" class="ml-sm" />

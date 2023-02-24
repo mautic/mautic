@@ -11,10 +11,12 @@
         </div>
         <div class="panel-body np">
             <ul class="list-group">
-                {% for r in result %}
-                <li class="list-group-item">
-                    {{ r|raw }}
-                </li>
+                {% for k, r in result %}
+                  {% if 'count' is not same as k %}
+                    <li class="list-group-item">
+                        {{ r|raw }}
+                    </li>
+                  {% endif %}
                 {% endfor %}
             </ul>
         </div>

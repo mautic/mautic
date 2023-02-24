@@ -1,0 +1,24 @@
+{% set scriptSrc = getAssetUrl('media/js/' ~ ('dev' == app.environment ? 'mautic-form-src.js' : 'mautic-form.js'), null, null, true)|replace({
+  '/index.php': '',
+  '/index_dev.php': ''
+}) %}
+<script type="text/javascript">
+    /** This section is only needed once per page if manually copying **/
+    if (typeof MauticSDKLoaded == 'undefined') {
+        var MauticSDKLoaded = true;
+        var head            = document.getElementsByTagName('head')[0];
+        var script          = document.createElement('script');
+        script.type         = 'text/javascript';
+        script.src          = '{{ scriptSrc }}';
+        script.onload       = function() {
+            MauticSDK.onLoad();
+        };
+        head.appendChild(script);
+        var MauticDomain = '{{ assetGetBaseUrl()|replace({'/index_dev.php': '', '/index.php': ''}) }}';
+        var MauticLang   = {
+            'submittingMessage': "{{ 'mautic.form.submission.pleasewait'|trans }}"
+        }
+    }else if (typeof MauticSDK != 'undefined') {
+        MauticSDK.onLoad();
+    }
+</script>

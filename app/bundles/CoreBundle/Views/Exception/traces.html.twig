@@ -1,0 +1,85 @@
+{% macro formatArgs(args) %}
+    {% set result = [] %}
+    {% for key, item in args %}
+        {# is an array with at least 2 items in, first one exists and is a string #}
+        {% if item is iterable 
+            and item|length == 2
+            and item[0] is defined 
+            and item[0] is not empty 
+            and item[0] is not iterable %}
+
+            {% if ('object' == item[0]) %}
+                {% set parts = item[1]|split('\\') %}
+                {% set short = parts|slice(0, -1)  %}
+                {% set formattedValue = '<em>object</em>(<abbr title="' ~ item[1] ~ '">' ~ parts|last ~ '</abbr>)' %}
+            {% elseif 'array' == item[0] %}
+                {% set s = (item[1] is iterable) ? _self.formatArgs(item[1]) : item[1] %}
+                {% set formattedValue = '<em>array</em>(' ~ s ~ ')' %}
+            {% elseif 'string' == item[0] %}
+                {% set formattedValue = "'" ~ item[1]|escape ~ "'" %}
+            {% elseif 'null' == item[0] %}
+                {% set formattedValue = '<em>null</em>' %}
+            {% elseif 'boolean' == item[0] %}
+                {% set s = item[1] | json_encode | raw %}
+                {% set s = s|lower %}
+                {% set formattedValue = '<em>' ~ s ~ '</em>' %}
+            {% elseif 'resource' == item[0] %}
+                {% set formattedValue = '<em>resource</em>' %}
+            {% else %}
+                {% set s = item[1]|escape %}
+                {% set s = s|escape | json_encode | raw %}
+                {% set s = s|replace({"\n" : ''}) %}
+                {% set formattedValue = s %}
+            {% endif %}
+        {# is an array #}
+        {% elseif item is iterable and item|length and item[0] is defined %}
+            {% set formattedValue = '<em>array</em>' ~ _self.formatArgs(item) %}
+        {# is an object #}
+        {% elseif item is iterable and item|length and item[0] is not defined %}
+            {% set formattedValue = item.class %}
+        {# is a string #}
+        {% elseif item is not iterable and item is not empty and item|length %}
+            {% set formattedValue = '<em>' ~ item|escape ~ '</em>' %}
+        {% else %}
+            {% set formattedValue = '' %}
+        {% endif %}
+
+        {# Match integer #}
+        {% set newResult = (key matches '/^\\d+$/') ? (formattedValue | raw) : "'" ~ key ~ "' => " ~ (formattedValue  | raw) %}
+        {% set result = result|merge([newResult]) %}
+
+    {% endfor %}
+
+    {% autoescape %}
+    {{ result|join(', ') | raw }} 
+    {% endautoescape %}
+
+{% endmacro %}
+
+{% set root = getRootPath() %}
+
+<ol>
+{% for trace in traces %}
+    <li class="pt-3 break-word">
+    {% if trace.file is defined and trace.file is not empty %}
+        {% set traceFile = trace.file|split(root)|join('') %}
+        <strong>
+            {{ traceFile }}{% if trace.file is defined and trace.file is not empty %}:{{ trace.line }}{% endif %}
+        </strong>
+        at
+    {% endif %}
+    {% if trace.function is defined and trace.function is not empty %}
+        {% if trace.class is defined %}
+            {{ trace.class }} {{ trace.type }}
+        {% endif %}
+        {{ trace.function }} (
+        {% if trace.args is defined and trace.args is not empty %}
+            
+            {{ _self.formatArgs(trace.args) }}
+            
+        {% endif %}
+        )
+    {% endif %}
+    </li>
+{% endfor %}
+</ol>

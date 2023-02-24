@@ -39,7 +39,7 @@ class ConfigSubscriberTest extends TestCase
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
             'formType'   => 'Mautic\\LeadBundle\\Form\\Type\\ConfigType',
-            'formTheme'  => 'MauticLeadBundle:FormTheme\\Config',
+            'formTheme'  => 'MauticLeadBundle:FormTheme:Config/_config_companyconfig_widget.html.twig',
             'parameters' => null,
         ];
 
@@ -47,7 +47,7 @@ class ConfigSubscriberTest extends TestCase
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',
             'formType'   => 'Mautic\\LeadBundle\\Form\\Type\\SegmentConfigType',
-            'formTheme'  => 'MauticLeadBundle:FormTheme\\Config',
+            'formTheme'  => 'MauticLeadBundle:FormTheme:Config/_config_leadconfig_widget.html.twig',
             'parameters' => null,
         ];
 
