@@ -66,9 +66,9 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                     'type'      => 'textarea',
                 ],
                 [
-                    'label'     => 'checkbox',
-                    'alias'     => 'checkbox',
-                    'type'      => 'checkboxgrp',
+                    'label'          => 'checkbox',
+                    'alias'          => 'checkbox',
+                    'type'           => 'checkboxgrp',
                     'properties'     => [
                         'syncList'   => 0,
                         'optionlist' => [
