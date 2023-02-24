@@ -241,6 +241,9 @@ class FormModel extends AbstractCommonModel
                     if (empty($changes)) {
                         $setDateModified = false;
                     }
+                    if (1 === count($changes) && isset($changes['dateLastActive'])) {
+                        $setDateModified = false;
+                    }
                 }
                 if ($setDateModified) {
                     $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
