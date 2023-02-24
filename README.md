@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-104-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-105-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -209,6 +209,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://stackoverflow.com/users/902161/irfan"><img src="https://avatars.githubusercontent.com/u/4272642?v=4?s=100" width="100px;" alt="Irfan Hanfi"/><br /><sub><b>Irfan Hanfi</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=irfanhanfi" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/annamunk"><img src="https://avatars.githubusercontent.com/u/102536220?v=4?s=100" width="100px;" alt="Anna Munk"/><br /><sub><b>Anna Munk</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=annamunk" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.schriftrolle.de/?utm_source=github&utm_medium=profilLink"><img src="https://avatars.githubusercontent.com/u/765204?v=4?s=100" width="100px;" alt="Sven Döring"/><br /><sub><b>Sven Döring</b></sub></a><br /><a href="#userTesting-sdoering" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/pedro-de-jesus-a60527167"><img src="https://avatars.githubusercontent.com/u/42081152?v=4?s=100" width="100px;" alt="Pedro de Jesus"/><br /><sub><b>Pedro de Jesus</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pedrodejesus" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
