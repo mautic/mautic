@@ -449,16 +449,17 @@ class ReportModel extends FormModel
 
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.php',
+                    'MauticReportBundle:Report:export.html.twig',
                     [
-                        'reportData' => $reportData,
-                        'data'       => $reportData['data'],
-                        'columns'    => $reportData['columns'],
-                        'pageTitle'  => $name,
-                        'graphs'     => $reportData['graphs'],
-                        'report'     => $report,
-                        'dateFrom'   => $reportData['dateFrom'],
-                        'dateTo'     => $reportData['dateTo'],
+                        'reportData'       => $reportData,
+                        'data'             => $reportData['data'],
+                        'columns'          => $reportData['columns'],
+                        'pageTitle'        => $name,
+                        'graphs'           => $reportData['graphs'],
+                        'report'           => $report,
+                        'dateFrom'         => $reportData['dateFrom'],
+                        'dateTo'           => $reportData['dateTo'],
+                        'reportDataResult' => new ReportDataResult($reportData),
                     ]
                 )->getContent();
 

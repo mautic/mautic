@@ -53,6 +53,7 @@ return [
                     'event_dispatcher',
                     'mautic.lead.model.field',
                     'mautic.tracker.contact',
+                    'twig',
                 ],
             ],
         ],

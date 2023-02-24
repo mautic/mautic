@@ -125,7 +125,7 @@ trait CustomFieldRepositoryTrait
 
                 //ORM - generates lead entities
                 /** @var \Doctrine\ORM\QueryBuilder $q */
-                $q = $this->getEntitiesOrmQueryBuilder($order);
+                $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                 $this->buildSelectClause($dq, $args);
 
                 //only pull the leads as filtered via DBAL

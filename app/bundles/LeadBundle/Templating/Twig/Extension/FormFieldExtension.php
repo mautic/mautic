@@ -20,6 +20,7 @@ final class FormFieldExtension extends AbstractExtension
             new TwigFunction('leadFieldRegionChoices', [FormFieldHelper::class, 'getRegionChoices']),
             new TwigFunction('leadFieldTimezonesChoices', [FormFieldHelper::class, 'getTimezonesChoices']),
             new TwigFunction('leadFieldLocaleChoices', [FormFieldHelper::class, 'getLocaleChoices']),
+            new TwigFunction('leadFormFieldParseListForChoices', [FormFieldHelper::class, 'parseListForChoices']),
         ];
     }
 }
