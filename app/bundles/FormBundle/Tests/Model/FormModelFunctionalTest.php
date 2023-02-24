@@ -10,14 +10,29 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormModelFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testPopulateValuesWithGetParameters(): void
     {
         $formId     = $this->createForm();
-        $crawler    = $this->client->request(Request::METHOD_GET, "/s/forms/preview/{$formId}?email=testform@test.com&firstname=test");
+        $crawler    = $this->client->request(
+            Request::METHOD_GET,
+            "/s/forms/preview/{$formId}?email=testform@test.com&firstname=test&description=test-test&checkbox=val1|val3"
+        );
         $inputValue = $crawler->filter('input[type=email]')->attr('value');
         self::assertSame('testform@test.com', $inputValue);
         $inputValue = $crawler->filter('input[type=text]')->attr('value');
         self::assertSame('test', $inputValue);
+        $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
+        self::assertSame('test-test', $inputValue);
+        $inputValue = $crawler->filter('textarea[name^=mauticform]')->html();
+        self::assertSame('test-test', $inputValue);
+        $inputValue = $crawler->filter('input[value^=val1]')->attr('checked');
+        self::assertSame('checked', $inputValue);
+        $inputValue = $crawler->filter('input[value^=val2]')->attr('checked');
+        self::assertNull($inputValue);
+        $inputValue = $crawler->filter('input[value^=val3]')->attr('checked');
+        self::assertSame('checked', $inputValue);
 
         $this->createPage($formId);
         $crawler    = $this->client->request(Request::METHOD_GET, '/test-page?email=test%2Bpage@test.com&firstname=test');
@@ -44,6 +59,37 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                     'alias'     => 'email',
                     'type'      => 'email',
                     'leadField' => 'email',
+                ],
+                [
+                    'label'     => 'description',
+                    'alias'     => 'description',
+                    'type'      => 'textarea',
+                ],
+                [
+                    'label'     => 'checkbox',
+                    'alias'     => 'checkbox',
+                    'type'      => 'checkboxgrp',
+                    'properties'     => [
+                        'syncList'   => 0,
+                        'optionlist' => [
+                            'list'   => [
+                                [
+                                    'label' => 'val1',
+                                    "value" => 'val1',
+                                ],
+                                [
+                                    'label' => 'val2',
+                                    'value' => 'val2',
+                                ],
+                                [
+                                    'label' => 'val3',
+                                    'value' => 'val3',
+                                ],
+                            ],
+                        ],
+                        'labelAttributes' => null,
+                    ],
+
                 ],
                 [
                     'label'     => 'Submit',
