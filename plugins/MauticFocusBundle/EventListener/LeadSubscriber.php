@@ -2,7 +2,6 @@
 
 namespace MauticPlugin\MauticFocusBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\ChannelTrait;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -14,8 +13,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    use ChannelTrait;
-
     /**
      * @var Translator
      */
