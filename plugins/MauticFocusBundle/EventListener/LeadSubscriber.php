@@ -76,11 +76,8 @@ class LeadSubscriber implements EventSubscriberInterface
             $counter = [Stat::TYPE_NOTIFICATION=>0, Stat::TYPE_CLICK=>0];
             // Add the view to the event array
             foreach ($statsViewsByLead['result'] as $statsView) {
-                if (((Stat::TYPE_CLICK == $statsView['type']) && !$eventClickApplicable)
-                    ||
-                    ((Stat::TYPE_NOTIFICATION == $statsView['type']) && !$eventViewApplicable)) {
-                    continue;
-                } else {
+                if (((Stat::TYPE_CLICK == $statsView['type']) && $eventClickApplicable)
+                    || ((Stat::TYPE_NOTIFICATION == $statsView['type']) && $eventViewApplicable)) {
                     ++$counter[$statsView['type']];
 
                     $eventLabel = [
