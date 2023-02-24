@@ -455,6 +455,12 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if ($event->checkContext(self::CONTEXT_EMAILS)
+            && !in_array('mautic.email.graph.pie.read.ingored.unsubscribed.bounced', $graphs)
+            && !in_array('mautic.email.table.most.emails.clicks', $graphs)) {
+            return;
+        }
+
         $qb = $event->getQueryBuilder();
         foreach ($graphs as $g) {
             $options      = $event->getOptions($g);
