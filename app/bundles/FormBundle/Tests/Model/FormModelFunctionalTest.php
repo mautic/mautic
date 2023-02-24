@@ -75,7 +75,7 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                             'list'   => [
                                 [
                                     'label' => 'val1',
-                                    "value" => 'val1',
+                                    'value' => 'val1',
                                 ],
                                 [
                                     'label' => 'val2',
@@ -89,7 +89,6 @@ class FormModelFunctionalTest extends MauticMysqlTestCase
                         ],
                         'labelAttributes' => null,
                     ],
-
                 ],
                 [
                     'label'     => 'Submit',
