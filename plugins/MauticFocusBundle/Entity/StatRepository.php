@@ -41,7 +41,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @return array<int, Stat>
+     * @return array<string, array|int>
      */
     public function getStatsViewByLead(int $leadId, array $options = []): array
     {
@@ -57,6 +57,14 @@ class StatRepository extends CommonRepository
 
         $q->where($expr)
             ->setParameter('type', [Stat::TYPE_NOTIFICATION, Stat::TYPE_CLICK]);
+
+        if (isset($options['search']) && $options['search']) {
+            $q->andWhere($q->expr()->orX(
+                $q->expr()->like('f.name', $q->expr()->literal('%'.$options['search'].'%')),
+                $q->expr()->like('f.description', $q->expr()->literal('%'.$options['search'].'%')),
+                $q->expr()->like('s.type', $q->expr()->literal('%'.$options['search'].'%'))
+            ));
+        }
 
         $result = $q->getQuery()->getArrayResult();
 
