@@ -146,9 +146,8 @@ class WebhookModel extends FormModel
     }
 
     /**
-     * @param Webhook $entity
-     * @param FormFactoryInterface $formFactory
-     * @param null    $action
+     * @param Webhook      $entity
+     * @param null         $action
      * @param array<mixed> $options
      *
      * @return mixed
