@@ -8,8 +8,6 @@ module.exports = function (grunt) {
     // Time how long tasks take. Can help when optimizing build times
     require('time-grunt')(grunt);
 
-    grunt.loadNpmTasks('grunt-contrib-clean');
-
     // Define the configuration for all the tasks
     grunt.initConfig({
 
@@ -41,16 +39,6 @@ module.exports = function (grunt) {
             },
             options: {
                 javascriptEnabled: true
-            }
-        },
-
-        // Remove prod's css files to force recompilation
-        clean : {
-            rootAssetsCss : {
-                src : [ 
-                    '<%= mautic.rootAssets %>/app.css', 
-                    '<%= mautic.rootAssets %>/libraries.css'
-                ]
             }
         }
     });
