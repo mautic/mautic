@@ -11,7 +11,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
@@ -54,11 +54,11 @@ class VariantType extends AbstractType
             'tooltip'  => 'mautic.core.ab_test.form.traffic_total_weight.help',
         ];
 
-        if ($options['is_parent'] === true && $options['is_existing'] === false) {
+        if (true === $options['is_parent'] && false === $options['is_existing']) {
             $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
         }
 
-        $builder->add('totalWeight', 'integer', [
+        $builder->add('totalWeight', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => $attr,
@@ -73,11 +73,11 @@ class VariantType extends AbstractType
             'tooltip'  => 'mautic.core.ab_test.form.send_winner_delay.help',
         ];
 
-        if ($options['is_parent'] === true && $options['is_existing'] === false) {
+        if (true === $options['is_parent'] && false === $options['is_existing']) {
             $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
         }
 
-        $builder->add('sendWinnerDelay', 'integer', [
+        $builder->add('sendWinnerDelay', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
             'label_attr'  => ['class' => 'control-label'],
             'attr'        => $attr,
@@ -146,10 +146,7 @@ class VariantType extends AbstractType
         return 'emailvariant';
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'is_parent'         => true,
