@@ -583,8 +583,6 @@ class InputHelper
                 // clean up ...
                 '#(?<=\>)(&nbsp;)(?=\<)#',
                 // --ibid
-                // Remove HTML comment(s) except IE comment(s)
-                '#\s*<!--(?!\[if\s).*?-->\s*|(?<!\>)\n+(?=\<[^!])#s',
             ],
             [
                 '<$1$2</$1>',
@@ -596,7 +594,6 @@ class InputHelper
                 '<$1$2',
                 '$1 ',
                 '$1',
-                '',
             ],
             $html
         );

@@ -243,14 +243,13 @@ class InputHelperTest extends TestCase
             ['<p style="color: red;">Hello World</p>', '<p style="color:red;">Hello World</p>'],
             // Test with an empty HTML string
             ['', ''],
-            // Test with an HTML string with a comment
-            ['<p>Hello World</p><!-- This is a comment -->', '<p>Hello World</p>'],
             // Test with an HTML string with multiple attributes
             ['<p class="big" id="title">Hello World</p>', '<p class="big" id="title">Hello World</p>'],
             // Test with an HTML string with multiple same tag
             ['<p>Hello World</p><p>Hello World</p>', '<p>Hello World</p><p>Hello World</p>'],
             // Test with an HTML string with multiple same tag but with different attributes
             ['<p class="big">Hello World</p><p class="small">Hello World</p>', '<p class="big">Hello World</p><p class="small">Hello World</p>'],
+            [file_get_contents(__DIR__.'/resource/email/email-no-minify.html'), file_get_contents(__DIR__.'/resource/email/email-minify.html')],
         ];
     }
 }
