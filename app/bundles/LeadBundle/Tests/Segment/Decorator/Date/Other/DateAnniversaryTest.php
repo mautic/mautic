@@ -83,14 +83,10 @@ class DateAnniversaryTest extends \PHPUnit\Framework\TestCase
 
         $filter        = [
             'operator' => '=',
-        ];
-        $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
-        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
-
-        $filter        = [
             'filter'   => 'birthday +2days',
         ];
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
+        $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
         $filterDecorator = new DateAnniversary($dateDecorator, $dateOptionParameters);
 
