@@ -118,9 +118,9 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
-        $interval   = '-3 months';
+        $interval        = '-3 months';
         $filterDecorator = new DateRelativeInterval($dateDecorator, $interval, $dateOptionParameters);
-        $expectedDate = $date->modify($interval, true);
+        $expectedDate    = $date->modify($interval, true);
 
         $this->assertEquals($expectedDate->format(DateOptionAbstract::Y_M_D), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
@@ -147,7 +147,7 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
 
         $originalValue   = '5 days ago';
         $filterDecorator = new DateRelativeInterval($dateDecorator, $originalValue, $dateOptionParameters);
-        $expectedDate = $date->modify($originalValue, true);
+        $expectedDate    = $date->modify($originalValue, true);
 
         $this->assertEquals($expectedDate->format(DateOptionAbstract::Y_M_D), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
@@ -197,9 +197,9 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
-        $interval   = '5 days';
+        $interval        = '5 days';
         $filterDecorator = new DateRelativeInterval($dateDecorator, $interval, $dateOptionParameters);
-        $expectedData = $date->modify($interval, true);
+        $expectedData    = $date->modify($interval, true);
 
         $this->assertEquals($expectedData->format(DateOptionAbstract::Y_M_D), $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
@@ -225,11 +225,12 @@ class DateRelativeIntervalTest extends \PHPUnit\Framework\TestCase
         $contactSegmentFilterCrate = new ContactSegmentFilterCrate($filter);
         $dateOptionParameters      = new DateOptionParameters($contactSegmentFilterCrate, [], $timezoneResolver);
 
-        $filterDecorator = new DateRelativeInterval($dateDecorator, '5 days', $dateOptionParameters);
+        $interval        = '+5 days';
+        $filterDecorator = new DateRelativeInterval($dateDecorator, $interval, $dateOptionParameters);
         $results         = $filterDecorator->getParameterValue($contactSegmentFilterCrate);
 
         $endDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
-        $date->modify('-1 day +1 second');
+        $date->modify('-'.$interval);
         $startDate     = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
         $this->assertEquals([$startDate, $endDate], $results);
     }
