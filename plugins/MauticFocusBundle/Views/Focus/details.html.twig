@@ -45,6 +45,14 @@
                           <table class="table table-bordered table-striped mb-0">
                               <tbody>
                               {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': item}) }}
+                              <tr>
+                                  <td width="20%">
+                                      <span class="fw-b">{{ 'mautic.focus.details.views'|trans }}</span>
+                                  </td>
+                                  <td>
+                                      {{ totalViews }}
+                                  </td>
+                              </tr>
                               </tbody>
                           </table>
                       </div>

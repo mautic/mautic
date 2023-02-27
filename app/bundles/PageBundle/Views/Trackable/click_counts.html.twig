@@ -8,6 +8,9 @@
                 <td>{{ 'mautic.trackable.click_count'|trans }}</td>
                 <td>{{ 'mautic.trackable.click_unique_count'|trans }}</td>
                 {{ customContent('click_counts_headers', mauticTemplateVars) }}
+                {% if totalViews is defined %}
+                    <td>{{ 'mautic.trackable.click_conversion_rate'|trans }}</td>
+                {% endif %}
                 <td>{{ 'mautic.trackable.click_track_id'|trans }}</td>
             </tr>
             </thead>
@@ -34,6 +37,9 @@
                         </span>
                             </td>
                             {{ customContent('click_counts', mauticTemplateVars|merge({'redirect_id' : link.redirect_id})) }}
+                            {% if totalViews is defined %}
+                                <td>{{ (totalViews > 0 ? link.hits / totalViews * 100 : 0)|round(4) }}%</td>
+                            {% endif %}
                             <td>{{ link.redirect_id }}</td>
                         </tr>
                 {% endfor %}
@@ -55,6 +61,9 @@
                         {% endif %}
                         </span>
                     </td>
+                    {% if totalViews is defined %}
+                        <td>{{ (totalViews > 0 ? totalClicks / totalViews * 100 : 0)|round(4) }}%</td>
+                    {% endif %}
                     <td></td>
                 </tr>
             </tbody>

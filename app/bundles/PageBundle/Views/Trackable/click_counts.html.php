@@ -7,9 +7,6 @@
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_count'); ?></td>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_unique_count'); ?></td>
                 <?php echo $view['content']->getCustomContent('click_counts_headers', $mauticTemplateVars); ?>
-                <?php if (!empty($totalViews)): ?>
-                    <td><?php echo $view['translator']->trans('mautic.trackable.click_conversion_rate'); ?></td>
-                <?php endif; ?>
                 <td><?php echo $view['translator']->trans('mautic.trackable.click_track_id'); ?></td>
             </tr>
             </thead>
@@ -39,9 +36,6 @@
                         <?php endif; ?>
                         </span>
                             </td>
-                            <?php if (!empty($totalViews)): ?>
-                                <td><?php echo round(($totalViews > 0 ? ($link['hits'] / $totalViews) : 0), 4); ?>%</td>
-                            <?php endif; ?>
                             <?php echo $view['content']->getCustomContent('click_counts', array_merge($mauticTemplateVars, ['redirect_id' => $link['redirect_id']])); ?>
                             <td><?php echo $link['redirect_id']; ?></td>
                         </tr>
@@ -65,9 +59,6 @@
                   <?php endif; ?>
                         </span>
                     </td>
-                    <?php if (!empty($totalViews)): ?>
-                        <td><?php echo round(($totalViews > 0 ? ($totalClicks / $totalViews) : 0), 4); ?>%</td>
-                    <?php endif; ?>
                     <td></td>
                 </tr>
 
