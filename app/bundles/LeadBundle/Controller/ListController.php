@@ -348,10 +348,11 @@ class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]);
 
+                        $form = $segmentModel->createForm($segment, $this->get('form.factory'), $postActionVars['returnUrl']);
+
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
-                            //'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
                             'form'         => $form->createView(),
                         ];
 
