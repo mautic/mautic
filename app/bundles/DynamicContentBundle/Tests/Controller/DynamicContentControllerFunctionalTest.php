@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\DynamicContentBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
@@ -114,5 +115,47 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($user);
 
         return $user;
+    }
+
+    public function testIndexActionIsSuccessful(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/dwc');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testNewActionIsSuccessful(): void
+    {
+        $this->client->request(Request::METHOD_GET, '/s/dwc/new');
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testEditActionIsSuccessful(): void
+    {
+        $entity = new DynamicContent();
+        $entity->setName('Test Dynamic Content');
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/dwc/edit/'.$entity->getId());
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+    }
+
+    public function testViewActionIsSuccessful(): void
+    {
+        $entity = new DynamicContent();
+        $entity->setName('Test Dynamic Content');
+        $this->em->persist($entity);
+        $this->em->flush();
+
+        $this->client->request(Request::METHOD_GET, '/s/dwc/view/'.$entity->getId());
+        $response = $this->client->getResponse();
+
+        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
     }
 }

@@ -16,7 +16,7 @@ class ScheduleController extends CommonAjaxController
         $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
         $html = $this->render(
-            'MauticReportBundle:Schedule:index.html.php',
+            'MauticReportBundle:Schedule:index.html.twig',
             [
                 'dates' => $dates,
             ]
