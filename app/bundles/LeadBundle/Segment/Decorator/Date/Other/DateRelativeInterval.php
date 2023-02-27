@@ -70,7 +70,7 @@ class DateRelativeInterval extends DateOptionAbstract
         $dateFormat = 'Y-m-d H:i:s';
         $startWith  = $dateTimeHelper->toUtcString($dateFormat);
 
-        $modifier = '+1 day -1 second';
+        $modifier = $this->originalValue;
         $dateTimeHelper->modify($modifier);
         $endWith = $dateTimeHelper->toUtcString($dateFormat);
 
