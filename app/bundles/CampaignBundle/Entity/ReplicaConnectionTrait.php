@@ -19,7 +19,7 @@ trait ReplicaConnectionTrait
      *
      * @return Connection
      */
-    private function getReplicaConnectionTrait(ContactLimiter $limiter = null)
+    private function getReplicaConnection(ContactLimiter $limiter = null): Connection
     {
         /** @var Connection $connection */
         $connection = $this->getEntityManager()->getConnection();
