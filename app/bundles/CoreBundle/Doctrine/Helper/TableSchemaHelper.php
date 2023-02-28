@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Doctrine\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 
@@ -241,7 +242,7 @@ class TableSchemaHelper
             return $this->schema;
         }
 
-        if ($this->db instanceof \Doctrine\DBAL\Connections\MasterSlaveConnection) {
+        if ($this->db instanceof PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
             $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);

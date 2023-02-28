@@ -3,13 +3,13 @@
 namespace Mautic\CampaignBundle\Entity;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 
 /**
- * Trait SlaveConnectionTrait.
+ * Trait ReplicaConnectionTrait.
  */
-trait SlaveConnectionTrait
+trait ReplicaConnectionTrait
 {
     /**
      * Get a connection, preferring a slave connection if available and prudent.
@@ -19,16 +19,16 @@ trait SlaveConnectionTrait
      *
      * @return Connection
      */
-    private function getSlaveConnection(ContactLimiter $limiter = null)
+    private function getReplicaConnectionTrait(ContactLimiter $limiter = null)
     {
         /** @var Connection $connection */
         $connection = $this->getEntityManager()->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             if (
                 !$limiter
                 || !($limiter->getContactId() || $limiter->getContactIdList())
             ) {
-                $connection->connect('slave');
+                $connection->ensureConnectedToReplica();
             }
         }
 

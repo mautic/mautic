@@ -3,7 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -55,9 +55,9 @@ class ContactSegmentQueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a slave connection if available.
-            $connection->connect('slave');
+            $connection->ensureConnectedToReplica();
         }
 
         /** @var QueryBuilder $queryBuilder */
@@ -107,9 +107,9 @@ class ContactSegmentQueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
+        if ($connection instanceof PrimaryReadReplicaConnection) {
             // Prefer a slave connection if available.
-            $connection->connect('slave');
+            $connection->ensureConnectedToReplica();
         }
 
         // Add count functions to the query
