@@ -106,8 +106,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            'country' => 'Australia',
-            'state'   => 'Victoria',
+            '`country`' => 'Australia',
+            '`state`'   => 'Victoria',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -200,7 +200,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            'country' => '',
+            '`country`' => '',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
