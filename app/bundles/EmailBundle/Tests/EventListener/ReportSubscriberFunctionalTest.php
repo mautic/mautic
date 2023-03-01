@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Entity\Stat;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\ReportBundle\Entity\Report;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
 class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
@@ -27,23 +32,19 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
         $this->em->flush();
 
-        $report = $this->createReport(
-            'Emails and top 10 links',
-            'emails',
-            ['e.id', 'e.name'],
-            ['mautic.email.table.most.emails.clicks']
-        );
+        $report = new Report();
+        $report->setName('Email stats and top 10 links');
+        $report->setSource('emails');
+        $report->setColumns(['e.id', 'cmp.name', 'e.name']);
+        $report->setGraphs(['mautic.email.table.most.emails.clicks']);
+        $this->em->persist($report);
         $this->em->flush();
 
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $crawlerTable = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
         // convert html table to php array
-        $table = array_slice($crawlerTable->filter('tr')->each(function ($tr) {
-            return $tr->filter('td')->each(function ($td) {
-                return trim($td->text());
-            });
-        }), 1);
+        $table = array_slice($this->domTableToArray($crawlerTable), 1);
 
         $this->assertSame([
             ['Email 2', '10', '8', 'example.com/5'],
@@ -54,16 +55,84 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         ], $table);
     }
 
-    private function createReport(string $name, string $source, array $columns, array $graphs = []): Report
+    public function testEmailStatReportGraphWithMostClickedLinks(): void
     {
-        $report = new Report();
-        $report->setName($name);
-        $report->setSource($source);
-        $report->setColumns($columns);
-        $report->setGraphs($graphs);
-        $this->em->persist($report);
+        $emailA = $this->createEmail('Email 1');
+        $emailB = $this->createEmail('Email 2');
 
-        return $report;
+        $contacts = [
+            $this->createContact('test1@example.com'),
+            $this->createContact('test2@example.com'),
+            $this->createContact('test3@example.com'),
+        ];
+        $this->em->flush();
+
+        $trackables = [
+            $this->createTrackable('https://example.com/1', $emailA->getId()),
+            $this->createTrackable('https://example.com/2', $emailA->getId()),
+            $this->createTrackable('https://example.com/3', $emailB->getId()),
+        ];
+        $this->em->flush();
+
+        $statsEmailA = $this->emulateEmailSend($emailA, $contacts);
+        $statsEmailB = $this->emulateEmailSend($emailB, $contacts);
+
+        $this->emulateEmailRead($statsEmailA[0]);
+        $this->emulateEmailRead($statsEmailA[1]);
+        $this->emulateEmailRead($statsEmailB[1]);
+
+        $this->emulateLinkClick($emailA, $trackables[0], $contacts[0], 3);
+        $this->emulateLinkClick($emailA, $trackables[1], $contacts[0]);
+        $this->emulateLinkClick($emailA, $trackables[1], $contacts[1]);
+        $this->emulateLinkClick($emailB, $trackables[1], $contacts[1], 2);
+        $this->em->flush();
+
+        $report = new Report();
+        $report->setName('Email sent stats with hits and top 10 links');
+        $report->setSource('email.stats');
+        $report->setColumns(['l.email', 'e.name', 'hits', 'unique_hits']);
+        $report->setGraphs(['mautic.email.table.most.emails.clicks']);
+        $report->setTableOrder([
+            [
+                'column'    => 'hits',
+                'direction' => 'DESC',
+            ],
+        ]);
+        $this->em->persist($report);
+        $this->em->flush();
+
+        $this->client->restart();
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+        $crawlerGraphTable  = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
+
+        // convert html table to php array
+        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 6);
+        $graphTableArray    = array_slice($this->domTableToArray($crawlerGraphTable), 1);
+
+        $this->assertSame([
+            ['1', 'test1@example.com', 'Email 1', '4', '2'],
+            ['2', 'test2@example.com', 'Email 1', '1', '1'],
+            ['3', 'test3@example.com', 'Email 1', '0', '0'],
+            ['4', 'test1@example.com', 'Email 2', '0', '0'],
+            ['5', 'test2@example.com', 'Email 2', '0', '0'],
+            ['6', 'test3@example.com', 'Email 2', '0', '0'],
+        ], $crawlerReportTable);
+
+        $this->assertSame([
+            ['Email 1', '4', '3', 'example.com/2'],
+            ['Email 1', '3', '1', 'example.com/1'],
+            ['Email 2', '0', '0', 'example.com/3'],
+        ], $graphTableArray);
+    }
+
+    private function createContact(string $email): Lead
+    {
+        $contact = new Lead();
+        $contact->setEmail($email);
+        $this->em->persist($contact);
+
+        return $contact;
     }
 
     private function createEmail(string $name): Email
@@ -99,5 +168,80 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($trackable);
 
         return $trackable;
+    }
+
+    /**
+     * @param Lead[] $contacts
+     *
+     * @return Stat[]
+     *
+     * @throws \Doctrine\ORM\Exception\ORMException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     */
+    private function emulateEmailSend(Email $email, array $contacts): array
+    {
+        $stats = [];
+        foreach ($contacts as $contact) {
+            $emailStat = new Stat();
+            $emailStat->setEmail($email);
+            $emailStat->setEmailAddress($contact->getEmail());
+            $emailStat->setLead($contact);
+            $emailStat->setDateSent(new \DateTime());
+            $this->em->persist($emailStat);
+            $stats[] = $emailStat;
+        }
+        $email->setSentCount(count($contacts));
+        $this->em->persist($email);
+
+        $this->em->flush();
+
+        return $stats;
+    }
+
+    private function emulateEmailRead(Stat $emailStat): void
+    {
+        $emailStat->setIsRead(true);
+        $emailStat->setDateRead(new \DateTime());
+        $emailStat->setOpenCount(1);
+        $email = $emailStat->getEmail();
+        $email->setReadCount($email->getReadCount() + 1);
+        $this->em->persist($emailStat);
+    }
+
+    private function emulateLinkClick(Email $email, Trackable $trackable, Lead $lead, int $count = 1): void
+    {
+        $trackable->setHits($trackable->getHits() + $count);
+        $trackable->setUniqueHits($trackable->getUniqueHits() + 1);
+        $this->em->persist($trackable);
+
+        $redirect = $trackable->getRedirect();
+
+        $ip = new IpAddress();
+        $ip->setIpAddress('127.0.0.1');
+        $this->em->persist($ip);
+
+        for ($i = 0; $i < $count; ++$i) {
+            $pageHit = new Hit();
+            $pageHit->setRedirect($redirect);
+            $pageHit->setEmail($email);
+            $pageHit->setLead($lead);
+            $pageHit->setIpAddress($ip);
+            $pageHit->setDateHit(new \DateTime());
+            $pageHit->setCode(200);
+            $pageHit->setUrl($redirect->getUrl());
+            $pageHit->setTrackingId($redirect->getRedirectId());
+            $pageHit->setSource('email');
+            $pageHit->setSourceId($email->getId());
+            $this->em->persist($pageHit);
+        }
+    }
+
+    private function domTableToArray(Crawler $crawler): array
+    {
+        return $crawler->filter('tr')->each(function ($tr) {
+            return $tr->filter('td')->each(function ($td) {
+                return trim($td->text());
+            });
+        });
     }
 }
