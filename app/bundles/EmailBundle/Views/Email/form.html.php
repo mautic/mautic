@@ -219,20 +219,23 @@ if (!isset($previewUrl)) {
                 <?php echo $view['form']->row($form['preferenceCenter']); ?>
             <?php endif; ?>
             <hr />
-            <h5><?php echo $view['translator']->trans('mautic.core.ab_test.form.abtest_settings'); ?></h5>
-            <br />
-            <?php if (!$isExisting && !$isVariant): ?>
-                <?php echo $view['form']->row($form['variantSettings']['enableAbTest']); ?>
-            <?php endif; ?>
+            <?php if ($email->isEnableAbTest() || !$isExisting): ?>
+                <h5><?php echo $view['translator']->trans('mautic.core.ab_test.form.abtest_settings'); ?></h5>
+                <br/>
+                <?php if (!$isExisting && !$isVariant): ?>
+                    <?php echo $view['form']->row($form['variantSettings']['enableAbTest']); ?>
+                <?php endif; ?>
 
-            <?php if ($isVariant): ?>
-                <?php echo $view['form']->row($form['variantSettings']['weight']); ?>
-            <?php else: ?>
-                <?php echo $view['form']->row($form['variantSettings']['winnerCriteria']); ?>
-                <?php echo $view['form']->row($form['variantSettings']['totalWeight']); ?>
-                <?php echo $view['form']->row($form['variantSettings']['sendWinnerDelay']); ?>
+
+                <?php if ($isVariant): ?>
+                    <?php echo $view['form']->row($form['variantSettings']['weight']); ?>
+                <?php else: ?>
+                    <?php echo $view['form']->row($form['variantSettings']['winnerCriteria']); ?>
+                    <?php echo $view['form']->row($form['variantSettings']['totalWeight']); ?>
+                    <?php echo $view['form']->row($form['variantSettings']['sendWinnerDelay']); ?>
+                <?php endif; ?>
+                <hr/>
             <?php endif; ?>
-            <hr />
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
             <br />
             <?php

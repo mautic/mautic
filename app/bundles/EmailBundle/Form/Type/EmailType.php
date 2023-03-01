@@ -420,7 +420,7 @@ class EmailType extends AbstractType
                 /** @var Email $emailEntity */
                 $emailEntity = $event->getData();
                 $variantChildren = $emailEntity->getVariantChildren();
-                $isParent = $variantChildren && count($variantChildren) > 0;
+                $isParent = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
                 $isExisting = $event->getData()->getId() > 0;
                 $variantSettingsModifier($event, $isParent, $isExisting);
             }

@@ -100,16 +100,21 @@ class VariantType extends AbstractType
                 );
             }
 
+            $attr = [
+                'class'    => 'form-control',
+                'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
+            ];
+            if (true === $options['is_parent'] && false === $options['is_existing']) {
+                $attr['data-show-on'] = '{"emailform_variantSettings_enableAbTest_1":"checked"}';
+            }
+
             $builder->add(
                 'winnerCriteria',
                 ChoiceType::class,
                 [
-                    'label'      => 'mautic.core.ab_test.form.winner',
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class'    => 'form-control',
-                        'onchange' => 'Mautic.getAbTestWinnerForm(\'email\', \'emailform\', this);',
-                    ],
+                    'label'       => 'mautic.core.ab_test.form.winner',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => $attr,
                     'expanded'    => false,
                     'multiple'    => false,
                     'choices'     => $choices,

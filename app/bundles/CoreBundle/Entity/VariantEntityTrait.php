@@ -313,6 +313,11 @@ trait VariantEntityTrait
         }
     }
 
+    public function isEnableAbTest(): bool
+    {
+        return (bool) $this->variantSettings['enableAbTest'] ?? false;
+    }
+
     /**
      * @param $getter
      *
