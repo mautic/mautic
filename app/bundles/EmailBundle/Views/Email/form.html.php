@@ -219,7 +219,7 @@ if (!isset($previewUrl)) {
                 <?php echo $view['form']->row($form['preferenceCenter']); ?>
             <?php endif; ?>
             <hr />
-            <?php if ($email->isEnableAbTest() || !$isExisting): ?>
+            <?php if ('list' === $email->getEmailType() && ($email->isEnableAbTest() || !$isExisting)): ?>
                 <h5><?php echo $view['translator']->trans('mautic.core.ab_test.form.abtest_settings'); ?></h5>
                 <br/>
                 <?php if (!$isExisting && !$isVariant): ?>
