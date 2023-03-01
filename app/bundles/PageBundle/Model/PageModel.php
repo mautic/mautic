@@ -130,18 +130,18 @@ class PageModel extends FormModel
         CoreParametersHelper $coreParametersHelper,
         VariantConverterService $variantConverterService
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->pageRedirectModel    = $pageRedirectModel;
-        $this->pageTrackableModel   = $pageTrackableModel;
-        $this->dateTimeHelper       = new DateTimeHelper();
-        $this->queueService         = $queueService;
-        $this->companyModel         = $companyModel;
-        $this->deviceTracker        = $deviceTracker;
-        $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->cookieHelper             = $cookieHelper;
+        $this->ipLookupHelper           = $ipLookupHelper;
+        $this->leadModel                = $leadModel;
+        $this->leadFieldModel           = $leadFieldModel;
+        $this->pageRedirectModel        = $pageRedirectModel;
+        $this->pageTrackableModel       = $pageTrackableModel;
+        $this->dateTimeHelper           = new DateTimeHelper();
+        $this->queueService             = $queueService;
+        $this->companyModel             = $companyModel;
+        $this->deviceTracker            = $deviceTracker;
+        $this->contactTracker           = $contactTracker;
+        $this->coreParametersHelper     = $coreParametersHelper;
         $this->variantConverterService  = $variantConverterService;
     }
 
@@ -1202,8 +1202,6 @@ class PageModel extends FormModel
 
     /**
      * Converts a variant to the main item and the original main item a variant.
-     *
-     * @param VariantEntityInterface $entity
      */
     public function convertWinnerVariant(VariantEntityInterface $entity)
     {
@@ -1221,8 +1219,6 @@ class PageModel extends FormModel
      * Cleans query params saving url values.
      *
      * @param $query array
-     *
-     * @return array
      */
     private function cleanQuery(array $query): array
     {

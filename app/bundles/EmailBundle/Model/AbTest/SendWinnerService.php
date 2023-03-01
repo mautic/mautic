@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\EmailBundle\Model\AbTest;
 
@@ -65,7 +57,7 @@ class SendWinnerService
      */
     public function processWinnerEmails($emailId = null)
     {
-        if ($emailId === null) {
+        if (null === $emailId) {
             $emails = $this->emailModel->getEmailsToSendWinnerVariant();
         } else {
             $emailEntity = $this->emailModel->getEntity($emailId);
@@ -91,7 +83,7 @@ class SendWinnerService
             }
         }
 
-        if ($emailId === null) {
+        if (null === $emailId) {
             // it has to be false for multiple emails
             $this->tryAgain = false;
         }
@@ -114,8 +106,6 @@ class SendWinnerService
     }
 
     /**
-     * @param Email $email
-     *
      * @throws NotReadyToSendWinnerException
      * @throws \ReflectionException
      */
@@ -125,7 +115,7 @@ class SendWinnerService
 
         $abTestSettings = $this->abTestSettingsService->getAbTestSettings($email);
 
-        if ($this->isAllowedToSendWinner($email, $abTestSettings) === true) {
+        if (true === $this->isAllowedToSendWinner($email, $abTestSettings)) {
             $winner = $this->getWinner($email, $abTestSettings['winnerCriteria']);
 
             $this->emailModel->convertWinnerVariant($winner);
@@ -137,7 +127,6 @@ class SendWinnerService
     }
 
     /**
-     * @param Email $email
      * @param array $abTestSettings
      *
      * @return bool
@@ -153,16 +142,16 @@ class SendWinnerService
             throw new NotReadyToSendWinnerException('Amount of time to send winner email not specified in AB test variant settings.');
         }
 
-        if (!array_key_exists('totalWeight', $abTestSettings) || $abTestSettings['totalWeight'] === AbTestSettingsService::DEFAULT_TOTAL_WEIGHT) {
+        if (!array_key_exists('totalWeight', $abTestSettings) || AbTestSettingsService::DEFAULT_TOTAL_WEIGHT === $abTestSettings['totalWeight']) {
             throw new NotReadyToSendWinnerException('Total weight has to be smaller than 100.');
         }
 
-        if (count($children) === 0) {
+        if (0 === count($children)) {
             // no variants
             throw new NotReadyToSendWinnerException("Email doesn't have variants");
         }
 
-        if ($this->emailModel->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay']) === false) {
+        if (false === $this->emailModel->isReadyToSendWinner($parent->getId(), $abTestSettings['sendWinnerDelay'])) {
             $this->tryAgain = true; // we should reschedule the call in this case
             // too early
             throw new NotReadyToSendWinnerException("Predetermined amount of time hasn't passed yet");
@@ -172,7 +161,6 @@ class SendWinnerService
     }
 
     /**
-     * @param Email  $parentVariant
      * @param string $winnerCriteria
      *
      * @return Email|null

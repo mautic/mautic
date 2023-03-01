@@ -112,7 +112,7 @@ $isCurrent = ($variant->getId() === $activeEntity->getId());
         </div>
         <div class="col-md-4 va-t text-right">
             <em class="text-white dark-sm">
-                <?php if ($variants['configurationError'] === true): ?>
+                <?php if (true === $variants['configurationError']): ?>
                     <div class="text-danger" data-toggle="label label-danger"
                          title="<?php echo $view['translator']->trans('mautic.core.variant.misconfiguration'); ?>">
                         <div>

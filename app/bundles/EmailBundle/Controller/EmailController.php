@@ -14,7 +14,6 @@ namespace Mautic\EmailBundle\Controller;
 use Mautic\CoreBundle\Controller\BuilderControllerTrait;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Controller\FormErrorMessagesTrait;
-use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
@@ -982,7 +981,7 @@ class EmailController extends FormController
             }
 
             $variantSettings = $entity->getVariantSettings();
-            if (!array_key_exists('enableAbTest', $variantSettings) || $variantSettings['enableAbTest'] == false) {
+            if (!array_key_exists('enableAbTest', $variantSettings) || false == $variantSettings['enableAbTest']) {
                 $flashes[] = [
                     'type'    => 'error',
                     'msg'     => 'mautic.core.error.disabled_abtest',

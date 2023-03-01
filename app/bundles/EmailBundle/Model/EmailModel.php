@@ -2351,8 +2351,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
 
     /**
      * Converts a variant to the main item and the original main item a variant.
-     *
-     * @param Email $entity
      */
     public function convertWinnerVariant(Email $entity)
     {

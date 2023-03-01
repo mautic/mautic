@@ -19,8 +19,6 @@ trait VariantModelTrait
      * Converts a variant to the main item and the original main item a variant.
      *
      * @deprecated use VariantConverterService instead
-     *
-     * @param VariantEntityInterface $entity
      */
     public function convertVariant(VariantEntityInterface $entity)
     {
