@@ -25,7 +25,7 @@
         <div class="row ml-0 mr-0">
             {# wrap in a row to keep bootstrap container classes from affecting builder layout #}
             <!-- start: "{{ template }}" -->
-            {{- include(template|replace({'.html.php': '.html.twig'}), {
+            {{- include(template, {
                     'field': field,
                     'inForm': true,
                     'id': field.id,

@@ -116,7 +116,7 @@
                   <!-- contentTemplate: "{{ event.contentTemplate }}" -->
                   <tr class="timeline-row {{ rowStripe }} timeline-details hide" id="auditlog-details-{{ counter }}">
                       <td colspan="4">
-                        {{ include([event.contentTemplate|replace({'.html.php': '.html.twig'}), event.contentTemplate], {'event': event, 'lead': lead}) }}
+                        {{ include([event.contentTemplate, event.contentTemplate], {'event': event, 'lead': lead}) }}
                       </td>
                   </tr>
               {% endif %}
