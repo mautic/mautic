@@ -211,7 +211,6 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'form' => $form->createView(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
@@ -376,7 +375,6 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'form'          => $form->createView(),
                 'currentListId' => $segment->getId(),
             ],
