@@ -1,23 +1,19 @@
 <?php
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\CoreBundle\Model\AbTest;
 
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class AbTestResultService.
  */
 class AbTestResultService
 {
+    private EventDispatcherInterface $dispatcher;
+
     /**
      * @var MauticFactory
      */
@@ -25,16 +21,14 @@ class AbTestResultService
 
     /**
      * AbTestResultService constructor.
-     *
-     * @param MauticFactory $factory
      */
-    public function __construct(MauticFactory $factory)
+    public function __construct(MauticFactory $factory, EventDispatcherInterface $dispatcher)
     {
-        $this->factory = $factory;
+        $this->factory    = $factory;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param VariantEntityInterface $parentVariant
      * @param $criteria
      *
      * @return array|mixed
@@ -44,24 +38,29 @@ class AbTestResultService
     public function getAbTestResult(VariantEntityInterface $parentVariant, $criteria)
     {
         //get A/B test information
-        list($parent, $children) = $parentVariant->getVariants();
+        [$parent, $children] = $parentVariant->getVariants();
 
         $abTestResults = [];
         if (isset($criteria)) {
             $testSettings = $criteria;
-
-            $args = [
+            $args         = [
                 'factory'    => $this->factory,
                 'email'      => $parentVariant,
                 'parent'     => $parent,
                 'children'   => $children,
             ];
 
+            if (isset($testSettings['event'])) {
+                $determineWinnerEvent = new DetermineWinnerEvent($args);
+                $this->dispatcher->dispatch($determineWinnerEvent, $testSettings['event']);
+                $abTestResults = $determineWinnerEvent->getAbTestResults();
+            }
+
             //execute the callback
             if (isset($testSettings['callback']) && is_callable($testSettings['callback'])) {
                 if (is_array($testSettings['callback'])) {
                     $reflection = new \ReflectionMethod($testSettings['callback'][0], $testSettings['callback'][1]);
-                } elseif (strpos($testSettings['callback'], '::') !== false) {
+                } elseif (false !== strpos($testSettings['callback'], '::')) {
                     $parts      = explode('::', $testSettings['callback']);
                     $reflection = new \ReflectionMethod($parts[0], $parts[1]);
                 } else {

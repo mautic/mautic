@@ -674,7 +674,10 @@ return [
             ],
             'mautic.core.variant.abtest_result'=> [
                 'class'     => \Mautic\CoreBundle\Model\AbTest\AbTestResultService::class,
-                'arguments' => 'mautic.factory',
+                'arguments' => [
+                    'mautic.factory',
+                    'event_dispatcher',
+                ],
             ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
