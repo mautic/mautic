@@ -187,7 +187,7 @@ class ListControllerTest extends MauticMysqlTestCase
         $this->client->request('GET', sprintf('/s/segments/clone/%d', $list->getId()));
 
         $clientResponse = $this->client->getResponse();
-        $this->assertSame(200, $clientResponse->getStatusCode(), 'Return code must be 200.');
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), 'Return code must be 200.');
         self::assertStringContainsString('Segment clone', $clientResponse->getContent());
     }
 }

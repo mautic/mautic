@@ -308,6 +308,8 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertTrue($this->client->getResponse()->isOk());
 
+        $this->client->submit($form);
+
         $rows = $this->listRepo->findAll();
         $this->assertCount(2, $rows);
 
