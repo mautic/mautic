@@ -59,16 +59,12 @@ interface VariantEntityInterface
     /**
      * Add entity to $translationChildren.
      *
-     * @param VariantEntityInterface $child
-     *
      * @return mixed
      */
     public function addVariantChild(VariantEntityInterface $child);
 
     /**
      * Remove entity from $translationChildren.
-     *
-     * @param VariantEntityInterface $child
      *
      * @return mixed
      */
@@ -106,7 +102,6 @@ interface VariantEntityInterface
      * Sets settings array for the variant.
      *
      * @param array $variantSettings
-     *
      */
     public function setVariantSettings($variantSettings);
 

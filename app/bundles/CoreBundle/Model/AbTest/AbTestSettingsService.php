@@ -1,12 +1,4 @@
 <?php
-/*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
 
 namespace Mautic\CoreBundle\Model\AbTest;
 
@@ -61,8 +53,6 @@ class AbTestSettingsService
     private $setCriteriaFromVariants;
 
     /**
-     * @param VariantEntityInterface $variant
-     *
      * @return array
      */
     public function getAbTestSettings(VariantEntityInterface $variant)
@@ -88,8 +78,6 @@ class AbTestSettingsService
     }
 
     /**
-     * @param Email $entity
-     *
      * @return int|null
      */
     public function getSendWinnerDelay(Email $entity)
@@ -116,9 +104,6 @@ class AbTestSettingsService
         $this->setCriteriaFromVariants    = false;
     }
 
-    /**
-     * @param VariantEntityInterface $parentVariant
-     */
     private function setGeneralSettings(VariantEntityInterface $parentVariant)
     {
         $parentSettings = $parentVariant->getVariantSettings();
@@ -139,9 +124,6 @@ class AbTestSettingsService
         }
     }
 
-    /**
-     * @param VariantEntityInterface $parentVariant
-     */
     private function setVariantsSettings(VariantEntityInterface $parentVariant)
     {
         $variants = $parentVariant->getVariantChildren();
@@ -152,23 +134,19 @@ class AbTestSettingsService
         $this->setParentSettingsWeight($parentVariant);
     }
 
-    /**
-     * @param VariantEntityInterface $variant
-     */
     private function setVariantSettings(VariantEntityInterface $variant)
     {
         $variantsSettings = $variant->getVariantSettings();
         $weight           = isset($variantsSettings['weight']) ? $variantsSettings['weight'] : 0;
         $this->setVariantSettingsWeight($variant, $weight);
 
-        if ($this->setCriteriaFromVariants === true && array_key_exists('winnerCriteria', $variantsSettings)) {
+        if (true === $this->setCriteriaFromVariants && array_key_exists('winnerCriteria', $variantsSettings)) {
             $this->setWinnerCriteriaFromVariant($variantsSettings['winnerCriteria']);
         }
     }
 
     /**
-     * @param VariantEntityInterface $variant
-     * @param int                    $weight
+     * @param int $weight
      */
     private function setVariantSettingsWeight(VariantEntityInterface $variant, $weight)
     {
@@ -180,9 +158,6 @@ class AbTestSettingsService
         }
     }
 
-    /**
-     * @param VariantEntityInterface $parentVariant
-     */
     private function setParentSettingsWeight(VariantEntityInterface $parentVariant)
     {
         if ($this->totalWeight < $this->allPublishedVariantsWeight) {
