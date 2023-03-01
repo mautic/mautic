@@ -69,13 +69,13 @@
                             {{ attribute(variant, nameGetter) }}
                         </a>
                         {% if isCurrent %}
-                            <span class="label label-success">{{ 'mautic.core.current'|trans }}</span>
+                            &nbsp;<span class="label label-success">{{ 'mautic.core.current'|trans }}</span>
                         {% endif %}
                         {% if variants.parent.id is same as variant.id %}
-                            <span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
+                            &nbsp;<span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
                         {% endif %}
                         {% if variant is instanceof('\\Mautic\\CoreBundle\\Entity\\TranslationEntityInterface') and variant.isTranslation %}
-                            <span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
+                            &nbsp;<span data-toggle="tooltip" title="{{ 'mautic.core.icon_tooltip.translation'|trans }}">
                                 <i class="fa fa-fw fa-language"></i>
                             </span>
                         {% endif %}
