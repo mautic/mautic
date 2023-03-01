@@ -15,11 +15,15 @@
 {% set message = message|default('mautic.core.error.generic') %}
 {% set status_code = status_code | default('') %}
 
+{% set pageTitle = pageTitle|default('') %}
+
 {% if isAjax == false %}
     {% extends baseTemplate %}
 
     {% set pageTitle = (isInline == false) ? status_text : pageTitle|default('') %}
 {% endif %}
+
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
 
 {% block _content %}
     <div class="pa-20 mautibot-error{% if isInline %} inline well{% endif %}">

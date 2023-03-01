@@ -401,13 +401,13 @@ class LeadController extends FormController
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => end($dnc),
                     'doNotContactSms'   => end($dncSms),
-                    'leadNotes'         => $this->forward(
-                        'Mautic\LeadBundle\Controller\NoteController::indexAction',
-                        [
-                            'leadId'     => $lead->getId(),
-                            'ignoreAjax' => 1,
-                        ]
-                    )->getContent(),
+                    //'leadNotes'         => $this->forward(
+                    //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
+                    //    [
+                    //        'leadId'     => $lead->getId(),
+                    //        'ignoreAjax' => 1,
+                    //    ]
+                    //)->getContent(),
                 ],
                 'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.twig',
                 'passthroughVars' => [

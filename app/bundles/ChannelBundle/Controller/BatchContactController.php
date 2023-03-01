@@ -86,7 +86,7 @@ class BatchContactController extends AbstractFormController
                     'save_button'   => true,
                 ])->createView(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:Batch:channel.html.php',
+            'contentTemplate' => 'MauticLeadBundle:Batch:channel.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contact_index',
                 'mauticContent' => 'leadBatch',
