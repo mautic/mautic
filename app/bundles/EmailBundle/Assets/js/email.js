@@ -223,7 +223,7 @@ Mautic.selectEmailType = function(emailType) {
     } else {
         mQuery('#segmentTranslationParent').addClass('hide');
         mQuery('#templateTranslationParent').removeClass('hide');
-        mQuery('#leadList').addClass('hide');
+        mQuery('#leadList,#ab-test').addClass('hide');
         mQuery('.page-header h3').text(mauticLang.newTemplateEmail);
     }
 

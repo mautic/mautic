@@ -219,7 +219,8 @@ if (!isset($previewUrl)) {
                 <?php echo $view['form']->row($form['preferenceCenter']); ?>
             <?php endif; ?>
             <hr />
-            <?php if ('list' === $email->getEmailType() && ($email->isEnableAbTest() || !$isExisting)): ?>
+            <?php if ($email->isEnableAbTest() || !$isExisting): ?>
+            <div id="ab-test">
                 <h5><?php echo $view['translator']->trans('mautic.core.ab_test.form.abtest_settings'); ?></h5>
                 <br/>
                 <?php if (!$isExisting && !$isVariant): ?>
@@ -235,6 +236,7 @@ if (!isset($previewUrl)) {
                     <?php echo $view['form']->row($form['variantSettings']['sendWinnerDelay']); ?>
                 <?php endif; ?>
                 <hr/>
+            </div>
             <?php endif; ?>
             <h5><?php echo $view['translator']->trans('mautic.email.utm_tags'); ?></h5>
             <br />
