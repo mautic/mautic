@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
@@ -17,12 +16,10 @@ use Twig\TwigFunction;
 class CoreHelpersExtension extends AbstractExtension
 {
     private TranslatorInterface $translate;
-    private DateHelper $dateHelper;
 
-    public function __construct(TranslatorInterface $translate, DateHelper $dateHelper)
+    public function __construct(TranslatorInterface $translate)
     {
         $this->translate  = $translate;
-        $this->dateHelper = $dateHelper;
     }
 
     public function getFunctions()
@@ -43,10 +40,18 @@ class CoreHelpersExtension extends AbstractExtension
     {
         return [
             new TwigFilter('json_decode', fn (string $json) => json_decode($json, true)),
-            new TwigFilter('parse_str', function (string $string) { parse_str($string, $result);
-
-return $result; }),
+            new TwigFilter('parse_str', [$this, 'parseString']),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function parseString(string $string): array
+    {
+        parse_str($string, $result);
+
+        return $result;
     }
 
     /**
