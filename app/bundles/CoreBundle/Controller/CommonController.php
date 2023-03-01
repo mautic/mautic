@@ -593,7 +593,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function getFlashContent()
     {
-        return $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php');
+        return $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig');
     }
 
     /**
@@ -619,7 +619,7 @@ class CommonController extends AbstractController implements MauticController
         $lastNotification = reset($notifications);
 
         return [
-            'content' => ($notifications || $updateMessage) ? $this->renderView('MauticCoreBundle:Notification:notification_messages.html.php', [
+            'content' => ($notifications || $updateMessage) ? $this->renderView('MauticCoreBundle:Notification:notification_messages.html.twig', [
                 'notifications' => $notifications,
                 'updateMessage' => $updateMessage,
             ]) : '',

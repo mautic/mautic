@@ -56,7 +56,7 @@ class RequestSubscriber implements EventSubscriberInterface
         if ($this->isAjaxPost($request) && $this->isSecurePath($request) && !$this->isCsrfTokenFromRequestHeaderValid($request)) {
             $message  = $this->translator->trans('mautic.core.error.csrf', [], 'flashes');
             $data     = ['flashes' => ['error' => $message]];
-            $content  = $this->templating->getTemplating()->render('MauticCoreBundle:Notification:flash_messages.html.php', $data);
+            $content  = $this->templating->getTemplating()->render('MauticCoreBundle:Notification:flash_messages.html.twig', $data);
             $response = new JsonResponse(['flashes' => $content], Response::HTTP_OK);
             $event->setResponse($response);
             $event->stopPropagation();

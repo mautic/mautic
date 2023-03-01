@@ -244,7 +244,7 @@ class PublicController extends CommonFormController
                     $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
+                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
 
                 $response = $this->render(
                     $logicalName,
@@ -326,7 +326,7 @@ class PublicController extends CommonFormController
                 $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
 
             $response = $this->render(
                 $logicalName,
@@ -582,8 +582,8 @@ class PublicController extends CommonFormController
                 $options['public'] = true;
 
                 // Dead code? Templates do not exist
-                $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
-                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
+                $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.twig');
+                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.twig', $options));
             } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
                 $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
                 $slotsHelper->set($slot, $value);
