@@ -315,6 +315,10 @@ trait VariantEntityTrait
 
     public function isEnableAbTest(): bool
     {
+        if ($this->getVariantParent()) {
+            return (bool) $this->getVariantParent()->getVariantSettings()['enableAbTest'] ?? false;
+        }
+
         return (bool) $this->variantSettings['enableAbTest'] ?? false;
     }
 
