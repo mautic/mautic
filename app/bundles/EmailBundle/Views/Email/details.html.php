@@ -89,7 +89,7 @@ if (!$isEmbedded) {
                         $email->getCreatedBy()
                     ),
                     'clone'  => $permissions['email:emails:create'],
-                    'abtest' => ($allowAbTest && $permissions['email:emails:create']),
+                    'abtest' => ('list' === $email->getEmailType() && $allowAbTest && $permissions['email:emails:create']),
                     'delete' => $view['security']->hasEntityAccess(
                         $permissions['email:emails:deleteown'],
                         $permissions['email:emails:deleteother'],
