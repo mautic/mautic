@@ -13,6 +13,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
 use Mautic\LeadBundle\Form\Type\AddToCompanyActionType;
+use Mautic\LeadBundle\Form\Type\CampaignConditionLeadPageHitType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadCampaignsType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadDeviceType;
 use Mautic\LeadBundle\Form\Type\CampaignEventLeadFieldValueType;
@@ -209,6 +210,15 @@ class CampaignSubscriber implements EventSubscriberInterface
         ];
 
         $event->addCondition('lead.device', $trigger);
+
+        $trigger = [
+            'label'       => 'mautic.lead.lead.events.pageHit',
+            'description' => 'mautic.lead.lead.events.pageHit_descr',
+            'formType'    => CampaignConditionLeadPageHitType::class,
+            'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+        ];
+
+        $event->addCondition('lead.pageHit', $trigger);
 
         $trigger = [
             'label'       => 'mautic.lead.lead.events.tags',
@@ -514,6 +524,76 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $operators[$event->getConfig()['operator']]['expr'],
                     $fields[$field]['type'] ?? null
                 );
+            }
+        } elseif ($event->checkContext('lead.pageHit')) {
+            $startDate = $event->getConfig()['startDate'] ?? null;
+            $endDate   = $event->getConfig()['endDate'] ?? null;
+            $page      = $event->getConfig()['page'] ?? null;
+            $url       = $event->getConfig()['page_url'] ?? null;
+
+            $filter = [
+                'search'        => '',
+                'includeEvents' => [
+                    0 => 'page.hit',
+                ],
+                'excludeEvents' => [],
+            ];
+
+            if ($startDate) {
+                if (!is_a($startDate, 'DateTime')) {
+                    $startDate = new \DateTime($startDate);
+                }
+                $filter['dateFrom'] = $startDate;
+            }
+
+            if ($endDate) {
+                if (!is_a($endDate, 'DateTime')) {
+                    $endDate = new \DateTime($endDate);
+                }
+                $filter['dateTo'] = $endDate->modify('+1 minutes');
+            }
+
+            $orderby = [
+                0 => 'timestamp',
+                1 => 'DESC',
+            ];
+
+            $leadTimeline       = $this->leadModel->getEngagements($lead, $filter, $orderby, 1, 255, false);
+            $totalSpentTime     = $event->getConfig()['accumulative_time'] ?? null;
+            $eventsLeadTimeline = $leadTimeline[0]['events'] ?? null;
+            if (!empty($eventsLeadTimeline)) {
+                foreach ($eventsLeadTimeline as $eventLeadTimeline) {
+                    $hit        = $eventLeadTimeline['details']['hit'] ?? null;
+                    $pageHitUrl = $hit['url'] ?? null;
+                    $pageId     = $hit['page_id'] ?? null;
+
+                    if (!empty($url)) {
+                        $pageUrl = html_entity_decode($pageHitUrl);
+                        if (fnmatch($url, $pageUrl)) {
+                            if ($hit['dateLeft'] && $totalSpentTime) {
+                                $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
+                                    (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                                if ($realTotalSpentTime >= $totalSpentTime) {
+                                    return $event->setResult(true);
+                                }
+                            } elseif (!$totalSpentTime) {
+                                return $event->setResult(true);
+                            }
+                        }
+                    }
+
+                    if (!empty($page) && (int) $page === (int) $pageId) {
+                        if ($hit['dateLeft'] && $totalSpentTime) {
+                            $realTotalSpentTime = (new \DateTime($hit['dateLeft']->format('Y-m-d H:i')))->getTimestamp() -
+                                (new \DateTime($hit['dateHit']->format('Y-m-d H:i')))->getTimestamp();
+                            if ($realTotalSpentTime >= $totalSpentTime) {
+                                return $event->setResult(true);
+                            }
+                        } elseif (!$totalSpentTime) {
+                            return $event->setResult(true);
+                        }
+                    }
+                }
             }
         }
 
