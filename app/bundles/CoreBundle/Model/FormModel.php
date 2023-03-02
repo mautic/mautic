@@ -241,7 +241,7 @@ class FormModel extends AbstractCommonModel
                     if (empty($changes)) {
                         $setDateModified = false;
                     }
-                    if (1 === count($changes) && isset($changes['dateLastActive'])) {
+                    if (is_array($changes) && 1 === count($changes) && isset($changes['dateLastActive'])) {
                         $setDateModified = false;
                     }
                 }
