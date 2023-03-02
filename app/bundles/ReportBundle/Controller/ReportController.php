@@ -109,7 +109,7 @@ class ReportController extends FormController
                     'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'security'    => $this->container->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:list.html.php',
+                'contentTemplate' => 'MauticReportBundle:Report:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
@@ -414,9 +414,9 @@ class ReportController extends FormController
             [
                 'viewParameters' => [
                     'report' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
+                    'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+                'contentTemplate' => 'MauticReportBundle:Report:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
@@ -518,9 +518,9 @@ class ReportController extends FormController
             [
                 'viewParameters' => [
                     'report' => $entity,
-                    'form'   => $this->setFormTheme($form, 'MauticReportBundle:Report:form.html.php', 'MauticReportBundle:FormTheme\Report'),
+                    'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:form.html.php',
+                'contentTemplate' => 'MauticReportBundle:Report:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
