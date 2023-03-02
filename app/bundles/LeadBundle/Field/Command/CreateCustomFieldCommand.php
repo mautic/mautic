@@ -8,6 +8,7 @@ use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\Field\BackgroundService;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
@@ -30,9 +31,10 @@ class CreateCustomFieldCommand extends ModeratedCommand
     public function __construct(
         BackgroundService $backgroundService,
         TranslatorInterface $translator,
-        LeadFieldRepository $leadFieldRepository
+        LeadFieldRepository $leadFieldRepository,
+        PathsHelper $pathsHelper
     ) {
-        parent::__construct();
+        parent::__construct($pathsHelper);
         $this->backgroundService   = $backgroundService;
         $this->translator          = $translator;
         $this->leadFieldRepository = $leadFieldRepository;
