@@ -5,8 +5,8 @@
         {%- set btnText = btnText|default('mautic.core.form.delete_selected'|trans) %}
         {%- set btnClass = btnClass|default('') %}
         {%- set confirmCallback = confirmCallback|default('executeBatchAction') %}
-        {%- set wrapOpeningTag = wrapOpeningTag|default('<li>') %}
-        {%- set wrapClosingTag = wrapClosingTag|default('</li>') %}
+        {% set wrapOpeningTag = wrapOpeningTag is defined ? wrapOpeningTag : '' %}
+        {% set wrapClosingTag = wrapClosingTag is defined ? wrapClosingTag : '' %}
         {%- set precheck = precheck|default('batchActionPrecheck') %}
     {%- elseif template is same as 'delete' %}
         {%- set confirmText = confirmText|default('mautic.core.form.delete'|trans) %}
@@ -38,7 +38,10 @@
     {%- set attr = attr|merge({'data-confirm-callback': confirmCallback}) %}
 {%- endif %}
 {%- if cancelText is not empty %}
-    {%- set attr = attr|merge({'data-confirm-text': cancelText|escape('js')}) %}
+    {%- set attr = attr|merge({'data-cancel-text': cancelText|escape('js')}) %}
+{%- endif %}
+{%- if confirmText is not empty %}
+    {%- set attr = attr|merge({'data-confirm-text': confirmText|escape('js')}) %}
 {%- endif %}
 {%- if cancelCallback is not empty %}
     {%- set attr = attr|merge({'data-cancel-callback': cancelCallback}) %}
