@@ -56,7 +56,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.email.form.action.sendemail.admin',
             'description'       => 'mautic.email.form.action.sendemail.admin.descr',
             'formType'          => FormSubmitActionUserEmailType::class,
-            'formTheme'         => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'formTheme'         => 'MauticEmailBundle:FormTheme:FormAction/_formaction_properties_useremail_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);
@@ -67,7 +67,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description'     => 'mautic.email.form.action.sendemail.lead.descr',
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'formaction_properties_email'],
-            'formTheme'       => 'MauticEmailBundle:FormTheme\EmailSendList',
+            'formTheme'       => 'MauticEmailBundle:FormTheme:EmailSendList/_emailsend_list_row.html.twig',
             'eventName'       => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
     }

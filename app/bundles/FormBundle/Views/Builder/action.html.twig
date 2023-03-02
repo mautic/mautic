@@ -1,0 +1,20 @@
+{% if formTheme is defined %}
+  {#
+    git grep 'FormBuilderEvent', there are various listeners
+    that set the form theme, all those need to be converted to use
+    twig files and not directories
+  #}
+  {% form_theme form formTheme %}
+{% endif %}
+<div class="bundle-form">
+    <div class="bundle-form-header">
+        <h3>{{ actionHeader|default('') }}</h3>
+    </div>
+    {{ form_start(form) }}
+    <div class="row pa-md">
+        {{ form_row(form.name) }}
+        {{ form_row(form.description) }}
+        {{ form_row(form.properties) }}
+    </div>
+    {{ form_end(form) }}
+</div>

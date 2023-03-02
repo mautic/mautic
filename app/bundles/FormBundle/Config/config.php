@@ -141,6 +141,9 @@ return [
                 'class'       => FieldType::class,
                 'arguments'   => [
                     'translator',
+                    'mautic.form.collector.object',
+                    'mautic.form.collector.field',
+                    'mautic.form.collector.already.mapped.field',
                 ],
                 'methodCalls' => [
                     'setFieldModel' => ['mautic.form.model.field'],
@@ -190,6 +193,7 @@ return [
                     'mautic.tracker.contact',
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
+                    'mautic.form.collector.mapped.object',
                 ],
             ],
             'mautic.form.model.submission' => [
@@ -234,6 +238,22 @@ return [
             ],
         ],
         'other' => [
+            'mautic.form.collector.object' => [
+                'class'     => \Mautic\FormBundle\Collector\ObjectCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.field' => [
+                'class'     => \Mautic\FormBundle\Collector\FieldCollector::class,
+                'arguments' => ['event_dispatcher'],
+            ],
+            'mautic.form.collector.mapped.object' => [
+                'class'     => \Mautic\FormBundle\Collector\MappedObjectCollector::class,
+                'arguments' => ['mautic.form.collector.field'],
+            ],
+            'mautic.form.collector.already.mapped.field' => [
+                'class'     => \Mautic\FormBundle\Collector\AlreadyMappedFieldCollector::class,
+                'arguments' => ['mautic.cache.provider'],
+            ],
             'mautic.helper.form.field_helper' => [
                 'class'     => FormFieldHelper::class,
                 'arguments' => [

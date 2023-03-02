@@ -18,10 +18,10 @@
             {{ 'mautic.email.timeline.event.not.read'|trans|raw }}
         {% else %}
             {{ ('mautic.email.timeline.event.' ~ event['extra']['type'])|trans({
-                    '%date%': dateToFull(event['timestamp']),
-                    '%interval%': dateFormatRange(event['timestamp']),
-                    '%sent%': dateToFull(item['dateSent']),
-            }) }}
+                    '%date%': dateToFull(event.timestamp),
+                    '%interval%': dateFormatRange(item.dateSent.diff(event.timestamp)),
+                    '%sent%': dateToFull(item.dateSent),
+            })|raw }}
         {% endif %}
 
         {% if item.viewedInBrowser is not empty and item.viewedInBrowser %}
