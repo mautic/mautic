@@ -22,16 +22,16 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return array<string, array<int, int|string>>
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_DISPLAY => ['onReportDisplay', 0],
         ];
     }
 
-    public function onReportDisplay(ReportDataEvent $event)
+    public function onReportDisplay(ReportDataEvent $event): void
     {
         if (!$this->useContactOrCompanyColumn($event->getReport()->getColumns())) {
             return;
@@ -49,6 +49,9 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
         $event->setData($rows);
     }
 
+    /**
+     * @param array<string> $columns
+     */
     protected function useContactOrCompanyColumn(array $columns): bool
     {
         foreach ($columns as $column) {
