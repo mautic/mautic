@@ -11,10 +11,10 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportGeneratorEvent extends AbstractReportEvent
 {
-    const CATEGORY_PREFIX    = 'c';
-    const CONTACT_PREFIX     = 'l';
-    const COMPANY_PREFIX     = 'comp';
-    const IP_ADDRESS_PREFIX  = 'i';
+    public const CATEGORY_PREFIX    = 'c';
+    public const CONTACT_PREFIX     = 'l';
+    public const COMPANY_PREFIX     = 'comp';
+    public const IP_ADDRESS_PREFIX  = 'i';
 
     /**
      * @var array
@@ -73,11 +73,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function getQueryBuilder()
     {
-        if ($this->queryBuilder instanceof QueryBuilder) {
-            return $this->queryBuilder;
-        }
-
-        throw new \RuntimeException('QueryBuilder not set.');
+        return $this->queryBuilder;
     }
 
     /**
@@ -106,7 +102,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         // Default content template
-        return 'MauticReportBundle:Report:details_data.html.php';
+        return 'MauticReportBundle:Report:details.html.twig';
     }
 
     /**

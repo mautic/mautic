@@ -15,22 +15,22 @@ abstract class AbstractFormFieldHelper
     /**
      * Json encoded format.
      */
-    const FORMAT_JSON = 'json';
+    public const FORMAT_JSON = 'json';
 
     /**
      * Bar format value1|value2.
      */
-    const FORMAT_BAR = 'bar';
+    public const FORMAT_BAR = 'bar';
 
     /**
      * Simple value => label array.
      */
-    const FORMAT_SIMPLE_ARRAY = 'simple_array';
+    public const FORMAT_SIMPLE_ARRAY = 'simple_array';
 
     /**
      * Array [['value' => 'value', 'label' => 'label'] ..].
      */
-    const FORMAT_ARRAY = 'array';
+    public const FORMAT_ARRAY = 'array';
 
     /**
      * @var string

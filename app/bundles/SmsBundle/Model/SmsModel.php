@@ -25,6 +25,10 @@ use Mautic\SmsBundle\SmsEvents;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Sms>
+ * @implements AjaxLookupModelInterface<Sms>
+ */
 class SmsModel extends FormModel implements AjaxLookupModelInterface
 {
     /**
@@ -90,8 +94,8 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     /**
      * Save an array of entities.
      *
-     * @param  $entities
-     * @param  $unlock
+     * @param iterable<Sms> $entities
+     * @param $unlock
      *
      * @return array
      */

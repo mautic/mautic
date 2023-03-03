@@ -65,7 +65,7 @@ class FieldPaginationController extends CommonController
         );
 
         $html = $this->render(
-            'IntegrationsBundle:Config:field_mapping.html.php',
+            'IntegrationsBundle:Config:field_mapping.html.twig',
             [
                 'form'        => $form->createView(),
                 'integration' => $integration,

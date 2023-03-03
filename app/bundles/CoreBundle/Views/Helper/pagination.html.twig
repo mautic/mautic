@@ -4,6 +4,9 @@
 {% if fixedPages is not defined or fixedPages is empty %}
     {% set limit = limit is not defined ? 30 : limit|int %}
     {% set totalPages = limit ? (totalItems / limit)|round(0, 'ceil') : 1 %}
+    {% if totalPages == 0 %}
+      {% set totalPages = 1 %}
+    {% endif %}
 {% else %}
     {# Fixed number of pages #}
     {% set limit = 1 %}
@@ -85,7 +88,7 @@
                 {% for i in startPage..lastPage %}
                     {% set action = getPaginationAction(i, (page != i|int), jsCallback, jsArguments, baseUrl, queryString) %}
                     {% set data = 'javascript:void(0);' in action ? '' : ' data-toggle="' ~ linkType ~ '" data-target="' ~ target ~ '"' ~ menuLink %}
-                
+
                     <li{% if page == i|int %} class="active"{% endif %}>
                         <a {{ (action ~ data ~ formExit)|raw }}>
                             <span>{{ i }}</span>

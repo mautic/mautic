@@ -6,24 +6,24 @@ namespace Mautic\IntegrationsBundle\Sync\DAO\Value;
 
 class NormalizedValueDAO
 {
-    const BOOLEAN_TYPE     = 'boolean';
-    const DATE_TYPE        = 'date';
-    const DATETIME_TYPE    = 'datetime';
-    const DOUBLE_TYPE      = 'double';
-    const EMAIL_TYPE       = 'email';
-    const FLOAT_TYPE       = 'float';
-    const INT_TYPE         = 'int';
-    const LOOKUP_TYPE      = 'lookup';
-    const MULTISELECT_TYPE = 'multiselect';
-    const PHONE_TYPE       = 'phone';
-    const SELECT_TYPE      = 'select';
-    const STRING_TYPE      = 'string';
-    const REGION_TYPE      = 'region';
-    const TEXT_TYPE        = 'text';
-    const TEXTAREA_TYPE    = 'textarea';
-    const TIME_TYPE        = 'time';
-    const URL_TYPE         = 'url';
-    const REFERENCE_TYPE   = 'reference';
+    public const BOOLEAN_TYPE     = 'boolean';
+    public const DATE_TYPE        = 'date';
+    public const DATETIME_TYPE    = 'datetime';
+    public const DOUBLE_TYPE      = 'double';
+    public const EMAIL_TYPE       = 'email';
+    public const FLOAT_TYPE       = 'float';
+    public const INT_TYPE         = 'int';
+    public const LOOKUP_TYPE      = 'lookup';
+    public const MULTISELECT_TYPE = 'multiselect';
+    public const PHONE_TYPE       = 'phone';
+    public const SELECT_TYPE      = 'select';
+    public const STRING_TYPE      = 'string';
+    public const REGION_TYPE      = 'region';
+    public const TEXT_TYPE        = 'text';
+    public const TEXTAREA_TYPE    = 'textarea';
+    public const TIME_TYPE        = 'time';
+    public const URL_TYPE         = 'url';
+    public const REFERENCE_TYPE   = 'reference';
 
     /**
      * @var string

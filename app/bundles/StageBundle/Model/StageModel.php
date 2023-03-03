@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class StageModel.
+ * @extends CommonFormModel<Stage>
  */
 class StageModel extends CommonFormModel
 {

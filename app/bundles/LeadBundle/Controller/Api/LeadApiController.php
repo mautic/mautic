@@ -10,16 +10,18 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Controller\LeadDetailsTrait;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * @property LeadModel $model
+ * @extends CommonApiController<Lead>
  */
 class LeadApiController extends CommonApiController
 {
@@ -27,11 +29,18 @@ class LeadApiController extends CommonApiController
     use FrequencyRuleTrait;
     use LeadDetailsTrait;
 
-    const MODEL_ID = 'lead.lead';
+    public const MODEL_ID = 'lead.lead';
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var LeadModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel(self::MODEL_ID);
+        $leadModel = $this->getModel(self::MODEL_ID);
+        \assert($leadModel instanceof LeadModel);
+        $this->model            = $leadModel;
         $this->entityClass      = Lead::class;
         $this->entityNameOne    = 'contact';
         $this->entityNameMulti  = 'contacts';
@@ -409,7 +418,7 @@ class LeadApiController extends CommonApiController
             return $this->returnError(
                 'Invalid reason code given',
                 Response::HTTP_BAD_REQUEST,
-                'Reason code needs to be an integer and higher than 0.'
+                ['Reason code needs to be an integer and higher than 0.']
             );
         }
 
@@ -460,9 +469,9 @@ class LeadApiController extends CommonApiController
     /**
      * Add/Remove a UTM Tagset to/from the contact.
      *
-     * @param int       $id
-     * @param string    $method
-     * @param array/int $data
+     * @param int              $id
+     * @param string           $method
+     * @param array<mixed>|int $data
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -566,7 +575,18 @@ class LeadApiController extends CommonApiController
         if ('edit' === $action) {
             // Merge existing duplicate contact based on unique fields if exist
             // new endpoints will leverage getNewEntity in order to return the correct status codes
-            $entity = $this->model->checkForDuplicateContact($this->entityRequestParameters, $entity);
+            $existingEntity = $this->model->checkForDuplicateContact($this->entityRequestParameters);
+            $contactMerger  = $this->get('mautic.lead.merger');
+            \assert($contactMerger instanceof ContactMerger);
+
+            if ($entity->getId() && $existingEntity->getId()) {
+                try {
+                    $entity = $contactMerger->merge($entity, $existingEntity);
+                } catch (SameContactException $exception) {
+                }
+            } elseif ($existingEntity->getId()) {
+                $entity = $existingEntity;
+            }
         }
 
         $manipulatorObject = $this->inBatchMode ? 'api-batch' : 'api-single';
@@ -649,7 +669,7 @@ class LeadApiController extends CommonApiController
             $viewParameters = [];
             $data           = $this->getFrequencyRuleFormData($entity, null, null, false, $parameters['frequencyRules']);
 
-            if (!$frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
+            if (true !== $frequencyForm = $this->getFrequencyRuleForm($entity, $viewParameters, $data)) {
                 $formErrors = $this->getFormErrorMessages($frequencyForm);
                 $msg        = $this->getFormErrorMessage($formErrors);
 

@@ -13,7 +13,7 @@ class ArrayListParser implements ListParserInterface
         }
 
         if (
-            isset($list[0])
+            array_key_exists(0, $list)
             && !is_array($list[0])
             && array_keys($list) === range(0, count($list) - 1)
         ) {

@@ -58,7 +58,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $options     = $input->getOptions();
         $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
@@ -187,7 +187,7 @@ EOT
         $this->completeRun();
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         return 0;

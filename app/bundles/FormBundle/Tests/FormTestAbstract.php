@@ -15,7 +15,10 @@ use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\FormRepository;
+use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\Event\Service\FieldValueTransformer;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\FormBundle\Helper\FormUploader;
@@ -24,6 +27,7 @@ use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\FormBundle\Model\SubmissionModel;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -33,8 +37,9 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\Service\DeviceTrackingService\DeviceTrackingServiceInterface;
 use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
-use Monolog\Logger;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -49,6 +54,16 @@ class FormTestAbstract extends TestCase
     protected $formRepository;
     protected $leadFieldModel;
 
+    /**
+     * @var MockObject|LeadModel
+     */
+    protected $leadModel;
+
+    /**
+     * @var MockObject|FormFieldHelper
+     */
+    protected $fieldHelper;
+
     protected function setUp(): void
     {
         $this->mockTrackingId = hash('sha1', uniqid((string) mt_rand()));
@@ -59,22 +74,24 @@ class FormTestAbstract extends TestCase
      */
     protected function getFormModel()
     {
-        $requestStack         = $this->createMock(RequestStack::class);
-        $templatingHelperMock = $this->createMock(TemplatingHelper::class);
-        $themeHelper          = $this->createMock(ThemeHelperInterface::class);
-        $formActionModel      = $this->createMock(ActionModel::class);
-        $formFieldModel       = $this->createMock(FieldModel::class);
-        $fieldHelper          = $this->createMock(FormFieldHelper::class);
-        $dispatcher           = $this->createMock(EventDispatcher::class);
-        $translator           = $this->createMock(Translator::class);
-        $entityManager        = $this->createMock(EntityManager::class);
-        $formUploaderMock     = $this->createMock(FormUploader::class);
-        $contactTracker       = $this->createMock(ContactTracker::class);
-        $this->leadFieldModel = $this->createMock(LeadFieldModel::class);
-        $this->formRepository = $this->createMock(FormRepository::class);
-        $columnSchemaHelper   = $this->createMock(ColumnSchemaHelper::class);
-        $tableSchemaHelper    = $this->createMock(TableSchemaHelper::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $requestStack          = $this->createMock(RequestStack::class);
+        $templatingHelperMock  = $this->createMock(TemplatingHelper::class);
+        $themeHelper           = $this->createMock(ThemeHelperInterface::class);
+        $formActionModel       = $this->createMock(ActionModel::class);
+        $formFieldModel        = $this->createMock(FieldModel::class);
+        $this->leadModel       = $this->createMock(LeadModel::class);
+        $this->fieldHelper     = $this->createMock(FormFieldHelper::class);
+        $dispatcher            = $this->createMock(EventDispatcher::class);
+        $translator            = $this->createMock(Translator::class);
+        $entityManager         = $this->createMock(EntityManager::class);
+        $formUploaderMock      = $this->createMock(FormUploader::class);
+        $contactTracker        = $this->createMock(ContactTracker::class);
+        $this->leadFieldModel  = $this->createMock(LeadFieldModel::class);
+        $this->formRepository  = $this->createMock(FormRepository::class);
+        $columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
+        $tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
+        $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
+        $coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
 
         $contactTracker->expects($this
             ->any())
@@ -105,12 +122,13 @@ class FormTestAbstract extends TestCase
             $themeHelper,
             $formActionModel,
             $formFieldModel,
-            $fieldHelper,
+            $this->fieldHelper,
             $this->leadFieldModel,
             $formUploaderMock,
             $contactTracker,
             $columnSchemaHelper,
             $tableSchemaHelper,
+            $mappedObjectCollector,
             $coreParametersHelper
         );
 
@@ -142,14 +160,15 @@ class FormTestAbstract extends TestCase
         $contactTracker           = $this->createMock(ContactTracker::class);
         $userHelper               = $this->createMock(UserHelper::class);
         $entityManager            = $this->createMock(EntityManager::class);
-        $formRepository           = $this->createMock(FormRepository::class);
+        $formRepository           = $this->createMock(SubmissionRepository::class);
         $leadRepository           = $this->createMock(LeadRepository::class);
-        $mockLogger               = $this->createMock(Logger::class);
+        $mockLogger               = $this->createMock(LoggerInterface::class);
         $uploadFieldValidatorMock = $this->createMock(UploadFieldValidator::class);
         $formUploaderMock         = $this->createMock(FormUploader::class);
         $deviceTrackingService    = $this->createMock(DeviceTrackingServiceInterface::class);
         $file1Mock                = $this->createMock(UploadedFile::class);
         $router                   = $this->createMock(RouterInterface::class);
+        $contactMerger            = $this->createMock(ContactMerger::class);
         $router->method('generate')->willReturn('absolute/path/somefile.jpg');
 
         $lead                     = new Lead();
@@ -187,8 +206,8 @@ class FormTestAbstract extends TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $leadRepository],
-                        ['MauticFormBundle:Submission', $formRepository],
+                        [Lead::class, $leadRepository],
+                        [Submission::class, $formRepository],
                     ]
                 )
             );
@@ -228,7 +247,8 @@ class FormTestAbstract extends TestCase
             $deviceTrackingService,
             new FieldValueTransformer($router),
             $dateHelper,
-            $contactTracker
+            $contactTracker,
+            $contactMerger
         );
         $submissionModel->setDispatcher($dispatcher);
         $submissionModel->setTranslator($translator);

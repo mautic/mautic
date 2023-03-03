@@ -8,6 +8,7 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\PointsChangeLog;
@@ -37,7 +38,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
-    const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
+    public const ACTION_LEAD_CHANGE_OWNER = 'lead.changeowner';
 
     /**
      * @var IpLookupHelper
@@ -113,6 +114,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 ['onCampaignTriggerActionChangeCompanyScore', 4],
                 ['onCampaignTriggerActionChangeOwner', 7],
                 ['onCampaignTriggerActionUpdateCompany', 8],
+                ['onCampaignTriggerActionSetManipulator', 100],
             ],
             LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition', 0],
         ];
@@ -144,7 +146,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.updatelead',
             'description' => 'mautic.lead.lead.events.updatelead_descr',
             'formType'    => UpdateLeadActionType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateLead',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:ActionUpdateLead/_updatelead_action_widget.html.twig',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.updatelead', $action);
@@ -153,7 +155,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.updatecompany',
             'description' => 'mautic.lead.lead.events.updatecompany_descr',
             'formType'    => UpdateCompanyActionType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ActionUpdateCompany',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:ActionUpdateCompany/_updatecompany_action_widget.html.twig',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
         ];
         $event->addAction('lead.updatecompany', $action);
@@ -194,7 +196,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.field_value',
             'description' => 'mautic.lead.lead.events.field_value_descr',
             'formType'    => CampaignEventLeadFieldValueType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\FieldValueCondition',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:FieldValueCondition/_campaignevent_lead_field_value_widget.html.twig',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
         $event->addCondition('lead.field_value', $trigger);
@@ -247,7 +249,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.events.campaigns',
             'description' => 'mautic.lead.lead.events.campaigns_descr',
             'formType'    => CampaignEventLeadCampaignsType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme\ContactCampaignsCondition',
+            'formTheme'   => 'MauticLeadBundle:FormTheme:ContactCampaignsCondition/_campaignevent_lead_campaigns_widget.html.twig',
             'eventName'   => LeadEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
         ];
 
@@ -509,12 +511,18 @@ class CampaignSubscriber implements EventSubscriberInterface
                     $lead->getId(),
                     $field,
                     $fieldValue,
-                    $operators[$event->getConfig()['operator']]['expr']
+                    $operators[$event->getConfig()['operator']]['expr'],
+                    $fields[$field]['type'] ?? null
                 );
             }
         }
 
         return $event->setResult($result);
+    }
+
+    public function onCampaignTriggerActionSetManipulator(CampaignExecutionEvent $event): void
+    {
+        $event->getLead()->setManipulator(new LeadManipulator('campaign', 'trigger-action'));
     }
 
     /**

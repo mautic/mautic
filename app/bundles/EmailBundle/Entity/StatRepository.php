@@ -8,6 +8,9 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
+/**
+ * @extends CommonRepository<Stat>
+ */
 class StatRepository extends CommonRepository
 {
     use TimelineTrait;

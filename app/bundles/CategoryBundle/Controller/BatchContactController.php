@@ -7,7 +7,7 @@ use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class BatchContactController extends AbstractFormController
 {
@@ -25,7 +25,7 @@ class BatchContactController extends AbstractFormController
      * Initialize object props here to simulate constructor
      * and make the future controller refactoring easier.
      */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->actionModel   = $this->container->get('mautic.category.model.contact.action');
         $this->categoryModel = $this->container->get('mautic.category.model.category');
@@ -89,7 +89,7 @@ class BatchContactController extends AbstractFormController
                         ]
                     )->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',

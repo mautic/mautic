@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\ArrayLinebreakTransformer;
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -28,6 +29,20 @@ class ConfigFormType extends AbstractType
                     'required' => false,
                 ]
             )->addViewTransformer($arrayLinebreakTransformer)
+        );
+
+        $builder->add(
+            'form_results_data_sources',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.form.config.form_results_data_sources',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.form.config.form_results_data_sources.tooltip',
+                ],
+                'data'       => isset($options['data']['form_results_data_sources']) && (bool) $options['data']['form_results_data_sources'],
+            ]
         );
 
         $builder->add(

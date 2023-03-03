@@ -63,7 +63,7 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');

@@ -2,6 +2,8 @@
 
 namespace Mautic\LeadBundle\Controller;
 
+use function assert;
+use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Form\Type\ContactFrequencyType;
@@ -27,7 +29,7 @@ trait FrequencyRuleTrait
      * @param null  $action
      * @param bool  $isPreferenceCenter
      *
-     * @return bool|Form
+     * @return true|Form
      */
     protected function getFrequencyRuleForm($lead, &$viewParameters = [], &$data = null, $isPublic = false, $action = null, $isPreferenceCenter = false)
     {
@@ -51,6 +53,7 @@ trait FrequencyRuleTrait
         $currentChannelId = null;
         if (!empty($viewParameters['idHash'])) {
             $emailModel = $this->getModel('email');
+            assert($emailModel instanceof EmailModel);
             if ($stat = $emailModel->getEmailStatus($viewParameters['idHash'])) {
                 if ($email = $stat->getEmail()) {
                     $currentChannelId = $email->getId();
@@ -158,8 +161,8 @@ trait FrequencyRuleTrait
         /** @var LeadModel $leadModel */
         $leadModel = $this->getModel('lead.lead');
 
-        /** @var \Mautic\LeadBundle\Model\DoNotContact $dncModel */
-        $dncModel = $this->getModel('lead.dnc');
+        $dncModel = $this->get('mautic.lead.model.dnc');
+        assert($dncModel instanceof \Mautic\LeadBundle\Model\DoNotContact);
 
         // iF subscribed_channels are enabled in form, then touch DNC
         if (isset($this->request->request->get('lead_contact_frequency_rules')['lead_channels'])) {

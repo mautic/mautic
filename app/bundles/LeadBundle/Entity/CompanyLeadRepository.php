@@ -4,6 +4,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<CompanyLead>
+ */
 class CompanyLeadRepository extends CommonRepository
 {
     /**
@@ -161,5 +164,16 @@ class CompanyLeadRepository extends CommonRepository
                 $q->expr()->in('id', $leadIds)
             )->execute();
         }
+    }
+
+    public function removeContactPrimaryCompany(int $leadId): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
+        $qb->where(
+            $qb->expr()->eq('lead_id', $leadId)
+        )->andWhere(
+            $qb->expr()->eq('is_primary', 1)
+        )->execute();
     }
 }

@@ -33,6 +33,8 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -50,6 +52,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+/**
+ * @extends CommonFormModel<Submission>
+ */
 class SubmissionModel extends CommonFormModel
 {
     /**
@@ -132,6 +137,8 @@ class SubmissionModel extends CommonFormModel
      */
     private $contactTracker;
 
+    private ContactMerger $contactMerger;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         TemplatingHelper $templatingHelper,
@@ -148,7 +155,8 @@ class SubmissionModel extends CommonFormModel
         DeviceTrackingServiceInterface $deviceTrackingService,
         FieldValueTransformer $fieldValueTransformer,
         DateHelper $dateHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        ContactMerger $contactMerger
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
         $this->templatingHelper       = $templatingHelper;
@@ -166,16 +174,15 @@ class SubmissionModel extends CommonFormModel
         $this->fieldValueTransformer  = $fieldValueTransformer;
         $this->dateHelper             = $dateHelper;
         $this->contactTracker         = $contactTracker;
+        $this->contactMerger          = $contactMerger;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return SubmissionRepository
-     */
-    public function getRepository()
+    public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository('MauticFormBundle:Submission');
+        $result = $this->em->getRepository(Submission::class);
+        \assert($result instanceof SubmissionRepository);
+
+        return $result;
     }
 
     /**
@@ -333,11 +340,11 @@ class SubmissionModel extends CommonFormModel
                 $validationErrors[$alias] = $isValid;
             }
 
-            $leadField = $f->getLeadField();
-            if (!empty($leadField)) {
+            $mappedField = $f->getMappedField();
+            if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
-                $leadFieldMatches[$leadField] = $leadValue;
+                $leadFieldMatches[$mappedField] = $leadValue;
             }
 
             $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
@@ -579,7 +586,7 @@ class SubmissionModel extends CommonFormModel
                 return $response;
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticFormBundle:Result:export.html.php',
+                    'MauticFormBundle:Result:export.html.twig',
                     [
                         'form'           => $form,
                         'results'        => $results,
@@ -733,7 +740,7 @@ class SubmissionModel extends CommonFormModel
                 return $response;
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticPageBundle:Result:export.html.php',
+                    'MauticPageBundle:Result:export.html.twig',
                     [
                         'page'      => $page,
                         'results'   => $results,
@@ -803,15 +810,15 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
+     * @param bool        $canViewOthers
      *
      * @return array
      */
     public function getSubmissionsLineChartData(
-        $unit,
+        ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
@@ -1050,7 +1057,10 @@ class SubmissionModel extends CommonFormModel
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
                 // Merge the found lead with currently tracked lead
-                $lead = $this->leadModel->mergeLeads($lead, $foundLead);
+                try {
+                    $lead = $this->contactMerger->merge($lead, $foundLead);
+                } catch (SameContactException $exception) {
+                }
             }
 
             // Update unique fields data for comparison with submitted data

@@ -13,12 +13,15 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Client>
+ */
 class ClientModel extends FormModel
 {
     /**
      * @var string
      */
-    const API_MODE_OAUTH2 = 'oauth2';
+    public const API_MODE_OAUTH2 = 'oauth2';
 
     /**
      * @var string

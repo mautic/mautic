@@ -17,7 +17,7 @@ class StatsCollectionHelper
 {
     use FilterTrait;
 
-    const GENERAL_STAT_PREFIX = 'email';
+    public const GENERAL_STAT_PREFIX = 'email';
 
     /**
      * @var StatHelperContainer

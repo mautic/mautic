@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -278,6 +279,7 @@ class AjaxController extends CommonController
                         $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
                         $model->getRepository()->saveEntity($entity);
                     } else {
+                        \assert($model instanceof FormModel);
                         $refresh = $model->togglePublishStatus($entity);
                     }
                     if (!empty($refresh)) {
@@ -289,7 +291,7 @@ class AjaxController extends CommonController
 
                         //get updated icon HTML
                         $html = $this->renderView(
-                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
                             [
                                 'item'          => $entity,
                                 'model'         => $name,
@@ -336,6 +338,7 @@ class AjaxController extends CommonController
             $checkedOut = $entity->getCheckedOutBy();
             if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+                \assert($model instanceof FormModel);
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
             }
@@ -353,7 +356,7 @@ class AjaxController extends CommonController
     {
         $dataArray = [
             'success' => 1,
-            'content' => $this->renderView('MauticCoreBundle:Update:update.html.php'),
+            'content' => $this->renderView('MauticCoreBundle:Update:update.html.twig'),
         ];
 
         // A way to keep the upgrade from failing if the session is lost after
@@ -801,13 +804,14 @@ class AjaxController extends CommonController
                 if ($ipService instanceof IpLookupFormInterface) {
                     if ($formType = $ipService->getConfigFormService()) {
                         $themes   = $ipService->getConfigFormThemes();
-                        $themes[] = 'MauticCoreBundle:FormTheme\Config';
+                        $themes[] = 'MauticCoreBundle:FormTheme:Config/config_layout.html.twig';
 
                         $form = $this->get('form.factory')->create($formType, [], ['ip_lookup_service' => $ipService]);
                         $html = $this->renderView(
-                            'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php',
+                            'MauticCoreBundle:FormTheme:Config/ip_lookup_config_row.html.twig',
                             [
-                                'form' => $this->setFormTheme($form, 'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php', $themes),
+                                'form'       => $form->createView(),
+                                'formThemes' => $themes,
                             ]
                         );
 

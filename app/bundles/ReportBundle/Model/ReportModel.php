@@ -32,11 +32,11 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class ReportModel.
+ * @extends FormModel<Report>
  */
 class ReportModel extends FormModel
 {
-    const CHANNEL_FEATURE = 'reporting';
+    public const CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array
@@ -140,7 +140,7 @@ class ReportModel extends FormModel
         }
 
         $options = array_merge($options, [
-            'table_list' => $this->getTableData(),
+            'table_list' => $this->getTableData('all', $entity->getSource()),
             'attr'       => [
                 'readonly' => false,
             ],
@@ -216,7 +216,7 @@ class ReportModel extends FormModel
      *
      * @return mixed
      */
-    public function buildAvailableReports($context)
+    public function buildAvailableReports($context, ?string $reportSource = null)
     {
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
@@ -227,7 +227,7 @@ class ReportModel extends FormModel
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
-                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
+                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
                 $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_BUILD);
 
                 $tables = $event->getTables();
@@ -262,9 +262,9 @@ class ReportModel extends FormModel
      *
      * @return array
      */
-    public function getTableData($context = 'all')
+    public function getTableData($context = 'all', ?string $reportSource = null)
     {
-        $data = $this->buildAvailableReports($context);
+        $data = $this->buildAvailableReports($context, $reportSource);
 
         $data = (!isset($data['tables'])) ? [] : $data['tables'];
 
@@ -449,16 +449,17 @@ class ReportModel extends FormModel
 
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.php',
+                    'MauticReportBundle:Report:export.html.twig',
                     [
-                        'reportData' => $reportData,
-                        'data'       => $reportData['data'],
-                        'columns'    => $reportData['columns'],
-                        'pageTitle'  => $name,
-                        'graphs'     => $reportData['graphs'],
-                        'report'     => $report,
-                        'dateFrom'   => $reportData['dateFrom'],
-                        'dateTo'     => $reportData['dateTo'],
+                        'reportData'       => $reportData,
+                        'data'             => $reportData['data'],
+                        'columns'          => $reportData['columns'],
+                        'pageTitle'        => $name,
+                        'graphs'           => $reportData['graphs'],
+                        'report'           => $report,
+                        'dateFrom'         => $reportData['dateFrom'],
+                        'dateTo'           => $reportData['dateTo'],
+                        'reportDataResult' => new ReportDataResult($reportData),
                     ]
                 )->getContent();
 

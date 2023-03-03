@@ -10,7 +10,7 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class InstallController extends CommonController
 {
@@ -20,10 +20,7 @@ class InstallController extends CommonController
     /** @var InstallService */
     private $installer;
 
-    /**
-     * Initialize controller.
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
         $this->configurator = $this->container->get('mautic.configurator');
         $this->installer    = $this->container->get('mautic.install.service');
@@ -195,7 +192,7 @@ class InstallController extends CommonController
                             'tmpl'        => $tmpl,
                         ],
                         'returnUrl'         => $this->generateUrl('mautic_installer_final'),
-                        'contentTemplate'   => 'MauticInstallBundle:Install:final.html.php',
+                        'contentTemplate'   => 'MauticInstallBundle:Install:final.html.twig',
                         'forwardController' => false,
                     ]
                 );
@@ -275,7 +272,7 @@ class InstallController extends CommonController
                     'version'     => MAUTIC_VERSION,
                     'tmpl'        => $tmpl,
                 ],
-                'contentTemplate' => 'MauticInstallBundle:Install:final.html.php',
+                'contentTemplate' => 'MauticInstallBundle:Install:final.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_installer_index',
                     'mauticContent' => 'installer',

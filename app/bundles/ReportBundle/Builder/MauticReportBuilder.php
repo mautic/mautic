@@ -17,7 +17,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * @var array
      */
-    const OPERATORS = [
+    public const OPERATORS = [
         'default' => [
             'eq'         => 'mautic.core.operator.equals',
             'gt'         => 'mautic.core.operator.greaterthan',
@@ -69,12 +69,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
     /**
      * Standard Channel Columns.
      */
-    const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
-    const CHANNEL_COLUMN_NAME            = 'channel.name';
-    const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
-    const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
-    const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
-    const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
+    public const CHANNEL_COLUMN_CATEGORY_ID     = 'channel.category_id';
+    public const CHANNEL_COLUMN_NAME            = 'channel.name';
+    public const CHANNEL_COLUMN_DESCRIPTION     = 'channel.description';
+    public const CHANNEL_COLUMN_DATE_ADDED      = 'channel.date_added';
+    public const CHANNEL_COLUMN_CREATED_BY      = 'channel.created_by';
+    public const CHANNEL_COLUMN_CREATED_BY_USER = 'channel.created_by_user';
 
     /**
      * @var Connection

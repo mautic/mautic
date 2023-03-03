@@ -1,0 +1,10 @@
+{% if showMore is defined %}
+    <a href="{{ url('mautic_campaign_index', {'search': searchString}) }}" data-toggle="ajax">
+        <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+    </a>
+</div>
+{% else %}
+<a href="{{ url('mautic_campaign_action', {'objectAction': 'view', 'objectId': campaign.id}) }}" data-toggle="ajax">
+    {{ campaign.name }}
+</a>
+{% endif %}
