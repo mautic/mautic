@@ -13,7 +13,7 @@
               {%- if form.webroot is defined %}<div class="col-md-6">{{ form_row(form.webroot) }}</div>{% endif %}
               {%- if form['404_page'] is defined %}<div class="col-md-6">{{ form_row(form['404_page']) }}</div>{% endif %}
               {%- if form.cache_path is defined %}<div class="col-md-6">{{ form_row(form.cache_path) }}</div>{% endif %}
-              {%- if form.lop_path is defined %}<div class="col-md-6">{{ form_row(form.lop_path) }}</div>{% endif %}
+              {%- if form.log_path is defined %}<div class="col-md-6">{{ form_row(form.log_path) }}</div>{% endif %}
               {%- if form.theme is defined %}<div class="col-md-6">{{ form_row(form.theme) }}</div>{% endif %}
               {%- if form.image_path is defined %}<div class="col-md-6">{{ form_row(form.image_path) }}</div>{% endif %}
               {%- if form.last_shown_tab is defined %}{{ form_row(form.last_shown_tab) }}{% endif %}
@@ -40,7 +40,7 @@
 
           <div class="row">
               {%- if form.date_format_full is defined %}<div class="col-md-6">{{ form_row(form.date_format_full) }}</div>{% endif %}
-              {%- if form.date_form_short is defined %}<div class="col-md-6">{{ form_row(form.date_form_short) }}</div>{% endif %}
+              {%- if form.date_format_short is defined %}<div class="col-md-6">{{ form_row(form.date_format_short) }}</div>{% endif %}
               {%- if form.date_format_dateonly is defined %}<div class="col-md-6">{{ form_row(form.date_format_dateonly) }}</div>{% endif %}
               {%- if form.date_format_timeonly is defined %}<div class="col-md-6">{{ form_row(form.date_format_timeonly) }}</div>{% endif %}
           </div>
