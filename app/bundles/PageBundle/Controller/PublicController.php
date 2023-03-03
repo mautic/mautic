@@ -580,10 +580,6 @@ class PublicController extends CommonFormController
 
                 $options['slot']   = $slot;
                 $options['public'] = true;
-
-                // Dead code? Templates do not exist
-                $renderingEngine = $this->container->get('templating')->getEngine('MauticPageBundle:Page:Slots/slideshow.html.twig');
-                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.twig', $options));
             } elseif (isset($slotConfig['type']) && 'textarea' == $slotConfig['type']) {
                 $value = isset($content[$slot]) ? nl2br($content[$slot]) : '';
                 $slotsHelper->set($slot, $value);
