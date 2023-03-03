@@ -73,7 +73,7 @@ trait CitrixStartTrait
                             ];
 
                             $button = $this->templating->render(
-                                'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
+                                'MauticCitrixBundle:SubscribedEvents:EmailToken:token.html.twig',
                                 $params
                             );
                             $content = str_replace('{'.$product.'_button}', $button, $content);

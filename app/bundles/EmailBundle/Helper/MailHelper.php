@@ -120,6 +120,8 @@ class MailHelper
      */
     protected $email;
 
+    protected ?string $emailType = null;
+
     /**
      * @var array
      */
@@ -1344,6 +1346,16 @@ class MailHelper
         $this->source = $source;
     }
 
+    public function getEmailType(): ?string
+    {
+        return $this->emailType;
+    }
+
+    public function setEmailType(?string $emailType): void
+    {
+        $this->emailType = $emailType;
+    }
+
     /**
      * @return Email|null
      */
@@ -1432,7 +1444,7 @@ class MailHelper
 
             $this->processSlots($slots, $email);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
                 'slots'    => $slots,
@@ -1505,6 +1517,12 @@ class MailHelper
     public function getCustomHeaders()
     {
         $headers = array_merge($this->headers, $this->getSystemHeaders());
+
+        // Personal and transactional emails do not contain unsubscribe header
+        $email = $this->getEmail();
+        if (empty($email) || 'transactional' === $this->getEmailType()) {
+            return $headers;
+        }
 
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {

@@ -161,7 +161,7 @@ class ResultController extends CommonFormController
                         $form->getCreatedBy()
                     ),
                 ],
-                'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
+                'contentTemplate' => 'MauticFormBundle:Result:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_form_index',
                     'mauticContent' => 'formresult',
