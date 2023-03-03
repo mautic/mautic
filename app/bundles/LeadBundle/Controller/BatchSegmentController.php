@@ -85,7 +85,7 @@ class BatchSegmentController extends AbstractFormController
                         ]
                     )->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',

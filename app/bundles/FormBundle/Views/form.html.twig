@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>{{ name }}</title>
+        {{ metaRobots|raw }}
+        {{ analyticsGetCode() }}
+        {% if stylesheets is defined and stylesheets is iterable %}
+        {% for css in stylesheets %}
+        <link rel="stylesheet" type="text/css" href="{{ css }}" />
+        {% endfor %}
+        {% endif %}
+    </head>
+    <body>
+        {{ content|raw }}
+    </body>
+</html>

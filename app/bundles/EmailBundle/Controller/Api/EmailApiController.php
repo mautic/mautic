@@ -162,6 +162,8 @@ class EmailApiController extends CommonApiController
                     'tokens'            => $cleanTokens,
                     'assetAttachments'  => $assetsIds,
                     'return_errors'     => true,
+                    'ignoreDNC'         => true,
+                    'email_type'        => 'transactional',
                 ]
             );
 
