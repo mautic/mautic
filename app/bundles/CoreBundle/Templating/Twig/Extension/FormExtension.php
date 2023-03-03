@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Templating\Helper\FormHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
@@ -12,13 +11,6 @@ use Twig\TwigFunction;
 
 class FormExtension extends AbstractExtension
 {
-    private FormHelper $formHelper;
-
-    public function __construct(FormHelper $formHelper)
-    {
-        $this->formHelper = $formHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
