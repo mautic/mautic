@@ -6,9 +6,9 @@ namespace Mautic\LeadBundle\Tests\Segment;
 
 use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData;
-use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData;
 use Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
@@ -46,7 +46,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
                 LoadCompanyData::class,
                 LoadLeadListData::class,
                 LoadLeadData::class,
-                LoadLeadFieldData::class,
+                LeadFieldData::class,
                 LoadPageHitData::class,
                 LoadSegmentsData::class,
                 LoadPageCategoryData::class,
@@ -124,6 +124,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             'tags-not-empty'                                                     => 2,
             'segment-having-company'                                             => 50,
             'segment-not-having-company'                                         => 4,
+            'has-email-and-visited-url'                                          => 4,
         ];
     }
 
@@ -178,6 +179,44 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
             11,
             $segmentContacts[$segmentTest40Ref->getId()]['count'],
             'There should be 11 contacts in the segment-test-include-segment-with-or segment after rebuilding from the command line.'
+        );
+
+        $segmentTest51Ref      = $this->getReference('has-email-and-visited-url');
+        $this->runCommand('mautic:segments:update', [
+            '-i'    => $segmentTest51Ref->getId(),
+            '--env' => 'test',
+        ]);
+
+        $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest51Ref);
+
+        $this->assertEquals(
+            4,
+            $segmentContacts[$segmentTest51Ref->getId()]['count'],
+            'There should be 4 contacts in the has-email-and-visited-url segment after rebuilding from the command line.'
+        );
+
+        // Change the url from page_hits with the right tracking_id, rebuild the list, and check that list is updated
+        $this->em->getConnection()->query(sprintf(
+            "UPDATE %spage_hits SET url = '%s' WHERE tracking_id = '%s';",
+            MAUTIC_TABLE_PREFIX,
+            'https://test/regex-segment-other.com',
+            'abcdr')
+        );
+
+        $this->runCommand(
+            'mautic:segments:update',
+            [
+                '-i'    => $segmentTest51Ref->getId(),
+                '--env' => 'test',
+            ]
+        );
+
+        $segmentContacts = $this->contactSegmentService->getTotalLeadListLeadsCount($segmentTest51Ref);
+
+        $this->assertEquals(
+            0,
+            $segmentContacts[$segmentTest51Ref->getId()]['count'],
+            'There should be no contacts in the has-email-and-visited-url segment after removing contact titles and rebuilding from the command line.'
         );
     }
 

@@ -82,14 +82,6 @@ class AggregatorType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
-    {
-        return 'aggregator';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

@@ -1,0 +1,7 @@
+<div class="textarea">
+    {{ textareaTemplate|replace({
+          ('properties_'~type~'_template'): 'properties',
+          'leadfield_properties': 'leadfield_properties_template',
+          'leadfield[properties]': 'leadfield[properties][allowHtml]',
+    })|raw }}
+</div>

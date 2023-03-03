@@ -118,7 +118,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'form.submissions',
-                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.php',
+                    'supportTemplate' => 'MauticPageBundle:SubscribedEvents\AbTest:bargraph.html.twig',
                 ]);
 
                 return;

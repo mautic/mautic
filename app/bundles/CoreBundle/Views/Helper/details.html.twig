@@ -1,0 +1,51 @@
+{% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
+{{ customContent('details.top', mauticTemplateVars) }}
+{% if attribute(entity, 'getCategory') is defined and method_exists(entity, 'getCategory') %}
+<tr>
+    <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.category{% endtrans %}</span></td>
+    <td>{{ entity.getCategory() is object ? entity.getCategory().getTitle() : 'mautic.core.form.uncategorized'|trans }}</td>
+</tr>
+{% endif %}
+
+{% if attribute(entity, 'getCreateByUser') is defined %}
+{% if entity.getCreatedByUser() %}
+<tr>
+    <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.createdby{% endtrans %}</span></td>
+    <td>{{ entity.getCreatedByUser() }}</td>
+</tr>
+{% endif %}
+<tr>
+    <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.created{% endtrans %}</span></td>
+    <td>{{ dateToFull(entity.getDateAdded()) }}</td>
+</tr>
+{% endif %}
+{% if attribute(entity, 'getModifiedByUser') is defined %}
+{% set modified = entity.getModifiedByUser() %}
+{% if modified %}
+    <tr>
+        <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.modifiedby{% endtrans %}</span></td>
+        <td>{{ entity.getModifiedByUser() }}</td>
+    </tr>
+    <tr>
+        <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.modified{% endtrans %}</span></td>
+        <td>{{ dateToFull(entity.getDateModified()) }}</td>
+    </tr>
+{% endif %}
+{% endif %}
+{% if attribute(entity, 'getPublishUp') is defined and method_exists(entity, 'getPublishUp') %}
+<tr>
+    <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.page.publish.up{% endtrans %}</span></td>
+    <td>{{ entity.getPublishUp() is not null ? dateToFull(entity.getPublishUp()) : dateToFull(entity.getDateAdded()) }}</td>
+</tr>
+<tr>
+    <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.page.publish.down{% endtrans %}</span></td>
+    <td>{{ entity.getPublishDown() is not null ? dateToFull(entity.getPublishDown()) : 'mautic.core.never'|trans }}</td>
+</tr>
+{% endif %}
+{% if attribute(entity, 'getId') is defined %}
+    <tr>
+        <td width="20%"><span class="fw-b textTitle">{% trans %}mautic.core.id{% endtrans %}</span></td>
+        <td>{{ entity.getId() }}</td>
+    </tr>
+{% endif %}
+{{ customContent('details.bottom', mauticTemplateVars) }}

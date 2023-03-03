@@ -14,6 +14,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
@@ -38,7 +39,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $statRepository;
 
     /**
-     * @var MockObject|GeneratedColumnsProviderInterface
+     * @var MockObject&GeneratedColumnsProviderInterface
      */
     private $generatedColumnsProvider;
 
@@ -57,10 +58,12 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $queryBuilder;
 
+    private ReportSubscriber $subscriber;
+
     /**
-     * @var ReportSubscriber
+     * @var MockObject|FieldsBuilder
      */
-    private $subscriber;
+    private $fieldsBuilderMock;
 
     protected function setUp(): void
     {
@@ -70,11 +73,13 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->companyReportDataMock    = $this->createMock(CompanyReportData::class);
         $this->statRepository           = $this->createMock(StatRepository::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
+        $this->fieldsBuilderMock        = $this->createMock(FieldsBuilder::class);
         $this->subscriber               = new ReportSubscriber(
             $this->connectionMock,
             $this->companyReportDataMock,
             $this->statRepository,
-            $this->generatedColumnsProvider
+            $this->generatedColumnsProvider,
+            $this->fieldsBuilderMock
         );
 
         $this->report            = $this->createMock(Report::class);

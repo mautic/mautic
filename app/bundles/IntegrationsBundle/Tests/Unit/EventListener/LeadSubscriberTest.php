@@ -434,7 +434,7 @@ class LeadSubscriberTest extends TestCase
 
         $this->fieldChangeRepository->expects($this->once())
             ->method('deleteEntitiesForObject')
-            ->with((int) $deletedId, MauticSyncDataExchange::OBJECT_COMPANY);
+            ->with((int) $deletedId, Company::class);
 
         $this->objectMappingRepository->expects($this->once())
             ->method('deleteEntitiesForObject')

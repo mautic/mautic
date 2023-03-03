@@ -5,7 +5,7 @@ namespace Mautic\WebhookBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class WebhookRepository.
+ * @extends CommonRepository<Webhook>
  */
 class WebhookRepository extends CommonRepository
 {
@@ -40,7 +40,7 @@ class WebhookRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

@@ -5,6 +5,7 @@ namespace Mautic\PointBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\PointBundle\Entity\TriggerEvent;
 use Mautic\PointBundle\Form\Type\TriggerEventType;
+use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -50,7 +51,10 @@ class TriggerEventController extends CommonFormController
         }
 
         //fire the builder event
-        $events = $this->getModel('point.trigger')->getEvents();
+        /** @var TriggerModel $pointTriggerModel */
+        $pointTriggerModel = $this->getModel('point.trigger');
+        \assert($pointTriggerModel instanceof TriggerModel);
+        $events = $pointTriggerModel->getEvents();
         $form   = $this->get('form.factory')->create(TriggerEventType::class, $triggerEvent, [
             'action'   => $this->generateUrl('mautic_pointtriggerevent_action', ['objectAction' => 'new']),
             'settings' => $events[$eventType],
@@ -86,12 +90,12 @@ class TriggerEventController extends CommonFormController
         if ($cancelled || $valid) {
             $closeModal = true;
         } else {
-            $form = (isset($triggerEvent['settings']['formTheme'])) ?
-                $this->setFormTheme($form, 'MauticPointBundle:Event:form.html.php', $triggerEvent['settings']['formTheme']) :
-                $form->createView();
+            if (isset($triggerEvent['settings']['formTheme'])) {
+                $viewParams['formTheme'] = $triggerEvent['settings']['formTheme'];
+            }
 
             $closeModal                = false;
-            $viewParams['form']        = $form;
+            $viewParams['form']        = $form->createView();
             $header                    = $triggerEvent['settings']['label'];
             $viewParams['eventHeader'] = $this->get('translator')->trans($header);
         }
@@ -108,7 +112,7 @@ class TriggerEventController extends CommonFormController
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
 
-            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.php'
+            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
             $passthroughVars['eventId']   = $keyId;
@@ -127,7 +131,7 @@ class TriggerEventController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticPointBundle:Event:form.html.php',
+            'contentTemplate' => 'MauticPointBundle:Event:form.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -152,8 +156,10 @@ class TriggerEventController extends CommonFormController
         $triggerEvent = array_key_exists($objectId, $events) ? $events[$objectId] : null;
 
         if (null !== $triggerEvent) {
-            $eventType                = $triggerEvent['type'];
-            $events                   = $this->getModel('point.trigger')->getEvents();
+            $eventType         = $triggerEvent['type'];
+            $pointTriggerModel = $this->getModel('point.trigger');
+            \assert($pointTriggerModel instanceof TriggerModel);
+            $events                   = $pointTriggerModel->getEvents();
             $triggerEvent['settings'] = $events[$eventType];
 
             //ajax only for form fields
@@ -203,12 +209,12 @@ class TriggerEventController extends CommonFormController
             if ($cancelled || $valid) {
                 $closeModal = true;
             } else {
-                $form = (isset($triggerEvent['settings']['formTheme'])) ?
-                    $this->setFormTheme($form, 'MauticPointBundle:Event:form.html.php', $triggerEvent['settings']['formTheme']) :
-                    $form->createView();
+                if (isset($triggerEvent['settings']['formTheme'])) {
+                    $viewParams['formTheme'] = $triggerEvent['settings']['formTheme'];
+                }
 
                 $closeModal                = false;
-                $viewParams['form']        = $form;
+                $viewParams['form']        = $form->createView();
                 $viewParams['eventHeader'] = $this->get('translator')->trans($triggerEvent['settings']['label']);
             }
 
@@ -225,7 +231,7 @@ class TriggerEventController extends CommonFormController
                 $entity       = new TriggerEvent();
                 $blank        = $entity->convertToArray();
                 $triggerEvent = array_merge($blank, $triggerEvent);
-                $template     = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.php'
+                $template     = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
                     : $triggerEvent['settings']['template'];
 
                 $passthroughVars['eventId']   = $keyId;
@@ -244,7 +250,7 @@ class TriggerEventController extends CommonFormController
             }
 
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticPointBundle:Event:form.html.php',
+                'contentTemplate' => 'MauticPointBundle:Event:form.html.twig',
                 'viewParameters'  => $viewParams,
                 'passthroughVars' => $passthroughVars,
             ]);
@@ -286,7 +292,7 @@ class TriggerEventController extends CommonFormController
                 $session->set('mautic.point.'.$triggerId.'.triggerevents.deleted', $delete);
             }
 
-            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.php'
+            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
             //prevent undefined errors
@@ -348,7 +354,7 @@ class TriggerEventController extends CommonFormController
                 $session->set('mautic.point.'.$triggerId.'.triggerevents.deleted', $delete);
             }
 
-            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.php'
+            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
             //prevent undefined errors

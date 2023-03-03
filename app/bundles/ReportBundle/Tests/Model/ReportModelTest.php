@@ -40,7 +40,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $mockDispatcher = $this->createMock(EventDispatcher::class);
         $mockDispatcher->method('dispatch')
             ->willReturnCallback(
-                function ($eventName, ReportBuilderEvent $event) {
+                function (ReportBuilderEvent $event) {
                     $reportBuilderData = Fixtures::getReportBuilderEventData();
                     $event->addTable('assets', $reportBuilderData['all']['tables']['assets']);
                 }
@@ -58,7 +58,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
     }
 
-    public function testGetColumnListWithContext()
+    public function testGetColumnListWithContext(): void
     {
         $properContextFormat = 'assets';
         $actual              = $this->reportModel->getColumnList($properContextFormat);

@@ -22,9 +22,9 @@ class ListController extends FormController
 {
     use EntityContactsTrait;
 
-    const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
+    public const ROUTE_SEGMENT_CONTACTS = 'mautic_segment_contacts';
 
-    const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
+    public const SEGMENT_CONTACT_FIELDS = ['id', 'company', 'city', 'state', 'country'];
 
     /**
      * @var array
@@ -132,12 +132,13 @@ class ListController extends FormController
             'currentUser'                    => $this->user,
             'searchValue'                    => $search,
             'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
+            'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
         ];
 
         return $this->delegateView(
             $this->getViewArguments([
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticLeadBundle:List:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:List:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
@@ -193,7 +194,7 @@ class ListController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect([
                     'returnUrl'       => $returnUrl,
                     'viewParameters'  => ['page' => $page],
@@ -210,9 +211,9 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
+                'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
+            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']),
@@ -326,7 +327,7 @@ class ListController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($this->isFormValid($form)) {
                     //form is valid so process the data
-                    $segmentModel->saveEntity($segment, $form->get('buttons')->get('save')->isClicked());
+                    $segmentModel->saveEntity($segment, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                     $this->addFlash('mautic.core.notice.updated', [
                         '%name%'      => $segment->getName().' ('.$segment->getAlias().')',
@@ -338,7 +339,7 @@ class ListController extends FormController
                     ]);
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.php';
+                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_segment_action', [
@@ -349,7 +350,7 @@ class ListController extends FormController
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
-                            'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
+                            'form'         => $form->createView(),
                         ];
 
                         return $this->postActionRedirect($postActionVars);
@@ -372,10 +373,10 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.php', 'MauticLeadBundle:FormTheme\Filter'),
+                'form'          => $form->createView(),
                 'currentListId' => $segment->getId(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.php',
+            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $action,
@@ -396,11 +397,11 @@ class ListController extends FormController
      */
     private function getSegment($segmentId)
     {
-        /** @var LeadList $segment */
+        /** @var LeadList|null $segment */
         $segment = $this->getModel('lead.list')->getEntity($segmentId);
 
         // Check if exists
-        if (!$segment instanceof LeadList) {
+        if (!$segment) {
             throw new EntityNotFoundException(sprintf('Segment with id %d not found.', $segmentId));
         }
 
@@ -810,7 +811,7 @@ class ListController extends FormController
                     ],
                 ],
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:details.html.php',
+            'contentTemplate' => 'MauticLeadBundle:List:details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',

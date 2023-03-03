@@ -35,7 +35,7 @@ class UpdateController extends CommonController
                 'currentVersion'    => MAUTIC_VERSION,
                 'isComposerEnabled' => $coreParametersHelper->get('composer_updates', false),
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:index.html.php',
+            'contentTemplate' => 'MauticCoreBundle:Update:index.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update'),
@@ -55,7 +55,7 @@ class UpdateController extends CommonController
         $result       = 0;
         $failed       = false;
         $noMigrations = true;
-        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
@@ -104,7 +104,7 @@ class UpdateController extends CommonController
                 'failed'       => $failed,
                 'noMigrations' => $noMigrations,
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:schema.html.php',
+            'contentTemplate' => 'MauticCoreBundle:Update:schema.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update_schema'),

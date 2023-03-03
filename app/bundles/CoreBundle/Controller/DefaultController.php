@@ -21,7 +21,7 @@ class DefaultController extends CommonController
         $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            return $this->redirectToRoute('mautic_dashboard_index');
         } else {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel = $this->getModel('page');
@@ -49,7 +49,7 @@ class DefaultController extends CommonController
 
         if (!empty($searchStr)) {
             $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-            $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+            $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
             $results = $event->getResults();
         } else {
             $results = [];

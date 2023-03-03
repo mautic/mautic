@@ -881,8 +881,8 @@ class MailHelperTest extends TestCase
 
         $eventDispatcher->expects(self::once())
             ->method('dispatch')
-            ->with(EmailEvents::EMAIL_ON_SEND, new EmailSendEvent($mailer))
-            ->willReturnCallback(static function (string $eventName, EmailSendEvent $event): object {
+            ->with(new EmailSendEvent($mailer), EmailEvents::EMAIL_ON_SEND)
+            ->willReturnCallback(static function (EmailSendEvent $event, string $eventName): object {
                 $event->addToken('{ token }', 'https://mautic.com/image.gif');
 
                 return $event;

@@ -33,11 +33,14 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<LeadList>
+ */
 class ListModel extends FormModel
 {
     use OperatorListTrait;
@@ -269,7 +272,7 @@ class ListModel extends FormModel
                 $event = new LeadListEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -303,7 +306,7 @@ class ListModel extends FormModel
         // Add custom choices
         if ($this->dispatcher->hasListeners(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE)) {
             $event = new LeadListFiltersChoicesEvent([], $this->getOperatorsForFieldType(), $this->translator, $this->requestStack->getCurrentRequest(), $search);
-            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE);
             $choices = $event->getChoices();
         }
 
@@ -354,8 +357,8 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param int  $limit
-     * @param bool $maxLeads
+     * @param int      $limit
+     * @param bool|int $maxLeads
      *
      * @return int
      *
@@ -373,7 +376,7 @@ class ListModel extends FormModel
         $list          = ['id' => $segmentId, 'filters' => $leadList->getFilters()];
 
         $this->dispatcher->dispatch(
-            LeadEvents::LIST_PRE_PROCESS_LIST, new ListPreProcessListEvent($list, false)
+            new ListPreProcessListEvent($list, false), LeadEvents::LIST_PRE_PROCESS_LIST
         );
 
         try {
@@ -449,8 +452,8 @@ class ListModel extends FormModel
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
-                        LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true)
+                        new ListChangeEvent($segmentId, $leadList, true),
+                        LeadEvents::LEAD_LIST_BATCH_CHANGE
                     );
                 }
 
@@ -528,8 +531,8 @@ class ListModel extends FormModel
                 // Dispatch batch event
                 if (count($processedLeads) && $this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
-                        LeadEvents::LEAD_LIST_BATCH_CHANGE,
-                        new ListChangeEvent($processedLeads, $leadList, false)
+                        new ListChangeEvent($processedLeads, $leadList, false),
+                        LeadEvents::LEAD_LIST_BATCH_CHANGE
                     );
                 }
 
@@ -565,7 +568,7 @@ class ListModel extends FormModel
     /**
      * Add lead to lists.
      *
-     * @param array|Lead     $lead
+     * @param array|int|Lead $lead
      * @param array|LeadList $lists
      * @param bool           $manuallyAdded
      * @param bool           $batchProcess
@@ -693,7 +696,7 @@ class ListModel extends FormModel
         } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId]);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+                $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
 
                 unset($event);
             }
@@ -819,7 +822,7 @@ class ListModel extends FormModel
         } elseif (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_CHANGE))) {
             foreach ($dispatchEvents as $listId) {
                 $event = new ListChangeEvent($lead, $this->leadChangeLists[$listId], false);
-                $this->dispatcher->dispatch(LeadEvents::LEAD_LIST_CHANGE, $event);
+                $this->dispatcher->dispatch($event, LeadEvents::LEAD_LIST_CHANGE);
 
                 unset($event);
             }

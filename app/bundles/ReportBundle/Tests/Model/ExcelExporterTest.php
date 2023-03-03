@@ -36,18 +36,21 @@ class ExcelExporterTest extends TestCase
                 'ID',
                 'Name',
                 'SUM Read',
+                'AVG Read',
                 'COUNT Contact ID',
             ],
             [
                 1,
                 'Email 1',
                 50,
+                0.5,
                 100,
             ],
             [
                 2,
                 'Email 2',
                 10,
+                0.1666,
                 60,
             ],
         ];

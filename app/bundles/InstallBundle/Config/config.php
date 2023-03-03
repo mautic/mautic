@@ -34,12 +34,12 @@ return [
             'mautic.install.fixture.lead_field' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'arguments' => ['translator'],
             ],
             'mautic.install.fixture.role' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\RoleData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => [],
+                'arguments' => ['translator'],
             ],
             'mautic.install.fixture.report_data' => [
                 'class'     => \Mautic\InstallBundle\InstallFixtures\ORM\LoadReportData::class,
@@ -52,41 +52,12 @@ return [
                 'arguments' => [],
             ],
         ],
-        'forms' => [
-            \Mautic\InstallBundle\Configurator\Form\CheckStepType::class => [
-                'class' => \Mautic\InstallBundle\Configurator\Form\CheckStepType::class,
-            ],
-            \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class => [
-                'class' => \Mautic\InstallBundle\Configurator\Form\DoctrineStepType::class,
-            ],
-            \Mautic\InstallBundle\Configurator\Form\EmailStepType::class => [
-                'class'     => \Mautic\InstallBundle\Configurator\Form\EmailStepType::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.email.transport_type',
-                ],
-            ],
-            \Mautic\InstallBundle\Configurator\Form\UserStepType::class => [
-                'class'     => \Mautic\InstallBundle\Configurator\Form\UserStepType::class,
-                'arguments' => ['session'],
-            ],
-        ],
-        'commands' => [
-            'mautic.install.command.install' => [
-                'tag'       => 'console.command',
-                'class'     => \Mautic\InstallBundle\Command\InstallCommand::class,
-                'arguments' => [
-                    'mautic.install.service',
-                    'doctrine',
-                ],
-            ],
-        ],
         'other' => [
             'mautic.install.configurator.step.check' => [
                 'class'     => \Mautic\InstallBundle\Configurator\Step\CheckStep::class,
                 'arguments' => [
                     'mautic.configurator',
-                    '%kernel.root_dir%',
+                    '%kernel.project_dir%',
                     'request_stack',
                     'mautic.cipher.openssl',
                 ],
@@ -133,7 +104,7 @@ return [
                     'kernel',
                     'validator',
                     'security.password_encoder',
-                    'service_container',
+                    'mautic.doctrine.loader.mautic_fixtures_loader',
                 ],
             ],
             'mautic.install.leadcolumns' => [

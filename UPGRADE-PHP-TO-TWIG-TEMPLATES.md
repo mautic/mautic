@@ -80,6 +80,7 @@ Becomes
 - If you extend `MauticCoreBundle:Default:content.html.twig`, everything HAS to be in blocks. Trying to put any HTML elements outside a block will fail with the following error:
 
     > A template that extends another one cannot include content outside Twig blocks.
+- If you need to extend a Twig template but also need to override variabes inside of it, you can use [Embed](https://twig.symfony.com/doc/3.x/tags/embed.html)(`embed`) instead. This tag combines the functionality of `include` and `extends`.
 - You're probably used to writing `if !empty($variable) {}` in PHP. That checks if the variable is set and whether it is not empty. In Twig, you explicity have to write `if variable is defined and variable is not empty`. It's a lot more descriptive. In some cases, you can use Twig's [default filter](https://twig.symfony.com/doc/3.x/filters/default.html), like:
 
     ```Twig
@@ -92,3 +93,18 @@ Becomes
     {% set nameGetter = nameGetter|default('getName') %}
 
     ```
+- Regarding the `default` filter: pay special attention to the [documented use case](https://twig.symfony.com/doc/3.x/filters/default.html) where false is treated as an empty value. Consider using `?? true` instead of `|default(true)` when using the default filter on a variable that could already have a boolean value set.
+- You can use text replacement with the `{% trans %}` tag as a built-in functionality:
+    ```
+    {% trans with {'%code%': status_code} %}message{% endtrans %}
+    ```
+    Alternatively, you can use the more compact `|trans` filter instead.:
+    ````
+    {{ message|trans({'%code%': status_code}) }}
+    ```    
+    The nice thing about using filters, is that you can chain them:
+    ```
+    {{ message|striptags|trans({'%code%': status_code}) }}
+    ```
+- [Symfony Best Practices for Templates](https://symfony.com/doc/current/best_practices.html#templates)
+- [Twig for Template Designers](https://twig.symfony.com/doc/3.x/templates.html) is a good overview on creating templates.

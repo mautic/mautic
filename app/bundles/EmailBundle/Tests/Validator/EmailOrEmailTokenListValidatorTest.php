@@ -13,7 +13,6 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Validator\CustomFieldValidator;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Context\ExecutionContext;
 
@@ -68,7 +67,7 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
             {
             }
 
-            public function dispatch($eventName, ?Event $event = null)
+            public function dispatch($event)
             {
                 return $event;
             }

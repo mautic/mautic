@@ -51,7 +51,7 @@ trait CustomFieldRepositoryTrait
             }
 
             //get a total count
-            $result = $dq->execute()->fetchAll();
+            $result = $dq->execute()->fetchAllAssociative();
             $total  = ($result) ? $result[0]['count'] : 0;
         } else {
             $total = $args['count'];
@@ -71,7 +71,7 @@ trait CustomFieldRepositoryTrait
             $dq->resetQueryPart('select');
             $this->buildSelectClause($dq, $args);
 
-            $results = $dq->execute()->fetchAll();
+            $results = $dq->execute()->fetchAllAssociative();
             if (isset($args['route']) && ListController::ROUTE_SEGMENT_CONTACTS == $args['route']) {
                 unset($args['select']); //Our purpose of getting list of ids has already accomplished. We no longer need this.
             }
@@ -125,7 +125,7 @@ trait CustomFieldRepositoryTrait
 
                 //ORM - generates lead entities
                 /** @var \Doctrine\ORM\QueryBuilder $q */
-                $q = $this->getEntitiesOrmQueryBuilder($order);
+                $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                 $this->buildSelectClause($dq, $args);
 
                 //only pull the leads as filtered via DBAL
@@ -429,10 +429,15 @@ trait CustomFieldRepositoryTrait
 
     public function getUniqueIdentifiersWherePart(): string
     {
-        if (CompositeExpression::TYPE_AND == $this->uniqueIdentifiersOperator) {
+        if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return 'andWhere';
         }
 
         return 'orWhere';
+    }
+
+    private function uniqueIdentifiersOperatorIs(string $operator): bool
+    {
+        return $this->uniqueIdentifiersOperator === $operator;
     }
 }

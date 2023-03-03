@@ -10,10 +10,13 @@ use MauticPlugin\MauticSocialBundle\Form\Type\MonitoringType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterHashtagType;
 use MauticPlugin\MauticSocialBundle\Form\Type\TwitterMentionType;
 use MauticPlugin\MauticSocialBundle\SocialEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Monitoring>
+ */
 class MonitoringModel extends FormModel
 {
     private $networkTypes = [
@@ -100,7 +103,7 @@ class MonitoringModel extends FormModel
                 $event = new Events\SocialEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

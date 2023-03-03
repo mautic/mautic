@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Remover
 {
-    const NAME = 'removed';
+    public const NAME = 'removed';
 
     /**
      * @var LeadRepository

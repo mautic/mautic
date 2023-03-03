@@ -45,9 +45,8 @@ trait FormThemeTrait
 
         $findThemes($form, $formView);
 
-        $themes   = (array) $themes;
-        $themes[] = 'MauticCoreBundle:FormTheme\Custom';
-        $themes   = array_values(array_unique(array_merge($themes, $fieldThemes)));
+        $themes = (array) $themes;
+        $themes = array_values(array_unique(array_merge($themes, $fieldThemes)));
 
         $templating->get('form')->setTheme($formView, $themes);
 

@@ -5,7 +5,9 @@ namespace Mautic\LeadBundle\Controller;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\LeadBundle\Entity\LeadNote;
+use Mautic\LeadBundle\Model\NoteModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class NoteController extends FormController
@@ -119,7 +121,7 @@ class NoteController extends FormController
                     'mauticContent' => 'leadNote',
                     'noteCount'     => count($items),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Note:list.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Note:list.html.twig',
             ]
         );
     }
@@ -142,7 +144,8 @@ class NoteController extends FormController
         $note = new LeadNote();
         $note->setLead($lead);
 
-        $model  = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $action = $this->generateUrl(
             'mautic_contactnote_action',
             [
@@ -155,7 +158,7 @@ class NoteController extends FormController
         $closeModal = false;
         $valid      = false;
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     $closeModal = true;
@@ -184,7 +187,7 @@ class NoteController extends FormController
             if ($valid && !$cancelled) {
                 $passthroughVars['upNoteCount'] = 1;
                 $passthroughVars['noteHtml']    = $this->renderView(
-                    'MauticLeadBundle:Note:note.html.php',
+                    'MauticLeadBundle:Note:note.html.twig',
                     [
                         'note'        => $note,
                         'lead'        => $lead,
@@ -203,7 +206,7 @@ class NoteController extends FormController
                         'lead'        => $lead,
                         'permissions' => $permissions,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.twig',
                 ]
             );
         }
@@ -224,7 +227,8 @@ class NoteController extends FormController
             return $lead;
         }
 
-        $model      = $this->getModel('lead.note');
+        $model = $this->getModel('lead.note');
+        \assert($model instanceof NoteModel);
         $note       = $model->getEntity($objectId);
         $closeModal = false;
         $valid      = false;
@@ -244,7 +248,7 @@ class NoteController extends FormController
         $form = $model->createForm($note, $this->get('form.factory'), $action);
 
         ///Check for a submitted form and process it
-        if ('POST' == $this->request->getMethod()) {
+        if (Request::METHOD_POST === $this->request->getMethod()) {
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
@@ -268,7 +272,7 @@ class NoteController extends FormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['noteHtml'] = $this->renderView(
-                    'MauticLeadBundle:Note:note.html.php',
+                    'MauticLeadBundle:Note:note.html.twig',
                     [
                         'note'        => $note,
                         'lead'        => $lead,
@@ -289,7 +293,7 @@ class NoteController extends FormController
                         'lead'        => $lead,
                         'permissions' => $permissions,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.twig',
                 ]
             );
         }
@@ -308,9 +312,9 @@ class NoteController extends FormController
         if ($lead instanceof Response) {
             return $lead;
         }
-
         $model = $this->getModel('lead.note');
-        $note  = $model->getEntity($objectId);
+        \assert($model instanceof NoteModel);
+        $note = $model->getEntity($objectId);
 
         if (null === $note) {
             return $this->notFound();

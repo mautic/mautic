@@ -416,14 +416,6 @@ class ReportType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'report';
-    }
-
-    /**
      * Extracts the keys from the table_list option and builds an array of tables for the select list.
      *
      * @param array $tables Array with the table list and columns

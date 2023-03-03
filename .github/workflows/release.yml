@@ -20,7 +20,7 @@ jobs:
       is-prerelease: ${{ steps.is-prerelease.outputs.is-prerelease }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       # Our build script needs access to all previous tags, so we add fetch-depth: 0
       with:
         fetch-depth: 0
@@ -28,12 +28,12 @@ jobs:
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Get tag name
       id: get-mautic-version
-      run: echo "::set-output name=version::${GITHUB_REF/refs\/tags\//}"
+      run: echo "version=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
     - name: Check if tag name matches version in release_metadata.json
       run: |
@@ -69,7 +69,7 @@ jobs:
           PRERELEASE=true
         fi
 
-        echo "::set-output name=is-prerelease::${PRERELEASE}"
+        echo "is-prerelease=${PRERELEASE}" >> $GITHUB_OUTPUT
 
     - name: Create Release
       id: create_release
@@ -107,13 +107,13 @@ jobs:
         asset_content_type: application/zip
 
     - name: Store full package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.get-mautic-version.outputs.version }}.zip
         path: ./build/packages/${{ steps.get-mautic-version.outputs.version }}.zip
 
     - name: Store update package artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: ${{ steps.get-mautic-version.outputs.version }}-update.zip
         path: ./build/packages/${{ steps.get-mautic-version.outputs.version }}-update.zip
@@ -135,16 +135,16 @@ jobs:
 
     steps:
     # We need this so we can get the local.php override file
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Download full installation package from previous step
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{ needs.release.outputs.mautic-version }}.zip
 
@@ -160,7 +160,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: install-logs
         path: ./mautic-testing/var/logs/*
@@ -182,7 +182,7 @@ jobs:
 
     steps:
       # We need this so we can get the local.php override file
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Get tag name and minimum Mautic version
       run: |
@@ -207,7 +207,7 @@ jobs:
         php bin/console mautic:install --force http://localhost
     
     - name: "Download update package artifact ${{ needs.release.outputs.mautic-version }}-update.zip"
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{ needs.release.outputs.mautic-version }}-update.zip
         path: ./mautic-testing
@@ -222,7 +222,7 @@ jobs:
 
     - name: Store log artifacts
       if: ${{ always() }}
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: update-logs
         path: ./mautic-testing/var/logs/*
@@ -235,12 +235,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Setup PHP, with composer and extensions
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
+        php-version: 8.0
         extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, mysql, pdo_mysql
 
     - name: Install dependencies
@@ -248,7 +248,7 @@ jobs:
       run: composer install --prefer-dist --no-progress
 
     - name: Download full installation package from previous step
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: ${{ needs.release.outputs.mautic-version }}.zip
 

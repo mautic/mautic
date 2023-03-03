@@ -8,10 +8,13 @@ use Mautic\FormBundle\Event\FormFieldEvent;
 use Mautic\FormBundle\Form\Type\FieldType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends CommonFormModel<Field>
+ */
 class FieldModel extends CommonFormModel
 {
     /**
@@ -35,36 +38,15 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * @param object                              $entity
+     * @param object|array<mixed>                 $entity
      * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param null                                $action
+     * @param string|null                         $action
      * @param array                               $options
      *
      * @return \Symfony\Component\Form\FormInterface
      */
     public function createForm($entity, $formFactory, $action = null, $options = [])
     {
-        list($fields, $choices)               = $this->getObjectFields('lead');
-        list($companyFields, $companyChoices) = $this->getObjectFields('company');
-
-        // Only show the lead fields not already used
-        $usedLeadFields   = $this->session->get('mautic.form.'.$entity['formId'].'.fields.leadfields', []);
-        $testLeadFields   = array_flip($usedLeadFields);
-        $currentLeadField = (isset($entity['leadField'])) ? $entity['leadField'] : null;
-        if (!empty($currentLeadField) && isset($testLeadFields[$currentLeadField])) {
-            unset($testLeadFields[$currentLeadField]);
-        }
-
-        foreach ($choices as &$group) {
-            $group = array_diff_key($group, $testLeadFields);
-        }
-
-        $options['leadFields']['lead']          = $choices;
-        $options['leadFieldProperties']['lead'] = $fields;
-
-        $options['leadFields']['company']          = $companyChoices;
-        $options['leadFieldProperties']['company'] = $companyFields;
-
         if ($action) {
             $options['action'] = $action;
         }
@@ -72,6 +54,9 @@ class FieldModel extends CommonFormModel
         return $formFactory->create(FieldType::class, $entity, $options);
     }
 
+    /**
+     * @deprecated to be removed in Mautic 4. This method is not used anymore.
+     */
     public function getObjectFields($object = 'lead')
     {
         $fields  = $this->leadFieldModel->getFieldListWithProperties($object);
@@ -91,8 +76,6 @@ class FieldModel extends CommonFormModel
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return \Mautic\FormBundle\Entity\FieldRepository
      */
     public function getRepository()
@@ -100,17 +83,11 @@ class FieldModel extends CommonFormModel
         return $this->em->getRepository('MauticFormBundle:Field');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPermissionBase()
     {
         return 'form:forms';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntity($id = null)
     {
         if (null === $id) {
@@ -201,7 +178,7 @@ class FieldModel extends CommonFormModel
                 $event = new FormFieldEvent($entity, $isNew);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

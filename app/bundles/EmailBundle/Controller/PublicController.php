@@ -13,8 +13,10 @@ use Mautic\EmailBundle\Event\TransportWebhookEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Swiftmailer\Transport\CallbackTransportInterface;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Controller\FrequencyRuleTrait;
 use Mautic\LeadBundle\Entity\DoNotContact;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
@@ -144,7 +146,8 @@ class PublicController extends CommonFormController
                 if (null != $unsubscribeForm && $unsubscribeForm->isPublished()) {
                     $formTemplate = $unsubscribeForm->getTemplate();
                     $formModel    = $this->getModel('form');
-                    $formContent  = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
+                    \assert($formModel instanceof FormModel);
+                    $formContent = '<div class="mautic-unsubscribeform">'.$formModel->getContent($unsubscribeForm).'</div>';
                 }
             }
         }
@@ -159,7 +162,7 @@ class PublicController extends CommonFormController
         if ($theme->getTheme() != $template) {
             $template = $theme->getTheme();
         }
-        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+        $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.twig');
         if (!empty($stat)) {
             $successSessionName = 'mautic.email.prefscenter.success';
 
@@ -192,6 +195,10 @@ class PublicController extends CommonFormController
                     'showContactSegments'          => $this->get('mautic.helper.core_parameters')->get('show_contact_segments'),
                 ];
 
+                if ($session->get($successSessionName)) {
+                    $viewParameters['successMessage'] = $this->translator->trans('mautic.email.preferences_center_success_message.text');
+                }
+
                 $form = $this->getFrequencyRuleForm($lead, $viewParameters, $data, true, $action, true);
                 if (true === $form) {
                     $session->set($successSessionName, 1);
@@ -203,6 +210,9 @@ class PublicController extends CommonFormController
                             'contentTemplate' => $contentTemplate,
                         ]
                     );
+                } else {
+                    // success message should not persist on page refresh
+                    $session->set($successSessionName, 0);
                 }
 
                 $formView = $form->createView();
@@ -232,7 +242,7 @@ class PublicController extends CommonFormController
                         // Replace tokens in preference center page
                         $event = new PageDisplayEvent($html, $prefCenter, $params);
                         $this->get('event_dispatcher')
-                            ->dispatch(PageEvents::PAGE_ON_DISPLAY, $event);
+                            ->dispatch($event, PageEvents::PAGE_ON_DISPLAY);
                         $html = $event->getContent();
                         if (!$session->has($successSessionName)) {
                             $successMessageDataSlots       = [
@@ -263,7 +273,7 @@ class PublicController extends CommonFormController
 
                 if (empty($html)) {
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
-                        'MauticEmailBundle:Lead:preference_options.html.php',
+                        'MauticEmailBundle:Lead:preference_options.html.twig',
                         array_merge(
                             $viewParameters,
                             [
@@ -297,7 +307,7 @@ class PublicController extends CommonFormController
         if (!empty($formContent)) {
             $viewParams['content'] = $formContent;
             if (in_array('form', $config['features'])) {
-                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.php');
+                $contentTemplate = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':form.html.twig');
             } else {
                 $viewParams['content'] = '';
                 $viewParams['message'] = $message.$formContent;
@@ -319,7 +329,8 @@ class PublicController extends CommonFormController
     {
         //find the email
         $model = $this->getModel('email');
-        $stat  = $model->getEmailStatus($idHash);
+        \assert($model instanceof EmailModel);
+        $stat = $model->getEmailStatus($idHash);
 
         if (!empty($stat)) {
             $email = $stat->getEmail();
@@ -367,7 +378,7 @@ class PublicController extends CommonFormController
             $message = $this->translator->trans('mautic.email.stat_record.not_found');
         }
 
-        $template = (null !== $email && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
+        $template = (!empty($email) && 'mautic_code_mode' !== $email->getTemplate()) ? $email->getTemplate() : $this->coreParametersHelper->get('theme');
 
         $theme = $this->factory->getTheme($template);
 
@@ -387,7 +398,7 @@ class PublicController extends CommonFormController
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
         }
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':message.html.twig');
 
         return $this->render(
             $logicalName,
@@ -419,7 +430,7 @@ class PublicController extends CommonFormController
         }
 
         $event = new TransportWebhookEvent($realTransport, $this->request);
-        $this->dispatcher->dispatch(EmailEvents::ON_TRANSPORT_WEBHOOK, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::ON_TRANSPORT_WEBHOOK);
 
         return new Response('success');
     }
@@ -468,7 +479,7 @@ class PublicController extends CommonFormController
 
             $this->processSlots($slots, $emailEntity);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.twig');
 
             $response = $this->render(
                 $logicalName,
@@ -516,7 +527,7 @@ class PublicController extends CommonFormController
                 'lead'         => $fields,
             ]
         );
-        $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $event);
+        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_ON_DISPLAY);
 
         $content = $event->getContent(true);
 
@@ -625,8 +636,10 @@ class PublicController extends CommonFormController
         $model = $this->getModel('email');
 
         // email is a semicolon delimited list of emails
-        $emails = explode(';', $query['email']);
-        $repo   = $this->getModel('lead')->getRepository();
+        $emails    = explode(';', $query['email']);
+        $leadModel = $this->getModel('lead');
+        \assert($leadModel instanceof LeadModel);
+        $repo = $leadModel->getRepository();
 
         foreach ($emails as $email) {
             $lead = $repo->getLeadByEmail($email);
@@ -715,6 +728,7 @@ class PublicController extends CommonFormController
     private function createLead($email, $repo)
     {
         $model = $this->getModel('lead.lead');
+        \assert($model instanceof LeadModel);
         $lead  = $model->getEntity();
         // set custom field values
         $data = ['email' => $email];

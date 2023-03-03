@@ -75,7 +75,7 @@ class ConfigController extends AbstractFormController
 
         $dispatcher = $this->get('event_dispatcher');
         $event      = new FormLoadEvent($this->integrationConfiguration);
-        $dispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD, $event);
+        $dispatcher->dispatch($event, IntegrationEvents::INTEGRATION_CONFIG_FORM_LOAD);
 
         // Set the request for private methods
         $this->request = $request;
@@ -135,7 +135,7 @@ class ConfigController extends AbstractFormController
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $this->get('event_dispatcher');
         $configEvent     = new ConfigSaveEvent($this->integrationConfiguration);
-        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE, $configEvent);
+        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_BEFORE_SAVE);
 
         // Show the form if there are errors and the plugin is published or the authorized button was clicked
         $integrationDetailsPost = $this->request->request->get('integration_details', []);
@@ -148,7 +148,7 @@ class ConfigController extends AbstractFormController
         $this->integrationsHelper->saveIntegrationConfiguration($this->integrationConfiguration);
 
         // Dispatch after save event
-        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE, $configEvent);
+        $eventDispatcher->dispatch($configEvent, IntegrationEvents::INTEGRATION_CONFIG_AFTER_SAVE);
 
         // Show the form if the apply button was clicked
         if ($this->isFormApplied($form)) {
@@ -184,7 +184,7 @@ class ConfigController extends AbstractFormController
     private function showForm(Form $form)
     {
         $integrationObject = $this->integrationObject;
-        $form              = $this->setFormTheme($form, 'IntegrationsBundle:Config:form.html.php');
+        $form              = $form->createView();
         $formHelper        = $this->get('templating.helper.form');
 
         $showFeaturesTab =
@@ -227,7 +227,7 @@ class ConfigController extends AbstractFormController
                     'callbackUrl'         => $callbackUrl,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
-                    ?: 'IntegrationsBundle:Config:form.html.php',
+                    ?: 'IntegrationsBundle:Config:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',
@@ -249,6 +249,7 @@ class ConfigController extends AbstractFormController
             'enabled'       => $this->integrationConfiguration->getIsPublished(),
             'name'          => $this->integrationConfiguration->getName(),
             'mauticContent' => 'integrationsConfig',
+            'flashes'       => $this->getFlashContent(),
         ];
 
         if ($this->integrationObject instanceof ConfigFormAuthorizeButtonInterface) {
