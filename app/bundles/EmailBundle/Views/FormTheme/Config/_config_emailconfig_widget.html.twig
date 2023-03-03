@@ -82,7 +82,11 @@
             {% endif %}
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_custom_headers', template) }}
+                {% if form.mailer_custom_headers is defined %}
+                  <div class="col-md-6">
+                    {{ form_row(form.mailer_custom_headers) }}
+                  </div>
+                {% endif %}
             </div>
 
             {% if fields.mailer_transport is defined %}
