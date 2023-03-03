@@ -69,14 +69,14 @@
   "repositories": [
     {
       "type": "git",
-      "url": "https://github.com/dennisameling/FOSOAuthServerBundle.git"
+      "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
     },
     {
         "type": "path",
         "url": "../app",
         "options": {
             "versions": {
-                "mautic/core-lib": "4.x-dev"
+                "mautic/core-lib": "5.x-dev"
             },
             "symlink": false
         }
@@ -110,7 +110,8 @@
       "composer/package-versions-deprecated": true,
       "symfony/flex": true,
       "mautic/core-composer-scaffold": true,
-      "mautic/core-project-message": true
+      "mautic/core-project-message": true,
+      "php-http/discovery": true
     }
   },
   "autoload": {

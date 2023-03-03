@@ -77,7 +77,7 @@ class ActionDispatcher
 
         // this if statement can be removed when legacy dispatcher is removed
         if ($customEvent = $config->getBatchEventName()) {
-            $this->dispatcher->dispatch($customEvent, $pendingEvent);
+            $this->dispatcher->dispatch($pendingEvent, $customEvent);
 
             $success = $pendingEvent->getSuccessful();
             $failed  = $pendingEvent->getFailures();
@@ -111,14 +111,14 @@ class ActionDispatcher
 
         foreach ($logs as $log) {
             $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_EXECUTED,
-                new ExecutedEvent($config, $log)
+                new ExecutedEvent($config, $log),
+                CampaignEvents::ON_EVENT_EXECUTED
             );
         }
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
-            new ExecutedBatchEvent($config, $event, $logs)
+            new ExecutedBatchEvent($config, $event, $logs),
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH
         );
     }
 
@@ -135,8 +135,8 @@ class ActionDispatcher
             );
 
             $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_FAILED,
-                new FailedEvent($config, $log)
+                new FailedEvent($config, $log),
+                CampaignEvents::ON_EVENT_FAILED
             );
 
             $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());

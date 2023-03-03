@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\UpdateHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLocalDataLookup;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
@@ -78,12 +79,10 @@ class AjaxController extends CommonController
                 //call the specified bundle's ajax action
                 $parts     = explode(':', $action);
                 $namespace = 'Mautic';
-                $isPlugin  = false;
 
                 if (3 == count($parts) && 'plugin' == $parts['0']) {
                     $namespace = 'MauticPlugin';
                     array_shift($parts);
-                    $isPlugin = true;
                 }
 
                 if (2 == count($parts)) {
@@ -95,13 +94,11 @@ class AjaxController extends CommonController
                         // Check if a plugin is prefixed with Mautic
                         $bundle      = 'Mautic'.$bundle;
                         $classExists = class_exists($namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController');
-                    } elseif (!$isPlugin && 'Marketplace' !== $bundle) {
-                        $bundle = 'Mautic'.$bundle;
                     }
 
                     if ($classExists) {
                         return $this->forward(
-                            "{$bundle}Bundle:Ajax:executeAjax",
+                            $namespace.'\\'.$bundle.'Bundle\\Controller\\AjaxController::executeAjaxAction',
                             [
                                 'action' => $action,
                                 //forward the request as well as Symfony creates a subrequest without GET/POST
@@ -144,7 +141,7 @@ class AjaxController extends CommonController
         $this->get('session')->set('mautic.global_search', $searchStr);
 
         $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-        $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+        $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
 
         $dataArray['newContent'] = $this->renderView(
             'MauticCoreBundle:GlobalSearch:results.html.php',
@@ -190,7 +187,7 @@ class AjaxController extends CommonController
     {
         $dispatcher = $this->get('event_dispatcher');
         $event      = new CommandListEvent();
-        $dispatcher->dispatch(CoreEvents::BUILD_COMMAND_LIST, $event);
+        $dispatcher->dispatch($event, CoreEvents::BUILD_COMMAND_LIST);
         $allCommands = $event->getCommands();
         $translator  = $this->get('translator');
         $dataArray   = [];
@@ -282,6 +279,7 @@ class AjaxController extends CommonController
                         $accessor->setValue($entity, $customToggle, !$accessor->getValue($entity, $customToggle));
                         $model->getRepository()->saveEntity($entity);
                     } else {
+                        \assert($model instanceof FormModel);
                         $refresh = $model->togglePublishStatus($entity);
                     }
                     if (!empty($refresh)) {
@@ -293,7 +291,7 @@ class AjaxController extends CommonController
 
                         //get updated icon HTML
                         $html = $this->renderView(
-                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
                             [
                                 'item'          => $entity,
                                 'model'         => $name,
@@ -340,6 +338,7 @@ class AjaxController extends CommonController
             $checkedOut = $entity->getCheckedOutBy();
             if (null !== $entity && !empty($checkedOut) && $checkedOut === $currentUser->getId()) {
                 //entity exists, is checked out, and is checked out by the current user so go ahead and unlock
+                \assert($model instanceof FormModel);
                 $model->unlockEntity($entity, $extra);
                 $dataArray['success'] = 1;
             }
@@ -357,7 +356,7 @@ class AjaxController extends CommonController
     {
         $dataArray = [
             'success' => 1,
-            'content' => $this->renderView('MauticCoreBundle:Update:update.html.php'),
+            'content' => $this->renderView('MauticCoreBundle:Update:update.html.twig'),
         ];
 
         // A way to keep the upgrade from failing if the session is lost after
@@ -519,7 +518,7 @@ class AjaxController extends CommonController
             $cookieHelper->deleteCookie('mautic_update');
         } else {
             // Extract the archive file now
-            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+            if (!$zipper->extractTo(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade')) {
                 $dataArray['stepStatus'] = $translator->trans('mautic.core.update.step.failed');
                 $dataArray['message']    = $translator->trans(
                     'mautic.core.update.error',
@@ -554,9 +553,9 @@ class AjaxController extends CommonController
         $result     = 0;
 
         // Also do the last bit of filesystem cleanup from the upgrade here
-        if (is_dir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade')) {
+        if (is_dir(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade')) {
             $iterator = new \FilesystemIterator(
-                dirname($this->container->getParameter('kernel.root_dir')).'/upgrade', \FilesystemIterator::SKIP_DOTS
+                dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade', \FilesystemIterator::SKIP_DOTS
             );
 
             /** @var \FilesystemIterator $file */
@@ -568,7 +567,7 @@ class AjaxController extends CommonController
             }
 
             // Should be empty now, nuke the folder
-            @rmdir(dirname($this->container->getParameter('kernel.root_dir')).'/upgrade');
+            @rmdir(dirname($this->container->getParameter('kernel.project_dir')).'/app/upgrade');
         }
 
         $cacheDir = $this->container->get('mautic.helper.paths')->getSystemPath('cache');
@@ -610,7 +609,7 @@ class AjaxController extends CommonController
             }
         }
 
-        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.root_dir').'/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
@@ -627,7 +626,7 @@ class AjaxController extends CommonController
             $minExecutionTime = 300;
             $maxExecutionTime = (int) ini_get('max_execution_time');
             if ($maxExecutionTime > 0 && $maxExecutionTime < $minExecutionTime) {
-                ini_set('max_execution_time', $minExecutionTime);
+                ini_set('max_execution_time', "$minExecutionTime");
             }
 
             $result = $application->run($input, $output);
@@ -696,7 +695,7 @@ class AjaxController extends CommonController
         }
 
         // Execute the mautic.post_upgrade event
-        $this->dispatcher->dispatch(CoreEvents::POST_UPGRADE, new UpgradeEvent($dataArray));
+        $this->dispatcher->dispatch(new UpgradeEvent($dataArray), CoreEvents::POST_UPGRADE);
 
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
@@ -805,13 +804,14 @@ class AjaxController extends CommonController
                 if ($ipService instanceof IpLookupFormInterface) {
                     if ($formType = $ipService->getConfigFormService()) {
                         $themes   = $ipService->getConfigFormThemes();
-                        $themes[] = 'MauticCoreBundle:FormTheme\Config';
+                        $themes[] = 'MauticCoreBundle:FormTheme:Config/config_layout.html.twig';
 
                         $form = $this->get('form.factory')->create($formType, [], ['ip_lookup_service' => $ipService]);
                         $html = $this->renderView(
-                            'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php',
+                            'MauticCoreBundle:FormTheme:Config/ip_lookup_config_row.html.twig',
                             [
-                                'form' => $this->setFormTheme($form, 'MauticCoreBundle:FormTheme\Config:ip_lookup_config_row.html.php', $themes),
+                                'form'       => $form->createView(),
+                                'formThemes' => $themes,
                             ]
                         );
 

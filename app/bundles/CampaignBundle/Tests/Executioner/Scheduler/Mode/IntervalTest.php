@@ -497,4 +497,48 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
 
         return new Interval(new NullLogger(), $coreParametersHelper);
     }
+
+    public function testExecutionDateIsValidatedAsExpectedWithStartHourAndDaylightSavingsTimeChange(): void
+    {
+        $campaign = $this->createMock(Campaign::class);
+        $campaign->method('getId')
+                 ->willReturn(1);
+
+        $event = $this->createMock(Event::class);
+        $event->method('getTriggerMode')
+              ->willReturn(Event::TRIGGER_MODE_INTERVAL);
+        $event->method('getTriggerInterval')
+              ->willReturn(15);
+        $event->method('getTriggerIntervalUnit')
+              ->willReturn('D');
+        $event->method('getTriggerRestrictedStartHour')
+              ->willReturn(new \DateTime('1970-01-01 08:00:00'));
+        $event->method('getTriggerRestrictedStopHour')
+              ->willReturn(new \DateTime('1970-01-01 20:00:00'));
+        $event->method('getTriggerRestrictedDaysOfWeek')
+              ->willReturn([]);
+        $event->method('getCampaign')
+              ->willReturn($campaign);
+
+        $contact1 = $this->createMock(Lead::class);
+        $contact1->method('getId')
+                 ->willReturn(1);
+        $contact1->method('getTimezone')
+                 ->willReturn('America/New_York');
+
+        $log = new LeadEventLog();
+        $log->setCampaign($campaign);
+        $log->setEvent($event);
+        $log->setLead($contact1);
+        $log->setDateTriggered(new \DateTime('2021-10-24 17:00:00'));
+        $log->setTriggerDate(new \DateTime('2021-12-08 17:00:00'));
+        $log->setIsScheduled(true);
+
+        $interval = $this->getInterval();
+
+        $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime('2021-11-08 17:00:00'));
+        $executionDate->setTimezone(new \DateTimeZone('UTC'));
+
+        $this->assertEquals('2021-11-08 17:00', $executionDate->format('Y-m-d H:i'));
+    }
 }

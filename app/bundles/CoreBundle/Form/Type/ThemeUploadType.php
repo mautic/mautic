@@ -43,12 +43,4 @@ class ThemeUploadType extends AbstractType
             $builder->setAction($options['action']);
         }
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'theme_upload';
-    }
 }

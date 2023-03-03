@@ -8,9 +8,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\CustomFieldRepositoryTrait;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -19,38 +18,15 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MockObject|EntityManagerInterface
-     */
-    private $entityManager;
+    use RepositoryConfiguratorTrait;
 
-    /**
-     * @var MockObject|ClassMetadata
-     */
-    private $classMetadata;
-
-    /**
-     * @var MockObject|Connection
-     */
-    private $connection;
-
-    /**
-     * @var LeadRepository
-     */
-    private $repository;
+    private LeadRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->classMetadata = $this->createMock(ClassMetadata::class);
-        $this->connection    = $this->createMock(Connection::class);
-        $this->repository    = new LeadRepository($this->entityManager, $this->classMetadata);
-
-        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $this->repository = $this->configureRepository(Lead::class);
     }
 
     public function testBooleanWithPrepareDbalFieldsForSave(): void
@@ -137,16 +113,16 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testApplySearchQueryRelationshipJoinOnlyOnce(): void
     {
         $queryBuilder = new QueryBuilder($this->connection);
-        $queryBuilder->select('*')->from('table_a');
+        $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX.'table_a');
         $tableB = [
             'alias'      => 'alias_b',
-            'from_alias' => 'table_a',
+            'from_alias' => MAUTIC_TABLE_PREFIX.'table_a',
             'table'      => 'table_b',
             'condition'  => 'condition_b',
         ];
         $tableC = [
             'alias'      => 'alias_c',
-            'from_alias' => 'table_a',
+            'from_alias' => MAUTIC_TABLE_PREFIX.'table_a',
             'table'      => 'table_c',
             'condition'  => 'condition_c',
         ];
@@ -158,7 +134,7 @@ class LeadRepositoryTest extends \PHPUnit\Framework\TestCase
         );
 
         Assert::assertSame(
-            'SELECT * FROM table_a INNER JOIN table_b alias_b ON condition_b INNER JOIN table_c alias_c ON condition_c GROUP BY l.id',
+            'SELECT * FROM '.MAUTIC_TABLE_PREFIX.'table_a INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_b alias_b ON condition_b INNER JOIN '.MAUTIC_TABLE_PREFIX.'table_c alias_c ON condition_c GROUP BY l.id',
             $queryBuilder->getSQL()
         );
     }

@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Event\StatsEvent;
 use Mautic\CoreBundle\Helper\InputHelper;
 
 /**
- * Class StatsApiController.
+ * @extends CommonApiController<object>
  */
 class StatsApiController extends CommonApiController
 {
@@ -35,7 +35,7 @@ class StatsApiController extends CommonApiController
 
         try {
             $event = new StatsEvent($table, $start, $limit, $order, $where, $this->get('mautic.helper.user')->getUser());
-            $this->get('event_dispatcher')->dispatch(CoreEvents::LIST_STATS, $event);
+            $this->get('event_dispatcher')->dispatch($event, CoreEvents::LIST_STATS);
 
             // Return available tables if no result was set
             if (!$event->hasResults()) {

@@ -12,15 +12,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConfigType extends AbstractType
 {
-    /**
-     * @var RestrictionHelper
-     */
-    private $restrictionHelper;
+    private RestrictionHelper $restrictionHelper;
 
-    /**
-     * @var EscapeTransformer
-     */
-    private $escapeTransformer;
+    private EscapeTransformer $escapeTransformer;
 
     public function __construct(RestrictionHelper $restrictionHelper, EscapeTransformer $escapeTransformer)
     {
@@ -28,9 +22,6 @@ class ConfigType extends AbstractType
         $this->escapeTransformer = $escapeTransformer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // TODO very dirty quick fix for https://github.com/mautic/mautic/issues/8854
@@ -90,14 +81,6 @@ class ConfigType extends AbstractType
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'config';
     }
 
     public function configureOptions(OptionsResolver $resolver)

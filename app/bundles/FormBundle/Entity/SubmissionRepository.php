@@ -2,13 +2,14 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * IpAddressRepository.
+ * @extends CommonRepository<Submission>
  */
 class SubmissionRepository extends CommonRepository
 {
@@ -59,7 +60,7 @@ class SubmissionRepository extends CommonRepository
                 $fq->expr()->notIn('f.type', $viewOnlyFields),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
-            ->orderBy('f.field_order', 'ASC')
+            ->orderBy('f.field_order, f.id', 'ASC')
             ->setParameter('saveResult', true);
         $results = $fq->execute()->fetchAll();
 
@@ -235,24 +236,25 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param array<mixed>                  $filter
      */
-    public function getFilterExpr(&$q, $filter, $parameterName = null)
+    public function getFilterExpr($q, array $filter, ?string $unique = null): array
     {
-        if ('s.date_submitted' == $filter['column']) {
+        if ('s.date_submitted' === $filter['column']) {
             $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
             $parameters = [$date1 => $date.' 00:00:00', $date2 => $date.' 23:59:59'];
-            $expr       = $q->expr()->andX(
+            $expr       = $q->expr()->and(
                 $q->expr()->gte('s.date_submitted', ":$date1"),
                 $q->expr()->lte('s.date_submitted', ":$date2")
             );
 
             return [$expr, $parameters];
-        } else {
-            return parent::getFilterExpr($q, $filter);
         }
+
+        return parent::getFilterExpr($q, $filter);
     }
 
     /**
@@ -301,9 +303,9 @@ class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param DbalQueryBuilder $query
+     * @param int              $limit
+     * @param int              $offset
      *
      * @return array
      *
@@ -324,9 +326,9 @@ class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param DbalQueryBuilder $query
+     * @param int              $limit
+     * @param int              $offset
      *
      * @return array
      *

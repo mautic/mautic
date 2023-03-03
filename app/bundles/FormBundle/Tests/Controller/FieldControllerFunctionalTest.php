@@ -12,6 +12,23 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
+    public function testNewEmailFieldFormIsPreMapped(): void
+    {
+        $this->client->request(
+            Request::METHOD_GET,
+            '/s/forms/field/new?type=email&tmpl=field&formId=temporary_form_hash&inBuilder=1',
+            [],
+            [],
+            $this->createAjaxHeaders()
+        );
+        $clientResponse = $this->client->getResponse();
+        $payload        = json_decode($clientResponse->getContent(), true);
+        Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        Assert::assertStringContainsString('<option value="email"  selected="selected">', $payload['newContent']);
+    }
+
     public function testNewCaptchaFieldFormCanBeSaved(): void
     {
         $payload = [
@@ -42,6 +59,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
 
         $crawler     = $this->client->request(Request::METHOD_GET, "/s/forms/field/new?type=captcha&tmpl=field&formId={$formId}&inBuilder=1", [], [], $this->createAjaxHeaders());
         $content     = $this->client->getResponse()->getContent();
+        Assert::assertTrue($this->client->getResponse()->isOk(), $content);
         $content     = json_decode($content)->newContent;
         $crawler     = new Crawler($content, $this->client->getInternalRequest()->getUri());
         $formCrawler = $crawler->filter('form[name=formfield]');

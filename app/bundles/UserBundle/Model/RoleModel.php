@@ -4,24 +4,25 @@ namespace Mautic\UserBundle\Model;
 
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\UserBundle\Entity\Role;
+use Mautic\UserBundle\Entity\RoleRepository;
 use Mautic\UserBundle\Event\RoleEvent;
 use Mautic\UserBundle\Form\Type\RoleType;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\PreconditionRequiredHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class RoleModel.
+ * @extends FormModel<Role>
  */
 class RoleModel extends FormModel
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getRepository()
+    public function getRepository(): RoleRepository
     {
-        return $this->em->getRepository('MauticUserBundle:Role');
+        $result = $this->em->getRepository(Role::class);
+        \assert($result instanceof RoleRepository);
+
+        return $result;
     }
 
     /**
@@ -158,7 +159,7 @@ class RoleModel extends FormModel
                 $event = new RoleEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }

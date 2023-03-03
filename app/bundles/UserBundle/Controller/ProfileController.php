@@ -203,7 +203,7 @@ class ProfileController extends FormController
                     return $this->postActionRedirect(
                         [
                             'returnUrl'       => $returnUrl,
-                            'contentTemplate' => 'MauticUserBundle:Profile:index',
+                            'contentTemplate' => 'Mautic\UserBundle\Controller\ProfileController::indexAction',
                             'passthroughVars' => [
                                 'mauticContent' => 'user',
                             ],
@@ -217,7 +217,7 @@ class ProfileController extends FormController
                     );
                 }
             } else {
-                return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+                return $this->redirectToRoute('mautic_dashboard_index');
             }
         }
         $this->get('session')->set('formProcessed', 0);
@@ -226,7 +226,7 @@ class ProfileController extends FormController
             'permissions'       => $permissions,
             'me'                => $me,
             'userForm'          => $form->createView(),
-            'authorizedClients' => $this->forward('MauticApiBundle:Client:authorizedClients')->getContent(),
+            'authorizedClients' => $this->forward('Mautic\ApiBundle\Controller\ClientController::authorizedClientsAction')->getContent(),
         ];
 
         return $this->delegateView(

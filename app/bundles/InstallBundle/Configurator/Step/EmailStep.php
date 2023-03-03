@@ -8,6 +8,10 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class EmailStep implements StepInterface
 {
+    private const SKIP_PARAMETERS = [
+        'messenger_transport',
+    ];
+
     /**
      * From name for email sent from Mautic.
      *
@@ -75,6 +79,13 @@ class EmailStep implements StepInterface
     public $mailer_amazon_other_region;
 
     /**
+     * Sparkpost Region.
+     *
+     * @var string
+     */
+    public $mailer_sparkpost_region;
+
+    /**
      * Mailer API key if applicable.
      *
      * @var string
@@ -108,7 +119,52 @@ class EmailStep implements StepInterface
      *
      * @var string
      */
-    public $mailer_spool_path = '%kernel.root_dir%/../var/spool';
+    public $mailer_spool_path = '%kernel.project_dir%/var/spool';
+
+    /**
+     * @var string
+     */
+    public $messenger_dsn = 'sync://';
+
+    /**
+     * @var string
+     */
+    public $messenger_type = 'sync';
+
+    /**
+     * Messneger mode.
+     *
+     * @var string
+     */
+    public $messenger_transport = 'sync';
+
+    /**
+     * Messenger Retry Strategy Max Retries.
+     *
+     * @var int
+     */
+    public ?int $messenger_retry_strategy_max_retries = 3;
+
+    /**
+     * Messenger Retry Strategy Delay.
+     *
+     * @var int
+     */
+    public ?int $messenger_retry_strategy_delay = 1000;
+
+    /**
+     * Messenger Retry Strategy Multiplier.
+     *
+     * @var int
+     */
+    public ?int $messenger_retry_strategy_multiplier = 2;
+
+    /**
+     * Messenger Retry Strategy Max Delay.
+     *
+     * @var int
+     */
+    public ?int $messenger_retry_strategy_max_delay = 0;
 
     public function __construct(Session $session)
     {
@@ -148,7 +204,7 @@ class EmailStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:email.html.php';
+        return 'MauticInstallBundle:Install:email.html.twig';
     }
 
     /**
@@ -159,7 +215,9 @@ class EmailStep implements StepInterface
         $parameters = [];
 
         foreach ($data as $key => $value) {
-            $parameters[$key] = $value;
+            if (!in_array($key, self::SKIP_PARAMETERS)) {
+                $parameters[$key] = $value;
+            }
         }
 
         return $parameters;

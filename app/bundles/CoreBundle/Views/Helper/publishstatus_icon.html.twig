@@ -1,0 +1,98 @@
+{#
+  Variables
+    * item (object)
+    * model (string)
+    * query (optional, string)
+    * size (optional, string)
+    * onclick (optional, string)
+    * attributes (optional, array)
+    * transKeys (optional, array)
+#}
+{# set defaults #}
+{%- set query = query|default('') %}
+{%- set size = size|default('fa-lg') %}
+{%- set onclick = onclick|default('') %}
+{%- set attributes = attributes|default({}) %}
+{%- set transKeys = transKeys|default({}) %}
+{%- set status = status|default(item.publishStatus) %}
+{%- set text = text|default('') %}
+{%- set icon = text|default('') %}
+
+{%- if query is not empty %}
+  {%- set queryParam = query|parse_str %}
+  {%- if queryParam.customToggle is defined %}
+    {# needs more testing #}
+    {%- set status = attribute(item, queryParam['customToggle']) %}
+  {%- endif %}
+{%- endif %}
+
+
+{%- if status is same as 'published' %}
+  {%- set icon = 'fa-toggle-on text-success' %}
+  {%- set text = 'mautic.core.form.published'|trans %}
+{%- elseif status is same as 'unpublished' %}
+  {%- set icon = 'fa-toggle-off text-danger' %}
+  {%- set text = 'mautic.core.form.unpublished'|trans %}
+{%- elseif status is same as 'expired' %}
+  {%- set icon = 'fa-clock-o text-danger' %}
+  {%- set text = 'mautic.core.form.expired_to'|trans({'%date%': dateToFull(item.publishDown)}) %}
+{%- elseif status is same as 'pending' %}
+  {%- set icon = 'fa-clock-o text-warning' %}
+  {%- set text = 'mautic.core.form.pending.start_at'|trans({'%date%': dateToFull(item.publishUp)}) %}
+{%- endif %}
+
+{%- if true is same as status %}
+  {%- set icon = 'fa-toggle-on text-success' %}
+  {%- set text = 'mautic.core.form.public'|trans %}
+{%- elseif false is same as status %}
+  {%- set icon = 'fa-toggle-off text-danger' %}
+  {%- set text = 'mautic.core.form.not.public'|trans %}
+{%- endif %}
+
+{%- set text = text ~ aditionalLabel|default('') %}
+
+{%- if disableToggle is defined and disableToggle is not empty %}
+  {%- set icon = icon|replace({'success': 'muted', 'danger': 'muted', 'warning': 'muted'}) %}
+{%- endif %}
+
+{%- set clickAction = (disableToggle is defined and true is same as disableToggle) ? 'disabled' : 'has-click-event' %}
+{%- set idClass = model|replace({'.': '-'}) ~ '-publish-icon' ~ item.id ~ md5(query) %}
+
+{%- set backdropFlag = (backdrop is defined) ? 'true' : 'false' %}
+
+{%- set onclick = onclick is empty ? 'Mautic.togglePublishStatus(event, \'.%s\', \'%s\', \'%s\', \'%s\', %s);'|format(idClass, model, item.id, query, backdropFlag) : onclick %}
+
+{%- set defaultAttributes = {
+          'data-container': 'body',
+          'data-placement': 'right',
+          'data-toggle': 'tooltip',
+          'data-status': status,
+} %}
+
+
+{%- if attributes is not empty %}
+  {%- set attributes = attributes|merge({
+            'data-id-class': '.' ~ idClass,
+            'data-model': model,
+            'data-item-id': item.id,
+            'data-query': query,
+            'data-backdrop': backdropFlag,
+  }) %}
+{%- endif %}
+
+{%- if transKeys is not empty %}
+  {%- for k, v in transKeys %}
+    {% set attributes = attributes|merge({
+            (k): v|trans
+    }) %}
+  {%- endfor %}
+{%- endif %}
+
+{%- set allDataAttrs = defaultAttributes|merge(attributes) %}
+
+{%- set dataAttributes = allDataAttrs|map((v, k) => '%s="%s"'|format(k, v))|join(' ') %}
+
+<i class="fa fa-fw {{ size }} {{ icon }} {{ clickAction }} {{ idClass }} toggle-publish-status"
+   title="{{ text }}"
+   {{ dataAttributes|raw }}
+   {% if disableToggle is not defined or (disableToggle is defined and disableToggle is empty) %}onclick="{{ onclick|raw }}"{% endif %}></i>

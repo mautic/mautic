@@ -1,32 +1,31 @@
 <?php
 
 use Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass;
-use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Mock\Client;
+use Mautic\CoreBundle\Test\EnvLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\Dotenv\Dotenv;
 
-/** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
-
-/*
- * @copyright   2014 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+/* @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 $loader->import('config.php');
 
-// Load environment variables from .env.test file
-$env     = new Dotenv();
-$root    = __DIR__.'/../../';
-$envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
-
-$env->load($envFile);
+EnvLoader::load();
 
 // Define some constants from .env
 defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 defined('MAUTIC_ENV') || define('MAUTIC_ENV', getenv('MAUTIC_ENV') ?: 'test');
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'cache'            => false,
+    'debug'            => '%kernel.debug%',
+    'strict_variables' => true,
+    'paths'            => [
+        '%kernel.project_dir%/app/bundles' => 'bundles',
+    ],
+    'form_themes' => [
+        // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
+        '@MauticCore/FormTheme/mautic_form_layout.html.twig',
+    ],
+]);
 
 $container->loadFromExtension('framework', [
     'test'    => true,
@@ -42,13 +41,16 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => [
         'enabled' => true,
     ],
+    'messenger' => [
+        'transports' => [
+            'email_transport' => [
+                'dsn'            => 'in-memory://',
+            ],
+        ],
+    ],
 ]);
 
 $container->setParameter('mautic.famework.csrf_protection', true);
-
-$container
-    ->register('mautic_integration.pipedrive.guzzle.client', Client::class)
-    ->setPublic(true);
 
 $container->loadFromExtension('web_profiler', [
     'toolbar'             => false,
@@ -82,7 +84,6 @@ $container->loadFromExtension('doctrine', [
     ],
 ]);
 
-// Ensure the mautic.db_table_prefix is set to our phpunit configuration.
 $container->setParameter('mautic.db_table_prefix', MAUTIC_TABLE_PREFIX);
 
 $container->loadFromExtension('monolog', [
@@ -124,10 +125,6 @@ $container->loadFromExtension('liip_test_fixtures', [
     'keep_database_and_schema' => true,
 ]);
 
-// Enable api by default
-$container->setParameter('mautic.api_enabled', true);
-$container->setParameter('mautic.api_enable_basic_auth', true);
-
 $loader->import('security_test.php');
 
 // Allow overriding config without a requiring a full bundle or hacks
@@ -143,11 +140,7 @@ $container->setParameter('mautic.batch_sleep_time', 0);
 
 // Turn off creating of indexes in lead field fixtures
 $container->register('mautic.install.fixture.lead_field', \Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData::class)
-    ->addArgument(false)
-    ->addTag(FixturesCompilerPass::FIXTURE_TAG)
-    ->setPublic(true);
-$container->register('mautic.lead.fixture.contact_field', \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadFieldData::class)
-    ->addArgument(false)
+    ->addArgument(new Reference('translator'))
     ->addTag(FixturesCompilerPass::FIXTURE_TAG)
     ->setPublic(true);
 
@@ -159,11 +152,4 @@ $container->register('security.csrf.token_manager', \Symfony\Component\Security\
     ->setPublic(true);
 
 // HTTP client mock handler providing response queue
-$container->register('mautic.http.client.mock_handler', \GuzzleHttp\Handler\MockHandler::class)
-    ->setClass('\GuzzleHttp\Handler\MockHandler');
-
-// Stub Guzzle HTTP client to prevent accidental request to third parties
-$container->register('mautic.http.client', \GuzzleHttp\Client::class)
-    ->setPublic(true)
-    ->setFactory('\Mautic\CoreBundle\Test\Guzzle\ClientFactory::stub')
-    ->addArgument(new Reference('mautic.http.client.mock_handler'));
+$container->register(\GuzzleHttp\Handler\MockHandler::class)->setPublic(true);
