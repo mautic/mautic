@@ -123,6 +123,26 @@ class ReportSubscriber implements EventSubscriberInterface
                     'label' => 'mautic.report.field.source_id',
                     'type'  => 'int',
                 ],
+                $downloadPrefix.'utm_campaign' => [
+                    'label' => 'mautic.report.field.utm_campaign',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_content' => [
+                    'label' => 'mautic.report.field.utm_content',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_medium' => [
+                    'label' => 'mautic.report.field.utm_medium',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_source' => [
+                    'label' => 'mautic.report.field.utm_source',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_term' => [
+                    'label' => 'mautic.report.field.utm_term',
+                    'type'  => 'string',
+                ],
             ];
 
             $companyColumns = $this->companyReportData->getCompanyData();
