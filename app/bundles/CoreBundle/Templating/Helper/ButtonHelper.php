@@ -315,7 +315,7 @@ class ButtonHelper extends Helper
 
         if (isset($button['confirm'])) {
             $button['confirm']['btnTextAttr'] = $this->generateTextAttributes($button);
-            $buttons .= $this->wrapOpeningTag.$this->templating->render('MauticCoreBundle:Helper:confirm.html.php', $button['confirm']).
+            $buttons .= $this->wrapOpeningTag.$this->templating->render('MauticCoreBundle:Helper:confirm.html.twig', $button['confirm']).
                 "{$this->wrapClosingTag}\n";
         } else {
             $attr = $this->menuLink;

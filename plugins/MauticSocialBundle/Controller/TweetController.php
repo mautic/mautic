@@ -134,7 +134,7 @@ class TweetController extends FormController
      */
     protected function getTemplateName($file, string $engine = self::ENGINE_PHP)
     {
-        if (('form.html.php' === $file || 'form.html.twig' === $file) && 1 == $this->request->get('modal')) {
+        if (('form.html.twig' === $file) && 1 == $this->request->get('modal')) {
             return parent::getTemplateName('form.modal.html.twig');
         }
 
