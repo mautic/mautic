@@ -31,6 +31,7 @@
     * `AbstractMauticTestCase::loadFixtures` and `AbstractMauticTestCase::loadFixtureFiles` now accept only two arguments: `array $fixtures` and `bool $append`. If you need to use old parameters - refer to the documentation of `LiipTestFixturesBundle`
     * Transactional emails in campaigns ignore the DNC setting.
     * There are no unsubscribe headers in transactional emails.
+    * The SortablePanels templates, JS and CSS was removed as unused.
 
 # Dependency injection improvements
 

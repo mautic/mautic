@@ -291,7 +291,7 @@ class AjaxController extends CommonController
 
                         //get updated icon HTML
                         $html = $this->renderView(
-                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
                             [
                                 'item'          => $entity,
                                 'model'         => $name,
