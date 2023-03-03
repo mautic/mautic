@@ -45,7 +45,7 @@ class CustomFieldValueHelper
     private static function normalizeValue(array $field)
     {
         $value      = $field['value'] ?? '';
-        $type       = $field['value'] ?? null;
+        $type       = $field['type'] ?? null;
         $properties = $field['properties'] ?? null;
 
         return self::normalize($value, $type, $properties);
