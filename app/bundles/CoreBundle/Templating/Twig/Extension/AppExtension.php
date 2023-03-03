@@ -5,25 +5,35 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 use Twig\TwigTest;
 
 class AppExtension extends AbstractExtension
 {
-    public function getTests()
+    /**
+     * @return TwigFunction[]
+     */
+    public function getFunctions()
     {
         return [
-            new TwigTest('instanceof', [$this, 'isinstanceof']),
-            new TwigTest('string', [$this, 'is_string']),
+            new TwigFunction('ini_get', fn ($value) => ini_get($value)),
+            new TwigFunction('is_class', fn (string $value) => class_exists($value)),
+            new TwigFunction('is_file', fn (string $value) => file_exists($value)),
+            new TwigFunction('is_function', fn (string $value) => function_exists($value)),
+            new TwigFunction('is_extension_loaded', fn (string $value) => extension_loaded($value)),
         ];
     }
 
-    public function isInstanceof(mixed $var, string $instance): bool
+    /**
+     * @return TwigTest[]
+     */
+    public function getTests(): array
     {
-        return $var instanceof $instance;
-    }
-
-    public function is_string(mixed $value): bool
-    {
-        return is_string($value);
+        return [
+            new TwigTest('string', fn ($value) => is_string($value)),
+            new TwigTest('class', fn (string $value) => class_exists($value)),
+            new TwigTest('file', fn (string $value) => file_exists($value)),
+            new TwigTest('function', fn (string $value) => function_exists($value)),
+        ];
     }
 }

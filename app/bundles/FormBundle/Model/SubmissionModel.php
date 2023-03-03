@@ -340,11 +340,11 @@ class SubmissionModel extends CommonFormModel
                 $validationErrors[$alias] = $isValid;
             }
 
-            $leadField = $f->getLeadField();
-            if (!empty($leadField)) {
+            $mappedField = $f->getMappedField();
+            if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
-                $leadFieldMatches[$leadField] = $leadValue;
+                $leadFieldMatches[$mappedField] = $leadValue;
             }
 
             $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
@@ -586,7 +586,7 @@ class SubmissionModel extends CommonFormModel
                 return $response;
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticFormBundle:Result:export.html.php',
+                    'MauticFormBundle:Result:export.html.twig',
                     [
                         'form'           => $form,
                         'results'        => $results,
@@ -740,7 +740,7 @@ class SubmissionModel extends CommonFormModel
                 return $response;
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticPageBundle:Result:export.html.php',
+                    'MauticPageBundle:Result:export.html.twig',
                     [
                         'page'      => $page,
                         'results'   => $results,

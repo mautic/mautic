@@ -46,7 +46,7 @@
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto">
             <!-- page detail header -->
-            <!-- sms detail collapseable toggler -->
+            <!-- segment detail collapseable toggler -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
@@ -54,7 +54,7 @@
                     </div>
                 </div>
             </div>
-            <div class="collapse" id="sms-details">
+            <div class="collapse" id="segment-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
@@ -64,17 +64,25 @@
                                 <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.leads'|trans }}</span></td>
                                 <td>{{ segmentCount }}</td>
                             </tr>
+                            {% if list.lastBuiltTime %}
+                            <tr>
+                                <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.list.last_built_time'|trans }}</span></td>
+                                <td>
+                                    {{ 'mautic.core.date.second'|trans({'%count%': list.lastBuiltTime}) }} ({{ dateToFull(list.lastBuiltDate) }})
+                                </td>
+                            </tr>
+                            {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
-        <!--/ sms detail collapseable toggler -->
+        <!--/ segment detail collapseable toggler -->
         <div class="bg-auto bg-dark-xs">
             <div class="hr-expand nm">
                 <span data-toggle="tooltip" title="Detail">
-                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#sms-details">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse" data-target="#segment-details">
                         <span class="caret"></span> {{ 'mautic.core.details'|trans }}
                     </a>
                 </span>
