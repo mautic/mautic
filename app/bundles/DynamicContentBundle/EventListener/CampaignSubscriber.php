@@ -59,8 +59,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'              => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'               => DynamicContentSendType::class,
                 'formTypeOptions'        => ['update_select' => 'campaignevent_properties_dynamicContent'],
-                'formTheme'              => 'MauticDynamicContentBundle:FormTheme\DynamicContentPushList',
-                'timelineTemplate'       => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.php',
+                'formTheme'              => 'MauticDynamicContentBundle:FormTheme:DynamicContentPushList/_dynamiccontentpush_list_row.html.twig',
+                'timelineTemplate'       => 'MauticDynamicContentBundle:SubscribedEvents\Timeline:index.html.twig',
                 'hideTriggerMode'        => true,
                 'connectionRestrictions' => [
                     'anchor' => [
@@ -85,7 +85,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'eventName'       => DynamicContentEvents::ON_CAMPAIGN_TRIGGER_DECISION,
                 'formType'        => DynamicContentDecisionType::class,
                 'formTypeOptions' => ['update_select' => 'campaignevent_properties_dynamicContent'],
-                'formTheme'       => 'MauticDynamicContentBundle:FormTheme\DynamicContentDecisionList',
+                'formTheme'       => 'MauticDynamicContentBundle:FormTheme:DynamicContentDecisionList/_dynamiccontentdecision_list_row.html.twig',
                 'channel'         => 'dynamicContent',
                 'channelIdField'  => 'dynamicContent',
             ]

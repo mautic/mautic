@@ -16,7 +16,7 @@ class PopupController extends CommonController
         $assetsHelper->addStylesheet('/app/bundles/NotificationBundle/Assets/css/popup/popup.css');
 
         $response = $this->render(
-            'MauticNotificationBundle:Popup:index.html.php',
+            'MauticNotificationBundle:Popup:index.html.twig',
             [
                 'siteUrl' => $this->coreParametersHelper->get('site_url'),
             ]

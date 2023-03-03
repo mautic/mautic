@@ -132,6 +132,7 @@ class ListController extends FormController
             'currentUser'                    => $this->user,
             'searchValue'                    => $search,
             'segmentRebuildWarningThreshold' => $this->coreParametersHelper->get('segment_rebuild_time_warning'),
+            'segmentBuildWarningThreshold'   => $this->coreParametersHelper->get('segment_build_time_warning'),
         ];
 
         return $this->delegateView(
@@ -210,7 +211,6 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'form' => $form->createView(),
             ],
             'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
@@ -350,7 +350,6 @@ class ListController extends FormController
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
-                            //'form'         => $this->setFormTheme($form, $contentTemplate, 'MauticLeadBundle:FormTheme\Filter'),
                             'form'         => $form->createView(),
                         ];
 
@@ -374,7 +373,6 @@ class ListController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                //'form'          => $this->setFormTheme($form, 'MauticLeadBundle:List:form.html.twig', 'MauticLeadBundle:FormTheme\Filter'),
                 'form'          => $form->createView(),
                 'currentListId' => $segment->getId(),
             ],

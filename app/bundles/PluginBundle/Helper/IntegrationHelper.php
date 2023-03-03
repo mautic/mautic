@@ -88,7 +88,7 @@ class IntegrationHelper
      * @param int|null     $pluginFilter
      * @param bool|false   $publishedOnly
      *
-     * @return mixed
+     * @return array<AbstractIntegration>
      *
      * @throws \Doctrine\ORM\ORMException
      */
@@ -560,7 +560,7 @@ class IntegrationHelper
 
                 //add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $templating->render($plugin->getBundle().":Integration/$integration:share.html.php", [
+                $shareBtns[$integration] = $templating->render($plugin->getBundle().":Integration/$integration:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }

@@ -8,23 +8,23 @@
 {% block mauticContent %}
     {% if not slot('mauticContent') %}
         {% if mauticContent is defined %}
-            {{ muaticContent }}
+            {{ mauticContent }}
         {% endif %}
     {% else %}
         {{ slot('mauticContent') }}
     {% endif %}
 {% endblock %}
 
-{% block headerTitle %}
-    {% if not slot('headerTitle') %}
-        {% if headerTitle is not defined %}
-            {% set headerTitle = 'Mautic' %}
-        {% endif %}
-        {{ headerTitle|trans }}
-        {% else %}
-        {{ slot('headerTitle') }}
+{% if not slot('headerTitle') %}
+    {% if headerTitle is not defined %}
+        {% set headerTitle = 'Mautic' %}
     {% endif %}
-{% endblock %}
+    {% set headerTitle = headerTitle|trans %}
+{% else %}
+    {% set headerTitle = slot('headerTitle') %}
+{% endif %}
+
+{% block headerTitle %}{{ headerTitle }}{% endblock %}
 
 {% block actions %}
     {{- include('MauticCoreBundle:Helper:page_actions.html.twig',

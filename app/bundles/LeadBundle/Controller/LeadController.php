@@ -106,12 +106,13 @@ class LeadController extends FormController
         }
 
         $results = $model->getEntities([
-            'start'          => $start,
-            'limit'          => $limit,
-            'filter'         => $filter,
-            'orderBy'        => $orderBy,
-            'orderByDir'     => $orderByDir,
-            'withTotalCount' => true,
+            'start'           => $start,
+            'limit'           => $limit,
+            'filter'          => $filter,
+            'orderBy'         => $orderBy,
+            'orderByDir'      => $orderByDir,
+            'withTotalCount'  => true,
+            'joinIpAddresses' => false,
         ]);
 
         $count = $results['count'];
@@ -201,7 +202,7 @@ class LeadController extends FormController
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
-                'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.php",
+                'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.twig",
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -262,7 +263,7 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'quickForm' => $quickForm->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:quickadd.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:quickadd.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -400,15 +401,15 @@ class LeadController extends FormController
                     'auditlog'          => $this->getAuditlogs($lead),
                     'doNotContact'      => end($dnc),
                     'doNotContactSms'   => end($dncSms),
-                    'leadNotes'         => $this->forward(
-                        'Mautic\LeadBundle\Controller\NoteController::indexAction',
-                        [
-                            'leadId'     => $lead->getId(),
-                            'ignoreAjax' => 1,
-                        ]
-                    )->getContent(),
+                    //'leadNotes'         => $this->forward(
+                    //    'Mautic\LeadBundle\Controller\NoteController::indexAction',
+                    //    [
+                    //        'leadId'     => $lead->getId(),
+                    //        'ignoreAjax' => 1,
+                    //    ]
+                    //)->getContent(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -578,7 +579,7 @@ class LeadController extends FormController
                     'lead'   => $lead,
                     'fields' => $model->organizeFieldsByGroup($fields),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -762,7 +763,7 @@ class LeadController extends FormController
                     'lead'   => $lead,
                     'fields' => $lead->getFields(), //pass in the lead fields as they are already organized by ['group']['alias']
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -974,7 +975,7 @@ class LeadController extends FormController
                         ]
                     ),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.lead-merge-options' : null,
@@ -1054,7 +1055,7 @@ class LeadController extends FormController
                     ],
                     $viewParameters
                 ),
-                'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.lead-frequency-options' : null,
@@ -1243,7 +1244,7 @@ class LeadController extends FormController
                     'leadsLists' => $leadsLists,
                     'lead'       => $lead,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.php',
+                'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.twig',
             ]
         );
     }
@@ -1288,7 +1289,7 @@ class LeadController extends FormController
                     'companyLead' => $companyLead,
                     'lead'        => $lead,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:company.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:company.html.twig',
             ]
         );
     }
@@ -1330,7 +1331,7 @@ class LeadController extends FormController
                     'campaigns' => $campaigns,
                     'lead'      => $lead,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:LeadCampaigns:index.html.php',
+                'contentTemplate' => 'MauticLeadBundle:LeadCampaigns:index.html.twig',
             ]
         );
     }
@@ -1504,7 +1505,7 @@ class LeadController extends FormController
 
         return $this->ajaxAction(
             [
-                'contentTemplate' => 'MauticLeadBundle:Lead:email.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:email.html.twig',
                 'viewParameters'  => [
                     'form' => $form->createView(),
                     'dnc'  => end($dnc),
@@ -1634,7 +1635,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -1728,7 +1729,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -1834,7 +1835,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -1932,7 +1933,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -2092,7 +2093,7 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'emailStats' => $model->getLeadEmailStats($lead),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:lead_stats.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Lead:lead_stats.html.twig',
             ]
         );
     }

@@ -1,0 +1,9 @@
+{% if showMore is defined and true == showMore %}
+  <a href="{{ url('mautic_report_index', {'search': searchString}) }}" data-toggle="ajax">
+      <span>{{ 'mautic.core.search.more'|trans({'%count%': remaining}) }}</span>
+  </a>
+{% else %}
+  <a href="{{ url('mautic_report_view', {'objectId': item.id}) }}" data-toggle="ajax">
+      {{ item.name }}
+  </a>
+{% endif %}
