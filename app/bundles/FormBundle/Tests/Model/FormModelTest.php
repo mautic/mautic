@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -135,7 +134,6 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $this->columnSchemaHelper    = $this->createMock(ColumnSchemaHelper::class);
         $this->tableSchemaHelper     = $this->createMock(TableSchemaHelper::class);
         $this->mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
-        $coreParametersHelper        = $this->createMock(CoreParametersHelper::class);
 
         $this->entityManager->expects($this
             ->any())
@@ -160,8 +158,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->columnSchemaHelper,
             $this->tableSchemaHelper,
-            $this->mappedObjectCollector,
-            $coreParametersHelper
+            $this->mappedObjectCollector
         );
 
         $this->formModel->setDispatcher($this->dispatcher);
