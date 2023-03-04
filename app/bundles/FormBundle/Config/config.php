@@ -194,7 +194,6 @@ return [
                     'mautic.schema.helper.column',
                     'mautic.schema.helper.table',
                     'mautic.form.collector.mapped.object',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.form.model.submission' => [

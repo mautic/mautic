@@ -43,7 +43,6 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $formRepository        = $this->createMock(FormRepository::class);
         $form                  = $this->createMock(Form::class);
         $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $formModel             = new FormModel(
             $requestStack,
             $templatingHelperMock,
@@ -56,8 +55,7 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
             $contactTracker,
             $columnSchemaHelper,
             $tableSchemaHelper,
-            $mappedObjectCollector,
-            $coreParametersHelper
+            $mappedObjectCollector
         );
 
         $dispatcher->expects($this->exactly(2))

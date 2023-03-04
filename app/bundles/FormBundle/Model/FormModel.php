@@ -107,8 +107,7 @@ class FormModel extends CommonFormModel
         ContactTracker $contactTracker,
         ColumnSchemaHelper $columnSchemaHelper,
         TableSchemaHelper $tableSchemaHelper,
-        MappedObjectCollectorInterface $mappedObjectCollector,
-        CoreParametersHelper $coreParametersHelper
+        MappedObjectCollectorInterface $mappedObjectCollector
     ) {
         $this->requestStack          = $requestStack;
         $this->templatingHelper      = $templatingHelper;
@@ -122,7 +121,6 @@ class FormModel extends CommonFormModel
         $this->columnSchemaHelper    = $columnSchemaHelper;
         $this->tableSchemaHelper     = $tableSchemaHelper;
         $this->mappedObjectCollector = $mappedObjectCollector;
-        $this->coreParametersHelper   = $coreParametersHelper;
     }
 
     /**
