@@ -118,6 +118,18 @@ class ContactSegmentFilter
     }
 
     /**
+     * @return string|null
+     */
+    public function getForeignTableField()
+    {
+        if (method_exists($this->filterDecorator, 'getForeignTableField')) {
+            return $this->filterDecorator->getForeignTableField($this->contactSegmentFilterCrate);
+        } else {
+            return null;
+        }
+    }
+
+    /**
      * @param $argument
      *
      * @return mixed

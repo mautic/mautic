@@ -53,6 +53,17 @@ class CustomMappedDecorator extends BaseDecorator
         }
     }
 
+    public function getForeignTableField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    {
+        $originalField = $contactSegmentFilterCrate->getField();
+
+        try {
+            return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
+        } catch (FilterNotFoundException $e) {
+            return parent::getTable($contactSegmentFilterCrate);
+        }
+    }
+
     /**
      * @return string
      */
