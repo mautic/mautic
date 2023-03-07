@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -11,9 +12,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
 
 class ModeratedCommandTest extends TestCase
 {
+    private CoreParametersHelper|MockObject $coreParametersHelper;
+
     /**
      * @var MockObject|InputInterface
      */
@@ -38,8 +42,9 @@ class ModeratedCommandTest extends TestCase
     {
         $this->input                = $this->createMock(InputInterface::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->output               = new NullOutput();
-        $this->fakeModeratedCommand = new FakeModeratedCommand($this->pathsHelper);
+        $this->fakeModeratedCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
     }
 
     public function testUnableToWriteLockFileThrowsAnException(): void
@@ -228,23 +233,9 @@ class ModeratedCommandTest extends TestCase
 
     public function testRedisLock(): void
     {
-        $command = new FakeModeratedCommand();
-        $command->setContainer($this->container);
-
-        $this->container->expects($this->once())
+        $this->coreParametersHelper->expects($this->once())
             ->method('get')
-            ->with('mautic.helper.core_parameters')
-            ->willReturnCallback(function (string $key) {
-                return new class() {
-                    /**
-                     * @return string[]
-                     */
-                    public function get(): array
-                    {
-                        return ['dsn' => 'redis://localhost'];
-                    }
-                };
-            });
+            ->willReturn(['dsn' => 'redis://localhost']);
 
         $this->input->method('getOption')
             ->willReturnCallback(
@@ -260,9 +251,9 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(LockAcquiringException::class);
 
-        $command->run($this->input, $this->output);
+        $this->fakeModeratedCommand->run($this->input, $this->output);
     }
 
     private function getFirstFile(Finder $finder): SplFileInfo

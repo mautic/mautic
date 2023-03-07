@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Command;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Console\Command\Command;
@@ -32,6 +33,8 @@ abstract class ModeratedCommand extends Command
     protected $lockExpiration;
     protected $lockFile;
 
+    private CoreParametersHelper $coreParametersHelper;
+
     /**
      * @var Lock
      */
@@ -44,9 +47,10 @@ abstract class ModeratedCommand extends Command
 
     protected PathsHelper $pathsHelper;
 
-    public function __construct(PathsHelper $pathsHelper)
+    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        $this->pathsHelper = $pathsHelper;
+        $this->pathsHelper          = $pathsHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
 
         parent::__construct();
     }
@@ -187,7 +191,7 @@ abstract class ModeratedCommand extends Command
     {
         switch ($this->moderationMode) {
             case self::MODE_REDIS:
-                $cacheAdapterConfig = $this->getContainer()->get('mautic.helper.core_parameters')->get('cache_adapter_redis');
+                $cacheAdapterConfig = $this->coreParametersHelper->get('cache_adapter_redis');
                 $redisDsn           = $cacheAdapterConfig['dsn'] ?? null;
                 $redisOptions       = $cacheAdapterConfig['options'] ?? [];
                 $redis              = RedisAdapter::createConnection($redisDsn, $redisOptions);
