@@ -138,7 +138,8 @@ class Stat
             ->addIndex(['tracking_hash'], 'stat_email_hash_search')
             ->addIndex(['source', 'source_id'], 'stat_email_source_search')
             ->addIndex(['date_sent'], 'email_date_sent')
-            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead');
+            ->addIndex(['date_read', 'lead_id'], 'email_date_read_lead')
+            ->addIndex(['lead_id', 'date_sent'], 'stat_email_lead_id_date_sent');
 
         $builder->addBigIntIdField();
 
