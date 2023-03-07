@@ -32,6 +32,7 @@
     * Transactional emails in campaigns ignore the DNC setting.
     * There are no unsubscribe headers in transactional emails.
     * The SortablePanels templates, JS and CSS was removed as unused.
+    * Country name of Swaziland was update to Eswatini based on Standard: ISO 3166.
 
 # Dependency injection improvements
 
