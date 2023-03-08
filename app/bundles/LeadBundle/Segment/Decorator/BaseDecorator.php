@@ -149,4 +149,14 @@ class BaseDecorator implements FilterDecoratorInterface
     {
         return null;
     }
+
+    /**
+     * Get foreign table field used in JOIN condition.
+     *
+     * @return string
+     */
+    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    {
+        return 'lead_id';
+    }
 }

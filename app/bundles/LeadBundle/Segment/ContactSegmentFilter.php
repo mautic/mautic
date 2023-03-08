@@ -120,10 +120,10 @@ class ContactSegmentFilter
     /**
      * @return string|null
      */
-    public function getForeignTableField()
+    public function getForeignContactColumn()
     {
-        if (method_exists($this->filterDecorator, 'getForeignTableField')) {
-            return $this->filterDecorator->getForeignTableField($this->contactSegmentFilterCrate);
+        if (method_exists($this->filterDecorator, 'getForeignContactColumn')) {
+            return $this->filterDecorator->getForeignContactColumn($this->contactSegmentFilterCrate);
         } else {
             return null;
         }

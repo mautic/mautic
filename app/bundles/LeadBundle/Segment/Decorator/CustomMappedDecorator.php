@@ -53,17 +53,6 @@ class CustomMappedDecorator extends BaseDecorator
         }
     }
 
-    public function getForeignTableField(ContactSegmentFilterCrate $contactSegmentFilterCrate)
-    {
-        $originalField = $contactSegmentFilterCrate->getField();
-
-        try {
-            return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
-        } catch (FilterNotFoundException $e) {
-            return parent::getTable($contactSegmentFilterCrate);
-        }
-    }
-
     /**
      * @return string
      */
@@ -103,6 +92,22 @@ class CustomMappedDecorator extends BaseDecorator
             return $this->dictionary->getFilterProperty($originalField, 'where');
         } catch (FilterNotFoundException $e) {
             return parent::getWhere($contactSegmentFilterCrate);
+        }
+    }
+
+    /**
+     * Get foreign table field used in JOIN condition.
+     *
+     * @return string
+     */
+    public function getForeignContactColumn(ContactSegmentFilterCrate $contactSegmentFilterCrate)
+    {
+        $originalField = $contactSegmentFilterCrate->getField();
+
+        try {
+            return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
+        } catch (FilterNotFoundException $e) {
+            return parent::getForeignContactColumn($contactSegmentFilterCrate);
         }
     }
 }
