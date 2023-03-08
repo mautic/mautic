@@ -53,6 +53,20 @@ class CustomMappedDecoratorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @covers \Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator::getForeignContactColumn
+     */
+    public function testGetForeignContactColumn(): void
+    {
+        $customMappedDecorator = $this->getDecorator();
+
+        $contactSegmentFilterCrate = new ContactSegmentFilterCrate([
+            'field'    => 'lead_email_read_count',
+        ]);
+
+        $this->assertSame('lead_id', $customMappedDecorator->getForeignContactColumn($contactSegmentFilterCrate));
+    }
+
+    /**
      * @return CustomMappedDecorator
      */
     private function getDecorator()
