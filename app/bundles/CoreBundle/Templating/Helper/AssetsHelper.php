@@ -59,8 +59,11 @@ class AssetsHelper
      */
     protected $pathsHelper;
 
-    protected BuilderIntegrationsHelper $builderIntegrationsHelper;
-    protected InstallService $installService;
+    /** @var BuilderIntegrationsHelper  */
+    protected $builderIntegrationsHelper;
+
+    /** @var InstallService */
+    protected  $installService;
 
     public function __construct(Packages $packages)
     {
