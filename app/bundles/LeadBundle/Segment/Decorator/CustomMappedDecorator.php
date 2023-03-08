@@ -105,7 +105,7 @@ class CustomMappedDecorator extends BaseDecorator
         $originalField = $contactSegmentFilterCrate->getField();
 
         try {
-            return MAUTIC_TABLE_PREFIX.$this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
+            return $this->dictionary->getFilterProperty($originalField, 'foreign_table_field');
         } catch (FilterNotFoundException $e) {
             return parent::getForeignContactColumn($contactSegmentFilterCrate);
         }
