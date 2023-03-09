@@ -14,8 +14,6 @@ namespace MauticPlugin\MauticCrmBundle\EventListener;
 use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Export\CompanyExport;
-use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CompanySubscriber implements EventSubscriberInterface
