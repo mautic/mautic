@@ -13,7 +13,7 @@
               <span class="label label-danger" data-toggle="tooltip" title="{{ dncReasonToText(doNotContact.reason) }}">
                 {{ 'mautic.lead.do.not.contact_channel'|trans({'%channel%': doNotContact.channel|upper}) }}
                 <span data-toggle="tooltip" data-placement="bottom" title="{{ 'mautic.lead.remove_dnc_status'|trans }}">
-                  <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, {{ doNotContact.id }});"></i>
+                  <i class="fa fa-times has-click-event" onclick="Mautic.removeBounceStatus(this, {{ doNotContact.id }}, '{{ doNotContact.channel }}');"></i>
                 </span>
               </span>
             {% elseif constant('\\Mautic\\LeadBundle\\Entity\\DoNotContact::BOUNCED') == doNotContact.reason %}
