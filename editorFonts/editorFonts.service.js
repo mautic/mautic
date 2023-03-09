@@ -28,7 +28,6 @@ export default class EditorFontsService {
   static updateFontList(editor, fontList) {
     const canvasHead = editor.Canvas.getDocument().head;
 
-    // eslint-disable-next-line no-undef
     mauticEditorFonts.forEach((item) => {
       if (!fontList.find((element) => element.name === item.name)) {
         fontList.push({ value: item.font, name: item.name });
@@ -53,7 +52,6 @@ export default class EditorFontsService {
     const headElem = htmlDoc.head;
     const headLinks = [...headElem.getElementsByTagName('link')];
 
-    // eslint-disable-next-line no-undef
     mauticEditorFonts.forEach((item) => {
       // Check which fonts are used
       if (item.url && htmlCode.indexOf(item.font) !== -1) {
