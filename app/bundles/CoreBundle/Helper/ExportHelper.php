@@ -6,10 +6,13 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
+use Mautic\CoreBundle\Exception\FilePathException;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Translation\TranslatorInterface;
+use ZipArchive;
 
 /**
  * Provides several functions for export-related tasks,
@@ -20,12 +23,18 @@ class ExportHelper
     public const EXPORT_TYPE_EXCEL = 'xlsx';
     public const EXPORT_TYPE_CSV   = 'csv';
 
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
+    private CoreParametersHelper $coreParametersHelper;
+    private FilePathResolver $filePathResolver;
 
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper,
+        FilePathResolver $filePathResolver
+    ) {
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->filePathResolver     = $filePathResolver;
     }
 
     /**
@@ -64,6 +73,35 @@ class ExportHelper
             default:
                 throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
         }
+    }
+
+    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
+    {
+        if (!$data->valid()) {
+            throw new \Exception('No or invalid data given');
+        }
+
+        if (self::EXPORT_TYPE_CSV === $type) {
+            return $this->exportAsCsvIntoFile($data, $fileName);
+        }
+
+        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
+    }
+
+    public function zipFile(string $filePath, string $fileName): string
+    {
+        $zipFilePath = str_replace('.csv', '.zip', $filePath);
+        $zipArchive  = new ZipArchive();
+
+        if (true === $zipArchive->open($zipFilePath, ZipArchive::OVERWRITE | ZipArchive::CREATE)) {
+            $zipArchive->addFile($filePath, $fileName);
+            $zipArchive->close();
+            $this->filePathResolver->delete($filePath);
+
+            return $zipFilePath;
+        }
+
+        throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
     private function getSpreadsheetGeneric(Iterator $data, string $filename): Spreadsheet
@@ -132,5 +170,47 @@ class ExportHelper
         $response->headers->set('Pragma', 'public');
 
         return $response;
+    }
+
+    /**
+     * @param Iterator<mixed> $data
+     */
+    private function exportAsCsvIntoFile(Iterator $data, string $fileName): string
+    {
+        $filePath  = $this->getValidExportFileName($fileName, 'contact_export_dir');
+        $handler   = @fopen($filePath, 'ab+');
+        $headerSet = false;
+
+        foreach ($data as $row) {
+            if (!$headerSet) {
+                fputcsv($handler, array_keys($row));
+                $headerSet = true;
+            }
+
+            fputcsv($handler, $row);
+        }
+
+        fclose($handler);
+
+        return $filePath;
+    }
+
+    public function getValidExportFileName(string $fileName, string $directory): string
+    {
+        $contactExportDir = $this->coreParametersHelper->get($directory);
+        $this->filePathResolver->createDirectory($contactExportDir);
+        $filePath     = $contactExportDir.'/'.$fileName;
+        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $originalName = $fileName;
+        $i            = 1;
+
+        while (file_exists($filePath)) {
+            $fileName = $originalName.'_'.$i;
+            $filePath = $contactExportDir.'/'.$fileName.'.'.$extension;
+            ++$i;
+        }
+
+        return $filePath;
     }
 }
