@@ -12,7 +12,6 @@ export default class ButtonCloseCommands {
     const htmlDocument = ContentService.getCanvasAsHtmlDocument(editor);
     let htmlString = ContentService.serializeHtmlDocument(htmlDocument);
 
-    // eslint-disable-next-line no-undef
     if (mauticEditorFonts) {
       htmlString = EditorFontsService.addFontLinksToHtml(htmlString);
     }
@@ -30,7 +29,6 @@ export default class ButtonCloseCommands {
 
     let html = ContentService.getEditorHtmlContent(editor);
 
-    // eslint-disable-next-line no-undef
     if (mauticEditorFonts) {
       html = EditorFontsService.addFontLinksToHtml(html);
     }
@@ -52,7 +50,6 @@ export default class ButtonCloseCommands {
       throw new Error('Could not generate html from MJML');
     }
 
-    // eslint-disable-next-line no-undef
     if (mauticEditorFonts) {
       htmlCode = EditorFontsService.addFontLinksToHtml(htmlCode);
     }
