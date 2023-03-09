@@ -98,10 +98,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param $order
+     * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order)
+    public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
@@ -237,8 +238,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             return $companies[$key];
         }
 
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+        $q->select('comp.*, cl.is_primary')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id');
 
         if (!empty($id)) {
             $q->where(

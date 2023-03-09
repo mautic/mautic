@@ -67,7 +67,9 @@ $container->loadFromExtension('framework', [
         'engines' => $engines,
         'form'    => [
             'resources' => [
-                'MauticCoreBundle:FormTheme\\Custom',
+                // Custom form theme has been moved into CoreBundle/Resources/views/FormTheme/mautic_form_layout.html.tiwg
+                // Once PHP engine has been removed, these no longer apply
+                //'MauticCoreBundle:FormTheme\\Custom',
             ],
         ],
     ],
@@ -145,6 +147,21 @@ $dbalSettings = [
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
     'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
+
+if (!empty($localConfigParameterBag->get('db_host_ro'))) {
+    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['keep_replica']    = true;
+    $dbalSettings['replicas']        = [
+        'replica1' => [
+            'host'                  => '%mautic.db_host_ro%',
+            'port'                  => '%mautic.db_port%',
+            'dbname'                => '%mautic.db_name%',
+            'user'                  => '%mautic.db_user%',
+            'password'              => '%mautic.db_password%',
+            'charset'               => 'utf8mb4',
+        ],
+    ];
+}
 
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,

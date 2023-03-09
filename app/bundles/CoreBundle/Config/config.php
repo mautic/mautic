@@ -412,19 +412,19 @@ return [
             'mautic.menu.admin' => [
                 'alias'   => 'admin',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:admin.html.php',
+                    'template' => 'MauticCoreBundle:Menu:admin.html.twig',
                 ],
             ],
             'mautic.menu.extra' => [
                 'alias'   => 'extra',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:extra.html.php',
+                    'template' => 'MauticCoreBundle:Menu:extra.html.twig',
                 ],
             ],
             'mautic.menu.profile' => [
                 'alias'   => 'profile',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.php',
+                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.twig',
                 ],
             ],
         ],
@@ -967,6 +967,7 @@ return [
         'db_user'                         => '',
         'db_password'                     => '',
         'db_table_prefix'                 => '',
+        'db_host_ro'                      => null,
         'locale'                          => 'en_US',
         'secret_key'                      => 'temp',
         'dev_hosts'                       => [],

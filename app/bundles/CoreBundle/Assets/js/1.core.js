@@ -575,7 +575,10 @@ var Mautic = {
      * @param errorThrown
      */
     processAjaxError: function (request, textStatus, errorThrown, mainContent) {
-        if (textStatus == 'abort') {
+        if (textStatus === 'abort' || textStatus.includes('error')) {
+            const flashMessage = Mautic.addFlashMessage(Mautic.translate('mautic.core.request.error'));
+            Mautic.setFlashes(flashMessage);
+
             Mautic.stopPageLoadingBar();
             Mautic.stopCanvasLoadingBar();
             Mautic.stopIconSpinPostEvent();
@@ -712,6 +715,30 @@ var Mautic = {
 
             mQuery(this).removeClass('alert-new');
         });
+    },
+
+    addFlashMessage: function (message) {
+        const elDiv = document.createElement('div');
+        elDiv.className = 'alert alert-growl alert-growl--error alert-new';
+
+        const elButton = document.createElement('button');
+        elButton.classList.add('close');
+        elButton.type = "button";
+        elButton.dataset.dismiss = "alert";
+        elButton.ariaHidden = "true";
+        elButton.ariaLabel = "Close";
+
+        const elI = document.createElement('i');
+        elI.className = 'fa fa-times';
+
+        const elSpan = document.createElement('span');
+        elSpan.innerHTML = message;
+
+        elButton.append(elI);
+        elDiv.append(elButton);
+        elDiv.append(elSpan);
+
+        return elDiv;
     },
 
     /**

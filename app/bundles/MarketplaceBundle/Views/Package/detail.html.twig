@@ -273,7 +273,7 @@
     'footerButtons' : false,
 }) -}}
 
-{{- include('MauticCoreBundle:Helper:modal.html.php', {
+{{- include('MauticCoreBundle:Helper:modal.html.twig', {
     'id'            : 'RemovalInProgressModal',
     'header'        : 'Removing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
     'size'          : 'md',

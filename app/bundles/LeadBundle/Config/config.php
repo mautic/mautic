@@ -1076,43 +1076,6 @@ return [
                 ],
             ],
         ],
-        'command' => [
-            'mautic.lead.command.deduplicate' => [
-                'class'     => \Mautic\LeadBundle\Command\DeduplicateCommand::class,
-                'arguments' => [
-                    'mautic.lead.deduper',
-                    'translator',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.lead.command.create_custom_field' => [
-                'class'     => \Mautic\LeadBundle\Field\Command\CreateCustomFieldCommand::class,
-                'arguments' => [
-                    'mautic.lead.field.settings.background_service',
-                    'translator',
-                    'mautic.lead.repository.field',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.lead.command.import' => [
-                'class'     => \Mautic\LeadBundle\Command\ImportCommand::class,
-                'arguments' => [
-                    'translator',
-                    'mautic.lead.model.import',
-                ],
-                'tag' => 'console.command',
-            ],
-            'mautic.lead.command.contact_scheduled_export' => [
-                'class'     => \Mautic\LeadBundle\Command\ContactScheduledExportCommand::class,
-                'arguments' => [
-                    'mautic.lead.model.export_scheduler',
-                    'event_dispatcher',
-                    'mautic.helper.template.formatter',
-                ],
-                'tag' => 'console.command',
-            ],
-        ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCompanyData::class,
@@ -1185,6 +1148,7 @@ return [
         'company_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'contact_unique_identifiers_operator'                                                   => \Doctrine\DBAL\Query\Expression\CompositeExpression::TYPE_OR,
         'segment_rebuild_time_warning'                                                          => 30,
+        'segment_build_time_warning'                                                            => 30,
         'contact_export_in_background'                                                          => true,
         'contact_export_dir'                                                                    => '%kernel.root_dir%/../media/files/temp',
         'contact_export_batch_size'                                                             => 20000,

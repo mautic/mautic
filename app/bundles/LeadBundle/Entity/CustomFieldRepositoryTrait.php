@@ -133,7 +133,7 @@ trait CustomFieldRepositoryTrait
 
                     //ORM - generates lead entities
                     /** @var \Doctrine\ORM\QueryBuilder $q */
-                    $q = $this->getEntitiesOrmQueryBuilder($order);
+                    $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                     $this->buildSelectClause($dq, $args);
 
                     $q->orderBy('ORD', 'ASC');
@@ -438,10 +438,15 @@ trait CustomFieldRepositoryTrait
 
     public function getUniqueIdentifiersWherePart(): string
     {
-        if (CompositeExpression::TYPE_AND === $this->uniqueIdentifiersOperator) {
+        if ($this->uniqueIdentifiersOperatorIs(CompositeExpression::TYPE_AND)) {
             return 'andWhere';
         }
 
         return 'orWhere';
+    }
+
+    private function uniqueIdentifiersOperatorIs(string $operator): bool
+    {
+        return $this->uniqueIdentifiersOperator === $operator;
     }
 }

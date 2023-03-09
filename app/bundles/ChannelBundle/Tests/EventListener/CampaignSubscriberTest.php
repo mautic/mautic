@@ -184,7 +184,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                                     'formType'         => SmsSendType::class,
                                     'formTypeOptions'  => ['update_select' => 'campaignevent_properties_sms'],
                                     'formTheme'        => 'MauticSmsBundle:FormTheme\SmsSendList',
-                                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.php',
+                                    'timelineTemplate' => 'MauticSmsBundle:SubscribedEvents\Timeline:index.html.twig',
                                     'channel'          => 'sms',
                                     'channelIdField'   => 'sms',
                                 ]
@@ -232,7 +232,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.php',
+                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.twig',
                 'timelineTemplateVars'   => [
                     'messageSettings' => [],
                 ],

@@ -242,7 +242,7 @@ trait LeadDetailsTrait
                 'eventLabel'      => $l['userName'],
                 'timestamp'       => $l['dateAdded'],
                 'details'         => $l['details'],
-                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.twig',
             ];
         }, $logs);
 

@@ -373,10 +373,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
         Mautic.activateSortable(this);
     });
 
-    mQuery(container + " div.sortable-panels").each(function () {
-        Mautic.activateSortablePanels(this);
-    });
-
     //downloads
     mQuery(container + " a[data-toggle='download']").off('click.download');
     mQuery(container + " a[data-toggle='download']").on('click.download', function (event) {
