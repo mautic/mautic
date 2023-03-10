@@ -20,6 +20,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
+    public const MINIFY_EMAIL_HTML = 'minify_email_html';
+
     /**
      * @var TranslatorInterface
      */
@@ -880,8 +882,6 @@ class ConfigType extends AbstractType
             ]
         );
     }
-
-    public const MINIFY_EMAIL_HTML              = 'minify_email_html';
 
     /**
      * {@inheritdoc}
