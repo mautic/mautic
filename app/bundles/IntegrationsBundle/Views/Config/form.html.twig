@@ -83,7 +83,7 @@
     <!-- Features -->
     {% if showFeaturesTab %}
     <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
-        {{ formRowIfExists(form, 'supportedFeatures') }}
+        {%- if form.supportedFeatures is defined %}{{ form_row(form.supportedFeatures) }}{% endif %}
 
         {% if useFeatureSettings or useSyncFeatures %}
             <hr />

@@ -8,8 +8,15 @@
     - companyFields
     - inBuilder (bool)
 #}
+{%- macro row_if_exists(form, field) %}
+  {% if form[field] is defined %}
+    <div class="col-md-6">
+      {{ form_row(form[field]) }}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
 {% set template = '<div class="col-md-6">{content}</div>' %}
-{% set toggleTemplate = '<div class="col-md-3">{content}</div>' %}
 {% set properties = form.properties|default([]) %}
 {% set validation = form.validation|default([]) %}
 
@@ -19,14 +26,14 @@
 
 {% set placeholder = '' %}
 {% if properties.placeholder is defined %}
-    {% set placeholder = formRowIfExists(properties, 'placeholder', template) %}
+    {% set placeholder = _self.row_if_exists(properties, 'placeholder') %}
     {% do properties.placeholder.setRendered() %}
     {% do form.properties.placeholder.setRendered() %}
 {% endif %}
 
 {% set customAttributes = '' %}
 {% if properties.labelAttributes is defined %}
-    {% set customAttributes = formRowIfExists(properties, 'labelAttributes', template) %}
+    {% set customAttributes = _self.row_if_exists(properties, 'labelAttributes') %}
     {% do properties.labelAttributes.setRendered() %}
     {% do form.properties.labelAttributes.setRendered() %}
 {% endif %}
@@ -124,11 +131,11 @@
         <div class="tab-content pa-lg">
             <div role="tabpanel" class="tab-pane active" id="general">
                 <div class="row">
-                    {{ formRowIfExists(form, 'label', template) }}
-                    {{ formRowIfExists(form, 'showLabel', template) }}
-                    {{ formRowIfExists(form, 'saveResult', template) }}
-                    {{ formRowIfExists(form, 'defaultValue', template) }}
-                    {{ formRowIfExists(form, 'helpMessage', template) }}
+                    {{ _self.row_if_exists(form, 'label') }}
+                    {{ _self.row_if_exists(form, 'showLabel') }}
+                    {{ _self.row_if_exists(form, 'saveResult') }}
+                    {{ _self.row_if_exists(form, 'defaultValue') }}
+                    {{ _self.row_if_exists(form, 'helpMessage') }}
                     {{ placeholder|raw }}
                 </div>
             </div>
@@ -136,8 +143,8 @@
             {% if form.mappedField is defined %}
               <div role="tabpanel" class="tab-pane" id="mappedfields">
                   <div class="row">
-                      {{ formRowIfExists(form, 'mappedObject', template) }}
-                      {{ formRowIfExists(form, 'mappedField', template) }}
+                      {{ _self.row_if_exists(form, 'mappedObject') }}
+                      {{ _self.row_if_exists(form, 'mappedField') }}
                   </div>
               </div>
             {% endif %}
@@ -145,8 +152,8 @@
             {% if form.isRequired is defined %}
               <div role="tabpanel" class="tab-pane" id="required">
                       <div class="row">
-                          {{ formRowIfExists(form, 'isRequired', '<div class="col-md-4">{content}</div>') }}
-                          {{ formRowIfExists(form, 'validationMessage', '<div class="col-md-8">{content}</div>') }}
+                          {%- if form.isRequired is defined %}<div class="col-md-4">{{ form_row(form.isRequired) }}</div>{% endif %}
+                          {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
                       </div>
                   <div class="row">
                       {% for name, property in validation %}
@@ -219,10 +226,10 @@
             {% if showAttributes %}
               <div role="tabpanel" class="tab-pane" id="attributes">
                   <div class="row">
-                      {{ formRowIfExists(form, 'alias', template) }}
-                      {{ formRowIfExists(form, 'labelAttributes', template) }}
-                      {{ formRowIfExists(form, 'inputAttributes', template) }}
-                      {{ formRowIfExists(form, 'containerAttributes', template) }}
+                      {{ _self.row_if_exists(form, 'alias') }}
+                      {{ _self.row_if_exists(form, 'labelAttributes') }}
+                      {{ _self.row_if_exists(form, 'inputAttributes') }}
+                      {{ _self.row_if_exists(form, 'containerAttributes') }}
                       {{ customAttributes|raw }}
                   </div>
               </div>
@@ -259,10 +266,10 @@
             {% if showBehavior %}
               <div role="tabpanel" class="tab-pane" id="progressive-profiling">
                   <div class="row">
-                      {{ formRowIfExists(form, 'alwaysDisplay', template) }}
-                      {{ formRowIfExists(form, 'isAutoFill', template) }}
-                      {{ formRowIfExists(form, 'showWhenValueExists', template) }}
-                      {{ formRowIfExists(form, 'showAfterXSubmissions', template) }}
+                      {{ _self.row_if_exists(form, 'alwaysDisplay') }}
+                      {{ _self.row_if_exists(form, 'isAutoFill') }}
+                      {{ _self.row_if_exists(form, 'showWhenValueExists') }}
+                      {{ _self.row_if_exists(form, 'showAfterXSubmissions') }}
                   </div>
               </div>
             {% endif %}

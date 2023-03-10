@@ -1,15 +1,15 @@
 <div class="text-center" id="marketplace-installation-in-progress">
-    <p><?php echo 'marketplace.package.install.html.in.progress'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) ?></p>
+    <p>{{ 'marketplace.package.install.html.in.progress'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) }}</p>
     <div class="spinner">
         <i class="fa fa-spin fa-spinner"></i>
     </div>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-failed">
-    <p><?php echo 'marketplace.package.install.html.failed'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) ?></p>
+    <p>{{ 'marketplace.package.install.html.failed'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) }}</p>
     <textarea class="form-control" readonly id="marketplace-installation-failed-details"></textarea>
 </div>
 <div style="display: none" class="text-center" id="marketplace-installation-success">
-    <p><?php echo 'marketplace.package.install.html.success'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) ?></p>
+    <p>{{ 'marketplace.package.install.html.success'|trans({'%packagename%' : packageDetail.packageBase.getHumanPackageName()|escape}) }}</p>
     <p><a class="btn btn-primary" href="{{ path('mautic_plugin_reload') }}">{% trans %}marketplace.package.install.html.success.continue{% endtrans %}</a></p>
 </div>
 
