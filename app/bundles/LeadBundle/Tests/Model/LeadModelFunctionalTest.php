@@ -204,7 +204,7 @@ class LeadModelFunctionalTest extends MauticMysqlTestCase
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    protected function getContactWithAssignTwoCompanies()
+    protected function getContactWithAssignTwoCompanies(): array
     {
         $company = new Company();
         $company->setName('Doe Corp');
