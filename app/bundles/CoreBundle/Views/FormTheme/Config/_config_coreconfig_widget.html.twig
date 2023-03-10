@@ -1,23 +1,22 @@
 {% block _config_coreconfig_widget %}
 {% set fields = form.children %}
 {% set fieldKeys = fields|keys %}
-{% set template = '<div class="col-md-6">{content}</div>' %}
 
-{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path'])|length > 0 %}
+{% if fieldKeys|filter(k => k in ['site_url', 'webroot', '404_page', 'cache_path', 'log_path', 'theme', 'image_path', 'last_shown_tab'])|length > 0 %}
   <div class="panel panel-primary">
       <div class="panel-heading">
           <h3 class="panel-title">{{ 'mautic.core.config.header.general'|trans }}</h3>
       </div>
       <div class="panel-body">
           <div class="row">
-              {{ formRowIfExists(fields, 'site_url', template) }}
-              {{ formRowIfExists(fields, 'webroot', template) }}
-              {{ formRowIfExists(fields, '404_page', template) }}
-              {{ formRowIfExists(fields, 'cache_path', template) }}
-              {{ formRowIfExists(fields, 'log_path', template) }}
-              {{ formRowIfExists(fields, 'theme', template) }}
-              {{ formRowIfExists(fields, 'image_path', template) }}
-              {{ formRowIfExists(fields, 'last_shown_tab') }}
+              {%- if form.site_url is defined %}<div class="col-md-6">{{ form_row(form.site_url) }}</div>{% endif %}
+              {%- if form.webroot is defined %}<div class="col-md-6">{{ form_row(form.webroot) }}</div>{% endif %}
+              {%- if form['404_page'] is defined %}<div class="col-md-6">{{ form_row(form['404_page']) }}</div>{% endif %}
+              {%- if form.cache_path is defined %}<div class="col-md-6">{{ form_row(form.cache_path) }}</div>{% endif %}
+              {%- if form.log_path is defined %}<div class="col-md-6">{{ form_row(form.log_path) }}</div>{% endif %}
+              {%- if form.theme is defined %}<div class="col-md-6">{{ form_row(form.theme) }}</div>{% endif %}
+              {%- if form.image_path is defined %}<div class="col-md-6">{{ form_row(form.image_path) }}</div>{% endif %}
+              {%- if form.last_shown_tab is defined %}{{ form_row(form.last_shown_tab) }}{% endif %}
           </div>
       </div>
   </div>
@@ -30,20 +29,20 @@
       </div>
       <div class="panel-body">
           <div class="row">
-              {{ formRowIfExists(fields, 'default_pagelimit', template) }}
-              {{ formRowIfExists(fields, 'default_timezone', template) }}
-              {{ formRowIfExists(fields, 'locale', template) }}
-              {{ formRowIfExists(fields, 'cached_data_timeout', template) }}
-              {{ formRowIfExists(fields, 'default_daterange_filter', template) }}
+              {%- if form.default_pagelimit is defined %}<div class="col-md-6">{{ form_row(form.default_pagelimit) }}</div>{% endif %}
+              {%- if form.default_timezone is defined %}<div class="col-md-6">{{ form_row(form.default_timezone) }}</div>{% endif %}
+              {%- if form.locale is defined %}<div class="col-md-6">{{ form_row(form.locale) }}</div>{% endif %}
+              {%- if form.cached_data_timeout is defined %}<div class="col-md-6">{{ form_row(form.cached_data_timeout) }}</div>{% endif %}
+              {%- if form.default_daterange_filter is defined %}<div class="col-md-6">{{ form_row(form.default_daterange_filter) }}</div>{% endif %}
           </div>
 
           <hr class="text-muted" />
 
           <div class="row">
-              {{ formRowIfExists(fields, 'date_format_full', template) }}
-              {{ formRowIfExists(fields, 'date_format_short', template) }}
-              {{ formRowIfExists(fields, 'date_format_dateonly', template) }}
-              {{ formRowIfExists(fields, 'date_format_timeonly', template) }}
+              {%- if form.date_format_full is defined %}<div class="col-md-6">{{ form_row(form.date_format_full) }}</div>{% endif %}
+              {%- if form.date_format_short is defined %}<div class="col-md-6">{{ form_row(form.date_format_short) }}</div>{% endif %}
+              {%- if form.date_format_dateonly is defined %}<div class="col-md-6">{{ form_row(form.date_format_dateonly) }}</div>{% endif %}
+              {%- if form.date_format_timeonly is defined %}<div class="col-md-6">{{ form_row(form.date_format_timeonly) }}</div>{% endif %}
           </div>
       </div>
   </div>
@@ -56,8 +55,8 @@
       </div>
       <div class="panel-body">
           <div class="row">
-              {{ formRowIfExists(fields, 'cors_restrict_domains', template) }}
-              {{ formRowIfExists(fields, 'cors_valid_domains', template) }}
+              {%- if form.cors_restrict_domains is defined %}<div class="col-md-6">{{ form_row(form.cors_restrict_domains) }}</div>{% endif %}
+              {%- if form.cors_valid_domains is defined %}<div class="col-md-6">{{ form_row(form.cors_valid_domains) }}</div>{% endif %}
           </div>
       </div>
   </div>
@@ -70,18 +69,18 @@
       </div>
       <div class="panel-body">
           <div class="row">
-              {{ formRowIfExists(fields, 'trusted_hosts', template) }}
-              {{ formRowIfExists(fields, 'trusted_proxies', template) }}
+              {%- if form.trusted_hosts is defined %}<div class="col-md-6">{{ form_row(form.trusted_hosts) }}</div>{% endif %}
+              {%- if form.trusted_proxies is defined %}<div class="col-md-6">{{ form_row(form.trusted_proxies) }}</div>{% endif %}
           </div>
 
           {% if fields.trusted_hosts is defined %}<hr class="text-muted" />{% endif %}
 
           <div class="row">
-              {{ formRowIfExists(fields, 'ip_lookup_service', template) }}
-              {{ formRowIfExists(fields, 'ip_lookup_auth', template) }}
-              {{ formRowIfExists(fields, 'ip_lookup_create_organization', template) }}
+              {%- if form.ip_lookup_service is defined %}<div class="col-md-6">{{ form_row(form.ip_lookup_service) }}</div>{% endif %}
+              {%- if form.ip_lookup_auth is defined %}<div class="col-md-6">{{ form_row(form.ip_lookup_auth) }}</div>{% endif %}
+              {%- if form.ip_lookup_create_organization is defined %}<div class="col-md-6">{{ form_row(form.ip_lookup_create_organization) }}</div>{% endif %}
               <div id="ip_lookup_config_container">
-                  {{ formRowIfExists(fields, 'ip_lookup_config', '<div class="col-md-12">{content}</div>') }}
+                  {%- if form.ip_lookup_config is defined %}<div class="col-md-12">{{ form_row(form.ip_lookup_config) }}</div>{% endif %}
               </div>
           </div>
           <div class="row">
@@ -93,33 +92,29 @@
           {% if fields.do_not_track_ips is defined or fields.do_not_track_bots is defined %}
               <hr class="text-muted" />
               <div class="row">
-                  {% if fields.do_not_track_ips is defined %}
-                      {{ formRowIfExists(fields, 'do_not_track_ips', template) }}
-                  {% endif %}
-                  {% if fields.do_not_track_bots is defined %}
-                      {{ formRowIfExists(fields, 'do_not_track_bots', template) }}
-                  {% endif %}
+                  {%- if form.do_not_track_ips is defined %}<div class="col-md-6">{{ form_row(form.do_not_track_ips) }}</div>{% endif %}
+                  {%- if form.do_not_track_bots is defined %}<div class="col-md-6">{{ form_row(form.do_not_track_bots) }}</div>{% endif %}
               </div>
           {% endif %}
 
           {% if fields.link_shortener_url is defined %}
             <hr class="text-muted" />
             <div class="row">
-                {{ formRowIfExists(fields, 'link_shortener_url', template) }}
+                {%- if form.link_shortener_url is defined %}<div class="col-md-6">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
             </div>
           {% endif %}
 
           {% if fields.max_entity_lock_time is defined %}
             <hr class="text-muted" />
             <div class="row">
-                {{ formRowIfExists(fields, 'max_entity_lock_time', template) }}
+                {%- if form.max_entity_lock_time is defined %}<div class="col-md-6">{{ form_row(form.max_entity_lock_time) }}</div>{% endif %}
             </div>
           {% endif %}
 
           {% if fields.transliterate_page_title %}
             <hr class="text-muted" />
             <div class="row">
-                {{ formRowIfExists(fields, 'transliterate_page_title', template) }}
+                {%- if form.transliterate_page_title is defined %}<div class="col-md-6">{{ form_row(form.transliterate_page_title) }}</div>{% endif %}
             </div>
           {% endif %}
       </div>
@@ -133,12 +128,12 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                {{ formRowIfExists(fields, 'headers_sts', template) }}
+                {%- if form.headers_sts is defined %}<div class="col-md-6">{{ form_row(form.headers_sts) }}</div>{% endif %}
             </div>
             <div class="row">
-                {{ formRowIfExists(fields, 'headers_sts_subdomains', template) }}
-                {{ formRowIfExists(fields, 'headers_sts_preload', template) }}
-                {{ formRowIfExists(fields, 'headers_sts_expire_time', template) }}
+                {%- if form.headers_sts_subdomains is defined %}<div class="col-md-6">{{ form_row(form.headers_sts_subdomains) }}</div>{% endif %}
+                {%- if form.headers_sts_preload is defined %}<div class="col-md-6">{{ form_row(form.headers_sts_preload) }}</div>{% endif %}
+                {%- if form.headers_sts_expire_time is defined %}<div class="col-md-6">{{ form_row(form.headers_sts_expire_time) }}</div>{% endif %}
             </div>
         </div>
     </div>
@@ -151,12 +146,18 @@
       </div>
       <div class="panel-body">
           <div class="row">
-              {{ formRowIfExists(fields, 'update_stability', template) }}
-              {{ formRowIfExists(fields, 'composer_updates',
-                  '<div class="col-md-6">{content}<span style="color:red">' ~
-                  'mautic.core.config.form.update.composer.warning'|trans({'%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">', '%url_end%': '</a>'}) ~
-                  '</div>'
-              ) }}
+              {%- if form.update_stability is defined %}<div class="col-md-6">{{ form_row(form.update_stability) }}</div>{% endif %}
+              {%- if form.composer_updates is defined %}
+                <div class="col-md-6">
+                  {{ form_row(form.composer_updates) }}
+                  <span style="color:red">
+                    {{ 'mautic.core.config.form.update.composer.warning'|trans({
+                          '%url_start%': '<a href="https://mau.tc/switch-to-composer" target="_blank" style="color: red; text-decoration: underline">',
+                          '%url_end%': '</a>'
+                    })|raw }}
+                  </span>
+                </div>
+              {% endif %}
           </div>
       </div>
   </div>

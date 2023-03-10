@@ -33,7 +33,7 @@
       {% endif %}
 
       {% if event.extra.hit.deviceBrand is defined and event.extra.hit.deviceBrand is not empty %}
-          <dt><?php echo $view['translator']->trans('mautic.core.timeline.device.brand'); ?></dt>
+          <dt>{{ 'mautic.core.timeline.device.brand'|trans }}</dt>
           <dd class="ellipsis">{{ inputClean(event.extra.hit.deviceBrand) }}</dd>
       {% endif %}
 
