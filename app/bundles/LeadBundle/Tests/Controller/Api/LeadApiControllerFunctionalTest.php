@@ -375,6 +375,24 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['timezone'], $response['contact']['fields']['all']['timezone']);
         $this->assertEquals($updatedValues['owner'], $response['contact']['owner']['id']);
 
+        // test: create the same contact, merge it based on unique identifier (email) - without loosing the owner and stage
+        unset($updatedValues['owner']);
+
+        $this->client->request('POST', '/api/contacts/new', $updatedValues);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertEquals($contactId, $response['contact']['id']);
+        $this->assertEquals($updatedValues['email'], $response['contact']['fields']['all']['email']);
+        $this->assertEquals($payload['firstname'], $response['contact']['fields']['all']['firstname']);
+        $this->assertEquals($updatedValues['lastname'], $response['contact']['fields']['all']['lastname']);
+        $this->assertSame(4, $response['contact']['points']);
+        $this->assertSame(null, $response['contact']['stage']); // stage was not set on the contact
+        $this->assertSame(2, $response['contact']['owner']['id']);
+
+        // set the owner again for the other tests to work
+        $updatedValues['owner'] = 2;
+
         // Test getting a contact
         $this->client->request(
             'GET', '/api/contacts/'.$contactId);
