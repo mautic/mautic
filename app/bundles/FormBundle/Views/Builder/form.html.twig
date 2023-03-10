@@ -64,7 +64,7 @@
                   {%- endif %}
 
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template|replace({'.html.php': '.html.twig'}), {
+                  {{- include(theme ~ template, {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -97,7 +97,7 @@
                   {%- endif -%}
 
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template|replace({'.html.php': '.html.twig'}), {
+                  {{- include(theme ~ template, {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,

@@ -1,7 +1,14 @@
+{%- macro row_if_exists(form, field) %}
+  {% if form[field] is defined %}
+    <div class="col-md-6">
+      {{ form_row(form[field]) }}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
 {% block _config_emailconfig_widget %}
 {% set fields = form.children %}
 {% set fieldKeys = fields|keys %}
-{% set template = '<div class="col-md-6">{content}</div>' %}
 
 {% form_theme form with [
     'MauticEmailBundle:FormTheme:Config/monitored_email_widget.html.twig',
@@ -15,15 +22,15 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_from_name', template) }}
-                {{ formRowIfExists(fields, 'mailer_from_email', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_from_name') }}
+                {{ _self.row_if_exists(fields, 'mailer_from_email') }}
             </div>
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_reply_to_email', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_reply_to_email') }}
             </div>
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_return_path', template) }}
-                {{ formRowIfExists(fields, 'mailer_is_owner', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_return_path') }}
+                {{ _self.row_if_exists(fields, 'mailer_is_owner') }}
             </div>
 
             {% if fields.mailer_from_name is defined or fields.mailer_from_email is defined %}
@@ -50,39 +57,43 @@
             {% endif %}
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_amazon_region', template) }}
-                {{ formRowIfExists(fields, 'mailer_amazon_other_region', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_amazon_region') }}
+                {{ _self.row_if_exists(fields, 'mailer_amazon_other_region') }}
             </div>
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_sparkpost_region', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_sparkpost_region') }}
             </div>
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_host', template) }}
-                {{ formRowIfExists(fields, 'mailer_port', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_host') }}
+                {{ _self.row_if_exists(fields, 'mailer_port') }}
             </div>
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_encryption', template) }}
-                {{ formRowIfExists(fields, 'mailer_auth_mode', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_encryption') }}
+                {{ _self.row_if_exists(fields, 'mailer_auth_mode') }}
             </div>
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_user', template) }}
-                {{ formRowIfExists(fields, 'mailer_password', template) }}
-                {{ formRowIfExists(fields, 'mailer_api_key', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_user') }}
+                {{ _self.row_if_exists(fields, 'mailer_password') }}
+                {{ _self.row_if_exists(fields, 'mailer_api_key') }}
             </div>
 
             {% if fields.mailer_transport is defined %}
                 <div class="row">
-                    {{ formRowIfExists(fields, 'mailer_mailjet_sandbox', template) }}
-                    {{ formRowIfExists(fields, 'mailer_mailjet_sandbox_default_mail', template) }}
+                    {{ _self.row_if_exists(fields, 'mailer_mailjet_sandbox') }}
+                    {{ _self.row_if_exists(fields, 'mailer_mailjet_sandbox_default_mail') }}
                 </div>
             {% endif %}
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_custom_headers', template) }}
+                {% if form.mailer_custom_headers is defined %}
+                  <div class="col-md-6">
+                    {{ form_row(form.mailer_custom_headers) }}
+                  </div>
+                {% endif %}
             </div>
 
             {% if fields.mailer_transport is defined %}
@@ -90,18 +101,18 @@
             {% endif %}
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_spool_type', template) }}
-                {{ formRowIfExists(fields, 'mailer_spool_path', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_spool_type') }}
+                {{ _self.row_if_exists(fields, 'mailer_spool_path') }}
             </div>
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_spool_msg_limit', template) }}
-                {{ formRowIfExists(fields, 'mailer_spool_time_limit', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_spool_msg_limit') }}
+                {{ _self.row_if_exists(fields, 'mailer_spool_time_limit') }}
             </div>
 
             <div class="row">
-                {{ formRowIfExists(fields, 'mailer_spool_recover_timeout', template) }}
-                {{ formRowIfExists(fields, 'mailer_spool_clear_timeout', template) }}
+                {{ _self.row_if_exists(fields, 'mailer_spool_recover_timeout') }}
+                {{ _self.row_if_exists(fields, 'mailer_spool_clear_timeout') }}
             </div>
         </div>
     </div>
@@ -144,14 +155,14 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            {{ formRowIfExists(fields, 'webview_text', template) }}
-            {{ formRowIfExists(fields, 'default_signature_text', template) }}
+            {{ _self.row_if_exists(fields, 'webview_text') }}
+            {{ _self.row_if_exists(fields, 'default_signature_text') }}
         </div>
         <div class="row">
-            {{ formRowIfExists(fields, 'mailer_append_tracking_pixel', template) }}
-            {{ formRowIfExists(fields, 'mailer_convert_embed_images', template) }}
-            {{ formRowIfExists(fields, 'disable_trackable_urls', template) }}
-            {{ formRowIfExists(fields, 'minify_email_html', template) }}
+            {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
+            {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
+            {{ _self.row_if_exists(fields, 'disable_trackable_urls') }}
+            {{ _self.row_if_exists(fields, 'minify_email_html') }}
         </div>
     </div>
 </div>
@@ -162,27 +173,27 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            {{ formRowIfExists(fields, 'unsubscribe_text', template) }}
+            {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
         </div>
         <div class="row">
-            {{ formRowIfExists(fields, 'unsubscribe_message', template) }}
-            {{ formRowIfExists(fields, 'resubscribe_message', template) }}
+            {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
+            {{ _self.row_if_exists(fields, 'resubscribe_message') }}
         </div>
         <div class="row">
-            {{ formRowIfExists(fields, 'unsubscribe_message', template) }}
-            {{ formRowIfExists(fields, 'resubscribe_message', template) }}
+            {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
+            {{ _self.row_if_exists(fields, 'resubscribe_message') }}
         </div>
         <div class="row">
-            {{ formRowIfExists(fields, 'show_contact_preferences', template) }}
-            {{ formRowIfExists(fields, 'show_contact_segments', template) }}
+            {{ _self.row_if_exists(fields, 'show_contact_preferences') }}
+            {{ _self.row_if_exists(fields, 'show_contact_segments') }}
         </div>
         <div class="row">
-            {{ formRowIfExists(fields, 'show_contact_frequency', template) }}
-            {{ formRowIfExists(fields, 'show_contact_pause_dates', template) }}
+            {{ _self.row_if_exists(fields, 'show_contact_frequency') }}
+            {{ _self.row_if_exists(fields, 'show_contact_pause_dates') }}
         </div>
         <div class="row">
-            {{ formRowIfExists(fields, 'show_contact_categories', template) }}
-            {{ formRowIfExists(fields, 'show_contact_preferred_channels', template) }}
+            {{ _self.row_if_exists(fields, 'show_contact_categories') }}
+            {{ _self.row_if_exists(fields, 'show_contact_preferred_channels') }}
         </div>
     </div>
 </div>
