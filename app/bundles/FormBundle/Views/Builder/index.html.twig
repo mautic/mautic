@@ -106,7 +106,7 @@
                                               {% set template = 'MauticFormBundle:Field:' ~ field.type ~ '.html.twig' %}
                                           {% endif %}
                                           {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
-                                                  'template': template|replace({'.html.php': '.html.twig'}),
+                                                  'template': template,
                                                   'field': field,
                                                   'viewOnlyFields': viewOnlyFields,
                                                   'inForm': true,
@@ -166,7 +166,7 @@
                                         {% set action = action|merge({
                                               'settings': actionSettings[action.type],
                                         }) %}
-                                        {{ include(template|replace({'.html.php': '.html.twig'}), {
+                                        {{ include(template, {
                                                 'action': action,
                                                 'inForm': true,
                                                 'id': action.id,
