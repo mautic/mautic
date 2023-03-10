@@ -553,10 +553,20 @@ class LeadApiController extends CommonApiController
             unset($parameters['tags']);
         }
 
+        // keep existing tags
         if (count($entity->getTags()) > 0) {
             foreach ($entity->getTags() as $tag) {
                 $parameters['tags'][] = $tag->getId();
             }
+        }
+
+        // keep existing owner if it is not set or should be reset to null
+        if (!array_key_exists('owner', $parameters) && $entity->getOwner()) {
+            $parameters['owner'] = $entity->getOwner()->getId();
+        }
+        // keep existing stage if it is not set or should be reset to null
+        if (!array_key_exists('stage', $parameters) && $entity->getStage()) {
+            $parameters['stage'] = $entity->getStage()->getId();
         }
 
         return $parameters;
