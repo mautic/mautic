@@ -15,6 +15,15 @@ class UnusedIpDeleteCommand extends ModeratedCommand
 {
     private const DEFAULT_LIMIT = 10000;
 
+    private IpAddressModel $ipAddressModel;
+
+    public function __construct(IpAddressModel $ipAddressModel)
+    {
+        $this->ipAddressModel = $ipAddressModel;
+
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this->setName('mautic:unusedip:delete')
@@ -41,13 +50,10 @@ EOT
         if (!$this->checkRunStatus($input, $output)) {
             return 0;
         }
-        $container = $this->getContainer();
-        /** @var IpAddressModel $ipAddressModel */
-        $ipAddressModel = $container->get('mautic.lead.model.ipaddress');
 
         try {
             $limit       = $input->getOption('limit');
-            $deletedRows = $ipAddressModel->deleteUnusedIpAddresses((int) $limit);
+            $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
         } catch (DBALException $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));

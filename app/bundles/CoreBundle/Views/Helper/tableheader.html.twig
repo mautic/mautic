@@ -32,8 +32,8 @@
             <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
                 <i class="fa fa-angle-down "></i>
             </button>
-            <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu">
-                {{ buttonsRender()|raw }}
+            <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu"> 
+                {{ buttonsRender() }}
             </ul>
         </div>
     </div>
@@ -76,7 +76,7 @@
             <span class="input-group-btn">
                 <button
                     class="btn btn-default btn-xs"
-                    onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}',{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
+                    onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
                     <i class="fa fa-fw fa-lg {{ value is defined and value is not empty ? 'fa-times' : 'fa-filter' }}"></i>
                 </button>
             </span>

@@ -134,7 +134,8 @@ Mautic.loadAjaxColumn = function(elementName, route, callback){
                     }
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         }
     }
@@ -370,10 +371,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
     //initialize sortable lists
     mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {
         Mautic.activateSortable(this);
-    });
-
-    mQuery(container + " div.sortable-panels").each(function () {
-        Mautic.activateSortablePanels(this);
     });
 
     //downloads

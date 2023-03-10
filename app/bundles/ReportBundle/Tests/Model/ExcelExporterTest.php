@@ -11,7 +11,7 @@ use Mautic\ReportBundle\Tests\Fixtures;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelExporterTest extends TestCase
 {
@@ -36,18 +36,21 @@ class ExcelExporterTest extends TestCase
                 'ID',
                 'Name',
                 'SUM Read',
+                'AVG Read',
                 'COUNT Contact ID',
             ],
             [
                 1,
                 'Email 1',
                 50,
+                0.5,
                 100,
             ],
             [
                 2,
                 'Email 2',
                 10,
+                0.1666,
                 60,
             ],
         ];

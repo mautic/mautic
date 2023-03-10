@@ -281,7 +281,7 @@ class CampaignController extends AbstractStandardFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.php'),
+                    'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.twig',
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
@@ -393,7 +393,7 @@ class CampaignController extends AbstractStandardFormController
                 'entity'          => $campaign,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.php',
+            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl(
@@ -1044,7 +1044,10 @@ class CampaignController extends AbstractStandardFormController
         if (is_array($campaignSources)) {
             foreach ($campaignSources as $type => $sources) {
                 if (!empty($sources)) {
-                    $sourceList                   = $this->getModel('campaign')->getSourceLists($type);
+                    $campaignModel = $this->getModel('campaign');
+                    \assert($campaignModel instanceof CampaignModel);
+
+                    $sourceList                   = $campaignModel->getSourceLists($type);
                     $this->campaignSources[$type] = [
                         'sourceType' => $type,
                         'campaignId' => $objectId,

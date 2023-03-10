@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -20,6 +21,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\QueueBundle\Queue\QueueService;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -109,6 +111,9 @@ class PageTestAbstract extends WebTestCase
 
         $contactTracker = $this->createMock(ContactTracker::class);
 
+        /** @var ContactRequestHelper&MockObject $contactRequestHelper */
+        $contactRequestHelper = $this->createMock(ContactRequestHelper::class);
+
         $contactTracker->expects($this
             ->any())
             ->method('getContact')
@@ -153,7 +158,8 @@ class PageTestAbstract extends WebTestCase
             $companyModel,
             $deviceTrackerMock,
             $contactTracker,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $contactRequestHelper
         );
 
         $pageModel->setDispatcher($dispatcher);

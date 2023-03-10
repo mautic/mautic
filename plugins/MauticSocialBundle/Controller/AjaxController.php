@@ -3,7 +3,6 @@
 namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
-use Mautic\CoreBundle\Controller\AjaxLookupControllerTrait;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,8 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AjaxController extends CommonAjaxController
 {
-    use AjaxLookupControllerTrait;
-
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -40,7 +37,7 @@ class AjaxController extends CommonAjaxController
             $form = $this->get('form.factory')->create($formType, [], ['label' => false, 'csrf_protection' => false]);
 
             $html = $this->renderView(
-                'MauticSocialBundle:FormTheme:'.$type.'_widget.html.php',
+                'MauticSocialBundle:FormTheme:'.$type.'_widget.html.twig',
                 ['form' => $form->createView()]
             );
 

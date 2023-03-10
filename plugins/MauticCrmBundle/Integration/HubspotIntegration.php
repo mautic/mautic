@@ -23,16 +23,20 @@ use MauticPlugin\MauticCrmBundle\Api\HubspotApi;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @method HubspotApi getApiHelper
  */
 class HubspotIntegration extends CrmAbstractIntegration
 {
+    public const ACCESS_KEY = 'accessKey';
+
     /**
      * @var UserHelper
      */
@@ -96,9 +100,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      */
     public function getRequiredKeyFields()
     {
-        return [
-            $this->getApiKey() => 'mautic.hubspot.form.apikey',
-        ];
+        return [];
     }
 
     /**
@@ -128,13 +130,36 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
+     * @param bool $inAuthorization
+     *
+     * @return mixed|string|null
+     */
+    public function getBearerToken($inAuthorization = false)
+    {
+        $tokenData = $this->getKeys();
+
+        return $tokenData[self::ACCESS_KEY] ?? null;
+    }
+
+    /**
+     * @return array<string,bool>
+     */
+    public function getFormSettings()
+    {
+        return [
+            'requires_callback'      => false,
+            'requires_authorization' => false,
+        ];
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
      */
     public function getAuthenticationType()
     {
-        return 'key';
+        return $this->getBearerToken() ? 'oauth2' : 'key';
     }
 
     /**
@@ -295,7 +320,7 @@ class HubspotIntegration extends CrmAbstractIntegration
     {
         $keys = $this->getKeys();
 
-        return isset($keys[$this->getAuthTokenKey()]);
+        return isset($keys[$this->getAuthTokenKey()]) || isset($keys[self::ACCESS_KEY]);
     }
 
     /**
@@ -309,12 +334,40 @@ class HubspotIntegration extends CrmAbstractIntegration
     }
 
     /**
-     * @param \Mautic\PluginBundle\Integration\Form|FormBuilder $builder
-     * @param array                                             $data
-     * @param string                                            $formArea
+     * @param FormBuilder $builder
+     * @param array       $data
+     * @param string      $formArea
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
+        if ('keys' === $formArea) {
+            $builder->add(
+                   self::ACCESS_KEY,
+                   TextType::class,
+                   [
+                       'label'       => 'mautic.hubspot.form.accessKey',
+                       'label_attr'  => ['class' => 'control-label'],
+                       'attr'        => [
+                           'class'    => 'form-control',
+                       ],
+                       'required'    => false,
+                   ]
+               );
+
+            $builder->add(
+                $this->getApiKey(),
+                TextType::class,
+                [
+                    'label'       => 'mautic.hubspot.form.apikey',
+                    'label_attr'  => ['class' => 'control-label'],
+                    'attr'        => [
+                        'class'    => 'form-control',
+                        'readonly' => true,
+                    ],
+                    'required'    => false,
+                ]
+            );
+        }
         if ('features' == $formArea) {
             $builder->add(
                 'objects',
@@ -473,7 +526,7 @@ class HubspotIntegration extends CrmAbstractIntegration
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead

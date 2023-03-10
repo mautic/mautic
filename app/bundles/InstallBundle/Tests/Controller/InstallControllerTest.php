@@ -15,10 +15,10 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -78,7 +78,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
                 $this->pathsHelper
             );
 
-        $event = $this->createMock(FilterControllerEvent::class);
+        $event = $this->createMock(ControllerEvent::class);
         $this->controller->initialize($event);
     }
 

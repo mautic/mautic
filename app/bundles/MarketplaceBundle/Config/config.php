@@ -31,7 +31,7 @@ return [
             ],
             RouteProvider::ROUTE_CLEAR_CACHE => [
                 'path'       => '/marketplace/clear/cache',
-                'controller' => 'MarketplaceBundle:Cache:clear',
+                'controller' => 'Mautic\MarketplaceBundle\Controller\CacheController::clearAction',
                 'method'     => 'GET',
             ],
         ],
@@ -115,31 +115,6 @@ return [
                     'mautic.helper.composer',
                     'mautic.helper.cache',
                     'monolog.logger.mautic',
-                ],
-            ],
-        ],
-        'commands' => [
-            'marketplace.command.list' => [
-                'class'     => \Mautic\MarketplaceBundle\Command\ListCommand::class,
-                'tag'       => 'console.command',
-                'arguments' => ['marketplace.service.plugin_collector'],
-            ],
-            'marketplace.command.install' => [
-                'class'     => \Mautic\MarketplaceBundle\Command\InstallCommand::class,
-                'tag'       => 'console.command',
-                'arguments' => ['mautic.helper.composer', 'marketplace.model.package'],
-            ],
-            'marketplace.command.remove' => [
-                'class'     => \Mautic\MarketplaceBundle\Command\RemoveCommand::class,
-                'tag'       => 'console.command',
-                'arguments' => ['mautic.helper.composer', 'monolog.logger.mautic'],
-            ],
-        ],
-        'events' => [
-            'marketplace.menu.subscriber' => [
-                'class'     => \Mautic\MarketplaceBundle\EventListener\MenuSubscriber::class,
-                'arguments' => [
-                    'marketplace.service.config',
                 ],
             ],
         ],

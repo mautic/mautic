@@ -2,21 +2,28 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to install Mautic sample data.
  */
-class InstallDataCommand extends ContainerAwareCommand
+class InstallDataCommand extends Command
 {
-    /**
-     * {@inheritdoc}
-     */
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator)
+    {
+        parent::__construct();
+
+        $this->translator = $translator;
+    }
+
     protected function configure()
     {
         $this->setName('mautic:install:data')
@@ -38,19 +45,14 @@ EOT
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $options    = $input->getOptions();
-        $force      = $options['force'];
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.factory')->getParameter('locale'));
+        $options = $input->getOptions();
+        $force   = $options['force'];
 
         if (!$force) {
             $helper         = $this->getHelper('question');
-            $questionString = $translator->trans('mautic.core.command.install_data_confirm').' (y = '.$translator->trans('mautic.core.form.yes').', n = '.$translator->trans('mautic.core.form.no').'): ';
+            $questionString = $this->translator->trans('mautic.core.command.install_data_confirm').' (y = '.$this->translator->trans('mautic.core.form.yes').', n = '.$this->translator->trans('mautic.core.form.no').'): ';
             $question       = new ConfirmationQuestion($questionString, false);
 
             if (!$helper->ask($input, $output, $question)) {
@@ -75,7 +77,7 @@ EOT
         $returnCode = $command->run($input, $output);
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         //recreate the database
@@ -87,7 +89,7 @@ EOT
         ]);
         $returnCode = $command->run($input, $output);
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         //now populate the tables with fixture
@@ -104,12 +106,12 @@ EOT
         $returnCode = $command->run($input, $output);
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         $output->setVerbosity($verbosity);
         $output->writeln(
-            $translator->trans('mautic.core.command.install_data_success')
+            $this->translator->trans('mautic.core.command.install_data_success')
         );
 
         return 0;

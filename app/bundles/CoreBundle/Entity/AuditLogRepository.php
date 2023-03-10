@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * AuditLogRepository.
+ * @extends CommonRepository<AuditLog>
  */
 class AuditLogRepository extends CommonRepository
 {

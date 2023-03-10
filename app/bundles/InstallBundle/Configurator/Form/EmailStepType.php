@@ -5,6 +5,7 @@ namespace Mautic\InstallBundle\Configurator\Form;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\EmailBundle\Model\TransportType;
+use Mautic\MessengerBundle\Model\MessengerTransportType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -12,9 +13,9 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailStepType extends AbstractType
 {
@@ -28,10 +29,16 @@ class EmailStepType extends AbstractType
      */
     private $transportType;
 
-    public function __construct(TranslatorInterface $translator, TransportType $transportType)
+    /**
+     * @var MessengerTransportType
+     */
+    private $messengerTransportType;
+
+    public function __construct(TranslatorInterface $translator, TransportType $transportType, MessengerTransportType $messengerTransportType)
     {
-        $this->translator    = $translator;
-        $this->transportType = $transportType;
+        $this->translator             = $translator;
+        $this->transportType          = $transportType;
+        $this->messengerTransportType = $messengerTransportType;
     }
 
     /**
@@ -162,7 +169,7 @@ class EmailStepType extends AbstractType
                 'required'    => false,
                 'attr'        => [
                     'class'        => 'form-control',
-                    'data-show-on' => '{"config_emailconfig_mailer_transport":['.$this->transportType->getSparkPostService().']}',
+                    'data-show-on' => '{"install_email_step_mailer_transport":['.$this->transportType->getSparkPostService().']}',
                     'tooltip'      => 'mautic.email.config.mailer.sparkpost_region.tooltip',
                     'onchange'     => 'Mautic.disableSendTestEmailButton()',
                 ],
@@ -326,6 +333,44 @@ class EmailStepType extends AbstractType
 
         $builder->add('mailer_spool_path', HiddenType::class);
 
+        $messengerConditions     = '{"install_email_step_messenger_type":["async"]}';
+        $messengerHideConditions = '{"install_email_step_messenger_type":["sync"]}';
+
+        $builder->add(
+            'messenger_type',
+            ChoiceType::class,
+            [
+                'choices'           => [
+                    'mautic.messenger.config.enabled.true'    => 'async',
+                    'mautic.messenger.config.enabled.false'   => 'sync',
+                ],
+                'label'       => 'mautic.messenger.config.enabled',
+                'label_attr'  => ['class' => 'control-label'],
+                'required'    => true,
+                'attr'        => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.messenger.config.enabled.tooltip',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
+        $builder->add(
+            'messenger_transport',
+            ChoiceType::class,
+            [
+                'choices'           => $this->getMessengerTransportChoices(),
+                'label'             => 'mautic.install.form.email.messenger',
+                'required'          => false,
+                'attr'              => [
+                    'data-show-on' => $messengerConditions,
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.email.config.mailer.messenger.tooltip',
+                ],
+                'placeholder' => false,
+            ]
+        );
+
         $builder->add(
             'buttons',
             FormButtonsType::class,
@@ -368,6 +413,23 @@ class EmailStepType extends AbstractType
     {
         $choices    = [];
         $transports = $this->transportType->getTransportTypes();
+
+        foreach ($transports as $value => $label) {
+            $choices[$this->translator->trans($label)] = $value;
+        }
+
+        ksort($choices, SORT_NATURAL);
+
+        return $choices;
+    }
+
+    /**
+     * @return array<string>
+     */
+    private function getMessengerTransportChoices()
+    {
+        $choices    = [];
+        $transports = $this->messengerTransportType->getTransportTypes();
 
         foreach ($transports as $value => $label) {
             $choices[$this->translator->trans($label)] = $value;

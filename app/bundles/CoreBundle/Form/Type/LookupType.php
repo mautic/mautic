@@ -26,12 +26,4 @@ class LookupType extends AbstractType
     {
         return TextType::class;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'lookup';
-    }
 }

@@ -2,25 +2,39 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\SearchStringHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class CommonRepository extends EntityRepository
+/**
+ * @template T
+ * @extends ServiceEntityRepository<T>
+ */
+class CommonRepository extends ServiceEntityRepository
 {
+    /**
+     * @phpstan-param class-string<T>|null $entityFQCN
+     */
+    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
+    {
+        parent::__construct($registry, $entityFQCN ?? str_replace('Repository', '', get_class($this)));
+    }
+
     /**
      * Stores the parsed columns and their negate status for addAdvancedSearchWhereClause().
      *
@@ -29,7 +43,7 @@ class CommonRepository extends EntityRepository
     protected $advancedFilterCommands = [];
 
     /**
-     * @var User
+     * @var User|null
      */
     protected $currentUser;
 
@@ -398,14 +412,14 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param      $filter
-     * @param null $parameterName
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param array<mixed>                  $filter
      *
      * @return array
      */
-    public function getFilterExpr(&$q, $filter, $parameterName = null)
+    public function getFilterExpr($q, array $filter, ?string $unique = null)
     {
-        $unique    = ($parameterName) ? $parameterName : $this->generateRandomParameterName();
+        $unique    = ($unique) ?: $this->generateRandomParameterName();
         $parameter = [];
 
         if (isset($filter['group'])) {
@@ -479,11 +493,11 @@ class CommonRepository extends EntityRepository
      * Returns a andX Expr() that takes into account isPublished, publishUp and publishDown dates
      * The Expr() sets a :now and :true parameter that must be set in the calling function.
      *
-     * @param      $q
-     * @param null $alias
-     * @param bool $setNowParameter
-     * @param bool $setTrueParameter
-     * @param bool $allowNullForPublishedUp Allow entities without a published up date
+     * @param             $q
+     * @param string|null $alias
+     * @param bool        $setNowParameter
+     * @param bool        $setTrueParameter
+     * @param bool        $allowNullForPublishedUp Allow entities without a published up date
      *
      * @return mixed
      */
@@ -594,7 +608,7 @@ class CommonRepository extends EntityRepository
 
         $this->buildOrderByClauseFromArray($q, $order);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return [
             'total'   => $count,
@@ -788,6 +802,80 @@ class CommonRepository extends EntityRepository
         if ($flush) {
             $this->getEntityManager()->flush($entity);
         }
+    }
+
+    /**
+     * Insert entity if it does not exist, update if it does.
+     * ID is set to the enity after upsert.
+     * Main reason to use this over fetch/save is to avoid race conditions.
+     *
+     * Warning: This method use DBAL, not ORM. It will save only the entity you send it.
+     * It will NOT save the entity's associations. Entity manager won't know that the entity was flushed.
+     */
+    public function upsert(object $entity): void
+    {
+        $connection = $this->getEntityManager()->getConnection();
+        $metadata   = $this->getClassMetadata();
+        $identifier = $metadata->getSingleIdentifierFieldName();
+        $makeUpdate = fn (string $column) => "{$column} = VALUES({$column})";
+        $columns    = [];
+        $values     = [];
+        $types      = [];
+        $set        = [];
+        $update     = [];
+        $hasId      = $metadata->containsForeignIdentifier;
+
+        foreach ($metadata->getFieldNames() as $fieldName) {
+            $value = $metadata->getFieldValue($entity, $fieldName);
+            if ($metadata->isIdentifier($fieldName)) {
+                if ($value) {
+                    $hasId = true;
+                } else {
+                    continue;
+                }
+            }
+            $column    = $metadata->getColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $value;
+            $types[]   = $metadata->getTypeOfField($fieldName);
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        foreach ($metadata->getAssociationNames() as $fieldName) {
+            $assocEntity = $metadata->getFieldValue($entity, $fieldName);
+            if (!$metadata->isAssociationWithSingleJoinColumn($fieldName) || !is_object($assocEntity)) {
+                continue;
+            }
+            $idCol     = ucfirst($metadata->getSingleAssociationReferencedJoinColumnName($fieldName));
+            $idGetter  = "get{$idCol}";
+            $column    = $metadata->getSingleAssociationJoinColumnName($fieldName);
+            $columns[] = $column;
+            $values[]  = $assocEntity->$idGetter();
+            $types[]   = Types::STRING;
+            $set[]     = '?';
+            $update[]  = $makeUpdate($column);
+        }
+
+        $numberOfRowsAffected = $connection->executeStatement(
+            'INSERT INTO '.$this->getTableName().' ('.implode(', ', $columns).')'.
+            ' VALUES ('.implode(', ', $set).')'.
+            ' ON DUPLICATE KEY UPDATE '.implode(', ', $update),
+            $values,
+            $types
+        );
+
+        if ($entity instanceof UpsertInterface) {
+            $entity->setHasBeenInserted(UpsertInterface::ROWS_AFFECTED_ON_INSERT === $numberOfRowsAffected);
+            $entity->setHasBeenUpdated(UpsertInterface::ROWS_AFFECTED_ON_UPDATE === $numberOfRowsAffected);
+        }
+        if ($hasId) {
+            return;
+        }
+
+        $id = (int) $connection->lastInsertId();
+
+        $metadata->setFieldValue($entity, $identifier, $id);
     }
 
     /**
@@ -1224,11 +1312,9 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
-     *
-     * @return bool
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
-    protected function buildLimiterClauses(&$q, array $args)
+    protected function buildLimiterClauses($q, array $args): void
     {
         $start = array_key_exists('start', $args) ? $args['start'] : 0;
         $limit = array_key_exists('limit', $args) ? $args['limit'] : 0;
@@ -1240,9 +1326,9 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
-    protected function buildOrderByClause($q, array $args)
+    protected function buildOrderByClause($q, array $args): void
     {
         $orderBy = array_key_exists('orderBy', $args) ? $args['orderBy'] : '';
 
@@ -1271,8 +1357,8 @@ class CommonRepository extends EntityRepository
     /**
      * Build order by from an array.
      *
-     * @param QueryBuilder $query
-     * @param array        $clauses [['col' => 'column_a', 'dir' => 'ASC']]
+     * @param QueryBuilder|DbalQueryBuilder $query
+     * @param array                         $clauses [['col' => 'column_a', 'dir' => 'ASC']]
      *
      * @return array
      */
@@ -1362,7 +1448,7 @@ class CommonRepository extends EntityRepository
     }
 
     /**
-     * @param \Doctrine\ORM\QueryBuilder $q
+     * @param QueryBuilder|DbalQueryBuilder $q
      */
     protected function buildWhereClause($q, array $args)
     {
@@ -1378,21 +1464,22 @@ class CommonRepository extends EntityRepository
         $queryExpression              = $q->expr()->andX();
 
         if (isset($args['ids'])) {
-            $ids = array_map('intval', $args['ids']);
+            $ids   = array_map('intval', $args['ids']);
+            $param = $this->generateRandomParameterName();
             if ($q instanceof QueryBuilder) {
-                $param = $this->generateRandomParameterName();
                 $queryExpression->add(
                     $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
                 );
                 $queryParameters[$param] = $ids;
             } else {
                 $queryExpression->add(
-                    $q->expr()->in($this->getTableAlias().'.id', $ids)
+                    $q->expr()->in($this->getTableAlias().'.id', ':'.$param)
                 );
+                $q->setParameter($param, $ids, Connection::PARAM_INT_ARRAY);
             }
         } elseif (!empty($args['ownedBy'])) {
             $queryExpression->add(
-                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], (int) $args['ownedBy'][1])
+                $q->expr()->in($this->getTableAlias().'.'.$args['ownedBy'][0], (string) $args['ownedBy'][1])
             );
         }
 

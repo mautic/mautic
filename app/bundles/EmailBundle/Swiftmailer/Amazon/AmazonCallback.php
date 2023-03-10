@@ -16,14 +16,14 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AmazonCallback
 {
     /**
      * From address for SNS email.
      */
-    const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
+    public const SNS_ADDRESS = 'no-reply@sns.amazonaws.com';
 
     private TranslatorInterface $translator;
     private LoggerInterface $logger;

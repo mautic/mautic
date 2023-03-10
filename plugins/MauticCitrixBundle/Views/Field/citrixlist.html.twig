@@ -1,0 +1,9 @@
+{% set listType = field.customParameters.listType|default('') %}
+{{ include('MauticFormBundle:Field:select.html.twig', {
+        'field': field,
+        'inForm': inForm|default(false),
+        'list': citrix_choices(listType),
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}, with_context=false) }}
