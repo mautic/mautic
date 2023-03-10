@@ -664,7 +664,7 @@ class LeadSubscriber implements EventSubscriberInterface
                                     'mautic_import_action',
                                     [
                                         'objectAction' => 'view',
-                                        'object'       => 'lead',
+                                        'object'       => 'contacts',
                                         'objectId'     => $import['object_id'],
                                     ]
                                 ),

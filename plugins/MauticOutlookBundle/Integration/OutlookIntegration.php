@@ -41,13 +41,13 @@ class OutlookIntegration extends AbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticOutlookBundle:Integration:form.html.php',
+                'template'   => 'MauticOutlookBundle:Integration:form.html.twig',
                 'parameters' => [
                     'mauticUrl' => UrlHelper::rel2abs('/index.php'),
                 ],

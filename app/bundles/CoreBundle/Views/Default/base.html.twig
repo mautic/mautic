@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html>
-    {{ include('MauticCoreBundle:Default:head.html.twig') }}
+    {{ include('MauticCoreBundle:Default:head.html.twig', {
+            headerTitle: block('headerTitle') is defined ? block('headerTitle') : headerTitle|default(''),
+            pageTitle: block('pageTitle') is defined ? block('pageTitle') : 'Mautic',
+        })
+    }}
     <body class="header-fixed">
         <section id="app-wrapper">
             {{ outputScripts('bodyOpen') }}
@@ -31,7 +35,9 @@
             <!--/ end: app-footer -->
 
             <section id="app-content">
-                {{ include('MauticCoreBundle:Default:output.html.twig') }}
+                {% block _content %}
+                    {{ include('MauticCoreBundle:Default:output.html.twig') }}
+                {% endblock %}
             </section>
 
             <script>
