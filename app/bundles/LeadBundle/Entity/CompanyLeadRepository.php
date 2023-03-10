@@ -53,7 +53,7 @@ class CompanyLeadRepository extends CommonRepository
      *
      * @throws \Doctrine\DBAL\Exception
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null, $onlyPrimary = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null, bool $onlyPrimary = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
