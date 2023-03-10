@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,9 +21,9 @@ class CleanupMaintenanceCommand extends ModeratedCommand
     private TranslatorInterface $translator;
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
     {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
