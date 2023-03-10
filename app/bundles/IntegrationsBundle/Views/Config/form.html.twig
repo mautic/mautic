@@ -94,7 +94,7 @@
             </div>
         {% endif %}
 
-        {{ formRowIfExists(form, 'supportedFeatures') }}
+        {%- if form.supportedFeatures is defined %}{{ form_row(form.supportedFeatures) }}{% endif %}
 
         {% if useFeatureSettings or useSyncFeatures %}
             <hr />

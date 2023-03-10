@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Templating\Twig\Extension;
 
-use Mautic\CoreBundle\Templating\Helper\FormHelper;
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\FormView;
 use Twig\Extension\AbstractExtension;
@@ -12,13 +11,6 @@ use Twig\TwigFunction;
 
 class FormExtension extends AbstractExtension
 {
-    private FormHelper $formHelper;
-
-    public function __construct(FormHelper $formHelper)
-    {
-        $this->formHelper = $formHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -27,7 +19,6 @@ class FormExtension extends AbstractExtension
         return [
             new TwigFunction('formFieldFormatList', [$this, 'formatList'], ['is_safe' => ['all']]),
             new TwigFunction('formContainsErrors', [$this, 'containsErrors'], ['is_safe' => ['all']]),
-            new TwigFunction('formRowIfExists', [$this, 'rowIfExists'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -67,16 +58,5 @@ class FormExtension extends AbstractExtension
         }
 
         return false;
-    }
-
-    /**
-     * Render row if it exists.
-     *
-     * @param FormView|array<string> $form
-     * @param mixed[]                $variables
-     */
-    public function rowIfExists($form, string $key, string $template = null, array $variables = []): string
-    {
-        return $this->formHelper->rowIfExists($form, $key, $template, $variables);
     }
 }

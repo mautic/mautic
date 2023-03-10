@@ -68,7 +68,7 @@
 
   {% set bodyContent = 'mautic.core.ab_test.noresults'|trans %}
   {% if abTestResults.supportTemplate is defined %}
-      {% set bodyContent = include(abTestResults.supportTemplate|replace({'.html.php': '.html.twig'}), {'results': abTestResults, 'variants': variants}) %}
+      {% set bodyContent = include(abTestResults.supportTemplate, {'results': abTestResults, 'variants': variants}) %}
   {% endif %}
   {{ include('MauticCoreBundle:Helper:modal.html.twig', {
           'id': 'abStatsModal',
