@@ -53,16 +53,6 @@ class LeadSubscriber implements EventSubscriberInterface
             // Ignore this contact
             return;
         }
-        if ($lead->getEventData('pipedrive.webhook')) {
-            // Don't export what was just imported
-            return;
-        }
-        /** @var PipedriveIntegration $integrationObject */
-        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
-            return;
-        }
-        $this->leadExport->setIntegration($integrationObject);
 
         $changes = $lead->getChanges(true);
         if (!empty($changes['dateIdentified'])) {
@@ -75,34 +65,12 @@ class LeadSubscriber implements EventSubscriberInterface
     public function onLeadPostDelete(Events\LeadEvent $event)
     {
         $lead = $event->getLead();
-        if ($lead->getEventData('pipedrive.webhook')) {
-            // Don't export what was just imported
-            return;
-        }
-
-        /** @var PipedriveIntegration $integrationObject */
-        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
-            return;
-        }
-        $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->delete($lead);
     }
 
     public function onLeadCompanyChange(Events\LeadChangeCompanyEvent $event)
     {
         $lead = $event->getLead();
-        if ($lead->getEventData('pipedrive.webhook')) {
-            // Don't export what was just imported
-            return;
-        }
-
-        /** @var PipedriveIntegration $integrationObject */
-        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
-            return;
-        }
-        $this->leadExport->setIntegration($integrationObject);
         $this->leadExport->update($lead);
     }
 }

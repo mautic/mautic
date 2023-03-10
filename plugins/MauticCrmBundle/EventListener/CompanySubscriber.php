@@ -51,18 +51,6 @@ class CompanySubscriber implements EventSubscriberInterface
     public function onCompanyPostSave(Events\CompanyEvent $event)
     {
         $company = $event->getCompany();
-        if ($company->getEventData('pipedrive.webhook')) {
-            // Don't export what was just imported
-            return;
-        }
-
-        /** @var PipedriveIntegration $integrationObject */
-        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
-            return;
-        }
-
-        $this->companyExport->setIntegration($integrationObject);
         $this->companyExport->pushCompany($company);
     }
 
@@ -72,18 +60,6 @@ class CompanySubscriber implements EventSubscriberInterface
     public function onCompanyPreDelete(Events\CompanyEvent $event)
     {
         $company = $event->getCompany();
-        if ($company->getEventData('pipedrive.webhook')) {
-            // Don't export what was just imported
-            return;
-        }
-
-        /** @var PipedriveIntegration $integrationObject */
-        $integrationObject = $this->integrationHelper->getIntegrationObject(PipedriveIntegration::INTEGRATION_NAME);
-        if (false === $integrationObject || !$integrationObject->shouldImportDataToPipedrive()) {
-            return;
-        }
-
-        $this->companyExport->setIntegration($integrationObject);
         $this->companyExport->delete($company);
     }
 }
