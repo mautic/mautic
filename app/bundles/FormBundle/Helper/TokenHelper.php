@@ -56,7 +56,7 @@ class TokenHelper
                         )
                     )
                 ) {
-                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, false) :
+                    $formHtml = ($form->isPublished()) ? $this->formModel->getContent($form, true) :
                         '';
 
                     //pouplate get parameters
