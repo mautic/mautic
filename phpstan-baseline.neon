@@ -64216,6 +64216,11 @@ parameters:
 			path: plugins/MauticCrmBundle/Api/ZohoApi.php
 
 		-
+			message: "#^Method MauticPlugin\\\\MauticCrmBundle\\\\Controller\\\\PublicController\\:\\:contactDataAction\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: plugins/MauticCrmBundle/Controller/PublicController.php
+
+		-
 			message: "#^Method MauticPlugin\\\\MauticCrmBundle\\\\EventListener\\\\CompanySubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: plugins/MauticCrmBundle/EventListener/CompanySubscriber.php
