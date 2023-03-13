@@ -143,6 +143,12 @@ Mautic.submitSendForm = function () {
     mQuery('form[name=\'batch_send\']').submit();
 };
 
+Mautic.submitAbSendForm = function () {
+    Mautic.dismissConfirmation();
+    mQuery('.btn-send').prop('disabled', true);
+    mQuery('form[name=\'ab_test_send\']').submit();
+};
+
 Mautic.emailSendOnLoad = function (container, response) {
     if (mQuery('.email-send-progress').length) {
         if (!mQuery('#emailSendProgress').length) {

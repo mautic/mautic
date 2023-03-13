@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Form\Type\AbTestSendType;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
@@ -1086,10 +1087,155 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
+    public function absendAction($objectId)
+    {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model   = $this->getModel('email');
+        $entity  = $model->getEntity($objectId);
+        $session = $this->container->get('session');
+        $page    = $session->get('mautic.email.page', 1);
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email',
+            ],
+        ];
+
+        //not found
+        if (null === $entity) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        if (!$entity->isPublished()) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.send.unpublished',
+                                'msgVars' => [
+                                    '%id%'   => $objectId,
+                                    '%name%' => $entity->getName(),
+                                ],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        if ('template' == $entity->getEmailType()
+            || !$this->get('mautic.security')->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $entity->getCreatedBy()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        // Check that the parent is getting sent
+        if ($variantParent = $entity->getVariantParent()) {
+            return $this->redirect($this->generateUrl('mautic_email_action',
+                [
+                    'objectAction' => 'send',
+                    'objectId'     => $variantParent->getId(),
+                ]
+            ));
+        }
+
+        if ($translationParent = $entity->getTranslationParent()) {
+            return $this->redirect($this->generateUrl('mautic_email_action',
+                [
+                    'objectAction' => 'send',
+                    'objectId'     => $translationParent->getId(),
+                ]
+            ));
+        }
+
+        $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'absend', 'objectId' => $objectId]);
+        $pending  = $model->getPendingLeads($entity, null, true);
+        $form     = $this->get('form.factory')->create(AbTestSendType::class, [], ['action' => $action]);
+
+        if ('POST' == $this->request->getMethod()) {
+            $entity->setPublishUp(new \DateTime());
+            $this->getModel('email.email')->saveEntity($entity);
+            $viewParameters = [
+                'objectAction' => 'view',
+                'objectId'     => $entity->getId(),
+            ];
+            $template       = 'MauticEmailBundle:Email:view';
+            $passthrough    = [
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email',
+            ];
+
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => $template,
+                        'passthroughVars' => $passthrough,
+                    ]
+                )
+            );
+        }
+
+        //process and send
+        $contentTemplate = 'MauticEmailBundle:Send:abform.html.php';
+        $viewParameters  = [
+            'form'    => $form->createView(),
+            'email'   => $entity,
+            'pending' => $entity->getVariantsPendingCount($pending),
+        ];
+
+        return $this->delegateView(
+            [
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => $contentTemplate,
+                'passthroughVars' => [
+                    'mauticContent' => 'emailSend',
+                    'route'         => $action,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Manually sends emails.
+     *
+     * @param $objectId
+     *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
     public function sendAction($objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
+        /** @var Email $entity */
         $entity  = $model->getEntity($objectId);
         $session = $this->container->get('session');
         $page    = $session->get('mautic.email.page', 1);
@@ -1170,6 +1316,15 @@ class EmailController extends FormController
                 [
                     'objectAction' => 'send',
                     'objectId'     => $translationParent->getId(),
+                ]
+            ));
+        }
+
+        if ($entity->isEnableAbTest()) {
+            return $this->redirect($this->generateUrl('mautic_email_action',
+                [
+                    'objectAction' => 'absend',
+                    'objectId'     => $entity->getId(),
                 ]
             ));
         }

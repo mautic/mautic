@@ -1076,6 +1076,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $minContactId = null,
         $maxContactId = null
     ) {
+        if ($email->isEnableAbTest()) {
+            $limit = null;
+        }
+
         //get the leads
         if (empty($lists)) {
             $lists = $email->getLists();
