@@ -22,7 +22,7 @@ function postFormHandler() {
 </script>
 
 {% if message is not empty %}
-    <div class="alert alert-<?php echo $alert; ?>">
+    <div class="alert alert-{{ alert }}">
         {{ message|purify }}
     </div>
 {% endif %}

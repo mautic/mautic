@@ -89,7 +89,7 @@
 <div class="tab-content pa-md bg-white">
     <div class="tab-pane fade {% if 'details-container' == activeTab %}in active{% endif %} bdr-w-0" id="details-container">
         {{- form_row(form.isPublished) -}}
-        {{- formRowIfExists(form, 'virtual') -}}
+        {%- if form.virtual is defined %}{{ form_row(form.virtual) }}{% endif %}
         {%- if form.apiKeys is defined -%}
             {{- form_row(form.apiKeys) -}}
             {%- if formNotes.authorization is defined -%}

@@ -25,7 +25,7 @@
         <div class="row ml-0 mr-0">
             {# wrap in a row to keep bootstrap container classes from affecting builder layout #}
             <!-- start: "{{ template }}" -->
-            {{- include(template|replace({'.html.php': '.html.twig'}), {
+            {{- include(template, {
                     'field': field,
                     'inForm': true,
                     'id': field.id,
@@ -38,8 +38,8 @@
 
         {% if ((field.showWhenValueExists is defined and false is same as field.showWhenValueExists) or field.showAfterXSubmissions) is not empty
             or (field.alwaysDisplay is defined and true is same as field.alwaysDisplay)
-            or field.leadField is not empty
-            or field.conditions is not empty
+            or (field.leadField is defined and field.leadField is not empty)
+            or (field.conditions is defined and field.conditions is not empty)
         %}
             <div class="panel-footer">
                 {% if field.conditions.expr is defined and field.conditions.expr is not empty %}

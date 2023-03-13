@@ -7,7 +7,7 @@
         <div class="panel-body">
             {% set tooltip = translatorHasId(child.vars.label ~ '.tooltip') ? (child.vars.label ~ '.tooltip')|trans : '' %}
             {% if tooltip %}
-                <p>{{ tooltip }}</p>
+                <p>{{ tooltip|raw }}</p>
             {% endif %}
             {{ form_widget(child) }}
         </div>
