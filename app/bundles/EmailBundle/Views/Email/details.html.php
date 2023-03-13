@@ -8,12 +8,13 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
 if (!$isEmbedded) {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 
     $view['slots']->set('mauticContent', 'email');
-    $view['slots']->set('headerTitle', $email->getName());
 }
+
 $variantContent = $view->render(
     'MauticCoreBundle:Variant:index.html.php',
     [
@@ -26,6 +27,14 @@ $variantContent = $view->render(
 );
 
 $showVariants = !empty(trim($variantContent));
+
+if (!$isEmbedded) {
+    $header = $email->getName();
+    if ($showVariants) {
+        $header .= ' <i title="'.$view['translator']->trans('mautic.email.icon_tooltip.abtest.part').'" class="fa fa-fw fa-sitemap"></i>';
+    }
+    $view['slots']->set('headerTitle', $header);
+}
 
 $translationContent = $view->render(
     'MauticCoreBundle:Translation:index.html.php',

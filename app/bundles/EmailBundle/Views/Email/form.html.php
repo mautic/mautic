@@ -41,6 +41,10 @@ $header = $isExisting ?
         ['%name%' => $email->getName()]) :
     $view['translator']->trans('mautic.email.header.new');
 
+if ($isVariant) {
+    $header .= ' <i title="'.$view['translator']->trans('mautic.email.icon_tooltip.abtest.part').'" class="fa fa-fw fa-sitemap"></i>';
+}
+
 $view['slots']->set('headerTitle', $header.$subheader);
 
 $emailType = $form['emailType']->vars['data'];
