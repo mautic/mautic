@@ -315,11 +315,30 @@ trait VariantEntityTrait
 
     public function isEnableAbTest(): bool
     {
+        if (!$this->isVariant()) {
+            return false;
+        }
+
         if ($this->getVariantParent()) {
             return (bool) $this->getVariantParent()->getVariantSettings()['enableAbTest'] ?? false;
         }
 
         return (bool) $this->variantSettings['enableAbTest'] ?? false;
+    }
+
+    public function getVariantsPendingCount(int $pendingCount): int
+    {
+        if (!$this->isEnableAbTest()) {
+            return $pendingCount;
+        }
+
+        $totalWeight = $this->variantSettings['totalWeight'];
+        if ($this->getVariantParent()) {
+            $totalWeight =  $this->getVariantParent()->getVariantSettings()['totalWeight'];
+        }
+        $totalWeight =  (int) ($totalWeight ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
+
+        return $pendingCount * ($totalWeight / 100);
     }
 
     /**
