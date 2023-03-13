@@ -671,7 +671,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     $this->addTrackableTablesForEmailStats($queryBuilder);
                     $queryBuilder->select('e.id, e.subject as `title`, tr.hits as `clicks`, tr.unique_hits as `unique clicks`, pr.url as `URL`')
                         ->andWhere('pr.url IS NOT NULL')
-                        ->groupBy('tr.redirect_id, tr.hits')
+                        ->groupBy('e.id, tr.redirect_id, tr.hits')
                         ->orderBy('tr.hits', 'DESC')
                         ->setMaxResults(10);
 

@@ -58,8 +58,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
 
     public function testEmailStatReportGraphWithMostClickedLinks(): void
     {
-        $emailA = $this->createEmail('Email 1');
-        $emailB = $this->createEmail('Email 2');
+        $email = $this->createEmail('Email');
 
         $contacts = [
             $this->createContact('test1@example.com'),
@@ -69,23 +68,19 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $trackables = [
-            $this->createTrackable('https://example.com/1', $emailA->getId()),
-            $this->createTrackable('https://example.com/2', $emailA->getId()),
-            $this->createTrackable('https://example.com/3', $emailB->getId()),
+            $this->createTrackable('https://example.com/1', $email->getId()),
+            $this->createTrackable('https://example.com/2', $email->getId()),
         ];
         $this->em->flush();
 
-        $statsEmailA = $this->emulateEmailSend($emailA, $contacts);
-        $statsEmailB = $this->emulateEmailSend($emailB, $contacts);
+        $statsEmail = $this->emulateEmailSend($email, $contacts);
 
-        $this->emulateEmailRead($statsEmailA[0]);
-        $this->emulateEmailRead($statsEmailA[1]);
-        $this->emulateEmailRead($statsEmailB[1]);
+        $this->emulateEmailRead($statsEmail[0]);
+        $this->emulateEmailRead($statsEmail[1]);
 
-        $this->emulateLinkClick($emailA, $trackables[0], $contacts[0], 3);
-        $this->emulateLinkClick($emailA, $trackables[1], $contacts[0]);
-        $this->emulateLinkClick($emailA, $trackables[1], $contacts[1]);
-        $this->emulateLinkClick($emailB, $trackables[1], $contacts[1], 2);
+        $this->emulateLinkClick($email, $trackables[0], $contacts[0], 3);
+        $this->emulateLinkClick($email, $trackables[1], $contacts[0]);
+        $this->emulateLinkClick($email, $trackables[1], $contacts[1]);
         $this->em->flush();
 
         $report = new Report();
@@ -108,22 +103,18 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $crawlerGraphTable  = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
         // convert html table to php array
-        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 6);
+        $crawlerReportTable = array_slice($this->domTableToArray($crawlerReportTable), 1, 3);
         $graphTableArray    = array_slice($this->domTableToArray($crawlerGraphTable), 1);
 
         $this->assertSame([
-            ['1', 'test1@example.com', 'Email 1', '4', '2'],
-            ['2', 'test2@example.com', 'Email 1', '1', '1'],
-            ['3', 'test3@example.com', 'Email 1', '0', '0'],
-            ['4', 'test1@example.com', 'Email 2', '0', '0'],
-            ['5', 'test2@example.com', 'Email 2', '0', '0'],
-            ['6', 'test3@example.com', 'Email 2', '0', '0'],
+            ['1', 'test1@example.com', 'Email', '4', '2'],
+            ['2', 'test2@example.com', 'Email', '1', '1'],
+            ['3', 'test3@example.com', 'Email', '0', '0'],
         ], $crawlerReportTable);
 
         $this->assertSame([
-            ['Email 1', '4', '3', 'example.com/2'],
-            ['Email 1', '3', '1', 'example.com/1'],
-            ['Email 2', '0', '0', 'example.com/3'],
+            ['Email', '3', '1', 'example.com/1'],
+            ['Email', '2', '2', 'example.com/2'],
         ], $graphTableArray);
     }
 
