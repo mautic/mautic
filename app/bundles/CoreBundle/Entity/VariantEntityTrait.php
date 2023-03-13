@@ -315,15 +315,11 @@ trait VariantEntityTrait
 
     public function isEnableAbTest(): bool
     {
-        if (!$this->isVariant()) {
-            return false;
-        }
-
         if ($this->getVariantParent()) {
             return (bool) $this->getVariantParent()->getVariantSettings()['enableAbTest'] ?? false;
         }
 
-        return (bool) $this->variantSettings['enableAbTest'] ?? false;
+        return (bool) ($this->variantSettings['enableAbTest'] ?? false);
     }
 
     public function getVariantsPendingCount(int $pendingCount): int

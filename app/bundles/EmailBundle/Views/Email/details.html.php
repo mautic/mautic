@@ -83,7 +83,8 @@ if (!$isEmbedded) {
     ];
 }
 // Only show A/B test button if not already a translation of an a/b test
-$allowAbTest = $email->isTranslation(true) && $translations['parent']->isVariant(true) ? false : true;
+/** @var \Mautic\EmailBundle\Entity\Email  $email */
+$allowAbTest = $email->isEnableAbTest();
 if (!$isEmbedded) {
     $view['slots']->set(
         'actions',
