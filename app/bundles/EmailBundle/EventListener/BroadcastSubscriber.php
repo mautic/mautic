@@ -50,6 +50,11 @@ class BroadcastSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $limit      = $event->getLimit();
+        $batch      = $event->getBatch();
+        $maxThreads = $event->getMaxThreads();
+        $threadId   = $event->getThreadId();
+
         // Get list of published broadcasts or broadcast if there is only a single ID
         $emails = $this->model->getRepository()->getPublishedBroadcasts($event->getId());
 
@@ -59,14 +64,33 @@ class BroadcastSubscriber implements EventSubscriberInterface
             if ($emailEntity->isVariant(true)) {
                 continue;
             }
+
+            // is a/b testings
+            if ($emailEntity->isVariant()) {
+                if ($emailEntity->getVariantSentCount(true)) {
+                    continue;
+                }
+                // a/b test first sending without limit
+                $limit = null;
+                // a/b test first sending without threads
+                if ($maxThreads && $threadId) {
+                    if ($threadId > 1) {
+                        continue;
+                    }
+                    $maxThreads = null;
+                    $threadId   = null;
+                }
+            }
+
+            $emailEntity->setLock($event->getLock());
             [$sentCount, $failedCount, $failedRecipientsByList] = $this->model->sendEmailToLists(
                 $emailEntity,
                 null,
-                $event->getLimit(),
-                $event->getBatch(),
+                $limit,
+                $batch,
                 $event->getOutput(),
                 $event->getMinContactIdFilter(),
-                $event->getMaxContactIdFilter()
+                $event->getMaxContactIdFilter(),
             );
 
             $event->setResults(
