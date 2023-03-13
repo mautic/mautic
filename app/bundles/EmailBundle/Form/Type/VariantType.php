@@ -14,6 +14,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class VariantType extends AbstractType
 {
@@ -22,9 +23,12 @@ class VariantType extends AbstractType
      */
     private $emailModel;
 
-    public function __construct(EmailModel $emailModel)
+    private TranslatorInterface $translator;
+
+    public function __construct(EmailModel $emailModel, TranslatorInterface $translator)
     {
         $this->emailModel = $emailModel;
+        $this->translator = $translator;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -44,8 +48,9 @@ class VariantType extends AbstractType
             'label'      => 'mautic.core.ab_test.form.traffic_weight',
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
-                'class'    => 'form-control',
-                'tooltip'  => 'mautic.core.ab_test.form.traffic_total_weight.weight.help',
+                'class'           => 'form-control',
+                'tooltip'         => 'mautic.core.ab_test.form.traffic_total_weight.weight.help',
+                'postaddon_text'  => '%',
             ],
         ]);
 
@@ -61,7 +66,7 @@ class VariantType extends AbstractType
         $builder->add('totalWeight', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.traffic_total_weight',
             'label_attr'  => ['class' => 'control-label'],
-            'attr'        => $attr,
+            'attr'        => $attr + ['postaddon_text'  => '%'],
             'constraints' => new Assert\Range([
                 'min' => 0,
                 'max' => 100,
@@ -80,7 +85,7 @@ class VariantType extends AbstractType
         $builder->add('sendWinnerDelay', IntegerType::class, [
             'label'       => 'mautic.core.ab_test.form.send_winner_delay',
             'label_attr'  => ['class' => 'control-label'],
-            'attr'        => $attr,
+            'attr'        => $attr + ['postaddon_text'  => $this->translator->trans('mautic.core.time.hour')],
             'constraints' => new Assert\Range([
                 'min' => 0,
                 'max' => 480,

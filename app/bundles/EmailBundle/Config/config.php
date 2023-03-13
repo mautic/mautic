@@ -317,8 +317,10 @@ return [
                 'class' => \Mautic\EmailBundle\Form\Type\EmailUtmTagsType::class,
             ],
             'mautic.form.type.emailvariant' => [
-                'class'     => \Mautic\EmailBundle\Form\Type\VariantType::class,
-                'arguments' => ['mautic.email.model.email'],
+                'class'     => VariantType::class,
+                'arguments' => [
+                    'mautic.email.model.email',
+                ],
             ],
             'mautic.form.type.email_list' => [
                 'class' => \Mautic\EmailBundle\Form\Type\EmailListType::class,
