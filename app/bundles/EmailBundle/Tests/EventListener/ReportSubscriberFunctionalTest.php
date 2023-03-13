@@ -41,6 +41,7 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler      = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
         $crawlerTable = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
         // convert html table to php array
@@ -101,8 +102,8 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($report);
         $this->em->flush();
 
-        $this->client->restart();
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $this->assertTrue($this->client->getResponse()->isOk());
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
         $crawlerGraphTable  = $crawler->filterXPath('//*[contains(@href,"example.com")]')->closest('table');
 
@@ -236,6 +237,9 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         }
     }
 
+    /**
+     * @return array<int,array<int,mixed>>
+     */
     private function domTableToArray(Crawler $crawler): array
     {
         return $crawler->filter('tr')->each(function ($tr) {
