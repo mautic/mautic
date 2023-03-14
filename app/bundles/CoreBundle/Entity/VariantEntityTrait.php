@@ -334,7 +334,11 @@ trait VariantEntityTrait
         }
         $totalWeight =  (int) ($totalWeight ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
 
-        return $pendingCount * ($totalWeight / 100);
+        $variants           = $this->getVariantChildren();
+        $variantCount       = count($variants) + 1;
+        $singleVariantCount = ceil(($pendingCount / $variantCount) * ($totalWeight / 100));
+
+        return $singleVariantCount * $variantCount;
     }
 
     /**
