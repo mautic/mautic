@@ -15,10 +15,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata as ValidatorClassMetadata;
 class ContactExportScheduler
 {
     private ?int $id = null;
-    private User $user; // Created by
-    private DateTimeImmutable $scheduledDateTime;
+
+    private ?User $user = null; // Created by
+
+    private ?DateTimeImmutable $scheduledDateTime = null;
+
     /** @var array<mixed> */
-    private array $data;
+    private array $data = [];
+
     /** @var array<mixed> */
     private array $changes = [];
 
@@ -84,9 +88,9 @@ class ContactExportScheduler
     }
 
     /**
-     * @return array<mixed>|null
+     * @return array<mixed>
      */
-    public function getData(): ?array
+    public function getData(): array
     {
         return $this->data;
     }
