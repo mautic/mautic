@@ -270,13 +270,6 @@ class GrapesJsController extends CommonController
                         ['data' => $slide]
                     )->getForm()->createView();
                 }
-
-                $renderingEngine = $this->get('templating');
-
-                if (method_exists($renderingEngine, 'getEngine')) {
-                    $renderingEngine->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
-                }
-                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } else {
                 $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
             }

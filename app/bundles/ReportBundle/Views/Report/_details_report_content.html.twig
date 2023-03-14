@@ -56,10 +56,10 @@
                             {% for row in data %}
                                 <tr>
                                     <td>{{ startCount }}</td>
-                                    {% for key in columnOrder|filter(v => column[v] is defined) %}
+                                    {% for key in columnOrder|filter(v => columns[v] is defined) %}
                                         <td>
                                             {%- set closeLink = false -%}
-                                            {% if columns[key].link is defined and row[columns[key]].alias is defined and row[columns[key]].alias is not empty %}
+                                            {% if columns[key].link is defined and row[columns[key].alias] is defined and row[columns[key].alias] is not empty %}
                                                 {%- set closeLink = true -%}
                                                 <a href="{{ path(columns[key].link, {'objectAction': 'view', 'objectId': row[columns[key].alias]}) }}" class="label label-success">
                                             {% endif %}

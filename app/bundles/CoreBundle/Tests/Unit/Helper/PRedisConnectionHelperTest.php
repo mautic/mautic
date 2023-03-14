@@ -26,7 +26,7 @@ class PRedisConnectionHelperTest extends TestCase
         Assert::assertSame([['scheme'=>'tcp', 'host'=>'1.1.1.1']], PRedisConnectionHelper::getRedisEndpoints('tcp://1.1.1.1'));
 
         // domain should be resolved and an array of ip addresses returned
-        $connInfo = PRedisConnectionHelper::getRedisEndpoints('tcp://mautic.net:8888?test=car');
+        $connInfo = PRedisConnectionHelper::getRedisEndpoints('tcp://bing.com:8888?test=car');
         Assert::assertIsArray($connInfo);
         Assert::assertGreaterThan(1, count($connInfo));
         foreach ($connInfo as $c) {
