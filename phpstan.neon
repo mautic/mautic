@@ -49,7 +49,6 @@ parameters:
 		- '#Parameter \#1 \$event of method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface::dispatch\(\) expects object, string given\.#'
 		# Following will be fixed in new PHP version. See https://github.com/doctrine/dbal/issues/4264
 		- '#Return type of call to static method Doctrine\\DBAL\\DriverManager::getConnection\(\) contains unresolvable type\.#'
-		- '#Property [a-zA-Z0-9\\_]+::\$id is never written, only read.#'
 	scanFiles:
 		- plugins/MauticFocusBundle/Include/lessc.inc.php
 		# This is here because a few functions in the global namespace are defined in this file

@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata as ValidatorClassMetadata;
 
 class ContactExportScheduler
 {
-    private int $id;
+    private ?int $id = null;
     private User $user; // Created by
     private DateTimeImmutable $scheduledDateTime;
     /** @var array<mixed> */
