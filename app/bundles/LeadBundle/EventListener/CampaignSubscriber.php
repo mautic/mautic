@@ -302,7 +302,6 @@ class CampaignSubscriber implements EventSubscriberInterface
             if (!empty($pointLeague)) {
                 $scoreRepository = $this->leadModel->getLeagueContactScoreRepository();
                 $scoreRepository->adjustPoints($lead, $pointLeague, $points);
-                $pointsLogEventName .= ' ('.$pointLeague->getName().')';
             }
 
             //add a lead point change log
@@ -314,6 +313,9 @@ class CampaignSubscriber implements EventSubscriberInterface
             $log->setActionName($pointsLogActionName);
             $log->setIpAddress($this->ipLookupHelper->getIpAddress());
             $log->setDateAdded(new \DateTime());
+            if ($pointLeague) {
+                $log->setLeague($pointLeague);
+            }
             $lead->addPointsChangeLog($log);
 
             $this->leadModel->saveEntity($lead);

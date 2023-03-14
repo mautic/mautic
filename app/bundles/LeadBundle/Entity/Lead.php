@@ -12,6 +12,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\NotificationBundle\Entity\PushID;
+use Mautic\PointBundle\Entity\League;
 use Mautic\PointBundle\Entity\LeagueContactScore;
 use Mautic\StageBundle\Entity\Stage;
 use Mautic\UserBundle\Entity\User;
@@ -899,7 +900,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param $action
      * @param $pointChanges
      */
-    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip)
+    public function addPointsChangeLogEntry($type, $name, $action, $pointChanges, IpAddress $ip, League $league = null)
     {
         if (0 === $pointChanges) {
             // No need to record no change
@@ -915,6 +916,9 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setDelta($pointChanges);
         $event->setIpAddress($ip);
         $event->setLead($this);
+        if ($league) {
+            $event->setLeague($league);
+        }
         $this->addPointsChangeLog($event);
     }
 

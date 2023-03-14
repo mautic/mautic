@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\PointBundle\Entity\League;
 
 /**
  * @extends CommonRepository<PointsChangeLog>
@@ -23,7 +24,8 @@ class PointsChangeLogRepository extends CommonRepository
     {
         $query = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->from(MAUTIC_TABLE_PREFIX.'lead_points_change_log', 'lp')
-            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, lp.lead_id');
+            ->select('lp.event_name as eventName, lp.action_name as actionName, lp.date_added as dateAdded, lp.type, lp.delta, lp.id, lp.lead_id, pl.name as leagueName')
+            ->leftJoin('lp', MAUTIC_TABLE_PREFIX.League::TABLE_NAME, 'pl', 'lp.league_id = pl.id');
 
         if ($leadId) {
             $query->where('lp.lead_id = '.(int) $leadId);

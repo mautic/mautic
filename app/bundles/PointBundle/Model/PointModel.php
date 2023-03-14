@@ -295,7 +295,6 @@ class PointModel extends CommonFormModel
                         /** @var LeagueContactScoreRepository $scoreRepository */
                         $scoreRepository = $this->em->getRepository(LeagueContactScore::class);
                         $scoreRepository->adjustPoints($lead, $pointLeague, $delta);
-                        $pointsChangeLogEntryName .= ' ('.$pointLeague->getName().')';
                     }
 
                     $parsed = explode('.', $action->getType());
@@ -304,7 +303,8 @@ class PointModel extends CommonFormModel
                         $pointsChangeLogEntryName,
                         $parsed[1],
                         $delta,
-                        $ipAddress
+                        $ipAddress,
+                        $pointLeague
                     );
 
                     $event = new PointActionEvent($action, $lead);
