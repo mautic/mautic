@@ -63,16 +63,6 @@ final class Version20230103074925 extends AbstractMauticMigration
 (
     `contact_id`          BIGINT UNSIGNED NOT NULL,
     `league_id`           INT UNSIGNED    NOT NULL,
-    `is_published`        TINYINT(1)      NOT NULL,
-    `date_added`          DATETIME     DEFAULT NULL,
-    `created_by`          INT          DEFAULT NULL,
-    `created_by_user`     VARCHAR(191) DEFAULT NULL,
-    `date_modified`       DATETIME     DEFAULT NULL,
-    `modified_by`         INT          DEFAULT NULL,
-    `modified_by_user`    VARCHAR(191) DEFAULT NULL,
-    `checked_out`         DATETIME     DEFAULT NULL,
-    `checked_out_by`      INT          DEFAULT NULL,
-    `checked_out_by_user` VARCHAR(191) DEFAULT NULL,
     `score`               INT             NOT NULL,
     PRIMARY KEY (`contact_id`, `league_id`)
 ) DEFAULT CHARACTER SET utf8mb4

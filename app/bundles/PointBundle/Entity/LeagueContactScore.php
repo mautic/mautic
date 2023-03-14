@@ -6,10 +6,10 @@ namespace Mautic\PointBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\CommonEntity;
 use Mautic\LeadBundle\Entity\Lead;
 
-class LeagueContactScore extends FormEntity
+class LeagueContactScore extends CommonEntity
 {
     public const TABLE_NAME = 'league_contact_score';
 
