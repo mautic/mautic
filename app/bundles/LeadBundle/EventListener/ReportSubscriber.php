@@ -284,6 +284,10 @@ class ReportSubscriber implements EventSubscriberInterface
                     $qb->join('l', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 's', 's.lead_id = l.id AND s.manually_removed = 0');
                 }
 
+                if ($event->usesColumn(['pl.id', 'pl.name'])) {
+                    $qb->leftJoin('lp', MAUTIC_TABLE_PREFIX.'leagues', 'pl', 'lp.league_id = pl.id');
+                }
+
                 break;
             case self::CONTEXT_CONTACT_FREQUENCYRULES:
                 $event->applyDateFilters($qb, 'date_added', 'lf');
@@ -701,6 +705,14 @@ class ReportSubscriber implements EventSubscriberInterface
                 'label'          => 'mautic.lead.report.points.date_added',
                 'type'           => 'datetime',
                 'groupByFormula' => 'DATE(lp.date_added)',
+            ],
+            'pl.id' => [
+                'label'          => 'mautic.lead.report.points.league_id',
+                'type'           => 'int',
+            ],
+            'pl.name' => [
+                'label'          => 'mautic.lead.report.points.league_name',
+                'type'           => 'string',
             ],
         ];
         $data = [
