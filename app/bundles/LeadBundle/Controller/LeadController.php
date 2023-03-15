@@ -12,19 +12,24 @@ use Mautic\LeadBundle\Deduplicate\ContactMerger;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
 use Mautic\LeadBundle\Form\Type\DncType;
 use Mautic\LeadBundle\Form\Type\EmailType;
 use Mautic\LeadBundle\Form\Type\MergeType;
 use Mautic\LeadBundle\Form\Type\OwnerType;
 use Mautic\LeadBundle\Form\Type\StageType;
+use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\ContactExportSchedulerModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Model\NoteModel;
 use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -1946,10 +1951,8 @@ class LeadController extends FormController
 
     /**
      * Bulk export contacts.
-     *
-     * @return array|JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
      */
-    public function batchExportAction()
+    public function batchExportAction(): Response
     {
         //set some permissions
         $permissions = $this->get('mautic.security')->isGranted(
@@ -1969,6 +1972,12 @@ class LeadController extends FormController
             return $this->accessDenied();
         }
 
+        $fileType = $this->request->get('filetype', 'csv');
+
+        if ('csv' === $fileType && $this->coreParametersHelper->get('contact_export_in_background', false)) {
+            return $this->contactExportCSVScheduler($permissions);
+        }
+
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model      = $this->getModel('lead');
         $session    = $this->get('session');
@@ -1985,7 +1994,6 @@ class LeadController extends FormController
         $anonymous  = $translator->trans('mautic.lead.lead.searchcommand.isanonymous');
         $mine       = $translator->trans('mautic.core.searchcommand.ismine');
         $indexMode  = $session->get('mautic.lead.indexmode', 'list');
-        $dataType   = $this->request->get('filetype');
 
         if (!empty($ids)) {
             $filter['force'] = [
@@ -2022,7 +2030,7 @@ class LeadController extends FormController
             return $exportHelper->parseLeadToExport($contact);
         });
 
-        return $this->exportResultsAs($iterator, $dataType, 'contacts');
+        return $this->exportResultsAs($iterator, $fileType, 'contacts');
     }
 
     /**
@@ -2064,6 +2072,49 @@ class LeadController extends FormController
         }
 
         return $this->exportResultsAs($export, $dataType, 'contact_data_'.($contactFields['email'] ?: $contactFields['id']));
+    }
+
+    public function downloadExportAction(string $fileName = ''): Response
+    {
+        $permissions = $this->get('mautic.security')
+            ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
+
+        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+            return $this->accessDenied();
+        }
+
+        /** @var ContactExportSchedulerModel $model */
+        $model = $this->getModel('lead.export_scheduler');
+
+        try {
+            return $model->getExportFileToDownload($fileName);
+        } catch (FileNotFoundException $exception) {
+            return $this->notFound();
+        }
+    }
+
+    /**
+     * @param array<mixed> $permissions
+     */
+    private function contactExportCSVScheduler(array $permissions): Response
+    {
+        /** @var ContactExportSchedulerModel $model */
+        $model                  = $this->getModel('lead.export_scheduler');
+        $data                   = $model->prepareData($permissions);
+        $contactExportScheduler = $model->saveEntity($data);
+
+        /** @var EventDispatcherInterface $dispatcher */
+        $dispatcher = $this->get('event_dispatcher');
+        $dispatcher->dispatch(
+            new ContactExportSchedulerEvent($contactExportScheduler),
+            LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
+        );
+
+        $this->addFlash('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
+        $response['message'] = 'Contact export scheduled for CSV file type.';
+        $response['flashes'] = $this->getFlashContent();
+
+        return new JsonResponse($response);
     }
 
     /**
