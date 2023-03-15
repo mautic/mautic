@@ -1,0 +1,37 @@
+{#
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+
+{% block mauticContent %}focus{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.focus'|trans }}{% endblock %}
+
+{% block actions %}
+    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+            'templateButtons': {
+                'new': permissions['focus:items:create'],
+            },
+            'routeBase': 'focus',
+    }) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': 'mautic.core.help.searchcommands',
+                'action': currentRoute,
+        }) }}
+        <div class="page-list">
+  {% endif %}
+
+  {{ include('MauticFocusBundle:Focus:_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

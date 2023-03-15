@@ -6,10 +6,11 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
+use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Provides several functions for export-related tasks,
@@ -132,5 +133,18 @@ class ExportHelper
         $response->headers->set('Pragma', 'public');
 
         return $response;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function parseLeadToExport(Lead $lead): array
+    {
+        $leadExport = $lead->getProfileFields();
+
+        $stage               = $lead->getStage();
+        $leadExport['stage'] = $stage ? $stage->getName() : null;
+
+        return $leadExport;
     }
 }

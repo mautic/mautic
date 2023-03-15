@@ -21,7 +21,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     protected function setUp(): void
     {
         $this->configParams['config_allowed_parameters'] = [
-            'kernel.root_dir',
             'kernel.project_dir',
         ];
 
@@ -57,7 +56,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
     public function testValuesAreEscapedProperly(): void
     {
         $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';
-        $trackIps        = "%ip1%\n%ip2%\n%kernel.root_dir%\n%kernel.project_dir%";
+        $trackIps        = "%ip1%\n%ip2%\n%kernel.project_dir%";
         $googleAnalytics = 'reveal pass: %mautic.db_password%';
 
         // request config edit page
@@ -91,14 +90,13 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('link_shortener_url', $configParameters);
+        Assert::assertArrayHasKey('link_shortener_url', $configParameters, 'Assert "link_shortener_url" in: '.implode(',', array_keys($configParameters)));
         Assert::assertSame($this->escape($url), $configParameters['link_shortener_url']);
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
         Assert::assertSame(
             [
                 $this->escape('%ip1%'),
                 $this->escape('%ip2%'),
-                '%kernel.root_dir%',
                 '%kernel.project_dir%',
             ],
             $configParameters['do_not_track_ips']

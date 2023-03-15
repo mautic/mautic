@@ -13,7 +13,7 @@ use Mautic\StageBundle\Form\Type\StageActionChangeType;
 use Mautic\StageBundle\Model\StageModel;
 use Mautic\StageBundle\StageEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -57,7 +57,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description'      => 'mautic.stage.campaign.event.change_descr',
             'batchEventName'   => StageEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'         => StageActionChangeType::class,
-            'formTheme'        => 'MauticStageBundle:FormTheme\StageActionChange',
+            'formTheme'        => 'MauticStageBundle:FormTheme:Action/_stageaction_properties_row.html.twig',
         ];
         $event->addAction('stage.change', $action);
     }

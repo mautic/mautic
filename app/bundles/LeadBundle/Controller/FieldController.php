@@ -95,7 +95,7 @@ class FieldController extends FormController
                 'limit'       => $limit,
                 'page'        => $page,
             ],
-            'contentTemplate' => 'MauticLeadBundle:Field:list.html.php',
+            'contentTemplate' => 'MauticLeadBundle:Field:list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'route'         => $this->generateUrl('mautic_contactfield_index', ['page' => $page]),
@@ -183,7 +183,7 @@ class FieldController extends FormController
                 }
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     [
                         'returnUrl'       => $returnUrl,
@@ -210,7 +210,7 @@ class FieldController extends FormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Field:form.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Field:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contactfield_index',
                     'route'         => $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']),
@@ -289,7 +289,7 @@ class FieldController extends FormController
 
                     if ($valid) {
                         //form is valid so process the data
-                        $model->saveEntity($field, $form->get('buttons')->get('save')->isClicked());
+                        $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
                         $this->addFlash('mautic.core.notice.updated', [
                             '%name%'      => $field->getLabel(),
@@ -306,7 +306,7 @@ class FieldController extends FormController
                 $model->unlockEntity($field);
             }
 
-            if ($cancelled || ($valid && $form->get('buttons')->get('save')->isClicked())) {
+            if ($cancelled || ($valid && $this->getFormButton($form, ['buttons', 'save'])->isClicked())) {
                 return $this->postActionRedirect(
                     array_merge($postActionVars, [
                             'viewParameters'  => ['objectId' => $field->getId()],
@@ -334,7 +334,7 @@ class FieldController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:Field:form.html.php',
+            'contentTemplate' => 'MauticLeadBundle:Field:form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'route'         => $action,
@@ -352,7 +352,8 @@ class FieldController extends FormController
      */
     public function cloneAction($objectId)
     {
-        $model  = $this->getModel('lead.field');
+        $model = $this->getModel('lead.field');
+        \assert($model instanceof FieldModel);
         $entity = $model->getEntity($objectId);
 
         if (null != $entity) {

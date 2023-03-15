@@ -2,6 +2,8 @@
 
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive;
 
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\Psr7\Response;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Company;
@@ -14,37 +16,36 @@ use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\MauticCrmBundle\Entity\PipedriveOwner;
 use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 abstract class PipedriveTest extends MauticMysqlTestCase
 {
-    const WEBHOOK_USER     = 'user';
-    const WEBHOOK_PASSWORD = 'pa$$word';
+    public const WEBHOOK_USER     = 'user';
+    public const WEBHOOK_PASSWORD = 'pa$$word';
+
+    protected MockHandler $mockHandler;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         // Simulate request.
-        $GLOBALS['requests']        = [];
         $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
         $_SERVER['SERVER_PORT']     = 80;
         $_SERVER['SERVER_NAME']     = 'www.example.com';
         $_SERVER['REQUEST_URI']     = '/index.php';
+
+        $this->mockHandler = self::$container->get(MockHandler::class);
     }
 
     public function tearDown(): void
     {
-        unset($GLOBALS['requests'], $_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
+        unset($_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
         parent::tearDown();
     }
 
-    /**
-     * @param $type
-     *
-     * @return string
-     */
-    public static function getData($type)
+    public static function getData(string $type): ?string
     {
         $filename = dirname(__FILE__).sprintf('/Data/%s.json', $type);
         if (file_exists($filename)) {
@@ -54,8 +55,10 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         return null;
     }
 
-    protected function makeRequest(string $method, string $json, bool $addCredential = true)
+    protected function makeRequest(string $method, string $json, bool $addCredential = true): void
     {
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], $json));
+
         $headers = !$addCredential ? [] : [
             'PHP_AUTH_USER' => self::WEBHOOK_USER,
             'PHP_AUTH_PW'   => self::WEBHOOK_PASSWORD,
@@ -64,7 +67,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->client->request($method, '/plugin/pipedrive/webhook', [], [], $headers, $json);
     }
 
-    protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = ['url' => '', 'token' => ''], array $features = ['push_lead'], $addCredential = true)
+    protected function installPipedriveIntegration($published = false, array $settings = [], array $apiKeys = ['url' => '', 'token' => ''], array $features = ['push_lead'], $addCredential = true): void
     {
         $plugin = new Plugin();
         $plugin->setName('CRM');
@@ -106,6 +109,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $integrationObject->encryptAndSetApiKeys($apiKeys, $integration);
 
         $this->em->flush();
+        $this->em->clear();
     }
 
     protected function createLead($companies = [], User $owner = null, $data = [])

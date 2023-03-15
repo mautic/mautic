@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormBuilder;
  */
 class ConnectwiseIntegration extends CrmAbstractIntegration
 {
-    const PAGESIZE = 200;
+    public const PAGESIZE = 200;
 
     /**
      * {@inheritdoc}

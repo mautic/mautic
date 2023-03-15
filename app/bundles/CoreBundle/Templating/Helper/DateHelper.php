@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Templating\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateHelper extends Helper
 {
@@ -190,35 +190,26 @@ class DateHelper extends Helper
      * Format DateInterval into humanly readable format.
      * Example: 55 minutes 49 seconds.
      * It doesn't return zero values like 0 years.
-     *
-     * @param DateInterval $range
-     * @param string       $format
-     *
-     * @return string $formatedRange
      */
-    public function formatRange($range, $format = null)
+    public function formatRange(\DateInterval $range): string
     {
-        if ($range instanceof \DateInterval) {
-            $formated  = [];
-            $timeUnits = ['y' => 'year', 'm' => 'month', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second'];
+        $formated  = [];
+        $timeUnits = ['y' => 'year', 'm' => 'month', 'd' => 'day', 'h' => 'hour', 'i' => 'minute', 's' => 'second'];
 
-            foreach ($timeUnits as $key => $unit) {
-                if ($range->{$key}) {
-                    $formated[] = $this->translator->trans(
-                        'mautic.core.date.'.$unit,
-                        ['%count%' => $range->{$key}]
-                    );
-                }
+        foreach ($timeUnits as $key => $unit) {
+            if ($range->{$key}) {
+                $formated[] = $this->translator->trans(
+                    'mautic.core.date.'.$unit,
+                    ['%count%' => $range->{$key}]
+                );
             }
-
-            if (empty($formated)) {
-                return $this->translator->trans('mautic.core.date.less.than.second');
-            }
-
-            return implode(' ', $formated);
         }
 
-        return '';
+        if (empty($formated)) {
+            return $this->translator->trans('mautic.core.date.less.than.second');
+        }
+
+        return implode(' ', $formated);
     }
 
     /**

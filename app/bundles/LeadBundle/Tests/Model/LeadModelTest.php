@@ -12,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
@@ -24,7 +25,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Model\LegacyLeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
@@ -37,7 +37,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class LeadModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -117,11 +116,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
     private $deviceTrackerMock;
 
     /**
-     * @var MockObject|LegacyLeadModel
-     */
-    private $legacyLeadModelMock;
-
-    /**
      * @var MockObject|IpAddressModel
      */
     private $ipAddressModelMock;
@@ -175,7 +169,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->userProviderMock          = $this->createMock(UserProvider::class);
         $this->contactTrackerMock        = $this->createMock(ContactTracker::class);
         $this->deviceTrackerMock         = $this->createMock(DeviceTracker::class);
-        $this->legacyLeadModelMock       = $this->createMock(LegacyLeadModel::class);
         $this->ipAddressModelMock        = $this->createMock(IpAddressModel::class);
         $this->leadRepositoryMock        = $this->createMock(LeadRepository::class);
         $this->companyLeadRepositoryMock = $this->createMock(CompanyLeadRepository::class);
@@ -198,7 +191,6 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
             $this->userProviderMock,
             $this->contactTrackerMock,
             $this->deviceTrackerMock,
-            $this->legacyLeadModelMock,
             $this->ipAddressModelMock
         );
 
@@ -358,6 +350,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 5 => ['label' => 'First Name', 'alias' => 'firstname', 'isPublished' => true, 'id' => 5, 'object' => 'lead', 'group' => 'basic', 'type' => 'text'],
             ]);
 
+        /** @var LeadModel&MockObject $mockLeadModel */
         $mockLeadModel = $this->getMockBuilder(LeadModel::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getRepository'])
@@ -377,7 +370,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         // The availableLeadFields property should start empty.
         $this->assertEquals([], $mockLeadModel->getAvailableLeadFields());
 
-        [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], null, true, true);
+        [$contact, $fields] = $mockLeadModel->checkForDuplicateContact(['email' => 'john@doe.com', 'firstname' => 'John'], true, true);
         $this->assertEquals(['email' => 'Email'], $mockLeadModel->getAvailableLeadFields());
         $this->assertEquals('john@doe.com', $contact->getEmail());
         $this->assertNull($contact->getFirstname());
@@ -537,7 +530,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 $stageRepositoryMock
             );
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->once())
             ->method('trans')
             ->with('mautic.stage.event.changed');
@@ -575,7 +568,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
                 $stageRepositoryMock
             );
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->once())
             ->method('trans')
             ->with('mautic.lead.import.stage.not.exists', ['id' => $data['stage']])
@@ -605,6 +598,10 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $contact->expects($this->exactly(2))
             ->method('getManipulator')
             ->willReturn($manipulator);
+
+        $contact->expects($this->exactly(2))
+            ->method('getUpdatedFields')
+            ->willReturn([]);
 
         $contact->expects($this->once())
             ->method('addEventLog')

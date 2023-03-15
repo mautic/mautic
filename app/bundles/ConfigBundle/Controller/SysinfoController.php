@@ -2,6 +2,8 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
+use function assert;
+use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -16,8 +18,8 @@ class SysinfoController extends FormController
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\ConfigBundle\Model\SysinfoModel $model */
-        $model = $this->getModel('config.sysinfo');
+        $model = $this->get('mautic.config.model.sysinfo');
+        assert($model instanceof SysinfoModel);
 
         return $this->delegateView([
             'viewParameters' => [
@@ -28,7 +30,7 @@ class SysinfoController extends FormController
                 'log'             => $model->getLogTail(200),
                 'dbInfo'          => $model->getDbInfo(),
             ],
-            'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
+            'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sysinfo_index',
                 'mauticContent' => 'sysinfo',

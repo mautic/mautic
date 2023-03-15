@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\AuditLog;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * Class AuditLogModel.
+ * @extends AbstractCommonModel<AuditLog>
  */
 class AuditLogModel extends AbstractCommonModel
 {

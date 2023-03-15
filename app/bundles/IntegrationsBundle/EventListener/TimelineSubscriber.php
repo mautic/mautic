@@ -8,19 +8,12 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TimelineSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var LeadEventLogRepository
-     */
-    private $eventLogRepository;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private LeadEventLogRepository $eventLogRepository;
+    private TranslatorInterface $translator;
 
     public function __construct(LeadEventLogRepository $eventLogRepository, TranslatorInterface $translator)
     {
@@ -28,34 +21,24 @@ class TimelineSubscriber implements EventSubscriberInterface
         $this->translator         = $translator;
     }
 
-    /**
-     * @return array
-     */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => ['onTimelineGenerate', 0],
         ];
     }
 
-    /**
-     * @param      $eventType
-     * @param      $eventTypeName
-     * @param      $icon
-     * @param null $bundle
-     * @param null $object
-     * @param null $action
-     */
-    private function addEvents(LeadTimelineEvent $event, $eventType, $eventTypeName, $icon, $bundle = null, $object = null, $action = null): void
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
-        $eventTypeName = $this->translator->trans($eventTypeName);
+        $eventType     = 'integration_sync_issues';
+        $eventTypeName = $this->translator->trans('mautic.integration.sync.timeline_notices');
         $event->addEventType($eventType, $eventTypeName);
 
         if (!$event->isApplicable($eventType)) {
             return;
         }
 
-        $events = $this->eventLogRepository->getEvents($event->getLead(), $bundle, $object, $action, $event->getQueryOptions());
+        $events = $this->eventLogRepository->getEvents($event->getLead(), 'integrations', null, 'sync', $event->getQueryOptions());
 
         // Add to counter
         $event->addToCounter($eventType, $events);
@@ -67,19 +50,17 @@ class TimelineSubscriber implements EventSubscriberInterface
         // Add the logs to the event array
         foreach ($events['results'] as $log) {
             $event->addEvent(
-                $this->getEventEntry($log, $eventType, $eventTypeName, $icon)
+                $this->getEventEntry($log, $eventType, $eventTypeName)
             );
         }
     }
 
     /**
-     * @param $eventType
-     * @param $eventTypeName
-     * @param $icon
+     * @param mixed[] $log
      *
-     * @return array
+     * @return mixed[]
      */
-    private function getEventEntry(array $log, $eventType, $eventTypeName, $icon)
+    private function getEventEntry(array $log, string $eventType, string $eventTypeName): array
     {
         $properties = json_decode($log['properties'], true);
 
@@ -95,21 +76,10 @@ class TimelineSubscriber implements EventSubscriberInterface
                 ]
             ),
             'timestamp'       => $log['date_added'],
-            'icon'            => $icon,
+            'icon'            => 'fa-refresh',
             'contactId'       => $log['lead_id'],
-            'contentTemplate' => 'IntegrationsBundle:Timeline:index.html.php',
+            'contentTemplate' => 'IntegrationsBundle:Timeline:index.html.twig',
             'extra'           => $properties,
         ];
-    }
-
-    public function onTimelineGenerate(LeadTimelineEvent $event): void
-    {
-        $this->addEvents(
-            $event,
-            'integration_sync_issues',
-            'mautic.integration.sync.timeline_notices',
-            'fa-refresh',
-            'integrations'
-        );
     }
 }

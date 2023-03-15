@@ -3,11 +3,11 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailGraphStatsController extends Controller
+class EmailGraphStatsController extends AbstractController
 {
     /**
      * Loads a specific form into the detailed panel.
@@ -43,10 +43,10 @@ class EmailGraphStatsController extends Controller
         }
 
         //get A/B test information
-        list($parent, $children) = $email->getVariants();
+        [$parent, $children] = $email->getVariants();
 
         //get related translations
-        list($translationParent, $translationChildren) = $email->getTranslations();
+        [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Prepare stats for bargraph
         if ($chartStatsSource = $request->query->get('stats', false)) {
@@ -83,7 +83,7 @@ class EmailGraphStatsController extends Controller
         );
 
         return $this->render(
-            'MauticEmailBundle:Email:graph.html.php',
+            'MauticEmailBundle:Email:graph.html.twig',
             [
                 'email'         => $email,
                 'stats'         => $stats,

@@ -5,7 +5,7 @@ namespace Mautic\PageBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class PageRepository.
+ * @extends CommonRepository<Page>
  */
 class PageRepository extends CommonRepository
 {
@@ -14,15 +14,20 @@ class PageRepository extends CommonRepository
      */
     public function getEntities(array $args = [])
     {
-        //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
-        $sq = $this->_em->createQueryBuilder()
-            ->select('count(fs.id)')
-            ->from('MauticFormBundle:Submission', 'fs')
-            ->where('fs.page = p');
+        $select = ['p'];
 
-        $q = $this
-            ->createQueryBuilder('p')
-            ->select('p, ('.$sq->getDql().') as submission_count')
+        if (!empty($args['submissionCount'])) {
+            //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
+            $sq = $this->_em->createQueryBuilder()
+                ->select('count(fs.id)')
+                ->from('MauticFormBundle:Submission', 'fs')
+                ->where('fs.page = p');
+
+            $select[] = '('.$sq->getDql().') as submission_count';
+        }
+
+        $q = $this->createQueryBuilder('p')
+            ->select($select)
             ->leftJoin('p.category', 'c');
 
         $args['qb'] = $q;

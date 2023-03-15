@@ -14,7 +14,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -159,28 +159,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             /**
              * @param array<int|string> $parameters
              */
-            public function trans($id, array $parameters = [], $domain = null, $locale = null): string
+            public function trans($id, array $parameters = [], string $domain = null, string $locale = null): string
             {
                 return '[trans]'.$id.'[/trans]';
-            }
-
-            /**
-             * @param array<int|string> $parameters
-             *
-             * @return string
-             */
-            public function transChoice($id, $number, array $parameters = [], $domain = null, $locale = null)
-            {
-                return '[trans]'.$id.'[/trans]';
-            }
-
-            public function setLocale($locale): void
-            {
-            }
-
-            public function getLocale()
-            {
-                return '';
             }
         };
     }

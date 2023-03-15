@@ -8,49 +8,49 @@ use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ButtonHelper extends Helper
 {
     /**
      * List dropdown actions.
      */
-    const LOCATION_LIST_ACTIONS = 'list_actions';
+    public const LOCATION_LIST_ACTIONS = 'list_actions';
 
     /**
      * Toolbar actions.
      */
-    const LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
+    public const LOCATION_TOOLBAR_ACTIONS = 'toolbar_actions';
 
     /**
      * Page actions.
      */
-    const LOCATION_PAGE_ACTIONS = 'page_actions';
+    public const LOCATION_PAGE_ACTIONS = 'page_actions';
 
     /**
      * Navbar actions.
      */
-    const LOCATION_NAVBAR = 'navbar_actions';
+    public const LOCATION_NAVBAR = 'navbar_actions';
 
     /**
      * Bulk actions.
      */
-    const LOCATION_BULK_ACTIONS = 'bulk_actions';
+    public const LOCATION_BULK_ACTIONS = 'bulk_actions';
 
     /**
      * Buttons are displayed in group and/or dropdown depending on button count.
      */
-    const TYPE_BUTTON_DROPDOWN = 'button-dropdown';
+    public const TYPE_BUTTON_DROPDOWN = 'button-dropdown';
 
     /**
      * Buttons are displayed in dropdown depending on button count.
      */
-    const TYPE_DROPDOWN = 'dropdown';
+    public const TYPE_DROPDOWN = 'dropdown';
 
     /**
      * Buttons are grouped together.
      */
-    const TYPE_GROUP = 'group';
+    public const TYPE_GROUP = 'group';
 
     /**
      * Location of the buttons.
@@ -65,7 +65,7 @@ class ButtonHelper extends Helper
     private $templating;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var TranslatorInterface
      */
     private $translator;
 
@@ -315,7 +315,7 @@ class ButtonHelper extends Helper
 
         if (isset($button['confirm'])) {
             $button['confirm']['btnTextAttr'] = $this->generateTextAttributes($button);
-            $buttons .= $this->wrapOpeningTag.$this->templating->render('MauticCoreBundle:Helper:confirm.html.php', $button['confirm']).
+            $buttons .= $this->wrapOpeningTag.$this->templating->render('MauticCoreBundle:Helper:confirm.html.twig', $button['confirm']).
                 "{$this->wrapClosingTag}\n";
         } else {
             $attr = $this->menuLink;
@@ -348,8 +348,8 @@ class ButtonHelper extends Helper
     {
         if (!$this->buttonsFetched && $this->dispatcher->hasListeners(CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS)) {
             $event = $this->dispatcher->dispatch(
-                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS,
-                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item)
+                new CustomButtonEvent($this->location, $this->request, $this->buttons, $this->item),
+                CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS
             );
             $this->buttonsFetched = true;
             $this->buttons        = $event->getButtons();

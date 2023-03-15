@@ -6,11 +6,11 @@ use Doctrine\Common\DataFixtures\Executor\AbstractExecutor;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
-use Liip\TestFixturesBundle\Test\FixturesTrait;
+use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
+use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
 use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -27,11 +27,6 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
 {
-    use FixturesTrait {
-        loadFixtures as private traitLoadFixtures;
-        loadFixtureFiles as private traitLoadFixtureFiles;
-    }
-
     protected EntityManager $em;
     protected Connection $connection;
     protected KernelBrowser $client;
@@ -53,9 +48,12 @@ abstract class AbstractMauticTestCase extends WebTestCase
      */
     protected bool $useMockServices = true;
 
+    protected AbstractDatabaseTool $databaseTool;
+
     protected function setUp(): void
     {
         $this->setUpSymfony($this->configParams);
+        $this->databaseTool = $this->getContainer()->get(DatabaseToolCollection::class)->get();
     }
 
     protected function setUpSymfony(array $defaultConfigOptions = []): void
@@ -92,17 +90,17 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * Make `$append = true` default so we can avoid unnecessary purges.
      */
-    protected function loadFixtures(array $classNames = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): ?AbstractExecutor
+    protected function loadFixtures(array $classNames = [], bool $append = true): ?AbstractExecutor
     {
-        return $this->traitLoadFixtures($classNames, $append, $omName, $registryName, $purgeMode);
+        return $this->databaseTool->loadFixtures($classNames, $append);
     }
 
     /**
      * Make `$append = true` default so we can avoid unnecessary purges.
      */
-    protected function loadFixtureFiles(array $paths = [], bool $append = true, ?string $omName = null, string $registryName = 'doctrine', ?int $purgeMode = null): array
+    protected function loadFixtureFiles(array $paths = [], bool $append = true): array
     {
-        return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
+        return $this->databaseTool->loadAliceFixture($paths, $append);
     }
 
     private function mockServices(): void
@@ -165,10 +163,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->setCatchExceptions(false);
 
         if ($command) {
-            if ($command instanceof ContainerAwareCommand) {
-                $command->setContainer(self::$container);
-            }
-
             // Register the command
             $application->add($command);
         }
@@ -176,10 +170,11 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input      = new ArrayInput($params);
         $output     = new BufferedOutput();
         $statusCode = $application->run($input, $output);
+        $result     = $output->fetch();
 
-        Assert::assertSame($expectedStatusCode, $statusCode);
+        Assert::assertSame($expectedStatusCode, $statusCode, $result);
 
-        return $output->fetch();
+        return $result;
     }
 
     protected function loginUser(string $username): void

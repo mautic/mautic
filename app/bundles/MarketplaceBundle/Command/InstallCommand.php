@@ -36,7 +36,7 @@ class InstallCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $packageName = $input->getArgument('package');
         $dryRun      = true === $input->getOption('dry-run') ? true : false;

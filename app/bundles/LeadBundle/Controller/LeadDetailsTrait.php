@@ -143,7 +143,7 @@ trait LeadDetailsTrait
     {
         // Get Places from IP addresses
         $places = [];
-        if ($lead->getIpAddresses()) {
+        if ($lead->getIpAddresses()->count() > 0) {
             foreach ($lead->getIpAddresses() as $ip) {
                 if ($details = $ip->getIpDetails()) {
                     if (!empty($details['latitude']) && !empty($details['longitude'])) {
@@ -242,7 +242,7 @@ trait LeadDetailsTrait
                 'eventLabel'      => $l['userName'],
                 'timestamp'       => $l['dateAdded'],
                 'details'         => $l['details'],
-                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.php',
+                'contentTemplate' => 'MauticLeadBundle:Auditlog:details.html.twig',
             ];
         }, $logs);
 
