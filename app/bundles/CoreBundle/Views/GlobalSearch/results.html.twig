@@ -1,5 +1,5 @@
 <div class="panel-group" id="globalSearchPanel">
-{% for header, result in results %}
+{%- for header, result in results %}
     <div class="panel panel-info">
         <div class="panel-heading">
             <h4 class="panel-title">
@@ -11,13 +11,15 @@
         </div>
         <div class="panel-body np">
             <ul class="list-group">
-                {% for r in result %}
-                <li class="list-group-item">
-                    {{ r|raw }}
-                </li>
+                {% for k, r in result %}
+                  {% if 'count' is not same as k %}
+                    <li class="list-group-item">
+                        {{ r|raw }}
+                    </li>
+                  {% endif %}
                 {% endfor %}
             </ul>
         </div>
     </div>
-{% endfor %}
+{%- endfor %}
 </div>

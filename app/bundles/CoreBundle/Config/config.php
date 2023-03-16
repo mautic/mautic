@@ -412,19 +412,19 @@ return [
             'mautic.menu.admin' => [
                 'alias'   => 'admin',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:admin.html.php',
+                    'template' => 'MauticCoreBundle:Menu:admin.html.twig',
                 ],
             ],
             'mautic.menu.extra' => [
                 'alias'   => 'extra',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:extra.html.php',
+                    'template' => 'MauticCoreBundle:Menu:extra.html.twig',
                 ],
             ],
             'mautic.menu.profile' => [
                 'alias'   => 'profile',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.php',
+                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.twig',
                 ],
             ],
         ],
@@ -661,6 +661,8 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
                 'arguments' => [
                     'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.file_path_resolver',
                 ],
             ],
             'mautic.helper.composer' => [

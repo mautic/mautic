@@ -19,6 +19,7 @@ use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormCallbackInterface
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeatureSettingsInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormFeaturesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormInterface;
+use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormNotesInterface;
 use Mautic\IntegrationsBundle\Integration\Interfaces\ConfigFormSyncInterface;
 use Mautic\IntegrationsBundle\IntegrationEvents;
 use Mautic\PluginBundle\Entity\Integration;
@@ -184,11 +185,10 @@ class ConfigController extends AbstractFormController
     private function showForm(Form $form)
     {
         $integrationObject = $this->integrationObject;
-        $form              = $this->setFormTheme($form, 'IntegrationsBundle:Config:form.html.twig');
+        $form              = $form->createView();
         $formHelper        = $this->get('templating.helper.form');
 
-        $showFeaturesTab =
-            $integrationObject instanceof ConfigFormFeaturesInterface ||
+        $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface ||
             $integrationObject instanceof ConfigFormSyncInterface ||
             $integrationObject instanceof ConfigFormFeatureSettingsInterface;
 
@@ -212,9 +212,11 @@ class ConfigController extends AbstractFormController
             $integrationObject->getRedirectUri()
             : false;
 
+        $useConfigFormNotes = $integrationObject instanceof ConfigFormNotesInterface;
+
         return $this->delegateView(
             [
-                'viewParameters'  => [
+                'viewParameters' => [
                     'integrationObject'   => $integrationObject,
                     'form'                => $form,
                     'activeTab'           => $this->request->get('activeTab'),
@@ -225,6 +227,7 @@ class ConfigController extends AbstractFormController
                     'useFeatureSettings'  => $useFeatureSettings,
                     'useAuthorizationUrl' => $useAuthorizationUrl,
                     'callbackUrl'         => $callbackUrl,
+                    'useConfigFormNotes'  => $useConfigFormNotes,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
                     ?: 'IntegrationsBundle:Config:form.html.twig',

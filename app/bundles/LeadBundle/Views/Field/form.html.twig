@@ -1,6 +1,7 @@
 {#
   Variables
     - form
+    - currentRoute
 #}
 {% extends 'MauticCoreBundle:Default:content.html.twig' %}
 
@@ -15,7 +16,6 @@
 {% endblock %}
 
 {% block content %}
-
 {# Render the templates so they don't get rendered automatically #}
 {% set textareaTemplate        = form_row(form['properties_textarea_template']) %}
 {% set selectTemplate          = form_row(form['properties_select_template']) %}

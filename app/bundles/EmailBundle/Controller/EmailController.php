@@ -245,7 +245,7 @@ class EmailController extends FormController
                     'permissions' => $permissions,
                     'model'       => $model,
                 ],
-                'contentTemplate' => 'MauticEmailBundle:Email:list.html.php',
+                'contentTemplate' => 'MauticEmailBundle:Email:list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
@@ -358,9 +358,9 @@ class EmailController extends FormController
 
                 $event = new DetermineWinnerEvent($args);
                 $this->dispatcher->dispatch(
-                        $event,
-                        $testSettings['event']
-                    );
+                    $event,
+                    $testSettings['event']
+                );
 
                 $abTestResults = $event->getAbTestResults();
             }
@@ -434,7 +434,7 @@ class EmailController extends FormController
                     )->getContent(),
                     'dateRangeForm' => $dateRangeForm->createView(),
                 ],
-                'contentTemplate' => 'MauticEmailBundle:Email:details.html.php',
+                'contentTemplate' => 'MauticEmailBundle:Email:details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_email_index',
                     'mauticContent' => 'email',
@@ -586,7 +586,7 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'          => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'form'          => $form->createView(),
                     'isVariant'     => $entity->isVariant(true),
                     'email'         => $entity,
                     'slots'         => $this->buildSlotForms($slotTypes),
@@ -597,7 +597,7 @@ class EmailController extends FormController
                     'updateSelect'  => $updateSelect,
                     'permissions'   => $permissions,
                 ],
-                'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
+                'contentTemplate' => 'MauticEmailBundle:Email:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'      => '#mautic_email_index',
                     'mauticContent'   => 'email',
@@ -800,7 +800,7 @@ class EmailController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'form'               => $this->setFormTheme($form, 'MauticEmailBundle:Email:form.html.php', 'MauticEmailBundle:FormTheme\Email'),
+                    'form'               => $form->createView(),
                     'isVariant'          => $entity->isVariant(true),
                     'slots'              => $this->buildSlotForms($slotTypes),
                     'sections'           => $this->buildSlotForms($sections),
@@ -817,7 +817,7 @@ class EmailController extends FormController
                         UrlGeneratorInterface::ABSOLUTE_URL
                     ),
                 ],
-                'contentTemplate' => 'MauticEmailBundle:Email:form.html.php',
+                'contentTemplate' => 'MauticEmailBundle:Email:form.html.twig',
                 'passthroughVars' => [
                     'activeLink'      => '#mautic_email_index',
                     'mauticContent'   => 'email',
@@ -985,7 +985,7 @@ class EmailController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.twig');
 
         return $this->render(
             $logicalName,
@@ -1227,7 +1227,7 @@ class EmailController extends FormController
             }
 
             $batchlimit      = $this->coreParametersHelper->get('mailer_memory_msg_limit');
-            $contentTemplate = 'MauticEmailBundle:Send:progress.html.php';
+            $contentTemplate = 'MauticEmailBundle:Send:progress.html.twig';
             $viewParameters  = [
                 'progress'   => $progress,
                 'stats'      => $stats,
@@ -1237,7 +1237,7 @@ class EmailController extends FormController
             ];
         } else {
             //process and send
-            $contentTemplate = 'MauticEmailBundle:Send:form.html.php';
+            $contentTemplate = 'MauticEmailBundle:Send:form.html.twig';
             $viewParameters  = [
                 'form'    => $form->createView(),
                 'email'   => $entity,
@@ -1436,7 +1436,7 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticEmailBundle:Email:recipients.html.php',
+                'contentTemplate' => 'MauticEmailBundle:Email:recipients.html.twig',
             ]
         );
     }

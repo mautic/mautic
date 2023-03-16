@@ -1,0 +1,40 @@
+<!-- filter form -->
+<form method="post" action="{{ path('mautic_contacttimeline_action', {'leadId': lead.id}) }}" class="panel" id="timeline-filters">
+    <div class="form-control-icon pa-xs">
+        <input type="text" class="form-control bdr-w-0" name="search" id="search" placeholder="{{ 'mautic.core.search.placeholder'|trans }}" value="{{ events.filters.search|e }}">
+        <span class="the-icon fa fa-search text-muted mt-xs"></span>
+    </div>
+    {% if events.types is defined and events.types is iterable %}
+        <div class="history-search panel-footer text-muted">
+            <div class="row">
+                <div class="col-sm-5">
+                    <select name="includeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.include.placeholder'|trans }}">
+                        {% for typeKey, typeName in events.types %}
+                            <option value="{{ typeKey|e }}" {% if typeKey in events.filters.includeEvents %}selected{% endif %}>
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-5">
+                    <select name="excludeEvents[]" multiple="multiple" class="form-control bdr-w-0" data-placeholder="{{ 'mautic.lead.lead.filter.bundles.exclude.placeholder'|trans }}">
+                        {% for typeKey, typeName in events.types %}
+                            <option value="{{ typeKey|e }}" {% if typeKey in events.filters.excludeEvents %}selected{% endif %}>
+                                {{ typeName }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <a class="btn btn-default btn-block" href="{{ url('mautic_contact_timeline_export_action', {'leadId': lead.id}) }}" data-toggle="download">
+                        <span>
+                            <i class="fa fa-download"></i> <span class="hidden-xs hidden-sm">{{ 'mautic.core.export'|trans }}</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <input type="hidden" name="leadId" id="leadId" value="{{ lead.id|e }}" />
+</form>
+<!--/ filter form -->

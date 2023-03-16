@@ -1,8 +1,0 @@
---TEST--
-formRowIfExists form function
---TEMPLATE--
-{{ formRowIfExists(form, 'supportedFeatures') }}
---DATA--
-return ['form' => new \Symfony\Component\Form\FormView()]
---EXPECT--
-<input name="supportedFeatures" />

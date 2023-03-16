@@ -523,6 +523,7 @@ class TrackableModelTest extends TestCase
         $urls = [
             'https://foo-bar.com',
             'https://foo-bar.com?foo=bar',
+            'https://FOO-bar.com/bar',
         ];
 
         $model = $this->getModel();
@@ -542,7 +543,7 @@ class TrackableModelTest extends TestCase
         );
 
         // Assert that both trackables found
-        Assert::assertCount(2, $trackables);
+        Assert::assertCount(3, $trackables);
 
         foreach ($trackables as $redirectId => $trackable) {
             // If the shared base was correctly parsed, all generated tokens will be in the content
