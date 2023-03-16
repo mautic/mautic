@@ -29,11 +29,12 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $report = new Report();
         $report->setName('Contact point log');
         $report->setSource('lead.pointlog');
-        $report->setColumns(['lp.type', 'lp.event_name', 'l.email', 'lp.delta', 'pl.id', 'pl.name']);
+        $report->setColumns(['lp.type', 'lp.event_name', 'l.email', 'lp.delta', 'pl.name']);
         $this->em->persist($report);
         $this->em->flush();
         $this->em->clear();
 
+        //-- test report table in mautic panel
         $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
         $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
 
@@ -41,12 +42,116 @@ class ReportSubscriberFunctionalTest extends MauticMysqlTestCase
         $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
 
         $this->assertSame([
-            ['1', 'test type', 'Adjust points', 'test1@example.com', '5', '1', 'League A'],
-            ['2', 'test type', 'Adjust points', 'test2@example.com', '10', '1', 'League A'],
-            ['3', 'test type', 'Adjust points', 'test2@example.com', '2', '2', 'League B'],
-            ['4', 'test type', 'Adjust points', 'test3@example.com', '10', '1', 'League A'],
-            ['5', 'test type', 'Adjust points', 'test3@example.com', '2', '2', 'League B'],
+            // no., event_type, event_name,      email,       points_delta, league_name
+            ['1', 'test type', 'Adjust points', 'test1@example.com', '5', 'League A'],
+            ['2', 'test type', 'Adjust points', 'test2@example.com', '10', 'League A'],
+            ['3', 'test type', 'Adjust points', 'test2@example.com', '2', 'League B'],
+            ['4', 'test type', 'Adjust points', 'test3@example.com', '10', 'League A'],
+            ['5', 'test type', 'Adjust points', 'test3@example.com', '2', 'League B'],
         ], array_slice($crawlerReportTable, 1, 5));
+
+        //-- test API report data
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $result         = json_decode($clientResponse->getContent(), true);
+        $this->assertSame([
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
+                'email'       => 'test1@example.com',
+                'delta'       => '5',
+                'league_name' => 'League A',
+            ],
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
+                'email'       => 'test2@example.com',
+                'delta'       => '10',
+                'league_name' => 'League A',
+            ],
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
+                'email'       => 'test2@example.com',
+                'delta'       => '2',
+                'league_name' => 'League B',
+            ],
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
+                'email'       => 'test3@example.com',
+                'delta'       => '10',
+                'league_name' => 'League A',
+            ],
+            [
+                'type'        => 'test type',
+                'event_name'  => 'Adjust points',
+                'email'       => 'test3@example.com',
+                'delta'       => '2',
+                'league_name' => 'League B',
+            ],
+        ], $result['data']);
+    }
+
+    public function testLeagueScoreReport(): void
+    {
+        $this->createTestContactWithLeaguePoints();
+        $report = new Report();
+        $report->setName('League score report');
+        $report->setSource('league.score');
+        $report->setColumns(['pl.name', 'ls.score', 'l.email']);
+        $this->em->persist($report);
+        $this->em->flush();
+        $this->em->clear();
+
+        //-- test report table in mautic panel
+        $crawler            = $this->client->request(Request::METHOD_GET, "/s/reports/view/{$report->getId()}");
+        $crawlerReportTable = $crawler->filterXPath('//table[@id="reportTable"]')->first();
+
+        // convert html table to php array
+        $crawlerReportTable = $this->domTableToArray($crawlerReportTable);
+
+        $this->assertSame([
+            // no., league_name, league_score, email
+            ['1', 'League A', '5', 'test1@example.com'],
+            ['2', 'League A', '10', 'test2@example.com'],
+            ['3', 'League B', '2', 'test2@example.com'],
+            ['4', 'League A', '10', 'test3@example.com'],
+            ['5', 'League B', '2', 'test3@example.com'],
+        ], array_slice($crawlerReportTable, 1, 5));
+
+        //-- test API report data
+        $this->client->request(Request::METHOD_GET, "/api/reports/{$report->getId()}");
+        $clientResponse = $this->client->getResponse();
+        $result         = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame([
+            [
+                'league_name'  => 'League A',
+                'league_score' => '5',
+                'email'        => 'test1@example.com',
+            ],
+            [
+                'league_name'  => 'League A',
+                'league_score' => '10',
+                'email'        => 'test2@example.com',
+            ],
+            [
+                'league_name'  => 'League B',
+                'league_score' => '2',
+                'email'        => 'test2@example.com',
+            ],
+            [
+                'league_name'  => 'League A',
+                'league_score' => '10',
+                'email'        => 'test3@example.com',
+            ],
+            [
+                'league_name'  => 'League B',
+                'league_score' => '2',
+                'email'        => 'test3@example.com',
+            ],
+        ], $result['data']);
     }
 
     private function createTestContactWithLeaguePoints(): void

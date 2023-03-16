@@ -707,10 +707,12 @@ class ReportSubscriber implements EventSubscriberInterface
                 'groupByFormula' => 'DATE(lp.date_added)',
             ],
             'pl.id' => [
+                'alias'          => 'league_id',
                 'label'          => 'mautic.lead.report.points.league_id',
                 'type'           => 'int',
             ],
             'pl.name' => [
+                'alias'          => 'league_name',
                 'label'          => 'mautic.lead.report.points.league_name',
                 'type'           => 'string',
             ],

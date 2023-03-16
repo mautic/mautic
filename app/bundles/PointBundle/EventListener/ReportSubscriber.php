@@ -18,19 +18,25 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public const LEAGUE_COLUMNS = [
         self::LEAGUE_PREFIX.'.id' => [
+            'alias' => 'league_id',
             'label' => 'mautic.point.report.league_id',
             'type'  => 'int',
         ],
         self::LEAGUE_PREFIX.'.name' => [
+            'alias' => 'league_name',
             'label' => 'mautic.point.report.league_name',
             'type'  => 'string',
         ],
         self::LEAGUE_SCORE_PREFIX.'.score' => [
+            'alias' => 'league_score',
             'label' => 'mautic.point.report.league_score',
             'type'  => 'int',
         ],
     ];
 
+    /**
+     * @var string[]
+     */
     private array $reportContexts = [
         self::CONTEXT_LEAGUE_SCORE,
     ];
@@ -56,7 +62,7 @@ class ReportSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onReportBuilder(ReportBuilderEvent $event)
+    public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->reportContexts)) {
             return;
@@ -80,7 +86,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->reportContexts)) {
             return;
