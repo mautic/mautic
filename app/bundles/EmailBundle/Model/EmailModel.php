@@ -1411,7 +1411,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         }
 
         // Process frequency rules for email
-        if ($isMarketing && count($sendTo)) {
+        if ($isMarketing && count($sendTo) && !$email->isEnableAbTest()) {
             $campaignEventId = (is_array($channel) && !empty($channel) && 'campaign.event' === $channel[0] && !empty($channel[1])) ? $channel[1]
                 : null;
             $this->messageQueueModel->processFrequencyRules(
