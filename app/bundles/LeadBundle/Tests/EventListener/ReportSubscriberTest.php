@@ -612,6 +612,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
                         ],
+                        'pl.id' => [
+                            'alias' => 'league_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'league_name',
+                            'label' => '',
+                            'type'  => 'string',
+                        ],
                         'i.ip_address' => [
                             'label' => '',
                             'type'  => 'string',
@@ -659,6 +669,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
+                        ],
+                        'pl.id' => [
+                            'alias' => 'league_id',
+                            'label' => '',
+                            'type'  => 'int',
+                        ],
+                        'pl.name' => [
+                            'alias' => 'league_name',
+                            'label' => '',
+                            'type'  => 'string',
                         ],
                     ],
                     'group' => 'contacts',
