@@ -38,7 +38,7 @@ class PreAuthorizationEventListener
     /**
      * @throws AccessDeniedException
      */
-    public function onPreAuthorizationProcess(PreAuthorizationEvent $event): void
+    public function onPreAuthorizationProcess(PreAuthorizationEvent $event)
     {
         if ($user = $this->getUser($event)) {
             //check to see if user has api access
@@ -52,7 +52,7 @@ class PreAuthorizationEventListener
         }
     }
 
-    public function onPostAuthorizationProcess(PreAuthorizationEvent $event): void
+    public function onPostAuthorizationProcess(PreAuthorizationEvent $event)
     {
         if ($event->isAuthorizedClient()) {
             if (null !== $client = $event->getClient()) {
