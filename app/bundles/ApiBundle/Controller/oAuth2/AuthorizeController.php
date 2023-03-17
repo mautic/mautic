@@ -2,11 +2,10 @@
 
 namespace Mautic\ApiBundle\Controller\oAuth2;
 
-use FOS\OAuthServerBundle\Event\OAuthEvent;
+use FOS\OAuthServerBundle\Event\PreAuthorizationEvent;
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
 use FOS\OAuthServerBundle\Model\ClientManagerInterface;
 use OAuth2\OAuth2;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Twig\Environment as TwigEnvironment;
 
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
@@ -40,7 +40,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     private $oAuth2Server;
 
     /**
-     * @var EngineInterface
+     * @var TwigEnvironment
      */
     private $templating;
 
@@ -62,13 +62,12 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         Form $authorizeForm,
         AuthorizeFormHandler $authorizeFormHandler,
         OAuth2 $oAuth2Server,
-        EngineInterface $templating,
         TokenStorageInterface $tokenStorage,
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
-        SessionInterface $session = null,
-        $templateEngineType = 'php'
+        TwigEnvironment $templating,
+        SessionInterface $session = null
     ) {
         $this->session              = $session;
         $this->authorizeForm        = $authorizeForm;
@@ -83,13 +82,12 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             $authorizeForm,
             $authorizeFormHandler,
             $oAuth2Server,
-            $templating,
             $tokenStorage,
             $router,
             $clientManager,
             $eventDispatcher,
-            $session,
-            $templateEngineType
+            $templating,
+            $session
         );
     }
 
@@ -112,11 +110,8 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             $this->session->set('_fos_oauth_server.ensure_logout', true);
         }
 
-        $event = new OAuthEvent($user, $this->getClient());
-
-        $this->eventDispatcher->dispatch(
-            $event,
-            OAuthEvent::PRE_AUTHORIZATION_PROCESS
+        $event = $this->eventDispatcher->dispatch(
+            new PreAuthorizationEvent($user, $this->getClient())
         );
 
         if ($event->isAuthorizedClient()) {
@@ -129,12 +124,14 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             return $this->processSuccess($user, $this->authorizeFormHandler, $request);
         }
 
-        return $this->templating->renderResponse(
+        return $this->renderResponse(
             '@MauticApi/Authorize/oAuth2/authorize.html.twig',
             [
                 'form'   => $this->authorizeForm->createView(),
                 'client' => $this->getClient(),
             ]
         );
+
+        return new Response($contents);
     }
 }

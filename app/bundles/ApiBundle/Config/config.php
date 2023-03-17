@@ -80,7 +80,7 @@ return [
         ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\OAuthEventListener',
+                'class'     => 'Mautic\ApiBundle\EventListener\PreAuthorizationEventListener',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.security',
