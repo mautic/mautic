@@ -77,7 +77,7 @@ class TemplateReference extends BaseTemplateReference
                     // Theme override
                     $template = $themeDir.'/html/'.$this->parameters['bundle'].'/'.$path;
                 } else {
-                    // We prefer /*Bundle/Views/something.html.php
+                    // We prefer /*Bundle/Views/something.html.twig
                     preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
 
                     if (

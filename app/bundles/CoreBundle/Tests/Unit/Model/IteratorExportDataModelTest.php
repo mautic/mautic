@@ -42,7 +42,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->commonModel->expects($this->once())
             ->method('getEntities')
-            ->with(['limit' => 1000, 'start' => 0])
+            ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => [['a'], ['b']]]);
 
         $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
@@ -57,7 +57,7 @@ class IteratorExportDataModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->commonModel->expects($this->once())
             ->method('getEntities')
-            ->with(['limit' => 1000, 'start' => 0])
+            ->with(['limit' => 1000, 'start' => 0, 'skipOrdering' => false])
             ->willReturn(['results' => []]);
 
         $this->commonModel->method('getRepository')->willReturn($this->commonRepository);
