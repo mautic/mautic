@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "865792219f0bb3cc186165e74f6ec539",
+    "content-hash": "b218daf5529a17558f54b43ed3edcfb5",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2943,8 +2943,14 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/mautic/FOSOAuthServerBundle.git",
+                "url": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle.git",
                 "reference": "dc8ff343363cf794d30eb1a123610d186a43f162"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FriendsOfSymfony/FOSOAuthServerBundle/zipball/dc8ff343363cf794d30eb1a123610d186a43f162",
+                "reference": "dc8ff343363cf794d30eb1a123610d186a43f162",
+                "shasum": ""
             },
             "require": {
                 "friendsofsymfony/oauth2-php": "~1.1",
@@ -2994,6 +3000,7 @@
                     "/Tests/"
                 ]
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -3014,6 +3021,10 @@
                 "oauth2",
                 "server"
             ],
+            "support": {
+                "issues": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle/issues",
+                "source": "https://github.com/FriendsOfSymfony/FOSOAuthServerBundle/tree/master"
+            },
             "time": "2022-03-24T10:22:23+00:00"
         },
         {
@@ -5709,7 +5720,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "fd88b9024273a278e1c0c00aa4cb02a2f14e9d0a"
+                "reference": "89e06c452521cfd6a16504208cc4278a2e28217d"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
