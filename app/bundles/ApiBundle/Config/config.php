@@ -68,7 +68,7 @@ return [
                     'router',
                     'fos_oauth_server.client_manager.default',
                     'event_dispatcher',
-                    'templating',
+                    'twig',
                     'session',
                 ],
             ],
