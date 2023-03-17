@@ -49,7 +49,7 @@
 {% if security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and not isInstalled and isComposerEnabled %}
     {% set installRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_INSTALL'),
         {
-            'vendor' : packageDetail.packageBase.getVendorName(), 
+            'vendor' : packageDetail.packageBase.getVendorName(),
             'package' : packageDetail.packageBase.getPackageName(),
         }
     ) %}
@@ -67,7 +67,7 @@
 
 {% elseif security.isGranted(constant('Mautic\\MarketplaceBundle\\Security\\Permissions\\MarketplacePermissions::CAN_INSTALL_PACKAGES')) and isComposerEnabled %}
     {% set removeRoute = path(constant('Mautic\\MarketplaceBundle\\Service\\RouteProvider::ROUTE_REMOVE'),
-        {'vendor' : packageDetail.packageBase.getVendorName(), 
+        {'vendor' : packageDetail.packageBase.getVendorName(),
         'package' : packageDetail.packageBase.getPackageName(),
         }) %}
 
