@@ -35,7 +35,7 @@ class UpdateController extends CommonController
                 'currentVersion'    => MAUTIC_VERSION,
                 'isComposerEnabled' => $coreParametersHelper->get('composer_updates', false),
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:index.html.php',
+            'contentTemplate' => 'MauticCoreBundle:Update:index.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update'),
@@ -104,7 +104,7 @@ class UpdateController extends CommonController
                 'failed'       => $failed,
                 'noMigrations' => $noMigrations,
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:schema.html.php',
+            'contentTemplate' => 'MauticCoreBundle:Update:schema.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update_schema'),

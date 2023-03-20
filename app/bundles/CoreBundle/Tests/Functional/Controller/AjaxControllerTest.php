@@ -62,7 +62,7 @@ final class AjaxControllerTest extends MauticMysqlTestCase
         Assert::assertTrue($response->isOk(), $response->getContent());
         $content = \json_decode($response->getContent(), true);
         Assert::assertArrayHasKey('newContent', $content);
-        Assert::assertSame("\n<div class=\"panel-group\" id=\"globalSearchPanel\">\n</div>", $content['newContent']);
+        Assert::assertSame("<div class=\"panel-group\" id=\"globalSearchPanel\"></div>\n", $content['newContent']);
 
         // Searching for a string that match 2 entities.
         $this->client->request(Request::METHOD_GET, '/s/ajax?action=globalSearch&global_search=John8888&tmp=list', [], [], $this->createAjaxHeaders());

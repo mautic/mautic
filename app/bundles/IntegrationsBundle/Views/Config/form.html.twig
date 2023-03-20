@@ -1,6 +1,6 @@
 {{ includeScript('app/bundles/IntegrationsBundle/Assets/js/integrations.js', 'integrationsConfigOnLoad', 'integrationsConfigOnLoad') }}
 {# @var integrationObject \Mautic\IntegrationsBundle\Integration\Interfaces\IntegrationInterface Set through buildView #}
-{% set activeTab = activeTab is defined or activeTab is not empty ? activeTab : 'details-container' %}
+{% set activeTab = activeTab|default('details-container') %}
 
 {{ form_start(form) }}
 <ul class="nav nav-tabs">
@@ -48,6 +48,11 @@
 <div class="tab-content pa-md bg-white">
     <!-- Enabled\Auth -->
     <div class="tab-pane fade{% if 'details-container' == activeTab %} in active{% endif %} bdr-w-0" id="details-container">
+        {% if useConfigFormNotes and integrationObject.getAuthorizationNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
+            <div class="alert alert-{{ integrationObject.getAuthorizationNote().getType() }}">
+                {{ integrationObject.getAuthorizationNote().getNote()|trans  }}
+            </div>
+        {% endif %}
         {{ form_row(form.isPublished) }}
         {% if integrationObject is instanceof('\\Mautic\\IntegrationsBundle\\Integration\\Interfaces\\ConfigFormAuthInterface') %}
         <hr />
@@ -68,7 +73,7 @@
                     <button type="button" id="integration_details_authButton" name="integration_details[authButton]" class="btn btn-success btn-lg" onclick="Mautic.authorizeIntegration()">
                         <i class="fa fa-key "></i>
                         {% if integrationObject.isAuthorized() %}
-                            {{ 'mautic.integration.form.reauthorize'|trans }} 
+                            {{ 'mautic.integration.form.reauthorize'|trans }}
                         {% else %}
                             {{ 'mautic.integration.form.authorize'|trans }}
                         {% endif %}
@@ -83,7 +88,13 @@
     <!-- Features -->
     {% if showFeaturesTab %}
     <div class="tab-pane fade{% if 'features-container' == activeTab %} in active{% endif %} bdr-w-0" id="features-container">
-        {{ formRowIfExists(form, 'supportedFeatures') }}
+        {% if useConfigFormNotes and integrationObject.getFeaturesNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
+            <div class="alert alert-{{ integrationObject.getFeaturesNote().getType() }}">
+                {{ integrationObject.getFeaturesNote().getNote()|trans  }}
+            </div>
+        {% endif %}
+
+        {%- if form.supportedFeatures is defined %}{{ form_row(form.supportedFeatures) }}{% endif %}
 
         {% if useFeatureSettings or useSyncFeatures %}
             <hr />
@@ -116,6 +127,13 @@
         <div class="has-error">
             {{ form_errors(objectFieldMapping) }}
         </div>
+
+        {% if useConfigFormNotes and integrationObject.getFieldMappingNote() is instanceof('\\Mautic\\IntegrationsBundle\\DTO\\Note') %}
+            <div class="alert alert-{{ integrationObject.getFieldMappingNote().getType() }}">
+                {{ integrationObject.getFieldMappingNote().getNote()|trans  }}
+            </div>
+        {% endif %}
+
         {{ form_row(objectFieldMapping['filter-keyword']) }}
 
         <div id="field-mappings-{{ object }}">

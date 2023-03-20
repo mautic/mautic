@@ -1,0 +1,78 @@
+{% extends 'MauticCoreBundle:Default:slim.html.twig' %}
+
+{% block pageTitle pageTitle %}
+
+{% block headerTitle report.name %}
+
+{% block mauticContent 'report' %}
+
+{% block _content %}
+  {#$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));#}
+  {%- set showGraphsAboveTable = report.settings.showGraphsAboveTable is defined -%}
+
+  {%- set dataCount = data|length -%}
+  {%- set columnOrder = report.columns -%}
+  {%- set graphOrder = report.graphs -%}
+  <style>
+      #app-content.content-only.container {
+          overflow-x: scroll;
+      }
+  </style>
+
+  <div class="pa-md">
+      <h3>{{ report.name }}</h3>
+      <div class="small">
+          {{ dateToDate(dateFrom, 'UTC') }} - {{ dateToDate(dateTo, 'UTC') }}
+      </div>
+  </div>
+
+  {% if showGraphsAboveTable is not empty %}
+      {{ include('MauticReportBundle:Report:details_data_graphs.html.twig', {
+              'graphOrder': graphOrder,
+              'graphs': graphs,
+              'report': report,
+      }) }}
+  {% endif %}
+
+
+  {% if columnOrder is not empty %}
+      <table class="table table-hover table-striped table-bordered report-list" id="reportTable">
+          <thead>
+          <tr>
+              <th class="col-report-count"></th>
+
+              {% for header in reportDataResult.headers %}
+                  <th>{{ header }}</th>
+              {% endfor %}
+          </tr>
+          </thead>
+          <tbody>
+          {% if dataCount %}
+              {% for count, data in reportDataResult.data %}
+                  <tr>
+                      <td>{{ count + 1 }}</td>
+                      {% for k, v in data %}
+                          <td>{{ format(v, reportDataResult.getType(k)) }}</td>
+                      {% endfor %}
+                  </tr>
+              {% endfor %}
+          {% else %}
+              <tr>
+                  <td>&nbsp;</td>
+                  {% for key in columnOrder %}
+                      <td>&nbsp;</td>
+                  {% endfor %}
+              </tr>
+          {% endif %}
+          </tbody>
+      </table>
+  {% endif %}
+
+  {% if showGraphsAboveTable is empty %}
+      {{ include('MauticReportBundle:Report:details_data_graphs.html.twig', {
+              'graphOrder': graphOrder,
+              'graphs': graphs,
+              'report': report,
+      }) }}
+  {% endif %}
+{% endblock %}

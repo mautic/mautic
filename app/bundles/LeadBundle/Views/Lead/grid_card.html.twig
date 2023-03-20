@@ -27,7 +27,7 @@
                         </a>
                     </h4>
                     <div class="text-muted mb-1 ellipsis">
-                        <i class="fa fa-fw fa-building mr-xs"></i>{{ fields.core.company.value|default('') }}<?php echo (!empty($fields['core']['company'])) ? $fields['core']['company']['value'] : ''; ?>
+                        <i class="fa fa-fw fa-building mr-xs"></i>{{ fields.core.company.value|default('') }}
                     </div>
                     <div class="text-muted mb-1 ellipsis">
                         <i class="fa fa-fw fa-map-marker mr-xs"></i>
@@ -46,7 +46,6 @@
                         <i class="fa fa-fw fa-globe mr-xs"></i>{{ fields.core.country.value|default('') }}
                     </div>
                     {% set flag = fields.core.country.value is not null ? assetGetCountryFlag(fields.core.country.value) : '' %}
-
                     {% if flag is not empty %}
                         <div style="position: absolute; right: 30px; bottom: 30px">
                             <img src="{{ flag }}" style="max-height: 24px;" class="ml-sm" />
