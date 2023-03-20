@@ -261,11 +261,11 @@ class ContactMerger
     {
         $loserUtmTags = $loser->getUtmTags();
 
-        if ($loserUtmTags instanceof PersistentCollection) {
-            foreach ($loserUtmTags->getValues() as $utmTag) {
-                $utmTag->setLead($winner);
-                $this->leadModel->setUtmTags($winner, $utmTag, false);
-            }
+        foreach ($loserUtmTags as $utmTag) {
+            $utmTag->setLead($winner);
+            $this->leadModel->getUtmTagRepository()->saveEntity($utmTag);
+
+            $this->leadModel->setUtmTags($winner, $utmTag, false);
         }
 
         return $this;
