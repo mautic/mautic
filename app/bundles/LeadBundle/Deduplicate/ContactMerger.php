@@ -264,7 +264,7 @@ class ContactMerger
             $utmTag->setLead($winner);
             $this->leadModel->getUtmTagRepository()->saveEntity($utmTag);
 
-            $this->leadModel->setUtmTags($winner, $utmTag, false);
+            $this->leadModel->setUtmTags($winner, $utmTag);
             $this->leadModel->removeUtmTags($loser, $utmTag->getid());
         }
 

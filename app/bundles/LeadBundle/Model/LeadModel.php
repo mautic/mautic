@@ -1575,13 +1575,11 @@ class LeadModel extends FormModel
     /**
      * Update a leads UTM tags.
      */
-    public function setUtmTags(Lead $lead, UtmTag $utmTags, bool $persist = true)
+    public function setUtmTags(Lead $lead, UtmTag $utmTags)
     {
         $lead->setUtmTags($utmTags);
 
-        if ($persist) {
-            $this->saveEntity($lead);
-        }
+        $this->saveEntity($lead);
     }
 
     /**
