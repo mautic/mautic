@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Form\Type\DynamicFiltersType;
 use Mautic\ReportBundle\Model\ExportResponse;
@@ -655,6 +656,8 @@ class ReportController extends FormController
             ]
         );
 
+        $reportDataResult = new ReportDataResult($reportData);
+
         return $this->delegateView(
             [
                 'viewParameters' => [
@@ -666,6 +669,7 @@ class ReportController extends FormController
                     'report'       => $entity,
                     'reportPage'   => $reportPage,
                     'graphs'       => $reportData['graphs'],
+                    'totals'       => $reportDataResult->getTotals(),
                     'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'limit'        => $reportData['limit'],
                     'permissions'  => $security->isGranted(

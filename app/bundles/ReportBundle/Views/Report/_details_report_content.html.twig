@@ -45,7 +45,6 @@
                                         'dataToggle': '',
                                         'target': '.report-content',
                                     }) }}
-                                    {%- set total = total|merge({(loop.index0): 0}) -%}
                                 {% endfor %}
                             {% endif %}
                         </tr>
@@ -82,28 +81,11 @@
                                         </td>
                                     {% endfor %}
                                     {% if aggregatorCount %}
-                                        {%- set avgCounter = avgCounter + 1 -%}
                                         {% for aggregator in aggregatorOrder %}
                                             {%- set _key = aggregator.function ~ ' ' ~ aggregator.column %}
                                             <td>
                                                 {% if row[_key] is defined %}
                                                     {{ format(row[_key], 'text') }}
-                                                    {%- set a = row[_key] -%}
-                                                    {%- set f = aggregator.function -%}
-                                                    {%- set t = total[loop.index0]|default(0) -%}
-                                                    {%- set allrows = dataCount -%}
-                                                    {%- set ac = avgCounter -%}
-                                                    {% if 'COUNT' is same as f or 'SUM' is same as f %}
-                                                      {%- set total = total|merge({(loop.index0): t + a}) -%}
-                                                    {% elseif 'AVG' is same as f %}
-                                                      {%- set total = total|merge({(loop.index0): (ac == allrows) ? ((t + a) / allrows)|round(2) : (t + a)}) -%}
-                                                    {% elseif 'MAX' is same as f %}
-                                                      {%- set total = total|merge({(loop.index0): (a >= t) ? a : t}) -%}
-                                                    {% elseif 'MIN' is same as f %}
-                                                      {%- set total = total|merge({(loop.index0): (a <= t) ? a : t}) -%}
-                                                    {% else %}
-                                                      {%- set total = total|merge({(loop.index0): t}) -%}
-                                                    {% endif %}
                                                 {% endif %}
                                             </td>
                                         {% endfor %}
@@ -125,14 +107,15 @@
                                 <td>&nbsp;</td>
                             {% endfor %}
                             {% if aggregatorCount %}
-                                {% for aggregator in aggregatorOrder %}
+                                {% for total in totals %}
                                     <td>
-                                        {% if total[loop.index0] is defined %}
-                                            {{ format(total[loop.index0], 'text') }}
+                                        {% if total is defined %}
+                                            {{ format(total, 'text') }}
                                         {% endif %}
                                     </td>
                                 {% endfor %}
                             {% endif %}
+                        </tr>
                         </tbody>
                     </table>
                 </div>
