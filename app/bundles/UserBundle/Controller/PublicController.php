@@ -18,9 +18,9 @@ class PublicController extends FormController
         /** @var UserModel $model */
         $model = $this->getModel('user');
 
-        $data = ['identifier' => ''];
+        $data   = ['identifier' => ''];
         $action = $this->generateUrl('mautic_user_passwordreset');
-        $form = $this->get('form.factory')->create(PasswordResetType::class, $data, ['action' => $action]);
+        $form   = $this->get('form.factory')->create(PasswordResetType::class, $data, ['action' => $action]);
 
         ///Check for a submitted form and process it
         if ('POST' == $this->request->getMethod()) {
@@ -77,6 +77,7 @@ class PublicController extends FormController
 
                 if (null == $user) {
                     $this->addFlash('mautic.user.user.notice.passwordreset.success');
+
                     return $this->redirectToRoute('login');
                 } else {
                     if ($this->request->getSession()->has('resetToken')) {
@@ -89,6 +90,7 @@ class PublicController extends FormController
                             $model->saveEntity($user);
                             $this->addFlash('mautic.user.user.notice.passwordreset.success');
                             $this->request->getSession()->remove('resetToken');
+
                             return $this->redirectToRoute('login');
                         }
 
