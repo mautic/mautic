@@ -46,6 +46,10 @@ class CsvExporter
             }
             $this->putRow($handle, $row);
         }
+
+        if (1 === $page) {
+            $this->putTotals($reportDataResult, $handle);
+        }
     }
 
     /**
@@ -54,6 +58,14 @@ class CsvExporter
     private function putHeader(ReportDataResult $reportDataResult, $handle)
     {
         $this->putRow($handle, $reportDataResult->getHeaders());
+    }
+
+    /**
+     * @param resource $handle
+     */
+    private function putTotals(ReportDataResult $reportDataResult, $handle)
+    {
+        $this->putRow($handle, $reportDataResult->getTotalsToExport());
     }
 
     /**

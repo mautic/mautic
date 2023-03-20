@@ -56,6 +56,21 @@
                       {% endfor %}
                   </tr>
               {% endfor %}
+              {% if reportDataResult.totals %}
+                  <tr class="cm-strong">
+                      <td>{{ 'mautic.report.report.groupby.totals'|trans }}</td>
+                      {% for key in columnOrder %}
+                          <td>&nbsp;</td>
+                      {% endfor %}
+                      {% for total in reportDataResult.totals %}
+                              <td>
+                                  {% if total is defined %}
+                                      {{ format(total, 'text') }}
+                                  {% endif %}
+                              </td>
+                      {% endfor %}
+                  </tr>
+              {% endif %}
           {% else %}
               <tr>
                   <td>&nbsp;</td>

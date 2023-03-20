@@ -7,6 +7,7 @@ use Mautic\ReportBundle\Crate\ReportDataResult;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 /**
  * Class CsvExporter.
@@ -42,10 +43,19 @@ class ExcelExporter
             $objPHPExcel = new Spreadsheet();
             $objPHPExcel->getProperties()->setTitle($name);
             $objPHPExcel->createSheet();
+            $objPHPExcelSheet = $objPHPExcel->getActiveSheet();
             $reportDataResult = new ReportDataResult($reportData);
+            $reportData       = $reportDataResult->getData();
+            $rowCount         = 1;
+
+            if (empty($reportData)) {
+                throw new \Exception('No report data to be exported');
+            }
+
+            $this->putHeader($reportDataResult, $objPHPExcelSheet);
 
             //build the data rows
-            foreach ($reportDataResult->getData() as $count=>$data) {
+            foreach ($reportData as $count=>$data) {
                 $row = [];
                 foreach ($data as $k => $v) {
                     $type      = $reportDataResult->getType($k);
@@ -53,16 +63,15 @@ class ExcelExporter
                     $row[]     = $formatted;
                 }
 
-                if (0 === $count) {
-                    //write the column names row
-                    $objPHPExcel->getActiveSheet()->fromArray($reportDataResult->getHeaders());
-                }
                 //write the row
                 $rowCount = $count + 2;
                 $objPHPExcel->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
                 //free memory
                 unset($row, $reportData['data'][$count]);
             }
+
+            //Add totals to export
+            $this->putTotals($reportDataResult, $objPHPExcelSheet, 'A'.++$rowCount);
 
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
             $objWriter->setPreCalculateFormulas(false);
@@ -71,5 +80,15 @@ class ExcelExporter
         } catch (Exception $e) {
             throw new \Exception('PHPSpreadsheet Error', 0, $e);
         }
+    }
+
+    private function putHeader(ReportDataResult $reportDataResult, Worksheet $activeSheet)
+    {
+        $activeSheet->fromArray($reportDataResult->getHeaders());
+    }
+
+    private function putTotals(ReportDataResult $reportDataResult, Worksheet $activeSheet, string $startCell)
+    {
+        $activeSheet->fromArray($reportDataResult->getTotalsToExport(), null, $startCell);
     }
 }
