@@ -24,6 +24,16 @@ class ReportDataResult
      */
     private $types = [];
 
+    /**
+     * @var array
+     */
+    private $totals = [];
+
+    /**
+     * @var array
+     */
+    private $columnKeys = [];
+
     public function __construct(array $data)
     {
         if (
@@ -37,8 +47,10 @@ class ReportDataResult
         $this->totalResults = (int) $data['totalResults'];
         $this->data         = $data['data'];
 
+        $this->buildColumnKeys();
         $this->buildHeader($data);
         $this->buildTypes($data);
+        $this->buildTotals($data['aggregatorColumns'] ?? []);
     }
 
     /**
@@ -76,16 +88,35 @@ class ReportDataResult
     }
 
     /**
+     * @return array
+     */
+    public function getTotals()
+    {
+        return $this->totals;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTotalsToExport()
+    {
+        foreach ($this->columnKeys as $key) {
+            $totalsRow[$key] = $this->totals[$key] ?? '';
+        }
+
+        return $totalsRow ?? [];
+    }
+
+    /**
      * @param array $data
      */
     private function buildHeader($data)
     {
-        if (!isset($this->data[0])) {
+        if (empty($this->columnKeys)) {
             return;
         }
 
-        $row = $this->data[0];
-        foreach ($row as $k => $v) {
+        foreach ($this->columnKeys as $k) {
             $dataColumn      = $data['dataColumns'][$k];
             $label           = $data['columns'][$dataColumn]['label'];
 
@@ -103,12 +134,11 @@ class ReportDataResult
      */
     private function buildTypes($data)
     {
-        if (!isset($this->data[0])) {
+        if (empty($this->columnKeys)) {
             return;
         }
 
-        $row = $this->data[0];
-        foreach ($row as $k => $v) {
+        foreach ($this->columnKeys as $k) {
             if (isset($data['aggregatorColumns']) && array_key_exists($k, $data['aggregatorColumns'])) {
                 $this->types[$k] = ('AVG' === substr($k, 0, 3)) ? 'float' : 'int';
             } else {
@@ -116,5 +146,67 @@ class ReportDataResult
                 $this->types[$k] = $data['columns'][$dataColumn]['type'];
             }
         }
+    }
+
+    /**
+     * @return float
+     */
+    private function calcTotal(string $calcFunction, float $cellVal, float $previousVal, int $avgCounter)
+    {
+        switch ($calcFunction) {
+            case 'COUNT':
+            case 'SUM':
+                return $previousVal + $cellVal;
+            case 'AVG':
+                return ($avgCounter == $this->totalResults) ? round(($previousVal + $cellVal) / $this->totalResults, 4) : $previousVal + $cellVal;
+            case 'MAX':
+                return ($cellVal >= $previousVal) ? $cellVal : $previousVal;
+            case 'MIN':
+                return ($cellVal <= $previousVal) ? $cellVal : $previousVal;
+            default:
+                return $previousVal;
+        }
+    }
+
+    /**
+     * @return void
+     */
+    private function buildTotals(array $aggregators)
+    {
+        if ($aggregators) {
+            $avgCounter   = 0;
+            $this->totals = [];
+
+            for ($i = 0; $i < $this->totalResults; ++$i) {
+                ++$avgCounter;
+
+                foreach ($aggregators as $j => $v) {
+                    if ($cellVal = $this->data[$i][$j] ?? null) {
+                        $calcFunc         = $this->getAggregatorCalcFunc($j, $v);
+                        $this->totals[$j] = $this->calcTotal($calcFunc, $cellVal, $this->totals[$j] ?? 0, $avgCounter);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function getAggregatorCalcFunc(string $index, string $value)
+    {
+        return trim(str_replace($value, '', $index));
+    }
+
+    private function buildColumnKeys()
+    {
+        if (!isset($this->data[0])) {
+            $this->columnKeys = [];
+
+            return;
+        }
+
+        $row              = $this->data[0];
+        $this->columnKeys =  array_keys($row);
     }
 }
