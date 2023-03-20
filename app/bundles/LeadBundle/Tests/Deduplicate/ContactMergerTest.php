@@ -558,7 +558,7 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->getMerger()->mergeTags($winner, $loser);
     }
 
-    public function testMergeUtmTags()
+    public function testMergeUtmTags(): void
     {
         $winner = new Lead();
         $loser  = new Lead();
@@ -577,6 +577,9 @@ class ContactMergerTest extends \PHPUnit\Framework\TestCase
         $this->leadModel->expects($this->once())
             ->method('setUtmTags')
             ->with($winner, $utmTag);
+
+        $this->leadModel->expects($this->once())
+            ->method('removeUtmTags');
 
         $this->getMerger()->mergeUtmTags($winner, $loser);
     }

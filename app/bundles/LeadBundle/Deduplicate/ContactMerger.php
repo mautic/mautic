@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Deduplicate;
 
-use Doctrine\ORM\PersistentCollection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Deduplicate\Exception\ValueNotMergeableException;
@@ -259,13 +258,14 @@ class ContactMerger
      */
     public function mergeUtmTags(Lead $winner, Lead $loser): self
     {
-        $loserUtmTags = $loser->getUtmTags();
+        $loserUtmTags = $loser->getUtmTags() ?? [];
 
         foreach ($loserUtmTags as $utmTag) {
             $utmTag->setLead($winner);
             $this->leadModel->getUtmTagRepository()->saveEntity($utmTag);
 
             $this->leadModel->setUtmTags($winner, $utmTag, false);
+            $this->leadModel->removeUtmTags($loser, $utmTag->getid());
         }
 
         return $this;
