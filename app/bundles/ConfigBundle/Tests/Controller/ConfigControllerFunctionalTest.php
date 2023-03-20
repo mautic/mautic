@@ -90,7 +90,7 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('link_shortener_url', $configParameters);
+        Assert::assertArrayHasKey('link_shortener_url', $configParameters, 'Assert "link_shortener_url" in: '.implode(',', array_keys($configParameters)));
         Assert::assertSame($this->escape($url), $configParameters['link_shortener_url']);
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
         Assert::assertSame(

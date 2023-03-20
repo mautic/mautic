@@ -745,4 +745,32 @@ final class LeadEvents
      * @var string
      */
     public const LEAD_FIELD_PRE_ADD_COLUMN_BACKGROUND_JOB = 'mautic.lead_field_pre_add_column_background_job';
+
+    /**
+     * The mautic.post_contact_export_scheduled event is dispatched when a contact export is scheduled.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const POST_CONTACT_EXPORT_SCHEDULED = 'mautic.post_contact_export_scheduled';
+
+    /**
+     * The mautic.contact_export_prepare_file event is dispatched when a contact export is being processed.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const CONTACT_EXPORT_PREPARE_FILE = 'mautic.contact_export_prepare_file';
+
+    /**
+     * The mautic.contact_export_prepare_file event is dispatched when a contact export email is to be sent.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const CONTACT_EXPORT_SEND_EMAIL = 'mautic.contact_export_send_email';
+
+    /**
+     * The mautic.post_contact_export_send_email event is dispatched when a contact export email is sent.
+     *
+     * The event listener receives a Mautic\LeadBundle\Event\ContactExportSchedulerEvent instance.
+     */
+    public const POST_CONTACT_EXPORT_SEND_EMAIL = 'mautic.post_contact_export_send_email';
 }
