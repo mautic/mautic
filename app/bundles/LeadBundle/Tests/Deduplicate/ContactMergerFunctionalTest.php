@@ -184,7 +184,7 @@ final class ContactMergerFunctionalTest extends MauticMysqlTestCase
         $model->getUtmTagRepository()->saveEntity($janesUtmValues);
         $model->setUtmTags($janesUtmValues->getLead(), $janesUtmValues);
 
-        $bob = $merger->merge($bob, $jane);
+        $bob     = $merger->merge($bob, $jane);
         $utmTags = $bob->getUtmTags();
 
         \assert($utmTags instanceof PersistentCollection);
