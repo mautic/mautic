@@ -1,7 +1,7 @@
 {% if event.extra is defined %}
   {% set timeOnPage = 'mautic.core.unknown'|trans %}
 
-  {% if event.extra.hit.dateLeft is defined %}
+  {% if event.extra.hit.dateLeft %}
       {% set timeOnPage = (event.extra.hit.dateLeft.timestamp - event.extra.hit.dateHit.timestamp) %}
 
       {# format the time #}
