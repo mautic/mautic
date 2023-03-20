@@ -52,7 +52,8 @@ class ExcelExporter
                 throw new \Exception('No report data to be exported');
             }
 
-            $this->putHeader($reportDataResult, $objPHPExcelSheet);
+            $headersRow = $reportDataResult->getHeaders();
+            $this->putHeader($headersRow, $objPHPExcelSheet);
 
             //build the data rows
             foreach ($reportData as $count=>$data) {
@@ -71,7 +72,10 @@ class ExcelExporter
             }
 
             //Add totals to export
-            $this->putTotals($reportDataResult, $objPHPExcelSheet, 'A'.++$rowCount);
+            $totalsRow = $reportDataResult->getTotalsToExport();
+            if (!empty($totalsRow)) {
+                $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);
+            }
 
             $objWriter = IOFactory::createWriter($objPHPExcel, 'Xlsx');
             $objWriter->setPreCalculateFormulas(false);
@@ -82,13 +86,13 @@ class ExcelExporter
         }
     }
 
-    private function putHeader(ReportDataResult $reportDataResult, Worksheet $activeSheet)
+    private function putHeader($headers, Worksheet $activeSheet)
     {
-        $activeSheet->fromArray($reportDataResult->getHeaders());
+        $activeSheet->fromArray($headers);
     }
 
-    private function putTotals(ReportDataResult $reportDataResult, Worksheet $activeSheet, string $startCell)
+    private function putTotals(array $totals, Worksheet $activeSheet, string $startCell)
     {
-        $activeSheet->fromArray($reportDataResult->getTotalsToExport(), null, $startCell);
+        $activeSheet->fromArray($totals, null, $startCell);
     }
 }

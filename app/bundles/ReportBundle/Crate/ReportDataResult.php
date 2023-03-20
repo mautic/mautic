@@ -100,6 +100,10 @@ class ReportDataResult
      */
     public function getTotalsToExport()
     {
+        if (empty($this->totals)) {
+            return [];
+        }
+
         foreach ($this->columnKeys as $key) {
             $totalsRow[$key] = $this->totals[$key] ?? '';
         }
