@@ -37,7 +37,7 @@
                             {% endfor %}
                             {% if aggregatorCount %}
                                 {% for aggregator in aggregatorOrder %}
-                                    {%- set columnName = columns[aggregator.column].alias|default('') -%}
+                                    {%- set columnName = columns[aggregator.column].label ?? columns[aggregator.column].alias|default('') -%}
                                     {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
                                         'sessionVar': 'report.' ~ report.id,
                                         'text': aggregator.function ~ ' ' ~ columnName,
