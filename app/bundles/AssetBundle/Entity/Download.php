@@ -395,7 +395,7 @@ class Download
         return $this->utmMedium;
     }
 
-    public function setUtmMedium(string $utmMedium): static
+    public function setUtmMedium(?string $utmMedium): static
     {
         $this->utmMedium = $utmMedium;
 
