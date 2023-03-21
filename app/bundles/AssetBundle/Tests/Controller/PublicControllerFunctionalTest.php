@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Tests\Controller;
 
+use Mautic\AssetBundle\Entity\Download;
 use Mautic\AssetBundle\Tests\Asset\AbstractAssetTest;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -65,8 +66,12 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
         $this->assertNotSame($this->expectedContentDisposition.$this->asset->getOriginalFileName(), $response->headers->get('Content-Disposition'));
         $this->assertEquals($this->expectedPngContent, $content);
 
-        $downlodRepo = $this->em->getRepository('MauticAssetBundle:Download');
-        $download    = $downlodRepo->findOneBy(['id' =>$this->asset->getId()]);
+        $downloadRepo = $this->em->getRepository(Download::class);
+
+        /**
+         * @var Download $download
+         */
+        $download = $downloadRepo->findOneBy(['id' =>$this->asset->getId()]);
         $this->assertSame('test2', $download->getUtmSource());
         $this->assertSame('test3', $download->getUtmMedium());
         $this->assertSame('test4', $download->getUtmTerm());

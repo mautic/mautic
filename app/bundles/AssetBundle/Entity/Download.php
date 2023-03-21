@@ -383,7 +383,7 @@ class Download
         return $this->utmContent;
     }
 
-    public function setUtmContent($utmContent): static
+    public function setUtmContent(?string $utmContent): static
     {
         $this->utmContent = $utmContent;
 
