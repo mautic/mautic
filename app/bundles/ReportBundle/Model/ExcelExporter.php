@@ -29,14 +29,10 @@ class ExcelExporter
      *
      * @throws \Exception
      */
-    public function export(array $reportData, $name, string $output = 'php://output')
+    public function export(ReportDataResult $reportDataResult, $name, string $output = 'php://output')
     {
         if (!class_exists(Spreadsheet::class)) {
             throw new \Exception('PHPSpreadsheet is required to export to Excel spreadsheets');
-        }
-
-        if (!array_key_exists('data', $reportData) || !array_key_exists('columns', $reportData)) {
-            throw new \InvalidArgumentException("Keys 'data' and 'columns' have to be provided");
         }
 
         try {
@@ -44,7 +40,6 @@ class ExcelExporter
             $objPHPExcel->getProperties()->setTitle($name);
             $objPHPExcel->createSheet();
             $objPHPExcelSheet = $objPHPExcel->getActiveSheet();
-            $reportDataResult = new ReportDataResult($reportData);
             $reportData       = $reportDataResult->getData();
             $rowCount         = 1;
 

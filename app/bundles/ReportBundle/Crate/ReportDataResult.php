@@ -34,7 +34,26 @@ class ReportDataResult
      */
     private $columnKeys = [];
 
-    public function __construct(array $data)
+    /**
+     * @var array
+     */
+    private $graphs = [];
+
+    /**
+     * @var string
+     */
+    private $dateFrom;
+
+    /**
+     * @var string
+     */
+    private $dateTo;
+
+    private ?int $limit;
+
+    private int $page;
+
+    public function __construct(array $data, array $preTotals = [])
     {
         if (
             !array_key_exists('data', $data) ||
@@ -46,6 +65,14 @@ class ReportDataResult
 
         $this->totalResults = (int) $data['totalResults'];
         $this->data         = $data['data'];
+        $this->graphs       = $data['graphs'] ?? [];
+        $this->dateFrom     = $data['dateFrom'];
+        $this->dateTo       = $data['dateTo'];
+        $this->limit        = $data['limit'] ? (int) $data['limit'] : null;
+        $this->page         = $data['page'] ? (int) $data['page'] : 1;
+
+        // Use the calculated totals for previous batch to continue
+        $this->totals       = $preTotals;
 
         $this->buildColumnKeys();
         $this->buildHeader($data);
@@ -98,6 +125,30 @@ class ReportDataResult
     /**
      * @return array
      */
+    public function getGraphs()
+    {
+        return $this->graphs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDateTo()
+    {
+        return $this->dateTo;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDateFrom()
+    {
+        return $this->dateFrom;
+    }
+
+    /**
+     * @return array
+     */
     public function getTotalsToExport()
     {
         if (empty($this->totals)) {
@@ -109,6 +160,19 @@ class ReportDataResult
         }
 
         return $totalsRow ?? [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLastPage()
+    {
+        // No limit set
+        if (empty($this->limit)) {
+            return true;
+        }
+
+        return $this->page == ceil($this->totalResults / $this->limit);
     }
 
     /**
@@ -155,14 +219,14 @@ class ReportDataResult
     /**
      * @return float
      */
-    private function calcTotal(string $calcFunction, float $cellVal, float $previousVal, int $avgCounter)
+    private function calcTotal(string $calcFunction, float $cellVal, float $previousVal, int $avgCounter, int $rowsCount)
     {
         switch ($calcFunction) {
             case 'COUNT':
             case 'SUM':
                 return $previousVal + $cellVal;
             case 'AVG':
-                return ($avgCounter == $this->totalResults) ? round(($previousVal + $cellVal) / $this->totalResults, 4) : $previousVal + $cellVal;
+                return ($avgCounter == $rowsCount) ? round(($previousVal + $cellVal) / $rowsCount, 4) : $previousVal + $cellVal;
             case 'MAX':
                 return ($cellVal >= $previousVal) ? $cellVal : $previousVal;
             case 'MIN':
@@ -177,17 +241,18 @@ class ReportDataResult
      */
     private function buildTotals(array $aggregators)
     {
-        if ($aggregators) {
-            $avgCounter   = 0;
-            $this->totals = [];
+        $dataCount = count($this->data);
 
-            for ($i = 0; $i < $this->totalResults; ++$i) {
+        if ($aggregators && !empty(array_keys($this->data))) {
+            $avgCounter   = 0;
+
+            for ($i = array_key_first($this->data); $i < $dataCount; ++$i) {
                 ++$avgCounter;
 
                 foreach ($aggregators as $j => $v) {
-                    if ($cellVal = $this->data[$i][$j] ?? null) {
+                    if (isset($this->data[$i][$j])) {
                         $calcFunc         = $this->getAggregatorCalcFunc($j, $v);
-                        $this->totals[$j] = $this->calcTotal($calcFunc, $cellVal, $this->totals[$j] ?? 0, $avgCounter);
+                        $this->totals[$j] = $this->calcTotal($calcFunc, $this->data[$i][$j], $this->totals[$j] ?? 0, $avgCounter, $dataCount);
                     }
                 }
             }

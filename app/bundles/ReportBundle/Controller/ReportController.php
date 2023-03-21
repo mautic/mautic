@@ -797,13 +797,18 @@ class ReportController extends FormController
                     $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);
                     $options['page']            = 1;
                     $handle                     = fopen('php://output', 'r+');
+                    $allTotals                  = [];
                     do {
                         $reportData = $model->getReportData($entity, null, $options);
+
+                        // Build the data rows
+                        $reportDataResult = new ReportDataResult($reportData, $allTotals);
+                        $allTotals = $reportDataResult->getTotals();
 
                         // Note this so that it's not recalculated on each batch
                         $options['totalResults'] = $reportData['totalResults'];
 
-                        $model->exportResults($format, $entity, $reportData, $handle, $options['page']);
+                        $model->exportResults($format, $entity, $reportDataResult, $handle, $options['page']);
                         ++$options['page'];
                     } while (!empty($reportData['data']));
 
@@ -816,8 +821,9 @@ class ReportController extends FormController
             if ('xlsx' === $format) {
                 $options['ignoreGraphData'] = true;
             }
-            $reportData = $model->getReportData($entity, null, $options);
-            $response   = $model->exportResults($format, $entity, $reportData);
+            $reportData       = $model->getReportData($entity, null, $options);
+            $reportDataResult = new ReportDataResult($reportData);
+            $response         = $model->exportResults($format, $entity, $reportDataResult);
         }
 
         return $response;

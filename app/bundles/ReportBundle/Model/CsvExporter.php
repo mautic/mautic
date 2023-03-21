@@ -48,7 +48,7 @@ class CsvExporter
         }
 
         $totalsRow = $reportDataResult->getTotalsToExport();
-        if (1 === $page && !empty($totalsRow)) {
+        if (!empty($totalsRow) && $reportDataResult->isLastPage()) {
             $this->putTotals($totalsRow, $handle);
         }
     }

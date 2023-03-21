@@ -10,7 +10,7 @@
   {#$showGraphsAboveTable = (true === !empty($report->getSettings()['showGraphsAboveTable']));#}
   {%- set showGraphsAboveTable = report.settings.showGraphsAboveTable is defined -%}
 
-  {%- set dataCount = data|length -%}
+  {%- set dataCount = reportDataResult.getData()|length -%}
   {%- set columnOrder = report.columns -%}
   {%- set graphOrder = report.graphs -%}
   <style>
@@ -22,14 +22,14 @@
   <div class="pa-md">
       <h3>{{ report.name }}</h3>
       <div class="small">
-          {{ dateToDate(dateFrom, 'UTC') }} - {{ dateToDate(dateTo, 'UTC') }}
+          {{ dateToDate(reportDataResult.getDateFrom(), 'UTC') }} - {{ dateToDate(reportDataResult.getDateTo(), 'UTC') }}
       </div>
   </div>
 
   {% if showGraphsAboveTable is not empty %}
       {{ include('MauticReportBundle:Report:details_data_graphs.html.twig', {
               'graphOrder': graphOrder,
-              'graphs': graphs,
+              'graphs': reportDataResult.getGraphs(),
               'report': report,
       }) }}
   {% endif %}
@@ -86,7 +86,7 @@
   {% if showGraphsAboveTable is empty %}
       {{ include('MauticReportBundle:Report:details_data_graphs.html.twig', {
               'graphOrder': graphOrder,
-              'graphs': graphs,
+              'graphs': reportDataResult.getGraphs(),
               'report': report,
       }) }}
   {% endif %}
