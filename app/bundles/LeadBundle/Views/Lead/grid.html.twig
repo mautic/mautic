@@ -33,7 +33,7 @@
 </div>
 {% if items|length > 0 %}
     <div class="panel-footer">
-        {% set route = link|default('mautic_contact_index') %}
+        {% set route = route is defined ? route : (link|default('mautic_contact_index')) %}
         {% set routeParameters = routeParameters|default([]) %}
         {% if objectId is defined %}
           {% set routeParameters = routeParameters|merge({'objectId': objectId}) %}
