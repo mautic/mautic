@@ -289,4 +289,31 @@ class ListControllerFunctionalTest extends MauticMysqlTestCase
             'statusCode' => $this->client->getResponse()->getStatusCode(),
         ];
     }
+
+    public function testCloneSegment(): void
+    {
+        $segment = $this->saveSegment(
+            'Clone Segment',
+            'clonesegment',
+        );
+
+        $this->em->clear();
+
+        $crawler = $this->client->request(Request::METHOD_POST, '/s/segments/clone/'.$segment->getId());
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $form    = $crawler->selectButton('leadlist_buttons_apply')->form();
+        $form['leadlist[alias]']->setValue('clonesegment2');
+        $this->client->submit($form);
+
+        $this->assertTrue($this->client->getResponse()->isOk());
+
+        $this->client->submit($form);
+
+        $rows = $this->listRepo->findAll();
+        $this->assertCount(2, $rows);
+
+        $this->assertSame('clonesegment', $rows[0]->getAlias());
+        $this->assertSame('clonesegment2', $rows[1]->getAlias());
+    }
 }

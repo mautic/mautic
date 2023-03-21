@@ -144,7 +144,7 @@ class AjaxController extends CommonController
         $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
 
         $dataArray['newContent'] = $this->renderView(
-            'MauticCoreBundle:GlobalSearch:results.html.php',
+            'MauticCoreBundle:GlobalSearch:results.html.twig',
             ['results' => $event->getResults()]
         );
 
@@ -291,7 +291,7 @@ class AjaxController extends CommonController
 
                         //get updated icon HTML
                         $html = $this->renderView(
-                            'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                            'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
                             [
                                 'item'          => $entity,
                                 'model'         => $name,

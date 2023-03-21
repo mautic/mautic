@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension;
 use Mautic\CoreBundle\Templating\Twig\Extension\ClassExtension;
 use Mautic\CoreBundle\Templating\Twig\Extension\FormExtension;
 use Mautic\CoreBundle\Tests\Twig\Fakes\AssetsHelperFake;
-use Mautic\CoreBundle\Tests\Twig\Fakes\FormHelperFake;
 use Twig\Extension\ExtensionInterface;
 
 /**
@@ -26,7 +25,7 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             new AppExtension(),
             new AssetExtension(new AssetsHelperFake()),
             new ClassExtension(),
-            new FormExtension(new FormHelperFake()),
+            new FormExtension(),
         ];
     }
 
