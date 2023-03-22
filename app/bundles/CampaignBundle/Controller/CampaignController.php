@@ -393,7 +393,7 @@ class CampaignController extends AbstractStandardFormController
                 'entity'          => $campaign,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.twig',
+            'contentTemplate' => '@MauticCampaign/Campaign/form.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl(

@@ -210,7 +210,7 @@ class StageController extends AbstractFormController
                     'form'      => $form->createView(),
                     'actions'   => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
+                'contentTemplate' => '@MauticStage/Stage/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -361,7 +361,7 @@ class StageController extends AbstractFormController
                     'form'    => $form->createView(),
                     'actions' => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
+                'contentTemplate' => '@MauticStage/Stage/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',

@@ -99,7 +99,7 @@ class PublicController extends FormController
                             'viewParameters' => [
                                 'form' => $form->createView(),
                             ],
-                            'contentTemplate' => 'MauticUserBundle:Security:resetconfirm.html.twig',
+                            'contentTemplate' => '@MauticUser/Security/resetconfirm.html.twig',
                             'passthroughVars' => [
                                 'route' => $action,
                             ],
@@ -117,7 +117,7 @@ class PublicController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:resetconfirm.html.twig',
+            'contentTemplate' => '@MauticUser/Security/resetconfirm.html.twig',
             'passthroughVars' => [
                 'route' => $action,
             ],

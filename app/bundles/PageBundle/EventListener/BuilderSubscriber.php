@@ -705,7 +705,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $langbar = $this->templating->getTemplating()->render('MauticPageBundle:SubscribedEvents\PageToken:langbar.html.twig', ['pages' => $related]);
+            $langbar = $this->templating->getTemplating()->render('@MauticPage/SubscribedEvents\PageToken/langbar.html.twig', ['pages' => $related]);
         }
 
         return $langbar;

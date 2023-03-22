@@ -25,7 +25,7 @@
             {% endif %}
 
             {% if filters is defined and filters is not empty %}
-            {{- include('MauticCoreBundle:Helper:list_filters.html.twig', {
+            {{- include('@MauticCore/Helper/list_filters.html.twig', {
                 filters: filters,
                 target: target|default(null),
                 tmpl: tmpl|default(null)

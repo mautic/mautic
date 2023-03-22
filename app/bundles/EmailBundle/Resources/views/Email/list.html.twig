@@ -25,12 +25,12 @@
                 'filters'     : filters,
             }) -}}
             <div class="page-list">
-              {{ include('MauticEmailBundle:Email:_list.html.twig') }}
+              {{ include('@MauticEmail/Email/_list.html.twig') }}
             </div>
         </div>
     {% else %}
 
-    {{ include('MauticEmailBundle:Email:_list.html.twig') }}
+    {{ include('@MauticEmail/Email/_list.html.twig') }}
 
     {% endif %}
 {% endblock %}

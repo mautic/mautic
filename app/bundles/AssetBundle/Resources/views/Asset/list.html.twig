@@ -219,7 +219,7 @@
     {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
 {% endif %}
 
-{{- include('MauticCoreBundle:Helper:modal.html.twig', {
+{{- include('@MauticCore/Helper/modal.html.twig', {
         'id'     : 'AssetPreviewModal',
         'header' : false,
 }) -}}

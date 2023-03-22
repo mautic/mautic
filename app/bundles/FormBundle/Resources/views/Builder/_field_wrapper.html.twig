@@ -119,7 +119,7 @@
               {% else %}
                   {% set template = 'MauticFormBundle:Field:' ~ field2.type ~ '.html.twig' %}
               {% endif %}
-              {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
+              {{ include('@MauticForm/Builder/_field_wrapper.html.twig', {
                       'isConditional': true,
                       'template': template,
                       'field': field2,

@@ -137,7 +137,7 @@
   </div>
   {{ form_end(form) }}
 
-  {{ include('MauticCoreBundle:Helper:builder.html.twig', {
+  {{ include('@MauticCore/Helper/builder.html.twig', {
       'type': 'page',
       'isCodeMode': ('mautic_code_mode' is same as activePage.template),
       'sectionForm': sectionForm,

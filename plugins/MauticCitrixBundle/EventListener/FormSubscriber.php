@@ -528,7 +528,7 @@ class FormSubscriber implements EventSubscriberInterface
                                 'data-product-action' => 'register',
                             ],
                         ],
-                        'template'  => 'MauticFormBundle:Action:_generic.html.twig',
+                        'template'  => '@MauticForm/Action/_generic.html.twig',
                         'eventName' => CitrixEvents::ON_WEBINAR_REGISTER_ACTION,
                     ]);
                     break;
@@ -538,7 +538,7 @@ class FormSubscriber implements EventSubscriberInterface
                         'description'     => 'plugin.citrix.form.header.meeting',
                         'label'           => 'plugin.citrix.action.start.meeting',
                         'formType'        => CitrixActionType::class,
-                        'template'        => 'MauticFormBundle:Action:_generic.html.twig',
+                        'template'        => '@MauticForm/Action/_generic.html.twig',
                         'eventName'       => CitrixEvents::ON_MEETING_START_ACTION,
                         'formTypeOptions' => [
                             'attr' => [
@@ -554,7 +554,7 @@ class FormSubscriber implements EventSubscriberInterface
                         'description'     => 'plugin.citrix.form.header.training',
                         'label'           => 'plugin.citrix.action.register.training',
                         'formType'        => CitrixActionType::class,
-                        'template'        => 'MauticFormBundle:Action:_generic.html.twig',
+                        'template'        => '@MauticForm/Action/_generic.html.twig',
                         'eventName'       => CitrixEvents::ON_TRAINING_REGISTER_ACTION,
                         'formTypeOptions' => [
                             'attr' => [
@@ -569,7 +569,7 @@ class FormSubscriber implements EventSubscriberInterface
                         'description'     => 'plugin.citrix.form.header.start.training',
                         'label'           => 'plugin.citrix.action.start.training',
                         'formType'        => CitrixActionType::class,
-                        'template'        => 'MauticFormBundle:Action:_generic.html.twig',
+                        'template'        => '@MauticForm/Action/_generic.html.twig',
                         'eventName'       => CitrixEvents::ON_TRAINING_START_ACTION,
                         'formTypeOptions' => [
                             'attr' => [
@@ -585,7 +585,7 @@ class FormSubscriber implements EventSubscriberInterface
                         'description'     => 'plugin.citrix.form.header.assist',
                         'label'           => 'plugin.citrix.action.screensharing.assist',
                         'formType'        => CitrixActionType::class,
-                        'template'        => 'MauticFormBundle:Action:_generic.html.twig',
+                        'template'        => '@MauticForm/Action/_generic.html.twig',
                         'eventName'       => CitrixEvents::ON_ASSIST_REMOTE_ACTION,
                         'formTypeOptions' => [
                             'attr' => [

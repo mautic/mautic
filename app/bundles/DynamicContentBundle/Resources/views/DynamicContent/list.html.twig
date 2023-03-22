@@ -35,10 +35,10 @@
                 'action': currentRoute,
         }) }}
         <div class="page-list">
-          {{ include('MauticDynamicContentBundle:DynamicContent:_list.html.twig') }}
+          {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}
         </div>
     </div>
   {% else %}
-    {{ include('MauticDynamicContentBundle:DynamicContent:_list.html.twig') }}
+    {{ include('@MauticDynamicContent/DynamicContent/_list.html.twig') }}
   {% endif %}
 {% endblock %}

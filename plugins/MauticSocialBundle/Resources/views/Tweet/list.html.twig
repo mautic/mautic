@@ -24,10 +24,10 @@
           'action': currentRoute,
           }) }}
       <div class="page-list">
-        {{- include('MauticSocialBundle:Tweet:_list.html.twig') -}}
+        {{- include('@MauticSocial/Tweet/_list.html.twig') -}}
       </div>
     </div>
   {% else %}
-    {{- include('MauticSocialBundle:Tweet:_list.html.twig') -}}
+    {{- include('@MauticSocial/Tweet/_list.html.twig') -}}
   {% endif %}
 {% endblock %}

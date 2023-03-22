@@ -221,7 +221,7 @@
     <div class="col-md-3 bg-white bdr-l height-auto">
 
         <!-- activity feed -->
-        {{ include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}) }}
+        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ item.id|e }}"/>

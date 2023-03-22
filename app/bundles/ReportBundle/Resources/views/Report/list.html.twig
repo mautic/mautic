@@ -26,10 +26,10 @@
               'action': currentRoute,
       }) }}
       <div class="page-list">
-        {{- include('MauticReportBundle:Report:_list.html.twig') -}}
+        {{- include('@MauticReport/Report/_list.html.twig') -}}
       </div>
   </div>
   {% else %}
-    {{- include('MauticReportBundle:Report:_list.html.twig') -}}
+    {{- include('@MauticReport/Report/_list.html.twig') -}}
   {% endif %}
 {% endblock %}

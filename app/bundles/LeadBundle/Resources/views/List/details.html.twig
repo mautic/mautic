@@ -207,7 +207,7 @@
         }) }}
 
         <!-- activity feed -->
-        {#{ includ('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}) }#}
+        {#{ includ('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }#}
     </div>
     <!--/ right section -->
     <input name="entityId" id="entityId" type="hidden" value="{{ list.id|e }}" />

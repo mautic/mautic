@@ -205,7 +205,7 @@ class MonitoringController extends FormController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.twig',
+                'contentTemplate' => '@MauticSocial/Monitoring/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',
@@ -356,7 +356,7 @@ class MonitoringController extends FormController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:form.html.twig',
+                'contentTemplate' => '@MauticSocial/Monitoring/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',

@@ -75,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
+                'contentTemplate' => '@MauticCore/Notification/notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

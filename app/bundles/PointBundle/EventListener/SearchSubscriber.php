@@ -113,7 +113,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit = $this->security->isGranted('point:triggers:edit');
                 foreach ($items as $item) {
                     $results[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents:Search/global_trigger.html.twig',
+                        '@MauticPoint/SubscribedEvents/Search/global_trigger.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -122,7 +122,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($count > 5) {
                     $results[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents:Search/global_trigger.html.twig',
+                        '@MauticPoint/SubscribedEvents/Search/global_trigger.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

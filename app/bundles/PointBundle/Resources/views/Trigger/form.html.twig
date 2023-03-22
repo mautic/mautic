@@ -79,7 +79,7 @@
                                 </div>
                             </div>
                             {% for event in triggerEvents %}
-                                {% set template = event.settings.template|default('MauticPointBundle:Event:generic.html.twig') %}
+                                {% set template = event.settings.template|default('@MauticPoint/Event/generic.html.twig') %}
                                 <!-- start: "{{ template }}" -->
                                 {{ include(template, {
                                     'event': event,

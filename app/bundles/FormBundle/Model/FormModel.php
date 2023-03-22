@@ -785,8 +785,9 @@ class FormModel extends CommonFormModel
             $theme .= '|';
         }
 
+        //TODO: add a check to see if the theme exists before rendering
         $script = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:_script.html.twig',
+            '@MauticForm/Builder/_script.html.twig',
             [
                 'form'  => $form,
                 'theme' => $theme,

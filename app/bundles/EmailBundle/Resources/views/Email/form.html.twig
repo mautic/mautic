@@ -253,7 +253,7 @@
             or (forceTypeSelection is defined and forceTypeSelection is not empty)
           )
     %}
-        {{- include('MauticCoreBundle:Helper:form_selecttype.html.twig', {
+        {{- include('@MauticCore/Helper/form_selecttype.html.twig', {
             'item'       : email,
             'mauticLang' : {
                 'newListEmail'     : 'mautic.email.type.list.header',

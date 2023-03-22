@@ -42,7 +42,7 @@
         }) }}
     </div>
     <div class="pa-20 tab-pane" id="TwitterTags">
-        {{ include('MauticSocialBundle:Integration:Twitter/Profile/tags.html.twig', {
+        {{ include('@MauticSocial/Integration/Twitter/Profile/tags.html.twig', {
             'lead': lead,
             'activity': details.activity.tags|default([]),
         }) }}
