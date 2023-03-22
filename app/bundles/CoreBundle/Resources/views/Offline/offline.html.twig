@@ -1,4 +1,3 @@
-{% if inline is not defined or inline is empty %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,13 +7,12 @@
     <meta name="author" content="">
     <title>Site is offline</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <link rel="icon" type="image/x-icon" href="{{assetBase}}/images/favicon.ico"/>
-    <link rel="stylesheet" href="{{assetBase}}/css/libraries.css"/>
-    <link rel="stylesheet" href="{{assetBase}}css/app.css"/>
+    <link rel="icon" type="image/x-icon" href="{{error.assetBase}}/images/favicon.ico"/>
+    <link rel="stylesheet" href="{{error.assetBase}}/css/libraries.css"/>
+    <link rel="stylesheet" href="{{error.assetBase}}/css/app.css"/>
 </head>
 <body>
 <div class="container">
-{% endif %}
     <div class="row">
         {% if error is defined and error is not empty %}
         <div class="{{ (error.isPrevious is defined and error.isPrevious is not empty) or (inline is defined and inline is not empty) ? 'col-sm-12' : 'col-sm-offset-2 col-sm-8' }}">
@@ -37,8 +35,7 @@
             {% if error.trace is defined and error.trace is not empty  %}
             <div class="well well-sm" tabindex="-1" style="{{ inline is not defined or inline is empty ? '' : 'max-height: 100px; overflow: scroll;'}}" onclick="this.focus();">
                 {% if error.trace is defined and error.trace is not empty and error.trace is iterable %}
-                    {% set traces = error.trace %}
-                    {% include dir ~ '/app/bundles/CoreBundle/Views/Exception/traces.html.twig' %}
+                    {% include 'traces.html.twig' with {'traces': error.trace, 'root': error.root } %}
                 {% else %}
                     <pre>{{ error.trace | raw }}</pre>;
                 {% endif %}
@@ -64,8 +61,6 @@
         </div>
     {% endif %}
     </div>
-{% if inline is not defined or inline is empty %}
 </div>
 </body>
 </html>
-{% endif %}

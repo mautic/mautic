@@ -488,10 +488,13 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
                 $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (empty($error['showExceptionMessage'])) {
-                    $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-                    $error['submessage'] = 'System administrators, check server logs for errors.';
+                if (!empty($error['showExceptionMessage'])) {
+                    $message = $error['message'];
+                } else {
+                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $submessage = 'System administrators, check server logs for errors.';
                 }
+                unset($error);
             }
 
             defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
@@ -507,7 +510,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 /** @var array<string, mixed> $paths */
                 $paths = [];
                 include self::$root.'/app/config/paths.php';
-
+                
                 $assetPrefix = $paths['asset_prefix'];
                 if (!empty($assetPrefix)) {
                     if ('/' == substr($assetPrefix, -1)) {
@@ -518,14 +521,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
-                $loader = new \Twig\Loader\FilesystemLoader('app/bundles/CoreBundle/Resources/views/Offline');
+                $loader = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
                 $twig   = new \Twig\Environment($loader);
-
+                $error['root'] = $root;
                 if ($loader->exists('custom_offline.html.twig')) {
-                    $content = $twig->render('custom_offline.html.twig', $error);
+                    $content = $twig->render('custom_offline.html.twig', ['error' => $error]);
                 } else {
-                    $content = $twig->render('offline.html.twig', $error);
+                    $content = $twig->render('offline.html.twig', ['error' => $error]);
                 }
+                
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }
