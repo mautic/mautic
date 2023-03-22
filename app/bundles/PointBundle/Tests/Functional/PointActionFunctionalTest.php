@@ -50,8 +50,9 @@ class PointActionFunctionalTest extends MauticMysqlTestCase
         $lead        = $leadModel->getEntity($lead->getId());
         $leagueScore = $lead->getLeagueScores()->first();
 
-        $this->assertEquals($pointAction->getDelta(), $lead->getPoints());
         $this->assertEquals($pointAction->getDelta(), $leagueScore->getScore());
+        // league point action shouldn't update main contact points
+        $this->assertEquals(0, $lead->getPoints());
     }
 
     private function createReadEmailAction(int $delta, League $league = null): Point

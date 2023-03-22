@@ -281,9 +281,10 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         /** @var Lead $contactC */
         $contactC = $this->contactRepository->getEntity($contactIds[2]);
 
+        // point update action with selected league shouldn't update contact main points
         $this->assertEquals(0, $contactA->getPoints());
         $this->assertEquals(0, $contactB->getPoints());
-        $this->assertEquals(2, $contactC->getPoints());
+        $this->assertEquals(1, $contactC->getPoints());
 
         $contactALeagueScores = $contactA->getLeagueScores();
         $contactBLeagueScores = $contactB->getLeagueScores();

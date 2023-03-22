@@ -293,15 +293,16 @@ class CampaignSubscriber implements EventSubscriberInterface
         $somethingHappened = false;
 
         if (null !== $lead && !empty($points)) {
-            $lead->adjustPoints($points);
-
             $pointsLogActionName      = "{$event->getEvent()['id']}: {$event->getEvent()['name']}";
             $pointsLogEventName       = "{$event->getEvent()['campaign']['id']}: {$event->getEvent()['campaign']['name']}";
             $pointLeagueId            = $event->getConfig()['league'] ?? null;
             $pointLeague              = $pointLeagueId ? $this->leagueModel->getEntity($pointLeagueId) : null;
+
             if (!empty($pointLeague)) {
                 $scoreRepository = $this->leadModel->getLeagueContactScoreRepository();
                 $scoreRepository->adjustPoints($lead, $pointLeague, $points);
+            } else {
+                $lead->adjustPoints($points);
             }
 
             //add a lead point change log
