@@ -26,7 +26,9 @@
 {% set submissions = submissions|default(null) %}
 {% set lead = lead|default(null) %}
 
-{{ style|raw }}
+{%- if style -%}
+<link rel="stylesheet" href="{{ style }}">
+{%- endif -%}
 <style type="text/css" scoped>
     .mauticform-field-hidden { display:none }
 </style>
