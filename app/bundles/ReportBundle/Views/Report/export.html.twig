@@ -13,6 +13,7 @@
   {%- set dataCount = reportDataResult.getData()|length -%}
   {%- set columnOrder = report.columns -%}
   {%- set graphOrder = report.graphs -%}
+  {%- set aggregatorOrder = report.aggregators -%}
   <style>
       #app-content.content-only.container {
           overflow-x: scroll;
@@ -62,10 +63,11 @@
                       {% for key in columnOrder %}
                           <td>&nbsp;</td>
                       {% endfor %}
-                      {% for i,t in reportDataResult.totals %}
+                      {% for aggregator in aggregatorOrder %}
+                      {%- set i = aggregator.function ~ ' ' ~ aggregator.column %}
                               <td>
-                                  {% if t is defined %}
-                                      {{ format(t, reportDataResult.getType(i)) }}
+                                  {% if reportDataResult.totals[i] is defined %}
+                                      {{ format(reportDataResult.totals[i], reportDataResult.getType(i)) }}
                                   {% endif %}
                               </td>
                       {% endfor %}

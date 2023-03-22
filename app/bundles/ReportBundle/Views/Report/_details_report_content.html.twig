@@ -51,7 +51,6 @@
                         </thead>
                         <tbody>
                         {% if dataCount %}
-                            {%- set avgCounter = 0 -%}
                             {% for row in data %}
                                 <tr>
                                     <td>{{ startCount }}</td>
@@ -107,10 +106,11 @@
                                 <td>&nbsp;</td>
                             {% endfor %}
                             {% if aggregatorCount %}
-                                {% for i, t in reportDataResult.totals %}
+                                {% for aggregator in aggregatorOrder %}
+                                    {%- set i = aggregator.function ~ ' ' ~ aggregator.column %}
                                     <td>
-                                        {% if t is defined %}
-                                            {{ format(t, reportDataResult.getType(i)) }}
+                                        {% if reportDataResult.totals[i] is defined %}
+                                            {{ format(reportDataResult.totals[i], reportDataResult.getType(i)) }}
                                         {% endif %}
                                     </td>
                                 {% endfor %}
