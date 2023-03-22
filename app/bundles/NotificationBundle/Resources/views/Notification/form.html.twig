@@ -34,7 +34,7 @@
                                     {{ form_row(form.button) }}
                                 </div>
                                 <div class="col-md-6">
-                                    {{ include('MauticNotificationBundle:Notification:preview.html.twig', {
+                                    {{ include('@MauticNotification/Notification/preview.html.twig', {
                                         'notification': notification,
                                     }, with_context=false) }}
                                 </div>

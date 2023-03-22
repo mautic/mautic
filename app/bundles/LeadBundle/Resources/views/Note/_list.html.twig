@@ -10,7 +10,7 @@
 </ul>
 {% if notes|length > 0 %}
   <div class="notes-pagination">
-      {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+      {{ include('@MauticCore/Helper/pagination.html.twig', {
           'totalItems': notes|length,
           'target': '#NoteList',
           'page': page,

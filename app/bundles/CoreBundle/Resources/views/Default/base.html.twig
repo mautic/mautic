@@ -57,7 +57,7 @@
                 {% endif %}
             </script>
             {{ outputScripts('bodyClose') }}
-            {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+            {{ include('@MauticCore/Helper/modal.html.twig', {
                 id: 'MauticSharedModal',
                 footerButtons: true
             }) }}

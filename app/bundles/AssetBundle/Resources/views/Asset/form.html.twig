@@ -89,7 +89,7 @@
 {{ form_end(form) }}
 
 {% if integrations %}
-	{{- include('MauticCoreBundle:Helper:modal.html.twig', {
+	{{- include('@MauticCore/Helper/modal.html.twig', {
         'id'            : 'RemoteFileModal',
         'size'          : 'lg',
         'footerButtons' : true,

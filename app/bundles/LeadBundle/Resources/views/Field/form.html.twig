@@ -75,7 +75,7 @@
                                 'type': 'lookup',
                             }) }}
                         {% elseif 'textarea' == type %}
-                            {{ include('MauticLeadBundle:Field:properties_textarea.html.twig', {
+                            {{ include('@MauticLead/Field/properties_textarea.html.twig', {
                                 'form': form.properties,
                                 'textareaTemplate': textareaTemplate,
                             }) }}
@@ -145,7 +145,7 @@
           'type': 'lookup',
       }) }}
 
-      {{ include('MauticLeadBundle:Field:properties_textarea.html.twig', {
+      {{ include('@MauticLead/Field/properties_textarea.html.twig', {
           'textareaTemplate': textareaTemplate,
       }) }}
   </div>

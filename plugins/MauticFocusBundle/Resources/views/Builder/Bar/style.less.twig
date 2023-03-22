@@ -109,7 +109,7 @@
 
 {% if preview is not empty %}
 {{ include('MauticFocusBundle:Builder:Bar/animations.less.twig', with_context=false) }}
-{{ include('MauticFocusBundle:Builder:Bar/shared.less.twig', with_context=false) }}
+{{ include('@MauticFocus/Builder/Bar/shared.less.twig', with_context=false) }}
 .mf-bar {
     &.mf-animate {
         .barAnimate();

@@ -232,7 +232,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                 ],
-                'timelineTemplate'       => 'MauticChannelBundle:SubscribedEvents\Timeline:index.html.twig',
+                'timelineTemplate'       => '@MauticChannel/SubscribedEvents\Timeline/index.html.twig',
                 'timelineTemplateVars'   => [
                     'messageSettings' => [],
                 ],

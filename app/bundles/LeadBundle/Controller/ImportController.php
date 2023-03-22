@@ -467,7 +467,7 @@ class ImportController extends FormController
                 'objectName' => $initEvent->objectName,
             ];
         } else {
-            $contentTemplate = 'MauticLeadBundle:Import:progress.html.twig';
+            $contentTemplate = '@MauticLead/Import/progress.html.twig';
             $viewParameters  = [
                 'progress'         => $progress,
                 'import'           => $import,

@@ -205,7 +205,7 @@
     <div class="col-md-3 bg-white bdr-l height-auto">
         {{ customContent('right.section.top', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
 
-        {{ include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}) }}
+        {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
 
         {{ customContent('right.section.bottom', mauticTemplateVars is defined ? mauticTemplateVars : {}) }}
     </div>

@@ -12,7 +12,7 @@
 
 {% form_theme form with [
     'MauticEmailBundle:FormTheme:Config/monitored_email_widget.html.twig',
-    'MauticEmailBundle:FormTheme:Config/monitored_mailboxes_widget.html.twig',
+    '@MauticEmail/FormTheme/Config/monitored_mailboxes_widget.html.twig',
 ] %}
 
 {% if fieldKeys|filter(k => k in ['mailer_from_name', 'mailer_from_email', 'mailer_reply_to_email',  'mailer_transport', 'mailer_spool_type'])|length > 0 %}

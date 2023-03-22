@@ -14,7 +14,7 @@
     {% endif %}
 {% endif %}
 
-{{ include('MauticFormBundle:Field:text.html.twig', {
+{{ include('@MauticForm/Field/text.html.twig', {
         'field': field,
         'fields': fields|default([]),
         'inForm': inForm|default(false),

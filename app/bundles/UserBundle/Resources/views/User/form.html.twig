@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauticContent %}user{% endblock %}
 {% set userId = form.vars.data.getId() %}
 {% if userId is not empty %}

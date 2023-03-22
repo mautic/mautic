@@ -252,7 +252,7 @@ class ClientController extends FormController
                     'form' => $form->createView(),
                     'tmpl' => $this->request->get('tmpl', 'form'),
                 ],
-                'contentTemplate' => 'MauticApiBundle:Client:form.html.twig',
+                'contentTemplate' => '@MauticApi/Client/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_client_new',
                     'route'         => $action,
@@ -359,7 +359,7 @@ class ClientController extends FormController
                     'form' => $form->createView(),
                     'tmpl' => $this->request->get('tmpl', 'form'),
                 ],
-                'contentTemplate' => 'MauticApiBundle:Client:form.html.twig',
+                'contentTemplate' => '@MauticApi/Client/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_client_index',
                     'route'         => $action,

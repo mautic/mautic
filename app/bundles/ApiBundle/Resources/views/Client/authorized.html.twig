@@ -10,7 +10,7 @@
         {% for k in clients %}
         <tr>
             <td>
-                {{- include('MauticCoreBundle:Helper:confirm.html.twig', {
+                {{- include('@MauticCore/Helper/confirm.html.twig', {
                     'btnClass'      : 'btn btn-danger btn-xs',
                     'message'       : 'mautic.api.client.form.confirmrevoke'|trans({'%name%' : k.getName()}),
                     'confirmText'   : 'mautic.api.client.form.revoke'|trans,

@@ -120,7 +120,7 @@
       <!-- right section -->
       <div class="col-md-3 bg-white bdr-l height-auto">
           <!-- activity feed -->
-          {{ include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}, with_context=false) }}
+          {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}, with_context=false) }}
       </div>
       <!--/ right section -->
       <input name="entityId" id="entityId" type="hidden" value="{{ notification.id|e }}" />
