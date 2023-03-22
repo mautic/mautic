@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 abstract class AbstractMauticTestCase extends WebTestCase
@@ -30,6 +30,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected EntityManager $em;
     protected Connection $connection;
     protected KernelBrowser $client;
+    protected Router $router;
     protected array $clientOptions = [];
     protected array $clientServer  = [
         'PHP_AUTH_USER' => 'admin',
@@ -67,10 +68,9 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $this->em         = self::$container->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
 
-        /** @var RouterInterface $router */
-        $router = self::$container->get('router');
-        $scheme = $router->getContext()->getScheme();
-        $secure = 0 === strcasecmp($scheme, 'https');
+        $this->router = self::$container->get('router');
+        $scheme       = $this->router->getContext()->getScheme();
+        $secure       = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', $secure);
 

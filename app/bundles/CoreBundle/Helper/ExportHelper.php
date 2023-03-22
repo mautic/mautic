@@ -6,11 +6,15 @@ namespace Mautic\CoreBundle\Helper;
 
 use ArrayIterator;
 use Iterator;
+use Mautic\CoreBundle\Exception\FilePathException;
+use Mautic\CoreBundle\Model\IteratorExportDataModel;
 use Mautic\LeadBundle\Entity\Lead;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use ZipArchive;
 
 /**
  * Provides several functions for export-related tasks,
@@ -21,12 +25,18 @@ class ExportHelper
     public const EXPORT_TYPE_EXCEL = 'xlsx';
     public const EXPORT_TYPE_CSV   = 'csv';
 
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
+    private CoreParametersHelper $coreParametersHelper;
+    private FilePathResolver $filePathResolver;
 
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        TranslatorInterface $translator,
+        CoreParametersHelper $coreParametersHelper,
+        FilePathResolver $filePathResolver
+    ) {
+        $this->translator           = $translator;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->filePathResolver     = $filePathResolver;
     }
 
     /**
@@ -55,38 +65,44 @@ class ExportHelper
             throw new \Exception('No or invalid data given');
         }
 
-        switch ($type) {
-            case self::EXPORT_TYPE_CSV:
-                return $this->exportAsCsv($data, $filename);
-
-            case self::EXPORT_TYPE_EXCEL:
-                return $this->exportAsExcel($data, $filename);
-
-            default:
-                throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.export.type', ['%type%' => $type]));
+        if (self::EXPORT_TYPE_EXCEL === $type) {
+            return $this->exportAsExcel($data, $filename);
         }
+
+        if (self::EXPORT_TYPE_CSV === $type) {
+            return $this->exportAsCsv($data, $filename);
+        }
+
+        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_EXCEL]));
     }
 
-    private function getSpreadsheetGeneric(Iterator $data, string $filename): Spreadsheet
+    public function exportDataIntoFile(IteratorExportDataModel $data, string $type, string $fileName): string
     {
-        $spreadsheet = new Spreadsheet();
-        $spreadsheet->getProperties()->setTitle($filename);
-        $spreadsheet->createSheet();
-
-        $rowCount = 2;
-        foreach ($data as $key => $row) {
-            if (0 === $key) {
-                // Build the header row from keys in the current row.
-                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
-            }
-
-            $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
-
-            // Increment row
-            ++$rowCount;
+        if (!$data->valid()) {
+            throw new \Exception('No or invalid data given');
         }
 
-        return $spreadsheet;
+        if (self::EXPORT_TYPE_CSV === $type) {
+            return $this->exportAsCsvIntoFile($data, $fileName);
+        }
+
+        throw new \InvalidArgumentException($this->translator->trans('mautic.error.invalid.specific.export.type', ['%type%' => $type, '%expected_type%' => self::EXPORT_TYPE_CSV]));
+    }
+
+    public function zipFile(string $filePath): string
+    {
+        $zipFilePath = str_replace('.csv', '.zip', $filePath);
+        $zipArchive  = new ZipArchive();
+
+        if (true === $zipArchive->open($zipFilePath, ZipArchive::OVERWRITE | ZipArchive::CREATE)) {
+            $zipArchive->addFile($filePath, 'contacts_export.csv');
+            $zipArchive->close();
+            $this->filePathResolver->delete($filePath);
+
+            return $zipFilePath;
+        }
+
+        throw new FilePathException("Could not create zip archive at $zipFilePath.");
     }
 
     private function exportAsExcel(Iterator $data, string $filename): StreamedResponse
@@ -111,11 +127,32 @@ class ExportHelper
         return $response;
     }
 
+    private function getSpreadsheetGeneric(Iterator $data, string $filename): Spreadsheet
+    {
+        $spreadsheet = new Spreadsheet();
+        $spreadsheet->getProperties()->setTitle($filename);
+        $spreadsheet->createSheet();
+
+        $rowCount = 2;
+        foreach ($data as $key => $row) {
+            if (0 === $key) {
+                // Build the header row from keys in the current row.
+                $spreadsheet->getActiveSheet()->fromArray(array_keys($row), null, 'A1');
+            }
+
+            $spreadsheet->getActiveSheet()->fromArray($row, null, "A{$rowCount}");
+
+            // Increment row
+            ++$rowCount;
+        }
+
+        return $spreadsheet;
+    }
+
     private function exportAsCsv(Iterator $data, string $filename): StreamedResponse
     {
         $spreadsheet = $this->getSpreadsheetGeneric($data, $filename);
-
-        $objWriter = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
+        $objWriter   = new Csv($spreadsheet);
         $objWriter->setPreCalculateFormulas(false);
         // For UTF-8 support
         $objWriter->setUseBOM(true);
@@ -133,6 +170,48 @@ class ExportHelper
         $response->headers->set('Pragma', 'public');
 
         return $response;
+    }
+
+    /**
+     * @param Iterator<mixed> $data
+     */
+    private function exportAsCsvIntoFile(Iterator $data, string $fileName): string
+    {
+        $filePath  = $this->getValidContactExportFileName($fileName);
+        $handler   = @fopen($filePath, 'ab+');
+        $headerSet = false;
+
+        foreach ($data as $row) {
+            if (!$headerSet) {
+                fputcsv($handler, array_keys($row));
+                $headerSet = true;
+            }
+
+            fputcsv($handler, $row);
+        }
+
+        fclose($handler);
+
+        return $filePath;
+    }
+
+    private function getValidContactExportFileName(string $fileName): string
+    {
+        $contactExportDir = $this->coreParametersHelper->get('contact_export_dir');
+        $this->filePathResolver->createDirectory($contactExportDir);
+        $filePath     = $contactExportDir.'/'.$fileName;
+        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $originalName = $fileName;
+        $i            = 1;
+
+        while (file_exists($filePath)) {
+            $fileName = $originalName.'_'.$i;
+            $filePath = $contactExportDir.'/'.$fileName.'.'.$extension;
+            ++$i;
+        }
+
+        return $filePath;
     }
 
     /**

@@ -540,6 +540,7 @@ var Mautic = {
         Mautic.dismissConfirmation();
 
         if (action.indexOf('batchExport') >= 0) {
+            delete Mautic.activeActions[action]
             Mautic.initiateFileDownload(action);
             return;
         }
