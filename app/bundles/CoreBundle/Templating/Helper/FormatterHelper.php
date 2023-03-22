@@ -9,6 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatterHelper extends Helper
 {
+    public const FLOAT_PRECISION = 4;
+
     /**
      * @var DateHelper
      */
@@ -81,6 +83,9 @@ class FormatterHelper extends Helper
                 break;
             case 'int':
                 $string = (int) $val;
+                break;
+            case 'float':
+                $string = number_format((float) $val, FormatterHelper::FLOAT_PRECISION);
                 break;
             case 'html':
                 $string = InputHelper::strict_html($val);

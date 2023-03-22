@@ -107,10 +107,10 @@
                                 <td>&nbsp;</td>
                             {% endfor %}
                             {% if aggregatorCount %}
-                                {% for total in totals %}
+                                {% for i, t in reportDataResult.totals %}
                                     <td>
-                                        {% if total is defined %}
-                                            {{ format(total, 'text') }}
+                                        {% if t is defined %}
+                                            {{ format(t, reportDataResult.getType(i)) }}
                                         {% endif %}
                                     </td>
                                 {% endfor %}

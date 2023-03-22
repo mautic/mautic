@@ -62,10 +62,10 @@
                       {% for key in columnOrder %}
                           <td>&nbsp;</td>
                       {% endfor %}
-                      {% for total in reportDataResult.totals %}
+                      {% for i,t in reportDataResult.totals %}
                               <td>
-                                  {% if total is defined %}
-                                      {{ format(total, 'text') }}
+                                  {% if t is defined %}
+                                      {{ format(t, reportDataResult.getType(i)) }}
                                   {% endif %}
                               </td>
                       {% endfor %}
