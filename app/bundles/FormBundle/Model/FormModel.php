@@ -819,7 +819,7 @@ class FormModel extends CommonFormModel
         foreach ($fields as $f) {
             $alias = $f->getAlias();
             if ($request->query->has($alias)) {
-                $value = $request->query->get($alias);
+                $value = urlencode($request->query->get($alias));
 
                 $this->fieldHelper->populateField($f, $value, $formName, $formHtml);
             }

@@ -1,4 +1,4 @@
-{%- set showGraphsAboveTable = report.settings.showGraphsAboveTable is defined -%}
+{%- set showGraphsAboveTable =  report.settings.showGraphsAboveTable|default(false) -%}
 {%- set dataCount = data|length %}
 {%- set columnOrder = report.columns -%}
 {%- set graphOrder = report.graphs -%}

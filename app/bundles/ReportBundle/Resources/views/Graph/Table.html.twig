@@ -23,7 +23,7 @@
                         {% for rowKey, row in graph.data %}
                         <tr>
                             {% for cellName, cell in row %}
-                                {% if 'id' in graph.data[0] and 'title' == cellName and graph.link is defined %}
+                                {% if graph.data[0].id is defined and 'title' == cellName and graph.link is defined %}
                                     <td>
                                         <a href="{{ path(graph.link, {'objectAction': 'view', 'objectId': row.id}) }}" data-toggle="ajax">
                                             {{ cell }}
