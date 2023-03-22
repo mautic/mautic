@@ -506,6 +506,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 // Determine if there is an asset prefix
                 $root = self::$root;
+
+                /** @var array<string, mixed> $paths */
+                $paths = [];
                 include self::$root.'/app/config/paths.php';
 
                 $assetPrefix = $paths['asset_prefix'];
