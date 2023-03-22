@@ -273,7 +273,7 @@ class PublicController extends CommonFormController
 
                 if (empty($html)) {
                     $html = $this->get('mautic.helper.templating')->getTemplating()->render(
-                        'MauticEmailBundle:Lead:preference_options.html.twig',
+                        '@MauticEmail/Lead/preference_options.html.twig',
                         array_merge(
                             $viewParameters,
                             [

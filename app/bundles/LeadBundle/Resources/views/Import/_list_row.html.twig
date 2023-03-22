@@ -16,7 +16,7 @@
     <td>
         <div>
             {% if item.status not in [constant('FAILED', item), constant('IMPORTED', item), constant('MANUAL', item)] and permissions[permissionBase~':publish'] %}
-              {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'lead.import'}) }}
+              {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'lead.import'}) }}
             {% endif %}
             {% if securityHasEntityAccess(true, permissions[permissionBase~':viewother'], item.createdBy) %}
               <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': item.id, 'object': app.request.get('object', 'contacts')}) }}" data-toggle="ajax">

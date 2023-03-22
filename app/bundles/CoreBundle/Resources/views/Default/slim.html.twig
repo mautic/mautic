@@ -17,7 +17,7 @@
                 {{ include('MauticCoreBundle:Default:output.html.twig') }}
             {% endblock %}
         </section>
-        {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+        {{ include('@MauticCore/Helper/modal.html.twig', {
             id: 'MauticSharedModal',
             footerButtons: true
         }) }}

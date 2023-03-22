@@ -108,7 +108,7 @@ class SourceController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.twig',
+                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -216,7 +216,7 @@ class SourceController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Source:form.html.twig',
+                    'contentTemplate' => '@MauticCampaign/Source/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]

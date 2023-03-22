@@ -63,7 +63,7 @@
 <input type="hidden" value="" id="droppedX"/>
 <input type="hidden" value="" id="droppedY"/>
 <input type="hidden" value="{{ campaign.id|e }}" id="campaignId"/>
-{{- include('MauticCoreBundle:Helper:modal.html.twig', {
+{{- include('@MauticCore/Helper/modal.html.twig', {
         'id': 'CampaignEventModal',
         'header': false,
         'footerButtons': true,

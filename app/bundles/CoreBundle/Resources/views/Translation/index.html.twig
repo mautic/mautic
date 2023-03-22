@@ -12,7 +12,7 @@
   <!-- start: related translations list -->
   <ul class="list-group">
       {% if translations.parent %}
-          {{ include('MauticCoreBundle:Translation:row.html.twig', {
+          {{ include('@MauticCore/Translation/row.html.twig', {
                   'translation': translations.parent,
                   'translations': translations,
                   'actionRoute': actionRoute,
@@ -23,7 +23,7 @@
       {% endif %}
       {% if translations.children|length > 0 %}
           {% for translation in translations.children %}
-              {{ include('MauticCoreBundle:Translation:row.html.twig', {
+              {{ include('@MauticCore/Translation/row.html.twig', {
                       'translation': translation,
                       'translations': translations,
                       'actionRoute': actionRoute,

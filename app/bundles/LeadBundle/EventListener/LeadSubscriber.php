@@ -672,7 +672,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'timestamp'       => $import['date_added'],
                             'icon'            => 'fa-download',
                             'extra'           => $import,
-                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.twig',
+                            'contentTemplate' => '@MauticLead/SubscribedEvents\Timeline/import.html.twig',
                             'contactId'       => $import['lead_id'],
                         ]
                     );

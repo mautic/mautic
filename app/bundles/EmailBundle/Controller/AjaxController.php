@@ -28,7 +28,7 @@ class AjaxController extends CommonAjaxController
             'email_abtest_settings',
             'emailform',
             'MauticEmailBundle:AbTest:form.html.twig',
-            ['MauticEmailBundle:AbTest:form.html.twig', 'MauticEmailBundle:FormTheme:Email/layout.html.twig']
+            ['MauticEmailBundle:AbTest:form.html.twig', '@MauticEmail/FormTheme/Email/layout.html.twig']
         );
     }
 

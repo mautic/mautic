@@ -65,7 +65,7 @@ class DetailController extends CommonController
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
                     'security'          => $security,
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:detail.html.twig',
+                'contentTemplate' => 'Marketplace/Package/detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',

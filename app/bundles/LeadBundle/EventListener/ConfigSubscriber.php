@@ -59,7 +59,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'companyconfig',
             'formType'   => ConfigCompanyType::class,
-            'formTheme'  => 'MauticLeadBundle:FormTheme:Config/_config_segment_config_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_segment_config_widget.html.twig',
             'parameters' => [
                 'company_unique_identifiers_operator' => $parameters['company_unique_identifiers_operator'],
             ],

@@ -813,7 +813,7 @@ class ListController extends FormController
                     ],
                 ],
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:details.html.twig',
+            'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',

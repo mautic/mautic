@@ -81,7 +81,7 @@
     {{ include('MauticCoreBundle:Helper:noresults.html.twig', {'tip': 'mautic.mautic.social.monitoring.noresults.tip'}) }}
 {% endif %}
 
-{{ include('MauticCoreBundle:Helper:modal.html.twig', {
+{{ include('@MauticCore/Helper/modal.html.twig', {
         'id': 'MonitoringPreviewModal',
         'header': false,
 }) }}

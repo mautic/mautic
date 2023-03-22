@@ -397,7 +397,7 @@ class PublicController extends CommonFormController
             if ('published' === $status) {
                 if ($this->request->get('video')) {
                     return $this->render(
-                        'MauticFormBundle:Public:videoembed.html.twig',
+                        '@MauticForm/Public/videoembed.html.twig',
                         ['form' => $form, 'fieldSettings' => $model->getCustomComponents()['fields']]
                     );
                 }

@@ -236,7 +236,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'three-column',
                 $this->translator->trans('mautic.core.slot.label.threecolumns'),
                 'th',
-                'MauticCoreBundle:Sections:three-column.html.twig',
+                '@MauticCore/Sections/three-column.html.twig',
                 null,
                 800
             );

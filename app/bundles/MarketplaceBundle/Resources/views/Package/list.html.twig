@@ -143,6 +143,6 @@
         ) -}}
     </div>
     {% else %}
-        {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'message' : 'marketplace.noresults.tip'}) -}}
+        {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'marketplace.noresults.tip'}) -}}
     {% endif %}
 {% endblock %}

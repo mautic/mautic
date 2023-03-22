@@ -786,7 +786,7 @@ class FormModel extends CommonFormModel
         }
 
         $script = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:_script.html.twig',
+            $theme.'@MauticForm/Builder/_script.html.twig',
             [
                 'form'  => $form,
                 'theme' => $theme,

@@ -124,7 +124,7 @@
           </tbody>
       </table>
   </div>
-  {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+  {{ include('@MauticCore/Helper/pagination.html.twig', {
           'page': events.page,
           'fixedPages': events.maxPages,
           'fixedLimit': true,
