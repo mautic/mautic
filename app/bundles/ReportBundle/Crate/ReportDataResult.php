@@ -2,6 +2,8 @@
 
 namespace Mautic\ReportBundle\Crate;
 
+use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+
 class ReportDataResult
 {
     /**
@@ -254,7 +256,7 @@ class ReportDataResult
             case 'AVG':
                 $sum= $previousVal + array_sum($aggregatorVal);
                 if ($this->isLastBatch) {
-                    return round($sum / $rowsCount, 4);
+                    return round($sum / $rowsCount, FormatterHelper::FLOAT_PRECISION);
                 }
 
                 return $sum;
