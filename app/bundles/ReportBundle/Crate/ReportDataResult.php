@@ -49,11 +49,27 @@ class ReportDataResult
      */
     private $dateTo;
 
-    private ?int $limit;
+    /**
+     * @var int|null
+     */
+    private $limit;
 
-    private int $page;
+    /**
+     * @var int
+     */
+    private $page;
 
-    public function __construct(array $data, array $preTotals = [])
+    /**
+     * @var int
+     */
+    private $preBatchSize;
+
+    /**
+     * @var bool
+     */
+    private $isLastBatch;
+
+    public function __construct(array $data, array $preTotals = [], int $preBatchSize = 0, bool $isLastBatch = true)
     {
         if (
             !array_key_exists('data', $data) ||
@@ -70,8 +86,10 @@ class ReportDataResult
         $this->dateTo       = $data['dateTo'];
         $this->limit        = $data['limit'] ? (int) $data['limit'] : null;
         $this->page         = $data['page'] ? (int) $data['page'] : 1;
+        $this->isLastBatch  = $isLastBatch;
 
         // Use the calculated totals for previous batch to continue
+        $this->preBatchSize = $preBatchSize;
         $this->totals       = $preTotals;
 
         $this->buildColumnKeys();
@@ -94,6 +112,14 @@ class ReportDataResult
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDataCount()
+    {
+        return count($this->data);
     }
 
     /**
@@ -219,18 +245,27 @@ class ReportDataResult
     /**
      * @return float
      */
-    private function calcTotal(string $calcFunction, float $cellVal, float $previousVal, int $avgCounter, int $rowsCount)
+    private function calcTotal(string $calcFunction, float $previousVal, array &$aggregatorVal, int $rowsCount)
     {
         switch ($calcFunction) {
             case 'COUNT':
             case 'SUM':
-                return $previousVal + $cellVal;
+                return $previousVal + array_sum($aggregatorVal);
             case 'AVG':
-                return ($avgCounter == $rowsCount) ? round(($previousVal + $cellVal) / $rowsCount, 4) : $previousVal + $cellVal;
+                $sum= $previousVal + array_sum($aggregatorVal);
+                if ($this->isLastBatch) {
+                    return round($sum / $rowsCount, 4);
+                }
+
+                return $sum;
             case 'MAX':
-                return ($cellVal >= $previousVal) ? $cellVal : $previousVal;
+                $aggregatorVal[] = $previousVal;
+
+                return max($aggregatorVal);
             case 'MIN':
-                return ($cellVal <= $previousVal) ? $cellVal : $previousVal;
+                $aggregatorVal[] = $previousVal;
+
+                return min($aggregatorVal);
             default:
                 return $previousVal;
         }
@@ -241,19 +276,15 @@ class ReportDataResult
      */
     private function buildTotals(array $aggregators)
     {
-        $dataCount = count($this->data);
+        $dataCount = count($this->data) + $this->preBatchSize;
 
         if ($aggregators && !empty(array_keys($this->data))) {
-            $avgCounter   = 0;
+            foreach ($aggregators as $j => $v) {
+                $aggregatorVal = array_column($this->data, $j);
 
-            for ($i = array_key_first($this->data); $i < $dataCount; ++$i) {
-                ++$avgCounter;
-
-                foreach ($aggregators as $j => $v) {
-                    if (isset($this->data[$i][$j])) {
-                        $calcFunc         = $this->getAggregatorCalcFunc($j, $v);
-                        $this->totals[$j] = $this->calcTotal($calcFunc, $this->data[$i][$j], $this->totals[$j] ?? 0, $avgCounter, $dataCount);
-                    }
+                if ($aggregatorVal) {
+                    $calcFunc         = $this->getAggregatorCalcFunc($j, $v);
+                    $this->totals[$j] = $this->calcTotal($calcFunc, $this->totals[$j] ?? 0, $aggregatorVal, $dataCount);
                 }
             }
         }

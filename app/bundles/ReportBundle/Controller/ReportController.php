@@ -661,18 +661,18 @@ class ReportController extends FormController
         return $this->delegateView(
             [
                 'viewParameters' => [
-                    'data'         => $reportData['data'],
-                    'columns'      => $reportData['columns'],
-                    'dataColumns'  => $reportData['dataColumns'],
-                    'totalResults' => $reportData['totalResults'],
-                    'debug'        => $reportData['debug'],
-                    'report'       => $entity,
-                    'reportPage'   => $reportPage,
-                    'graphs'       => $reportData['graphs'],
-                    'totals'       => $reportDataResult->getTotals(),
-                    'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
-                    'limit'        => $reportData['limit'],
-                    'permissions'  => $security->isGranted(
+                    'data'             => $reportData['data'],
+                    'columns'          => $reportData['columns'],
+                    'dataColumns'      => $reportData['dataColumns'],
+                    'totalResults'     => $reportData['totalResults'],
+                    'debug'            => $reportData['debug'],
+                    'report'           => $entity,
+                    'reportPage'       => $reportPage,
+                    'graphs'           => $reportData['graphs'],
+                    'reportDataResult' => $reportDataResult,
+                    'tmpl'             => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'limit'            => $reportData['limit'],
+                    'permissions'      => $security->isGranted(
                         [
                             'report:reports:viewown',
                             'report:reports:viewother',
@@ -797,13 +797,23 @@ class ReportController extends FormController
                     $options['limit']           = (int) $this->coreParametersHelper->getParameter('report_export_batch_size', 1000);
                     $options['page']            = 1;
                     $handle                     = fopen('php://output', 'r+');
-                    $allTotals                  = [];
+                    $batchTotals                = [];
+                    $batchDataSize              = 0;
                     do {
                         $reportData = $model->getReportData($entity, null, $options);
 
+                        // Calculate number of pages only once
+                        if (1 === $options['page']) {
+                            $totalPages = (int) ceil($reportData['totalResults'] / $options['limit']);
+                        }
+
                         // Build the data rows
-                        $reportDataResult = new ReportDataResult($reportData, $allTotals);
-                        $allTotals = $reportDataResult->getTotals();
+                        $isLastBatch = (isset($totalPages) && $totalPages === $options['page']);
+                        $reportDataResult = new ReportDataResult($reportData, $batchTotals, $batchDataSize, $isLastBatch);
+
+                        // Store batch totals and size
+                        $batchTotals = $reportDataResult->getTotals();
+                        $batchDataSize += $reportDataResult->getDataCount();
 
                         // Note this so that it's not recalculated on each batch
                         $options['totalResults'] = $reportData['totalResults'];
