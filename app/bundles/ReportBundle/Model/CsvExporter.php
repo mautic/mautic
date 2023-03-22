@@ -5,6 +5,7 @@ namespace Mautic\ReportBundle\Model;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CsvExporter.
@@ -21,10 +22,16 @@ class CsvExporter
      */
     private $coreParametersHelper;
 
-    public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
         $this->formatterHelper      = $formatterHelper;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -49,6 +56,12 @@ class CsvExporter
 
         $totalsRow = $reportDataResult->getTotalsToExport();
         if (!empty($totalsRow) && $reportDataResult->isLastPage()) {
+            $key = array_key_first($totalsRow);
+
+            if (empty($totalsRow[$key])) {
+                $totalsRow[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+            }
+
             $this->putTotals($totalsRow, $handle);
         }
     }

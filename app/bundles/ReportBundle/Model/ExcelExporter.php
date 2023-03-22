@@ -8,6 +8,7 @@ use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CsvExporter.
@@ -19,9 +20,15 @@ class ExcelExporter
      */
     protected $formatterHelper;
 
-    public function __construct(FormatterHelper $formatterHelper)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
     {
-        $this->formatterHelper = $formatterHelper;
+        $this->formatterHelper      = $formatterHelper;
+        $this->translator           = $translator;
     }
 
     /**
@@ -69,6 +76,12 @@ class ExcelExporter
             //Add totals to export
             $totalsRow = $reportDataResult->getTotalsToExport();
             if (!empty($totalsRow)) {
+                $key = array_key_first($totalsRow);
+
+                if (empty($totalsRow[$key])) {
+                    $totalsRow[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+                }
+
                 $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);
             }
 
