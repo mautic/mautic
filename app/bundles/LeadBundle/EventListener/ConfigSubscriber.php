@@ -47,7 +47,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'segment_config',
             'formType'   => SegmentConfigType::class,
-            'formTheme'  => 'MauticLeadBundle:FormTheme:Config/_config_leadconfig_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_leadconfig_widget.html.twig',
             'parameters' => $segmentParameters,
         ]);
     }
