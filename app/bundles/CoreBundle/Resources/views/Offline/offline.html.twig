@@ -56,7 +56,7 @@
             <i class="fa fa-warning fa-5x"></i>
             <h2>{{ message | raw }}</h2>
             {% if submessage is defined and submessage is not empty %}
-                <h4 class="mt-15">{{ submessage | purify  }}</h4>
+                <h4 class="mt-15">{{ submessage | raw  }}</h4>
             {% endif %}
         </div>
     {% endif %}

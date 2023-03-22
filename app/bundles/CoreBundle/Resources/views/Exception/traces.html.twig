@@ -56,9 +56,7 @@
 
 {% endmacro %}
 
-{% if root is not defined %}
-    {% set root = getRootPath() %}
-{% endif %}
+{% set root = getRootPath() %}
 <ol>
 {% for trace in traces %}
     <li class="pt-3 break-word">
