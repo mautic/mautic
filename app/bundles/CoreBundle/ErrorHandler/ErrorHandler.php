@@ -506,29 +506,26 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 // Determine if there is an asset prefix
                 $root = self::$root;
-                include self::$root .'/app/config/paths.php';
-                
+                include self::$root.'/app/config/paths.php';
+
                 $assetPrefix = $paths['asset_prefix'];
                 if (!empty($assetPrefix)) {
                     if ('/' == substr($assetPrefix, -1)) {
                         $assetPrefix = substr($assetPrefix, 0, -1);
                     }
                 }
-                $assetBase = $assetPrefix.$base.$paths['assets'];
+                $assetBase          = $assetPrefix.$base.$paths['assets'];
+                $error['assetBase'] = $assetBase;
 
                 // Allow a custom error page
-                if (file_exists(self::$root.'/custom_offline.php')) {
-                    include self::$root.'/custom_offline.php';
-
-                    exit;
-                }
-
                 $loader = new \Twig\Loader\FilesystemLoader('app/bundles/CoreBundle/Resources/views/Offline');
-                $twig = new \Twig\Environment($loader);
-                
-                ob_start();
-                $twig->render('offline.html.twig', $error);
-                $content = ob_get_clean();
+                $twig   = new \Twig\Environment($loader);
+
+                if ($loader->exists('custom_offline.html.twig')) {
+                    $content = $twig->render('custom_offline.html.twig', $error);
+                } else {
+                    $content = $twig->render('offline.html.twig', $error);
+                }
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }
