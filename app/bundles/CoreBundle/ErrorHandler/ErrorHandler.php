@@ -523,7 +523,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 // Allow a custom error page
                 $loader        = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
                 $twig          = new \Twig\Environment($loader);
+
                 $error['root'] = $root;
+
                 if ($loader->exists('custom_offline.html.twig')) {
                     $content = $twig->render('custom_offline.html.twig', ['error' => $error]);
                 } else {
