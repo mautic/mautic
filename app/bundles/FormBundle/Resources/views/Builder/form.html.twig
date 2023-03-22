@@ -27,7 +27,14 @@
 {% set lead = lead|default(null) %}
 {% set successfulSubmitAction = successfulSubmitAction|default('') %}
 
-{{ style|raw }}
+{%- if style -%}
+    {%- set trimmedStyle = style|trim -%}
+    {%- if trimmedStyle starts with '<' -%}
+        {{- style|raw -}}
+    {%- else -%}
+        <link rel="stylesheet" href="{{ getAssetUrl(style) }}">
+    {%- endif -%}
+{%- endif -%}
 <style type="text/css" scoped>
     .mauticform-field-hidden { display:none }
 </style>

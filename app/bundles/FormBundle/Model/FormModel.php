@@ -444,8 +444,12 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
         }
 
         if ($entity->getRenderStyle()) {
-            $styleTheme = $styleToRender;
-            $style      = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleTheme), []);
+            $styleAsset = "themes/{$theme}/assets/style.css";
+            if (is_file(MAUTIC_ROOT_DIR.'/'.$styleAsset)) {
+                $style = $styleAsset;
+            } else {
+                $style = $this->themeHelper->renderThemeTemplate($this->themeHelper->checkForTwigTemplate($styleToRender), []);
+            }
         }
 
         // Determine pages
