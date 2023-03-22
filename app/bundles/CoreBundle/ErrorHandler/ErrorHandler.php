@@ -488,11 +488,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
                 $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (!empty($error['showExceptionMessage'])) {
-                    $message = $error['message'];
-                } else {
-                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-                    $submessage = 'System administrators, check server logs for errors.';
+                if (empty($error['showExceptionMessage'])) {
+                    $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $error['submessage'] = 'System administrators, check server logs for errors.';
                 }
             }
 
