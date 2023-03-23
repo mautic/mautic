@@ -97,10 +97,9 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param object                              $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws NotFoundHttpException
      */
