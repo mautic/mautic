@@ -16,7 +16,7 @@
                 {% set s = (item[1] is iterable) ? _self.formatArgs(item[1]) : item[1] %}
                 {% set formattedValue = '<em>array</em>(' ~ s ~ ')' %}
             {% elseif 'string' == item[0] %}
-                {% set formattedValue = "'" ~ item[1]|raw ~ "'" %}
+                {% set formattedValue = "'" ~ item[1]|escape ~ "'" %}
             {% elseif 'null' == item[0] %}
                 {% set formattedValue = '<em>null</em>' %}
             {% elseif 'boolean' == item[0] %}
@@ -26,8 +26,8 @@
             {% elseif 'resource' == item[0] %}
                 {% set formattedValue = '<em>resource</em>' %}
             {% else %}
-                {% set s = item[1]|raw %}
-                {% set s = s|raw | json_encode | raw %}
+                {% set s = item[1]|escape %}
+                {% set s = s|escape | json_encode | raw %}
                 {% set s = s|replace({"\n" : ''}) %}
                 {% set formattedValue = s %}
             {% endif %}
@@ -39,7 +39,7 @@
             {% set formattedValue = item.class %}
         {# is a string #}
         {% elseif item is not iterable and item is not empty and item|length %}
-            {% set formattedValue = '<em>' ~ item|raw ~ '</em>' %}
+            {% set formattedValue = '<em>' ~ item|escape ~ '</em>' %}
         {% else %}
             {% set formattedValue = '' %}
         {% endif %}
@@ -50,14 +50,14 @@
 
     {% endfor %}
 
-    {% autoraw %}
+    {% autoescape %}
     {{ result|join(', ') | raw }} 
-    {% endautoraw %}
+    {% endautoescape %}
 
 {% endmacro %}
 
-
 {% set root = getRootPath() %}
+
 <ol>
 {% for trace in traces %}
     <li class="pt-3 break-word">
