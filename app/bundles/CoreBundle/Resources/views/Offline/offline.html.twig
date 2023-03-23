@@ -35,7 +35,7 @@
             {% if error.trace is defined and error.trace is not empty  %}
             <div class="well well-sm" tabindex="-1" style="{{ inline is not defined or inline is empty ? '' : 'max-height: 100px; overflow: scroll;'}}" onclick="this.focus();">
                 {% if error.trace is defined and error.trace is not empty and error.trace is iterable %}
-                    {% include 'traces.html.twig' with {'traces': error.trace, 'root': error.root } %}
+                    {% include 'traces.html.twig' with {'traces': error.trace} %}
                 {% else %}
                     <pre>{{ error.trace | raw }}</pre>;
                 {% endif %}
