@@ -173,7 +173,7 @@ class ConfigController extends FormController
                     'formConfigs' => $formConfigs,
                     'isWritable'  => $isWritabale,
                 ],
-                'contentTemplate' => 'MauticConfigBundle:Config:form.html.twig',
+                'contentTemplate' => '@MauticConfig/Config/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_config_index',
                     'mauticContent' => 'config',

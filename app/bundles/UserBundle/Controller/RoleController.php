@@ -168,10 +168,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_new',
                 'route'          => $this->generateUrl('mautic_role_action', ['objectAction' => 'new']),
@@ -279,10 +279,10 @@ class RoleController extends FormController
 
         return $this->delegateView([
             'viewParameters' => [
-                'form'              => $form->createView(), //$this->setFormTheme($form, 'MauticUserBundle:Role:form.html.php', 'MauticUserBundle:FormTheme\Role'),
+                'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_index',
                 'route'          => $action,

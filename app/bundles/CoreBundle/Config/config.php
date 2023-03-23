@@ -424,7 +424,7 @@ return [
             'mautic.menu.profile' => [
                 'alias'   => 'profile',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.twig',
+                    'template' => '@MauticCore/Menu/profile_inline.html.twig',
                 ],
             ],
         ],
@@ -661,6 +661,8 @@ return [
                 'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
                 'arguments' => [
                     'translator',
+                    'mautic.helper.core_parameters',
+                    'mautic.helper.file_path_resolver',
                 ],
             ],
             'mautic.helper.composer' => [

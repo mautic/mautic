@@ -108,7 +108,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($roles as $role) {
                     $roleResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
+                        '@MauticUser/SubscribedEvents\Search/global_role.html.twig',
                         [
                             'role'    => $role,
                             'canEdit' => $canEdit,
@@ -117,7 +117,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($roles) > 5) {
                     $roleResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_role.html.twig',
+                        '@MauticUser/SubscribedEvents\Search/global_role.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

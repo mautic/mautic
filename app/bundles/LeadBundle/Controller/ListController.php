@@ -347,6 +347,8 @@ class ListController extends FormController
                             'objectId'     => $segment->getId(),
                         ]);
 
+                        $form = $segmentModel->createForm($segment, $this->get('form.factory'), $postActionVars['returnUrl']);
+
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
@@ -811,7 +813,7 @@ class ListController extends FormController
                     ],
                 ],
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:details.html.twig',
+            'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',

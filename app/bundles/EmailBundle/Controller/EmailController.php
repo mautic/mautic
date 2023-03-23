@@ -1434,7 +1434,7 @@ class EmailController extends FormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticEmailBundle:Email:recipients.html.twig',
+                'contentTemplate' => '@MauticEmail/Email/recipients.html.twig',
             ]
         );
     }

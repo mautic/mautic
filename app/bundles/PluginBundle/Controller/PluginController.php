@@ -394,7 +394,7 @@ class PluginController extends FormController
                     'bundle' => $bundle,
                     'icon'   => $integrationHelper->getIconPath($bundle),
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.twig',
+                'contentTemplate' => '@MauticPlugin/Integration/info.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',

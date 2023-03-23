@@ -206,7 +206,7 @@ class NoteController extends FormController
                         'lead'        => $lead,
                         'permissions' => $permissions,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.twig',
+                    'contentTemplate' => '@MauticLead/Note/form.html.twig',
                 ]
             );
         }
@@ -293,7 +293,7 @@ class NoteController extends FormController
                         'lead'        => $lead,
                         'permissions' => $permissions,
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Note:form.html.twig',
+                    'contentTemplate' => '@MauticLead/Note/form.html.twig',
                 ]
             );
         }
