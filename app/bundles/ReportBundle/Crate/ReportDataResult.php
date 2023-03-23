@@ -90,8 +90,8 @@ class ReportDataResult
         $this->graphs       = $data['graphs'] ?? [];
         $this->dateFrom     = $data['dateFrom'] ?? '';
         $this->dateTo       = $data['dateTo'] ?? '';
-        $this->limit        = $data['limit'] ? (int) $data['limit'] : null;
-        $this->page         = $data['page'] ? (int) $data['page'] : 1;
+        $this->limit        = isset($data['limit']) ? (int) $data['limit'] : null;
+        $this->page         = isset($data['page']) ? (int) $data['page'] : 1;
         $this->isLastBatch  = $isLastBatch;
 
         // Use the calculated totals for previous batch to continue
