@@ -94,11 +94,21 @@ class ExcelExporter
         }
     }
 
-    private function putHeader($headers, Worksheet $activeSheet)
+    /**
+     * @param array<string> $headers
+     *
+     * @return void
+     */
+    private function putHeader(array $headers, Worksheet $activeSheet)
     {
         $activeSheet->fromArray($headers);
     }
 
+    /**
+     * @param array<string> $totals
+     *
+     * @return void
+     */
     private function putTotals(array $totals, Worksheet $activeSheet, string $startCell)
     {
         $activeSheet->fromArray($totals, null, $startCell);

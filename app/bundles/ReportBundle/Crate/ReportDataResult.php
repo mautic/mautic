@@ -27,17 +27,17 @@ class ReportDataResult
     private $types = [];
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $totals = [];
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $columnKeys = [];
 
     /**
-     * @var array
+     * @var array<mixed>
      */
     private $graphs = [];
 
@@ -71,6 +71,10 @@ class ReportDataResult
      */
     private $isLastBatch;
 
+    /**
+     * @param array<mixed> $data
+     * @param array<mixed> $preTotals
+     */
     public function __construct(array $data, array $preTotals = [], int $preBatchSize = 0, bool $isLastBatch = true)
     {
         if (
@@ -143,7 +147,7 @@ class ReportDataResult
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getTotals()
     {
@@ -151,7 +155,7 @@ class ReportDataResult
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getGraphs()
     {
@@ -159,7 +163,7 @@ class ReportDataResult
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getDateTo()
     {
@@ -167,7 +171,7 @@ class ReportDataResult
     }
 
     /**
-     * @return array
+     * @return string
      */
     public function getDateFrom()
     {
@@ -175,7 +179,7 @@ class ReportDataResult
     }
 
     /**
-     * @return array
+     * @return array<string>
      */
     public function getTotalsToExport()
     {
@@ -245,6 +249,8 @@ class ReportDataResult
     }
 
     /**
+     * @param array<mixed> $aggregatorVal
+     *
      * @return float
      */
     private function calcTotal(string $calcFunction, float $previousVal, array &$aggregatorVal, int $rowsCount)
@@ -274,6 +280,8 @@ class ReportDataResult
     }
 
     /**
+     * @param array<string> $aggregators
+     *
      * @return void
      */
     private function buildTotals(array $aggregators)
@@ -300,6 +308,9 @@ class ReportDataResult
         return trim(str_replace($value, '', $index));
     }
 
+    /**
+     * @return void
+     */
     private function buildColumnKeys()
     {
         if (!isset($this->data[0])) {

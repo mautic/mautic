@@ -68,6 +68,8 @@ class CsvExporter
 
     /**
      * @param resource $handle
+     *
+     * @return void
      */
     private function putHeader(ReportDataResult $reportDataResult, $handle)
     {
@@ -75,7 +77,10 @@ class CsvExporter
     }
 
     /**
-     * @param resource $handle
+     * @param array<string> $totals
+     * @param resource      $handle
+     *
+     * @return void
      */
     private function putTotals(array $totals, $handle)
     {

@@ -28,7 +28,7 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
         $reportDataResult = new ReportDataResult(Fixtures::getValidReportResult());
 
-        $csvExporter = new CsvExporter($formatterHelperMock, $coreParametersHelperMock);
+        $csvExporter = new CsvExporter($formatterHelperMock, $coreParametersHelperMock, $translator);
 
         $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
         $file    = fopen($tmpFile, 'w');
