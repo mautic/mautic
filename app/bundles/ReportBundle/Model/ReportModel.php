@@ -446,7 +446,7 @@ class ReportModel extends FormModel
 
             case 'html':
                 $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.twig',
+                    '@MauticReport/Report/export.html.twig',
                     [
                         'pageTitle'        => $name,
                         'report'           => $report,

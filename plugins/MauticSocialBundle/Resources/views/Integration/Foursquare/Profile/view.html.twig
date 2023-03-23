@@ -21,7 +21,7 @@
         }) }}
     </div>
     <div class="tab-pane" id="FoursquareTips">
-        {{ include('MauticSocialBundle:Integration:Foursquare/Profile/tips.html.twig', {
+        {{ include('@MauticSocial/Integration/Foursquare/Profile/tips.html.twig', {
             'lead': lead,
             'activity': details.activity.tips|default([]),
         }) }}

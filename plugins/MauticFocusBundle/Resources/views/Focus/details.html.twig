@@ -138,7 +138,7 @@
           {# we can leverage data from audit_log table and build activity feed from it #}
           <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
               <!-- recent activity -->
-              {{ include('MauticCoreBundle:Helper:recentactivity.html.twig', {'logs': logs}) }}
+              {{ include('@MauticCore/Helper/recentactivity.html.twig', {'logs': logs}) }}
           </div>
       </div>
       <!--/ right section -->

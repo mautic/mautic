@@ -35,6 +35,6 @@
   {% if step is defined and constant('Mautic\\LeadBundle\\Controller\\ImportController::STEP_UPLOAD_CSV') == step %}
     {{ include('MauticLeadBundle:Import:_upload_form.html.twig') }}
   {% else %}
-    {{ include('MauticLeadBundle:Import:_mapping_form.html.twig') }}
+    {{ include('@MauticLead/Import/_mapping_form.html.twig') }}
   {% endif %}
 {% endblock %}

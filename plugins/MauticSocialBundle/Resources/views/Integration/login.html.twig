@@ -150,7 +150,7 @@
 <script src="{{ url('mautic_social_js_generate', {'formName': formName}) }}" type="text/javascript" charset="utf-8" async="async"></script>
 <div {% for attrName, attrValue in containerAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>
   {% if inForm %}
-      {{ include('MauticFormBundle:Builder:_actions.html.twig', {
+      {{ include('@MauticForm/Builder/_actions.html.twig', {
           'deleted': false,
           'id': id,
           'formId': formId,

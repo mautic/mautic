@@ -266,14 +266,14 @@
     </table>
 </div>
 
-{{- include('MauticCoreBundle:Helper:modal.html.twig', {
+{{- include('@MauticCore/Helper/modal.html.twig', {
     'id'            : 'InstallationInProgressModal',
     'header'        : 'Installing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
     'size'          : 'md',
     'footerButtons' : false,
 }) -}}
 
-{{- include('MauticCoreBundle:Helper:modal.html.twig', {
+{{- include('@MauticCore/Helper/modal.html.twig', {
     'id'            : 'RemovalInProgressModal',
     'header'        : 'Removing ' ~ packageDetail.packageBase.getHumanPackageName()|escape,
     'size'          : 'md',

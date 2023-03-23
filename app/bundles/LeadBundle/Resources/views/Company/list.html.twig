@@ -173,7 +173,7 @@
           }) }}
       </div>
   {% else %}
-    {{ include('MauticCoreBundle:Helper:noresults.html.twig', {'tip': 'mautic.company.action.noresults.tip'}) }}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.company.action.noresults.tip'}) }}
   {% endif %}
 
   {% if isIndex %}

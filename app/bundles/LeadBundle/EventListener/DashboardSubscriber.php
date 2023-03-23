@@ -191,7 +191,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -348,7 +348,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -403,7 +403,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;
@@ -454,7 +454,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
 
             return;

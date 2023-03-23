@@ -169,8 +169,8 @@
         }) -}}
     </div>
 {% elseif not configured %}
-    {{- include('MauticCoreBundle:Helper:noresults.html.twig', { 'header' : 'mautic.sms.disabled', 'message' : 'mautic.sms.enable.in.configuration' }) -}}
+    {{- include('@MauticCore/Helper/noresults.html.twig', { 'header' : 'mautic.sms.disabled', 'message' : 'mautic.sms.enable.in.configuration' }) -}}
 {% else %}
-    {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'message' : 'mautic.sms.create.in.campaign.builder'}) -}}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'mautic.sms.create.in.campaign.builder'}) -}}
 {% endif %}
 {% endblock %}

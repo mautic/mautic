@@ -137,7 +137,7 @@
             }) -}}
     </div>
     {% else %}
-        {{- include('MauticCoreBundle:Helper:noresults.html.twig',
+        {{- include('@MauticCore/Helper/noresults.html.twig',
             {'tip' : 'mautic.stage.action.noresults.tip'}) -}}
     {% endif %}
 {% endblock %}

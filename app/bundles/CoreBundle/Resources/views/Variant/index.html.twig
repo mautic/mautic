@@ -70,7 +70,7 @@
   {% if abTestResults.supportTemplate is defined %}
       {% set bodyContent = include(abTestResults.supportTemplate, {'results': abTestResults, 'variants': variants}) %}
   {% endif %}
-  {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+  {{ include('@MauticCore/Helper/modal.html.twig', {
           'id': 'abStatsModal',
           'header': abStatsHeader,
           'body': bodyContent,

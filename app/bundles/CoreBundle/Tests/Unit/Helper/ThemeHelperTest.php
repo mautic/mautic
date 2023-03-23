@@ -197,7 +197,7 @@ class ThemeHelperTest extends TestCase
 
         $this->themeHelper->setDefaultTheme('nature');
 
-        $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
+        $template = $this->themeHelper->checkForTwigTemplate('/goldstar/page.html.twig');
         $this->assertEquals(':nature:page.html.twig', $template);
     }
 
@@ -246,9 +246,9 @@ class ThemeHelperTest extends TestCase
 
         $this->themeHelper->setDefaultTheme('nature');
 
-        $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
+        $template = $this->themeHelper->checkForTwigTemplate('/goldstar/page.html.twig');
         $this->assertNotEquals(':nature:page.html.twig', $template);
-        $this->assertNotEquals(':goldstar:page.html.twig', $template);
+        $this->assertNotEquals('/goldstar/page.html.twig', $template);
         $this->assertStringContainsString(':page.html.twig', $template);
     }
 

@@ -38,7 +38,7 @@
         {% if objectId is defined %}
           {% set routeParameters = routeParameters|merge({'objectId': objectId}) %}
         {% endif %}
-        {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
                 'totalItems': totalItems,
                 'page': page,
                 'limit': limit,

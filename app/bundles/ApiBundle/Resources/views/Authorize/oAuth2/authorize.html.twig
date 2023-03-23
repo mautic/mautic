@@ -1,5 +1,5 @@
 
-{% extends 'MauticUserBundle:Security:base.html.twig' %}
+{% extends '@MauticUser/Security/base.html.twig' %}
 {% block headerTitle %}mautic.api.oauth.header{% endblock %}
 {% set name = client.getName() %}
 {% set msg = name is empty ? 'mautic.api.oauth.clientnoname'|trans : 'mautic.api.oauth.clientwithname'|trans({'name' : name}) %}

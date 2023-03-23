@@ -104,7 +104,7 @@
   <input type="hidden" name="mauticform[focusId]" id="mauticform{{ formName }}_focus_id" value="{{ focusId }}"/>
 {% endset %}
 
-{{ include('MauticFormBundle:Builder:form.html.twig', {
+{{ include('@MauticForm/Builder/form.html.twig', {
         'form': form,
         'formPages': pages,
         'lastFormPage': lastPage,

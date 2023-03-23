@@ -9,7 +9,7 @@
             'bodyItems': chartData,
         }) }}
     {% else %}
-        {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': chartData, 'chartType': chartType, 'chartHeight': chartHeight}) }}
+        {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': chartData, 'chartType': chartType, 'chartHeight': chartHeight}) }}
     {% endif %}
 
     {% if dateFrom is iterable %}

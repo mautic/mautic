@@ -739,7 +739,7 @@ class NotificationController extends AbstractFormController
                 'viewParameters' => [
                     'notification' => $notification,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:preview.html.twig',
+                'contentTemplate' => '@MauticNotification/Notification/preview.html.twig',
             ]
         );
     }

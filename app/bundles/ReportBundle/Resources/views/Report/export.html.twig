@@ -28,7 +28,7 @@
   </div>
 
   {% if showGraphsAboveTable is not empty %}
-      {{ include('MauticReportBundle:Report:details_data_graphs.html.twig', {
+      {{ include('@MauticReport/Report/details_data_graphs.html.twig', {
               'graphOrder': graphOrder,
               'graphs': reportDataResult.getGraphs(),
               'report': report,
@@ -86,7 +86,7 @@
   {% endif %}
 
   {% if showGraphsAboveTable is empty %}
-      {{ include('MauticReportBundle:Report:details_data_graphs.html.twig', {
+      {{ include('@MauticReport/Report/details_data_graphs.html.twig', {
               'graphOrder': graphOrder,
               'graphs': reportDataResult.getGraphs(),
               'report': report,

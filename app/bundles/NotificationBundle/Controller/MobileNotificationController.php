@@ -740,7 +740,7 @@ class MobileNotificationController extends FormController
                 'viewParameters' => [
                     'notification' => $notification,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:MobileNotification:preview.html.twig',
+                'contentTemplate' => '@MauticNotification/MobileNotification/preview.html.twig',
             ]
         );
     }

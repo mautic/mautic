@@ -385,10 +385,10 @@
                 {% endif %}
             </div>
             {% if doNotContact %}
-                {{ include('MauticLeadBundle:Lead:_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
+                {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContact}) }}
             {% endif %}
             {% if doNotContactSms %}
-                {{ include('MauticLeadBundle:Lead:_dnc_large.html.twig', {'doNotContact': doNotContactSms}) }}
+                {{ include('@MauticLead/Lead/_dnc_large.html.twig', {'doNotContact': doNotContactSms}) }}
             {% endif %}
             <div class="panel-heading">
                 <div class="panel-title">

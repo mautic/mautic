@@ -763,7 +763,7 @@ class AssetController extends FormController
                 'integrations' => $integrations,
                 'tmpl'         => $tmpl,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Remote:browse.html.twig',
+            'contentTemplate' => '@MauticAsset/Remote/browse.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',

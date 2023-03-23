@@ -424,7 +424,7 @@ return [
             'mautic.menu.profile' => [
                 'alias'   => 'profile',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.twig',
+                    'template' => '@MauticCore/Menu/profile_inline.html.twig',
                 ],
             ],
         ],

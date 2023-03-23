@@ -5,7 +5,7 @@
 {% block headerTitle entity.name %}
 
 {% block actions %}
-{{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
     'item': entity,
     'templateButtons': {
         'edit': permissions['point:triggers:edit'],
