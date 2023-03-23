@@ -332,8 +332,10 @@ class BuilderSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // If a link shortener URL is provided, use it for shortening URLs in e-mails
-        $shorten = ( $this->coreParametersHelper->get('link_shortener_url', null) != null ? true : false );
+        // If a link shortener URL is provided, and shortening is enabled for e-mail, use it for shortening URLs in e-mails
+        $shorten_url = ( $this->coreParametersHelper->get('link_shortener_url', null) != null ? true : false );
+        $shorten_enabled = $this->coreParametersHelper->get('link_shortener_enable_email', false);
+        $shorten = $shorten_url && $shorten_enabled;
 
         $email   = $event->getEmail();
         $emailId = ($email) ? $email->getId() : null;
