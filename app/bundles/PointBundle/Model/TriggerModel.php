@@ -151,28 +151,17 @@ class TriggerModel extends CommonFormModel
                                 'expr'   => 'lte',
                                 'value'  => (new DateTimeHelper($entity->getDateAdded()))->toUtcString(),
                             ],
-                            [
-                                'column' => 'l.points',
-                                'expr'   => 'gte',
-                                'value'  => $entity->getPoints(),
-                            ],
                         ],
                     ],
                 ];
 
-                if (!$isNew) {
-                    //get a list of leads that has already had this event applied
-                    $leadIds = $repo->getLeadsForEvent($event->getId());
-                    if (!empty($leadIds)) {
-                        $args['filter']['force'][] = [
-                            'column' => 'l.id',
-                            'expr'   => 'notIn',
-                            'value'  => $leadIds,
-                        ];
-                    }
-                }
-
-                if ($pointLeague) {
+                if (!$pointLeague) {
+                    $args['filter']['force'][] = [
+                        'column' => 'l.points',
+                        'expr'   => 'gte',
+                        'value'  => $entity->getPoints(),
+                    ];
+                } else {
                     $args['qb'] = $leadRepository->getEntitiesDbalQueryBuilder()
                         ->leftJoin('l', MAUTIC_TABLE_PREFIX.LeagueContactScore::TABLE_NAME, 'pls', 'l.id = pls.contact_id');
                     $args['filter']['force'][] = [
@@ -185,6 +174,18 @@ class TriggerModel extends CommonFormModel
                         'expr'   => 'eq',
                         'value'  => $entity->getLeague()->getId(),
                     ];
+                }
+
+                if (!$isNew) {
+                    //get a list of leads that has already had this event applied
+                    $leadIds = $repo->getLeadsForEvent($event->getId());
+                    if (!empty($leadIds)) {
+                        $args['filter']['force'][] = [
+                            'column' => 'l.id',
+                            'expr'   => 'notIn',
+                            'value'  => $leadIds,
+                        ];
+                    }
                 }
 
                 //get a list of leads that are before the trigger's date_added and trigger if not already done so

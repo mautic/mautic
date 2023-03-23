@@ -222,6 +222,7 @@ class PointModel extends CommonFormModel
         $availablePoints = $repo->getPublishedByType($type);
         $ipAddress       = $this->ipLookupHelper->getIpAddress();
 
+        $hasLeadPointChanges = false;
         if (null === $lead) {
             $lead = $this->contactTracker->getContact();
 
@@ -298,7 +299,8 @@ class PointModel extends CommonFormModel
                         $lead->adjustPoints($delta);
                     }
 
-                    $parsed = explode('.', $action->getType());
+                    $hasLeadPointChanges = true;
+                    $parsed              = explode('.', $action->getType());
                     $lead->addPointsChangeLogEntry(
                         $parsed[0],
                         $pointsChangeLogEntryName,
@@ -329,7 +331,7 @@ class PointModel extends CommonFormModel
             $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
         }
 
-        if (!empty($lead->getpointchanges())) {
+        if ($hasLeadPointChanges) {
             $this->leadModel->saveEntity($lead);
         }
     }
