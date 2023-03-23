@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Twig\Environment as TwigEnvironment;
+use Twig\Environment;
 
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
@@ -41,9 +41,9 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
     private $oAuth2Server;
 
     /**
-     * @var TwigEnvironment
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var TokenStorageInterface
@@ -67,14 +67,14 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         UrlGeneratorInterface $router,
         ClientManagerInterface $clientManager,
         EventDispatcherInterface $eventDispatcher,
-        TwigEnvironment $templating,
+        Environment $twig,
         SessionInterface $session = null
     ) {
         $this->session              = $session;
         $this->authorizeForm        = $authorizeForm;
         $this->authorizeFormHandler = $authorizeFormHandler;
         $this->oAuth2Server         = $oAuth2Server;
-        $this->templating           = $templating;
+        $this->twig                 = $twig;
         $this->tokenStorage         = $tokenStorage;
         $this->eventDispatcher      = $eventDispatcher;
 
@@ -87,7 +87,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             $router,
             $clientManager,
             $eventDispatcher,
-            $templating,
+            $twig,
             $session
         );
     }
@@ -125,7 +125,7 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             return $this->processSuccess($user, $this->authorizeFormHandler, $request);
         }
 
-        $contents =  $this->render(
+        $contents =  $this->twig->render(
             '@MauticApi/Authorize/oAuth2/authorize.html.twig',
             [
                 'form'   => $this->authorizeForm->createView(),
