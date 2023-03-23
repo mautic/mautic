@@ -88,8 +88,8 @@ class ReportDataResult
         $this->totalResults = (int) $data['totalResults'];
         $this->data         = $data['data'];
         $this->graphs       = $data['graphs'] ?? [];
-        $this->dateFrom     = $data['dateFrom'];
-        $this->dateTo       = $data['dateTo'];
+        $this->dateFrom     = $data['dateFrom'] ?? '';
+        $this->dateTo       = $data['dateTo'] ?? '';
         $this->limit        = $data['limit'] ? (int) $data['limit'] : null;
         $this->page         = $data['page'] ? (int) $data['page'] : 1;
         $this->isLastBatch  = $isLastBatch;
