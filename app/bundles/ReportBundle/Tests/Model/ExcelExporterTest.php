@@ -55,6 +55,13 @@ class ExcelExporterTest extends TestCase
                 0.1666,
                 60,
             ],
+            [
+                null,
+                null,
+                60.0,
+                0.3333,
+                160.0,
+            ],
         ];
 
         $this->assertSame($expected, $result);
