@@ -45,18 +45,18 @@
     </div>
     {% elseif inline is defined and inline is not empty %}
     <div class="col-xs-12">
-        <h3><i class="fa fa-warning fa-fw text-danger"></i>{{ message }}</h3>
-        {% if submessage is defined and submessage is not empty %}
-        <h4 class="mt-15">{{ submessage | raw }}</h4>
+        <h3><i class="fa fa-warning fa-fw text-danger"></i>{{ error.message }}</h3>
+        {% if error.submessage is defined and error.submessage is not empty %}
+        <h4 class="mt-15">{{ error.submessage | raw }}</h4>
         {% endif %}
     </div>
     {% else %}
     <div class="col-sm-offset-3 col-sm-6">
         <div class="bg-white pa-lg text-center" style="margin-top:100px;">
             <i class="fa fa-warning fa-5x"></i>
-            <h2>{{ message | raw }}</h2>
-            {% if submessage is defined and submessage is not empty %}
-                <h4 class="mt-15">{{ submessage | raw  }}</h4>
+            <h2>{{ error.message | raw }}</h2>
+            {% if error.submessage is defined and error.submessage is not empty %}
+                <h4 class="mt-15">{{ error.submessage | raw  }}</h4>
             {% endif %}
         </div>
     {% endif %}

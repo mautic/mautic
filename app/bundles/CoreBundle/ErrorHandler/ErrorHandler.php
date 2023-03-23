@@ -484,13 +484,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ('dev' == self::$environment || $this->displayErrors) {
-                $error['file'] = str_replace(self::$root, '', $error['file']);
-                $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
-                $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
+                $error['file']          = str_replace(self::$root, '', $error['file']);
+                $errorMessage           = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
+                $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (!empty($error['showExceptionMessage'])) {
-                    $message = $error['message'];
-                } else {
+                if (empty($error['showExceptionMessage'])) {
                     unset($error);
                     $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
                     $error['submessage'] = 'System administrators, check server logs for errors.';
@@ -501,7 +499,6 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             try {
                 // Get the URLs base path
-                $inDev = false !== strpos($_SERVER['SCRIPT_NAME'], 'index_dev.php');
                 $base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
 
                 // Determine if there is an asset prefix
