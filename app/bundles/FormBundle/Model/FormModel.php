@@ -512,9 +512,7 @@ class FormModel extends CommonFormModel
         }
 
         if ($entity->getRenderStyle()) {
-            $templating = $this->templatingHelper->getTemplating();
-            $styleTheme = $theme.'MauticFormBundle:Builder:_style.html.twig';
-            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $style = "/themes/".substr($theme,0,-1)."/assets/style.css";
         }
 
         // Determine pages
