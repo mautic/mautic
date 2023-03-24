@@ -188,7 +188,7 @@ class PointController extends AbstractFormController
                 'actions'    => $actions['actions'],
                 'formThemes' => $themes,
             ],
-            'contentTemplate' => 'MauticPointBundle:Point:form.html.twig',
+            'contentTemplate' => '@MauticPoint/Point/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -322,7 +322,7 @@ class PointController extends AbstractFormController
                 'actions'    => $actions['actions'],
                 'formThemes' => $themes,
             ],
-            'contentTemplate' => 'MauticPointBundle:Point:form.html.twig',
+            'contentTemplate' => '@MauticPoint/Point/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',

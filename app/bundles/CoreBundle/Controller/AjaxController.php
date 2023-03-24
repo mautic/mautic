@@ -808,7 +808,7 @@ class AjaxController extends CommonController
 
                         $form = $this->get('form.factory')->create($formType, [], ['ip_lookup_service' => $ipService]);
                         $html = $this->renderView(
-                            'MauticCoreBundle:FormTheme:Config/ip_lookup_config_row.html.twig',
+                            '@MauticCore/FormTheme/Config/ip_lookup_config_row.html.twig',
                             [
                                 'form'       => $form->createView(),
                                 'formThemes' => $themes,

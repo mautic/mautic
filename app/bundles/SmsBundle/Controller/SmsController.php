@@ -719,7 +719,7 @@ class SmsController extends FormController
                 'viewParameters' => [
                     'sms' => $sms,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:preview.html.twig',
+                'contentTemplate' => '@MauticSms/Sms/preview.html.twig',
             ]);
         }
 

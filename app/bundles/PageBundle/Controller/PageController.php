@@ -1143,7 +1143,7 @@ class PageController extends FormController
                     'limit'      => $limit,
                     'tmpl'       => $tmpl,
                 ],
-                'contentTemplate' => 'MauticPageBundle:Result:list.html.twig',
+                'contentTemplate' => '@MauticPage/Result/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_page_index',
                     'mauticContent' => 'pageresult',

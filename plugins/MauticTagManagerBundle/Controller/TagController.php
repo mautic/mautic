@@ -465,7 +465,7 @@ class TagController extends FormController
                 'tag'      => $tag,
                 'security' => $security,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.twig',
+            'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',

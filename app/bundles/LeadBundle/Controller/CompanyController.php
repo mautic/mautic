@@ -961,7 +961,7 @@ class CompanyController extends FormController
                         ]
                     ),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.twig',
+                'contentTemplate' => '@MauticLead/Company/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.company-merge-options' : null,

@@ -2144,7 +2144,7 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'emailStats' => $model->getLeadEmailStats($lead),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:lead_stats.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/lead_stats.html.twig',
             ]
         );
     }

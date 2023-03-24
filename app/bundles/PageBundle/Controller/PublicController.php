@@ -341,7 +341,7 @@ class PublicController extends CommonFormController
 
             $content = $response->getContent();
         } else {
-            $content = str_replace('</head>', $analytics.$this->renderView('MauticPageBundle:Page:preview_header.html.twig')."\n</head>", $content);
+            $content = str_replace('</head>', $analytics.$this->renderView('@MauticPage/Page/preview_header.html.twig')."\n</head>", $content);
         }
 
         $dispatcher = $this->get('event_dispatcher');
