@@ -2,6 +2,8 @@
 
 namespace Mautic\CoreBundle\Helper;
 
+use Mautic\CoreBundle\Loader\ParameterLoader;
+
 class DateTimeHelper
 {
     public const FORMAT_DB = 'Y-m-d H:i:s';
@@ -405,7 +407,9 @@ class DateTimeHelper
 
     protected function setDefaultTimezone(): void
     {
-        self::$defaultTimezone = self::$defaultTimezone ?: (string) ((new ParamsLoaderHelper())->getParameters(
-        )['default_timezone'] ?? date_default_timezone_get());
+        if (null === self::$defaultTimezone) {
+            $parameterLoader       = new ParameterLoader();
+            self::$defaultTimezone = $parameterLoader->getParameterBag()->get('default_timezone') ?? date_default_timezone_get();
+        }
     }
 }
