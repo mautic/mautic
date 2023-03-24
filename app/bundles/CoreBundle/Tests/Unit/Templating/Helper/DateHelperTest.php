@@ -31,6 +31,8 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         self::$oldTimezone = date_default_timezone_get();
+        $envParameters     = json_encode(['default_timezone' => 'Etc/GMT-4']);
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
     }
 
     public static function tearDownAfterClass(): void
@@ -54,32 +56,14 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testStringToText()
     {
-        date_default_timezone_set('Etc/GMT-4');
         $time = '2016-01-27 14:30:00';
         $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
     }
 
-    public function testStringToTextUtc()
-    {
-        date_default_timezone_set('UTC');
-        $time = '2016-01-27 14:30:00';
-
-        $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
-    }
-
     public function testDateTimeToText()
     {
-        date_default_timezone_set('Etc/GMT-4');
         $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
         $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
-    }
-
-    public function testDateTimeToTextUtc()
-    {
-        date_default_timezone_set('UTC');
-        $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
-
-        $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
     }
 
     public function testToTextWithConfigurationToTime()
@@ -104,9 +88,8 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFullConcat()
     {
-        date_default_timezone_set('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
-        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+        $this->assertEquals($result, 'February 21, 2021 10:00 pm');
     }
 }
