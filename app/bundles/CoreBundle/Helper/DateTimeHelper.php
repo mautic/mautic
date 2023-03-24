@@ -6,6 +6,8 @@ class DateTimeHelper
 {
     public const FORMAT_DB = 'Y-m-d H:i:s';
 
+    private static ?string $defaultTimezone = null;
+
     /**
      * @var string
      */
@@ -43,6 +45,7 @@ class DateTimeHelper
      */
     public function __construct($string = '', $fromFormat = self::FORMAT_DB, $timezone = 'UTC')
     {
+        $this->setDefaultTimezone();
         $this->setDateTime($string, $fromFormat, $timezone);
     }
 
@@ -53,9 +56,8 @@ class DateTimeHelper
      */
     public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
     {
-        $localTimezone = date_default_timezone_get();
         if ('local' == $timezone) {
-            $timezone = $localTimezone;
+            $timezone = self::$defaultTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -64,7 +66,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone($localTimezone);
+        $this->local = new \DateTimeZone(self::$defaultTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
@@ -394,5 +396,16 @@ class DateTimeHelper
             $possibleUnitsString = implode(', ', $possibleUnits);
             throw new \InvalidArgumentException("Unit '$unit' is not supported. Use one of these: $possibleUnitsString");
         }
+    }
+
+    public function getLocalTimezoneOffset(): string
+    {
+        return $this->getLocalDateTime()->format('P');
+    }
+
+    protected function setDefaultTimezone(): void
+    {
+        self::$defaultTimezone = self::$defaultTimezone ?: (string) ((new ParamsLoaderHelper())->getParameters(
+        )['default_timezone'] ?? date_default_timezone_get());
     }
 }
