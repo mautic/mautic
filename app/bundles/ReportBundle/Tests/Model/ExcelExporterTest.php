@@ -58,9 +58,9 @@ class ExcelExporterTest extends TestCase
             [
                 null,
                 null,
-                60.0,
+                60,
                 0.3333,
-                160.0,
+                160,
             ],
         ];
 
