@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Crate;
 
+use DateTime;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 
 class ReportDataResult
@@ -42,12 +43,12 @@ class ReportDataResult
     private $graphs = [];
 
     /**
-     * @var string
+     * @var DateTime|null
      */
     private $dateFrom;
 
     /**
-     * @var string
+     * @var DateTime|null
      */
     private $dateTo;
 
@@ -88,17 +89,17 @@ class ReportDataResult
         $this->totalResults = (int) $data['totalResults'];
         $this->data         = $data['data'];
         $this->graphs       = $data['graphs'] ?? [];
-        $this->dateFrom     = $data['dateFrom'] ?? '';
-        $this->dateTo       = $data['dateTo'] ?? '';
+        $this->dateFrom     = $data['dateFrom'] ?? null;
+        $this->dateTo       = $data['dateTo'] ?? null;
         $this->limit        = isset($data['limit']) ? (int) $data['limit'] : null;
         $this->page         = isset($data['page']) ? (int) $data['page'] : 1;
         $this->isLastBatch  = $isLastBatch;
+        $this->columnKeys   = isset($this->data[0]) ? array_keys($this->data[0]) : [];
 
         // Use the calculated totals for previous batch to continue
         $this->preBatchSize = $preBatchSize;
         $this->totals       = $preTotals;
 
-        $this->buildColumnKeys();
         $this->buildHeader($data);
         $this->buildTypes($data);
         $this->buildTotals($data['aggregatorColumns'] ?? []);
@@ -163,7 +164,7 @@ class ReportDataResult
     }
 
     /**
-     * @return string
+     * @return DateTime|null
      */
     public function getDateTo()
     {
@@ -171,7 +172,7 @@ class ReportDataResult
     }
 
     /**
-     * @return string
+     * @return DateTime|null
      */
     public function getDateFrom()
     {
@@ -205,6 +206,14 @@ class ReportDataResult
         }
 
         return $this->page == ceil($this->totalResults / $this->limit);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getColumnKeys()
+    {
+        return $this->columnKeys;
     }
 
     /**
@@ -253,25 +262,29 @@ class ReportDataResult
      *
      * @return float
      */
-    private function calcTotal(string $calcFunction, float $previousVal, array &$aggregatorVal, int $rowsCount)
+    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, ?float $previousVal = null)
     {
         switch ($calcFunction) {
             case 'COUNT':
             case 'SUM':
-                return $previousVal + array_sum($aggregatorVal);
+                return ($previousVal ?? 0) + array_sum($aggregatorVal);
             case 'AVG':
-                $sum= $previousVal + array_sum($aggregatorVal);
+                $sum = ($previousVal ?? 0) + array_sum($aggregatorVal);
                 if ($this->isLastBatch) {
                     return round($sum / $rowsCount, FormatterHelper::FLOAT_PRECISION);
                 }
 
                 return $sum;
             case 'MAX':
-                $aggregatorVal[] = $previousVal;
+                if (!is_null($previousVal)) {
+                    $aggregatorVal[] = $previousVal;
+                }
 
                 return max($aggregatorVal);
             case 'MIN':
-                $aggregatorVal[] = $previousVal;
+                if (!is_null($previousVal)) {
+                    $aggregatorVal[] = $previousVal;
+                }
 
                 return min($aggregatorVal);
             default:
@@ -294,7 +307,7 @@ class ReportDataResult
 
                 if ($aggregatorVal) {
                     $calcFunc         = $this->getAggregatorCalcFunc($j, $v);
-                    $this->totals[$j] = $this->calcTotal($calcFunc, $this->totals[$j] ?? 0, $aggregatorVal, $dataCount);
+                    $this->totals[$j] = $this->calcTotal($calcFunc, $dataCount, $aggregatorVal, $this->totals[$j] ?? null);
                 }
             }
         }
@@ -306,20 +319,5 @@ class ReportDataResult
     private function getAggregatorCalcFunc(string $index, string $value)
     {
         return trim(str_replace($value, '', $index));
-    }
-
-    /**
-     * @return void
-     */
-    private function buildColumnKeys()
-    {
-        if (!isset($this->data[0])) {
-            $this->columnKeys = [];
-
-            return;
-        }
-
-        $row              = $this->data[0];
-        $this->columnKeys =  array_keys($row);
     }
 }
