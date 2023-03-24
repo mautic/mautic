@@ -41,7 +41,7 @@
         <h6 class="mt-lg mb-sm"><strong>{{ 'mautic.email.timeline.open_details'|trans }}</strong></h6>
         {% for key, detail in item.openDetails %}
             {% if 'bouces' != key %}
-              {% if showMore is empty and loop.index > 5 %}
+              {% if showMore is not defined and loop.index > 5 %}
                   {% set showMore = true %}
                   <div style="display:none">
               {% endif %}

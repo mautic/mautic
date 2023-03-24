@@ -1,4 +1,4 @@
-<div class="share-button twitter-share-button layout-<?php echo isset($settings['count']) ? $settings['count'] : 0; ?>">
+<div class="share-button twitter-share-button layout-{{ settings.count|default('0') }}">
     <a href="https://twitter.com/share"
     {% if settings.text is defined and settings.text is not empty %}data-text="{{ settings.text }}"{% endif %}
     {% if settings.via is defined and settings.via is not empty %}data-via="{{ settings.via }}"{% endif %}
