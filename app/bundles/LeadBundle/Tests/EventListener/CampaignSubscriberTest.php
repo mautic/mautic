@@ -31,12 +31,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
-    private $dncConditionForm = [
+    private array $dncConditionForm = [
         'condition'   => 0,
         'channels'    => ['email'],
     ];
 
-    private $dncConditionForm2 = [
+    private array $dncConditionForm2 = [
         'condition'   => 1,
         'channels'    => ['email'],
     ];
@@ -98,7 +98,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $doNotContact
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
@@ -128,7 +127,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
 
-    public function testOnCampaignTriggerConditionDNCFlag()
+    public function testOnCampaignTriggerConditionDNCFlag(): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
         $mockLeadModel      = $this->createMock(LeadModel::class);
@@ -154,7 +153,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $doNotContact
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
 
