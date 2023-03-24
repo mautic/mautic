@@ -3,12 +3,12 @@
 namespace Mautic\ApiBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use FOS\OAuthServerBundle\Event\OAuthEvent;
+use FOS\OAuthServerBundle\Event\PreAuthorizationEvent;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OAuthEventListener
+class PreAuthorizationEventListener
 {
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -26,7 +26,7 @@ class OAuthEventListener
     private $translator;
 
     /**
-     * OAuthEventListener constructor.
+     * PreAuthorizationEventListener constructor.
      */
     public function __construct(EntityManager $entityManager, CorePermissions $corePermissions, TranslatorInterface $translator)
     {
@@ -38,7 +38,7 @@ class OAuthEventListener
     /**
      * @throws AccessDeniedException
      */
-    public function onPreAuthorizationProcess(OAuthEvent $event)
+    public function onPreAuthorizationProcess(PreAuthorizationEvent $event)
     {
         if ($user = $this->getUser($event)) {
             //check to see if user has api access
@@ -52,7 +52,7 @@ class OAuthEventListener
         }
     }
 
-    public function onPostAuthorizationProcess(OAuthEvent $event)
+    public function onPostAuthorizationProcess(PreAuthorizationEvent $event)
     {
         if ($event->isAuthorizedClient()) {
             if (null !== $client = $event->getClient()) {
@@ -67,7 +67,7 @@ class OAuthEventListener
     /**
      * @return mixed
      */
-    protected function getUser(OAuthEvent $event)
+    protected function getUser(PreAuthorizationEvent $event)
     {
         return $this->em->getRepository('MauticUserBundle:User')->findOneByUsername($event->getUser()->getUsername());
     }
