@@ -31,11 +31,17 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
+    /**
+     * @var array<string,mixed>
+     */
     private array $dncConditionForm = [
         'condition'   => 0,
         'channels'    => ['email'],
     ];
 
+    /**
+     * @var array<string,mixed>
+     */
     private array $dncConditionForm2 = [
         'condition'   => 1,
         'channels'    => ['email'],
