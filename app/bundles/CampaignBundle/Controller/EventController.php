@@ -140,7 +140,7 @@ class EventController extends CommonFormController
             $blank  = $entity->convertToArray();
             $event  = array_merge($blank, $event);
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:_generic.html.twig'
+            $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
                 : $event['settings']['template'];
 
             $passthroughVars['event']     = $event;
@@ -345,7 +345,7 @@ class EventController extends CommonFormController
             $event    = array_merge((new Event())->convertToArray(), $event);
             $template = isset($event['settings']['template'])
                 ? $event['settings']['template']
-                : 'MauticCampaignBundle:Event:_generic.html.twig';
+                : '@MauticCampaign/Event/_generic.html.twig';
 
             $passthroughVars = array_merge($passthroughVars, [
                 'event'      => $event,
@@ -514,7 +514,7 @@ class EventController extends CommonFormController
                 $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
             }
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:_generic.html.twig'
+            $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
                 : $event['settings']['template'];
 
             //prevent undefined errors

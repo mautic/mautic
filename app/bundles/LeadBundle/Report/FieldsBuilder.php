@@ -158,7 +158,6 @@ class FieldsBuilder
             'l.owner_id' => [
                 'label' => 'mautic.lead.report.owner_id',
                 'type'  => 'int',
-                'link'  => 'mautic_user_action',
             ],
             'u.first_name' => [
                 'label' => 'mautic.lead.report.owner_firstname',

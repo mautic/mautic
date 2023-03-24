@@ -416,7 +416,7 @@ class ReportController extends FormController
                     'report' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:form.html.twig',
+                'contentTemplate' => '@MauticReport/Report/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',
@@ -520,7 +520,7 @@ class ReportController extends FormController
                     'report' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:form.html.twig',
+                'contentTemplate' => '@MauticReport/Report/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',

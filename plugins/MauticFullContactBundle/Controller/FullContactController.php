@@ -217,7 +217,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupEmails),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.twig',
+                    'contentTemplate' => '@MauticFullContact/FullContact/batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -469,7 +469,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItems' => array_values($lookupWebsites),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:batchLookup.html.twig',
+                    'contentTemplate' => '@MauticFullContact/FullContact/batchLookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'companyBatch',

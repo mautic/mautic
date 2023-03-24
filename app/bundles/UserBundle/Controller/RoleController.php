@@ -171,7 +171,7 @@ class RoleController extends FormController
                 'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_new',
                 'route'          => $this->generateUrl('mautic_role_action', ['objectAction' => 'new']),
@@ -282,7 +282,7 @@ class RoleController extends FormController
                 'form'              => $form->createView(),
                 'permissionsConfig' => $permissionsConfig,
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:form.html.twig',
+            'contentTemplate' => '@MauticUser/Role/form.html.twig',
             'passthroughVars' => [
                 'activeLink'     => '#mautic_role_index',
                 'route'          => $action,

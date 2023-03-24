@@ -144,7 +144,7 @@ class AjaxController extends CommonController
         $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
 
         $dataArray['newContent'] = $this->renderView(
-            'MauticCoreBundle:GlobalSearch:results.html.php',
+            'MauticCoreBundle:GlobalSearch:results.html.twig',
             ['results' => $event->getResults()]
         );
 
@@ -808,7 +808,7 @@ class AjaxController extends CommonController
 
                         $form = $this->get('form.factory')->create($formType, [], ['ip_lookup_service' => $ipService]);
                         $html = $this->renderView(
-                            'MauticCoreBundle:FormTheme:Config/ip_lookup_config_row.html.twig',
+                            '@MauticCore/FormTheme/Config/ip_lookup_config_row.html.twig',
                             [
                                 'form'       => $form->createView(),
                                 'formThemes' => $themes,

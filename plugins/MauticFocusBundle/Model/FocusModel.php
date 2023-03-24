@@ -284,7 +284,7 @@ class FocusModel extends FormModel
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
         $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:form.html.twig',
+            '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,
                 'pages'          => $pages,

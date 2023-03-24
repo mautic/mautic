@@ -126,7 +126,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.repost',
             'description'        => 'mautic.form.action.repost.descr',
             'formType'           => SubmitActionRepostType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme:SubmitAction/_submit_action_repost_widget.html.twig',
+            'formTheme'          => '@MauticForm/FormTheme/SubmitAction/_submit_action_repost_widget.html.twig',
             'formTypeCleanMasks' => [
                 'post_url'             => 'url',
                 'failure_email'        => 'string',
