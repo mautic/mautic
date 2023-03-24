@@ -55,6 +55,8 @@ class InstallWorkflowTest extends MauticMysqlTestCase
     {
         // Step 0: System checks.
         $crawler      = $this->client->request(Request::METHOD_GET, '/installer');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
         $submitButton = $crawler->selectButton('install_check_step[buttons][next]');
         $form         = $submitButton->form();
         $crawler      = $this->client->submit($form);
