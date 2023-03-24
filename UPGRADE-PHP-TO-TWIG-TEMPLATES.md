@@ -52,7 +52,7 @@ Becomes
 {# PAGE ACTIONS #}
 {% block actions %}
     {{- include(
-        'MauticCoreBundle:Helper:page_actions.html.twig', {
+        '@MauticCore/Helper/page_actions.html.twig', {
             item: item,
             templateButtons: {
                 'edit': securityHasEntityAccess(

@@ -310,7 +310,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getFormTheme()
     {
-        return 'MauticPluginBundle:FormTheme:Integration/layout.html.twig';
+        return '@MauticPlugin/FormTheme/Integration/layout.html.twig';
     }
 
     /**

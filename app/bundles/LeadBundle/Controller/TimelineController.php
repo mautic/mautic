@@ -118,7 +118,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.twig', $tmpl),
+                'contentTemplate' => sprintf('@MauticLead/Timeline/plugin_%s.html.twig', $tmpl),
             ]
         );
     }
@@ -180,7 +180,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.twig', $tmpl),
+                'contentTemplate' => sprintf('@MauticLead/Timeline/plugin_%s.html.twig', $tmpl),
             ]
         );
     }

@@ -261,7 +261,7 @@ class CheckStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:check.html.twig';
+        return '@MauticInstall/Install/check.html.twig';
     }
 
     /**

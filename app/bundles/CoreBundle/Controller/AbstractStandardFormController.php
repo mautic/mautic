@@ -493,7 +493,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'edit'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.php'),
+            'contentTemplate' => $this->getTemplateName('form.html.twig'),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $this->generateUrl(
@@ -954,7 +954,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => $this->getTemplateName('list.html.php'),
+                    'contentTemplate' => $this->getTemplateName('list.html.twig'),
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
@@ -1068,7 +1068,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                 'entity'          => $entity,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => $this->getTemplateName('form.html.php'),
+            'contentTemplate' => $this->getTemplateName('form.html.twig'),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $this->generateUrl(
@@ -1106,7 +1106,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', string $engine = self::ENGINE_PHP)
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', string $engine = self::ENGINE_TWIG)
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);
@@ -1180,7 +1180,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
                     true
                 ),
             ],
-            'contentTemplate' => $this->getTemplateName('details.html.php'),
+            'contentTemplate' => $this->getTemplateName('details.html.twig'),
             'passthroughVars' => [
                 'mauticContent' => $this->getJsLoadMethodPrefix(),
                 'route'         => $route,

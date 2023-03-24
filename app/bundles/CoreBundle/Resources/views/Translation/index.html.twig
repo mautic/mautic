@@ -1,0 +1,39 @@
+{#
+  Variables
+    - activeEntity
+    - translations
+    - model
+    - actionRoute
+    - nameGetter (optional, default="getName")
+#}
+{%- apply spaceless -%}
+{%- set nameGetter = nameGetter|default('getName') -%}
+{%- if translations.children|length > 0 or (translations.parent and translations.parent.id is not same as activeEntity.id) -%}
+  <!-- start: related translations list -->
+  <ul class="list-group">
+      {% if translations.parent %}
+          {{ include('@MauticCore/Translation/row.html.twig', {
+                  'translation': translations.parent,
+                  'translations': translations,
+                  'actionRoute': actionRoute,
+                  'activeEntity': activeEntity,
+                  'model': model,
+                  'nameGetter': nameGetter,
+          }) }}
+      {% endif %}
+      {% if translations.children|length > 0 %}
+          {% for translation in translations.children %}
+              {{ include('@MauticCore/Translation/row.html.twig', {
+                      'translation': translation,
+                      'translations': translations,
+                      'actionRoute': actionRoute,
+                      'activeEntity': activeEntity,
+                      'model': model,
+                      'nameGetter': nameGetter,
+              }) }}
+          {% endfor %}
+      {% endif %}
+  </ul>
+  <!--/ end: related translations list -->
+{%- endif -%}
+{%- endapply -%}
