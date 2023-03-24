@@ -500,7 +500,6 @@ class PublicController extends CommonFormController
             }
 
             if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {
-                //$url .= '?ct='.$ct;
                 if (strpos($url, '&')) {
                     $url .= '&ct='.$ct;
                 } else {
