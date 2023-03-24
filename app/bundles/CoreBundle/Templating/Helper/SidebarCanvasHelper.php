@@ -10,6 +10,8 @@ use Symfony\Component\Templating\Helper\Helper;
 
 /**
  * Class SidebarCanvasHelper.
+ *
+ * @deprecated Deprecated in Mautic 4.3. Will be removed in Mautic 5.0
  */
 class SidebarCanvasHelper extends Helper
 {
@@ -40,7 +42,7 @@ class SidebarCanvasHelper extends Helper
     {
         if ($this->dispatcher->hasListeners(CoreEvents::BUILD_CANVAS_CONTENT)) {
             $event = new SidebarCanvasEvent($templating);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_CANVAS_CONTENT, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_CANVAS_CONTENT);
             $this->content = $event->getCanvasContent();
         }
 

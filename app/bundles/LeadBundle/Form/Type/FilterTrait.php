@@ -12,10 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 trait FilterTrait
 {
@@ -289,20 +289,18 @@ trait FilterTrait
                 $type                                       = ChoiceType::class;
             break;
             case 'lookup':
-                if ('number' !== $fieldType) {
-                    $attr = array_merge(
-                        $attr,
-                        [
-                            'data-toggle' => 'field-lookup',
-                            'data-target' => isset($data['field']) ? $data['field'] : '',
-                            'data-action' => 'lead:fieldList',
-                            'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
-                        ]
-                    );
+                $attr = array_merge(
+                    $attr,
+                    [
+                        'data-toggle' => 'field-lookup',
+                        'data-target' => isset($data['field']) ? $data['field'] : '',
+                        'data-action' => 'lead:fieldList',
+                        'placeholder' => $translator->trans('mautic.lead.list.form.filtervalue'),
+                    ]
+                );
 
-                    if (isset($field['properties']['list'])) {
-                        $attr['data-options'] = $field['properties']['list'];
-                    }
+                if (isset($field['properties']['list'])) {
+                    $attr['data-options'] = $field['properties']['list'];
                 }
 
                 break;

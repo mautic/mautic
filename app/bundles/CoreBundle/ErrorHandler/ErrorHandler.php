@@ -5,11 +5,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
-    use Symfony\Component\Debug\Debug;
     use Symfony\Component\Debug\Exception\FatalErrorException;
     use Symfony\Component\Debug\Exception\FatalThrowableError;
-    use Symfony\Component\Debug\Exception\FlattenException;
     use Symfony\Component\Debug\Exception\OutOfMemoryException;
+    use Symfony\Component\ErrorHandler\Debug;
+    use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
     class ErrorHandler
     {
@@ -42,18 +42,15 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         private static $root;
 
-        /**
-         * ErrorHandler constructor.
-         */
         public function __construct()
         {
             self::$root = realpath(__DIR__.'/../../../../');
         }
 
         /**
-         * @param        $log
-         * @param string $context
-         * @param bool   $backtrace
+         * @param mixed               $log
+         * @param string|array<mixed> $context
+         * @param bool                $backtrace
          */
         public static function logDebugEntry($log, $context = 'null', $backtrace = false)
         {
@@ -176,23 +173,11 @@ namespace Mautic\CoreBundle\ErrorHandler {
          */
         public function handleException($exception, $returnContent = false, $inTemplate = false)
         {
-            $inline = $inTemplate;
-            if (!$exception instanceof FatalThrowableError && defined('MAUTIC_DELEGATE_VIEW')) {
-                $inline = true;
-            }
-
             if (!$error = self::prepareExceptionForOutput($exception)) {
                 return false;
             }
-            if (isset($error['inline'])) {
-                $inline = $error['inline'];
-            }
 
-            if (!empty($GLOBALS['MAUTIC_AJAX_DIRECT_RENDER'])) {
-                $inline = true;
-            }
-
-            $content = $this->generateResponse($error, $inline, $inTemplate);
+            $content = $this->generateResponse($error, $inTemplate);
 
             $message = isset($error['logMessage']) ? $error['logMessage'] : $error['message'];
             $this->log(LogLevel::ERROR, "$message - in file {$error['file']} - at line {$error['line']}", [], $error['trace']);
@@ -300,7 +285,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
             $type = ($exception instanceof \ErrorException) ? $exception->getSeverity() : E_ERROR;
 
             if (!$exception instanceof FlattenException) {
-                $exception = FlattenException::create($exception);
+                $exception = FlattenException::createFromThrowable($exception);
             }
 
             if (empty($message)) {
@@ -351,7 +336,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
                 // Hide errors by default so we can format them
                 self::$handler->setDisplayErrors(('dev' === $environment) ? 1 : 0); //ini_get('display_errors'));
-                ini_set('display_errors', 0);
+                ini_set('display_errors', '0');
             }
 
             return self::$handler;
@@ -434,13 +419,12 @@ namespace Mautic\CoreBundle\ErrorHandler {
         }
 
         /**
-         * @param      $error
-         * @param bool $inline
-         * @param bool $inTemplate
+         * @param mixed[] $error
+         * @param bool    $inTemplate
          *
          * @return mixed|string
          */
-        private function generateResponse($error, $inline = true, $inTemplate = false)
+        private function generateResponse($error, $inTemplate = false)
         {
             // Get a trace
             if ('dev' == self::$environment) {
@@ -500,25 +484,54 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ('dev' == self::$environment || $this->displayErrors) {
-                $error['file'] = str_replace(self::$root, '', $error['file']);
-                $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
-                $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
+                $error['file']          = str_replace(self::$root, '', $error['file']);
+                $errorMessage           = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
+                $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (!empty($error['showExceptionMessage'])) {
-                    $message = $error['message'];
-                } else {
-                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-                    $submessage = 'System administrators, check server logs for errors.';
+                if (empty($error['showExceptionMessage'])) {
+                    unset($error);
+                    $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $error['submessage'] = 'System administrators, check server logs for errors.';
                 }
-                unset($error);
             }
 
             defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
 
             try {
-                ob_start();
-                include __DIR__.'/../../../../offline.php';
-                $content = ob_get_clean();
+                // Get the URLs base path
+                $base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
+
+                // Determine if there is an asset prefix
+                $root = self::$root;
+
+                /** @var array<string, mixed> $paths */
+                $paths = [];
+                include self::$root.'/app/config/paths.php';
+
+                $assetPrefix = $paths['asset_prefix'];
+                if (!empty($assetPrefix)) {
+                    if ('/' == substr($assetPrefix, -1)) {
+                        $assetPrefix = substr($assetPrefix, 0, -1);
+                    }
+                }
+                $assetBase          = $assetPrefix.$base.$paths['assets'];
+                $error['assetBase'] = $assetBase;
+
+                // Allow a custom error page
+                $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
+                $twig               = new \Twig\Environment($loader);
+                // This is the same filter Located at Mautic\CoreBundle\Templating\Twig\Extension\ExceptionExtension;
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
+                    $root = realpath(__DIR__.'/../../../../');
+
+                    return $root;
+                }));
+
+                if ($loader->exists('custom_offline.html.twig')) {
+                    $content = $twig->render('custom_offline.html.twig', ['error' => $error]);
+                } else {
+                    $content = $twig->render('offline.html.twig', ['error' => $error]);
+                }
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }

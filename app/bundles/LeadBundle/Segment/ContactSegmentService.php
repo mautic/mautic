@@ -6,7 +6,6 @@ use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\Query\ContactSegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use Symfony\Bridge\Monolog\Logger;
 
 class ContactSegmentService
 {
@@ -21,14 +20,14 @@ class ContactSegmentService
     private $contactSegmentQueryBuilder;
 
     /**
-     * @var Logger
+     * @var \Psr\Log\LoggerInterface
      */
     private $logger;
 
     public function __construct(
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         ContactSegmentQueryBuilder $queryBuilder,
-        Logger $logger
+        \Psr\Log\LoggerInterface $logger
     ) {
         $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
         $this->contactSegmentQueryBuilder  = $queryBuilder;
@@ -43,7 +42,7 @@ class ContactSegmentService
      */
     public function getNewLeadListLeadsCount(LeadList $segment, array $batchLimiters)
     {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 
         if (!count($segmentFilters)) {
             $this->logger->debug('Segment QB: Segment has no filters', ['segmentId' => $segment->getId()]);
@@ -56,7 +55,7 @@ class ContactSegmentService
             ];
         }
 
-        $qb              = $this->getNewSegmentContactsQuery($segment);
+        $qb              = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
         $leadsTableAlias = $qb->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         $this->addMinMaxLimiters($qb, $batchLimiters);
@@ -122,7 +121,7 @@ class ContactSegmentService
      */
     public function getNewLeadListLeads(LeadList $segment, array $batchLimiters, $limit = 1000)
     {
-        $queryBuilder    = $this->getNewSegmentContactsQuery($segment);
+        $queryBuilder    = $this->getNewSegmentContactsQuery($segment, $batchLimiters);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
 
         // Prepend the DISTINCT to the beginning of the select array
@@ -194,21 +193,19 @@ class ContactSegmentService
     }
 
     /**
-     * @param $batchLimiters
-     *
-     * @return QueryBuilder
+     * @param array<string, mixed> $batchLimiters
      *
      * @throws Exception\SegmentQueryException
      * @throws \Exception
      */
-    private function getNewSegmentContactsQuery(LeadList $segment)
+    private function getNewSegmentContactsQuery(LeadList $segment, array $batchLimiters = []): QueryBuilder
     {
         $queryBuilder = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder(
             $segment->getId(),
-            $this->contactSegmentFilterFactory->getSegmentFilters($segment)
+            $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters)
         );
 
-        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, $segment->getId());
+        $queryBuilder = $this->contactSegmentQueryBuilder->addNewContactsRestrictions($queryBuilder, (int) $segment->getId(), $batchLimiters);
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
@@ -241,7 +238,7 @@ class ContactSegmentService
      */
     private function getOrphanedLeadListLeadsQueryBuilder(LeadList $segment, array $batchLimiters = [], $limit = null)
     {
-        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+        $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment, $batchLimiters);
 
         $queryBuilder    = $this->contactSegmentQueryBuilder->assembleContactsSegmentQueryBuilder($segment->getId(), $segmentFilters);
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
@@ -250,14 +247,14 @@ class ContactSegmentService
 
         $this->contactSegmentQueryBuilder->queryBuilderGenerated($segment, $queryBuilder);
 
-        $qbO = new QueryBuilder($queryBuilder->getConnection());
-        $qbO->select('orp.lead_id as id, orp.leadlist_id')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
-        $qbO->leftJoin('orp', '('.$queryBuilder->getSQL().')', 'members', 'members.id=orp.lead_id');
+        $expr = $queryBuilder->expr();
+        $qbO  = $queryBuilder->createQueryBuilder();
+        $qbO->select('orp.lead_id as id, orp.leadlist_id');
+        $qbO->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'orp');
         $qbO->setParameters($queryBuilder->getParameters(), $queryBuilder->getParameterTypes());
-        $qbO->andWhere($qbO->expr()->eq('orp.leadlist_id', ':orpsegid'));
-        $qbO->andWhere($qbO->expr()->isNull('members.id'));
-        $qbO->andWhere($qbO->expr()->eq('orp.manually_added', $qbO->expr()->literal(0)));
+        $qbO->andWhere($expr->eq('orp.leadlist_id', ':orpsegid'));
+        $qbO->andWhere($expr->eq('orp.manually_added', $expr->literal(0)));
+        $qbO->andWhere($expr->notIn('orp.lead_id', $queryBuilder->getSQL()));
         $qbO->setParameter(':orpsegid', $segment->getId());
         $this->addLeadLimiter($qbO, $batchLimiters, 'orp.lead_id');
 

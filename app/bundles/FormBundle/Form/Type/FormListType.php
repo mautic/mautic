@@ -66,14 +66,6 @@ class FormListType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'form_list';
-    }
-
-    /**
      * @return string|\Symfony\Component\Form\FormTypeInterface|null
      */
     public function getParent()

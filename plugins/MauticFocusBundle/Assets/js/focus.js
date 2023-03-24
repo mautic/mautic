@@ -275,7 +275,7 @@ Mautic.launchFocusBuilder = function (forceFetch) {
             Mautic.focusCreateIframe(url);
 
             Mautic.ignoreMauticFocusPreviewUpdate = false;
-        });
+        }, false, false, "GET");
     }
 };
 

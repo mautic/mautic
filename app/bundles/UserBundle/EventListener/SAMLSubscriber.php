@@ -5,23 +5,17 @@ namespace Mautic\UserBundle\EventListener;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class SAMLSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
+    private CoreParametersHelper $coreParametersHelper;
 
-    /**
-     * @var Router
-     */
-    private $router;
+    private RouterInterface $router;
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, Router $router)
+    public function __construct(CoreParametersHelper $coreParametersHelper, RouterInterface $router)
     {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->router               = $router;
@@ -37,7 +31,7 @@ class SAMLSubscriber implements EventSubscriberInterface
     /**
      * Block access to SAML URLs if SAML is disabled.
      */
-    public function onKernelRequest(GetResponseEvent $event): void
+    public function onKernelRequest(RequestEvent $event): void
     {
         if (!$event->isMasterRequest()) {
             return;

@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Templating;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\TemplateReference as BaseTemplateReference;
 
 class TemplateReference extends BaseTemplateReference
@@ -14,7 +14,7 @@ class TemplateReference extends BaseTemplateReference
     protected $themeOverride;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     protected $themeHelper;
 
@@ -23,7 +23,7 @@ class TemplateReference extends BaseTemplateReference
      */
     protected $pathsHelper;
 
-    public function setThemeHelper(ThemeHelper $themeHelper)
+    public function setThemeHelper(ThemeHelperInterface $themeHelper)
     {
         $this->themeHelper = $themeHelper;
     }
@@ -77,7 +77,7 @@ class TemplateReference extends BaseTemplateReference
                     // Theme override
                     $template = $themeDir.'/html/'.$this->parameters['bundle'].'/'.$path;
                 } else {
-                    // We prefer /*Bundle/Views/something.html.php
+                    // We prefer /*Bundle/Views/something.html.twig
                     preg_match('/Mautic(.*?)Bundle/', $this->parameters['bundle'], $match);
 
                     if (

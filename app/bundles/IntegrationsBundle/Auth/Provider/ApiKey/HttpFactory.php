@@ -24,7 +24,7 @@ use Mautic\IntegrationsBundle\Exception\PluginNotConfiguredException;
  */
 class HttpFactory implements AuthProviderInterface
 {
-    const NAME = 'api_key';
+    public const NAME = 'api_key';
 
     /**
      * Cache of initialized clients.

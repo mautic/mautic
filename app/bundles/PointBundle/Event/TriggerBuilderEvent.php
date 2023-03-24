@@ -2,9 +2,9 @@
 
 namespace Mautic\PointBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TriggerBuilderEvent extends Event
 {
@@ -31,7 +31,7 @@ class TriggerBuilderEvent extends Event
      *                      'label'           => (required) what to display in the list
      *                      'description'     => (optional) short description of event
      *                      'template'        => (optional) template to use for the action's HTML in the point builder
-     *                      i.e AcmeMyBundle:PointAction:theaction.html.php
+     *                      i.e AcmeMyBundle:PointAction:theaction.html.twig
      *                      'formType'        => (optional) name of the form type SERVICE for the action
      *                      'formTypeOptions' => (optional) array of options to pass to formType
      *                      'callback'        => (required) callback function that will be passed when the action is triggered

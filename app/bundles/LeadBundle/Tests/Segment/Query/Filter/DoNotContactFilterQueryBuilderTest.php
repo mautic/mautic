@@ -16,11 +16,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoNotContactFilterQueryBuilderTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-    }
-
     public function testGetServiceId(): void
     {
         Assert::assertSame('mautic.lead.query.builder.special.dnc', DoNotContactFilterQueryBuilder::getServiceId());
@@ -38,6 +33,7 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         $filter             = $this->createFilter($operator, $parameterValue);
         $filterQueryBuilder = new DoNotContactFilterQueryBuilder(new RandomParameterName(), new EventDispatcher());
 
+        $expectedQuery = str_replace('__MAUTIC_TABLE_PREFIX__', MAUTIC_TABLE_PREFIX, $expectedQuery);
         Assert::assertSame($queryBuilder, $filterQueryBuilder->applyQuery($queryBuilder, $filter));
         Assert::assertSame($expectedQuery, $queryBuilder->getDebugOutput());
     }
@@ -47,10 +43,10 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
      */
     public function dataApplyQuery(): iterable
     {
-        yield ['eq', '1', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
-        yield ['eq', '0', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
-        yield ['neq', '1', 'SELECT 1 FROM leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
-        yield ['neq', '0', 'SELECT 1 FROM leads l WHERE l.id IN (SELECT par0.lead_id FROM lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['eq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['eq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['neq', '1', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id NOT IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
+        yield ['neq', '0', 'SELECT 1 FROM __MAUTIC_TABLE_PREFIX__leads l WHERE l.id IN (SELECT par0.lead_id FROM __MAUTIC_TABLE_PREFIX__lead_donotcontact par0 WHERE (par0.reason = 1) AND (par0.channel = \'email\'))'];
     }
 
     private function createConnection(): Connection
@@ -63,9 +59,14 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
         };
     }
 
-    private function createFilter(string $operator, string $parameterValue): ContactSegmentFilter
+    /**
+     * @dataProvider dataApplyQueryWithBatchLimitersMinMaxBoth
+     *
+     *  @param array<string, mixed> $batchLimiters
+     */
+    private function createFilter(string $operator, string $parameterValue, array $batchLimiters = []): ContactSegmentFilter
     {
-        return new class($operator, $parameterValue) extends ContactSegmentFilter {
+        return new class($operator, $parameterValue, $batchLimiters) extends ContactSegmentFilter {
             /**
              * @var string
              */
@@ -76,11 +77,17 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
              */
             private $parameterValue;
 
+            /**
+             * @var array<string, mixed>
+             */
+            private $batchLimiters;
+
             /** @noinspection PhpMissingParentConstructorInspection */
-            public function __construct(string $operator, string $parameterValue)
+            public function __construct(string $operator, string $parameterValue, array $batchLimiters)
             {
                 $this->operator       = $operator;
                 $this->parameterValue = $parameterValue;
+                $this->batchLimiters  = $batchLimiters;
             }
 
             public function getDoNotContactParts()
@@ -101,6 +108,11 @@ class DoNotContactFilterQueryBuilderTest extends TestCase
             public function getGlue()
             {
                 return 'and';
+            }
+
+            public function getBatchLimiters(): array
+            {
+                return $this->batchLimiters;
             }
         };
     }

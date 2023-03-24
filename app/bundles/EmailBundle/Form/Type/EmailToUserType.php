@@ -20,6 +20,7 @@ class EmailToUserType extends AbstractType
                 'attr'  => [
                     'class'   => 'form-control',
                     'tooltip' => 'mautic.email.choose.emails_descr',
+                    'email'   => isset($options['data']) && isset($options['data']['useremail']) && isset($options['data']['useremail']['email']) ? $options['data']['useremail']['email'] : null,
                 ],
                 'update_select' => empty($options['update_select']) ? 'formaction_properties_useremail_email' : $options['update_select'],
             ]
@@ -104,13 +105,5 @@ class EmailToUserType extends AbstractType
         ]);
 
         $resolver->setDefined(['update_select']);
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'email_to_user';
     }
 }

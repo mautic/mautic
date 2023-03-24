@@ -34,8 +34,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->versionProvider = $this->createMock(VersionProviderInterface::class);
         $this->dispatcher      = $this->createMock(EventDispatcherInterface::class);
         $this->provider        = new GeneratedColumnsProvider($this->versionProvider, $this->dispatcher);
@@ -70,7 +68,6 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                CoreEvents::ON_GENERATED_COLUMNS_BUILD,
                 $this->callback(
                     // Emulate a subscriber.
                     function (GeneratedColumnsEvent $event) {
@@ -78,7 +75,8 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 
                         return true;
                     }
-                )
+                ),
+                CoreEvents::ON_GENERATED_COLUMNS_BUILD
             );
 
         $generatedColumns = $this->provider->getGeneratedColumns();
@@ -86,7 +84,7 @@ final class GeneratedColumnsProviderTest extends \PHPUnit\Framework\TestCase
 
         /** @var GeneratedColumn $generatedColumn */
         $generatedColumn = $generatedColumns->current();
-        $this->assertSame('page_hits', $generatedColumn->getTableName());
+        $this->assertSame(MAUTIC_TABLE_PREFIX.'page_hits', $generatedColumn->getTableName());
 
         // Ensure that the cache works and dispatcher is called only once
         $generatedColumns = $this->provider->getGeneratedColumns();
