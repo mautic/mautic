@@ -8,7 +8,6 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
@@ -19,6 +18,7 @@ use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -48,9 +48,9 @@ class FormSubscriber implements EventSubscriberInterface
     private $themeHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templatingHelper;
+    private $twig;
 
     /**
      * @var CoreParametersHelper
@@ -63,7 +63,7 @@ class FormSubscriber implements EventSubscriberInterface
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
         ThemeHelperInterface $themeHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->assetModel           = $assetModel;
@@ -71,7 +71,7 @@ class FormSubscriber implements EventSubscriberInterface
         $this->analyticsHelper      = $analyticsHelper;
         $this->assetsHelper         = $assetsHelper;
         $this->themeHelper          = $themeHelper;
-        $this->templatingHelper     = $templatingHelper;
+        $this->twig                 = $twig;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -179,14 +179,14 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->setPostSubmitResponse(new Response(
-            $this->templatingHelper->getTemplating()->renderResponse(
+            $this->twig->render(
                 $this->themeHelper->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.twig'),
                 [
                     'message'  => $msg,
                     'type'     => 'notice',
                     'template' => $this->coreParametersHelper->get('theme'),
                 ]
-            )->getContent()
+            )
         ));
     }
 }

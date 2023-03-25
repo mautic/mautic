@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
  * Class MailHelper.
@@ -39,7 +40,7 @@ class MailHelper
     protected $transport;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     * @var Environment
      */
     protected $templating;
 
@@ -888,7 +889,7 @@ class MailHelper
             $this->templating = $this->factory->getTemplating();
         }
 
-        $content = $this->templating->renderResponse($template, $vars)->getContent();
+        $content = $this->templating->render($template, $vars);
 
         unset($vars);
 

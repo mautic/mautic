@@ -31,7 +31,8 @@ $container->loadFromExtension('twig', [
 $container->loadFromExtension('framework', [
     'test'    => true,
     'session' => [
-        'storage_id' => 'session.storage.filesystem',
+        'storage_id' => 'session.storage.mock_file',
+        'name'       => 'MOCKSESSION',
     ],
     'profiler' => [
         'collect' => false,

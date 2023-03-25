@@ -3,9 +3,9 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Templating\TemplateNameParser;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Kernel;
+use Twig\Environment;
 
 class TemplatingHelper
 {
@@ -22,13 +22,13 @@ class TemplatingHelper
     /**
      * Retrieve the templating service.
      *
-     * @return DelegatingEngine
+     * @return Environment
      *
      *  @throws \Exception
      */
     public function getTemplating()
     {
-        return $this->container->get('templating');
+        return $this->container->get('twig');
     }
 
     /**

@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\EngineInterface;
 use Symfony\Component\Templating\TemplateReference;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class ThemeHelper implements ThemeHelperInterface
 {
@@ -263,13 +263,8 @@ class ThemeHelper implements ThemeHelperInterface
         $twigTemplate->set('engine', 'twig');
 
         // Does a twig version exist?
-        if ($templating->exists($twigTemplate)) {
+        if ($templating->getLoader()->exists($twigTemplate)) {
             return $twigTemplate->getLogicalName();
-        }
-
-        // Does a PHP version exist?
-        if ($templating->exists($template)) {
-            return $template->getLogicalName();
         }
 
         // Try any theme as a fall back starting with default
@@ -470,7 +465,7 @@ class ThemeHelper implements ThemeHelperInterface
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    private function findThemeWithTemplate(EngineInterface $templating, TemplateReference $template)
+    private function findThemeWithTemplate(Environment $templating, TemplateReference $template)
     {
         preg_match('/^:(.*?):(.*?)$/', $template->getLogicalName(), $match);
         $requestedThemeName = $match[1];
@@ -479,7 +474,7 @@ class ThemeHelper implements ThemeHelperInterface
         $defaultTheme = $this->getTheme();
         if ($requestedThemeName !== $defaultTheme->getTheme()) {
             $template->set('controller', $defaultTheme->getTheme());
-            if ($templating->exists($template)) {
+            if ($templating->getLoader()->exists($template)) {
                 return;
             }
         }
@@ -495,7 +490,7 @@ class ThemeHelper implements ThemeHelperInterface
             // Theme name is stored in the controller parameter
             $template->set('controller', $theme['key']);
 
-            if ($templating->exists($template)) {
+            if ($templating->getLoader()->exists($template)) {
                 return;
             }
         }
