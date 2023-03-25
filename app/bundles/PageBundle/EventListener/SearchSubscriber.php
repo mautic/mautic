@@ -4,11 +4,11 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PageBundle\Model\PageModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
@@ -28,20 +28,20 @@ class SearchSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         UserHelper $userHelper,
         PageModel $pageModel,
         CorePermissions $security,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->userHelper = $userHelper;
         $this->pageModel  = $pageModel;
         $this->security   = $security;
-        $this->templating = $templating;
+        $this->twig       = $twig;
     }
 
     /**
@@ -87,20 +87,20 @@ class SearchSubscriber implements EventSubscriberInterface
                 $pageResults = [];
 
                 foreach ($pages as $page) {
-                    $pageResults[] = $this->templating->getTemplating()->renderResponse(
+                    $pageResults[] = $this->twig->render(
                         '@MauticPage/SubscribedEvents\Search/global.html.twig',
                         ['page' => $page]
-                    )->getContent();
+                    );
                 }
                 if (count($pages) > 5) {
-                    $pageResults[] = $this->templating->getTemplating()->renderResponse(
+                    $pageResults[] = $this->twig->render(
                         '@MauticPage/SubscribedEvents\Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($pages) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $pageResults['count'] = count($pages);
                 $event->addResults('mautic.page.pages', $pageResults);

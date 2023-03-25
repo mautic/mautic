@@ -105,7 +105,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     private function mockServices(): void
     {
-        self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
+        //self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations(): void

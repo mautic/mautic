@@ -21,9 +21,9 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class ThemeHelperTest extends TestCase
 {
@@ -169,13 +169,16 @@ class ThemeHelperTest extends TestCase
                 new TemplateReference('', 'goldstar', 'page', 'html')
             );
 
-        $templating = $this->createMock(DelegatingEngine::class);
+        $templating = $this->createMock(Environment::class);
+        $loader     = $this->createMock(\Twig\Loader\FilesystemLoader::class);
+        $templating->expects($this->exactly(2))
+            ->method('getLoader')
+            ->willReturn($loader);
 
-        $templating->expects($this->exactly(3))
+        $loader->expects($this->exactly(2))
             ->method('exists')
             ->willReturnOnConsecutiveCalls(
                 false, // twig does not exist
-                false, // php does not exist
                 true // default themes twig exists
             );
 
@@ -213,14 +216,16 @@ class ThemeHelperTest extends TestCase
                 new TemplateReference('', 'goldstar', 'page', 'html')
             );
 
-        $templating = $this->createMock(DelegatingEngine::class);
+        $templating = $this->createMock(Environment::class);
+        $loader     = $this->createMock(\Twig\Loader\FilesystemLoader::class);
+        $templating->expects($this->exactly(3))
+            ->method('getLoader')
+            ->willReturn($loader);
 
-        $templating->expects($this->exactly(4))
+        $loader->expects($this->exactly(3))
             ->method('exists')
             ->willReturnOnConsecutiveCalls(
                 // twig does not exist
-                false,
-                // php does not exist
                 false,
                 // default theme twig does not exist
                 false,

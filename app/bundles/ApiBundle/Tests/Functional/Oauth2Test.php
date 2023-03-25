@@ -79,7 +79,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWorkflow(): void
     {
-        $this->client->enableReboot();
+        $this->client->disableReboot();
 
         // Create OAuth2 credentials.
         $crawler    = $this->client->request(Request::METHOD_GET, 's/credentials/new');
