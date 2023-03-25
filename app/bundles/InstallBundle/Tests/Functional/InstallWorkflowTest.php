@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Mautic\InstallBundle\Tests\Functional;
 
+use Mautic\CoreBundle\Helper\FileHelper;
 use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
@@ -26,10 +28,13 @@ class InstallWorkflowTest extends MauticMysqlTestCase
 
     private string $localConfigPath;
 
+    private string $defaultMemoryLimit;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $this->localConfigPath = self::$container->get('kernel')->getLocalConfigFile();
+        $this->localConfigPath    = self::$container->get('kernel')->getLocalConfigFile();
+        $this->defaultMemoryLimit = ini_get('memory_limit');
 
         if (file_exists($this->localConfigPath)) {
             // Move local.php so we can get to the installer.
@@ -48,13 +53,15 @@ class InstallWorkflowTest extends MauticMysqlTestCase
             rename($this->localConfigPath.'.bak', $this->localConfigPath);
         }
 
+        ini_set('memory_limit', $this->defaultMemoryLimit);
+
         parent::tearDown();
     }
 
     public function testInstallWorkflow(): void
     {
         // Step 0: System checks.
-        $crawler      = $this->client->request(Request::METHOD_GET, '/installer');
+        $crawler = $this->client->request(Request::METHOD_GET, '/installer');
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
         $submitButton = $crawler->selectButton('install_check_step[buttons][next]');
@@ -111,5 +118,27 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
         \assert($emailField instanceof LeadField);
         Assert::assertSame('Email', $emailField->getLabel());
+    }
+
+    public function testInstallRequirementsAndRecommendations(): void
+    {
+        $limit                 = FileHelper::convertPHPSizeToBytes(CheckStep::RECOMMENDED_MEMORY_LIMIT);
+        $expectedMemoryMessage = self::$container->get('translator')->trans('mautic.install.memory.limit', ['%min_memory_limit%' => CheckStep::RECOMMENDED_MEMORY_LIMIT]);
+
+        // set the memory limit lower than the recommended value.
+        ini_set('memory_limit', (string) ($limit - 1));
+        $crawler = $this->client->request(Request::METHOD_GET, '/installer');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $details = $crawler->filter('#minorDetails ul')->html();
+        Assert::assertStringContainsString($expectedMemoryMessage, $details);
+
+        // set the memory limit higher than the recommended value.
+        ini_set('memory_limit', (string) ($limit + 1));
+        $crawler = $this->client->request(Request::METHOD_GET, '/installer');
+        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
+
+        $details = $crawler->filter('#minorDetails ul')->html();
+        Assert::assertStringNotContainsString($expectedMemoryMessage, $details);
     }
 }
