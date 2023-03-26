@@ -8,7 +8,7 @@
 {% set isIndex = ('index' == tmpl) %}
 {% set tmpl = 'list' %}
 {% set filterValue = pluginFilter.id|default(null) %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent 'integration' %}
 
@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block actions %}
-{{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+{{ include('@MauticCore/Helper/page_actions.html.twig', {
     'customButtons': [
         {
             'attr': {
@@ -83,7 +83,7 @@
               {% endfor %}
           </div>
       </div>
-      {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+      {{ include('@MauticCore/Helper/modal.html.twig', {
           'id': 'IntegrationEditModal',
           'footerButtons': true,
       }) }}
