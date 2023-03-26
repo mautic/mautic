@@ -70,6 +70,6 @@ class finder
     }
 }
 
-$finder  = new finder('/var/www/html/app/bundles/SmsBundle');
+$finder  = new finder('/var/www/html/app/bundles/StageBundle');
 $results = $finder->searchAndReplace(false);
 echo $results."\n";
