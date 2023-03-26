@@ -13,10 +13,12 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Controller', // Enabling this will require to refactor all controllers to use DI.
         'Services',
     ];
 
     $services->load('MauticPlugin\\MauticClearbitBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
+
+    $services->load('MauticPlugin\\MauticClearbitBundle\\Controller\\', '../Controller')
+        ->tag('controller.service_arguments');
 };
