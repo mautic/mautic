@@ -70,6 +70,6 @@ class finder
     }
 }
 
-$finder  = new finder('/var/www/html/app/bundles/PointBundle');
+$finder  = new finder('/var/www/html/app/bundles/ReportBundle');
 $results = $finder->searchAndReplace(false);
 echo $results."\n";
