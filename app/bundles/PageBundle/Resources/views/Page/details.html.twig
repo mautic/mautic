@@ -17,14 +17,14 @@
 {# Only show A/B test button if not already a translation of an a/b test #}
 {% set allowAbTest = (activePage.isPreferenceCenter or (activePage.isTranslation(true) and translations.parent.isVariant)) ? false : true %}
 
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}page{% endblock %}
 
 {% block headerTitle %}{{ activePage.title }}{% endblock %}
 
 {% block actions %}
-    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'item': activePage,
             'customButtons': customButtons|default([]),
             'templateButtons': {
@@ -38,10 +38,10 @@
     }) }}
 {% endblock %}
 
-{% block publishStatus %}{{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': activePage}) }}{% endblock %}
+{% block publishStatus %}{{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activePage}) }}{% endblock %}
 
 {% block content %}
-  {% set variantContent = include('MauticCoreBundle:Variant:index.html.twig', {
+  {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
           'activeEntity': activePage,
           'variants': variants,
           'abTestResults': abTestResults,
@@ -51,7 +51,7 @@
   })|trim %}
   {% set showVariants = variantContent is not empty %}
 
-  {% set translationContent = include('MauticCoreBundle:Translation:index.html.twig', {
+  {% set translationContent = include('@MauticCore/Translation/index.html.twig', {
           'activeEntity': activePage,
           'translations': translations,
           'model': 'page',
@@ -100,7 +100,7 @@
                       <div class="panel shd-none mb-0">
                           <table class="table table-bordered table-striped mb-0">
                               <tbody>
-                                {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': activePage}, with_context=false) }}
+                                {{ include('@MauticCore/Helper/details.html.twig', {'entity': activePage}, with_context=false) }}
                               </tbody>
                           </table>
                       </div>
@@ -133,11 +133,11 @@
                                       </h5>
                                   </div>
                                   <div class="col-md-9 va-m">
-                                      {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
                               <div class="pt-0 pl-15 pb-10 pr-15">
-                                  {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': stats.pageviews, 'chartType': 'line', 'chartHeight': 300}) }}
+                                  {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats.pageviews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
                       </div>
