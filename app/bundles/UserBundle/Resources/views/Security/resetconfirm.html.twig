@@ -1,4 +1,4 @@
-{% extends app.request.xmlHttpRequest ? 'MauticCoreBundle:Default:content.html.twig' : '@MauticUser/Security/base.html.twig' %}
+{% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
 
 {% block content %}
     <div class="alert alert-warning">{% trans %}mautic.user.user.passwordresetconfirm.info{% endtrans %}</div>
