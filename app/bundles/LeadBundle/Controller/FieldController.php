@@ -95,7 +95,7 @@ class FieldController extends FormController
                 'limit'       => $limit,
                 'page'        => $page,
             ],
-            'contentTemplate' => 'MauticLeadBundle:Field:list.html.twig',
+            'contentTemplate' => '@MauticLead/Field/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'route'         => $this->generateUrl('mautic_contactfield_index', ['page' => $page]),
