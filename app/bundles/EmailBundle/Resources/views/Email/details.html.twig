@@ -1,10 +1,10 @@
-{% extends isEmbedded ? 'MauticCoreBundle:Default:raw_output.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends isEmbedded ? '@MauticCore/Default/raw_output.html.twig' : '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle email.name %}
 
 {% block mauticContent 'email' %}
 
-{% set variantContent = include('MauticCoreBundle:Variant:index.html.twig', {
+{% set variantContent = include('@MauticCore/Variant/index.html.twig', {
         'activeEntity': email,
         'variants': variants,
         'abTestResults': abTestResults,
@@ -14,7 +14,7 @@
 
 {% set showVariants = variantContent is defined and variantContent|trim is not empty %}
 
-{% set translationContent = include('MauticCoreBundle:Translation:index.html.twig',
+{% set translationContent = include('@MauticCore/Translation/index.html.twig',
     {
         'activeEntity'      : email,
         'translations'      : translations,
@@ -70,13 +70,13 @@
 
 {% block publishStatus %}
   {% if not isEmbedded %}
-    {{- include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity' : email}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : email}) -}}
   {% endif %}
 {% endblock %}
 
 {% block actions %}
     {% if not isEmbedded %}
-        {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+        {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item'            : email,
             'templateButtons' : {
                 'edit' : securityHasEntityAccess(
@@ -140,7 +140,7 @@
                       <div class="panel shd-none mb-0">
                           <table class="table table-bordered table-striped mb-0">
                               <tbody>
-                              {{- include('MauticCoreBundle:Helper:details.html.twig', {'entity': email}) -}}
+                              {{- include('@MauticCore/Helper/details.html.twig', {'entity': email}) -}}
                               <tr>
                                   <td width="20%">
                                       <span class="fw-b">{{ 'mautic.core.form.theme'|trans }}</span>
@@ -264,7 +264,7 @@
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
               <div class="tab-pane active bdr-w-0" id="clicks-container">
-                  {{- include('MauticPageBundle:Trackable:click_counts.html.twig', {
+                  {{- include('@MauticPage/Trackable/click_counts.html.twig', {
                       'trackables'  : trackables,
                       'entity'      : email,
                       'channel'     : 'email',
@@ -304,7 +304,7 @@
               <div class="panel-body pt-xs">
                   <div class="input-group">
                       <div class="input-group-addon">
-                          {{- include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {
+                          {{- include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                               'item'  : email,
                               'model' : 'email',
                               'query' : 'customToggle=publicPreview'
