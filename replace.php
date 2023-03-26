@@ -70,6 +70,6 @@ class finder
     }
 }
 
-$finder  = new finder('/var/www/html/app/bundles/ChannelBundle');
+$finder  = new finder('/var/www/html/app/bundles/ConfigBundle');
 $results = $finder->searchAndReplace(false);
 echo $results."\n";
