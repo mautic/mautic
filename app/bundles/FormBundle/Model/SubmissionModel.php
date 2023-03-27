@@ -585,7 +585,7 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
+                $content = $this->templatingHelper->getTemplating()->render(
                     'MauticFormBundle:Result:export.html.twig',
                     [
                         'form'           => $form,
@@ -593,7 +593,7 @@ class SubmissionModel extends CommonFormModel
                         'pageTitle'      => $name,
                         'viewOnlyFields' => $viewOnlyFields,
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
             case 'xlsx':
@@ -739,14 +739,14 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
+                $content = $this->templatingHelper->getTemplating()->render(
                     '@MauticPage/Result/export.html.twig',
                     [
                         'page'      => $page,
                         'results'   => $results,
                         'pageTitle' => $name,
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
             case 'xlsx':

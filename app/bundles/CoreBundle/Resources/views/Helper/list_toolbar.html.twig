@@ -5,7 +5,7 @@
     constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::TYPE_GROUP'),
 ) }}
 
-{{- include('MauticCoreBundle:Helper:action_button_helper.html.twig') -}}
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
 {# Workaround to get variables from action_button_helper here #}
 {{ restore('action_button_helper') }}
 
@@ -13,7 +13,7 @@
     <div class="box-layout">
         <div class="col-xs-6 col-lg-8 va-m form-inline">
             {% if searchValue is defined %}
-            {{- include('MauticCoreBundle:Helper:search.html.twig', {
+            {{- include('@MauticCore/Helper/search.html.twig', {
                 searchId: searchId|default(null),
                 searchValue: searchValue,
                 action: action|default(''),

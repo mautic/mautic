@@ -196,7 +196,7 @@ class FocusModel extends FormModel
             }
 
             $javascript = $this->twig->render(
-                'MauticFocusBundle:Builder:generate.js.twig',
+                '@MauticFocus/Builder/generate.js.twig',
                 [
                     'focus'    => $focus,
                     'preview'  => $isPreview,
@@ -257,7 +257,7 @@ class FocusModel extends FormModel
         }
 
         $content = $this->twig->render(
-            'MauticFocusBundle:Builder:content.html.twig',
+            '@MauticFocus/Builder/content.html.twig',
             [
                 'focus'    => $focus,
                 'preview'  => $isPreview,
