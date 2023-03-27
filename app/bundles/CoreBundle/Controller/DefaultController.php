@@ -55,7 +55,7 @@ class DefaultController extends CommonController
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
+        return $this->render('@MauticCore/GlobalSearch/globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
