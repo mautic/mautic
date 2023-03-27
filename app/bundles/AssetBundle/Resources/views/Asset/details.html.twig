@@ -1,8 +1,8 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauticContent %}asset{% endblock %}
 {% block headerTitle %}{{ activeAsset.getTitle() }}{% endblock %}
 {% block actions %}
-{{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+{{- include('@MauticCore/Helper/page_actions.html.twig',
         {
             'item'            : activeAsset,
             'templateButtons' : {
@@ -30,7 +30,7 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity' : activeAsset}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : activeAsset}) -}}
 {% endblock %}
 {% block content %}
 
@@ -55,7 +55,7 @@
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                             {{- include(
-                                'MauticCoreBundle:Helper:details.html.twig',
+                                '@MauticCore/Helper/details.html.twig',
                                 {'entity' : activeAsset}
                             ) -}}
                             <tr>
@@ -115,11 +115,11 @@
                                     <span class="text-white dark-md fw-sb mb-xs">{{ 'mautic.asset.asset.downloads.unique'|trans({'count' : stats.downloads.unique}) }}</span>
                                 </div>
                                 <div class="col-md-8 va-m">
-                                    {{- include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{- include('MauticCoreBundle:Helper:chart.html.twig', {'chartData' : stats.downloads.timeStats, 'chartType' : 'line', 'chartHeight' : 300}) -}}
+                                {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : stats.downloads.timeStats, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                             </div>
                         </div>
                     </div>
@@ -132,7 +132,7 @@
 
         <!-- start: tab-content -->
         <div class="tab-content pa-md preview-detail">
-            {{- include('MauticAssetBundle:Asset:preview.html.twig',
+            {{- include('@MauticAsset/Asset/preview.html.twig',
                 {
                     'activeAsset' : activeAsset, 
                     'assetDownloadUrl' : url(

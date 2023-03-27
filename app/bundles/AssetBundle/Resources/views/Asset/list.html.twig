@@ -1,14 +1,14 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}asset
 {% endblock %}
 {% block headerTitle %}
 	{% trans %}mautic.asset.assets{% endtrans %}
 {% endblock %}
 {% block actions %}
-	{{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+	{{- include('@MauticCore/Helper/page_actions.html.twig', {
          'templateButtons' : {
                 'new' : permissions['asset:assets:create'],
          },
@@ -21,7 +21,7 @@
 	{% if isIndex %}
 		<div class="panel panel-default bdr-t-wdh-0 mb-0">
 
-			{{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+			{{- include('@MauticCore/Helper/list_toolbar.html.twig', {
         'searchValue' : searchValue,
         'action'      : currentRoute,
         'searchHelp'  : 'mautic.asset.asset.help.searchcommands',
@@ -42,7 +42,7 @@
             <thead>
             <tr>
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'        : 'true',
                         'target'          : '#assetTable',
@@ -54,7 +54,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'a.title',
@@ -63,7 +63,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'c.title',
@@ -72,7 +72,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'a.downloadCount',
@@ -81,7 +81,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'a.dateAdded',
@@ -90,7 +90,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'a.dateModified',
@@ -100,7 +100,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'a.createdByUser',
@@ -109,7 +109,7 @@
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'asset',
                         'orderBy'    : 'a.id',
@@ -124,7 +124,7 @@
                 <tr>
                     <td>
                         {{- include(
-                            'MauticCoreBundle:Helper:list_actions.html.twig',
+                            '@MauticCore/Helper/list_actions.html.twig',
                             {
                                 'item'            : item,
                                 'templateButtons' : {
@@ -163,7 +163,7 @@
                     <td>
                         <div>
                             {{- include(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
+                                '@MauticCore/Helper/publishstatus_icon.html.twig',
                                 {
                                     'item'  : item,
                                     'model' : 'asset.asset',
@@ -206,7 +206,7 @@
     </div>
 
     <div class="panel-footer">
-        {{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
                 'totalItems' : items|length,
                 'page'       : page,
                 'limit'      : limit,
@@ -216,7 +216,7 @@
         }) -}}
     </div>
 {% else %}
-    {{- include('MauticCoreBundle:Helper:noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'tip' : 'mautic.asset.noresults.tip'}) -}}
 {% endif %}
 
 {{- include('@MauticCore/Helper/modal.html.twig', {

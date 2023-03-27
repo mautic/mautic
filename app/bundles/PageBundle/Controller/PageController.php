@@ -161,7 +161,7 @@ class PageController extends FormController
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 'security'    => $this->get('mautic.security'),
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:list.html.twig',
+            'contentTemplate' => '@MauticPage/Page/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -340,7 +340,7 @@ class PageController extends FormController
                 'logs'          => $logs,
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:details.html.twig',
+            'contentTemplate' => '@MauticPage/Page/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -458,7 +458,7 @@ class PageController extends FormController
                 'sectionForm'   => $sectionForm->createView(),
                 'permissions'   => $permissions,
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:form.html.twig',
+            'contentTemplate' => '@MauticPage/Page/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',
@@ -616,7 +616,7 @@ class PageController extends FormController
                 ),
                 'security'      => $security,
             ],
-            'contentTemplate' => 'MauticPageBundle:Page:form.html.twig',
+            'contentTemplate' => '@MauticPage/Page/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_page_index',
                 'mauticContent' => 'page',

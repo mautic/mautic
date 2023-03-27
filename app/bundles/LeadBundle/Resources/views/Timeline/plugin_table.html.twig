@@ -1,4 +1,4 @@
-{% extends not app.request.isXmlHttpRequest ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends not app.request.isXmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block content %}
   {% set leadId = lead is defined ? lead.id : null %}

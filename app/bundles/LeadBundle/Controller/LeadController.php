@@ -268,7 +268,7 @@ class LeadController extends FormController
                 'viewParameters' => [
                     'quickForm' => $quickForm->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:quickadd.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/quickadd.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -414,7 +414,7 @@ class LeadController extends FormController
                     //    ]
                     //)->getContent(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:lead.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/lead.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -584,7 +584,7 @@ class LeadController extends FormController
                     'lead'   => $lead,
                     'fields' => $model->organizeFieldsByGroup($fields),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:form.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -768,7 +768,7 @@ class LeadController extends FormController
                     'lead'   => $lead,
                     'fields' => $lead->getFields(), //pass in the lead fields as they are already organized by ['group']['alias']
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:form.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
@@ -980,7 +980,7 @@ class LeadController extends FormController
                         ]
                     ),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:merge.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.lead-merge-options' : null,
@@ -1060,7 +1060,7 @@ class LeadController extends FormController
                     ],
                     $viewParameters
                 ),
-                'contentTemplate' => 'MauticLeadBundle:Lead:frequency.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/frequency.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.lead-frequency-options' : null,
@@ -1249,7 +1249,7 @@ class LeadController extends FormController
                     'leadsLists' => $leadsLists,
                     'lead'       => $lead,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:LeadLists:index.html.twig',
+                'contentTemplate' => '@MauticLead/LeadLists/index.html.twig',
             ]
         );
     }
@@ -1294,7 +1294,7 @@ class LeadController extends FormController
                     'companyLead' => $companyLead,
                     'lead'        => $lead,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Lead:company.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/company.html.twig',
             ]
         );
     }
@@ -1336,7 +1336,7 @@ class LeadController extends FormController
                     'campaigns' => $campaigns,
                     'lead'      => $lead,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:LeadCampaigns:index.html.twig',
+                'contentTemplate' => '@MauticLead/LeadCampaigns/index.html.twig',
             ]
         );
     }
@@ -1510,7 +1510,7 @@ class LeadController extends FormController
 
         return $this->ajaxAction(
             [
-                'contentTemplate' => 'MauticLeadBundle:Lead:email.html.twig',
+                'contentTemplate' => '@MauticLead/Lead/email.html.twig',
                 'viewParameters'  => [
                     'form' => $form->createView(),
                     'dnc'  => end($dnc),
@@ -1640,7 +1640,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
+                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -1734,7 +1734,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
+                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -1840,7 +1840,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
+                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
@@ -1938,7 +1938,7 @@ class LeadController extends FormController
                             ]
                         )->createView(),
                     ],
-                    'contentTemplate' => 'MauticLeadBundle:Batch:form.html.twig',
+                    'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'leadBatch',
