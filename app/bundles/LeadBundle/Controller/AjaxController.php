@@ -632,7 +632,7 @@ class AjaxController extends CommonAjaxController
                 $emailRepo          = $this->getModel('email')->getRepository();
                 $indexMode          = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
-                $dataArray['leads'] = $this->factory->getTemplating()->render(
+                $dataArray['leads'] = $this->render(
                     "MauticLeadBundle:Lead:{$template}.html.twig",
                     [
                         'items'         => $results['results'],
