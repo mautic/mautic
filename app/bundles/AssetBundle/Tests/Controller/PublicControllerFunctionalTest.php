@@ -49,6 +49,9 @@ class PublicControllerFunctionalTest extends AbstractAssetTest
 
     /**
      * Download action with UTM should return the file content.
+     *
+     * @runTestsInSeparateProcesses
+     * @preserveGlobalState disabled
      */
     public function testDownloadActionWithUTM(): void
     {
