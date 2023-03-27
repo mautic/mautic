@@ -74,14 +74,8 @@ class ExcelExporter
             }
 
             //Add totals to export
-            $totalsRow = $reportDataResult->getTotalsToExport();
+            $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
             if (!empty($totalsRow)) {
-                $key = array_key_first($totalsRow);
-
-                if (empty($totalsRow[$key])) {
-                    $totalsRow[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
-                }
-
                 $this->putTotals($totalsRow, $objPHPExcelSheet, 'A'.++$rowCount);
             }
 
@@ -99,7 +93,7 @@ class ExcelExporter
      *
      * @return void
      */
-    private function putHeader(array $headers, Worksheet $activeSheet)
+    public function putHeader(array $headers, Worksheet $activeSheet)
     {
         $activeSheet->fromArray($headers);
     }
@@ -109,8 +103,15 @@ class ExcelExporter
      *
      * @return void
      */
-    private function putTotals(array $totals, Worksheet $activeSheet, string $startCell)
+    public function putTotals(array $totals, Worksheet $activeSheet, string $startCell)
     {
+        // Put label if the first item is empty
+        $key = array_key_first($totals);
+
+        if (empty($totals[$key])) {
+            $totals[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+        }
+
         $activeSheet->fromArray($totals, null, $startCell);
     }
 }

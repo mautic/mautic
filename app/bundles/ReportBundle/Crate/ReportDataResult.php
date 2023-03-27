@@ -182,14 +182,19 @@ class ReportDataResult
     /**
      * @return array<string>
      */
-    public function getTotalsToExport()
+    public function getTotalsToExport(FormatterHelper $formatterHelper)
     {
         if (empty($this->totals)) {
             return [];
         }
 
         foreach ($this->columnKeys as $key) {
-            $totalsRow[$key] = $this->totals[$key] ?? '';
+            if (isset($this->totals[$key])) {
+                $type            = $this->getType($key);
+                $totalsRow[$key] = $formatterHelper->_($this->totals[$key], $type, true);
+            } else {
+                $totalsRow[$key] = '';
+            }
         }
 
         return $totalsRow ?? [];

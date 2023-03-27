@@ -54,15 +54,12 @@ class CsvExporter
             $this->putRow($handle, $row);
         }
 
-        $totalsRow = $reportDataResult->getTotalsToExport();
-        if (!empty($totalsRow) && $reportDataResult->isLastPage()) {
-            $key = array_key_first($totalsRow);
+        if ($reportDataResult->isLastPage()) {
+            $totalsRow = $reportDataResult->getTotalsToExport($this->formatterHelper);
 
-            if (empty($totalsRow[$key])) {
-                $totalsRow[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+            if (!empty($totalsRow)) {
+                $this->putTotals($totalsRow, $handle);
             }
-
-            $this->putTotals($totalsRow, $handle);
         }
     }
 
@@ -71,7 +68,7 @@ class CsvExporter
      *
      * @return void
      */
-    private function putHeader(ReportDataResult $reportDataResult, $handle)
+    public function putHeader(ReportDataResult $reportDataResult, $handle)
     {
         $this->putRow($handle, $reportDataResult->getHeaders());
     }
@@ -82,8 +79,15 @@ class CsvExporter
      *
      * @return void
      */
-    private function putTotals(array $totals, $handle)
+    public function putTotals(array $totals, $handle)
     {
+        // Put label if the first item is empty
+        $key = array_key_first($totals);
+
+        if (empty($totals[$key])) {
+            $totals[$key] = $this->translator->trans('mautic.report.report.groupby.totals');
+        }
+
         $this->putRow($handle, $totals);
     }
 
