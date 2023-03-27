@@ -173,7 +173,7 @@ class FieldController extends CommonFormController
 
             $passthroughVars['parent']    = $formField['parent'];
             $passthroughVars['fieldId']   = $keyId;
-            $template                     = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.twig';
+            $template                     = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
             $leadFieldModel               = $this->getModel('lead.field');
             \assert($leadFieldModel instanceof \Mautic\LeadBundle\Model\FieldModel);
             $passthroughVars['fieldHtml'] = $this->renderView(
@@ -203,7 +203,7 @@ class FieldController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
+            'contentTemplate' => '@MauticForm/Builder/'.$viewParams['tmpl'].'.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -315,7 +315,7 @@ class FieldController extends CommonFormController
             ];
 
             $passthroughVars['fieldId'] = $objectId;
-            $template                   = (!empty($customParams)) ? $customParams['template'] : 'MauticFormBundle:Field:'.$fieldType.'.html.twig';
+            $template                   = (!empty($customParams)) ? $customParams['template'] : '@MauticForm/Field/'.$fieldType.'.html.twig';
 
             //prevent undefined errors
             $entity       = new Field();
@@ -350,7 +350,7 @@ class FieldController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
+                    'contentTemplate' => '@MauticForm/Builder/'.$viewParams['tmpl'].'.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]

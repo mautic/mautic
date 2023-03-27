@@ -60,7 +60,7 @@
                       {%- else -%}
                           {%- do displayManager.increaseDisplayedFields(f) -%}
                       {%- endif -%}
-                      {%- set template = '@MauticForm:Field:' ~ f.type ~ '.html.twig' -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif %}
 
                   <!-- start: "{{ theme }}{{ template }}" -->
@@ -93,7 +93,7 @@
                       %}
                           {%- do f.setType('hidden') -%}
                       {% endif %}
-                      {%- set template = '@MauticForm:Field:' ~ f.type ~ '.html.twig' -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
                   <!-- start: "{{ theme }}{{ template }}" -->
