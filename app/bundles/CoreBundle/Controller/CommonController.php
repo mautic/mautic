@@ -593,7 +593,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function getFlashContent()
     {
-        return $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig');
+        return $this->renderView('@MauticCore/Notification/flash_messages.html.twig');
     }
 
     /**

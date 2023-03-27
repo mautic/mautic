@@ -412,13 +412,13 @@ return [
             'mautic.menu.admin' => [
                 'alias'   => 'admin',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:admin.html.twig',
+                    'template' => '@MauticCore/Menu/admin.html.twig',
                 ],
             ],
             'mautic.menu.extra' => [
                 'alias'   => 'extra',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:extra.html.twig',
+                    'template' => '@MauticCore/Menu/extra.html.twig',
                 ],
             ],
             'mautic.menu.profile' => [
