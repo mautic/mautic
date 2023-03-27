@@ -153,8 +153,9 @@ class AbTestSettingsService
     private function setVariantSettingsWeight(VariantEntityInterface $variant, $weight)
     {
         if ($variant->getIsPublished()) {
-            $this->variantsSettings[$variant->getId()]['weight'] = $weight;
-            $this->addPublishedVariantWeight($weight);
+            $variantWeight                                       = round(($weight / 100) * $this->totalWeight);
+            $this->variantsSettings[$variant->getId()]['weight'] = $variantWeight;
+            $this->addPublishedVariantWeight($variantWeight);
         } else {
             $this->variantsSettings[$variant->getId()]['weight'] = 0;
         }

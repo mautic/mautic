@@ -140,30 +140,17 @@ trait VariantModelTrait
             $this->resetVariants($entity, $relatedIds, $variantStartDate);
         }
 
-        $this->setPublishStatus($entity);
+        $this->clonePublishStatusToChildren($entity);
     }
 
-    protected function setPublishStatus(VariantEntityInterface $entity)
+    protected function clonePublishStatusToChildren(VariantEntityInterface $entity)
     {
         $parent = $entity->getVariantParent() ?: $entity;
 
-        if ($entity->isParent()) {
-            $changes     = $parent->getChanges(true);
-            $isPublished = $changes['isPublished'][1] ?? null;
-            $publishUp   = $changes['publishUp'][1] ?? null;
-            $publishDown = $changes['publishDown'][1] ?? null;
-        } else {
-            $isPublished = $parent->getIsPublished();
-            $publishUp   = $parent->getPublishUp() ? $parent->getPublishUp()->format('Y-m-d H:i:s') : null;
-            $publishDown = $parent->getPublishDown() ? $parent->getPublishUp()->format('Y-m-d H:i:s') : null;
-        }
+        $repo = $this->getRepository();
 
-        if (null !== $isPublished || null !== $publishUp || null !== $publishDown) {
-            $repo = $this->getRepository();
-
-            if (method_exists($repo, 'setPublishStatus')) {
-                $repo->setPublishStatus($parent->getOnlyChildrenRelatedEntityIds(), $isPublished, $publishUp, $publishDown);
-            }
+        if (method_exists($repo, 'clonePublishStatusToChildren')) {
+            $repo->clonePublishStatusToChildren($parent->getId());
         }
     }
 

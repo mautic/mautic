@@ -9,6 +9,8 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
 /**
@@ -520,31 +522,25 @@ class EmailRepository extends CommonRepository
             ->execute();
     }
 
-    public function setPublishStatus($childrenIds, $isPublished, $publishUp, $publishDown)
+    /**
+     * @param VariantEntityInterface|FormEntity $parent
+     */
+    public function clonePublishStatusToChildren($parentId)
     {
-        if (!is_array($childrenIds)) {
-            $childrenIds = [(int) $childrenIds];
-        }
+        $conn = $this->getEntityManager()->getConnection();
 
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $sql = '
+            UPDATE '.MAUTIC_TABLE_PREFIX.'emails e
+            JOIN  '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id
+            SET e.is_published = parent.is_published,
+                e.publish_up = parent.publish_up,
+                e.publish_down = parent.publish_down
+            WHERE parent.id = :parentId
+        ';
 
-        $qb->update(MAUTIC_TABLE_PREFIX.'emails');
-        if (null !== $isPublished) {
-            $qb->set('is_published', ':isPublished')
-                ->setParameter('isPublished', (int) $isPublished);
-        }
-        if (null !== $publishUp) {
-            $qb->set('publish_up', ':publishUp')
-                ->setParameter('publishUp', $publishUp);
-        }
-        if (null !== $publishDown) {
-            $qb->set('publish_down', ':publishDown')
-                ->setParameter('publishDown', $publishDown);
-        }
-        $qb->where(
-                $qb->expr()->in('id', $childrenIds)
-            )
-            ->execute();
+        $stmt = $conn->prepare($sql);
+        $stmt->bindParam('parentId', $parentId);
+        $stmt->executeQuery();
     }
 
     /**
