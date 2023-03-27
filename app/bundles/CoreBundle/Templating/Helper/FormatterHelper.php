@@ -38,7 +38,7 @@ class FormatterHelper extends Helper
      */
     public function _($val, $type = 'html', $textOnly = false, $round = 1)
     {
-        if (empty($val) && 'bool' !== $type) {
+        if (empty($val) && 'bool' !== $type && 'float' !== $type) {
             return $val;
         }
 
