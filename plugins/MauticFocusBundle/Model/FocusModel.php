@@ -44,6 +44,11 @@ class FocusModel extends FormModel
     protected $trackableModel;
 
     /**
+     * @var Environment
+     */
+    protected $twig;
+
+    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
@@ -52,11 +57,6 @@ class FocusModel extends FormModel
      * @var ContactTracker
      */
     protected $contactTracker;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
 
     /**
      * FocusModel constructor.

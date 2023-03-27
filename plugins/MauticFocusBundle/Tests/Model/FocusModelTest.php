@@ -38,14 +38,14 @@ class FocusModelTest extends TestCase
     private $leadFieldModel;
 
     /**
+     * @var Environment|mixed|MockObject
+     */
+    private $twig;
+
+    /**
      * @var TrackableModel|mixed|MockObject
      */
     private $trackableModel;
-
-    /**
-     * @var Environment|MockObject
-     */
-    private $twig;
 
     protected function setUp(): void
     {
