@@ -35,7 +35,7 @@ class UpdateController extends CommonController
                 'currentVersion'    => MAUTIC_VERSION,
                 'isComposerEnabled' => $coreParametersHelper->get('composer_updates', false),
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:index.html.twig',
+            'contentTemplate' => '@MauticCore/Update/index.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update'),
