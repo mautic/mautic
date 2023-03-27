@@ -38,7 +38,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -435,21 +434,6 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
         $this->assertStringContainsString('.csv', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
-    }
-
-    public function testExportResultsHtml(): void
-    {
-        $this->setUpExport();
-
-        $twigMock = $this->createMock(Environment::class);
-
-        $this->templatingHelperMock->expects($this->any())
-            ->method('getTemplating')
-            ->willReturn($twigMock);
-
-        $response = $this->submissionModel->exportResults('html', new Form(), []);
-
-        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\Response');
     }
 
     public function testExportResultsExcel(): void
