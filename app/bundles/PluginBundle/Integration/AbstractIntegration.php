@@ -300,7 +300,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getFormTemplate()
     {
-        return 'MauticPluginBundle:Integration:form.html.twig';
+        return '@MauticPlugin/Integration/form.html.twig';
     }
 
     /**

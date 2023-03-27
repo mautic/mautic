@@ -92,7 +92,7 @@ class RoleController extends FormController
                     'delete' => $this->get('mautic.security')->isGranted('user:roles:delete'),
                 ],
             ],
-            'contentTemplate' => 'MauticUserBundle:Role:list.html.twig',
+            'contentTemplate' => '@MauticUser/Role/list.html.twig',
             'passthroughVars' => [
                 'route'         => $this->generateUrl('mautic_role_index', ['page' => $page]),
                 'mauticContent' => 'role',

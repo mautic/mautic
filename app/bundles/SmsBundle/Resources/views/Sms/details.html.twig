@@ -1,5 +1,5 @@
 {% if not isEmbedded %}
-    {% extends 'MauticCoreBundle:Default:content.html.twig' %}
+    {% extends '@MauticCore/Default/content.html.twig' %}
 {% endif %}
 
 {% block mauticContent %}sms{% endblock %}
@@ -7,7 +7,7 @@
 
 {% block actions %}
     {% set customButtons = [] %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+    {{- include('@MauticCore/Helper/page_actions.html.twig',
         {
             'item'            : sms,
             'customButtons'   : customButtons is defined ? customButtons : [],
@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{- include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity' : sms}) -}}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : sms}) -}}
 {% endblock %}
 {# This doesn't seem to be used anywhere: #}
 {# {% set smsType = sms.getSmsType() %}
@@ -63,7 +63,7 @@
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                {{- include('MauticCoreBundle:Helper:details.html.twig', {'entity' : sms}) -}}
+                                {{- include('@MauticCore/Helper/details.html.twig', {'entity' : sms}) -}}
                             </tbody>
                         </table>
                     </div>
@@ -92,11 +92,11 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
-                                    {{- include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
+                                    {{- include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm' : dateRangeForm, 'class' : 'pull-right'}) -}}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{- include('MauticCoreBundle:Helper:chart.html.twig', {'chartData' : entityViews, 'chartType' : 'line', 'chartHeight' : 300}) -}}
+                                {{- include('@MauticCore/Helper/chart.html.twig', {'chartData' : entityViews, 'chartType' : 'line', 'chartHeight' : 300}) -}}
                             </div>
                         </div>
                     </div>
@@ -125,7 +125,7 @@
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                {{- include('MauticPageBundle:Trackable:click_counts.html.twig', {
+                {{- include('@MauticPage/Trackable/click_counts.html.twig', {
                     'trackables' : trackables,
                     'entity'     : sms,
                     'channel'    : 'sms'

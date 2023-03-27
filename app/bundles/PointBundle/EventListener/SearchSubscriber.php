@@ -74,7 +74,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('point:points:edit');
                 foreach ($items as $item) {
                     $pointsResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents:Search/global_point.html.twig',
+                        '@MauticPoint/SubscribedEvents/Search/global_point.html.twig',
                         [
                             'item'    => $item,
                             'canEdit' => $canEdit,
@@ -83,7 +83,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if ($pointCount > 5) {
                     $pointsResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticPointBundle:SubscribedEvents:Search/global_point.html.twig',
+                        '@MauticPoint/SubscribedEvents/Search/global_point.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

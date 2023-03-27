@@ -95,7 +95,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => FormSubmitActionPointsChangeType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme:FormActionChangePoints/_formaction_properties_row.html.twig',
+            'formTheme'   => '@MauticLead/FormTheme/FormActionChangePoints/_formaction_properties_row.html.twig',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 

@@ -1,11 +1,11 @@
 {# //Check to see if the entire page should be displayed or just main content #}
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block headerTitle %}{% trans %}mautic.api.client.header.index{% endtrans %}{% endblock %}
 {% block mauticContent %}client{% endblock %}
 {% block actions %}
-{{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+{{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'templateButtons' : {
             'new' : permissions.create,
@@ -19,7 +19,7 @@
 {% block content %}
     {% if isIndex %}
         <div class="panel panel-default bdr-t-wdh-0 mb-0">
-            {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'searchHelp'  : 'mautic.api.client.help.searchcommands',
                 'filters'     : filters,
@@ -39,7 +39,7 @@
         <thead>
         <tr>
             {{- include(
-                'MauticCoreBundle:Helper:tableheader.html.twig',
+                '@MauticCore/Helper/tableheader.html.twig',
                 {
                     'checkall'        : 'true',
                     'target'          : '.client-list',
@@ -49,7 +49,7 @@
                 }
             ) -}}
             {{- include(
-                'MauticCoreBundle:Helper:tableheader.html.twig',
+                '@MauticCore/Helper/tableheader.html.twig',
                 {
                     'sessionVar' : 'client',
                     'orderBy'    : 'c.name',
@@ -61,7 +61,7 @@
             <th class="visible-md visible-lg col-client-publicid">{{ 'mautic.api.client.thead.publicid'|trans }}</th>
             <th class="visible-md visible-lg col-client-secret">{{ 'mautic.api.client.thead.secret'|trans }}</th>
             {{- include(
-                'MauticCoreBundle:Helper:tableheader.html.twig',
+                '@MauticCore/Helper/tableheader.html.twig',
                 {
                     'sessionVar' : 'client',
                     'orderBy'    : 'c.id',
@@ -76,7 +76,7 @@
             <tr>
                 <td>
                     {{- include(
-                        'MauticCoreBundle:Helper:list_actions.html.twig',
+                        '@MauticCore/Helper/list_actions.html.twig',
                         {
                             'item'            : item,
                             'templateButtons' : {

@@ -11,7 +11,7 @@
 {% set fieldKeys = fields|keys %}
 
 {% form_theme form with [
-    'MauticEmailBundle:FormTheme:Config/monitored_email_widget.html.twig',
+    '@MauticEmail/FormTheme/Config/monitored_email_widget.html.twig',
     '@MauticEmail/FormTheme/Config/monitored_mailboxes_widget.html.twig',
 ] %}
 

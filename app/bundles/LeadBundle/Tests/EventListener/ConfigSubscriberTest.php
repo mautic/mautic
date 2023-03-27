@@ -39,7 +39,7 @@ class ConfigSubscriberTest extends TestCase
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
             'formType'   => 'Mautic\\LeadBundle\\Form\\Type\\ConfigType',
-            'formTheme'  => 'MauticLeadBundle:FormTheme:Config/_config_companyconfig_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_companyconfig_widget.html.twig',
             'parameters' => null,
         ];
 

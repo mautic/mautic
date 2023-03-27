@@ -121,7 +121,7 @@ class NoteController extends FormController
                     'mauticContent' => 'leadNote',
                     'noteCount'     => count($items),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Note:list.html.twig',
+                'contentTemplate' => '@MauticLead/Note/list.html.twig',
             ]
         );
     }
@@ -187,7 +187,7 @@ class NoteController extends FormController
             if ($valid && !$cancelled) {
                 $passthroughVars['upNoteCount'] = 1;
                 $passthroughVars['noteHtml']    = $this->renderView(
-                    'MauticLeadBundle:Note:note.html.twig',
+                    '@MauticLead/Note/note.html.twig',
                     [
                         'note'        => $note,
                         'lead'        => $lead,
@@ -272,7 +272,7 @@ class NoteController extends FormController
 
             if ($valid && !$cancelled) {
                 $passthroughVars['noteHtml'] = $this->renderView(
-                    'MauticLeadBundle:Note:note.html.twig',
+                    '@MauticLead/Note/note.html.twig',
                     [
                         'note'        => $note,
                         'lead'        => $lead,
