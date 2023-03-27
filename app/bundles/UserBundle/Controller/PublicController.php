@@ -47,7 +47,7 @@ class PublicController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:reset.html.twig',
+            'contentTemplate' => '@MauticUser/Security/reset.html.twig',
             'passthroughVars' => [
                 'route' => $action,
             ],

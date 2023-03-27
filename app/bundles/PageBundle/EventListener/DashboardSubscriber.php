@@ -164,7 +164,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 
@@ -206,7 +206,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:table.html.twig');
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
             $event->stopPropagation();
         }
 

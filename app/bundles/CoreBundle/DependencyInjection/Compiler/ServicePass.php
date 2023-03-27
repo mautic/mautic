@@ -261,7 +261,7 @@ final class ServicePass implements CompilerPassInterface
                 \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
-                    new Reference('mautic.helper.templating'),
+                    new Reference('twig'),
                     $options,
                 ]
             ))

@@ -696,7 +696,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 'arguments' => [
                     'knp_menu.matcher',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
                 'tag'   => 'knp_menu.renderer',
                 'alias' => 'mautic',

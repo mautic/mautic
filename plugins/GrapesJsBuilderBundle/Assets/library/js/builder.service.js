@@ -6,6 +6,7 @@ import grapesjspostcss from 'grapesjs-parser-postcss';
 import contentService from 'grapesjs-preset-mautic/dist/content.service';
 import grapesjsmautic from 'grapesjs-preset-mautic';
 import mjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
+import editorFontsService from 'grapesjs-preset-mautic/dist/editorFonts/editorFonts.service';
 import 'grapesjs-plugin-ckeditor';
 
 // for local dev
@@ -112,6 +113,10 @@ export default class BuilderService {
     const codeModeButton = new CodeModeButton(this.editor);
     codeModeButton.addCommand();
     codeModeButton.addButton();
+
+    if (mauticEditorFonts) {
+      this.editor.on('load', () => editorFontsService.loadEditorFonts(this.editor));
+    }
 
     this.overrideCustomRteDisable();
     this.setListeners();

@@ -199,9 +199,9 @@ class AjaxController extends CommonAjaxController
         }
 
         $formHtml = $this->renderView(
-            'MauticLeadBundle:List:filterpropform.html.twig',
+            '@MauticLead/List/filterpropform.html.twig',
             [
-                //'form' => $this->setFormTheme($form, 'MauticLeadBundle:List:filterpropform.html.twig', []),
+                //'form' => $this->setFormTheme($form, '@MauticLead/List/filterpropform.html.twig', []),
                 'form' => $form->createView(),
             ]
         );
@@ -244,7 +244,7 @@ class AjaxController extends CommonAjaxController
                 $socialCount       = count($socialProfiles);
                 if (empty($network) || empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView(
-                        'MauticLeadBundle:Social:index.html.twig',
+                        '@MauticLead/Social/index.html.twig',
                         [
                             'socialProfiles'    => $socialProfiles,
                             'lead'              => $lead,
@@ -303,7 +303,7 @@ class AjaxController extends CommonAjaxController
 
                 if (empty($socialCount)) {
                     $dataArray['completeProfile'] = $this->renderView(
-                        'MauticLeadBundle:Social:index.html.twig',
+                        '@MauticLead/Social/index.html.twig',
                         [
                             'socialProfiles'    => $socialProfiles,
                             'lead'              => $lead,
@@ -632,7 +632,7 @@ class AjaxController extends CommonAjaxController
                 $emailRepo          = $this->getModel('email')->getRepository();
                 $indexMode          = $this->request->get('view', $session->get('mautic.lead.indexmode', 'list'));
                 $template           = ('list' == $indexMode) ? 'list_rows' : 'grid_cards';
-                $dataArray['leads'] = $this->factory->getTemplating()->render(
+                $dataArray['leads'] = $this->render(
                     "MauticLeadBundle:Lead:{$template}.html.twig",
                     [
                         'items'         => $results['results'],
