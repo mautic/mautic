@@ -10,6 +10,7 @@ use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -48,6 +49,11 @@ class ExcelExporterTest extends TestCase
         }
     }
 
+    /**
+     * @return array<mixed>
+     *
+     * @throws Exception
+     */
     private function getExcelResult(): array
     {
         /** @var Xlsx $objReader */
