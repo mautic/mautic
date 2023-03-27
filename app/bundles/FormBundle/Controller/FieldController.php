@@ -155,7 +155,7 @@ class FieldController extends CommonFormController
         } else {
             $closeModal                = false;
             $viewParams['tmpl']        = 'field';
-            $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, 'MauticFormBundle:Builder:field.html.twig', $customParams['formTheme']) : $form->createView();
+            $viewParams['form']        = (isset($customParams['formTheme'])) ? $this->setFormTheme($form, '@MauticForm/Builder/field.html.twig', $customParams['formTheme']) : $form->createView();
             $viewParams['fieldHeader'] = (!empty($customParams)) ? $this->get('translator')->trans($customParams['label']) : $this->get('translator')->transConditional('mautic.core.type.'.$fieldType, 'mautic.form.field.type.'.$fieldType);
         }
 
@@ -298,7 +298,7 @@ class FieldController extends CommonFormController
                 $viewParams['tmpl'] = 'field';
                 $viewParams['form'] = (isset($customParams['formTheme'])) ? $this->setFormTheme(
                     $form,
-                    'MauticFormBundle:Builder:field.html.twig',
+                    '@MauticForm/Builder/field.html.twig',
                     $customParams['formTheme']
                 ) : $form->createView();
                 $viewParams['fieldHeader'] = (!empty($customParams))

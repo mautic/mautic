@@ -513,7 +513,7 @@ class FormModel extends CommonFormModel
 
         if ($entity->getRenderStyle()) {
             $templating = $this->templatingHelper->getTemplating();
-            $styleTheme = $theme.'MauticFormBundle:Builder:_style.html.twig';
+            $styleTheme = $theme.'@MauticForm/Builder/_style.html.twig';
             $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
         }
 
@@ -533,7 +533,7 @@ class FormModel extends CommonFormModel
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
         $html               = $this->templatingHelper->getTemplating()->render(
-            $theme.'MauticFormBundle:Builder:form.html.twig',
+            $theme.'@MauticForm/Builder/form.html.twig',
             [
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
                 'viewOnlyFields' => $viewOnlyFields,
