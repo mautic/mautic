@@ -183,7 +183,7 @@ return [
                 'class'     => FormModel::class,
                 'arguments' => [
                     'request_stack',
-                    'twig',
+                    'mautic.helper.templating',
                     'mautic.helper.theme',
                     'mautic.form.model.action',
                     'mautic.form.model.field',
@@ -200,7 +200,7 @@ return [
                 'class'     => SubmissionModel::class,
                 'arguments' => [
                     'mautic.helper.ip_lookup',
-                    'twig',
+                    'mautic.helper.templating',
                     'mautic.form.model.form',
                     'mautic.page.model.page',
                     'mautic.lead.model.lead',

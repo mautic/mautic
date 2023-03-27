@@ -7,6 +7,7 @@ use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -37,7 +38,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,9 +47,9 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $ipLookupHelper;
 
     /**
-     * @var MockObject|Environment
+     * @var MockObject|TemplatingHelper
      */
-    private $twigMock;
+    private $templatingHelperMock;
 
     /**
      * @var MockObject|FormModel
@@ -176,7 +176,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->twigMock                 = $this->createMock(Environment::class);
+        $this->templatingHelperMock     = $this->createMock(TemplatingHelper::class);
         $this->formModel                = $this->createMock(FormModel::class);
         $this->pageModel                = $this->createMock(PageModel::class);
         $this->leadModel                = $this->createMock(LeadModel::class);
@@ -203,7 +203,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 
         $this->submissionModel          = new SubmissionModel(
             $this->ipLookupHelper,
-            $this->twigMock,
+            $this->templatingHelperMock,
             $this->formModel,
             $this->pageModel,
             $this->leadModel,

@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
@@ -42,7 +43,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
+use Symfony\Component\Templating\EngineInterface;
 
 class FormTestAbstract extends TestCase
 {
@@ -73,7 +74,7 @@ class FormTestAbstract extends TestCase
     protected function getFormModel()
     {
         $requestStack          = $this->createMock(RequestStack::class);
-        $twigMock              = $this->createMock(Environment::class);
+        $templatingHelperMock  = $this->createMock(TemplatingHelper::class);
         $themeHelper           = $this->createMock(ThemeHelperInterface::class);
         $formActionModel       = $this->createMock(ActionModel::class);
         $formFieldModel        = $this->createMock(FieldModel::class);
@@ -97,6 +98,11 @@ class FormTestAbstract extends TestCase
                 ->returnValue(['id' => self::$mockId, 'name' => self::$mockName])
             );
 
+        $templatingHelperMock->expects($this
+            ->any())
+            ->method('getTemplating')
+            ->willReturn($this->createMock(EngineInterface::class));
+
         $entityManager->expects($this
             ->any())
             ->method('getRepository')
@@ -110,7 +116,7 @@ class FormTestAbstract extends TestCase
 
         $formModel = new FormModel(
             $requestStack,
-            $twigMock,
+            $templatingHelperMock,
             $themeHelper,
             $formActionModel,
             $formFieldModel,
@@ -136,7 +142,7 @@ class FormTestAbstract extends TestCase
     protected function getSubmissionModel()
     {
         $ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $twigMock                 = $this->createMock(Environment::class);
+        $templatingHelperMock     = $this->createMock(TemplatingHelper::class);
         $formModel                = $this->createMock(FormModel::class);
         $pageModel                = $this->createMock(PageModel::class);
         $leadModel                = $this->createMock(LeadModel::class);
@@ -224,7 +230,7 @@ class FormTestAbstract extends TestCase
             ->willReturn([]);
         $submissionModel = new SubmissionModel(
             $ipLookupHelper,
-            $twigMock,
+            $templatingHelperMock,
             $formModel,
             $pageModel,
             $leadModel,
