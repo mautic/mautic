@@ -393,32 +393,32 @@ parameters:
 		-
 			message: "#^Call to an undefined method Doctrine\\\\ORM\\\\EntityRepository\\<MauticUserBundle\\:User\\>\\:\\:findOneByUsername\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Call to an undefined method FOS\\\\OAuthServerBundle\\\\Model\\\\ClientInterface\\:\\:addUser\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Call to an undefined method FOS\\\\OAuthServerBundle\\\\Model\\\\ClientInterface\\:\\:isAuthorizedClient\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
-			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\OAuthEventListener\\:\\:onPostAuthorizationProcess\\(\\) has no return type specified\\.$#"
+			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\PreAuthorizationEventListener\\:\\:onPostAuthorizationProcess\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
-			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\OAuthEventListener\\:\\:onPreAuthorizationProcess\\(\\) has no return type specified\\.$#"
+			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\PreAuthorizationEventListener\\:\\:onPreAuthorizationProcess\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticUserBundle\\:User\\>, string given\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\RateLimitGenerateKeySubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"

@@ -64,11 +64,11 @@ return [
                     'fos_oauth_server.authorize.form',
                     'fos_oauth_server.authorize.form.handler.default',
                     'fos_oauth_server.server',
-                    'templating',
                     'security.token_storage',
                     'router',
                     'fos_oauth_server.client_manager.default',
                     'event_dispatcher',
+                    'twig',
                     'session',
                 ],
             ],
@@ -80,7 +80,7 @@ return [
         ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\OAuthEventListener',
+                'class'     => 'Mautic\ApiBundle\EventListener\PreAuthorizationEventListener',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.security',
