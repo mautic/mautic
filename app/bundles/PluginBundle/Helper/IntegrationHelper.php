@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\PluginBundle\Entity\Integration;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\PluginBundle\Integration\AbstractIntegration;
@@ -15,6 +14,7 @@ use Mautic\PluginBundle\Integration\UnifiedIntegrationInterface;
 use Mautic\PluginBundle\Model\PluginModel;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Twig\Environment;
 
 class IntegrationHelper
 {
@@ -44,9 +44,9 @@ class IntegrationHelper
     protected $coreParametersHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var PluginModel
@@ -67,7 +67,7 @@ class IntegrationHelper
         PathsHelper $pathsHelper,
         BundleHelper $bundleHelper,
         CoreParametersHelper $coreParametersHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         PluginModel $pluginModel
     ) {
         $this->container            = $container;
@@ -76,7 +76,7 @@ class IntegrationHelper
         $this->bundleHelper         = $bundleHelper;
         $this->pluginModel          = $pluginModel;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->templatingHelper     = $templatingHelper;
+        $this->twig                 = $twig;
     }
 
     /**
@@ -543,7 +543,6 @@ class IntegrationHelper
 
         if (empty($shareBtns)) {
             $socialIntegrations = $this->getIntegrationObjects(null, ['share_button'], true);
-            $templating         = $this->templatingHelper->getTemplating();
 
             /**
              * @var string
@@ -560,7 +559,7 @@ class IntegrationHelper
 
                 //add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $templating->render($plugin->getBundle().":Integration/$integration:share.html.twig", [
+                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }

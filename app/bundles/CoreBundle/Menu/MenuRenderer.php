@@ -5,15 +5,14 @@ namespace Mautic\CoreBundle\Menu;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Renderer\RendererInterface;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Twig\Environment;
 
 class MenuRenderer implements RendererInterface
 {
     /**
-     * @var DelegatingEngine
+     * @var Environment
      */
-    private $engine;
+    private $twig;
 
     /**
      * @var MatcherInterface
@@ -25,9 +24,9 @@ class MenuRenderer implements RendererInterface
      */
     private $defaultOptions;
 
-    public function __construct(MatcherInterface $matcher, TemplatingHelper $templatingHelper, array $defaultOptions = [])
+    public function __construct(MatcherInterface $matcher, Environment $twig, array $defaultOptions = [])
     {
-        $this->engine         = $templatingHelper->getTemplating();
+        $this->twig           = $twig;
         $this->matcher        = $matcher;
         $this->defaultOptions = array_merge(
             [
@@ -60,7 +59,7 @@ class MenuRenderer implements RendererInterface
         }
 
         //render html
-        $html = $this->engine->render($options['template'], [
+        $html = $this->twig->render($options['template'], [
             'item'    => $item,
             'options' => $options,
             'matcher' => $this->matcher,
