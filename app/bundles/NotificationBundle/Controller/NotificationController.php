@@ -131,7 +131,7 @@ class NotificationController extends AbstractFormController
                     'model'       => $model,
                     'security'    => $this->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:list.html.twig',
+                'contentTemplate' => '@MauticNotification/Notification/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification',
@@ -239,7 +239,7 @@ class NotificationController extends AbstractFormController
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticNotificationBundle:Notification:details.html.twig',
+            'contentTemplate' => '@MauticNotification/Notification/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_notification_index',
                 'mauticContent' => 'notification',
@@ -366,7 +366,7 @@ class NotificationController extends AbstractFormController
                     'form'         => $form->createView(),
                     'notification' => $entity,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.twig',
+                'contentTemplate' => '@MauticNotification/Notification/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification',
@@ -530,7 +530,7 @@ class NotificationController extends AbstractFormController
                     'notification'       => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:Notification:form.html.twig',
+                'contentTemplate' => '@MauticNotification/Notification/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_notification_index',
                     'mauticContent' => 'notification',

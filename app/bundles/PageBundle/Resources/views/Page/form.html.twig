@@ -15,14 +15,14 @@
       - Defined when editing page
 #}
 {% form_theme form with [
-    'MauticPageBundle:FormTheme:Page/_page_abtest_settings_properties_row.html.twig',
-    'MauticPageBundle:FormTheme:Page/_page_variantSettings_properties_row.html.twig',
+    '@MauticPage/FormTheme/Page/_page_abtest_settings_properties_row.html.twig',
+    '@MauticPage/FormTheme/Page/_page_variantSettings_properties_row.html.twig',
 ] %}
 {% set isExisting = activePage.id %}
 {% set variantParent = activePage.variantParent %}
 {% set previewUrl = previewUrl|default('') %}
 
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}page{% endblock %}
 
@@ -72,7 +72,7 @@
                                   {{ form_row(form.template) }}
                               </div>
                           </div>
-                          {{ include('MauticCoreBundle:Helper:theme_select.html.twig', {
+                          {{ include('@MauticCore/Helper/theme_select.html.twig', {
                               'type': 'page',
                               'themes': themes,
                               'active': form.template.vars.value,

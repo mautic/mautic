@@ -83,7 +83,7 @@ class AjaxController extends CommonAjaxController
                         ]
                     );
 
-                    $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
+                    $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
                             'form'      => $form->createView(),
                             'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
                             'function'  => 'row',
@@ -146,7 +146,7 @@ class AjaxController extends CommonAjaxController
                     'campaigns'       => $data,
                 ]);
 
-                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
+                $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
                     'form'      => $form->createView(),
                     'function'  => 'widget',
                     'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
@@ -199,7 +199,7 @@ class AjaxController extends CommonAjaxController
                     'campaignContactStatus' => $statusData,
                 ]);
 
-                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
+                $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
                     'form'      => $form->createView(),
                     'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
                     'function'  => 'widget',
@@ -255,7 +255,7 @@ class AjaxController extends CommonAjaxController
                     'csrf_protection' => false,
                 ]);
 
-                $html = $this->render('MauticCoreBundle:Helper:blank_form.html.twig', [
+                $html = $this->render('@MauticCore/Helper/blank_form.html.twig', [
                     'form'      => $form->createView(),
                     'formTheme' => '@MauticPlugin/FormTheme/Integration/layout.html.twig',
                     'function'  => 'row',

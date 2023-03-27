@@ -86,7 +86,7 @@ class TriggerController extends FormController
                 'permissions' => $permissions,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
-            'contentTemplate' => 'MauticPointBundle:Trigger:list.html.twig',
+            'contentTemplate' => '@MauticPoint/Trigger/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',
@@ -147,7 +147,7 @@ class TriggerController extends FormController
                 'page'        => $page,
                 'permissions' => $permissions,
             ],
-            'contentTemplate' => 'MauticPointBundle:Trigger:details.html.twig',
+            'contentTemplate' => '@MauticPoint/Trigger/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_pointtrigger_index',
                 'mauticContent' => 'pointTrigger',

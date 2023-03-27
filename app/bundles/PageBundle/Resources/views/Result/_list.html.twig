@@ -8,7 +8,7 @@
     <table class="table table-hover table-striped table-bordered pageresult-list" id="pageResultsTable">
         <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'pageresult.' ~ pageId,
                     'orderBy': 's.id',
                     'text': 'mautic.form.report.submission.id',
@@ -16,7 +16,7 @@
                     'filterBy': 's.id',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'pageresult.' ~ pageId,
                     'orderBy': 's.lead_id',
                     'text': 'mautic.lead.report.contact_id',
@@ -24,7 +24,7 @@
                     'filterBy': 's.lead_id',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'pageresult.' ~ pageId,
                     'orderBy': 's.form_id',
                     'text': 'mautic.form.report.form_id',
@@ -32,7 +32,7 @@
                     'filterBy': 's.form_id',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'pageresult.' ~ pageId,
                     'orderBy': 's.date_submitted',
                     'text': 'mautic.form.result.thead.date',
@@ -42,7 +42,7 @@
                     'dataToggle': 'date',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'pageresult.' ~ pageId,
                     'orderBy': 'i.ip_address',
                     'text': 'mautic.core.ipaddress',
@@ -77,7 +77,7 @@
         {% else %}
             <tr>
                 <td colspan="4">
-                    {{ include('MauticCoreBundle:Helper:noresults.html.twig') }}
+                    {{ include('@MauticCore/Helper/noresults.html.twig') }}
                 </td>
             </tr>
         {% endif %}

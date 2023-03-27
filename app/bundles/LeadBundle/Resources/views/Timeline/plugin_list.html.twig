@@ -5,7 +5,7 @@
  */
 #}
 {% set leadId = lead is defined ? lead.id : null %}
-{% extends tmpl is defined and 'index' == tmpl ? 'MauticCoreBundle:Default:content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% extends tmpl is defined and 'index' == tmpl ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block content %}
   {% if not app.request.isXmlHttpRequest %}

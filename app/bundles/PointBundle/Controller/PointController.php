@@ -88,7 +88,7 @@ class PointController extends AbstractFormController
                 'permissions' => $permissions,
                 'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
             ],
-            'contentTemplate' => 'MauticPointBundle:Point:list.html.twig',
+            'contentTemplate' => '@MauticPoint/Point/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_point_index',
                 'mauticContent' => 'point',
@@ -175,7 +175,7 @@ class PointController extends AbstractFormController
             }
         }
 
-        $themes = ['MauticPointBundle:FormTheme:Action/_pointaction_properties_row.html.twig'];
+        $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];
         if ($actionType && !empty($actions['actions'][$actionType]['formTheme'])) {
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
@@ -309,7 +309,7 @@ class PointController extends AbstractFormController
             $model->lockEntity($entity);
         }
 
-        $themes = ['MauticPointBundle:FormTheme:Action/_pointaction_properties_row.html.twig'];
+        $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];
         if (!empty($actions['actions'][$actionType]['formTheme'])) {
             $themes[] = $actions['actions'][$actionType]['formTheme'];
         }
