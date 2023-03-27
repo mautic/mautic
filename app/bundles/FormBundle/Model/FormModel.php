@@ -497,7 +497,7 @@ class FormModel extends CommonFormModel
      */
     public function generateHtml(Form $entity, $persist = true)
     {
-        $theme         = $entity->getTemplate();
+        $theme         = '@themes/'.$entity->getTemplate().'/Field/';
         $submissions   = null;
         $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
         $style         = '';
