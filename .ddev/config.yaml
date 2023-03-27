@@ -1,4 +1,4 @@
-name: mautic
+name: mautic5
 type: php
 docroot: ""
 php_version: "8.0"

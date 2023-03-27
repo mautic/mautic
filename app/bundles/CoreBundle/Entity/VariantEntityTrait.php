@@ -211,6 +211,18 @@ trait VariantEntityTrait
         }
     }
 
+    public function isParent(): bool
+    {
+        return $this->isVariant() && empty($this->getVariantParent());
+    }
+
+    public function getOnlyChildrenRelatedEntityIds(): array
+    {
+        $parentId = $this->isParent() ? $this->getId() : $this->getVariantParent()->getId();
+
+        return array_filter($this->getRelatedEntityIds(), fn ($relatedId) => $relatedId != $parentId);
+    }
+
     /**
      * Check if this entity has variants.
      *

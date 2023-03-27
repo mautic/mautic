@@ -520,6 +520,33 @@ class EmailRepository extends CommonRepository
             ->execute();
     }
 
+    public function setPublishStatus($childrenIds, $isPublished, $publishUp, $publishDown)
+    {
+        if (!is_array($childrenIds)) {
+            $childrenIds = [(int) $childrenIds];
+        }
+
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $qb->update(MAUTIC_TABLE_PREFIX.'emails');
+        if (null !== $isPublished) {
+            $qb->set('is_published', ':isPublished')
+                ->setParameter('isPublished', (int) $isPublished);
+        }
+        if (null !== $publishUp) {
+            $qb->set('publish_up', ':publishUp')
+                ->setParameter('publishUp', $publishUp);
+        }
+        if (null !== $publishDown) {
+            $qb->set('publish_down', ':publishDown')
+                ->setParameter('publishDown', $publishDown);
+        }
+        $qb->where(
+                $qb->expr()->in('id', $childrenIds)
+            )
+            ->execute();
+    }
+
     /**
      * Up the read/sent counts.
      *

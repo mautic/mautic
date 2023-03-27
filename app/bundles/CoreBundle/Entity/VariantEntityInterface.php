@@ -111,4 +111,8 @@ interface VariantEntityInterface
      * @return $this
      */
     public function setVariantStartDate($variantStartDate);
+
+    public function isParent(): bool;
+
+    public function getOnlyChildrenRelatedEntityIds(): array;
 }
