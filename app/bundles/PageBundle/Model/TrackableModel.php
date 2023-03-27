@@ -914,7 +914,6 @@ class TrackableModel extends AbstractCommonModel
         /** @var \DOMElement $link */
         foreach ($links as $link) {
             $url = $link->getAttribute('href');
-            $url = preg_replace('/{(\S+?)}/i', '', $url);
 
             if ('' === $url) {
                 continue;
