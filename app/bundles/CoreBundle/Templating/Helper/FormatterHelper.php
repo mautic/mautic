@@ -82,7 +82,7 @@ class FormatterHelper extends Helper
                 $string = ($textOnly) ? $val : '<a href="mailto:'.$val.'">'.$val.'</a>';
                 break;
             case 'int':
-                $string = (int) $val;
+                $string = strval((int) $val);
                 break;
             case 'float':
                 $string = number_format((float) $val, FormatterHelper::FLOAT_PRECISION);

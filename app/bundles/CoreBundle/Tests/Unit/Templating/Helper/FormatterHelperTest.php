@@ -80,6 +80,14 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('string', gettype($result));
     }
 
+    public function testIntFormat(): void
+    {
+        $result = $this->formatterHelper->_(10, 'int');
+
+        $this->assertSame('10', $result);
+        $this->assertEquals('string', gettype($result));
+    }
+
     /**
      * @dataProvider stringProvider
      */
