@@ -203,8 +203,6 @@ $container->loadFromExtension('swiftmailer', [
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
-    'twig'             => false,
-    'templating'       => true,
     'default_renderer' => 'mautic',
 ]);
 
