@@ -554,7 +554,7 @@ class DashboardController extends AbstractFormController
                     'widgets'    => $widgets,
                     'preview'    => $preview,
                 ],
-                'contentTemplate' => 'MauticDashboardBundle:Dashboard:import.html.twig',
+                'contentTemplate' => '@MauticDashboard/Dashboard/import.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dashboard_index',
                     'mauticContent' => 'dashboardImport',

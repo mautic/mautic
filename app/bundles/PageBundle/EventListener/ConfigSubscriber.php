@@ -48,7 +48,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'PageBundle',
             'formAlias'  => 'trackingconfig',
             'formType'   => ConfigTrackingPageType::class,
-            'formTheme'  => 'MauticPageBundle:FormTheme:Config/_config_trackingconfig_widget.html.twig',
+            'formTheme'  => '@MauticPage/FormTheme/Config/_config_trackingconfig_widget.html.twig',
             // parameters defined this way because of the reason as above.
             'parameters' => [
                 'anonymize_ip'                          => false,

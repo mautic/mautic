@@ -518,7 +518,7 @@ class UserController extends FormController
                 'form' => $form->createView(),
                 'user' => $user,
             ],
-            'contentTemplate' => 'MauticUserBundle:User:contact.html.twig',
+            'contentTemplate' => '@MauticUser/User/contact.html.twig',
             'passthroughVars' => [
                 'route'         => $action,
                 'mauticContent' => 'user',

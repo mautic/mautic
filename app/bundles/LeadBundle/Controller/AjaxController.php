@@ -357,7 +357,7 @@ class AjaxController extends CommonAjaxController
                 $eventTypes = $event->getEventTypes();
 
                 $timeline = $this->renderView(
-                    'MauticLeadBundle:Lead:history.html.twig',
+                    '@MauticLead/Lead/history.html.twig',
                     [
                         'events'       => $events,
                         'eventTypes'   => $eventTypes,

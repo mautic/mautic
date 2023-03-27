@@ -411,7 +411,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'returnUrl'       => $action,
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.twig',
+                'contentTemplate' => '@MauticDynamicContent/DynamicContent/details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',

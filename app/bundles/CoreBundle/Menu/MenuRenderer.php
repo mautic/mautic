@@ -39,7 +39,7 @@ class MenuRenderer implements RendererInterface
                 'firstClass'        => 'first',
                 'lastClass'         => 'last',
                 'itemAttributes'    => [],
-                'template'          => 'MauticCoreBundle:Menu:main.html.twig',
+                'template'          => '@MauticCore/Menu/main.html.twig',
                 'compressed'        => false,
                 'allow_safe_labels' => false,
                 'clear_matcher'     => true,

@@ -210,7 +210,7 @@ class FieldController extends FormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Field:form.html.twig',
+                'contentTemplate' => '@MauticLead/Field/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contactfield_index',
                     'route'         => $this->generateUrl('mautic_contactfield_action', ['objectAction' => 'new']),
@@ -334,7 +334,7 @@ class FieldController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:Field:form.html.twig',
+            'contentTemplate' => '@MauticLead/Field/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_contactfield_index',
                 'route'         => $action,

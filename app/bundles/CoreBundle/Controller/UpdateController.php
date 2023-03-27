@@ -104,7 +104,7 @@ class UpdateController extends CommonController
                 'failed'       => $failed,
                 'noMigrations' => $noMigrations,
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:schema.html.twig',
+            'contentTemplate' => '@MauticCore/Update/schema.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update_schema'),

@@ -848,7 +848,7 @@ class PageController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.php');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,
@@ -1143,7 +1143,7 @@ class PageController extends FormController
                     'limit'      => $limit,
                     'tmpl'       => $tmpl,
                 ],
-                'contentTemplate' => 'MauticPageBundle:Result:list.html.twig',
+                'contentTemplate' => '@MauticPage/Result/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_page_index',
                     'mauticContent' => 'pageresult',

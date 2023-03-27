@@ -83,7 +83,7 @@ class EmailGraphStatsController extends AbstractController
         );
 
         return $this->render(
-            'MauticEmailBundle:Email:graph.html.twig',
+            '@MauticEmail/Email/graph.html.twig',
             [
                 'email'         => $email,
                 'stats'         => $stats,
