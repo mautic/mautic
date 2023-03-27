@@ -559,7 +559,7 @@ class IntegrationHelper
 
                 //add the api keys for use within the share buttons
                 $shareSettings['keys']   = $apiKeys;
-                $shareBtns[$integration] = $this->twig->render($plugin->getBundle().":Integration/$integration:share.html.twig", [
+                $shareBtns[$integration] = $this->twig->render($plugin->getBundle()."/Integration/$integration:share.html.twig", [
                     'settings' => $shareSettings,
                 ]);
             }
