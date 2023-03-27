@@ -6,7 +6,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
@@ -45,11 +44,6 @@ class FocusModel extends FormModel
     protected $trackableModel;
 
     /**
-     * @var TemplatingHelper
-     */
-    protected $templating;
-
-    /**
      * @var FieldModel
      */
     protected $leadFieldModel;
@@ -70,19 +64,17 @@ class FocusModel extends FormModel
     public function __construct(
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,
-        TemplatingHelper $templating,
+        Environment $twig,
         EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel,
         ContactTracker $contactTracker,
-        Environment $twig
     ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
-        $this->templating     = $templating;
+        $this->twig           = $twig;
         $this->dispatcher     = $dispatcher;
         $this->leadFieldModel = $leadFieldModel;
         $this->contactTracker = $contactTracker;
-        $this->twig           = $twig;
     }
 
     /**
@@ -203,8 +195,8 @@ class FocusModel extends FormModel
                 );
             }
 
-            $javascript = $this->templating->getTemplating()->render(
-                'MauticFocusBundle:Builder:generate.js.twig',
+            $javascript = $this->twig->render(
+                '@MauticFocus/Builder/generate.js.twig',
                 [
                     'focus'    => $focus,
                     'preview'  => $isPreview,
@@ -264,8 +256,8 @@ class FocusModel extends FormModel
             $focus[$htmlMode] = htmlspecialchars_decode($focus[$htmlMode]);
         }
 
-        $content = $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:content.html.twig',
+        $content = $this->twig->render(
+            '@MauticFocus/Builder/content.html.twig',
             [
                 'focus'    => $focus,
                 'preview'  => $isPreview,
@@ -283,7 +275,7 @@ class FocusModel extends FormModel
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
-        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
+        $formContent        = (!empty($form)) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,
