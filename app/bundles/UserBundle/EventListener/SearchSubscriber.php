@@ -74,7 +74,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
                     $userResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
+                        '@MauticUser/SubscribedEvents\Search/global_user.html.twig',
                         [
                             'user'    => $user,
                             'canEdit' => $canEdit,
@@ -83,7 +83,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($users) > 5) {
                     $userResults[] = $this->templating->getTemplating()->renderResponse(
-                        'MauticUserBundle:SubscribedEvents\Search:global_user.html.twig',
+                        '@MauticUser/SubscribedEvents\Search/global_user.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

@@ -162,7 +162,7 @@ class CategoryController extends AbstractFormController
                     'tmpl'           => $tmpl,
                     'categoryTypes'  => $categoryTypes,
                 ],
-                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.twig',
+                'contentTemplate' => '@MauticCategory/Category/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_'.$bundle.'category_index',
                     'mauticContent' => 'category',

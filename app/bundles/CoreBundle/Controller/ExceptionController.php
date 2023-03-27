@@ -76,10 +76,9 @@ class ExceptionController extends CommonController
             }
         }
 
-        $template   = "MauticCoreBundle:{$layout}:{$code}.html.twig";
-        $templating = $this->get('mautic.helper.templating')->getTemplating();
-        if (!$templating->exists($template)) {
-            $template = "MauticCoreBundle:{$layout}:base.html.twig";
+        $template   = "@MauticCore/{$layout}/{$code}.html.twig";
+        if (!$this->get('twig')->getLoader()->exists($template)) {
+            $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
         $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';

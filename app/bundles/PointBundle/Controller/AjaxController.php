@@ -51,7 +51,7 @@ class AjaxController extends CommonAjaxController
             $actions = $model->getPointActions();
 
             if (isset($actions['actions'][$type])) {
-                $themes = ['MauticPointBundle:FormTheme:Action/_pointaction_properties_row.html.twig'];
+                $themes = ['@MauticPoint/FormTheme/Action/_pointaction_properties_row.html.twig'];
                 if (!empty($actions['actions'][$type]['formTheme'])) {
                     $themes[] = $actions['actions'][$type]['formTheme'];
                 }

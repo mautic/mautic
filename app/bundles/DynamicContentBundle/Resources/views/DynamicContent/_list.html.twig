@@ -14,7 +14,7 @@
         <table class="table table-hover table-striped table-bordered dwctable-list" id="dwcTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#dwcTable',
                         'routeBase': 'dynamicContent',
@@ -23,7 +23,7 @@
                         },
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'dynamicContent',
                         'orderBy': 'e.name',
                         'text': 'mautic.core.name',
@@ -31,21 +31,21 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'dynamicContent',
                         'orderBy': 'e.slotName',
                         'text': 'mautic.dynamicContent.label.slot_name',
                         'class': 'col-dwc-slotname visible-md visible-lg',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'dynamicContent',
                         'orderBy': 'c.title',
                         'text': 'mautic.core.category',
                         'class': 'col-dwc-category visible-md visible-lg',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'dynamicContent',
                         'orderBy': 'e.id',
                         'text': 'mautic.core.id',
@@ -57,7 +57,7 @@
             {% for item in items %}
                 <tr>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
                                     'edit': securityHasEntityAccess(permissions['dynamiccontent:dynamiccontents:editown'], permissions['dynamiccontent:dynamiccontents:editother'], item.createdBy),
@@ -69,7 +69,7 @@
                         }) }}
                     </td>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'dynamicContent'}) }}
+                        {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'dynamicContent'}) }}
                         <a href="{{ url('mautic_dynamicContent_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                             {{ item.name }}
                             {% if item.isVariant or item.isTranslation %}
@@ -99,7 +99,7 @@
             </tbody>
         </table>
         <div class="panel-footer">
-            {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
                     'totalItems': items|length,
                     'page': page,
                     'limit': limit,

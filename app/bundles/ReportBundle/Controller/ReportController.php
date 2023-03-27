@@ -110,7 +110,7 @@ class ReportController extends FormController
                     'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                     'security'    => $this->container->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticReportBundle:Report:list.html.twig',
+                'contentTemplate' => '@MauticReport/Report/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_report_index',
                     'mauticContent' => 'report',

@@ -31,7 +31,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'PageBundle',
             'formAlias'  => 'pageconfig',
             'formType'   => ConfigType::class,
-            'formTheme'  => 'MauticPageBundle:FormTheme:Config/_config_pageconfig_widget.html.twig',
+            'formTheme'  => '@MauticPage/FormTheme/Config/_config_pageconfig_widget.html.twig',
             // parameters must be defined directly in case there are 2 config forms per bundle.
             // $event->getParametersFromConfig('MauticPageBundle') would return all params for PageBundle
             // and trackingconfig form would overwrote values in the pageconfig form. See #5559.
