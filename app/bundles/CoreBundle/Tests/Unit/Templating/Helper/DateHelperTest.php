@@ -31,8 +31,6 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     public static function setUpBeforeClass(): void
     {
         self::$oldTimezone = date_default_timezone_get();
-        $envParameters     = json_encode(['default_timezone' => 'Etc/GMT-4']);
-        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
     }
 
     public static function tearDownAfterClass(): void
@@ -42,6 +40,9 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $envParameters     = json_encode(['default_timezone' => 'Etc/GMT-4']);
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
+
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->helper               = new DateHelper(
