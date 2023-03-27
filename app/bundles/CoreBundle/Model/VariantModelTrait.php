@@ -140,18 +140,24 @@ trait VariantModelTrait
             $this->resetVariants($entity, $relatedIds, $variantStartDate);
         }
 
-        // If parent change publish/unpublished  status
-        if ($entity->isParent()) {
-            $this->setPublishDates($entity);
-        }
+        $this->setPublishStatus($entity);
     }
 
-    protected function setPublishDates(VariantEntityInterface $parent)
+    protected function setPublishStatus(VariantEntityInterface $entity)
     {
-        $changes     = $parent->getChanges(true);
-        $isPublished = $changes['isPublished'][1] ?? null;
-        $publishUp   = $changes['publishUp'][1] ?? null;
-        $publishDown = $changes['publishDown'][1] ?? null;
+        $parent = $entity->getVariantParent() ?: $entity;
+
+        if ($entity->isParent()) {
+            $changes     = $parent->getChanges(true);
+            $isPublished = $changes['isPublished'][1] ?? null;
+            $publishUp   = $changes['publishUp'][1] ?? null;
+            $publishDown = $changes['publishDown'][1] ?? null;
+        } else {
+            $isPublished = $parent->getIsPublished();
+            $publishUp   = $parent->getPublishUp() ? $parent->getPublishUp()->format('Y-m-d H:i:s') : null;
+            $publishDown = $parent->getPublishDown() ? $parent->getPublishUp()->format('Y-m-d H:i:s') : null;
+        }
+
         if (null !== $isPublished || null !== $publishUp || null !== $publishDown) {
             $repo = $this->getRepository();
 
