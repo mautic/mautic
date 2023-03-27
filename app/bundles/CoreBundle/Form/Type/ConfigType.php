@@ -575,6 +575,19 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
+            'link_shortener_enable_email',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.core.config.form.link.shortener.enable_email',
+                'data'       => (array_key_exists('link_shortener_enable_email', $options['data']) && !empty($options['data']['link_shortener_enable_email'])),
+                'attr'       => [
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.link.shortener.enable_email.tooltip',
+                ],
+            ]
+        );
+
+        $builder->add(
             'max_entity_lock_time',
             NumberType::class,
             [
