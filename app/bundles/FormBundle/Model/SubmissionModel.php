@@ -739,7 +739,7 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                $content = $this->twog->render(
+                $content = $this->twig->render(
                     '@MauticPage/Result/export.html.twig',
                     [
                         'page'      => $page,
