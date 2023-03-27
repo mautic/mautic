@@ -38,6 +38,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class SubmissionModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -401,5 +402,63 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         ];
 
         return $fields;
+    }
+
+    private function setUpExport(): void
+    {
+        $this->formModel->expects($this->any())
+            ->method('getCustomComponents')
+            ->willReturn([
+                'viewOnlyFields' => [
+                    'button',
+                    'captcha',
+                    'freetext',
+                    'freehtml',
+                    'pagebreak',
+                ],
+            ]);
+
+        $this->submissioRepository->expects($this->any())
+            ->method('getEntities')
+            ->willReturn([]);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->willReturn($this->submissioRepository);
+    }
+
+    public function testExportResultsCsv(): void
+    {
+        $this->setUpExport();
+        $response = $this->submissionModel->exportResults('csv', new Form(), []);
+
+        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertStringContainsString('.csv', $response->headers->get('Content-Disposition'));
+        $this->assertSame('0', $response->headers->get('Expires'));
+    }
+
+    public function testExportResultsHtml(): void
+    {
+        $this->setUpExport();
+
+        $twigMock = $this->createMock(Environment::class);
+
+        $this->templatingHelperMock->expects($this->any())
+            ->method('getTemplating')
+            ->willReturn($twigMock);
+
+        $response = $this->submissionModel->exportResults('html', new Form(), []);
+
+        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\Response');
+    }
+
+    public function testExportResultsExcel(): void
+    {
+        $this->setUpExport();
+        $response = $this->submissionModel->exportResults('xlsx', new Form(), []);
+
+        $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
+        $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
+        $this->assertSame('0', $response->headers->get('Expires'));
     }
 }
