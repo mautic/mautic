@@ -4,11 +4,11 @@ namespace Mautic\EmailBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Model\EmailModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
@@ -28,20 +28,20 @@ class SearchSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         UserHelper $userHelper,
         EmailModel $emailModel,
         CorePermissions $security,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->userHelper = $userHelper;
         $this->emailModel = $emailModel;
         $this->security   = $security;
-        $this->templating = $templating;
+        $this->twig       = $twig;
     }
 
     /**
@@ -86,20 +86,20 @@ class SearchSubscriber implements EventSubscriberInterface
                 $emailResults = [];
 
                 foreach ($emails as $email) {
-                    $emailResults[] = $this->templating->getTemplating()->renderResponse(
+                    $emailResults[] = $this->twig->render(
                         '@MauticEmail/SubscribedEvents\Search/global.html.twig',
                         ['email' => $email]
-                    )->getContent();
+                    );
                 }
                 if (count($emails) > 5) {
-                    $emailResults[] = $this->templating->getTemplating()->renderResponse(
+                    $emailResults[] = $this->twig->render(
                         '@MauticEmail/SubscribedEvents\Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($emails) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $emailResults['count'] = count($emails);
                 $event->addResults('mautic.email.emails', $emailResults);

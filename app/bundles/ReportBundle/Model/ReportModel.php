@@ -448,7 +448,7 @@ class ReportModel extends FormModel
                 return $response;
 
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
+                $content = $this->templatingHelper->getTemplating()->render(
                     '@MauticReport/Report/export.html.twig',
                     [
                         'reportData'       => $reportData,
@@ -461,7 +461,7 @@ class ReportModel extends FormModel
                         'dateTo'           => $reportData['dateTo'],
                         'reportDataResult' => new ReportDataResult($reportData),
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
 

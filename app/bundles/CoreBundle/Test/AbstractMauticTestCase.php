@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use InvalidArgumentException;
 use Liip\TestFixturesBundle\Services\DatabaseToolCollection;
 use Liip\TestFixturesBundle\Services\DatabaseTools\AbstractDatabaseTool;
-use Mautic\CoreBundle\Test\Session\FixedMockFileSessionStorage;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\Assert;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
@@ -21,7 +20,6 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
@@ -43,11 +41,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         'create_custom_field_in_background' => false,
         'mailer_from_name'                  => 'Mautic',
     ];
-
-    /**
-     * Flag to turn off the mockServices() method.
-     */
-    protected bool $useMockServices = true;
 
     protected AbstractDatabaseTool $databaseTool;
 
@@ -73,10 +66,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $secure       = 0 === strcasecmp($scheme, 'https');
 
         $this->client->setServerParameter('HTTPS', $secure);
-
-        if ($this->useMockServices) {
-            $this->mockServices();
-        }
     }
 
     /**
@@ -101,11 +90,6 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function loadFixtureFiles(array $paths = [], bool $append = true): array
     {
         return $this->databaseTool->loadAliceFixture($paths, $append);
-    }
-
-    private function mockServices(): void
-    {
-        self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
     protected function applyMigrations(): void

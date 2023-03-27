@@ -156,11 +156,11 @@ class MauticFactory
     /**
      * Retrieves templating service.
      *
-     * @return \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     * @return \Twig\Environment
      */
     public function getTemplating()
     {
-        return $this->container->get('mautic.helper.templating')->getTemplating();
+        return $this->container->get('twig');
     }
 
     /**
