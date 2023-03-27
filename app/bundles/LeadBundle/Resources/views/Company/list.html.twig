@@ -1,0 +1,183 @@
+{#
+  Variables
+    - searchValue
+    - leadCounts
+    - items
+    - page
+    - limit
+    - permissions
+    - tmpl
+    - totalItems
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}company{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.companies.menu.root'|trans }}{% endblock %}
+
+{% block actions %}
+  {% if permissions['lead:leads:create'] %}
+      {% set pageButtons = [
+        {
+          'attr': {
+              'href': path('mautic_import_action', {'object': 'companies', 'objectAction': 'new'}),
+          },
+          'iconClass': 'fa fa-upload',
+          'btnText': 'mautic.lead.lead.import',
+        },
+        {
+          'attr': {
+              'href': path('mautic_import_index', {'object': 'companies'}),
+          },
+          'iconClass': 'fa fa-history',
+          'btnText': 'mautic.lead.lead.import.index',
+        },
+      ] %}
+  {% endif %}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+          'templateButtons': {'new': permissions['lead:leads:create']},
+          'routeBase': 'company',
+          'customButtons': pageButtons|default([]),
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'searchHelp': 'mautic.core.help.searchcommands',
+                'action': currentRoute,
+        }) }}
+        <div class="page-list">
+  {% endif %}
+
+  {% if items|length > 0 %}
+      <div class="table-responsive page-list">
+          <table class="table table-hover table-striped table-bordered company-list" id="companyTable">
+              <thead>
+              <tr>
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'checkall': 'true',
+                          'target': '#companyTable',
+                          'routeBase': 'company',
+                          'templateButtons': {'delete': permissions['lead:leads:deleteother']},
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'company',
+                          'text': 'mautic.company.name',
+                          'class': 'col-company-name',
+                          'orderBy': 'comp.companyname',
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'company',
+                          'text': 'mautic.company.email',
+                          'class': 'visible-md visible-lg col-company-category',
+                          'orderBy': 'comp.companyemail',
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'company',
+                          'text': 'mautic.company.website',
+                          'class': 'visible-md visible-lg col-company-website',
+                          'orderBy': 'comp.companywebsite',
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'company',
+                          'text': 'mautic.company.score',
+                          'class': 'visible-md visible-lg col-company-score',
+                          'orderBy': 'comp.score',
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'company',
+                          'text': 'mautic.lead.list.thead.leadcount',
+                          'class': 'visible-md visible-lg col-leadlist-leadcount',
+                  }) }}
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                          'sessionVar': 'company',
+                          'orderBy': 'comp.id',
+                          'text': 'mautic.core.id',
+                          'class': 'visible-md visible-lg col-company-id',
+                  }) }}
+              </tr>
+              </thead>
+              <tbody>
+              {% for item in items %}
+                  {% set fields = item.fields %}
+                  <tr>
+                      <td>
+                          {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                  'item': item,
+                                  'templateButtons': {
+                                      'edit': permissions['lead:leads:editother'],
+                                      'clone': permissions['lead:leads:create'],
+                                      'delete': permissions['lead:leads:deleteother'],
+                                  },
+                                  'routeBase': 'company',
+                          }) }}
+                      </td>
+                      <td>
+                          <div>
+                          {% if securityHasEntityAccess(permissions['lead:leads:editown'], permissions['lead:leads:editother'], item.createdBy) %}
+                              <a href="{{ url('mautic_company_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                                {% if fields.core.companyname is defined %}
+                                  {{ fields.core.companyname.value|purify }}
+                                {% endif %}
+                              </a>
+                          {% else %}
+                              {% if fields.core.companyname is defined %}
+                                {{ fields.core.companyname.value|purify }}
+                              {% endif %}
+                          {% endif %}
+                          </div>
+                      </td>
+                      <td>
+                          {% if fields.core.companyemail is defined %}
+                            <div class="text-muted mt-4">
+                                <small>{{ fields.core.companyemail.value|purify }}</small>
+                            </div>
+                          {% endif %}
+                      </td>
+
+                      <td class="visible-md visible-lg">
+                          {% if fields.core.companywebsite is defined %}
+                            {{ inputUrl(fields.core.companywebsite.value) }}
+                          {% endif %}
+                      </td>
+                      <td class="visible-md visible-lg">
+                          {{ item.score }}
+                      </td>
+                      <td class="visible-md visible-lg">
+                          <a class="label label-primary"
+                             href="{{ path('mautic_contact_index', {'search': 'mautic.lead.lead.searchcommand.company_id'|trans~':'~item.id}) }}"
+                             data-toggle="ajax"
+                             {% if 0 == leadCounts[item.id] %}disabled="disabled"{% endif %}>
+                                  {{ 'mautic.lead.company.viewleads_count'|trans({'%count%': leadCounts[item.id]}) }}
+                          </a>
+                      </td>
+                      <td class="visible-md visible-lg">{{ item.id }}</td>
+                  </tr>
+              {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      <div class="panel-footer">
+          {{ include('@MauticCore/Helper/pagination.html.twig', {
+                  'totalItems': totalItems,
+                  'page': page,
+                  'limit': limit,
+                  'menuLinkId': 'mautic_company_index',
+                  'baseUrl': url('mautic_company_index'),
+                  'sessionVar': 'company',
+          }) }}
+      </div>
+  {% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.company.action.noresults.tip'}) }}
+  {% endif %}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

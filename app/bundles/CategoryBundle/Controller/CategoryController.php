@@ -162,7 +162,7 @@ class CategoryController extends AbstractFormController
                     'tmpl'           => $tmpl,
                     'categoryTypes'  => $categoryTypes,
                 ],
-                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.twig',
+                'contentTemplate' => '@MauticCategory/Category/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_'.$bundle.'category_index',
                     'mauticContent' => 'category',
@@ -252,7 +252,7 @@ class CategoryController extends AbstractFormController
             return $this->editAction($bundle, $entity->getId(), true);
         } else {
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticCategoryBundle:Category:form.html.twig',
+                'contentTemplate' => '@MauticCategory/Category/form.html.twig',
                 'viewParameters'  => [
                     'form'           => $form->createView(),
                     'activeCategory' => $entity,
@@ -379,7 +379,7 @@ class CategoryController extends AbstractFormController
         } else {
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCategoryBundle:Category:form.html.twig',
+                    'contentTemplate' => '@MauticCategory/Category/form.html.twig',
                     'viewParameters'  => [
                         'form'           => $form->createView(),
                         'activeCategory' => $entity,

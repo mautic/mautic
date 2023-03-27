@@ -109,7 +109,7 @@ class CompanyController extends FormController
                     'tmpl'        => $tmpl,
                     'totalItems'  => $count,
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:list.html.twig',
+                'contentTemplate' => '@MauticLead/Company/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_company_index',
                     'mauticContent' => 'company',
@@ -175,7 +175,7 @@ class CompanyController extends FormController
                     'permissions' => $permissions,
                     'security'    => $this->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:list_rows_contacts.html.twig',
+                'contentTemplate' => '@MauticLead/Company/list_rows_contacts.html.twig',
             ]
         );
     }
@@ -609,7 +609,7 @@ class CompanyController extends FormController
                     'totalItems'        => $contacts['count'],
                     'limit'             => $contacts['limit'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:company.html.twig',
+                'contentTemplate' => '@MauticLead/Company/company.html.twig',
             ]
         );
     }
@@ -961,7 +961,7 @@ class CompanyController extends FormController
                         ]
                     ),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Company:merge.html.twig',
+                'contentTemplate' => '@MauticLead/Company/merge.html.twig',
                 'passthroughVars' => [
                     'route'  => false,
                     'target' => ('update' == $tmpl) ? '.company-merge-options' : null,

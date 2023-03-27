@@ -102,7 +102,7 @@ class TweetController extends FormController
      */
     protected function getFormView(Form $form, $action)
     {
-        return $this->setFormTheme($form, 'MauticSocialBundle:Tweet:form.html.php', ['MauticSocialBundle:FormTheme']);
+        return $form->createView();
     }
 
     /**
@@ -132,13 +132,17 @@ class TweetController extends FormController
      *
      * @return string
      */
-    protected function getTemplateName($file, string $engine = self::ENGINE_PHP)
+    protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
     {
-        if ('form.html.php' === $file && 1 == $this->request->get('modal')) {
-            return parent::getTemplateName('form.modal.html.php');
+        if (('form.html.twig' === $file) && 1 == $this->request->get('modal')) {
+            return parent::getTemplateName('form.modal.html.twig');
         }
 
-        return parent::getTemplateName($file);
+        if ('form.html.twig' === $file && 1 == $this->request->get('modal')) {
+            return parent::getTemplateName('form.modal.html.twig', $engine);
+        }
+
+        return parent::getTemplateName($file, $engine);
     }
 
     /**
@@ -163,7 +167,9 @@ class TweetController extends FormController
      */
     public function viewAction($objectId)
     {
-        return parent::indexStandard(1);
+        return $this->forward('MauticPlugin\MauticSocialBundle\Controller\TweetController::editAction', [
+            'objectId' => $objectId,
+        ]);
     }
 
     /**

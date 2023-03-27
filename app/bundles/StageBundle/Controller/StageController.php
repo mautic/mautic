@@ -96,7 +96,7 @@ class StageController extends AbstractFormController
                     'permissions' => $permissions,
                     'tmpl'        => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:list.html.twig',
+                'contentTemplate' => '@MauticStage/Stage/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -210,7 +210,7 @@ class StageController extends AbstractFormController
                     'form'      => $form->createView(),
                     'actions'   => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
+                'contentTemplate' => '@MauticStage/Stage/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
@@ -361,7 +361,7 @@ class StageController extends AbstractFormController
                     'form'    => $form->createView(),
                     'actions' => $actions['actions'],
                 ],
-                'contentTemplate' => 'MauticStageBundle:Stage:form.html.twig',
+                'contentTemplate' => '@MauticStage/Stage/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_stage_index',
                     'mauticContent' => 'stage',
