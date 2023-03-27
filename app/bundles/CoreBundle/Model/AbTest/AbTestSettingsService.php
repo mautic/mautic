@@ -17,6 +17,8 @@ class AbTestSettingsService
      */
     public const DEFAULT_TOTAL_WEIGHT = 100;
 
+    const DEFAULT_AB_WEIGHT = 10;
+
     /**
      * @var int
      */

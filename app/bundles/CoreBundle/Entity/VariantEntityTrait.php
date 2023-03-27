@@ -32,7 +32,7 @@ trait VariantEntityTrait
     /**
      * @var array
      */
-    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT, 'enableAbTest' => false];
+    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_AB_WEIGHT, 'enableAbTest' => false];
 
     /**
      * @var \DateTimeInterface|null
@@ -318,7 +318,7 @@ trait VariantEntityTrait
         if (!$this->getVariantParent()) {
             $this->variantSettings = [
                 'enableAbTest' => false,
-                'totalWeight'  => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT,
+                'totalWeight'  => AbTestSettingsService::DEFAULT_AB_WEIGHT,
             ];
         } else {
             $this->variantSettings = [];
