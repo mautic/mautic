@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\Form;
@@ -21,13 +20,14 @@ use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Environment;
 
 class DeleteFormTest extends \PHPUnit\Framework\TestCase
 {
     public function testDelete(): void
     {
         $requestStack          = $this->createMock(RequestStack::class);
-        $templatingHelperMock  = $this->createMock(TemplatingHelper::class);
+        $twigMock              = $this->createMock(Environment::class);
         $themeHelper           = $this->createMock(ThemeHelperInterface::class);
         $formActionModel       = $this->createMock(ActionModel::class);
         $formFieldModel        = $this->createMock(FieldModel::class);
@@ -44,7 +44,7 @@ class DeleteFormTest extends \PHPUnit\Framework\TestCase
         $mappedObjectCollector = $this->createMock(MappedObjectCollectorInterface::class);
         $formModel             = new FormModel(
             $requestStack,
-            $templatingHelperMock,
+            $twigMock,
             $themeHelper,
             $formActionModel,
             $formFieldModel,

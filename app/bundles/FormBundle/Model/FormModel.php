@@ -6,7 +6,6 @@ use DOMDocument;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
@@ -28,6 +27,7 @@ use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
  * @extends CommonFormModel<Form>
@@ -40,9 +40,9 @@ class FormModel extends CommonFormModel
     protected $requestStack;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var ThemeHelperInterface
@@ -96,7 +96,7 @@ class FormModel extends CommonFormModel
 
     public function __construct(
         RequestStack $requestStack,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         ThemeHelperInterface $themeHelper,
         ActionModel $formActionModel,
         FieldModel $formFieldModel,
@@ -109,7 +109,7 @@ class FormModel extends CommonFormModel
         MappedObjectCollectorInterface $mappedObjectCollector
     ) {
         $this->requestStack          = $requestStack;
-        $this->templatingHelper      = $templatingHelper;
+        $this->twig                  = $twig;
         $this->themeHelper           = $themeHelper;
         $this->formActionModel       = $formActionModel;
         $this->formFieldModel        = $formFieldModel;
@@ -497,14 +497,20 @@ class FormModel extends CommonFormModel
      */
     public function generateHtml(Form $entity, $persist = true)
     {
-        //generate cached HTML
-        $theme       = $entity->getTemplate();
-        $submissions = null;
-        $lead        = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
-        $style       = '';
+        $theme         = $entity->getTemplate();
+        $submissions   = null;
+        $lead          = ($this->requestStack->getCurrentRequest()) ? $this->contactTracker->getContact() : null;
+        $style         = '';
+        $styleToRender = '@MauticForm/Builder/_style.html.twig';
+        $formToRender  = '@MauticForm/Builder/form.html.twig';
 
         if (!empty($theme)) {
-            $theme .= '|';
+            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig')) {
+                $styleToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/_style.html.twig';
+            }
+            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig')) {
+                $formToRender = '@themes/'.$theme.'/html/MauticFormBundle/Builder/form.html.twig';
+            }
         }
 
         if ($lead instanceof Lead && $lead->getId() && $entity->usesProgressiveProfiling()) {
@@ -512,9 +518,8 @@ class FormModel extends CommonFormModel
         }
 
         if ($entity->getRenderStyle()) {
-            $templating = $this->templatingHelper->getTemplating();
-            $styleTheme = $theme.'@MauticForm/Builder/_style.html.twig';
-            $style      = $templating->render($this->themeHelper->checkForTwigTemplate($styleTheme));
+            $styleTheme = $styleToRender;
+            $style      = $this->twig->render($this->themeHelper->checkForTwigTemplate($styleTheme));
         }
 
         // Determine pages
@@ -532,8 +537,8 @@ class FormModel extends CommonFormModel
         $viewOnlyFields     = $this->getCustomComponents()['viewOnlyFields'];
         $displayManager     = new DisplayManager($entity, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         [$pages, $lastPage] = $this->getPages($fields);
-        $html               = $this->templatingHelper->getTemplating()->render(
-            $theme.'@MauticForm/Builder/form.html.twig',
+        $html               = $this->twig->render(
+            $formToRender,
             [
                 'fieldSettings'  => $this->getCustomComponents()['fields'],
                 'viewOnlyFields' => $viewOnlyFields,
@@ -779,15 +784,17 @@ class FormModel extends CommonFormModel
      */
     public function getFormScript(Form $form)
     {
-        $theme = $form->getTemplate();
+        $theme          = $form->getTemplate();
+        $scriptToRender = '@MauticForm/Builder/_script.html.twig';
 
         if (!empty($theme)) {
-            $theme .= '|';
+            if ($this->twig->getLoader()->exists('@themes/'.$theme.'/MauticForm/Builder/_script.html.twig')) {
+                $scriptToRender = '@themes/'.$theme.'/MauticForm/Builder/_script.html.twig';
+            }
         }
 
-        //TODO: add a check to see if the theme exists before rendering
-        $script = $this->templatingHelper->getTemplating()->render(
-            '@MauticForm/Builder/_script.html.twig',
+        $script = $this->twig->render(
+            $scriptToRender,
             [
                 'form'  => $form,
                 'theme' => $theme,
