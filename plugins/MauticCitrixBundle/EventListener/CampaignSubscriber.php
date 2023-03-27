@@ -15,7 +15,6 @@ use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
-use Twig\Environment;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
