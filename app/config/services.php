@@ -5,29 +5,33 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-// This is loaded by \Mautic\CoreBundle\DependencyInjection\MauticCoreExtension to auto-wire services
-// if the bundle do not cover it itself by their own *Extension and services.php which is prefered.
 return function (ContainerConfigurator $configurator, ContainerInterface $container) {
     $services = $configurator->services()
         ->defaults()
         ->autowire()
         ->autoconfigure()
-        ->public()
-    ;
+        ->public();
 
-    $bundles = array_merge($container->getParameter('mautic.bundles'), $container->getParameter('mautic.plugin.bundles'));
+    $bundles = array_merge(
+        $container->getParameter('mautic.bundles'),
+        $container->getParameter('mautic.plugin.bundles')
+    );
 
-    // Autoconfigure services for bundles that do not have its own Config/services.php
     foreach ($bundles as $bundle) {
-        if (file_exists($bundle['directory'].'/Config/services.php')) {
+        $bundleDirectory = $bundle['directory'];
+        $bundleNamespace = $bundle['namespace'];
+
+        if (file_exists("$bundleDirectory/Config/services.php")) {
             continue;
         }
 
-        $services->load($bundle['namespace'].'\\', $bundle['directory'])
-            ->exclude($bundle['directory'].'/{'.implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
+        $services->load("$bundleNamespace\\", $bundleDirectory)
+            ->exclude("$bundleDirectory/{".implode(',', MauticCoreExtension::DEFAULT_EXCLUDES).'}');
 
-        if (is_dir($bundle['directory'].'/Entity')) {
-            $services->load($bundle['namespace'].'\\Entity\\', $bundle['directory'].'/Entity/*Repository.php');
+        $entityDirectory = "$bundleDirectory/Entity";
+
+        if (is_dir($entityDirectory)) {
+            $services->load("$bundleNamespace\\Entity\\", "$entityDirectory/*Repository.php");
         }
     }
 };
