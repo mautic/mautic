@@ -36,7 +36,7 @@ class SlotExtension extends AbstractExtension
         return 'slot';
     }
 
-    public function getSlot($name, $default = null)
+    public function getSlot($name, $default = '')
     {
         ob_start();
 

@@ -71,4 +71,26 @@ final class SlotsHelper
     {
         $this->inBuilder = (bool) $bool;
     }
+
+    /**
+     * Outputs a slot.
+     *
+     * @return bool true if the slot is defined or if a default content has been provided, false otherwise
+     */
+    public function output(string $name, bool|string $default = false): bool
+    {
+        if (!isset($this->slots[$name])) {
+            if (false !== $default) {
+                echo $default;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        echo $this->slots[$name];
+
+        return true;
+    }
 }

@@ -207,7 +207,7 @@ class LeadController extends FormController
                     'maxLeadId'        => $maxLeadId,
                     'anonymousShowing' => $anonymousShowing,
                 ],
-                'contentTemplate' => "MauticLeadBundle:Lead:{$indexMode}.html.twig",
+                'contentTemplate' => "@MauticLead/Lead/{$indexMode}.html.twig",
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
