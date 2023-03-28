@@ -294,15 +294,9 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->withConsecutive(
                 ['mautic.dashboard.widget'],
-                ['twig'],
                 ['twig']
             )
             ->willReturnOnConsecutiveCalls($widgetService, $twig, $twig);
-
-        $this->containerMock->expects(self::once())
-            ->method('has')
-            ->with('templating')
-            ->willReturn(true);
 
         $response = $this->controller->widgetAction($widgetId);
 
