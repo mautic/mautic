@@ -46,8 +46,8 @@ class TemplatingPass implements CompilerPassInterface
                 ->setPublic(true);
         }
 
-        if ($container->hasDefinition('templating.helper.translator')) {
-            $container->getDefinition('templating.helper.translator')
+        if ($container->hasDefinition('twig.helper.translator')) {
+            $container->getDefinition('twig.helper.translator')
                 ->setClass(TranslatorHelper::class)
                 ->setPublic(true);
         }

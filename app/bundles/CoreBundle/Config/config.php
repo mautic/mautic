@@ -293,7 +293,7 @@ return [
                 ],
                 'alias' => 'security',
             ],
-            'mautic.helper.template.translator' => [
+            'mautic.helper.twig.translator' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\TranslatorHelper::class,
                 'arguments' => [
                     'translator',

@@ -8,7 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Symfony\Bundle\FrameworkBundle\Twig\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -142,6 +142,11 @@ class Import extends FormEntity
      */
     private $properties = [];
 
+    /**
+     * @var Translator
+     */
+    private $translator;
+
     public function __clone()
     {
         $this->id = null;
@@ -149,10 +154,11 @@ class Import extends FormEntity
         parent::__clone();
     }
 
-    public function __construct()
+    public function __construct(Translator $translator)
     {
-        $this->status   = self::QUEUED;
-        $this->priority = self::LOW;
+        $this->translator = $translator;
+        $this->status     = self::QUEUED;
+        $this->priority   = self::LOW;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
@@ -933,12 +939,12 @@ class Import extends FormEntity
      *
      * @return array
      */
-    public function getRowStatusesPieChart(TranslatorHelper $translator)
+    public function getRowStatusesPieChart()
     {
         $chart = new PieChart();
-        $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.updated.count'), $this->getUpdatedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.ignored.count'), $this->getIgnoredCount());
+        $chart->setDataset($this->translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
+        $chart->setDataset($this->translator->trans('mautic.lead.import.updated.count'), $this->getUpdatedCount());
+        $chart->setDataset($this->translator->trans('mautic.lead.import.ignored.count'), $this->getIgnoredCount());
 
         return $chart->render();
     }

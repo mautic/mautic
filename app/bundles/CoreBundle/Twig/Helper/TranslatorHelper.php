@@ -3,15 +3,24 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper as BaseHelper;
 
 /**
  * Extended TranslatorHelper.
  *
  * @property Translator $translator
  */
-final class TranslatorHelper extends BaseHelper
+final class TranslatorHelper
 {
+    /**
+     * @var Translator
+     */
+    private $translator;
+
+    public function __construct(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
     /**
      * Check if the specified message ID exists.
      *
