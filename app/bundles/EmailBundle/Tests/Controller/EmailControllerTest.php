@@ -13,7 +13,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\twig\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -90,7 +90,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $formMock;
 
     /**
-     * @var MockObject|DelegatingEngine
+     * @var MockObject|Environment
      */
     private $twigMock;
 
@@ -110,7 +110,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->helperUserMock       = $this->createMock(UserHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->twigMock             = $this->createMock(DelegatingEngine::class);
+        $this->twigMock             = $this->createMock(Environment::class);
         $this->controller           = new EmailController();
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);

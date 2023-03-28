@@ -13,23 +13,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FormatterExtensionTest extends TestCase
 {
-    public function testItContainsAtLeastOneFilter(): void
+    private FormatterExtension $extension;
+
+    protected function setUp(): void
     {
-        $extension = new FormatterExtension($this->createMock(FormatterHelper::class));
-
-        $this->assertGreaterThan(0, $extension->getFilters());
-    }
-
-    public function testItContainsAtLeastOneFunction(): void
-    {
-        $extension = new FormatterExtension($this->createMock(FormatterHelper::class));
-
-        $this->assertGreaterThan(0, $extension->getFunctions());
-    }
-
-    public function testSimpleArrayToHtml(): void
-    {
-        $extension = new FormatterExtension(
+        $this->extension = new FormatterExtension(
             new FormatterHelper(
                 new DateHelper(
                     'F j, Y g:i a T',
@@ -42,7 +30,20 @@ final class FormatterExtensionTest extends TestCase
                 $this->createMock(TranslatorInterface::class)
             )
         );
+    }
 
+    public function testItContainsAtLeastOneFilter(): void
+    {
+        $this->assertGreaterThan(0, $this->extension->getFilters());
+    }
+
+    public function testItContainsAtLeastOneFunction(): void
+    {
+        $this->assertGreaterThan(0, $this->extension->getFunctions());
+    }
+
+    public function testSimpleArrayToHtml(): void
+    {
         $array = [
             'one' => 'one',
             'two' => 'two',
@@ -50,6 +51,6 @@ final class FormatterExtensionTest extends TestCase
 
         $expected = 'one: one<br />two: two';
 
-        $this->assertSame($expected, $extension->simpleArrayToHtml($array));
+        $this->assertSame($expected, $this->extension->simpleArrayToHtml($array));
     }
 }

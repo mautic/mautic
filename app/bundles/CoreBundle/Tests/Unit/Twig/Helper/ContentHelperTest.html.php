@@ -3,8 +3,8 @@
 namespace Mautic\CoreBundle\Tests\Unit\twig\Helper;
 
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
-use Symfony\Bundle\FrameworkBundle\twig\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 
 class ContentHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,7 +19,7 @@ class ContentHelperTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $delegationMock = $this->getMockBuilder(DelegatingEngine::class)
+        $delegationMock = $this->getMockBuilder(Environment::class)
             ->disableOriginalConstructor()
             ->getMock();
 

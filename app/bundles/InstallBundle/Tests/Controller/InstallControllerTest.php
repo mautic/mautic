@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Bundle\FrameworkBundle\twig\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
@@ -19,6 +18,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -52,7 +52,7 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->twigMock             = $this->createMock(DelegatingEngine::class);
+        $this->twigMock             = $this->createMock(Environment::class);
 
         $this->configurator         = $this->createMock(Configurator::class);
         $this->installer            = $this->createMock(InstallService::class);

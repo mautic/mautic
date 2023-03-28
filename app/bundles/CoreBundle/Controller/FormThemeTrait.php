@@ -2,9 +2,9 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Symfony\Bundle\FrameworkBundle\twig\DelegatingEngine;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
+use Twig\Environment;
 
 trait FormThemeTrait
 {
@@ -22,7 +22,7 @@ trait FormThemeTrait
         $formView = $form->createView();
 
         $twig = $this->container->get('mautic.helper.twig')->gettwig();
-        if ($twig instanceof DelegatingEngine) {
+        if ($twig instanceof Environment) {
             $twig = $twig->getEngine($template);
         }
 

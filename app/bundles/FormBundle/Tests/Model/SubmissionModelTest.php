@@ -187,7 +187,14 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelper              = $this->createMock(FormFieldHelper::class);
         $this->dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translator               = $this->createMock(Translator::class);
-        $this->dateHelper               = $this->createMock(DateHelper::class);
+        $this->dateHelper               = new DateHelper(
+            'Y-m-d H:i:s',
+            'Y-m-d H:i',
+            'Y-m-d',
+            'H:i',
+            $this->translator,
+            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+        );
         $this->userHelper               = $this->createMock(UserHelper::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
         $this->submissioRepository      = $this->createMock(SubmissionRepository::class);

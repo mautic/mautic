@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helper;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
@@ -29,7 +30,7 @@ class FieldHelperTest extends TestCase
     private $variableExpresserHelper;
 
     /**
-     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var ChannelListHelper
      */
     private $channelListHelper;
 
@@ -57,7 +58,7 @@ class FieldHelperTest extends TestCase
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
+        $this->channelListHelper       = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
         $this->channelListHelper->method('getFeatureChannels')
             ->willReturn(['Email' => 'email']);
