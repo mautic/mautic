@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\twig\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;

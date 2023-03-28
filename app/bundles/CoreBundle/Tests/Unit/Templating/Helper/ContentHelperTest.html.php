@@ -1,9 +1,9 @@
 <?php
 
-namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\twig\Helper;
 
 use Mautic\CoreBundle\Twig\Helper\ContentHelper;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Bundle\FrameworkBundle\twig\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ContentHelperTest extends \PHPUnit\Framework\TestCase

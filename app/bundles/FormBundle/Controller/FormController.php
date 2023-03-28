@@ -977,9 +977,9 @@ class FormController extends CommonFormController
 
         if (!empty($template)) {
             $logicalName     = $this->get('mautic.helper.theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
-            $assetsHelper    = $this->get('templating.helper.assets');
-            $slotsHelper     = $this->get('templating.helper.slots');
-            $analyticsHelper = $this->get('mautic.helper.template.analytics');
+            $assetsHelper    = $this->get('twig.helper.assets');
+            $slotsHelper     = $this->get('twig.helper.slots');
+            $analyticsHelper = $this->get('mautic.helper.twig.analytics');
 
             $slotsHelper->set('pageTitle', $form->getName());
 

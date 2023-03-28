@@ -46,10 +46,10 @@ return function (ContainerConfigurator $configurator) {
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);
-    $services->alias('templating.helper.assets', \Mautic\CoreBundle\Twig\Helper\AssetsHelper::class);
+    $services->alias('twig.helper.assets', \Mautic\CoreBundle\Twig\Helper\AssetsHelper::class);
     $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', \Mautic\CoreBundle\Helper\EmailAddressHelper::class);
 
-    $services->get(\Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('templating.helper', ['alias' => 'assets']);
+    $services->get(\Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 };

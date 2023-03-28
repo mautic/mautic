@@ -389,7 +389,7 @@ class EventController extends CommonFormController
                 }
 
                 /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
-                $dh                       = $this->get('mautic.helper.template.date');
+                $dh                       = $this->get('mautic.helper.twig.date');
                 $passthroughVars['label'] = $this->translator->trans(
                     $label,
                     [

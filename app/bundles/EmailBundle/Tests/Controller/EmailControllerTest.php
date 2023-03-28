@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
+use Symfony\Bundle\FrameworkBundle\twig\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
@@ -92,7 +92,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|DelegatingEngine
      */
-    private $templatingMock;
+    private $twigMock;
 
     protected function setUp(): void
     {
@@ -110,7 +110,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->helperUserMock       = $this->createMock(UserHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->templatingMock       = $this->createMock(DelegatingEngine::class);
+        $this->twigMock             = $this->createMock(DelegatingEngine::class);
         $this->controller           = new EmailController();
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
@@ -193,8 +193,8 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
                 ['router'],
                 ['mautic.helper.user'],
                 ['form.factory'],
-                ['templating'],
-                ['templating']
+                ['twig'],
+                ['twig']
             )
             ->willReturnOnConsecutiveCalls(
                 $this->modelFactoryMock,
@@ -202,11 +202,11 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
                 $this->routerMock,
                 $this->helperUserMock,
                 $this->formFactoryMock,
-                $this->templatingMock,
-                $this->templatingMock
+                $this->twigMock,
+                $this->twigMock
             );
 
-        $this->templatingMock->method('supports')
+        $this->twigMock->method('supports')
             ->willReturn(true);
 
         $this->modelFactoryMock->expects($this->once())
@@ -254,10 +254,10 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->containerMock->expects($this->once())
             ->method('has')
-            ->with('templating')
+            ->with('twig')
             ->willReturn(true);
 
-        $this->templatingMock->expects($this->once())
+        $this->twigMock->expects($this->once())
             ->method('render')
             ->willReturn('');
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\LeadBundle\Tests\Templating;
+namespace Mautic\LeadBundle\Tests\twig;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;

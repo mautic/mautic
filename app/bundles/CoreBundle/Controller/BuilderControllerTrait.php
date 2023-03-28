@@ -13,10 +13,10 @@ trait BuilderControllerTrait
     protected function getAssetsForBuilder()
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->get('templating.helper.assets');
+        $assetsHelper = $this->get('twig.helper.assets');
         /** @var RouterInterface $routerHelper */
         $routerHelper = $this->get('router');
-        $translator   = $this->get('templating.helper.translator');
+        $translator   = $this->get('twig.helper.translator');
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';")

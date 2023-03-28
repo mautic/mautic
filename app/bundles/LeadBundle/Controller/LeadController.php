@@ -791,7 +791,7 @@ class LeadController extends FormController
     {
         $leadInformation = $this->request->files->get('lead', []);
         $file            = $leadInformation['custom_avatar'] ?? null;
-        $avatarDir       = $this->get('mautic.helper.template.avatar')->getAvatarPath(true);
+        $avatarDir       = $this->get('mautic.helper.twig.avatar')->getAvatarPath(true);
 
         if (!file_exists($avatarDir)) {
             mkdir($avatarDir);

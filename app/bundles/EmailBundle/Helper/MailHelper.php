@@ -42,7 +42,7 @@ class MailHelper
     /**
      * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var null
@@ -885,11 +885,11 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->templating) {
-            $this->templating = $this->factory->getTemplating();
+        if (null == $this->twig) {
+            $this->twig = $this->factory->gettwig();
         }
 
-        $content = $this->templating->render($template, $vars);
+        $content = $this->twig->render($template, $vars);
 
         unset($vars);
 

@@ -9,9 +9,9 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -279,10 +279,10 @@ class PublicControllerTest extends MauticMysqlTestCase
                 $this->returnValueMap(
                     [
                         ['mautic.helper.cookie', Container::EXCEPTION_ON_INVALID_REFERENCE, $cookieHelper],
-                        ['templating.helper.assets', Container::EXCEPTION_ON_INVALID_REFERENCE, $assetHelper],
+                        ['twig.helper.assets', Container::EXCEPTION_ON_INVALID_REFERENCE, $assetHelper],
                         ['mautic.helper.ip_lookup', Container::EXCEPTION_ON_INVALID_REFERENCE, $ipHelper],
                         ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $mauticSecurity],
-                        ['mautic.helper.template.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
+                        ['mautic.helper.twig.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
                         ['mautic.page.model.page', Container::EXCEPTION_ON_INVALID_REFERENCE, $pageModel],
                         ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->leadModel],
                         ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $router],

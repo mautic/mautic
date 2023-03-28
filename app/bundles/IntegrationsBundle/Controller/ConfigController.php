@@ -186,7 +186,7 @@ class ConfigController extends AbstractFormController
     {
         $integrationObject = $this->integrationObject;
         $form              = $form->createView();
-        $formHelper        = $this->get('templating.helper.form');
+        $formHelper        = $this->get('twig.helper.form');
 
         $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface ||
             $integrationObject instanceof ConfigFormSyncInterface ||

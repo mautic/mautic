@@ -2,17 +2,18 @@
 
 namespace Mautic\CoreBundle\Twig\Helper;
 
-use Symfony\Component\Templating\Helper\SlotsHelper as BaseSlotsHelper;
-
 /**
  * final class SlotsHelper.
  */
-final class SlotsHelper extends BaseSlotsHelper
+final class SlotsHelper
 {
+    private $slots     = [];
+    private $openSlots = [];
+
     /**
      * @var bool
      */
-    protected $inBuilder = false;
+    private $inBuilder = false;
 
     /**
      * Appends a slot value if already set.

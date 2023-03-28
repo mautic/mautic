@@ -20,10 +20,6 @@ class TemplatingPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if ($container->hasDefinition('templating')) {
-            return;
-        }
-
         if ($container->hasDefinition(AssetsHelper::class)) {
             $container->getDefinition(AssetsHelper::class)
                 ->addMethodCall('setPathsHelper', [new Reference('mautic.helper.paths')])
@@ -34,14 +30,14 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION]);
         }
 
-        if ($container->hasDefinition('templating.helper.slots')) {
-            $container->getDefinition('templating.helper.slots')
+        if ($container->hasDefinition('twig.helper.slots')) {
+            $container->getDefinition('twig.helper.slots')
                 ->setClass(SlotsHelper::class)
                 ->setPublic(true);
         }
 
-        if ($container->hasDefinition('templating.helper.form')) {
-            $container->getDefinition('templating.helper.form')
+        if ($container->hasDefinition('twig.helper.form')) {
+            $container->getDefinition('twig.helper.form')
                 ->setClass(FormHelper::class)
                 ->setPublic(true);
         }

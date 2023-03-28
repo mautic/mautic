@@ -223,7 +223,7 @@ class PublicController extends CommonFormController
             }
 
             // Generate contents
-            $analytics = $this->get('mautic.helper.template.analytics')->getCode();
+            $analytics = $this->get('mautic.helper.twig.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
             $content   = $entity->getCustomHtml();
@@ -267,7 +267,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $this->get('templating.helper.assets')->addScript(
+            $this->get('twig.helper.assets')->addScript(
                 $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,

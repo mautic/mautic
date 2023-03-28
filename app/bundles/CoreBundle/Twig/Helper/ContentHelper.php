@@ -32,7 +32,7 @@ final class ContentHelper
      * Dispatch an event to collect custom content.
      *
      * @param       $context  Context of the content requested for the viewName
-     * @param array $vars     Templating vars
+     * @param array $vars     twig vars
      * @param       $viewName The main identifier for the content requested. Will be etracted from $vars if get_
      *defined
      *

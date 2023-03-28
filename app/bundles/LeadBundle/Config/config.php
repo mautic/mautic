@@ -653,21 +653,21 @@ return [
             ],
         ],
         'helpers' => [
-            'mautic.helper.template.avatar' => [
+            'mautic.helper.twig.avatar' => [
                 'class'     => Mautic\LeadBundle\Twig\Helper\AvatarHelper::class,
                 'arguments' => [
-                    'templating.helper.assets',
+                    'twig.helper.assets',
                     'mautic.helper.paths',
-                    'mautic.helper.template.gravatar',
-                    'mautic.helper.template.default_avatar',
+                    'mautic.helper.twig.gravatar',
+                    'mautic.helper.twig.default_avatar',
                 ],
                 'alias' => 'lead_avatar',
             ],
-            'mautic.helper.template.default_avatar' => [
+            'mautic.helper.twig.default_avatar' => [
                 'class'     => Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
-                    'templating.helper.assets',
+                    'twig.helper.assets',
                 ],
                 'alias' => 'default_avatar',
             ],
@@ -675,7 +675,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Helper\FieldAliasHelper::class,
                 'arguments' => ['mautic.lead.model.field'],
             ],
-            'mautic.helper.template.dnc_reason' => [
+            'mautic.helper.twig.dnc_reason' => [
                 'class'     => Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class,
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',

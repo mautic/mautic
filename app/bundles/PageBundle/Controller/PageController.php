@@ -980,9 +980,9 @@ class PageController extends FormController
     private function processSlots($slots, $entity)
     {
         /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->get('templating.helper.assets');
+        $assetsHelper = $this->get('twig.helper.assets');
         /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->get('templating.helper.slots');
+        $slotsHelper = $this->get('twig.helper.slots');
         $formFactory = $this->get('form.factory');
 
         $slotsHelper->inBuilder(true);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Test\Templating\Helper;
+namespace Mautic\CoreBundle\Test\twig\Helper;
 
 use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use PHPUnit\Framework\TestCase;

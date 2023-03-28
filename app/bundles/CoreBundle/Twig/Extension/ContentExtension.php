@@ -32,7 +32,7 @@ class ContentExtension extends AbstractExtension
      * Dispatch an event to collect custom content.
      *
      * @param ?mixed              $context  Context of the content requested for the viewName
-     * @param array<string,mixed> $vars     Templating vars
+     * @param array<string,mixed> $vars     twig vars
      * @param ?string             $viewName The main identifier for the content requested. Will be etracted from $vars if get_defined
      */
     public function getCustomContent($context = null, array $vars = [], ?string $viewName = null): string

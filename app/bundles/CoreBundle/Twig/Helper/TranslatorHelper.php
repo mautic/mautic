@@ -61,11 +61,11 @@ final class TranslatorHelper
         $messages        = $this->translator->getCatalogue()->all('javascript');
 
         $oldKeys = [
-            'chosenChooseOne'     => $this->trans('mautic.core.form.chooseone'),
-            'chosenChooseMore'    => $this->trans('mautic.core.form.choosemultiple'),
-            'chosenNoResults'     => $this->trans('mautic.core.form.nomatches'),
-            'pleaseWait'          => $this->trans('mautic.core.wait'),
-            'popupBlockerMessage' => $this->trans('mautic.core.popupblocked'),
+            'chosenChooseOne'     => $this->translator->trans('mautic.core.form.chooseone'),
+            'chosenChooseMore'    => $this->translator->trans('mautic.core.form.choosemultiple'),
+            'chosenNoResults'     => $this->translator->trans('mautic.core.form.nomatches'),
+            'pleaseWait'          => $this->translator->trans('mautic.core.wait'),
+            'popupBlockerMessage' => $this->translator->trans('mautic.core.popupblocked'),
         ];
         $jsLang = array_merge($defaultMessages, $messages, $oldKeys);
 

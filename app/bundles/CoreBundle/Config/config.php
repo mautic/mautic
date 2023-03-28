@@ -207,12 +207,12 @@ return [
             'mautic.helper.app_version' => [
                 'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
             ],
-            'mautic.helper.template.menu' => [
+            'mautic.helper.twig.menu' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
                 'arguments' => ['knp_menu.helper'],
                 'alias'     => 'menu',
             ],
-            'mautic.helper.template.date' => [
+            'mautic.helper.twig.date' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\DateHelper::class,
                 'arguments' => [
                     '%mautic.date_format_full%',
@@ -224,34 +224,34 @@ return [
                 ],
                 'alias' => 'date',
             ],
-            'mautic.helper.template.gravatar' => [
+            'mautic.helper.twig.gravatar' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\GravatarHelper::class,
                 'arguments' => [
-                    'mautic.helper.template.default_avatar',
+                    'mautic.helper.twig.default_avatar',
                     'mautic.helper.core_parameters',
                     'request_stack',
                 ],
                 'alias'     => 'gravatar',
             ],
-            'mautic.helper.template.analytics' => [
+            'mautic.helper.twig.analytics' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class,
                 'alias'     => 'analytics',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.helper.template.config' => [
+            'mautic.helper.twig.config' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\ConfigHelper::class,
                 'alias'     => 'config',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'mautic.helper.template.mautibot' => [
+            'mautic.helper.twig.mautibot' => [
                 'class' => \Mautic\CoreBundle\Twig\Helper\MautibotHelper::class,
                 'alias' => 'mautibot',
             ],
-            'mautic.helper.template.button' => [
+            'mautic.helper.twig.button' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\ButtonHelper::class,
                 'arguments' => [
                     'twig',
@@ -260,7 +260,7 @@ return [
                 ],
                 'alias' => 'buttons',
             ],
-            'mautic.helper.template.content' => [
+            'mautic.helper.twig.content' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\ContentHelper::class,
                 'arguments' => [
                     'twig',
@@ -268,22 +268,22 @@ return [
                 ],
                 'alias' => 'content',
             ],
-            'mautic.helper.template.formatter' => [
+            'mautic.helper.twig.formatter' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\FormatterHelper::class,
                 'arguments' => [
-                    'mautic.helper.template.date',
+                    'mautic.helper.twig.date',
                     'translator',
                 ],
                 'alias' => 'formatter',
             ],
-            'mautic.helper.template.version' => [
+            'mautic.helper.twig.version' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\VersionHelper::class,
                 'arguments' => [
                     'mautic.helper.app_version',
                 ],
                 'alias' => 'version',
             ],
-            'mautic.helper.template.security' => [
+            'mautic.helper.tiwg.security' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
@@ -478,10 +478,6 @@ return [
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
-            ],
-            'mautic.templating.name_parser' => [
-                'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-                'arguments' => 'kernel',
             ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',

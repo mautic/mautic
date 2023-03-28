@@ -181,7 +181,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
 
-        // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
+        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
         $this->controller->saveAction();
     }
@@ -228,7 +228,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.error.save');
 
-        // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
+        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
         $this->controller->saveAction();
     }

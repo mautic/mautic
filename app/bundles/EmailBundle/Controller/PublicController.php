@@ -69,7 +69,7 @@ class PublicController extends CommonFormController
                 $content = '';
             }
 
-            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+            $content = $this->get('mautic.helper.twig.analytics')->addCode($content);
 
             // Add subject as title
             if (!empty($subject)) {
@@ -226,7 +226,7 @@ class PublicController extends CommonFormController
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
                         /** @var \Mautic\CoreBundle\Twig\Helper\FormHelper $formHelper */
-                        $formHelper =$this->get('templating.helper.form');
+                        $formHelper =$this->get('twig.helper.form');
                         $params     = array_merge(
                             $viewParameters,
                             [
@@ -532,7 +532,7 @@ class PublicController extends CommonFormController
         $content = $event->getContent(true);
 
         if ($this->get('mautic.security')->isAnonymous()) {
-            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+            $content = $this->get('mautic.helper.twig.analytics')->addCode($content);
         }
 
         return new Response($content);
