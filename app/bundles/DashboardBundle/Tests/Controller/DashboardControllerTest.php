@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -271,7 +272,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $widgetId        = '1';
         $widget          = new \Mautic\DashboardBundle\Entity\Widget();
         $renderedContent = 'lfsadkdhfůasfjds';
-        $twig          = $this->createMock(Environment::class);
+        $twig            = $this->createMock(Environment::class);
 
         $twig->expects(self::once())
             ->method('render')
@@ -293,14 +294,14 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->withConsecutive(
                 ['mautic.dashboard.widget'],
-                ['templating'],
-                ['templating']
+                ['twig'],
+                ['twig']
             )
-            ->willReturnOnConsecutiveCalls($widgetService, $engine, $engine);
+            ->willReturnOnConsecutiveCalls($widgetService, $twig, $twig);
 
         $this->containerMock->expects(self::once())
             ->method('has')
-            ->with('templating')
+            ->with('twig')
             ->willReturn(true);
 
         $response = $this->controller->widgetAction($widgetId);

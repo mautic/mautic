@@ -706,6 +706,18 @@ abstract class AbstractStandardFormController extends AbstractFormController
     }
 
     /**
+     * Get the template file.
+     *
+     * @param $file
+     *
+     * @return string
+     */
+    protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
+    {
+        // Content Removed intentionally
+    }
+
+    /**
      * Get template base different than @MauticCore/Standard.
      *
      * @return string
