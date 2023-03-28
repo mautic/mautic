@@ -19,8 +19,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebhookFunctionalTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->setUpSymfony(
             $this->configParams +
             [
