@@ -8,11 +8,12 @@ use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
+use Symfony\Component\Asset\Packages;
 
 class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AssetsHelper
+     * @var AssetsHelper
      */
     private $assetsHelperMock;
 
@@ -43,7 +44,10 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->assetsHelperMock        = $this->createMock(AssetsHelper::class);
+        $packagesMock = $this->getMockBuilder(Packages::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->assetsHelperMock        = new AssetsHelper($packagesMock);
         $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
         $this->gravatarHelperMock      = $this->createMock(GravatarHelper::class);
         $this->defaultAvatarHelperMock = $this->createMock(DefaultAvatarHelper::class);

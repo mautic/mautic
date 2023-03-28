@@ -60,8 +60,6 @@ class FieldHelperTest extends TestCase
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
         $this->channelListHelper       = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
-        $this->channelListHelper->method('getFeatureChannels')
-            ->willReturn(['Email' => 'email']);
 
         $this->mauticSyncFieldsLoadEvent = $this->createMock(MauticSyncFieldsLoadEvent::class);
         $this->eventDispatcher           = $this->createMock(EventDispatcherInterface::class);
