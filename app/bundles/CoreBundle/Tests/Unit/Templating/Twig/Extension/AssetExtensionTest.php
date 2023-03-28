@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\Templating\Twig\Extension;
+namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
-use Mautic\CoreBundle\Templating\Twig\Extension\AssetExtension;
+use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use PHPUnit\Framework\Assert;
 

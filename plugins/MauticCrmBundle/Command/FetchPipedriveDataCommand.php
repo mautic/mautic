@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Command;
 
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\AbstractImport;

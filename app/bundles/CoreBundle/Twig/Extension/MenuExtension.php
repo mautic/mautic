@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Twig\Twig\Extension;
+namespace Mautic\CoreBundle\Twig\Extension;
 
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;

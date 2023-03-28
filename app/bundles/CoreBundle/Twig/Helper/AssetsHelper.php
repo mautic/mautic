@@ -671,7 +671,7 @@ final class AssetsHelper
      *
      * @return string
      */
-    public function getCountryFlag($country, $urlOnly = true, $final class = '')
+    public function getCountryFlag($country, $urlOnly = true, $class = '')
     {
         $flagPath = $this->pathsHelper->getSystemPath('assets', true).'/images/flags/';
         $relpath  = $this->pathsHelper->getSystemPath('assets').'/images/flags/';

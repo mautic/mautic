@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Twig\Twig\Extension;
+namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Twig\Extension\AbstractExtension;

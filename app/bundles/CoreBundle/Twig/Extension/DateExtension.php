@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Twig\Twig\Extension;
+namespace Mautic\CoreBundle\Twig\Extension;
 
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Twig\Extension\AbstractExtension;

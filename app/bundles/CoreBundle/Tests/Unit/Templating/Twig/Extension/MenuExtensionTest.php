@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\Templating\Twig\Extension;
+namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Knp\Menu\MenuFactory;
-use Mautic\CoreBundle\Templating\Twig\Extension\MenuExtension;
+use Mautic\CoreBundle\Twig\Extension\MenuExtension;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use PHPUnit\Framework\Assert;
 

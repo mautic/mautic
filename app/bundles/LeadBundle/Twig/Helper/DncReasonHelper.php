@@ -1,16 +1,15 @@
 <?php
 
-namespace Mautic\LeadBundle\Templating\Helper;
+namespace Mautic\LeadBundle\Twig\Helper;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
-use Symfony\Component\Templating\Helper\Helper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Convert DNC reason ID to text.
  */
-class DncReasonHelper extends Helper
+final class DncReasonHelper
 {
     /**
      * @var TranslatorInterface

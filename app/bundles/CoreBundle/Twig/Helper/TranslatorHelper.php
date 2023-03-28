@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Translation\Translator;
-use Symfony\Bundle\FrameworkBundle\Twig\Helper\TranslatorHelper as BaseHelper;
+use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper as BaseHelper;
 
 /**
  * Extended TranslatorHelper.

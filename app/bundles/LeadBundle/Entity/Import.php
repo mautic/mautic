@@ -8,7 +8,7 @@ use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
-use Symfony\Bundle\FrameworkBundle\Templating\Helper\TranslatorHelper;
+use Symfony\Bundle\FrameworkBundle\Twig\Helper\TranslatorHelper;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 

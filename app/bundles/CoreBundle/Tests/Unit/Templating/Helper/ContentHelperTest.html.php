@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
-use Mautic\CoreBundle\Templating\Helper\ContentHelper;
+use Mautic\CoreBundle\Twig\Helper\ContentHelper;
 use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 

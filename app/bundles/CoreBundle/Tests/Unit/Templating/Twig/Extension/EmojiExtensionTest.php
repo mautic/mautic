@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\Templating\Twig\Extension;
+namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\EmojiHelper;
-use Mautic\CoreBundle\Templating\Twig\Extension\EmojiExtension;
+use Mautic\CoreBundle\Twig\Extension\EmojiExtension;
 use PHPUnit\Framework\TestCase;
 
 final class EmojiExtensionTest extends TestCase

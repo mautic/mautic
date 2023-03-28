@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mautic\LeadBundle\Templating\Twig\Extension;
+namespace Mautic\LeadBundle\Twig\Extension;
 
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

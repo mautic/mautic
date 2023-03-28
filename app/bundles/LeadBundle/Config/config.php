@@ -654,7 +654,7 @@ return [
         ],
         'helpers' => [
             'mautic.helper.template.avatar' => [
-                'class'     => Mautic\LeadBundle\Templating\Helper\AvatarHelper::class,
+                'class'     => Mautic\LeadBundle\Twig\Helper\AvatarHelper::class,
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.paths',
@@ -664,7 +664,7 @@ return [
                 'alias' => 'lead_avatar',
             ],
             'mautic.helper.template.default_avatar' => [
-                'class'     => Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper::class,
+                'class'     => Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
                     'templating.helper.assets',
@@ -676,7 +676,7 @@ return [
                 'arguments' => ['mautic.lead.model.field'],
             ],
             'mautic.helper.template.dnc_reason' => [
-                'class'     => Mautic\LeadBundle\Templating\Helper\DncReasonHelper::class,
+                'class'     => Mautic\LeadBundle\Twig\Helper\DncReasonHelper::class,
                 'arguments' => ['translator'],
                 'alias'     => 'lead_dnc_reason',
             ],

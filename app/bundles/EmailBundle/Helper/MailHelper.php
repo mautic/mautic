@@ -2044,7 +2044,7 @@ class MailHelper
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();

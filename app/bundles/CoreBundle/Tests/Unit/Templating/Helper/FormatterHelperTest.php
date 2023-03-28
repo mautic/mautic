@@ -6,8 +6,8 @@ namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use DateTime;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FormatterHelperTest extends \PHPUnit\Framework\TestCase

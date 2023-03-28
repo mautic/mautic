@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\FormBundle\Templating\Twig\Extension;
+namespace Mautic\FormBundle\Twig\Extension;
 
 use Mautic\FormBundle\Helper\FormFieldHelper;
 use Twig\Extension\AbstractExtension;

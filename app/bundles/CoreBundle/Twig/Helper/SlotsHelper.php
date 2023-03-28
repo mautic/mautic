@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Twig\Helper;
 
-use Symfony\Component\Twig\Helper\SlotsHelper as BaseSlotsHelper;
+use Symfony\Component\Templating\Helper\SlotsHelper as BaseSlotsHelper;
 
 /**
  * final class SlotsHelper.

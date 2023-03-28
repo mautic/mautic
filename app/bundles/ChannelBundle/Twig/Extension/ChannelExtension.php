@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\ChannelBundle\Templating\Twig\Extension;
+namespace Mautic\ChannelBundle\Twig\Extension;
 
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Twig\Extension\AbstractExtension;

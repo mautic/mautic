@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**

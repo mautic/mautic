@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
 use PhpOffice\PhpSpreadsheet\IOFactory;

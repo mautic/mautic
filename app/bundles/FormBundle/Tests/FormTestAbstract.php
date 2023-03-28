@@ -11,7 +11,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
 use Mautic\FormBundle\Entity\FormRepository;

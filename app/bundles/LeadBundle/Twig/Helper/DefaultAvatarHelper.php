@@ -1,11 +1,11 @@
 <?php
 
-namespace Mautic\LeadBundle\Templating\Helper;
+namespace Mautic\LeadBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 
-class DefaultAvatarHelper
+final class DefaultAvatarHelper
 {
     /**
      * @var PathsHelper

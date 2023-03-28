@@ -225,7 +225,7 @@ class PublicController extends CommonFormController
                     if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
+                        /** @var \Mautic\CoreBundle\Twig\Helper\FormHelper $formHelper */
                         $formHelper =$this->get('templating.helper.form');
                         $params     = array_merge(
                             $viewParameters,
@@ -544,7 +544,7 @@ class PublicController extends CommonFormController
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();

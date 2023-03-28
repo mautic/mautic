@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

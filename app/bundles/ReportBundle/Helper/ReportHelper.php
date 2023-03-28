@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Helper;
 
-use Symfony\Component\Templating\Helper\Helper;
+use Symfony\Component\Twig\Helper\Helper;
 
 class ReportHelper extends Helper
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig\Fakes;
 
-use Mautic\CoreBundle\Templating\Helper\FormHelper;
+use Mautic\CoreBundle\Twig\Helper\FormHelper;
 use Symfony\Component\Form\FormView;
 
 class FormHelperFake extends FormHelper

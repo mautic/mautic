@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCrmBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;

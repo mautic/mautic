@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mautic\LeadBundle\Templating\Twig\Extension;
+namespace Mautic\LeadBundle\Twig\Extension;
 
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
-use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

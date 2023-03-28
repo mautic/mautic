@@ -1,16 +1,16 @@
 <?php
 
-namespace Mautic\LeadBundle\Templating\Helper;
+namespace Mautic\LeadBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Templating\Helper\GravatarHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Templating\Helper\Helper;
 
-class AvatarHelper extends Helper
+
+final class AvatarHelper
 {
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
     /**

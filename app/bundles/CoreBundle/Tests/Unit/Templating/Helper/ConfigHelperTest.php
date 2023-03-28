@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Templating\Helper;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\ConfigHelper;
+use Mautic\CoreBundle\Twig\Helper\ConfigHelper;
 use PHPUnit\Framework\Assert;
 
 class ConfigHelperTest extends \PHPUnit\Framework\TestCase

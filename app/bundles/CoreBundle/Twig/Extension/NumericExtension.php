@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Twig\Twig\Extension;
+namespace Mautic\CoreBundle\Twig\Extension;
 
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

@@ -3,11 +3,11 @@
 namespace Mautic\LeadBundle\Tests\Helper;
 
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Templating\Helper\GravatarHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
-use Mautic\LeadBundle\Templating\Helper\DefaultAvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\DefaultAvatarHelper;
 
 class AvatarHelperTest extends \PHPUnit\Framework\TestCase
 {

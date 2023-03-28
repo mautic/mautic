@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as TemplatingThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;

@@ -3,8 +3,8 @@
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;

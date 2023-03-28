@@ -73,7 +73,7 @@ final class MenuHelper
         $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);
 
-        $final class   = $item->getAttribute('class');
+        $class   = $item->getAttribute('class');
         $classes = ($class) ? " {$class}" : '';
         $classes .= ($isCurrent) ? " {$options['currentClass']}" : '';
         $classes .= ($isAncestor) ? " {$options['ancestorClass']}" : '';

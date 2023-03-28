@@ -172,7 +172,7 @@ class EventController extends CommonFormController
                     ]
                 );
             } elseif ('date' == $event['triggerMode']) {
-                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
                 $dh    = $this->factory->getHelper('template.date');
                 $label = 'mautic.campaign.connection.trigger.date.label';
                 if ('no' == $anchorName) {
@@ -388,7 +388,7 @@ class EventController extends CommonFormController
                     $label .= '_inaction';
                 }
 
-                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
                 $dh                       = $this->get('mautic.helper.template.date');
                 $passthroughVars['label'] = $this->translator->trans(
                     $label,

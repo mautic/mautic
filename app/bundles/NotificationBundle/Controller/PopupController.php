@@ -11,7 +11,7 @@ class PopupController extends CommonController
 {
     public function indexAction()
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->container->get('templating.helper.assets');
         $assetsHelper->addStylesheet('/app/bundles/NotificationBundle/Assets/css/popup/popup.css');
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

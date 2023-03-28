@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;

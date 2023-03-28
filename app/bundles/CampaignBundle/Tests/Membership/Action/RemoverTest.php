@@ -7,7 +7,7 @@ use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Action\Remover;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RemoverTest extends \PHPUnit\Framework\TestCase

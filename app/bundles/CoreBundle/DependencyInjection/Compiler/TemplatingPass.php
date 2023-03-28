@@ -2,10 +2,10 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Mautic\CoreBundle\Templating\Helper\FormHelper;
-use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\FormHelper;
+use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
+use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

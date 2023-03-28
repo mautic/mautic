@@ -520,7 +520,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
                 // Allow a custom error page
                 $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
                 $twig               = new \Twig\Environment($loader);
-                // This is the same filter Located at Mautic\CoreBundle\Templating\Twig\Extension\ExceptionExtension;
+                // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
                 $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
                     $root = realpath(__DIR__.'/../../../../');
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticCitrixBundle\Templating\Twig\Extension;
+namespace MauticPlugin\MauticCitrixBundle\Twig\Extension;
 
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Twig\Extension\AbstractExtension;

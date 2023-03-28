@@ -208,12 +208,12 @@ return [
                 'class' => \Mautic\CoreBundle\Helper\AppVersion::class,
             ],
             'mautic.helper.template.menu' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\MenuHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\MenuHelper::class,
                 'arguments' => ['knp_menu.helper'],
                 'alias'     => 'menu',
             ],
             'mautic.helper.template.date' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\DateHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\DateHelper::class,
                 'arguments' => [
                     '%mautic.date_format_full%',
                     '%mautic.date_format_short%',
@@ -225,7 +225,7 @@ return [
                 'alias' => 'date',
             ],
             'mautic.helper.template.gravatar' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\GravatarHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\GravatarHelper::class,
                 'arguments' => [
                     'mautic.helper.template.default_avatar',
                     'mautic.helper.core_parameters',
@@ -234,25 +234,25 @@ return [
                 'alias'     => 'gravatar',
             ],
             'mautic.helper.template.analytics' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\AnalyticsHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\AnalyticsHelper::class,
                 'alias'     => 'analytics',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.template.config' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\ConfigHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\ConfigHelper::class,
                 'alias'     => 'config',
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.helper.template.mautibot' => [
-                'class' => \Mautic\CoreBundle\Templating\Helper\MautibotHelper::class,
+                'class' => \Mautic\CoreBundle\Twig\Helper\MautibotHelper::class,
                 'alias' => 'mautibot',
             ],
             'mautic.helper.template.button' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\ButtonHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\ButtonHelper::class,
                 'arguments' => [
                     'templating',
                     'translator',
@@ -261,7 +261,7 @@ return [
                 'alias' => 'buttons',
             ],
             'mautic.helper.template.content' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\ContentHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\ContentHelper::class,
                 'arguments' => [
                     'templating',
                     'event_dispatcher',
@@ -269,7 +269,7 @@ return [
                 'alias' => 'content',
             ],
             'mautic.helper.template.formatter' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\FormatterHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\FormatterHelper::class,
                 'arguments' => [
                     'mautic.helper.template.date',
                     'translator',
@@ -277,14 +277,14 @@ return [
                 'alias' => 'formatter',
             ],
             'mautic.helper.template.version' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\VersionHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\VersionHelper::class,
                 'arguments' => [
                     'mautic.helper.app_version',
                 ],
                 'alias' => 'version',
             ],
             'mautic.helper.template.security' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\SecurityHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',
                     'request_stack',
@@ -294,7 +294,7 @@ return [
                 'alias' => 'security',
             ],
             'mautic.helper.template.translator' => [
-                'class'     => \Mautic\CoreBundle\Templating\Helper\TranslatorHelper::class,
+                'class'     => \Mautic\CoreBundle\Twig\Helper\TranslatorHelper::class,
                 'arguments' => [
                     'translator',
                 ],
