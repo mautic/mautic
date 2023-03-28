@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig\Fakes;
 
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-
-class AssetsHelperFake extends AssetsHelper
+class AssetsHelperFake
 {
     public function __construct()
     {
