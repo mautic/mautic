@@ -24,7 +24,7 @@ class ResultController extends CommonFormController
             'mautic_form', // route base
             'mautic.formresult', // session base
             'mautic.form.result', // lang string base
-            'MauticFormBundle/Result', // template base
+            '@MauticForm/Result', // template base
             'mautic_form', // activeLink
             'formresult' // mauticContent
         );

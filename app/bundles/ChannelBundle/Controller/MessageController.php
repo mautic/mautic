@@ -190,7 +190,7 @@ class MessageController extends AbstractStandardFormController
 
     protected function getTemplateBase(): string
     {
-        return 'MauticChannelBundle:Message';
+        return '@MauticChannel/Message';
     }
 
     /**

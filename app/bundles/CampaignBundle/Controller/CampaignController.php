@@ -690,7 +690,7 @@ class CampaignController extends AbstractStandardFormController
 
     protected function getTemplateBase(): string
     {
-        return 'MauticCampaignBundle:Campaign';
+        return '@MauticCampaign/Campaign';
     }
 
     /**

@@ -108,7 +108,7 @@ class DashboardController extends AbstractFormController
             throw new NotFoundHttpException('Not found.');
         }
 
-        $response = $this->render(
+        $content = $this->get('twig')->render(
             '@MauticDashboard/Dashboard/widget.html.twig',
             ['widget' => $widget]
         );
@@ -116,7 +116,7 @@ class DashboardController extends AbstractFormController
         return new JsonResponse([
             'success'      => 1,
             'widgetId'     => $widgetId,
-            'widgetHtml'   => $response->getContent(),
+            'widgetHtml'   => $content,
             'widgetWidth'  => $widget->getWidth(),
             'widgetHeight' => $widget->getHeight(),
         ]);
