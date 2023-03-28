@@ -21,9 +21,9 @@ class ThemeHelper implements ThemeHelperInterface
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templatingHelper;
+    private $twig;
 
     /**
      * @var TranslatorInterface
@@ -112,7 +112,7 @@ class ThemeHelper implements ThemeHelperInterface
 
     public function __construct(
         PathsHelper $pathsHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         TranslatorInterface $translator,
         CoreParametersHelper $coreParametersHelper,
         Filesystem $filesystem,
@@ -120,7 +120,7 @@ class ThemeHelper implements ThemeHelperInterface
         BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
         $this->pathsHelper               = $pathsHelper;
-        $this->templatingHelper          = $templatingHelper;
+        $this->twig          = $twig;
         $this->translator                = $translator;
         $this->coreParametersHelper      = $coreParametersHelper;
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
@@ -252,25 +252,14 @@ class ThemeHelper implements ThemeHelperInterface
         return $minors;
     }
 
-    public function checkForTwigTemplate($template)
+    public function checkForTwigTemplate($template) : string
     {
-        $parser     = $this->templatingHelper->getTemplateNameParser();
-        $templating = $this->templatingHelper->getTemplating();
-
-        $template = $parser->parse($template);
-
-        $twigTemplate = clone $template;
-        $twigTemplate->set('engine', 'twig');
-
-        // Does a twig version exist?
-        if ($templating->getLoader()->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
+        if ($this->twig->getLoader()->exists($template)) {
+            return $template;
         }
 
         // Try any theme as a fall back starting with default
-        $this->findThemeWithTemplate($templating, $twigTemplate);
-
-        return $twigTemplate->getLogicalName();
+        return $this->findThemeWithTemplate($template);
     }
 
     public function getInstalledThemes($specificFeature = 'all', $extended = false, $ignoreCache = false, $includeDirs = true)
@@ -465,33 +454,38 @@ class ThemeHelper implements ThemeHelperInterface
      * @throws BadConfigurationException
      * @throws FileNotFoundException
      */
-    private function findThemeWithTemplate(Environment $templating, TemplateReference $template)
+    private function findThemeWithTemplate(string $template): string
     {
-        preg_match('/^:(.*?):(.*?)$/', $template->getLogicalName(), $match);
+        preg_match('/^@themes\/(.*?)\/(.*?)$/', $template, $match);
+        
         $requestedThemeName = $match[1];
+        $templatePath = $match[2];
 
         // Try the default theme first
         $defaultTheme = $this->getTheme();
-        if ($requestedThemeName !== $defaultTheme->getTheme()) {
-            $template->set('controller', $defaultTheme->getTheme());
-            if ($templating->getLoader()->exists($template)) {
-                return;
+        
+        if ($requestedThemeName !== $defaultTheme->getTheme()) {            
+            $defaultTemplate = '@themes/' . $defaultTheme->getTheme() . '/' . $templatePath;
+            if ($this->twig->getLoader()->exists($defaultTemplate)) {
+                
+                return $defaultTemplate;
             }
         }
 
         // Find any theme as a fallback
         $themes = $this->getInstalledThemes('all', true);
+        
         foreach ($themes as $theme) {
             // Already handled the default
             if ($theme['key'] === $defaultTheme->getTheme()) {
                 continue;
             }
+            
+            $fallbackTemplate = '@themes/' . $theme['key'] . '/' . $templatePath;
 
-            // Theme name is stored in the controller parameter
-            $template->set('controller', $theme['key']);
+            if ($this->twig->getLoader()->exists($template)) {
 
-            if ($templating->getLoader()->exists($template)) {
-                return;
+                return $fallbackTemplate;
             }
         }
     }

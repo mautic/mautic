@@ -619,17 +619,11 @@ return [
                     'kernel',
                 ],
             ],
-            'mautic.helper.templating' => [
-                'class'     => 'Mautic\CoreBundle\Helper\TemplatingHelper',
-                'arguments' => [
-                    'kernel',
-                ],
-            ],
             'mautic.helper.theme' => [
                 'class'     => \Mautic\CoreBundle\Helper\ThemeHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
-                    'mautic.helper.templating',
+                    'twig',
                     'translator',
                     'mautic.helper.core_parameters',
                     'mautic.filesystem',
