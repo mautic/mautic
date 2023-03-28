@@ -88,7 +88,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Model\ReportModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.channel.helper.channel_list',
                     'mautic.lead.model.field',
                     'mautic.report.helper.report',

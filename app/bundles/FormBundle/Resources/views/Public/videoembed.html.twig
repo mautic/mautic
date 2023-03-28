@@ -8,7 +8,7 @@
                     {{ f.setCustomParameters(params) }}
                     {% set template = params.template %}
                 {% else %}
-                    {% set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' %}
+                    {% set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' %}
                 {% endif %}
                 {{ include(template, {'field': f.convertToArray(), 'id': f.alias, 'formName': f.form.generateFormName()}) }}
             {% endif %}

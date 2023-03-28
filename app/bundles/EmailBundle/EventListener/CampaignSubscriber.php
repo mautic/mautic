@@ -124,7 +124,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'batchEventName'       => EmailEvents::ON_CAMPAIGN_BATCH_ACTION,
                 'formType'             => EmailSendType::class,
                 'formTypeOptions'      => ['update_select' => 'campaignevent_properties_email', 'with_email_types' => true],
-                'formTheme'            => 'MauticEmailBundle:FormTheme:EmailSendList/_emailsend_list_row.html.twig',
+                'formTheme'            => '@MauticEmail/FormTheme/EmailSendList/_emailsend_list_row.html.twig',
                 'channel'              => 'email',
                 'channelIdField'       => 'email',
             ]

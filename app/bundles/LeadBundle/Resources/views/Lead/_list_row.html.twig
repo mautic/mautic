@@ -42,7 +42,7 @@
             }]) %}
         {% endif %}
 
-        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
             'item': item,
             'templateButtons': {
                 'edit': hasEditAccess,

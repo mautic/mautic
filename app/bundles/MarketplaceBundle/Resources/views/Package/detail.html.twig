@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 {% block headerTitle %}{{ packageDetail.packageBase.getHumanPackageName()|escape }}{% endblock %}
 
 {% set buttons = {
@@ -84,7 +84,7 @@
 {% endif %}
 
 {% block actions %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'customButtons' : buttons
     }) -}}
 {% endblock %}
