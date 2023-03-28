@@ -132,7 +132,7 @@ class GrapesJsController extends CommonController
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
 
         return $this->render(
-            'GrapesJsBuilder/Builder/template.html.twig',
+            '@GrapesJsBuilder/Builder/template.html.twig',
             [
                 'templateHtml' => $renderedTemplateHtml,
                 'templateMjml' => $renderedTemplateMjml,
@@ -281,6 +281,9 @@ class GrapesJsController extends CommonController
         $slotsHelper->stop();
     }
 
+    /**
+     * @deprecated deprecated since version 5.0 - use mjml directly in email.html.twig
+     */
     private function checkForMjmlTemplate($template)
     {
         $twig = $this->get('twig');
