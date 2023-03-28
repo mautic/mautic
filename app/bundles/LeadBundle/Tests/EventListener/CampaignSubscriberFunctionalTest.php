@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\OptimisticLockException;
 use Mautic\CampaignBundle\Entity\Campaign;
@@ -72,12 +71,7 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
         $this->contactRepository  = $this->em->getRepository(Lead::class);
     }
 
-    /**
-     * Clean up after the tests.
-     *
-     * @throws DBALException
-     */
-    protected function beforeTearDown(): void
+    protected function beforeBeginTransaction(): void
     {
         $this->truncateTables('leads', 'stages', 'campaigns', 'campaign_events');
     }
