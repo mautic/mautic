@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -28,6 +27,7 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -223,9 +223,11 @@ class PublicControllerTest extends MauticMysqlTestCase
         $ipHelper->method('getIpAddress')
             ->will($this->returnValue(new IpAddress()));
 
-        $assetHelper = $this->getMockBuilder(AssetsHelper::class)
+        $packagesMock = $this->getMockBuilder(Packages::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $assetHelper = new AssetHelper($packagesMock);
 
         $mauticSecurity = $this->getMockBuilder(CorePermissions::class)
             ->disableOriginalConstructor()

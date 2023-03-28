@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
@@ -49,8 +50,8 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->assetsHelperMock        = new AssetsHelper($packagesMock);
         $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
-        $this->gravatarHelperMock      = $this->createMock(GravatarHelper::class);
-        $this->defaultAvatarHelperMock = $this->createMock(DefaultAvatarHelper::class);
+        $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->assetsHelperMock, $this->pathsHelperMock);
+        $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $this->createMock(CoreParametersHelper::class), $this->createMock(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
         $this->avatarHelper            = new AvatarHelper($this->assetsHelperMock, $this->pathsHelperMock, $this->gravatarHelperMock, $this->defaultAvatarHelperMock);
     }
