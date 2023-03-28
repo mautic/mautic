@@ -485,7 +485,7 @@ class ThemeHelper implements ThemeHelperInterface
             }
         }
 
-        throw new BadConfigurationException(sprintf('Could not find theme %s nor a fail back theme to replace it', $requestedThemeName));
+        throw new BadConfigurationException(sprintf('Could not find theme %s nor a fall back theme to replace it', $requestedThemeName));
     }
 
     private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
