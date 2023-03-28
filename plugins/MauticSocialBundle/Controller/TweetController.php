@@ -49,7 +49,7 @@ class TweetController extends FormController
      */
     protected function getTemplateBase()
     {
-        return 'MauticSocialBundle:Tweet';
+        return '@MauticSocial/Tweet';
     }
 
     /**

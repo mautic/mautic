@@ -7,7 +7,6 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -272,15 +271,11 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $widgetId        = '1';
         $widget          = new \Mautic\DashboardBundle\Entity\Widget();
         $renderedContent = 'lfsadkdhfůasfjds';
-        $engine          = $this->createMock(PhpEngine::class);
+        $twig          = $this->createMock(Environment::class);
 
-        $engine->expects(self::once())
+        $twig->expects(self::once())
             ->method('render')
             ->willReturn($renderedContent);
-
-        $engine->expects(self::once())
-            ->method('supports')
-            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
