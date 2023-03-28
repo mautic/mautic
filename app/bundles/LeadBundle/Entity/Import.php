@@ -7,7 +7,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
-use Mautic\CoreBundle\Helper\Chart\PieChart;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -925,20 +924,5 @@ class Import extends FormEntity
         }
 
         return parent::setIsPublished($isPublished);
-    }
-
-    /**
-     * Get pie graph data for row status counts.
-     *
-     * @return array
-     */
-    public function getRowStatusesPieChart(TranslatorHelper $translator)
-    {
-        $chart = new PieChart();
-        $chart->setDataset($translator->trans('mautic.lead.import.inserted.count'), $this->getInsertedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.updated.count'), $this->getUpdatedCount());
-        $chart->setDataset($translator->trans('mautic.lead.import.ignored.count'), $this->getIgnoredCount());
-
-        return $chart->render();
     }
 }
