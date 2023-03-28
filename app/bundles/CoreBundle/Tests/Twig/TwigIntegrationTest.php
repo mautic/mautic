@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig;
 
-use Mautic\CoreBundle\Tests\Twig\Fakes\AssetsHelperFake;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Twig\Extension\AppExtension;
 use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use Mautic\CoreBundle\Twig\Extension\ClassExtension;
 use Mautic\CoreBundle\Twig\Extension\FormExtension;
-use Twig\Extension\ExtensionInterface;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Component\Asset\Packages;
-use Mautic\CoreBundle\Helper\PathsHelper;
+use Twig\Extension\ExtensionInterface;
 
 /**
  * @see https://twig.symfony.com/doc/2.x/advanced.html#functional-tests
@@ -32,17 +31,17 @@ class TwigIntegrationTest extends \Twig\Test\IntegrationTestCase
             ->will($this->returnCallback(function (string $path) {
                 $packageName = $version = null;
                 $absolute = $ignorePrefix = false;
+
                 return "{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
             }));
 
         $pathHelperMock = $this->getMockBuilder(PathsHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-            
+
         $assetsHelper = new AssetsHelper($packagesMock);
         $pathHelperMock->method('getSystemPath')->willReturn('https://example.com/');
         $assetsHelper->setPathsHelper($pathHelperMock);
-        
 
         return [
             new AppExtension(),
