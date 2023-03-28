@@ -77,10 +77,8 @@ class CampaignSubscriberFunctionalTest extends MauticMysqlTestCase
      *
      * @throws DBALException
      */
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
-        parent::tearDown();
-
         $this->truncateTables('leads', 'stages', 'campaigns', 'campaign_events');
     }
 

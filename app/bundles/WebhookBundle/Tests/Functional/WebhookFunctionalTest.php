@@ -34,10 +34,8 @@ class WebhookFunctionalTest extends MauticMysqlTestCase
     /**
      * Clean up after the tests.
      */
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
-        parent::tearDown();
-
         $this->truncateTables('leads', 'webhooks', 'webhook_queue', 'webhook_events');
     }
 

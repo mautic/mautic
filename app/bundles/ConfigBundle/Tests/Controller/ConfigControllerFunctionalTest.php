@@ -40,19 +40,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         }
     }
 
-    protected function tearDown(): void
-    {
-        if (file_exists($this->getConfigPath().'.backup')) {
-            // restore original local.php
-            rename($this->getConfigPath().'.backup', $this->getConfigPath());
-        } else {
-            // local.php didn't exist to start with so delete
-            unlink($this->getConfigPath());
-        }
-
-        parent::tearDown();
-    }
-
     public function testValuesAreEscapedProperly(): void
     {
         $url             = 'https://test.us/create?key=2MLzQFXBSqd2nqwGero90CpB1jX1FbVhhRd51ojr&domain=https%3A%2F%2Ftest.us%2F&longUrl=';

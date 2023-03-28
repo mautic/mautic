@@ -38,7 +38,7 @@ abstract class PipedriveTest extends MauticMysqlTestCase
         $this->mockHandler = self::$container->get(MockHandler::class);
     }
 
-    public function tearDown(): void
+    public function beforeTearDown(): void
     {
         unset($_SERVER['SERVER_PROTOCOL'], $_SERVER['SERVER_PORT'], $_SERVER['SERVER_NAME']);
 
