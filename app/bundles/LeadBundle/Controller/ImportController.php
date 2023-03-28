@@ -730,7 +730,7 @@ class ImportController extends FormController
      */
     protected function getTemplateBase()
     {
-        return 'MauticLeadBundle:Import';
+        return '@MauticLead/Import';
     }
 
     /**
