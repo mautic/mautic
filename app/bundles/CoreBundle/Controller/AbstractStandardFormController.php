@@ -714,7 +714,13 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
     {
-        // Content Removed intentionally
+        $originalFile = $file;
+
+        if ($this->get('twig')->getLoader()->exists($this->getTemplateBase().'/'.$file)) {
+            return $this->getTemplateBase().'/'.$file;
+        }
+
+        throw new \Exception("Template {$file} not found");
     }
 
     /**

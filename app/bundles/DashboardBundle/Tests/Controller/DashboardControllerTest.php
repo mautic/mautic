@@ -301,7 +301,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->containerMock->expects(self::once())
             ->method('has')
-            ->with('twig')
+            ->with('templating')
             ->willReturn(true);
 
         $response = $this->controller->widgetAction($widgetId);
