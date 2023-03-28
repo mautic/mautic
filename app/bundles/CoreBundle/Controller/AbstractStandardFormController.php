@@ -13,12 +13,6 @@ abstract class AbstractStandardFormController extends AbstractFormController
 {
     use FormErrorMessagesTrait;
 
-    public const ENGINE_TWIG = 'twig';
-    /**
-     * @deprecated The PHP templating engine is deprecated and will be removed in Mautic 5. Please use ENGINE_TWIG instead.
-     */
-    public const ENGINE_PHP  = 'php';
-
     /**
      * Get this controller's model name.
      */
@@ -712,10 +706,8 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return string
      */
-    protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
+    protected function getTemplateName($file)
     {
-        $originalFile = $file;
-
         if ($this->get('twig')->getLoader()->exists($this->getTemplateBase().'/'.$file)) {
             return $this->getTemplateBase().'/'.$file;
         }
@@ -1097,7 +1089,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
      *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item', string $engine = self::ENGINE_TWIG)
+    protected function viewStandard($objectId, $logObject = null, $logBundle = null, $listPage = null, $itemName = 'item')
     {
         $model    = $this->getModel($this->getModelName());
         $entity   = $model->getEntity($objectId);

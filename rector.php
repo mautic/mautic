@@ -21,7 +21,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
                 __DIR__.'/app/bundles/CoreBundle/Factory/MauticFactory.php', // Requires quite a refactoring.
                 __DIR__.'/plugins/MauticCitrixBundle/MauticCitrixBundle.php', // Requires quite a refactoring.
                 __DIR__.'/app/bundles/CoreBundle/Helper/TemplatingHelper.php', // Will be removed once Twig refactoring is done.
-                __DIR__.'/app/bundles/CoreBundle/Templating/TemplateNameParser.php', // Will be removed once Twig refactoring is done.
             ],
         ]
     );

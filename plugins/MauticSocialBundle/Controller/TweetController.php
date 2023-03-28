@@ -132,7 +132,7 @@ class TweetController extends FormController
      *
      * @return string
      */
-    protected function getTemplateName($file, string $engine = self::ENGINE_TWIG)
+    protected function getTemplateName($file)
     {
         if (('form.html.twig' === $file) && 1 == $this->request->get('modal')) {
             return '@MauticSocial/Tweet/form_modal.html.twig';
