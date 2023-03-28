@@ -29,15 +29,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         parent::setUp();
 
         $this->prefix = MAUTIC_TABLE_PREFIX;
-
-        $configPath = $this->getConfigPath();
-        if (file_exists($configPath)) {
-            // backup original local.php
-            copy($configPath, $configPath.'.backup');
-        } else {
-            // write a temporary local.php
-            file_put_contents($configPath, '<?php $parameters = [];');
-        }
     }
 
     public function testValuesAreEscapedProperly(): void
