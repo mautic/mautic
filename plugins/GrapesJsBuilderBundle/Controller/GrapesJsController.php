@@ -281,6 +281,9 @@ class GrapesJsController extends CommonController
         $slotsHelper->stop();
     }
 
+    /**
+     * @deprecated deprecated since version 5.0 - use mjml directly in email.html.twig
+     */
     private function checkForMjmlTemplate($template)
     {
         $twig = $this->get('twig');

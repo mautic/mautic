@@ -451,7 +451,6 @@ class ThemeHelper implements ThemeHelperInterface
 
     /**
      * @throws BadConfigurationException
-     * @throws FileNotFoundException
      */
     private function findThemeWithTemplate(string $template): string
     {
@@ -485,6 +484,8 @@ class ThemeHelper implements ThemeHelperInterface
                 return $fallbackTemplate;
             }
         }
+
+        throw new BadConfigurationException(sprintf('Could not find theme %s nor a fail back theme to replace it', $requestedThemeName));
     }
 
     private function loadThemes(string $specificFeature, bool $includeDirs, string $key): void
