@@ -13,7 +13,6 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
-        'Services',
     ];
 
     $services->load('MauticPlugin\\MauticOutlookBundle\\', '../')

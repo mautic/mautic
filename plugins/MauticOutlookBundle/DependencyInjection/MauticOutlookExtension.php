@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\MauticFullContactBundle\DependencyInjection;
+namespace MauticPlugin\MauticOutlookBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
-class MauticOutlookBundleExtension extends Extension
+class MauticOutlookExtension extends Extension
 {
     /**
      * @param mixed[] $configs
