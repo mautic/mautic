@@ -708,11 +708,18 @@ abstract class AbstractStandardFormController extends AbstractFormController
      */
     protected function getTemplateName($file)
     {
-        if ($this->get('twig')->getLoader()->exists($this->getTemplateBase().'/'.$file)) {
-            return $this->getTemplateBase().'/'.$file;
+        $namespaces = [
+            $this->getTemplateBase(),
+            '@MauticCore/Standard',
+        ];
+
+        foreach ($namespaces as $namespace) {
+            if ($this->get('twig')->getLoader()->exists($namespace.'/'.$file)) {
+                return $namespace.'/'.$file;
+            }
         }
 
-        throw new \Exception("Template {$file} not found");
+        throw new \Exception("Template {$file} not found in any of the following places: ".implode(', ', $namespaces).'.');
     }
 
     /**
