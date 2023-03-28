@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
-use Mautic\CoreBundle\Templating\TemplateReference;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
@@ -41,7 +40,6 @@ class ThemeHelperTest extends TestCase
      */
     private $loader;
 
-    
     /**
      * @var TranslatorInterface|MockObject
      */
@@ -66,8 +64,8 @@ class ThemeHelperTest extends TestCase
     {
         parent::setUp();
         $this->pathsHelper         = $this->createMock(PathsHelper::class);
-        $this->twig    = $this->createMock(Environment::class);
-        $this->loader = $this->createMock(FilesystemLoader::class);
+        $this->twig                = $this->createMock(Environment::class);
+        $this->loader              = $this->createMock(FilesystemLoader::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParameterHelper->method('get')
@@ -75,7 +73,6 @@ class ThemeHelperTest extends TestCase
             ->willReturn(['json', 'twig', 'css', 'js', 'htm', 'html', 'txt', 'jpg', 'jpeg', 'png', 'gif']);
 
         $this->builderIntegrationsHelper = $this->createMock(BuilderIntegrationsHelper::class);
-        
 
         $this->themeHelper = new ThemeHelper(
             $this->pathsHelper,
@@ -239,6 +236,7 @@ class ThemeHelperTest extends TestCase
                 public function __construct()
                 {
                 }
+
                 public function getSystemPath($name, $fullPath = false)
                 {
                     Assert::assertSame('themes', $name);
@@ -246,7 +244,7 @@ class ThemeHelperTest extends TestCase
                     return '/path/to/themes';
                 }
             },
-            new Environment(new FilesystemLoader()),           
+            new Environment(new FilesystemLoader()),
             new class() extends Translator {
                 public function __construct()
                 {

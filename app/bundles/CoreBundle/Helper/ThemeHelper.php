@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\TemplateReference;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -120,7 +119,7 @@ class ThemeHelper implements ThemeHelperInterface
         BuilderIntegrationsHelper $builderIntegrationsHelper
     ) {
         $this->pathsHelper               = $pathsHelper;
-        $this->twig          = $twig;
+        $this->twig                      = $twig;
         $this->translator                = $translator;
         $this->coreParametersHelper      = $coreParametersHelper;
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
@@ -252,7 +251,7 @@ class ThemeHelper implements ThemeHelperInterface
         return $minors;
     }
 
-    public function checkForTwigTemplate($template) : string
+    public function checkForTwigTemplate($template): string
     {
         if ($this->twig->getLoader()->exists($template)) {
             return $template;
@@ -457,34 +456,32 @@ class ThemeHelper implements ThemeHelperInterface
     private function findThemeWithTemplate(string $template): string
     {
         preg_match('/^@themes\/(.*?)\/(.*?)$/', $template, $match);
-        
+
         $requestedThemeName = $match[1];
-        $templatePath = $match[2];
+        $templatePath       = $match[2];
 
         // Try the default theme first
         $defaultTheme = $this->getTheme();
-        
-        if ($requestedThemeName !== $defaultTheme->getTheme()) {            
-            $defaultTemplate = '@themes/' . $defaultTheme->getTheme() . '/' . $templatePath;
+
+        if ($requestedThemeName !== $defaultTheme->getTheme()) {
+            $defaultTemplate = '@themes/'.$defaultTheme->getTheme().'/'.$templatePath;
             if ($this->twig->getLoader()->exists($defaultTemplate)) {
-                
                 return $defaultTemplate;
             }
         }
 
         // Find any theme as a fallback
         $themes = $this->getInstalledThemes('all', true);
-        
+
         foreach ($themes as $theme) {
             // Already handled the default
             if ($theme['key'] === $defaultTheme->getTheme()) {
                 continue;
             }
-            
-            $fallbackTemplate = '@themes/' . $theme['key'] . '/' . $templatePath;
+
+            $fallbackTemplate = '@themes/'.$theme['key'].'/'.$templatePath;
 
             if ($this->twig->getLoader()->exists($template)) {
-
                 return $fallbackTemplate;
             }
         }
