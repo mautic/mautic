@@ -201,7 +201,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->contactMerger            = $this->createMock(ContactMerger::class);
 
-        $this->submissionModel          = new SubmissionModel(
+        $this->submissionModel = new SubmissionModel(
             $this->ipLookupHelper,
             $this->templatingHelperMock,
             $this->formModel,
@@ -239,14 +239,14 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new User());
 
         $mockLeadField['email'] = [
-                'label'        => 'Email',
-                'alias'        => 'email',
-                'type'         => 'email',
-                'group'        => 'core',
-                'group_label'  => 'Core',
-                'defaultValue' => '',
-                'properties'   => [],
-            ];
+            'label'        => 'Email',
+            'alias'        => 'email',
+            'type'         => 'email',
+            'group'        => 'core',
+            'group_label'  => 'Core',
+            'defaultValue' => '',
+            'properties'   => [],
+        ];
 
         $this->leadFieldModel->expects($this->any())
             ->method('getUniqueIdentifierFields')
@@ -352,17 +352,17 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $field->setProperties(
             [
                 'list' => [
-                        'list' => [
-                                [
-                                    'label' => 'First',
-                                    'value' => 1,
-                                ],
-                                [
-                                    'label' => 'Second',
-                                    'value' => 2,
-                                ],
-                            ],
+                    'list' => [
+                        [
+                            'label' => 'First',
+                            'value' => 1,
+                        ],
+                        [
+                            'label' => 'Second',
+                            'value' => 2,
+                        ],
                     ],
+                ],
             ]
         );
         $this->assertEquals('', $method->invokeArgs($this->submissionModel, ['', $field]));
@@ -407,15 +407,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     {
         $this->formModel->expects($this->any())
             ->method('getCustomComponents')
-            ->willReturn([
-                'viewOnlyFields' => [
-                    'button',
-                    'captcha',
-                    'freetext',
-                    'freehtml',
-                    'pagebreak',
-                ],
-            ]);
+            ->willReturn(['viewOnlyFields' => ['button', 'captcha', 'freetext']]);
 
         $this->submissioRepository->expects($this->any())
             ->method('getEntities')
@@ -444,5 +436,153 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(get_class($response), 'Symfony\Component\HttpFoundation\StreamedResponse');
         $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
         $this->assertSame('0', $response->headers->get('Expires'));
+    }
+
+    private function mockTranslation(): void
+    {
+        $values = ['Submission ID', 'Contact ID', 'Date Submitted', 'IP address', 'Referrer', 'Form ID'];
+
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->with($this->anything())
+            ->will($this->returnCallback(function ($text) use ($values) {
+                return match ($text) {
+                    'mautic.form.report.submission.id'  => $values[0],
+                    'mautic.lead.report.contact_id'     => $values[1],
+                    'mautic.form.result.thead.date'     => $values[2],
+                    'mautic.core.ipaddress'             => $values[3],
+                    'mautic.form.result.thead.referrer' => $values[4],
+                    'mautic.form.report.form_id'        => $values[5],
+                    default                             => null,
+                };
+            }));
+    }
+
+    public function testGetExportHeader(): void
+    {
+        $form   = new Form();
+        $field  = new Field();
+        $field2 = new Field();
+        $field->setLabel('Email');
+        $field2->setType('text');
+        $field2->setLabel('Click');
+        $field2->setType('button');
+        $form->addField('email', $field);
+        $form->addField('button', $field2);
+        $viewOnlyFields = ['button', 'captcha', 'freetext'];
+
+        $expectedHeader = ['Submission ID', 'Contact ID', 'Date Submitted', 'IP address', 'Referrer', 'Email'];
+        $this->mockTranslation();
+
+        $header = $this->submissionModel->getExportHeader($form, $viewOnlyFields);
+
+        $this->assertCount(6, $header);
+        $this->assertSame($expectedHeader, $header);
+        $this->assertNotContains('Click', $header);
+    }
+
+    public function testGetExportHeaderForPage(): void
+    {
+        $expectedHeader = ['Submission ID', 'Contact ID', 'Form ID', 'Date Submitted', 'IP address', 'Referrer'];
+        $this->mockTranslation();
+
+        $header1 = $this->submissionModel->getExportHeaderForPage();
+        $header2 = $this->submissionModel->getExportHeaderForPage('xlsx');
+
+        $this->assertCount(6, $header1);
+        $this->assertCount(5, $header2);
+        $this->assertSame($expectedHeader, $header1);
+        $this->assertNotContains('Form ID', $header2);
+    }
+
+    public function testPutCsvExportRow(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
+        $handle  = fopen($tmpFile, 'r+');
+        $header  = ['Submission ID', 'Contact ID', 'Form ID'];
+
+        $this->submissionModel->putCsvExportRow($handle, $header);
+
+        fclose($handle);
+        $result = array_map('str_getcsv', file($tmpFile));
+
+        $this->assertCount(1, $result);
+        $this->assertSame($header, $result[0]);
+
+        if (file_exists($tmpFile)) {
+            unlink($tmpFile);
+        }
+    }
+
+    public function testGetExportRow(): void
+    {
+        $viewOnlyFields = ['button'];
+        $fixture        = [
+            'id'            => 1,
+            'leadId'        => 123,
+            'dateSubmitted' => '28-03-2023 12:00',
+            'ipAddress'     => '127.0.0.1',
+            'referer'       => 'https://test.com',
+            'results'       => [
+                [
+                    'type'  => 'text',
+                    'label' => 'Email',
+                    'value' => 'a@b.c',
+                ],
+                [
+                    'type'  => 'button',
+                    'label' => 'Click',
+                    'value' => true,
+                ],
+            ],
+        ];
+
+        $this->dateHelper->expects($this->any())
+            ->method('toFull')
+            ->with('28-03-2023 12:00')
+            ->willReturn('2023-03-28 10:00:00');
+
+        $result = $this->submissionModel->getExportRow($fixture, $viewOnlyFields);
+
+        $this->assertIsArray($result);
+        $this->assertSame([1, 123, '2023-03-28 10:00:00', '127.0.0.1', 'https://test.com', 'a@b.c'], $result);
+    }
+
+    public function testGetExportRowForPage(): void
+    {
+        $email   = 'a@b.c';
+        $formId  = 432;
+        $fixture = [
+            'id'            => 1,
+            'leadId'        => 123,
+            'dateSubmitted' => '28-03-2023 12:00',
+            'ipAddress'     => '127.0.0.1',
+            'referer'       => 'https://test.com',
+            'formId'        => $formId,
+            'results'       => [
+                [
+                    'type'  => 'text',
+                    'label' => 'Email',
+                    'value' => $email,
+                ],
+            ],
+        ];
+
+        $this->dateHelper->expects($this->any())
+            ->method('toFull')
+            ->with('28-03-2023 12:00')
+            ->willReturn('2023-03-28 10:00:00');
+
+        $row1 = $this->submissionModel->getExportRowForPage($fixture);
+        $row2 = $this->submissionModel->getExportRowForPage($fixture, 'xlsx');
+
+        $this->assertIsArray($row1);
+        $this->assertIsArray($row2);
+        $this->assertCount(6, $row1);
+        $this->assertCount(5, $row2);
+        $this->assertSame([1, 123, $formId, '2023-03-28 10:00:00', '127.0.0.1', 'https://test.com'], $row1);
+        $this->assertSame([1, 123, '2023-03-28 10:00:00', '127.0.0.1', 'https://test.com'], $row2);
+        $this->assertNotContains($formId, $row2);
+        $this->assertNotContains($email, $row1);
     }
 }
