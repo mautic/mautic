@@ -31,10 +31,9 @@ class MonitoringModel extends FormModel
     ];
 
     /**
-     * @param object               $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null          $action
-     * @param mixed[]              $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param mixed[]     $options
      *
      * @return mixed
      *
