@@ -4,15 +4,15 @@ namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
-use Symfony\Bundle\FrameworkBundle\Twig\DelegatingEngine;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 
 final class ContentHelper
 {
     /**
-     * @var DelegatingEngine
+     * @var Environment
      */
-    private $templating;
+    private $twg;
 
     /**
      * @var EventDispatcherInterface
@@ -22,9 +22,9 @@ final class ContentHelper
     /**
      * UIHelper constructor.
      */
-    public function __construct(DelegatingEngine $templating, EventDispatcherInterface $dispatcher)
+    public function __construct(Environment $twig, EventDispatcherInterface $dispatcher)
     {
-        $this->templating = $templating;
+        $this->twig       = $twig;
         $this->dispatcher = $dispatcher;
     }
 
@@ -58,7 +58,7 @@ final class ContentHelper
 
         if ($templatProps = $event->getTemplates()) {
             foreach ($templatProps as $props) {
-                $content[] = $this->templating->render($props['template'], array_merge($vars, $props['vars']));
+                $content[] = $this->twig->render($props['template'], array_merge($vars, $props['vars']));
             }
         }
 

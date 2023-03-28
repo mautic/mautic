@@ -4,10 +4,10 @@ namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Symfony\Bundle\FrameworkBundle\Twig\EngineInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 final class ButtonHelper
 {
@@ -59,9 +59,9 @@ final class ButtonHelper
     private $location;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Twig\DelegatingEngine
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var TranslatorInterface
@@ -120,9 +120,9 @@ final class ButtonHelper
      */
     private $listMarker = 3;
 
-    public function __construct(EngineInterface $templating, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(Environment $twig, TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
     {
-        $this->templating = $templating;
+        $this->twig       = $twig;
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
     }
@@ -314,7 +314,7 @@ final class ButtonHelper
 
         if (isset($button['confirm'])) {
             $button['confirm']['btnTextAttr'] = $this->generateTextAttributes($button);
-            $buttons .= $this->wrapOpeningTag.$this->templating->render('@MauticCore/Helper/confirm.html.twig', $button['confirm']).
+            $buttons .= $this->wrapOpeningTag.$this->twig->render('@MauticCore/Helper/confirm.html.twig', $button['confirm']).
                 "{$this->wrapClosingTag}\n";
         } else {
             $attr = $this->menuLink;

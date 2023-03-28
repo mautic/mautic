@@ -254,7 +254,7 @@ return [
             'mautic.helper.template.button' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\ButtonHelper::class,
                 'arguments' => [
-                    'templating',
+                    'twig',
                     'translator',
                     'event_dispatcher',
                 ],
@@ -263,7 +263,7 @@ return [
             'mautic.helper.template.content' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\ContentHelper::class,
                 'arguments' => [
-                    'templating',
+                    'twig',
                     'event_dispatcher',
                 ],
                 'alias' => 'content',
