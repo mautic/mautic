@@ -70,7 +70,14 @@ class RemoverTest extends \PHPUnit\Framework\TestCase
     private function getRemover()
     {
         $translator     = $this->createMock(TranslatorInterface::class);
-        $dateTimeHelper = $this->createMock(DateHelper::class);
+        $dateTimeHelper = new DateHelper(
+            'Y-m-d H:i:s',
+            'Y-m-d H:i',
+            'Y-m-d',
+            'H:i',
+            $translator,
+            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+        );
 
         return new Remover($this->leadRepository, $this->leadEventLogRepository, $translator, $dateTimeHelper);
     }

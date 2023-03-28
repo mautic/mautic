@@ -166,7 +166,11 @@ class AssetsHelperTest extends TestCase
 
         $packagesMock->method('getUrl')
             ->will($this->returnCallback(function (string $path) {
-                return $path;
+                $path = $packageName = $version = null;
+                $absolute = $ignorePrefix = false;
+                
+               return "https://example.com/{$path}/{$packageName}/{$version}/{$absolute}/{$ignorePrefix}}";
+                
             }));
 
         return $packagesMock;
