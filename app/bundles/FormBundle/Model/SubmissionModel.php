@@ -13,7 +13,6 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
 use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
@@ -52,6 +51,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Twig\Environment;
 
 /**
  * @extends CommonFormModel<Submission>
@@ -64,9 +64,9 @@ class SubmissionModel extends CommonFormModel
     protected $ipLookupHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var FormModel
@@ -142,7 +142,7 @@ class SubmissionModel extends CommonFormModel
 
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         FormModel $formModel,
         PageModel $pageModel,
         LeadModel $leadModel,
@@ -160,7 +160,7 @@ class SubmissionModel extends CommonFormModel
         ContactMerger $contactMerger
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
-        $this->templatingHelper       = $templatingHelper;
+        $this->twig                   = $twig;
         $this->formModel              = $formModel;
         $this->pageModel              = $pageModel;
         $this->leadModel              = $leadModel;
@@ -555,8 +555,8 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->render(
-                    'MauticFormBundle:Result:export.html.twig',
+                $content = $this->twig->render(
+                    '@MauticForm/Result/export.html.twig',
                     [
                         'form'           => $form,
                         'results'        => $results,
@@ -660,7 +660,7 @@ class SubmissionModel extends CommonFormModel
 
                 return $response;
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->render(
+                $content = $this->twig->render(
                     '@MauticPage/Result/export.html.twig',
                     [
                         'page'      => $page,
