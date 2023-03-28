@@ -248,18 +248,11 @@ return [
                 ],
             ],
             'mautic.helper.template.mautibot' => [
-                'class' => 'Mautic\CoreBundle\Templating\Helper\MautibotHelper',
+                'class' => \Mautic\CoreBundle\Templating\Helper\MautibotHelper::class,
                 'alias' => 'mautibot',
             ],
-            'mautic.helper.template.canvas' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\SidebarCanvasHelper',
-                'arguments' => [
-                    'event_dispatcher',
-                ],
-                'alias' => 'canvas',
-            ],
             'mautic.helper.template.button' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\ButtonHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\ButtonHelper::class,
                 'arguments' => [
                     'templating',
                     'translator',
@@ -268,7 +261,7 @@ return [
                 'alias' => 'buttons',
             ],
             'mautic.helper.template.content' => [
-                'class'     => 'Mautic\CoreBundle\Templating\Helper\ContentHelper',
+                'class'     => \Mautic\CoreBundle\Templating\Helper\ContentHelper::class,
                 'arguments' => [
                     'templating',
                     'event_dispatcher',
@@ -318,7 +311,7 @@ return [
                 ],
             ],
             'mautic.helper.ip_lookup' => [
-                'class'     => 'Mautic\CoreBundle\Helper\IpLookupHelper',
+                'class'     => \Mautic\CoreBundle\Helper\IpLookupHelper::class,
                 'arguments' => [
                     'request_stack',
                     'doctrine.orm.entity_manager',
@@ -327,7 +320,7 @@ return [
                 ],
             ],
             'mautic.helper.user' => [
-                'class'     => 'Mautic\CoreBundle\Helper\UserHelper',
+                'class'     => \Mautic\CoreBundle\Helper\UserHelper::class,
                 'arguments' => [
                     'security.token_storage',
                 ],
@@ -340,14 +333,14 @@ return [
                 'serviceAlias' => 'mautic.config',
             ],
             'mautic.helper.bundle' => [
-                'class'     => 'Mautic\CoreBundle\Helper\BundleHelper',
+                'class'     => \Mautic\CoreBundle\Helper\BundleHelper::class,
                 'arguments' => [
                     '%mautic.bundles%',
                     '%mautic.plugin.bundles%',
                 ],
             ],
             'mautic.helper.phone_number' => [
-                'class' => 'Mautic\CoreBundle\Helper\PhoneNumberHelper',
+                'class' => \Mautic\CoreBundle\Helper\PhoneNumberHelper::class,
             ],
             'mautic.helper.input_helper' => [
                 'class' => \Mautic\CoreBundle\Helper\InputHelper::class,
@@ -485,6 +478,10 @@ return [
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
+            ],
+            'mautic.templating.name_parser' => [
+                'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
+                'arguments' => 'kernel',
             ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
