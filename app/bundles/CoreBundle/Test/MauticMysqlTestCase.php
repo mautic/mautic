@@ -337,6 +337,10 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     {
         $path = $this->getLocalConfigFile();
 
+        if (!file_exists($path)) {
+            file_put_contents($path, '<?php $parameters = [];');
+        }
+
         if (!copy($path, $path.'.backup')) {
             throw new RuntimeException(sprintf('Unable to copy file %s => %s', $path, $path.'.backup'));
         }
