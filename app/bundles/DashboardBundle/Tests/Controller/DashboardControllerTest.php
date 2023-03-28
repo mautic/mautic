@@ -290,7 +290,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $this->containerMock->expects(self::exactly(3))
+        $this->containerMock->expects(self::exactly(2))
             ->method('get')
             ->withConsecutive(
                 ['mautic.dashboard.widget'],
