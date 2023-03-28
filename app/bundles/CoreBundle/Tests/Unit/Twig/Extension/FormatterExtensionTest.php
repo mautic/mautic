@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Twig\Extension\FormatterExtension;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
-use Mautic\CoreBundle\Twig\Extension\FormatterExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 

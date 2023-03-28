@@ -6,7 +6,6 @@ use Knp\Menu\ItemInterface;
 use Knp\Menu\Matcher\MatcherInterface;
 use Knp\Menu\Twig\Helper as KnpHelper;
 
-
 /**
  * final class MenuHelper.
  */
@@ -15,7 +14,7 @@ final class MenuHelper
     /**
      * @var KnpHelper
      */
-    protected $helper;
+    private $helper;
 
     /**
      * MenuHelper constructor.

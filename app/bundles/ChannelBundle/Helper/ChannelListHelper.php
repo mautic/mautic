@@ -12,22 +12,22 @@ final class ChannelListHelper
     /**
      * @var Translator
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var array
      */
-    protected $channels = [];
+    private $channels = [];
 
     /**
      * @var array
      */
-    protected $featureChannels = [];
+    private $featureChannels = [];
 
     /**
      * @var EventDispatcherInterface
      */
-    protected $dispatcher;
+    private $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
     {
@@ -131,7 +131,7 @@ final class ChannelListHelper
      *
      * Done this way to avoid a circular dependency error with LeadModel
      */
-    protected function setupChannels()
+    private function setupChannels()
     {
         if (!empty($this->channels)) {
             return;

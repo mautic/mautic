@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Twig\Helper\GravatarHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Filesystem\Filesystem;
 
-
 final class AvatarHelper
 {
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];

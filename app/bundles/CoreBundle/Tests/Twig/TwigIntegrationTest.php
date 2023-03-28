@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Twig;
 
+use Mautic\CoreBundle\Tests\Twig\Fakes\AssetsHelperFake;
 use Mautic\CoreBundle\Twig\Extension\AppExtension;
 use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use Mautic\CoreBundle\Twig\Extension\ClassExtension;
 use Mautic\CoreBundle\Twig\Extension\FormExtension;
-use Mautic\CoreBundle\Tests\Twig\Fakes\AssetsHelperFake;
 use Twig\Extension\ExtensionInterface;
 
 /**

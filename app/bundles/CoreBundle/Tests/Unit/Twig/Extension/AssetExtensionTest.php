@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
-use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Twig\Extension\AssetExtension;
 use PHPUnit\Framework\Assert;
 
 class AssetExtensionTest extends AbstractMauticTestCase

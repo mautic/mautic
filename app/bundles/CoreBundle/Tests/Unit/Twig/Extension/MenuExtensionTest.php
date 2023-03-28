@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\Twig\Extension;
 
 use Knp\Menu\MenuFactory;
-use Mautic\CoreBundle\Twig\Extension\MenuExtension;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
+use Mautic\CoreBundle\Twig\Extension\MenuExtension;
 use PHPUnit\Framework\Assert;
 
 class MenuExtensionTest extends AbstractMauticTestCase

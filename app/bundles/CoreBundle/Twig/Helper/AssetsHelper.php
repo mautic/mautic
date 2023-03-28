@@ -25,42 +25,42 @@ final class AssetsHelper
     /**
      * @var AssetGenerationHelper
      */
-    protected $assetHelper;
+    private $assetHelper;
 
     /**
      * @var string
      */
-    protected $context = self::CONTEXT_APP;
+    private $context = self::CONTEXT_APP;
 
     /**
      * @var array
      */
-    protected $assets = [
+    private $assets = [
         self::CONTEXT_APP => [],
     ];
 
     /**
      * @var string|null
      */
-    protected $version;
+    private $version;
 
     /**
      * @var Packages
      */
-    protected $packages;
+    private $packages;
 
     /**
      * @var string
      */
-    protected $siteUrl;
+    private $siteUrl;
 
     /**
      * @var PathsHelper
      */
-    protected $pathsHelper;
+    private $pathsHelper;
 
-    protected BuilderIntegrationsHelper $builderIntegrationsHelper;
-    protected InstallService $installService;
+    private BuilderIntegrationsHelper $builderIntegrationsHelper;
+    private InstallService $installService;
 
     public function __construct(Packages $packages)
     {
