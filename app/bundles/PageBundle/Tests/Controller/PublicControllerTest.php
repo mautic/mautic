@@ -7,6 +7,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
@@ -236,9 +237,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $mauticSecurity->method('hasEntityAccess')
             ->will($this->returnValue(false));
 
-        $analyticsHelper = $this->getMockBuilder(AnalyticsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $analyticsHelper = new AnalyticsHelper($this->createMock(CoreParametersHelper::class));
 
         $pageModel = $this->getMockBuilder(PageModel::class)
             ->disableOriginalConstructor()

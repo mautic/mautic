@@ -64,7 +64,7 @@ final class ChannelListHelper
         if (!is_array($features)) {
             $features = [$features];
         }
-
+        dd($features);
         $channels = [];
         foreach ($features as $feature) {
             $featureChannels = (isset($this->featureChannels[$feature])) ? $this->featureChannels[$feature] : [];
