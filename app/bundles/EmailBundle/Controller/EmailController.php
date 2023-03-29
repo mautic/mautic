@@ -323,7 +323,7 @@ class EmailController extends FormController
 
         if (count($children) > 0) {
             $abTestSettings      = $abTestSettingsService->getAbTestSettings($parent);
-            $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
+            $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']] ?? null);
         }
 
         //get related translations
