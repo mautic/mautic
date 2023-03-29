@@ -18,7 +18,7 @@ class FocusController extends AbstractStandardFormController
 {
     protected function getTemplateBase(): string
     {
-        return 'MauticFocusBundle:Focus';
+        return '@MauticFocus/Focus';
     }
 
     /**

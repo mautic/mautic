@@ -49,7 +49,7 @@ return [
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
-                    'mautic.helper.templating',
+                    'twig',
                     'event_dispatcher',
                     'mautic.lead.model.field',
                     'mautic.tracker.contact',

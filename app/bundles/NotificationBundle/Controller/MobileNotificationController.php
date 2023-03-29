@@ -127,7 +127,7 @@ class MobileNotificationController extends FormController
                     'model'       => $model,
                     'security'    => $this->get('mautic.security'),
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:MobileNotification:list.html.twig',
+                'contentTemplate' => '@MauticNotification/MobileNotification/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_mobile_notification_index',
                     'mauticContent' => 'mobile_notification',
@@ -235,7 +235,7 @@ class MobileNotificationController extends FormController
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticNotificationBundle:MobileNotification:details.html.twig',
+            'contentTemplate' => '@MauticNotification/MobileNotification/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_mobile_notification_index',
                 'mauticContent' => 'mobile_notification',
@@ -365,7 +365,7 @@ class MobileNotificationController extends FormController
                     'notification' => $entity,
                     'integration'  => $integration,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:MobileNotification:form.html.twig',
+                'contentTemplate' => '@MauticNotification/MobileNotification/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_mobile_notification_index',
                     'mauticContent' => 'mobile_notification',
@@ -531,7 +531,7 @@ class MobileNotificationController extends FormController
                     'forceTypeSelection' => $forceTypeSelection,
                     'integration'        => $integration,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:MobileNotification:form.html.twig',
+                'contentTemplate' => '@MauticNotification/MobileNotification/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_mobile_notification_index',
                     'mauticContent' => 'mobile_notification',
@@ -740,7 +740,7 @@ class MobileNotificationController extends FormController
                 'viewParameters' => [
                     'notification' => $notification,
                 ],
-                'contentTemplate' => 'MauticNotificationBundle:MobileNotification:preview.html.twig',
+                'contentTemplate' => '@MauticNotification/MobileNotification/preview.html.twig',
             ]
         );
     }

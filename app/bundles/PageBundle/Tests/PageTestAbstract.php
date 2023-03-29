@@ -22,18 +22,23 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\QueueBundle\Queue\QueueService;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class PageTestAbstract extends WebTestCase
+class PageTestAbstract extends TestCase
 {
     protected static $mockId   = 123;
     protected static $mockName = 'Mock test name';
-    protected $mockTrackingId;
+    protected string $mockTrackingId;
+
+    /**
+     * @var Router|MockObject
+     */
+    protected $router;
 
     protected function setUp(): void
     {
-        self::bootKernel();
         $this->mockTrackingId = hash('sha1', uniqid(mt_rand(), true));
     }
 
@@ -47,7 +52,7 @@ class PageTestAbstract extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $router = self::$container->get('router');
+        $this->router = $this->createMock(Router::class);
 
         $ipLookupHelper = $this
             ->getMockBuilder(IpLookupHelper::class)
@@ -165,7 +170,7 @@ class PageTestAbstract extends WebTestCase
         $pageModel->setDispatcher($dispatcher);
         $pageModel->setTranslator($translator);
         $pageModel->setEntityManager($entityManager);
-        $pageModel->setRouter($router);
+        $pageModel->setRouter($this->router);
         $pageModel->setUserHelper($userHelper);
 
         return $pageModel;
