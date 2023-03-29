@@ -1083,6 +1083,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     ) {
         if ($email->isEnableAbTest()) {
             $limit = null;
+            $batch = null;
         }
 
         //get the leads
@@ -1118,6 +1119,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         if ($batch && $output) {
             $progressCounter = 0;
             $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false);
+            $totalLeadCount  = $email->getVariantsPendingCount($totalLeadCount);
             if (!$totalLeadCount) {
                 return [0, 0, []];
             }
