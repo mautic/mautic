@@ -13,6 +13,7 @@ use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
@@ -32,7 +33,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
             $this->createMock(Environment::class),
             new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
             $fieldModelMock,
-            $this->createMock(ReportHelper::class),
+            new ReportHelper(),
             $this->createMock(CsvExporter::class),
             $this->createMock(ExcelExporter::class)
         );
