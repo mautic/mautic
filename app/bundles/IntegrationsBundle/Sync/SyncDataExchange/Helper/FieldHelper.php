@@ -170,7 +170,6 @@ class FieldHelper
 
         // Mautic contacts have "pseudo" fields such as channel do not contact, timeline, etc.
         $channels = $this->channelListHelper->getFeatureChannels([LeadModel::CHANNEL_FEATURE], true);
-        dd($channels);
         foreach ($channels as $label => $channel) {
             $this->syncFields[$objectName]['mautic_internal_dnc_'.$channel] = $this->translator->trans('mautic.integration.sync.channel_dnc', ['%channel%' => $label]);
         }
