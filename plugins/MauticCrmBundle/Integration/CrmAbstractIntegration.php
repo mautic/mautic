@@ -550,10 +550,8 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      */
     protected function getSyncTimeframeDates(array $params)
     {
-        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['start'])->format('Y-m-d H:i:s')
-            : null;
-        $toDate = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ISO8601, $params['end'])->format('Y-m-d H:i:s')
-            : null;
+        $fromDate = (isset($params['start'])) ? \DateTime::createFromFormat(\DateTime::ATOM, $params['start'])->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
+        $toDate   = (isset($params['end'])) ? \DateTime::createFromFormat(\DateTime::ATOM, $params['end'])->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
 
         return [$fromDate, $toDate];
     }
