@@ -11,6 +11,7 @@ use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -227,7 +228,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $assetHelper = new AssetHelper($packagesMock);
+        $assetHelper = new AssetsHelper($packagesMock);
 
         $mauticSecurity = $this->getMockBuilder(CorePermissions::class)
             ->disableOriginalConstructor()

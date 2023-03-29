@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ReportBundle\Tests\Model;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Model\ExcelExporter;
@@ -17,8 +18,16 @@ class ExcelExporterTest extends TestCase
 {
     public function testExport(): void
     {
-        $dateHelperMock   = $this->createMock(DateHelper::class);
         $translator       = $this->createMock(TranslatorInterface::class);
+        $dateHelperMock   =new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $translator,
+            $this->createMock(CoreParametersHelper::class)
+        );
+
         $formatterHelper  = new FormatterHelper($dateHelperMock, $translator);
         $reportDataResult = Fixtures::getValidReportResultWithAggregatedColumns();
         $excelExporter    = new ExcelExporter($formatterHelper);

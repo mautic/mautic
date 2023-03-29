@@ -14,15 +14,18 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testExport()
     {
-        $dateHelperMock = $this->createMock(DateHelper::class);
-
-        $dateHelperMock->expects($this->any())
-            ->method('toFullConcat')
-            ->willReturn('2017-10-01');
-
         $translator = $this->createMock(TranslatorInterface::class);
 
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $dateHelperMock =new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $translator,
+           $coreParametersHelperMock
+        );
 
         $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
 

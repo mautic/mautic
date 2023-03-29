@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use PHPUnit\Framework\Assert;
@@ -38,7 +39,7 @@ final class MauticReportBuilderTest extends TestCase
 
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->connection        = $this->createMock(Connection::class);
-        $this->channelListHelper = $this->createMock(ChannelListHelper::class);
+        $channelListHelperMock   = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
 
         $this->connection->method('createQueryBuilder')->willReturnOnConsecutiveCalls(
             new QueryBuilder($this->connection),

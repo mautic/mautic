@@ -30,7 +30,7 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $this->reportModel = new ReportModel(
             $this->createMock(CoreParametersHelper::class),
             $this->createMock(Environment::class),
-            $this->createMock(ChannelListHelper::class),
+            new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
             $fieldModelMock,
             $this->createMock(ReportHelper::class),
             $this->createMock(CsvExporter::class),

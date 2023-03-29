@@ -20,6 +20,7 @@ use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -72,7 +73,11 @@ class PageSubscriberTest extends TestCase
      */
     protected function getPageSubscriber()
     {
-        $assetsHelperMock   = $this->createMock(AssetsHelper::class);
+        $packagesMock = $this->getMockBuilder(Packages::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $assetsHelperMock   = new AssetsHelper($packagesMock);
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
         $pageModelMock      = $this->createMock(PageModel::class);
