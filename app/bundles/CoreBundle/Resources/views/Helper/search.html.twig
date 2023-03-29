@@ -1,0 +1,31 @@
+{% set searchValue = searchValue|default('') %}
+{% set target = target|default('.page-list') %}
+{% set overlayTarget = overlayTarget|default(target) %}
+{% set overlayEnabled = overlayDisabled is defined and overlayDisabled is not empty ? 'false' : 'true' %}
+{% set id = searchId|default('list-search') %}
+{% set tmpl = tmpl|default('list') %}
+
+<div class="input-group">
+    {% if searchHelp is defined and searchHelp is not empty %}
+    <div class="input-group-btn">
+        <button class="btn btn-default btn-nospin" data-toggle="modal" data-target="#{{ searchId }}-search-help">
+            <i class="fa fa-question-circle"></i>
+        </button>
+    </div>
+    {% endif %}
+
+    <input type="search" class="form-control search" id="{{ id }}" name="search" placeholder="{% trans %}mautic.core.search.placeholder{% endtrans %}" value="{{ searchValue|escape }}" autocomplete="false" data-toggle="livesearch" data-target="{{ target }}" data-tmpl="{{ tmpl }}" data-action="{{ action }}" data-overlay="{{ overlayEnabled }}" data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" data-overlay-target="{{ overlayTarget }}" />
+    <div class="input-group-btn">
+        <button type="button" class="btn btn-default btn-search btn-nospin" id="btn-filter" data-livesearch-parent="{{ id }}">
+            <i class="fa fa-search fa-fw"></i>
+        </button>
+    </div>
+</div>
+
+{% if searchHelp %}
+{{- include('@MauticCore/Helper/modal.html.twig', {
+    id: (searchId ~ '-search-help'),
+    header: 'mautic.core.search.header'|trans,
+    body: ('mautic.core.search.help'|trans ~ searchHelp|trans)
+}) -}}
+{% endif %}

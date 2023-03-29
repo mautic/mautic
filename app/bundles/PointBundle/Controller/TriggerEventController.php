@@ -112,7 +112,7 @@ class TriggerEventController extends CommonFormController
             $blank        = $entity->convertToArray();
             $triggerEvent = array_merge($blank, $triggerEvent);
 
-            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
+            $template = (empty($triggerEvent['settings']['template'])) ? '@MauticPoint/Event/generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
             $passthroughVars['eventId']   = $keyId;
@@ -131,7 +131,7 @@ class TriggerEventController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticPointBundle:Event:form.html.twig',
+            'contentTemplate' => '@MauticPoint/Event/form.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -231,7 +231,7 @@ class TriggerEventController extends CommonFormController
                 $entity       = new TriggerEvent();
                 $blank        = $entity->convertToArray();
                 $triggerEvent = array_merge($blank, $triggerEvent);
-                $template     = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
+                $template     = (empty($triggerEvent['settings']['template'])) ? '@MauticPoint/Event/generic.html.twig'
                     : $triggerEvent['settings']['template'];
 
                 $passthroughVars['eventId']   = $keyId;
@@ -250,7 +250,7 @@ class TriggerEventController extends CommonFormController
             }
 
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticPointBundle:Event:form.html.twig',
+                'contentTemplate' => '@MauticPoint/Event/form.html.twig',
                 'viewParameters'  => $viewParams,
                 'passthroughVars' => $passthroughVars,
             ]);
@@ -292,7 +292,7 @@ class TriggerEventController extends CommonFormController
                 $session->set('mautic.point.'.$triggerId.'.triggerevents.deleted', $delete);
             }
 
-            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
+            $template = (empty($triggerEvent['settings']['template'])) ? '@MauticPoint/Event/generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
             //prevent undefined errors
@@ -354,7 +354,7 @@ class TriggerEventController extends CommonFormController
                 $session->set('mautic.point.'.$triggerId.'.triggerevents.deleted', $delete);
             }
 
-            $template = (empty($triggerEvent['settings']['template'])) ? 'MauticPointBundle:Event:generic.html.twig'
+            $template = (empty($triggerEvent['settings']['template'])) ? '@MauticPoint/Event/generic.html.twig'
                 : $triggerEvent['settings']['template'];
 
             //prevent undefined errors

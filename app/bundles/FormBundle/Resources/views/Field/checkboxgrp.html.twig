@@ -1,0 +1,24 @@
+{% if field.defaultValue is defined and field.defaultValue is not empty %}
+    {{ include('@MauticForm/Field/hidden.html.twig', {
+            'field': field,
+            'fields': fields|default([]),
+            'inForm': inForm|default(false),
+            'id': id,
+            'formId': formId|default(0),
+            'type': 'checkbox',
+            'formName': formName|default(''),
+            'mappedFields': mappedFields|default([]),
+    })|replace({
+            '<input': '<input value="' ~ field.defaultValue ~ '"',
+    }) }}
+{% endif %}
+{{ include('@MauticForm/Field/group.html.twig', {
+        'field': field,
+        'inForm': inForm|default(false),
+        'id': id,
+        'formId': formId|default(0),
+        'type': 'checkbox',
+        'formName': formName|default(''),
+        'mappedFields': mappedFields|default([]),
+        'fields': fields|default(null),
+}) }}

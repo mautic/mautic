@@ -55,7 +55,7 @@ class DefaultController extends CommonController
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
+        return $this->render('@MauticCore/GlobalSearch/globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -75,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
+                'contentTemplate' => '@MauticCore/Notification/notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

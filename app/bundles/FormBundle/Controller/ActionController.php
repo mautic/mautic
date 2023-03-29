@@ -113,7 +113,7 @@ class ActionController extends CommonFormController
             $formAction = array_merge($blank, $formAction);
 
             $template = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                'MauticFormBundle:Action:_generic.html.twig';
+                '@MauticForm/Action/_generic.html.twig';
             $passthroughVars['actionId']   = $keyId;
             $passthroughVars['actionHtml'] = $this->renderView($template, [
                 'inForm' => true,
@@ -131,7 +131,7 @@ class ActionController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
+            'contentTemplate' => '@MauticForm/Builder/'.$viewParams['tmpl'].'.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -247,7 +247,7 @@ class ActionController extends CommonFormController
                 $blank      = $entity->convertToArray();
                 $formAction = array_merge($blank, $formAction);
                 $template   = (!empty($formAction['settings']['template'])) ? $formAction['settings']['template'] :
-                    'MauticFormBundle:Action:_generic.html.twig';
+                    '@MauticForm/Action/_generic.html.twig';
                 $passthroughVars['actionHtml'] = $this->renderView($template, [
                     'inForm' => true,
                     'action' => $formAction,
@@ -264,7 +264,7 @@ class ActionController extends CommonFormController
             }
 
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
+                'contentTemplate' => '@MauticForm/Builder/'.$viewParams['tmpl'].'.html.twig',
                 'viewParameters'  => $viewParams,
                 'passthroughVars' => $passthroughVars,
             ]);

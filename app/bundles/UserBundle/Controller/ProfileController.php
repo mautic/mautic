@@ -232,7 +232,7 @@ class ProfileController extends FormController
         return $this->delegateView(
             [
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticUserBundle:Profile:index.html.twig',
+                'contentTemplate' => '@MauticUser/Profile/index.html.twig',
                 'passthroughVars' => [
                     'route'         => $this->generateUrl('mautic_user_account'),
                     'mauticContent' => 'user',

@@ -94,7 +94,7 @@ class DynamicContentController extends FormController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:list.html.twig',
+                'contentTemplate' => '@MauticDynamicContent/DynamicContent/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
@@ -219,7 +219,7 @@ class DynamicContentController extends FormController
                 'viewParameters' => [
                     'form' => $form->createView(),
                 ],
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
+                'contentTemplate' => '@MauticDynamicContent/DynamicContent/form.html.twig',
                 'passthroughVars' => $passthrough,
             ]
         );
@@ -325,7 +325,7 @@ class DynamicContentController extends FormController
                     'form'          => $form->createView(),
                     'currentListId' => $objectId,
                 ],
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:form.html.twig',
+                'contentTemplate' => '@MauticDynamicContent/DynamicContent/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'route'         => $action,
@@ -411,7 +411,7 @@ class DynamicContentController extends FormController
         return $this->delegateView(
             [
                 'returnUrl'       => $action,
-                'contentTemplate' => 'MauticDynamicContentBundle:DynamicContent:details.html.twig',
+                'contentTemplate' => '@MauticDynamicContent/DynamicContent/details.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_dynamicContent_index',
                     'mauticContent' => 'dynamicContent',
