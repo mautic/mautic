@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Asset\Packages;
 
 class CoreSubscriberTest extends TestCase
 {
@@ -110,7 +111,10 @@ class CoreSubscriberTest extends TestCase
         $this->bundleHelper         = $this->createMock(BundleHelper::class);
         $this->menuHelper           = $this->createMock(MenuHelper::class);
         $this->userHelper           = $this->createMock(UserHelper::class);
-        $this->assetsHelper         = $this->createMock(AssetsHelper::class);
+        $packagesMock = $this->getMockBuilder(Packages::class)
+        ->disableOriginalConstructor()
+        ->getMock();
+        $this->assetsHelper         = new AssetsHelper($packagesMock);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->securityContext      = $this->createMock(AuthorizationChecker::class);
         $this->userModel            = $this->createMock(UserModel::class);

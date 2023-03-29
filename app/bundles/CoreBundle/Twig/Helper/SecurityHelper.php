@@ -25,7 +25,7 @@ final class SecurityHelper
     private $requestStack;
 
     /**
-     * @var Dispatcher
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
@@ -60,19 +60,19 @@ final class SecurityHelper
     /**
      * Helper function to check if the logged in user has access to an entity.
      *
-     * @param $ownPermission
-     * @param $otherPermission
-     * @param $ownerId
+     * @param string|bool $ownPermission
+     * @param string|bool $otherPermission
+     * @param User|int    $ownerId
      *
      * @return bool
      */
-    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId)
+    public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
     {
         return $this->security->hasEntityAccess($ownPermission, $otherPermission, $ownerId);
     }
 
     /**
-     * @param $permission
+     * @param string[]|string $permission
      *
      * @return mixed
      */
@@ -84,7 +84,7 @@ final class SecurityHelper
     /**
      * Get content from listeners.
      */
-    public function getAuthenticationContent()
+    public function getAuthenticationContent(): string
     {
         $request = $this->requestStack->getCurrentRequest();
         $content = '';

@@ -12,7 +12,7 @@ final class ContentHelper
     /**
      * @var Environment
      */
-    private $twg;
+    private $twig;
 
     /**
      * @var EventDispatcherInterface
@@ -31,14 +31,14 @@ final class ContentHelper
     /**
      * Dispatch an event to collect custom content.
      *
-     * @param       $context  Context of the content requested for the viewName
-     * @param array $vars     twig vars
-     * @param       $viewName The main identifier for the content requested. Will be etracted from $vars if get_
+     * @param string|null $context  Context of the content requested for the viewName
+     * @param array<string,string> $vars     twig vars
+     * @param string|null $viewName The main identifier for the content requested. Will be etracted from $vars if get_
      *defined
      *
      * @return string
      */
-    public function getCustomContent($context = null, array $vars = [], $viewName = null)
+    public function getCustomContent($context = null, array $vars = [], $viewName = null): string
     {
         if (null === $viewName) {
             if (empty($vars['mauticTemplate'])) {
@@ -72,7 +72,7 @@ final class ContentHelper
      *
      * @return string
      */
-    public function showScriptTags($html)
+    public function showScriptTags($html): string
     {
         $tagsToShow = ['script', 'style'];
 
@@ -86,7 +86,7 @@ final class ContentHelper
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return 'content';
     }

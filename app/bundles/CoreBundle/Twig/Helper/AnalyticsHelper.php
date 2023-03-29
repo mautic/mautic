@@ -30,7 +30,7 @@ final class AnalyticsHelper
     /**
      * @param string $content
      */
-    public function addCode($content)
+    public function addCode($content): string
     {
         // Add analytics
         $analytics = $this->getCode();

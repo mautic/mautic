@@ -33,7 +33,7 @@ final class AssetsHelper
     private $context = self::CONTEXT_APP;
 
     /**
-     * @var array
+     * @var array<mixed, mixed>
      */
     private $assets = [
         self::CONTEXT_APP => [],
@@ -88,7 +88,7 @@ final class AssetsHelper
         return $prefix;
     }
 
-    public function getImagesPath($absolute = false)
+    public function getImagesPath(bool $absolute = false): string
     {
         return $this->pathsHelper->getSystemPath('images', $absolute);
     }
@@ -148,7 +148,7 @@ final class AssetsHelper
      * If changing the context from app, it's important to reset the context back to app after
      * injecting/fetching assets for a different context.
      *
-     * @param $context
+     * @param string $context
      *
      * @return $this
      */
@@ -307,7 +307,7 @@ final class AssetsHelper
     /**
      * Outputs the stylesheets and style declarations.
      */
-    public function outputStyles()
+    public function outputStyles(): void
     {
         echo $this->getStyles();
     }
@@ -342,7 +342,7 @@ final class AssetsHelper
      *
      * @param string $location
      */
-    public function outputScripts($location)
+    public function outputScripts($location): void
     {
         if (isset($this->assets[$this->context]['scripts'][$location])) {
             foreach (array_reverse($this->assets[$this->context]['scripts'][$location]) as $s) {
@@ -369,7 +369,7 @@ final class AssetsHelper
     /**
      * Output head scripts, stylesheets, and custom declarations.
      */
-    public function outputHeadDeclarations()
+    public function outputHeadDeclarations(): void
     {
         echo $this->getHeadDeclarations();
     }
@@ -423,7 +423,7 @@ final class AssetsHelper
     /**
      * Output system stylesheets.
      */
-    public function outputSystemStylesheets()
+    public function outputSystemStylesheets(): void
     {
         $assets = $this->assetHelper->getAssets();
 
@@ -439,7 +439,7 @@ final class AssetsHelper
      *
      * @param bool|false $includeEditor
      */
-    public function outputSystemScripts($includeEditor = false)
+    public function outputSystemScripts($includeEditor = false): void
     {
         $assets = $this->assetHelper->getAssets();
 
@@ -476,7 +476,7 @@ final class AssetsHelper
      * @param bool $render        If true, a string will be returned of rendered script for header
      * @param bool $includeEditor
      *
-     * @return array|string
+     * @return array<string, string>|string
      */
     public function getSystemScripts($render = false, $includeEditor = false)
     {

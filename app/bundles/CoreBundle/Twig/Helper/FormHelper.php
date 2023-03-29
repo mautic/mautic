@@ -7,15 +7,15 @@ use Symfony\Component\Form\FormView;
 /**
  * final class FormHelper.
  */
-final class FormHelper extends \Symfony\Bundle\FrameworkBundle\Twig\Helper\FormHelper
+final class FormHelper
 {
     /**
      * Render widget if it exists.
      *
-     * @param       $form
-     * @param       $key
-     * @param null  $template
-     * @param array $variables
+     * @param array<string, mixed>       $form
+     * @param string       $key
+     * @param string|null  $template
+     * @param array<string,mixed> $variables
      *
      * @return mixed|string
      */

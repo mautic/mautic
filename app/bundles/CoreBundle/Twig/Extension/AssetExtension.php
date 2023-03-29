@@ -47,7 +47,7 @@ class AssetExtension extends AbstractExtension
         ];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'coreasset';
     }
@@ -86,7 +86,7 @@ class AssetExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function outputScripts($name): string
+    public function outputScripts(string $name): string
     {
         ob_start();
 
@@ -118,7 +118,15 @@ class AssetExtension extends AbstractExtension
         return $this->assetsHelper->addScript($script, $location, $async, $name);
     }
 
-    public function getAssetUrl($path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
+    /**
+     * @param   string  $path
+     * @param   string|null  $packageName
+     * @param   string|null  $version
+     * @param   bool  $absolute
+     * @param   bool   $ignorePrefix
+     * @return  string
+     */
+    public function getAssetUrl(string $path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
     {
         return $this->assetsHelper->getUrl($path, $packageName, $version, $absolute, $ignorePrefix);
     }

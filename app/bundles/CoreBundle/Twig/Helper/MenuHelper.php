@@ -35,8 +35,8 @@ final class MenuHelper
     /**
      * Parses attributes for the menu view.
      *
-     * @param $attributes
-     * @param $overrides
+     * @param array<string, mixed> $attributes
+     * @param array<string, mixed> $overrides
      *
      * @return string
      */
@@ -65,9 +65,9 @@ final class MenuHelper
     /**
      * Concats the appropriate classes for menu links.
      *
-     * @param array $options
+     * @param array<string, mixed> $options
      */
-    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options)
+    public function buildClasses(ItemInterface &$item, MatcherInterface &$matcher, $options): void
     {
         $isAncestor = $matcher->isAncestor($item, $options['matchingDepth']);
         $isCurrent  = $matcher->isCurrent($item);
@@ -87,7 +87,7 @@ final class MenuHelper
      *
      * @return bool
      */
-    public function invisibleChildSelected($menu, MatcherInterface $matcher)
+    public function invisibleChildSelected($menu, MatcherInterface $matcher): bool
     {
         /** @var ItemInterface $item */
         foreach ($menu as $item) {
@@ -115,6 +115,7 @@ final class MenuHelper
      * Renders a menu with the specified renderer.
      *
      * @param \Knp\Menu\ItemInterface|string|array $menu
+     * @param array<string, mixed>                 $options
      * @param string                               $renderer
      *
      * @return string

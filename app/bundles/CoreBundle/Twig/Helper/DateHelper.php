@@ -159,7 +159,7 @@ final class DateHelper
      *
      * @return string
      */
-    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false)
+    public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
     {
         if (empty($datetime)) {
             return '';
@@ -243,7 +243,7 @@ final class DateHelper
         return $this->formats['short'];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'date';
     }

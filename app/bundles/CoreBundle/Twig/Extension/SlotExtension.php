@@ -31,12 +31,15 @@ class SlotExtension extends AbstractExtension
         ];
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'slot';
     }
 
-    public function getSlot($name, $default = '')
+    /**
+     * @return  string|false
+     */
+    public function getSlot(string $name, string $default = '')
     {
         ob_start();
 
@@ -45,7 +48,14 @@ class SlotExtension extends AbstractExtension
         return ob_get_clean();
     }
 
-    public function slotHasContent($name)
+    /**
+     * [slotHasContent description]
+     *
+     * @param   string  $name  [$name description]
+     *
+     * @return  string|array
+     */
+    public function slotHasContent(string $name)
     {
         return $this->helper->hasContent($name);
     }

@@ -93,9 +93,9 @@ final class ThemeHelper
     /**
      * Get the theme's slots.
      *
-     * @param $type
+     * @param string $type
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getSlots($type)
     {
@@ -117,7 +117,7 @@ final class ThemeHelper
     /**
      * Returns template.
      *
-     * @param $code
+     * @param string $code
      *
      * @return bool|string
      */

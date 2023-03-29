@@ -61,7 +61,7 @@ class CustomAssetsEvent extends Event
     public function addScriptDeclaration($script, $location = 'head', $context = AssetsHelper::CONTEXT_APP)
     {
         $this->assetsHelper->setContext($context)
-            ->addScriptDeclaration($script, $location, $context)
+            ->addScriptDeclaration($script, $location)
             ->setContext(AssetsHelper::CONTEXT_APP);
 
         return $this;

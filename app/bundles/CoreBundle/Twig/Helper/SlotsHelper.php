@@ -7,8 +7,10 @@ namespace Mautic\CoreBundle\Twig\Helper;
  */
 final class SlotsHelper
 {
+    /**
+     * @var array<string, mixed>
+     */
     private $slots     = [];
-    private $openSlots = [];
 
     /**
      * @var bool
@@ -21,7 +23,7 @@ final class SlotsHelper
      * @param $name
      * @param $content
      */
-    public function append($name, $content)
+    public function append(string $name, string $content): void
     {
         if (isset($this->slots[$name])) {
             if (is_array($this->slots[$name])) {
@@ -39,7 +41,7 @@ final class SlotsHelper
      *
      * @param string|array $names
      */
-    public function hasContent($names)
+    public function hasContent($names): bool
     {
         // If we're in the builder, return true so all slots show.
         if ($this->inBuilder) {
@@ -67,7 +69,7 @@ final class SlotsHelper
     /**
      * @param bool $bool
      */
-    public function inBuilder($bool)
+    public function inBuilder($bool): bool
     {
         $this->inBuilder = (bool) $bool;
     }

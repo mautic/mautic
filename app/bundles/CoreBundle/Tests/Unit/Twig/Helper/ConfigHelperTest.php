@@ -8,7 +8,7 @@ use PHPUnit\Framework\Assert;
 
 class ConfigHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         $coreParametersHelper = new class() extends CoreParametersHelper {
             public function __construct()
@@ -28,7 +28,7 @@ class ConfigHelperTest extends \PHPUnit\Framework\TestCase
         Assert::assertEquals('value A', $helper->get('param_a'));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $coreParametersHelper = new class() extends CoreParametersHelper {
             public function __construct()

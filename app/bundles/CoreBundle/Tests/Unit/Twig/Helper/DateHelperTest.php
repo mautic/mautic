@@ -52,14 +52,14 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testStringToText()
+    public function testStringToText(): void
     {
         date_default_timezone_set('Etc/GMT-4');
         $time = '2016-01-27 14:30:00';
         $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
     }
 
-    public function testStringToTextUtc()
+    public function testStringToTextUtc(): void
     {
         date_default_timezone_set('UTC');
         $time = '2016-01-27 14:30:00';
@@ -67,14 +67,14 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
     }
 
-    public function testDateTimeToText()
+    public function testDateTimeToText(): void
     {
         date_default_timezone_set('Etc/GMT-4');
         $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
         $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
     }
 
-    public function testDateTimeToTextUtc()
+    public function testDateTimeToTextUtc(): void
     {
         date_default_timezone_set('UTC');
         $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
@@ -82,7 +82,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
     }
 
-    public function testToTextWithConfigurationToTime()
+    public function testToTextWithConfigurationToTime(): void
     {
         $this->coreParametersHelper->method('get')
             ->with('date_format_timeonly')
@@ -102,7 +102,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('00:00:00', $this->helper->toText($dateTime));
     }
 
-    public function testFullConcat()
+    public function testFullConcat(): void
     {
         date_default_timezone_set('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));

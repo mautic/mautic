@@ -15,7 +15,7 @@ final class GravatarHelper
     private $devMode;
 
     /**
-     * @var array
+     * @var array<string>
      */
     private $devHosts = [];
 
@@ -72,7 +72,7 @@ final class GravatarHelper
         return $url.('&d='.urlencode($default));
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'gravatar';
     }

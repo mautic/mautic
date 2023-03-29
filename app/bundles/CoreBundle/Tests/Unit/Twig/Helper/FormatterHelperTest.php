@@ -74,13 +74,18 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stringProvider
+     * @param mixed $input
+     * @param mixed $expected
      */
-    public function testNormalizeStringValue($input, $expected)
+    public function testNormalizeStringValue($input, $expected): void
     {
         date_default_timezone_set('Europe/Paris');
         $this->assertEquals($this->formatterHelper->normalizeStringValue($input), $expected);
     }
 
+    /**
+     * @return  iterable<array<mixed>>
+     */
     public function stringProvider(): iterable
     {
         // string

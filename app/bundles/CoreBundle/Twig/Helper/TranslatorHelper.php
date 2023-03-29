@@ -39,15 +39,11 @@ final class TranslatorHelper
      * Checks for $preferred string existence and returns translation if it does.  Otherwise, returns translation for
      * $alternative.
      *
-     * @param      $preferred
-     * @param      $alternative
-     * @param      $parameters
-     * @param null $domain
-     * @param null $locale
+     * @param array<mixed> $parameters
      *
      * @return string
      */
-    public function transConditional($preferred, $alternative, $parameters = [], $domain = null, $locale = null)
+    public function transConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
@@ -55,7 +51,7 @@ final class TranslatorHelper
     /**
      * @return string
      */
-    public function getJsLang()
+    public function getJsLang(): string
     {
         $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');
         $messages        = $this->translator->getCatalogue()->all('javascript');

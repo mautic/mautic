@@ -21,10 +21,7 @@ trait FormThemeTrait
     {
         $formView = $form->createView();
 
-        $twig = $this->container->get('mautic.helper.twig')->gettwig();
-        if ($twig instanceof Environment) {
-            $twig = $twig->getEngine($template);
-        }
+        $twig = $this->container->get('twig');
 
         // Extract form theme from options if applicable
         $fieldThemes = [];
