@@ -120,7 +120,7 @@ class SmsController extends FormController
                 'security'    => $this->get('mautic.security'),
                 'configured'  => count($this->get('mautic.sms.transport_chain')->getEnabledTransports()) > 0,
             ],
-            'contentTemplate' => 'MauticSmsBundle:Sms:list.html.twig',
+            'contentTemplate' => '@MauticSms/Sms/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
@@ -226,7 +226,7 @@ class SmsController extends FormController
                 )->getContent(),
                 'dateRangeForm' => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticSmsBundle:Sms:details.html.twig',
+            'contentTemplate' => '@MauticSms/Sms/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sms_index',
                 'mauticContent' => 'sms',
@@ -353,7 +353,7 @@ class SmsController extends FormController
                     'form' => $form->createView(),
                     'sms'  => $entity,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.twig',
+                'contentTemplate' => '@MauticSms/Sms/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
@@ -517,7 +517,7 @@ class SmsController extends FormController
                     'sms'                => $entity,
                     'forceTypeSelection' => $forceTypeSelection,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:form.html.twig',
+                'contentTemplate' => '@MauticSms/Sms/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_sms_index',
                     'mauticContent' => 'sms',
@@ -719,7 +719,7 @@ class SmsController extends FormController
                 'viewParameters' => [
                     'sms' => $sms,
                 ],
-                'contentTemplate' => 'MauticSmsBundle:Sms:preview.html.twig',
+                'contentTemplate' => '@MauticSms/Sms/preview.html.twig',
             ]);
         }
 

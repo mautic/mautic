@@ -78,6 +78,23 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l.')
             ->willReturn($leadColumns);
 
+        $fieldsBuilderMock
+            ->expects($this->any())
+            ->method('getLeadFilter')
+            ->willReturn([
+                'tag' => [
+                    'label'     => 'mautic.core.filter.tags',
+                    'type'      => 'multiselect',
+                    'list'      => ['A', 'B', 'C'],
+                    'operators' => [
+                        'in'       => 'mautic.core.operator.in',
+                        'notIn'    => 'mautic.core.operator.notin',
+                        'empty'    => 'mautic.core.operator.isempty',
+                        'notEmpty' => 'mautic.core.operator.isnotempty',
+                    ],
+                ],
+            ]);
+
         $companyReportDataMock->expects($this->once())
             ->method('getCompanyData')
             ->with()
@@ -88,47 +105,62 @@ class ReportUtmTagSubscriberTest extends \PHPUnit\Framework\TestCase
         $segmentReportSubscriber = new ReportUtmTagSubscriber($fieldsBuilderMock, $companyReportDataMock);
         $segmentReportSubscriber->onReportBuilder($reportBuilderEvent);
 
+        $expectedColumns = [
+            'lead.name' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'name',
+            ],
+            'comp.name' => [
+                'label' => null,
+                'type'  => 'bool',
+                'alias' => 'name',
+            ],
+            'utm.utm_campaign' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_campaign',
+            ],
+            'utm.utm_content' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_content',
+            ],
+            'utm.utm_medium' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_medium',
+            ],
+            'utm.utm_source' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_source',
+            ],
+            'utm.utm_term' => [
+                'label' => null,
+                'type'  => 'text',
+                'alias' => 'utm_term',
+            ],
+        ];
+
         $expected = [
             'lead.utmTag' => [
                 'display_name' => 'mautic.lead.report.utm.utm_tag',
-                'columns'      => [
-                    'lead.name' => [
-                        'label' => null,
-                        'type'  => 'bool',
-                        'alias' => 'name',
+                'columns'      => $expectedColumns,
+                'filters'      => array_merge($expectedColumns, [
+                    'tag' => [
+                        'label'     => null,
+                        'type'      => 'multiselect',
+                        'list'      => ['A', 'B', 'C'],
+                        'operators' => [
+                            'in'       => 'mautic.core.operator.in',
+                            'notIn'    => 'mautic.core.operator.notin',
+                            'empty'    => 'mautic.core.operator.isempty',
+                            'notEmpty' => 'mautic.core.operator.isnotempty',
+                        ],
+                        'alias' => 'tag',
                     ],
-                    'comp.name' => [
-                        'label' => null,
-                        'type'  => 'bool',
-                        'alias' => 'name',
-                    ],
-                    'utm.utm_campaign' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_campaign',
-                    ],
-                    'utm.utm_content' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_content',
-                    ],
-                    'utm.utm_medium' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_medium',
-                    ],
-                    'utm.utm_source' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_source',
-                    ],
-                    'utm.utm_term' => [
-                        'label' => null,
-                        'type'  => 'text',
-                        'alias' => 'utm_term',
-                    ],
-                ],
-                'filters' => null,
+                ]),
                 'group'   => 'contacts',
             ],
         ];

@@ -49,7 +49,7 @@ class TweetController extends FormController
      */
     protected function getTemplateBase()
     {
-        return 'MauticSocialBundle:Tweet';
+        return '@MauticSocial/Tweet';
     }
 
     /**
@@ -132,13 +132,13 @@ class TweetController extends FormController
      *
      * @return string
      */
-    protected function getTemplateName($file, string $engine = self::ENGINE_PHP)
+    protected function getTemplateName($file)
     {
-        if (('form.html.php' === $file || 'form.html.twig' === $file) && 1 == $this->request->get('modal')) {
-            return parent::getTemplateName('form.modal.html.twig');
+        if (('form.html.twig' === $file) && 1 == $this->request->get('modal')) {
+            return '@MauticSocial/Tweet/form_modal.html.twig';
         }
 
-        return parent::getTemplateName($file);
+        return '@MauticSocial/'.$file;
     }
 
     /**

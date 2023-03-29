@@ -17,7 +17,7 @@ class WebhookController extends FormController
             'mautic_webhook', // route base
             'mautic_webhook', // session base
             'mautic.webhook', // lang string base
-            'MauticWebhookBundle:Webhook', // template base
+            '@MauticWebhook/Webhook', // template base
             'mautic_webhook', // activeLink
             'mauticWebhook' // mauticContent
         );

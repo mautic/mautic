@@ -129,7 +129,7 @@ class TagController extends FormController
 
         return $this->delegateView([
             'viewParameters'  => $parameters,
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:list.html.twig',
+            'contentTemplate' => '@MauticTagManager/Tag/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $this->generateUrl('mautic_tagmanager_index', ['page' => $page]),
@@ -214,7 +214,7 @@ class TagController extends FormController
                 'form'   => $form->createView(),
                 'entity' => $tag,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.twig',
+            'contentTemplate' => '@MauticTagManager/Tag/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $this->generateUrl('mautic_tagmanager_action', ['objectAction' => 'new']),
@@ -315,7 +315,7 @@ class TagController extends FormController
                     }
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticTagManagerBundle:Tag:form.html.twig';
+                        $contentTemplate                     = '@MauticTagManager/Tag/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_tagmanager_action', [
@@ -353,7 +353,7 @@ class TagController extends FormController
                 'entity'     => $tag,
                 'currentTag' => $tag->getId(),
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:form.html.twig',
+            'contentTemplate' => '@MauticTagManager/Tag/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'route'         => $action,
@@ -465,7 +465,7 @@ class TagController extends FormController
                 'tag'      => $tag,
                 'security' => $security,
             ],
-            'contentTemplate' => 'MauticTagManagerBundle:Tag:details.html.twig',
+            'contentTemplate' => '@MauticTagManager/Tag/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_tagmanager_index',
                 'mauticContent' => 'tagmanager',

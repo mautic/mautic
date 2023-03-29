@@ -7,7 +7,6 @@ namespace Mautic\DashboardBundle\Tests\Controller;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -20,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -272,15 +272,11 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $widgetId        = '1';
         $widget          = new \Mautic\DashboardBundle\Entity\Widget();
         $renderedContent = 'lfsadkdhfůasfjds';
-        $engine          = $this->createMock(PhpEngine::class);
+        $twig            = $this->createMock(Environment::class);
 
-        $engine->expects(self::once())
+        $twig->expects(self::once())
             ->method('render')
             ->willReturn($renderedContent);
-
-        $engine->expects(self::once())
-            ->method('supports')
-            ->willReturn(true);
 
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(true);
@@ -294,19 +290,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $this->containerMock->expects(self::exactly(3))
+        $this->containerMock->expects(self::exactly(2))
             ->method('get')
             ->withConsecutive(
                 ['mautic.dashboard.widget'],
-                ['templating'],
-                ['templating']
+                ['twig']
             )
-            ->willReturnOnConsecutiveCalls($widgetService, $engine, $engine);
-
-        $this->containerMock->expects(self::once())
-            ->method('has')
-            ->with('templating')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls($widgetService, $twig, $twig);
 
         $response = $this->controller->widgetAction($widgetId);
 

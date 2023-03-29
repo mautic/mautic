@@ -420,11 +420,9 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         Assert::assertCount(1, $submissions);
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
-
-        parent::tearDown();
 
         if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
