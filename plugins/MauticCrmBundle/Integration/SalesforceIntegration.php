@@ -1907,6 +1907,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
     protected function prepareFieldsForPush($config)
     {
         $leadFields = array_unique(array_values($config['leadFields']));
+        $leadFields = str_replace('mauticContactId', 'id', $leadFields);
         $leadFields = array_combine($leadFields, $leadFields);
         unset($leadFields['mauticContactTimelineLink']);
         unset($leadFields['mauticContactIsContactableByEmail']);
