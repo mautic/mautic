@@ -18,6 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class VariantType extends AbstractType
 {
+    const DEFAULT_WINNER_DELAY = 24;
+
     /**
      * @var EmailModel
      */
@@ -90,6 +92,7 @@ class VariantType extends AbstractType
                 'min' => 0,
                 'max' => 480,
             ]),
+            'data' => $options['data']['sendWinnerDelay'] ?? self::DEFAULT_WINNER_DELAY
         ]);
 
         $abTestWinnerCriteria = $this->emailModel->getBuilderComponents(null, 'abTestWinnerCriteria');
