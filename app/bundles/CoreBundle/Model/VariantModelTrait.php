@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Entity\TranslationEntityInterface;
 use Mautic\CoreBundle\Entity\VariantEntityInterface;
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Class VariantModelTrait.
@@ -97,6 +98,8 @@ trait VariantModelTrait
             // Do it here in addition to postVariantSave() so that it's available to the event listeners
             $changes = $entity->getChanges();
 
+            $this->clonePublishStatusToChildren($entity);
+
             // If unpublished and wasn't changed from published - don't reset
             if (!$entity->isPublished(false) && (!isset($changes['isPublished']))) {
                 return false;
@@ -139,18 +142,26 @@ trait VariantModelTrait
         if ($resetVariants && empty($this->inConversion)) {
             $this->resetVariants($entity, $relatedIds, $variantStartDate);
         }
-
-        $this->clonePublishStatusToChildren($entity);
     }
 
-    protected function clonePublishStatusToChildren(VariantEntityInterface $entity)
+    /**
+     * @param VariantEntityInterface|Email $entity
+     */
+    protected function clonePublishStatusToChildren($entity)
     {
         $parent = $entity->getVariantParent() ?: $entity;
 
         $repo = $this->getRepository();
 
-        if (method_exists($repo, 'clonePublishStatusToChildren')) {
-            $repo->clonePublishStatusToChildren($parent->getId());
+        $isParent = $entity->getId() === $parent->getId();
+        if ($isParent && method_exists($repo, 'clonePublishStatusToChildren')) {
+            $repo->clonePublishStatusToChildren($parent);
+        }
+
+        if (!$isParent) {
+            $entity->setIsPublished($parent->getIsPublished());
+            $entity->setPublishUp($parent->getPublishUp());
+            $entity->setPublishDown($parent->getPublishDown());
         }
     }
 

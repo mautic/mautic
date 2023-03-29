@@ -525,21 +525,28 @@ class EmailRepository extends CommonRepository
     /**
      * @param VariantEntityInterface|FormEntity $parent
      */
-    public function clonePublishStatusToChildren($parentId)
+    public function clonePublishStatusToChildren($parent)
     {
         $conn = $this->getEntityManager()->getConnection();
 
         $sql = '
             UPDATE '.MAUTIC_TABLE_PREFIX.'emails e
             JOIN  '.MAUTIC_TABLE_PREFIX.'emails parent ON e.variant_parent_id = parent.id
-            SET e.is_published = parent.is_published,
-                e.publish_up = parent.publish_up,
-                e.publish_down = parent.publish_down
+            SET e.is_published = :isPublished,
+                e.publish_up = :publishUp,
+                e.publish_down = :publishDown
             WHERE parent.id = :parentId
         ';
 
-        $stmt = $conn->prepare($sql);
-        $stmt->bindParam('parentId', $parentId);
+        $stmt        = $conn->prepare($sql);
+        $id          = $parent->getId();
+        $isPublished = (int) $parent->getIsPublished();
+        $stmt->bindParam('parentId', $id);
+        $stmt->bindParam('isPublished', $isPublished);
+        $publishUp = $parent->getPublishUp() ? $parent->getPublishUp()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
+        $stmt->bindParam('publishUp', $publishUp);
+        $publishDown = $parent->getPublishDown() ? $parent->getPublishDown()->setTimezone(new \DateTimeZone('UTC'))->format('Y-m-d H:i:s') : null;
+        $stmt->bindParam('publishDown', $publishDown);
         $stmt->executeQuery();
     }
 
