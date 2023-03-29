@@ -56,21 +56,19 @@ class LeadSubscriber implements EventSubscriberInterface
 
         $contactId        = $event->getLead()->getId();
         $statsViewsByLead = $this->focusModel->getStatRepository()->getStatsViewByLead($contactId, $event->getQueryOptions());
+        $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($contactId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
             $template = 'MauticFocusBundle:SubscribedEvents\Timeline:index.html.php';
             $icon     = 'fa-search';
 
-            $counter = [Stat::TYPE_NOTIFICATION=>0, Stat::TYPE_CLICK=>0];
             // Add the view to the event array
-            foreach ($statsViewsByLead['result'] as $statsView) {
+            foreach (array_merge($statsViewsByLead['results'], $statsClickByLead['results']) as $statsView) {
                 if (((Stat::TYPE_CLICK == $statsView['type']) && $eventClickApplicable)
                     || ((Stat::TYPE_NOTIFICATION == $statsView['type']) && $eventViewApplicable)) {
-                    ++$counter[$statsView['type']];
-
                     $eventLabel = [
-                        'label' => $statsView['focus']['name'],
-                        'href'  => $this->router->generate('mautic_focus_action', ['objectAction' => 'view', 'objectId' => $statsView['focus']['id']]),
+                        'label' => $statsView['focus_name'],
+                        'href'  => $this->router->generate('mautic_focus_action', ['objectAction' => 'view', 'objectId' => $statsView['focus_id']]),
                     ];
 
                     $eventType = (Stat::TYPE_NOTIFICATION == $statsView['type']) ? FocusEventTypes::FOCUS_ON_VIEW : FocusEventTypes::FOCUS_ON_CLICK;
@@ -81,7 +79,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'eventId'         => $eventType.'.'.$statsView['id'],
                             'eventLabel'      => $eventLabel,
                             'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
-                            'timestamp'       => $statsView['dateAdded'],
+                            'timestamp'       => $statsView['date_added'],
                             'contentTemplate' => $template,
                             'icon'            => $icon,
                             'contactId'       => $contactId,
@@ -89,11 +87,10 @@ class LeadSubscriber implements EventSubscriberInterface
                     );
                 }
             }
-
             // Add to counter view
-            $event->addToCounter(FocusEventTypes::FOCUS_ON_VIEW, $counter[Stat::TYPE_NOTIFICATION]);
+            $event->addToCounter(FocusEventTypes::FOCUS_ON_VIEW, $statsViewsByLead['total']);
             // Add to counter click
-            $event->addToCounter(FocusEventTypes::FOCUS_ON_CLICK, $counter[Stat::TYPE_CLICK]);
+            $event->addToCounter(FocusEventTypes::FOCUS_ON_CLICK, $statsClickByLead['total']);
         }
     }
 }
