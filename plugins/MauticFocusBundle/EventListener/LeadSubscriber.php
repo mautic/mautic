@@ -13,19 +13,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 class LeadSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private Translator $translator;
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
+    private RouterInterface $router;
 
-    /*
-     * @var FocusModel
-     */
     private FocusModel $focusModel;
 
     public function __construct(
