@@ -71,7 +71,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $lead->getEmail(),
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.twig',
+                    'contentTemplate' => '@MauticFullContact/FullContact/lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_contact_index',
                         'mauticContent' => 'lead',
@@ -324,7 +324,7 @@ class FullContactController extends FormController
                         )->createView(),
                         'lookupItem' => $parse['host'],
                     ],
-                    'contentTemplate' => 'MauticFullContactBundle:FullContact:lookup.html.twig',
+                    'contentTemplate' => '@MauticFullContact/FullContact/lookup.html.twig',
                     'passthroughVars' => [
                         'activeLink'    => '#mautic_company_index',
                         'mauticContent' => 'company',
