@@ -225,8 +225,6 @@ class PublicController extends CommonFormController
                     if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        /** @var \Mautic\CoreBundle\Twig\Helper\FormHelper $formHelper */
-                        $formHelper =$this->get('twig.helper.form');
                         $params     = array_merge(
                             $viewParameters,
                             [

@@ -16,7 +16,7 @@ class TwigPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if ($container->hasDefinition(AssetsHelper::class)) {
             $container->getDefinition(AssetsHelper::class)

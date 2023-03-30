@@ -145,6 +145,7 @@ final class FormatterHelper
     /**
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
+     * @param mixed       $csv
      * @param string|null $type
      *
      * @return array<string, string>|array<int, string>
