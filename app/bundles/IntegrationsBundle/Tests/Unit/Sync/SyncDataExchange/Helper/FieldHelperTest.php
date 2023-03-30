@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Helper;
 
-use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\IntegrationsBundle\Event\MauticSyncFieldsLoadEvent;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
@@ -59,17 +57,10 @@ class FieldHelperTest extends TestCase
     {
         $this->fieldModel              = $this->createMock(FieldModel::class);
         $this->variableExpresserHelper = $this->createMock(VariableExpresserHelperInterface::class);
-        $dispatcherMock                = $this->createMock(EventDispatcherInterface::class);
-        $channelEventMock              = $this->createMock(ChannelEvent::class);
-        $dispatcherMock->method('dispatch')
-            ->willReturn($channelEventMock);
-        $channelEventMock->method('getChannelConfigs')
-            ->willReturn(['email']);
-        $channelEventMock->method('getFeatureChannels')
-            ->willReturn(['lead' => 'dnc']);
-
-        $this->channelListHelper       = new ChannelListHelper($dispatcherMock, $this->createMock(Translator::class));
+        $this->channelListHelper       = $this->createMock(ChannelListHelper::class);
         $this->objectProvider          = $this->createMock(ObjectProvider::class);
+        $this->channelListHelper->method('getFeatureChannels')
+            ->willReturn(['Email' => 'email']);
 
         $this->mauticSyncFieldsLoadEvent = $this->createMock(MauticSyncFieldsLoadEvent::class);
         $this->eventDispatcher           = $this->createMock(EventDispatcherInterface::class);

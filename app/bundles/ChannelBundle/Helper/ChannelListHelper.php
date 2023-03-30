@@ -7,27 +7,21 @@ use Mautic\ChannelBundle\Event\ChannelEvent;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-final class ChannelListHelper
+class ChannelListHelper
 {
-    /**
-     * @var Translator
-     */
-    private $translator;
+    private Translator $translator;
 
     /**
-     * @var array
+     * @var array<string,string>
      */
-    private $channels = [];
+    private array $channels = [];
 
     /**
-     * @var array
+     * @var array<string,string[]>
      */
-    private $featureChannels = [];
+    private array $featureChannels = [];
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
+    private EventDispatcherInterface $dispatcher;
 
     public function __construct(EventDispatcherInterface $dispatcher, Translator $translator)
     {
@@ -130,7 +124,7 @@ final class ChannelListHelper
      *
      * Done this way to avoid a circular dependency error with LeadModel
      */
-    private function setupChannels()
+    private function setupChannels(): void
     {
         if (!empty($this->channels)) {
             return;
