@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,5 +43,33 @@ class AjaxController extends CommonAjaxController
         }
 
         return $this->sendJsonResponse($responseContent);
+    }
+
+    protected function getViewsCountAction(Request $request): JsonResponse
+    {
+        $focusId = (int) InputHelper::clean($request->query->get('focusId'));
+        $model   = $this->getModel('focus');
+
+        if (0 === $focusId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        /** @var Focus $focus */
+        $focus = $model->getEntity($focusId);
+        if (!$focus) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.api.call.notfound'),
+            ], 404);
+        }
+        $viewsCount = $model->getViewsCount($focus);
+
+        return $this->sendJsonResponse([
+            'success' => 1,
+            'views'   => $viewsCount,
+        ]);
     }
 }
