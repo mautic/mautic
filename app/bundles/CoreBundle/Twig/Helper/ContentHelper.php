@@ -31,12 +31,10 @@ final class ContentHelper
     /**
      * Dispatch an event to collect custom content.
      *
-     * @param string|null $context  Context of the content requested for the viewName
+     * @param string|null          $context  Context of the content requested for the viewName
      * @param array<string,string> $vars     twig vars
-     * @param string|null $viewName The main identifier for the content requested. Will be etracted from $vars if get_
+     * @param string|null          $viewName The main identifier for the content requested. Will be etracted from $vars if get_
      *defined
-     *
-     * @return string
      */
     public function getCustomContent($context = null, array $vars = [], $viewName = null): string
     {
@@ -69,8 +67,6 @@ final class ContentHelper
      * Replaces HTML script tags with non HTML tags so the JS inside them won't execute and will be readable.
      *
      * @param string $html
-     *
-     * @return string
      */
     public function showScriptTags($html): string
     {
@@ -83,9 +79,6 @@ final class ContentHelper
         return $html;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return 'content';

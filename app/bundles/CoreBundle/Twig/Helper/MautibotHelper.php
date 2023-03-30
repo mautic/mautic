@@ -13,8 +13,6 @@ final class MautibotHelper
 
     /**
      * @param string $image openMouth | smile | wave
-     *
-     * @return string
      */
     public function getImage($image): string
     {
@@ -25,8 +23,6 @@ final class MautibotHelper
      * Static alternative to retrieve image.
      *
      * @param string $image openMouth | smile | wave
-     *
-     * @return string
      */
     public static function get($image): string
     {

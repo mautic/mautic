@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
-use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -34,6 +33,5 @@ class TemplatingPass implements CompilerPassInterface
                 ->setClass(SlotsHelper::class)
                 ->setPublic(true);
         }
-
     }
 }

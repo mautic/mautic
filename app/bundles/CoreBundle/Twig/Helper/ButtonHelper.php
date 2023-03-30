@@ -367,7 +367,7 @@ final class ButtonHelper
     /**
      * Order buttons by priority.
      */
-    private function orderButtons()
+    private function orderButtons(): void
     {
         foreach ($this->buttons as $key => $button) {
             $this->validatePriority($this->buttons[$key]);
@@ -425,11 +425,13 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function validatePriority(&$button)
+    private function validatePriority(&$button): void
     {
         if (!empty($button['primary'])) {
-            if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 200)) {
-                $button['priority'] = 215;
+            if (isset($button['priority'])) {
+                if ($button['priority'] < 200) {
+                    $button['priority'] = 215;
+                }
             }
         } elseif (!isset($button['priority'])) {
             $button['priority'] = 0;
@@ -486,7 +488,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function addMobileResponsiveClasses(&$button)
+    private function addMobileResponsiveClasses(&$button): void
     {
         if (isset($button['confirm'])) {
             $change = &$button['confirm'];
@@ -505,7 +507,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function addButtonClasses(&$button)
+    private function addButtonClasses(&$button): void
     {
         if (isset($button['confirm'])) {
             $addTo = &$button['confirm'];
@@ -529,7 +531,7 @@ final class ButtonHelper
     /**
      * @param array<string,mixed> $button
      */
-    private function removeButtonClasses(&$button)
+    private function removeButtonClasses(&$button): void
     {
         if (isset($button['confirm'])) {
             $removeFrom = &$button['confirm'];

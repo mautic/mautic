@@ -119,12 +119,10 @@ class AssetExtension extends AbstractExtension
     }
 
     /**
-     * @param   string  $path
-     * @param   string|null  $packageName
-     * @param   string|null  $version
-     * @param   bool  $absolute
-     * @param   bool   $ignorePrefix
-     * @return  string
+     * @param string|null $packageName
+     * @param string|null $version
+     * @param bool        $absolute
+     * @param bool        $ignorePrefix
      */
     public function getAssetUrl(string $path, $packageName = null, $version = null, $absolute = false, $ignorePrefix = false): string
     {

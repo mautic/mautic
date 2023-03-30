@@ -145,11 +145,11 @@ final class FormatterHelper
     /**
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
-     * @param $csv
+     * @param string $type
      *
-     * @return array<string, string>
+     * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray($csv, $type = null)
+    public function simpleCsvToArray(string $csv, $type = null)
     {
         if (!$csv) {
             return [];

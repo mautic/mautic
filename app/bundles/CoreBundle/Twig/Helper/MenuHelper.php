@@ -109,9 +109,9 @@ final class MenuHelper
     /**
      * Renders a menu with the specified renderer.
      *
-     * @param \Knp\Menu\ItemInterface|string|array $menu
-     * @param array<string, mixed>                 $options
-     * @param string                               $renderer
+     * @param \Knp\Menu\ItemInterface|string|array<ItemInterface|string> $menu
+     * @param array<string, mixed>                                       $options
+     * @param string                                                     $renderer
      */
     public function render($menu, array $options = [], $renderer = null): string
     {

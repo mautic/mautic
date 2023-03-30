@@ -291,7 +291,7 @@ class InputHelper
      * @param                    $value
      * @param bool|false         $urldecode
      * @param array<string>|null $allowedProtocols
-     * @param bool|string|null   $defaultProtocol
+     * @param mixed              $defaultProtocol
      * @param array<string>      $removeQuery
      * @param bool|false         $ignoreFragment
      *

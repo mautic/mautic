@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Controller;
 
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormInterface;
-use Twig\Environment;
 
 trait FormThemeTrait
 {

@@ -40,17 +40,12 @@ final class TranslatorHelper
      * $alternative.
      *
      * @param array<mixed> $parameters
-     *
-     * @return string
      */
     public function transConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
 
-    /**
-     * @return string
-     */
     public function getJsLang(): string
     {
         $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');

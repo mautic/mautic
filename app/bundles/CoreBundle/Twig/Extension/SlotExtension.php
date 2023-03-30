@@ -53,7 +53,7 @@ class SlotExtension extends AbstractExtension
      *
      * @return bool
      */
-    public function slotHasContent(string $name)
+    public function slotHasContent($name)
     {
         return $this->helper->hasContent($name);
     }

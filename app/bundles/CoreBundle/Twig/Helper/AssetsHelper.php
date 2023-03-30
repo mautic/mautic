@@ -684,9 +684,7 @@ final class AssetsHelper
         $country  = ucwords(str_replace(' ', '-', $country));
         $flagImg  = '';
         if (file_exists($flagPath.$country.'.png')) {
-            if (file_exists($flagPath.$country.'.png')) {
-                $flagImg = $this->getUrl($relpath.$country.'.png');
-            }
+            $flagImg = $this->getUrl($relpath.$country.'.png');
         }
 
         if ($urlOnly) {

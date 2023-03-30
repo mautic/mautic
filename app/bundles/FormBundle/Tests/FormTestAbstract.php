@@ -159,7 +159,7 @@ class FormTestAbstract extends TestCase
             'D, M d',
             'F j, Y',
             'g:i a',
-            $this->translator,
+            $translator,
             $this->coreParametersHelper
         );
         $contactTracker           = $this->createMock(ContactTracker::class);

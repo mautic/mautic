@@ -152,10 +152,10 @@ final class DateHelper
     /**
      * Returns date/time like Today, 10:00 AM.
      *
-     * @param string|int<min, -1>|int<1, max>|DateTime $datetime
-     * @param string                                   $timezone
-     * @param string                                   $fromFormat
-     * @param bool                                     $forceDateForNonText If true, return as full date/time rather than "29 days ago"
+     * @param string|int<min, -1>|int<1, max>|\DateTime $datetime
+     * @param string                                    $timezone
+     * @param string                                    $fromFormat
+     * @param bool                                      $forceDateForNonText If true, return as full date/time rather than "29 days ago"
      */
     public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
     {

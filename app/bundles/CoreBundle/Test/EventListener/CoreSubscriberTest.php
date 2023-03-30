@@ -19,6 +19,7 @@ use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -27,7 +28,6 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\SecurityEvents;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Symfony\Component\Asset\Packages;
 
 class CoreSubscriberTest extends TestCase
 {
@@ -111,7 +111,7 @@ class CoreSubscriberTest extends TestCase
         $this->bundleHelper         = $this->createMock(BundleHelper::class);
         $this->menuHelper           = $this->createMock(MenuHelper::class);
         $this->userHelper           = $this->createMock(UserHelper::class);
-        $packagesMock = $this->getMockBuilder(Packages::class)
+        $packagesMock               = $this->getMockBuilder(Packages::class)
         ->disableOriginalConstructor()
         ->getMock();
         $this->assetsHelper         = new AssetsHelper($packagesMock);
