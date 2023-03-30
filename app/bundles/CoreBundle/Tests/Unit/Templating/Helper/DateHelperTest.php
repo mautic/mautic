@@ -40,6 +40,9 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
+        $envParameters     = json_encode(['default_timezone' => 'Etc/GMT-4']);
+        putenv('MAUTIC_CONFIG_PARAMETERS='.$envParameters);
+
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->helper               = new DateHelper(
@@ -107,7 +110,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
         $this->setDefaultLocalTimezone('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
-        $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+        $this->assertEquals($result, 'February 21, 2021 10:00 pm');
     }
 
     private function setDefaultLocalTimezone(string $timezone): void
