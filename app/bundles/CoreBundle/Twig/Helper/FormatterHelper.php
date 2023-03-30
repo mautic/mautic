@@ -145,11 +145,11 @@ final class FormatterHelper
     /**
      * Takes a simple csv list like 1,2,3,4 and returns as an array.
      *
-     * @param string $type
+     * @param string|null $type
      *
      * @return array<string, string>|array<int, string>
      */
-    public function simpleCsvToArray(string $csv, $type = null)
+    public function simpleCsvToArray($csv, $type = null)
     {
         if (!$csv) {
             return [];
@@ -167,8 +167,10 @@ final class FormatterHelper
 
     /**
      * Takes a string and returns a normalized representation of it.
+     *
+     * @param mixed $string
      */
-    public function normalizeStringValue(string $string): string
+    public function normalizeStringValue($string): string
     {
         $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
 

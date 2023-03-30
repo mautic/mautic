@@ -206,9 +206,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
                 $this->twigMock
             );
 
-        $this->twigMock->method('supports')
-            ->willReturn(true);
-
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
             ->with('email')

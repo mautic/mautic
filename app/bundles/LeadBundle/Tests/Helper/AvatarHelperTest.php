@@ -68,9 +68,6 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $this->leadMock->method('getEmail')
             ->willReturn('mautic@acquia.com');
-        $this->gravatarHelperMock->method('getImage')
-            ->with('mautic@acquia.com')
-            ->willReturn('gravatarImage');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
         $this->assertSame('gravatarImage', $avatar, 'Gravatar image should be returned');
     }
@@ -86,8 +83,6 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $this->leadMock->method('getEmail')
             ->willReturn('');
-        $this->defaultAvatarHelperMock->method('getDefaultAvatar')
-            ->willReturn('defaultImage');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
         $this->assertSame('defaultImage', $avatar, 'Default image image should be returned');
     }
