@@ -231,8 +231,7 @@ class PublicController extends CommonFormController
                             $viewParameters,
                             [
                                 'form'                         => $formView,
-                                //@mabumusa1: TODO Add a custom twig template with form start only
-                                'startform'                    => $formHelper->start($formView),
+                                'startform'                    => $this->render('@MauticCore/Default/form.html.twig', ['form' => $formView]),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
                                 'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
