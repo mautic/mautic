@@ -428,10 +428,8 @@ final class ButtonHelper
     private function validatePriority(&$button): void
     {
         if (!empty($button['primary'])) {
-            if (isset($button['priority'])) {
-                if ($button['priority'] < 200) {
-                    $button['priority'] = 215;
-                }
+            if (!isset($button['priority']) || (isset($button['priority']) && $button['priority'] < 200)) {
+                $button['priority'] = 215;
             }
         } elseif (!isset($button['priority'])) {
             $button['priority'] = 0;
