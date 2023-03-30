@@ -7,14 +7,15 @@ namespace Mautic\CoreBundle\Twig\Extension;
 use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
+use Mautic\CoreBundle\Translation\Translator;
 
 class TranslatorExtension extends AbstractExtension
 {
-    private TranslatorHelper $translatorHelper;
+    private Translator $translator;
 
-    public function __construct(TranslatorHelper $translatorHelper)
+    public function __construct(Translator $translator)
     {
-        $this->translatorHelper = $translatorHelper;
+        $this->translator = $translator;
     }
 
     public function getFunctions()
@@ -29,12 +30,12 @@ class TranslatorExtension extends AbstractExtension
 
     public function getJsLang(): string
     {
-        return $this->translatorHelper->getJsLang();
+        return $this->translator->getJsLang();
     }
 
     public function translatorHasId(string $id, ?string $domain = null, ?string $locale = null): bool
     {
-        return $this->translatorHelper->hasId($id, $domain, $locale);
+        return $this->translator->hasId($id, $domain, $locale);
     }
 
     /**
@@ -45,11 +46,11 @@ class TranslatorExtension extends AbstractExtension
      */
     public function translatorConditional(string $preferred, string $alternative, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
-        return $this->translatorHelper->transConditional($preferred, $alternative, $parameters, $domain, $locale);
+        return $this->translator->transConditional($preferred, $alternative, $parameters, $domain, $locale);
     }
 
-    public function getHelper(): TranslatorHelper
+    public function getHelper(): Translator
     {
-        return $this->translatorHelper;
+        return $this->translator;
     }
 }

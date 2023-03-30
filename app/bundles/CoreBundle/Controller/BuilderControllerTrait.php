@@ -16,7 +16,7 @@ trait BuilderControllerTrait
         $assetsHelper = $this->get('twig.helper.assets');
         /** @var RouterInterface $routerHelper */
         $routerHelper = $this->get('router');
-        $translator   = $this->get('twig.helper.translator');
+        $translator   = $this->get('translator');
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';")
