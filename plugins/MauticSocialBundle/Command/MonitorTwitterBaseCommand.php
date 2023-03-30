@@ -131,7 +131,7 @@ abstract class MonitorTwitterBaseCommand extends ContainerAwareCommand
     /**
      * Used in various areas to set name of the network being searched.
      *
-     * @return string twitter|facebook|linkedin etc..
+     * @return string twitter|facebook etc..
      */
     abstract public function getNetworkName();
 
