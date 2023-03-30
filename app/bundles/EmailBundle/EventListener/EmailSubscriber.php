@@ -60,12 +60,20 @@ class EmailSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            EmailEvents::EMAIL_PRE_SAVE       => ['onEmailPreSave', 0],
             EmailEvents::EMAIL_POST_SAVE      => ['onEmailPostSave', 0],
             EmailEvents::EMAIL_POST_DELETE    => ['onEmailDelete', 0],
             EmailEvents::EMAIL_FAILED         => ['onEmailFailed', 0],
             EmailEvents::EMAIL_RESEND         => ['onEmailResend', 0],
             EmailEvents::ON_TRANSPORT_WEBHOOK => ['onTransportWebhook', -255],
         ];
+    }
+
+    public function onEmailPreSave(Events\EmailEvent $event)
+    {
+        if ($event->getEmail()->isVariant()) {
+            $this->emailModel->clonePublishStatusToChildren($event->getEmail());;
+        }
     }
 
     /**

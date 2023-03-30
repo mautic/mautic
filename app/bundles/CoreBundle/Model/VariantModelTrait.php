@@ -98,8 +98,6 @@ trait VariantModelTrait
             // Do it here in addition to postVariantSave() so that it's available to the event listeners
             $changes = $entity->getChanges();
 
-            $this->clonePublishStatusToChildren($entity);
-
             // If unpublished and wasn't changed from published - don't reset
             if (!$entity->isPublished(false) && (!isset($changes['isPublished']))) {
                 return false;
@@ -147,7 +145,7 @@ trait VariantModelTrait
     /**
      * @param VariantEntityInterface|Email $entity
      */
-    protected function clonePublishStatusToChildren($entity)
+    public function clonePublishStatusToChildren($entity)
     {
         $parent = $entity->getVariantParent() ?: $entity;
 
