@@ -28,7 +28,7 @@ class FetchPipedriveDataCommand extends Command
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        TranslatorHelper $translator,
+        Translator $translator,
         OwnerImport $ownerImport,
         CompanyImport $companyImport,
         LeadImport $leadImport
