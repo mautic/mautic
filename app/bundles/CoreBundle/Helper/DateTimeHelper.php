@@ -8,7 +8,7 @@ class DateTimeHelper
 {
     public const FORMAT_DB = 'Y-m-d H:i:s';
 
-    private static ?string $defaultTimezone = null;
+    private static ?string $defaultLocalTimezone = null;
 
     /**
      * @var string
@@ -59,7 +59,7 @@ class DateTimeHelper
     public function setDateTime($datetime = '', $fromFormat = self::FORMAT_DB, $timezone = 'local')
     {
         if ('local' == $timezone) {
-            $timezone = self::$defaultTimezone;
+            $timezone = self::$defaultLocalTimezone;
         } elseif (empty($timezone)) {
             $timezone = 'UTC';
         }
@@ -68,7 +68,7 @@ class DateTimeHelper
         $this->timezone = $timezone;
 
         $this->utc   = new \DateTimeZone('UTC');
-        $this->local = new \DateTimeZone(self::$defaultTimezone);
+        $this->local = new \DateTimeZone(self::$defaultLocalTimezone);
 
         if ($datetime instanceof \DateTimeInterface) {
             $this->datetime = $datetime;
@@ -98,6 +98,11 @@ class DateTimeHelper
                 );
             }
         }
+    }
+
+    public function getLocal(): \DateTimeZone
+    {
+        return $this->local;
     }
 
     /**
@@ -407,9 +412,9 @@ class DateTimeHelper
 
     protected function setDefaultTimezone(): void
     {
-        if (null === self::$defaultTimezone) {
-            $parameterLoader       = new ParameterLoader();
-            self::$defaultTimezone = $parameterLoader->getParameterBag()->get('default_timezone') ?? date_default_timezone_get();
+        if (null === self::$defaultLocalTimezone) {
+            $parameterLoader            = new ParameterLoader();
+            self::$defaultLocalTimezone = $parameterLoader->getParameterBag()->get('default_timezone') ?? date_default_timezone_get();
         }
     }
 }
