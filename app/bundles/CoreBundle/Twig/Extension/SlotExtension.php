@@ -37,7 +37,7 @@ class SlotExtension extends AbstractExtension
     }
 
     /**
-     * @return  string|false
+     * @return string|false
      */
     public function getSlot(string $name, string $default = '')
     {
@@ -49,11 +49,9 @@ class SlotExtension extends AbstractExtension
     }
 
     /**
-     * [slotHasContent description]
+     * @param string|array<string, mixed> $names
      *
-     * @param   string  $name  [$name description]
-     *
-     * @return  string|array
+     * @return bool
      */
     public function slotHasContent(string $name)
     {

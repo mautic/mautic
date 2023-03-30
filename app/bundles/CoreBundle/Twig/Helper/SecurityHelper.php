@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Twig\Helper;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\AuthenticationContentEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -63,8 +64,6 @@ final class SecurityHelper
      * @param string|bool $ownPermission
      * @param string|bool $otherPermission
      * @param User|int    $ownerId
-     *
-     * @return bool
      */
     public function hasEntityAccess($ownPermission, $otherPermission, $ownerId): bool
     {

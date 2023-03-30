@@ -113,6 +113,9 @@ final class ButtonHelper
      */
     private $request;
 
+    /**
+     * @var mixed
+     */
     private $item;
 
     /**
@@ -128,6 +131,8 @@ final class ButtonHelper
     }
 
     /**
+     * @param array<array<string,mixed>> $buttons
+     *
      * @return $this
      */
     public function addButtons(array $buttons)
@@ -152,8 +157,8 @@ final class ButtonHelper
     }
 
     /**
-     * @param $wrapOpeningTag
-     * @param $wrapClosingTag
+     * @param string|null $wrapOpeningTag
+     * @param string|null $wrapClosingTag
      *
      * @return $this
      */
@@ -166,7 +171,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $groupType
+     * @param string $groupType
      *
      * @return $this
      */
@@ -178,7 +183,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $menuLink
+     * @param string|null $menuLink
      *
      * @return $this
      */
@@ -256,7 +261,7 @@ final class ButtonHelper
     /**
      * Reset the buttons.
      *
-     * @param        $buttonCount
+     * @param string $buttonCount
      * @param string $groupType
      * @param null   $item
      *
@@ -264,6 +269,7 @@ final class ButtonHelper
      */
     public function reset(Request $request, $buttonCount, $groupType = self::TYPE_GROUP, $item = null)
     {
+        //@escopecz: I think there is a possible bug here
         $this->location       = $buttonCount;
         $this->groupType      = $groupType;
         $this->buttonCount    = 0;
@@ -287,8 +293,8 @@ final class ButtonHelper
     }
 
     /**
-     * @param     $button
-     * @param int $buttonCount
+     * @param array<string,mixed> $button
+     * @param int                 $buttonCount
      *
      * @return string
      */
@@ -417,7 +423,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $button
+     * @param array<string,mixed> $button
      */
     private function validatePriority(&$button)
     {
@@ -431,7 +437,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param array $button
+     * @param array<string,mixed> $button
      *
      * @return string
      */
@@ -453,7 +459,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $button
+     * @param array<string,mixed> $button
      *
      * @return string
      */
@@ -478,7 +484,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $button
+     * @param array<string,mixed> $button
      */
     private function addMobileResponsiveClasses(&$button)
     {
@@ -497,7 +503,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $button
+     * @param array<string,mixed> $button
      */
     private function addButtonClasses(&$button)
     {
@@ -521,7 +527,7 @@ final class ButtonHelper
     }
 
     /**
-     * @param $button
+     * @param array<string,mixed> $button
      */
     private function removeButtonClasses(&$button)
     {

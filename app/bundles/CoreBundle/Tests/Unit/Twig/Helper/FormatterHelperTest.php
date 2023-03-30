@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mautic\CoreBundle\Tests\Unit\twig\Helper;
+namespace Mautic\CoreBundle\Tests\Unit\Twig\Helper;
 
 use DateTime;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -74,6 +74,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider stringProvider
+     *
      * @param mixed $input
      * @param mixed $expected
      */
@@ -84,7 +85,7 @@ class FormatterHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return  iterable<array<mixed>>
+     * @return iterable<array<mixed>>
      */
     public function stringProvider(): iterable
     {

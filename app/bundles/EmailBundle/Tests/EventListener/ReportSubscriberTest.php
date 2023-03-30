@@ -58,7 +58,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     private $channelListHelper;
 
     /**
-     * @var MockObject
+     * @var MockObject|QueryBuilder
      */
     private $queryBuilder;
 

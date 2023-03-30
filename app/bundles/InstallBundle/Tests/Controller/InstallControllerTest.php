@@ -18,7 +18,6 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Twig\Environment;
 
 class InstallControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +32,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     private $pathsHelper;
     private $formFactoryMock;
     private $formMock;
-    private $twigMock;
 
     private $configurator;
     private $installer;
@@ -52,7 +50,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->twigMock             = $this->createMock(Environment::class);
 
         $this->configurator         = $this->createMock(Configurator::class);
         $this->installer            = $this->createMock(InstallService::class);

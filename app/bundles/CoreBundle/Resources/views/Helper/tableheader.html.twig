@@ -2,8 +2,8 @@
 
 {% if checkall is defined and checkall is not empty %}
     {{ buttonReset(
-    constant('Mautic\\CoreBundle\\twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
-    constant('Mautic\\CoreBundle\\twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
     ) }}
 
     {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}

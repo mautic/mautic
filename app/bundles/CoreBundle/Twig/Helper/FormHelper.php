@@ -4,6 +4,7 @@ namespace Mautic\CoreBundle\Twig\Helper;
 
 use Symfony\Component\Form\FormView;
 
+//@mabumusa1 Remove this helpre and replace with twig functions
 /**
  * final class FormHelper.
  */
@@ -12,10 +13,10 @@ final class FormHelper
     /**
      * Render widget if it exists.
      *
-     * @param array<string, mixed>       $form
-     * @param string       $key
-     * @param string|null  $template
-     * @param array<string,mixed> $variables
+     * @param array<string, mixed> $form
+     * @param string               $key
+     * @param string|null          $template
+     * @param array<string,mixed>  $variables
      *
      * @return mixed|string
      */

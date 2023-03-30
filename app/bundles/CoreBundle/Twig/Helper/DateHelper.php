@@ -49,7 +49,7 @@ final class DateHelper
             'time'     => $timeOnlyFormat,
         ];
 
-        $this->helper               = new DateTimeHelper(null, null, 'local');
+        $this->helper               = new DateTimeHelper('', 'Y-m-d H:i:s', 'local');
         $this->translator           = $translator;
         $this->coreParametersHelper = $coreParametersHelper;
     }
@@ -152,12 +152,10 @@ final class DateHelper
     /**
      * Returns date/time like Today, 10:00 AM.
      *
-     * @param        $datetime
+     * @param string $datetime
      * @param string $timezone
      * @param string $fromFormat
      * @param bool   $forceDateForNonText If true, return as full date/time rather than "29 days ago"
-     *
-     * @return string
      */
     public function toText($datetime, $timezone = 'local', $fromFormat = 'Y-m-d H:i:s', $forceDateForNonText = false): string
     {

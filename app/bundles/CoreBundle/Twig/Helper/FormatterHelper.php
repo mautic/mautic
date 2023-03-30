@@ -26,7 +26,7 @@ final class FormatterHelper
     /**
      * Format a string.
      *
-     * @param $val
+     * @param mixed  $val
      * @param string $type
      * @param bool   $textOnly
      * @param int    $round
@@ -127,7 +127,8 @@ final class FormatterHelper
     }
 
     /**
-     * @param string $delimeter
+     * @param string                $delimeter
+     * @param array<string, string> $array
      *
      * @return string
      */
@@ -146,7 +147,7 @@ final class FormatterHelper
      *
      * @param $csv
      *
-     * @return array
+     * @return array<string, string>
      */
     public function simpleCsvToArray($csv, $type = null)
     {
@@ -166,12 +167,8 @@ final class FormatterHelper
 
     /**
      * Takes a string and returns a normalized representation of it.
-     *
-     * @param $string string
-     *
-     * @return string
      */
-    public function normalizeStringValue($string)
+    public function normalizeStringValue(string $string): string
     {
         $stringIsDate = \DateTime::createFromFormat('Y-m-d H:i:s', $string, new \DateTimeZone('UTC'));
 

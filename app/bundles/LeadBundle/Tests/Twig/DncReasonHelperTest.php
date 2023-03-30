@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\LeadBundle\Tests\twig;
+namespace Mautic\LeadBundle\Tests\Twig;
 
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Exception\UnknownDncReasonException;
@@ -9,6 +9,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var array<int, string>
+     */
     private $reasonTo = [
         DoNotContact::IS_CONTACTABLE => 'mautic.lead.event.donotcontact_contactable',
         DoNotContact::UNSUBSCRIBED   => 'mautic.lead.event.donotcontact_unsubscribed',
@@ -16,6 +19,9 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
         DoNotContact::MANUAL         => 'mautic.lead.event.donotcontact_manual',
     ];
 
+    /**
+     * @var array<string, string>
+     */
     private $translations = [
         'mautic.lead.event.donotcontact_contactable'  => 'a',
         'mautic.lead.event.donotcontact_unsubscribed' => 'b',
@@ -23,7 +29,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
         'mautic.lead.event.donotcontact_manual'       => 'd',
     ];
 
-    public function testToText()
+    public function testToText(): void
     {
         foreach ($this->reasonTo as $reasonId => $translationKey) {
             $translationResult = $this->translations[$translationKey];
@@ -45,7 +51,7 @@ class DncReasonHelperTest extends \PHPUnit\Framework\TestCase
         $dncReasonHelper->toText(999);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $translator      = $this->createMock(TranslatorInterface::class);
         $dncReasonHelper = new DncReasonHelper($translator);

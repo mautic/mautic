@@ -11,6 +11,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class AvatarHelper
 {
+    /**
+     * @var array<string>
+     */
     private $imageTypes = ['jpg', 'jpeg', 'png', 'gif'];
     /**
      * @var AssetsHelper
@@ -49,7 +52,7 @@ final class AvatarHelper
      *
      * @throws FileNotFoundException
      */
-    public function createAvatarFromFile(Lead $lead, $filePath)
+    public function createAvatarFromFile(Lead $lead, $filePath): void
     {
         if (!file_exists($filePath)) {
             throw new FileNotFoundException();

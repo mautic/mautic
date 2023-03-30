@@ -24,10 +24,7 @@ final class MenuHelper
         $this->helper = $helper;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return 'menu';
     }
@@ -84,8 +81,6 @@ final class MenuHelper
 
     /**
      * @param ItemInterface $menu
-     *
-     * @return bool
      */
     public function invisibleChildSelected($menu, MatcherInterface $matcher): bool
     {
@@ -103,10 +98,10 @@ final class MenuHelper
      * Retrieves an item following a path in the tree.
      *
      * @param \Knp\Menu\ItemInterface|string $menu
-     *
-     * @return \Knp\Menu\ItemInterface
+     * @param array<int, string>             $path
+     * @param array<string, mixed>           $options
      */
-    public function get($menu, array $path = [], array $options = [])
+    public function get($menu, array $path = [], array $options = []): ItemInterface
     {
         return $this->helper->get($menu, $path, $options);
     }
@@ -117,10 +112,8 @@ final class MenuHelper
      * @param \Knp\Menu\ItemInterface|string|array $menu
      * @param array<string, mixed>                 $options
      * @param string                               $renderer
-     *
-     * @return string
      */
-    public function render($menu, array $options = [], $renderer = null)
+    public function render($menu, array $options = [], $renderer = null): string
     {
         if (null === $renderer) {
             $renderer = $menu;

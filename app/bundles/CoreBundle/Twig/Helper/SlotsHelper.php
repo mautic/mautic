@@ -31,7 +31,7 @@ final class SlotsHelper
      *
      * @throws \InvalidArgumentException if a slot with the same name is already started
      */
-    public function start($name)
+    public function start($name): void
     {
         if (\in_array($name, $this->openSlots)) {
             throw new \InvalidArgumentException(sprintf('A slot named "%s" is already started.', $name));
@@ -41,7 +41,7 @@ final class SlotsHelper
         $this->slots[$name] = '';
 
         ob_start();
-        ob_implicit_flush(0);
+        ob_implicit_flush(false);
     }
 
     /**
@@ -49,7 +49,7 @@ final class SlotsHelper
      *
      * @throws \LogicException if no slot has been started
      */
-    public function stop()
+    public function stop(): void
     {
         if (!$this->openSlots) {
             throw new \LogicException('No slot started.');
@@ -91,7 +91,7 @@ final class SlotsHelper
      * @param string $name    The slot name
      * @param string $content The slot content
      */
-    public function set($name, $content)
+    public function set($name, $content): void
     {
         $this->slots[$name] = $content;
     }
@@ -128,7 +128,7 @@ final class SlotsHelper
     /**
      * Checks if the slot has some content when a page is viewed in public.
      *
-     * @param string|array $names
+     * @param string|array<string, mixed> $names
      */
     public function hasContent($names): bool
     {
@@ -155,10 +155,7 @@ final class SlotsHelper
         return false;
     }
 
-    /**
-     * @param bool $bool
-     */
-    public function inBuilder($bool): bool
+    public function inBuilder($bool): void
     {
         $this->inBuilder = (bool) $bool;
     }

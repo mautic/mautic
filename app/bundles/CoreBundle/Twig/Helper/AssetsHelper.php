@@ -165,10 +165,10 @@ final class AssetsHelper
     /**
      * Adds a JS script to the template.
      *
-     * @param string $script
-     * @param string $location
-     * @param bool   $async
-     * @param string $name
+     * @param string|array<string, string> $script
+     * @param string                       $location
+     * @param bool                         $async
+     * @param string                       $name
      *
      * @return $this
      */
@@ -176,7 +176,7 @@ final class AssetsHelper
     {
         $assets     = &$this->assets[$this->context];
         $addScripts = function ($s) use ($location, &$assets, $async, $name) {
-            $name = $name ?: 'script_'.hash('sha1', uniqid(mt_rand()));
+            $name = $name ?: 'script_'.hash('sha1', uniqid((string) mt_rand()));
 
             if ('head' == $location) {
                 //special place for these so that declarations and scripts can be mingled
@@ -232,7 +232,7 @@ final class AssetsHelper
     /**
      * Adds a stylesheet to be loaded in the template header.
      *
-     * @param string $stylesheet
+     * @param string|array<string, string> $stylesheet
      *
      * @return $this
      */
@@ -500,6 +500,11 @@ final class AssetsHelper
         return $assets['js'];
     }
 
+    /**
+     * Load CKEditor JS source files.
+     *
+     * @return array<string>
+     */
     private function getCKEditorScripts(): array
     {
         $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
@@ -513,7 +518,7 @@ final class AssetsHelper
     /**
      * Load Froala JS source files.
      *
-     * @return array
+     * @return array<string>
      */
     public function getFroalaScripts()
     {
@@ -579,8 +584,9 @@ final class AssetsHelper
     /**
      * Turn all URLs in clickable links.
      *
-     * @param string $text
-     * @param array  $protocols http/https, ftp, mail, twitter
+     * @param string                $text
+     * @param array<string>         $protocols  http/https, ftp, mail, twitter
+     * @param array<string, string> $attributes
      *
      * @return string
      */
@@ -665,7 +671,7 @@ final class AssetsHelper
     }
 
     /**
-     * @param           $country
+     * @param string    $country
      * @param bool|true $urlOnly
      * @param string    $class
      *
@@ -693,7 +699,7 @@ final class AssetsHelper
     /**
      * Clear all the assets.
      */
-    public function clear()
+    public function clear(): void
     {
         $this->assets = [];
     }
@@ -706,14 +712,7 @@ final class AssetsHelper
         return 'assets';
     }
 
-    /**
-     * Not used.
-     */
-    public function setCharset()
-    {
-    }
-
-    public function setAssetHelper(AssetGenerationHelper $helper)
+    public function setAssetHelper(AssetGenerationHelper $helper): void
     {
         $this->assetHelper = $helper;
     }
@@ -721,7 +720,7 @@ final class AssetsHelper
     /**
      * @param $siteUrl
      */
-    public function setSiteUrl($siteUrl)
+    public function setSiteUrl($siteUrl): void
     {
         if ('/' === substr($siteUrl, -1)) {
             $siteUrl = substr($siteUrl, 0, -1);
@@ -730,26 +729,26 @@ final class AssetsHelper
         $this->siteUrl = $siteUrl;
     }
 
-    public function setPathsHelper(PathsHelper $pathsHelper)
+    public function setPathsHelper(PathsHelper $pathsHelper): void
     {
         $this->pathsHelper = $pathsHelper;
     }
 
     /**
-     * @param $secretKey
-     * @param $version
+     * @param string $secretKey
+     * @param string $version
      */
-    public function setVersion($secretKey, $version)
+    public function setVersion($secretKey, $version): void
     {
         $this->version = substr(hash('sha1', $secretKey.$version), 0, 8);
     }
 
-    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper)
+    public function setBuilderIntegrationsHelper(BuilderIntegrationsHelper $builderIntegrationsHelper): void
     {
         $this->builderIntegrationsHelper = $builderIntegrationsHelper;
     }
 
-    public function setInstallService(InstallService $installService)
+    public function setInstallService(InstallService $installService): void
     {
         $this->installService = $installService;
     }
@@ -759,7 +758,7 @@ final class AssetsHelper
      *
      * @return string
      */
-    private function escape($string)
+    private function escape(string $string)
     {
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8', false);
     }
