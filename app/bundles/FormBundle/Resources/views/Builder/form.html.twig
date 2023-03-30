@@ -60,11 +60,12 @@
                       {%- else -%}
                           {%- do displayManager.increaseDisplayedFields(f) -%}
                       {%- endif -%}
-                      {%- set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif %}
-
+                
+                {%- if theme is empty -%}                    
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template, {
+                  {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -73,6 +74,17 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
+                  {%- else -%}                    
+                  {{- include(template, {
+                          'field': f.convertToArray,
+                          'id': f.alias,
+                          'formName': formName,
+                          'fieldPage': (pageCount - 1),
+                          'mappedFields': mappedFields,
+                          'inBuilder': inBuilder,
+                          'fields': fields,
+                  }) -}}
+                {%- endif -%}                    
                   <!-- end: "{{ theme }}{{ template }}" -->
               {%- endif -%}
 
@@ -93,11 +105,13 @@
                       %}
                           {%- do f.setType('hidden') -%}
                       {% endif %}
-                      {%- set template = 'MauticFormBundle:Field:' ~ f.type ~ '.html.twig' -%}
+                      {%- set template = '@MauticForm/Field/' ~ f.type ~ '.html.twig' -%}
                   {%- endif -%}
 
+
                   <!-- start: "{{ theme }}{{ template }}" -->
-                  {{- include(theme ~ template, {
+                  {%- if theme is empty -%}                    
+                  {{- include(theme ~ f.type ~ '.html.twig', {
                           'field': f.convertToArray,
                           'id': f.alias,
                           'formName': formName,
@@ -106,6 +120,17 @@
                           'inBuilder': inBuilder,
                           'fields': fields,
                   }) -}}
+                  {%- else -%}                    
+                  {{- include(template, {
+                          'field': f.convertToArray,
+                          'id': f.alias,
+                          'formName': formName,
+                          'fieldPage': (pageCount - 1),
+                          'mappedFields': mappedFields,
+                          'inBuilder': inBuilder,
+                          'fields': fields,
+                  }) -}}
+                {%- endif -%}                    
                   <!-- end: "{{ theme }}{{ template }}" -->
                 {%- endif -%}
               {%- endfor -%}

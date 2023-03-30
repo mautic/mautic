@@ -11,7 +11,7 @@
 #}
 {% set isIndex = 'index' == tmpl ? true : false %}
 {% set tmpl = 'list' %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent %}company{% endblock %}
 
@@ -36,7 +36,7 @@
         },
       ] %}
   {% endif %}
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
           'templateButtons': {'new': permissions['lead:leads:create']},
           'routeBase': 'company',
           'customButtons': pageButtons|default([]),
@@ -46,7 +46,7 @@
 {% block content %}
   {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
-        {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'searchHelp': 'mautic.core.help.searchcommands',
                 'action': currentRoute,
@@ -59,42 +59,42 @@
           <table class="table table-hover table-striped table-bordered company-list" id="companyTable">
               <thead>
               <tr>
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'checkall': 'true',
                           'target': '#companyTable',
                           'routeBase': 'company',
                           'templateButtons': {'delete': permissions['lead:leads:deleteother']},
                   }) }}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.company.name',
                           'class': 'col-company-name',
                           'orderBy': 'comp.companyname',
                   }) }}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.company.email',
                           'class': 'visible-md visible-lg col-company-category',
                           'orderBy': 'comp.companyemail',
                   }) }}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.company.website',
                           'class': 'visible-md visible-lg col-company-website',
                           'orderBy': 'comp.companywebsite',
                   }) }}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.company.score',
                           'class': 'visible-md visible-lg col-company-score',
                           'orderBy': 'comp.score',
                   }) }}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'text': 'mautic.lead.list.thead.leadcount',
                           'class': 'visible-md visible-lg col-leadlist-leadcount',
                   }) }}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'company',
                           'orderBy': 'comp.id',
                           'text': 'mautic.core.id',
@@ -107,7 +107,7 @@
                   {% set fields = item.fields %}
                   <tr>
                       <td>
-                          {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                          {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                   'item': item,
                                   'templateButtons': {
                                       'edit': permissions['lead:leads:editother'],
@@ -163,7 +163,7 @@
           </table>
       </div>
       <div class="panel-footer">
-          {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+          {{ include('@MauticCore/Helper/pagination.html.twig', {
                   'totalItems': totalItems,
                   'page': page,
                   'limit': limit,

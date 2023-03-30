@@ -36,7 +36,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
 Becomes
 
 ```Twig
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{% trans %}mautic.webhook.webhooks{% endtrans %}{% endblock %}
 {% block mauticContent %}mauticWebhook{% endblock %}

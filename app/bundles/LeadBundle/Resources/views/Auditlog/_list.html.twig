@@ -55,7 +55,7 @@
                       <span class="fa fa-fw fa-level-down"></span>
                   </a>
               </th>
-              {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'userName',
                   'text': 'mautic.lead.timeline.user_name',
                   'class': 'timeline-name',
@@ -63,7 +63,7 @@
                   'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
                   'target': '#auditlog-table',
               }) }}
-              {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'action',
                   'text': 'mautic.lead.timeline.event_type',
                   'class': 'visible-md visible-lg timeline-type',
@@ -71,7 +71,7 @@
                   'baseUrl': path('mautic_contact_auditlog_action', {'leadId': lead.id}),
                   'target': '#auditlog-table',
               }) }}
-              {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+              {{ include('@MauticCore/Helper/tableheader.html.twig', {
                   'orderBy': 'dateAdded',
                   'text': 'mautic.lead.timeline.event_timestamp',
                   'class': 'visible-md visible-lg timeline-timestamp',

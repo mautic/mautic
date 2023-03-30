@@ -74,10 +74,8 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         $this->em->getConnection()->exec($sql);
     }
 
-    public function tearDown(): void
+    public function beforeTearDown(): void
     {
-        parent::tearDown();
-
         $this->clientServer = $this->defaultClientServer;
     }
 

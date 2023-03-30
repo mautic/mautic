@@ -393,32 +393,32 @@ parameters:
 		-
 			message: "#^Call to an undefined method Doctrine\\\\ORM\\\\EntityRepository\\<MauticUserBundle\\:User\\>\\:\\:findOneByUsername\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Call to an undefined method FOS\\\\OAuthServerBundle\\\\Model\\\\ClientInterface\\:\\:addUser\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Call to an undefined method FOS\\\\OAuthServerBundle\\\\Model\\\\ClientInterface\\:\\:isAuthorizedClient\\(\\)\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
-			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\OAuthEventListener\\:\\:onPostAuthorizationProcess\\(\\) has no return type specified\\.$#"
+			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\PreAuthorizationEventListener\\:\\:onPostAuthorizationProcess\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
-			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\OAuthEventListener\\:\\:onPreAuthorizationProcess\\(\\) has no return type specified\\.$#"
+			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\PreAuthorizationEventListener\\:\\:onPreAuthorizationProcess\\(\\) has no return type specified\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<MauticUserBundle\\:User\\>, string given\\.$#"
 			count: 1
-			path: app/bundles/ApiBundle/EventListener/OAuthEventListener.php
+			path: app/bundles/ApiBundle/EventListener/PreAuthorizationEventListener.php
 
 		-
 			message: "#^Method Mautic\\\\ApiBundle\\\\EventListener\\\\RateLimitGenerateKeySubscriber\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -12886,81 +12886,6 @@ parameters:
 			path: app/bundles/CoreBundle/Event/RouteEvent.php
 
 		-
-			message: "#^If condition is always false\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:getCanvasContent\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:pushToLeftCanvas\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:pushToLeftCanvas\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:pushToMainCanvas\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:pushToMainCanvas\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:pushToRightCanvas\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:pushToRightCanvas\\(\\) has parameter \\$sections with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:setCanvasSection\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:setCanvasSection\\(\\) has parameter \\$canvas with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:setCanvasSection\\(\\) has parameter \\$sections with no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:\\$left type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:\\$main type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:\\$right type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Event\\\\SidebarCanvasEvent\\:\\:\\$sections type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Event/SidebarCanvasEvent.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Event\\\\StatsEvent\\:\\:__construct\\(\\) has parameter \\$order with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Event/StatsEvent.php
@@ -17321,36 +17246,6 @@ parameters:
 			path: app/bundles/CoreBundle/Session/Storage/Handler/RedisSentinelSessionHandler.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: app/bundles/CoreBundle/Templating/Engine/PhpEngine.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Engine\\\\PhpEngine\\:\\:evaluate\\(\\) has parameter \\$mauticTemplateVars with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Engine/PhpEngine.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Engine\\\\PhpEngine\\:\\:render\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Engine/PhpEngine.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Engine\\\\PhpEngine\\:\\:setDispatcher\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Engine/PhpEngine.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Engine\\\\PhpEngine\\:\\:setRequestStack\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Engine/PhpEngine.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Templating\\\\Engine\\\\PhpEngine\\:\\:\\$jsLoadMethodPrefix has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Engine/PhpEngine.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\AnalyticsHelper\\:\\:addCode\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Templating/Helper/AnalyticsHelper.php
@@ -17871,36 +17766,6 @@ parameters:
 			path: app/bundles/CoreBundle/Templating/Helper/SecurityHelper.php
 
 		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\Templating\\\\Helper\\\\HelperInterface\\:\\:render\\(\\)\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/SidebarCanvasHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\SidebarCanvasHelper\\:\\:getContent\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/SidebarCanvasHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\SidebarCanvasHelper\\:\\:renderCanvasContent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/SidebarCanvasHelper.php
-
-		-
-			message: "#^Offset 'menu' does not exist on Symfony\\\\Bundle\\\\FrameworkBundle\\\\Templating\\\\PhpEngine\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/SidebarCanvasHelper.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\SidebarCanvasHelper\\:\\:\\$canvases type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/SidebarCanvasHelper.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\SidebarCanvasHelper\\:\\:\\$content type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/Helper/SidebarCanvasHelper.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\SlotsHelper\\:\\:append\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Templating/Helper/SlotsHelper.php
@@ -17959,21 +17824,6 @@ parameters:
 			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Helper\\\\TranslatorHelper\\:\\:transConditional\\(\\) has parameter \\$preferred with no type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Templating/Helper/TranslatorHelper.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\TemplateReference\\:\\:setPathsHelper\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/TemplateReference.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\TemplateReference\\:\\:setThemeHelper\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/TemplateReference.php
-
-		-
-			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\TemplateReference\\:\\:setThemeOverride\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Templating/TemplateReference.php
 
 		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Templating\\\\Twig\\\\Extension\\\\AssetExtension\\:\\:getAssetUrl\\(\\) has parameter \\$absolute with no type specified\\.$#"

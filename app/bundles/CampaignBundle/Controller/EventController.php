@@ -197,7 +197,7 @@ class EventController extends CommonFormController
         } else {
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.twig',
+                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -333,7 +333,7 @@ class EventController extends CommonFormController
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.twig',
+                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]

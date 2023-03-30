@@ -89,7 +89,7 @@ class MonitoringController extends FormController
                     'tmpl'        => $tmpl,
                     'page'        => $page,
                 ],
-                'contentTemplate' => 'MauticSocialBundle:Monitoring:list.html.twig',
+                'contentTemplate' => '@MauticSocial/Monitoring/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_social_index',
                     'mauticContent' => 'monitoring',

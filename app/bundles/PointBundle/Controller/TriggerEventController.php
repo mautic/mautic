@@ -131,7 +131,7 @@ class TriggerEventController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticPointBundle:Event:form.html.twig',
+            'contentTemplate' => '@MauticPoint/Event/form.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -250,7 +250,7 @@ class TriggerEventController extends CommonFormController
             }
 
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticPointBundle:Event:form.html.twig',
+                'contentTemplate' => '@MauticPoint/Event/form.html.twig',
                 'viewParameters'  => $viewParams,
                 'passthroughVars' => $passthroughVars,
             ]);

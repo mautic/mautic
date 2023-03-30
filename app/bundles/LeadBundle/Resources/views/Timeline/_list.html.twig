@@ -8,7 +8,7 @@
                     <span class="fa fa-fw fa-level-down"></span>
                 </a>
             </th>
-            {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+            {{ include('@MauticCore/Helper/tableheader.html.twig', {
                 'orderBy': 'eventLabel',
                 'text': 'mautic.lead.timeline.event_name',
                 'class': 'timeline-name',
@@ -17,7 +17,7 @@
                 'target': '#timeline-table',
             }) }}
 
-            {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+            {{ include('@MauticCore/Helper/tableheader.html.twig', {
                 'orderBy': 'eventType',
                 'text': 'mautic.lead.timeline.event_type',
                 'class': 'visible-md visible-lg timeline-type',
@@ -26,7 +26,7 @@
                 'target': '#timeline-table',
             }) }}
 
-            {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+            {{ include('@MauticCore/Helper/tableheader.html.twig', {
                 'orderBy': 'timestamp',
                 'text': 'mautic.lead.timeline.event_timestamp',
                 'class': 'visible-md visible-lg timeline-timestamp',
