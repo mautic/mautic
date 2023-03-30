@@ -27,7 +27,6 @@ return function (ContainerConfigurator $configurator) {
         'Predis/Replication/StrategyConfig.php',
         'Predis/Replication/MasterOnlyStrategy.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
-        'Twig/Helper/FormHelper.php',
         'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',

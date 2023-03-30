@@ -3,7 +3,6 @@
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\FormHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -36,16 +35,5 @@ class TemplatingPass implements CompilerPassInterface
                 ->setPublic(true);
         }
 
-        if ($container->hasDefinition('twig.helper.form')) {
-            $container->getDefinition('twig.helper.form')
-                ->setClass(FormHelper::class)
-                ->setPublic(true);
-        }
-
-        if ($container->hasDefinition('twig.helper.translator')) {
-            $container->getDefinition('twig.helper.translator')
-                ->setClass(TranslatorHelper::class)
-                ->setPublic(true);
-        }
     }
 }
