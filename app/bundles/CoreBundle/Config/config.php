@@ -293,13 +293,6 @@ return [
                 ],
                 'alias' => 'security',
             ],
-            'mautic.helper.twig.translator' => [
-                'class'     => \Mautic\CoreBundle\Twig\Helper\TranslatorHelper::class,
-                'arguments' => [
-                    'translator',
-                ],
-                'alias' => 'translator',
-            ],
             'mautic.helper.paths' => [
                 'class'     => \Mautic\CoreBundle\Helper\PathsHelper::class,
                 'arguments' => [

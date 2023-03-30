@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Twig\Extension;
 
-use Mautic\CoreBundle\Twig\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
-use Mautic\CoreBundle\Translation\Translator;
 
 class TranslatorExtension extends AbstractExtension
 {
