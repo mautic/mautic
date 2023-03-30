@@ -185,26 +185,19 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ->method('setSubject')
             ->with($this->stringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX));
 
-        $this->containerMock->expects($this->exactly(7))
-            ->method('get')
-            ->withConsecutive(
-                ['mautic.model.factory'],
-                ['mautic.security'],
-                ['router'],
-                ['mautic.helper.user'],
-                ['form.factory'],
-                ['twig'],
-                ['twig']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->modelFactoryMock,
-                $this->corePermissionsMock,
-                $this->routerMock,
-                $this->helperUserMock,
-                $this->formFactoryMock,
-                $this->twigMock,
-                $this->twigMock
-            );
+        $services = [
+            ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactoryMock],
+            ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->corePermissionsMock],
+            ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->routerMock],
+            ['mautic.helper.user', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->helperUserMock],
+            ['form.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->formFactoryMock],
+            ['twig', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->twigMock],
+        ];
+
+        $serviceExists = fn ($key) => count(array_filter($services, fn ($service) => $service[0] === $key));
+
+        $this->containerMock->method('has')->willReturnCallback($serviceExists);
+        $this->containerMock->method('get')->willReturnMap($services);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
