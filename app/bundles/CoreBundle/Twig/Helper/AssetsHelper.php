@@ -649,7 +649,7 @@ final class AssetsHelper
 
         // Insert all link
         return preg_replace_callback('/<(\d+)>/', function ($match) use (&$links) {
-            return $links[$match[1] - 1];
+            return $links[(int) $match[1] - 1];
         }, $text);
     }
 
@@ -718,7 +718,7 @@ final class AssetsHelper
     }
 
     /**
-     * @param $siteUrl
+     * @param string $siteUrl
      */
     public function setSiteUrl($siteUrl): void
     {
@@ -735,8 +735,8 @@ final class AssetsHelper
     }
 
     /**
-     * @param string $secretKey
-     * @param string $version
+     * @param string     $secretKey
+     * @param string|int $version
      */
     public function setVersion($secretKey, $version): void
     {

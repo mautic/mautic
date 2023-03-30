@@ -49,7 +49,7 @@ class SlotExtension extends AbstractExtension
     }
 
     /**
-     * @param string|array<string, mixed> $names
+     * @param string|array<string, mixed> $name
      *
      * @return bool
      */
