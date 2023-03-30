@@ -281,7 +281,7 @@ class CampaignController extends AbstractStandardFormController
             $this->getViewArguments(
                 [
                     'viewParameters'  => $viewParameters,
-                    'contentTemplate' => 'MauticCampaignBundle:Campaign:list.html.twig',
+                    'contentTemplate' => '@MauticCampaign/Campaign/list.html.twig',
                     'passthroughVars' => [
                         'mauticContent' => $this->getJsLoadMethodPrefix(),
                         'route'         => $this->generateUrl($this->getIndexRoute(), ['page' => $page]),
@@ -393,7 +393,7 @@ class CampaignController extends AbstractStandardFormController
                 'entity'          => $campaign,
                 'form'            => $this->getFormView($form, 'new'),
             ],
-            'contentTemplate' => 'MauticCampaignBundle:Campaign:form.html.twig',
+            'contentTemplate' => '@MauticCampaign/Campaign/form.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'campaign',
                 'route'         => $this->generateUrl(
@@ -690,7 +690,7 @@ class CampaignController extends AbstractStandardFormController
 
     protected function getTemplateBase(): string
     {
-        return 'MauticCampaignBundle:Campaign';
+        return '@MauticCampaign/Campaign';
     }
 
     /**

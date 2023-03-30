@@ -1,0 +1,70 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent 'emailSend' %}
+
+{% block headerTitle 'mautic.email.send.list'|trans({'%name%': email.name})|purify %}
+
+{% set percent = (progress[1]) ? ((progress[0] / progress[1]) * 100)|round : 100 %}
+{% set id = ('inprogress' != status) ? 'emailSendProgressComplete' : 'emailSendProgress' %}
+
+{% block content %}
+    <div class="row ma-lg email-send-progress" id="{{ id }}">
+        <div class="col-sm-offset-3 col-sm-6 text-center">
+            <div class="panel panel-{{ ('inprogress' != status) ? 'success' : 'danger' }}">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        {{ ('mautic.email.send.' ~ status)|trans({'%subject%' : emoji_to_html(email.getSubject(), 'short')})|purify }}
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    {% if 'inprogress' != status %}
+                        <h4>{{ 'mautic.email.send.stats'|trans({'%sent%': stats.sent, '%failed%': stats.failed}) }}</h4>
+                    {% endif %}
+                    <div class="progress mt-md" style="height:50px;">
+                        <div class="progress-bar-send progress-bar progress-bar-striped{% if 'inprogress' == status %}{{ ' active' }}{% endif %}"
+                             role="progressbar"
+                             aria-valuenow="{{ progress[0] }}"
+                             aria-valuemin="0"
+                             aria-valuemax="{{ progress[1] }}"
+                             style="width: {{ percent }}%; height: 50px;"
+                             data-batchlimit="{{ batchlimit }}"
+                             data-email="{{ email.id }}">
+                            <span class="sr-only">{{ percent }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if stats.failedRecipients is not empty %}
+                    <ul class="list-group">
+                        {% for leadId, failedEmail in stats.failedRecipients %}
+                            <li class="list-group-item">
+                                <a target="_new" class="text-danger" href="{{ path('mautic_contact_action', {'objectAction': 'view', 'objectId': leadId}) }}">
+                                    {{- failedEmail -}}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="panel-footer">
+                    <span class="small">
+                      <span class="imported-count">{{ progress[0] }}</span> / <span class="total-count">{{ progress[1] }}</span>
+                    </span>
+                    {% if 'inprogress' == status %}
+                        <div>
+                            <a class="text-danger mt-md"
+                               href="{{ path('mautic_email_action', {'objectAction': 'send', 'objectId': email.id}) }}"
+                               data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
+                        </div>
+                    {% else %}
+                        <div>
+                            <a class="text-success mt-md"
+                               href="{{ path('mautic_email_action', {'objectAction': 'send', 'objectId': email.id}) }}"
+                               data-toggle="ajax">{{ 'mautic.core.form.done'|trans }}</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

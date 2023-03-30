@@ -138,7 +138,7 @@ class ListController extends FormController
         return $this->delegateView(
             $this->getViewArguments([
                 'viewParameters'  => $parameters,
-                'contentTemplate' => 'MauticLeadBundle:List:list.html.twig',
+                'contentTemplate' => '@MauticLead/List/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_segment_index',
                     'route'         => $this->generateUrl('mautic_segment_index', ['page' => $page]),
@@ -213,7 +213,7 @@ class ListController extends FormController
             'viewParameters' => [
                 'form' => $form->createView(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
+            'contentTemplate' => '@MauticLead/List/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $this->generateUrl('mautic_segment_action', ['objectAction' => 'new']),
@@ -339,13 +339,15 @@ class ListController extends FormController
                     ]);
 
                     if ($form->get('buttons')->get('apply')->isClicked()) {
-                        $contentTemplate                     = 'MauticLeadBundle:List:form.html.twig';
+                        $contentTemplate                     = '@MauticLead/List/form.html.twig';
                         $postActionVars['contentTemplate']   = $contentTemplate;
                         $postActionVars['forwardController'] = false;
                         $postActionVars['returnUrl']         = $this->generateUrl('mautic_segment_action', [
                             'objectAction' => 'edit',
                             'objectId'     => $segment->getId(),
                         ]);
+
+                        $form = $segmentModel->createForm($segment, $this->get('form.factory'), $postActionVars['returnUrl']);
 
                         $postActionVars['viewParameters'] = [
                             'objectAction' => 'edit',
@@ -376,7 +378,7 @@ class ListController extends FormController
                 'form'          => $form->createView(),
                 'currentListId' => $segment->getId(),
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:form.html.twig',
+            'contentTemplate' => '@MauticLead/List/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'route'         => $action,
@@ -811,7 +813,7 @@ class ListController extends FormController
                     ],
                 ],
             ],
-            'contentTemplate' => 'MauticLeadBundle:List:details.html.twig',
+            'contentTemplate' => '@MauticLead/List/details.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_segment_index',
                 'mauticContent' => 'list',

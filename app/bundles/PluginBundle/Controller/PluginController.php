@@ -117,7 +117,7 @@ class PluginController extends FormController
                     'pluginFilter' => ($pluginFilter) ? ['id' => $pluginId, 'name' => $pluginName] : false,
                     'plugins'      => $plugins,
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:grid.html.twig',
+                'contentTemplate' => '@MauticPlugin/Integration/grid.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',
@@ -299,7 +299,7 @@ class PluginController extends FormController
                         'enabled'       => $entity->getIsPublished(),
                         'name'          => $integrationObject->getName(),
                         'mauticContent' => 'integrationConfig',
-                        'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.twig'),
+                        'sidebar'       => $this->get('templating')->render('@MauticCore/LeftPanel/index.html.twig'),
                     ]
                 );
             }
@@ -308,7 +308,7 @@ class PluginController extends FormController
         $template    = $integrationObject->getFormTemplate();
         $objectTheme = $integrationObject->getFormTheme();
         $themes      = [
-            'MauticPluginBundle:FormTheme:Integration/layout.html.twig',
+            '@MauticPlugin/FormTheme/Integration/layout.html.twig',
         ];
         if (is_array($objectTheme)) {
             $themes = array_merge($themes, $objectTheme);
@@ -353,7 +353,7 @@ class PluginController extends FormController
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationConfig',
                     'route'         => false,
-                    'sidebar'       => $this->get('templating')->render('MauticCoreBundle:LeftPanel:index.html.twig'),
+                    'sidebar'       => $this->get('templating')->render('@MauticCore/LeftPanel/index.html.twig'),
                 ],
             ]
         );
@@ -394,7 +394,7 @@ class PluginController extends FormController
                     'bundle' => $bundle,
                     'icon'   => $integrationHelper->getIconPath($bundle),
                 ],
-                'contentTemplate' => 'MauticPluginBundle:Integration:info.html.twig',
+                'contentTemplate' => '@MauticPlugin/Integration/info.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integration',

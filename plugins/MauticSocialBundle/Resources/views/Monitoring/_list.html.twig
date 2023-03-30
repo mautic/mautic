@@ -1,0 +1,87 @@
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered monitoring-list" id="monitoringTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#monitoringTable',
+                        'langVar': 'mautic.social.monitoring',
+                        'routeBase': 'social',
+                        'templateButtons': {
+                            'delete': securityIsGranted('mauticSocial:monitoring:delete'),
+                        },
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'social.monitoring',
+                        'orderBy': 'e.title',
+                        'text': 'mautic.core.title',
+                        'class': 'col-monitoring-title',
+                        'default': true,
+                }) }}
+
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'social.monitoring',
+                        'orderBy': 'e.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-asset-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+                {% for k, item in items %}
+                    <tr>
+                        <td>
+                            {{ include('@MauticCore/Helper/list_actions.html.twig', {
+                                    'item': item,
+                                    'templateButtons': {
+                                        'edit': securityIsGranted('mauticSocial:monitoring:edit'),
+                                        'delete': securityIsGranted('mauticSocial:monitoring:delete'),
+                                    },
+                                    'routeBase': 'social',
+                                    'langVar': 'mautic.social.monitoring',
+                                    'nameGetter': 'getTitle',
+                            }) }}
+                        </td>
+                        <td>
+                            <div>
+                                {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                                        'item': item,
+                                        'model': 'social.monitoring',
+                                }) }}
+                                <a href="{{ path('mautic_social_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
+                                    {{ item.title }}
+                                </a>
+                            </div>
+                            {% if item.description %}
+                                <div class="text-muted mt-4">
+                                    <small>{{ item.description|purify }}</small>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="visible-md visible-lg">{{ item.id }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
+                'totalItems': items|length,
+                'page': page,
+                'limit': limit,
+                'menuLinkId': 'mautic_campaign_index',
+                'baseUrl': path('mautic_social_index'),
+                'sessionVar': 'social.monitoring',
+                'routeBase': 'social',
+        }) }}
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.mautic.social.monitoring.noresults.tip'}) }}
+{% endif %}
+
+{{ include('@MauticCore/Helper/modal.html.twig', {
+        'id': 'MonitoringPreviewModal',
+        'header': false,
+}) }}

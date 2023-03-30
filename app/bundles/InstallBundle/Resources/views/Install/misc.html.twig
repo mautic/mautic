@@ -1,0 +1,61 @@
+{#
+    @copyright   2014 Mautic Contributors. All rights reserved
+    @author      Mautic
+    @link        http://mautic.org
+    @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+#}
+
+{% if 'index' == tmpl %}
+    {% extends '@MauticInstall/Install/content.html.twig' %}
+{% endif %}
+
+{% block content %}
+<div class="panel-heading">
+    <h2 class="panel-title">
+        {{ 'mautic.install.heading.misc.configuration'|trans }}
+    </h2>
+</div>
+<div class="panel-body">
+    {{ form_start(form) }}
+    <h4>{{ 'mautic.install.misc.header.url'|trans }}</h4>
+    <h6>{{ 'mautic.install.misc.subheader.url'|trans }}</h6>
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_row(form.site_url) }}
+        </div>
+    </div>
+    <h4>{{ 'mautic.install.misc.header.paths'|trans }}</h4>
+    <h6>{{ 'mautic.install.misc.subheader.paths'|trans }}</h6>
+    <div class="row">
+        <div class="col-sm-6">
+            {{ form_row(form.log_path) }}
+        </div>
+        <div class="col-sm-6">
+            {{ form_row(form.cache_path) }}
+        </div>
+    </div>
+    {% if constant('AppKernel::EXTRA_VERSION') %}
+    <h4>{{ 'mautic.install.misc.header.stability'|trans }}</h4>
+    <h6>{{ 'mautic.install.misc.subheader.stability'|trans }}</h6>
+    <div class="row">
+        <div class="col-sm-12">
+            {{ form_row(form.update_stability) }}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row mt-20">
+        <div class="col-sm-9">
+            <div class="hide" id="waitMessage">
+                <div class="alert alert-info">
+                    <strong>{{ 'mautic.install.finalizing'|trans }}</strong>
+                </div>
+            </div>
+            {{- include('@MauticInstall/Install/navbar.html.twig', {'step' : index, 'count' : count, 'completedSteps' : completedSteps}) -}}
+        </div>
+        <div class="col-sm-3">
+            {{ form_row(form.buttons) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

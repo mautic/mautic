@@ -123,9 +123,9 @@ class ThemeHelper
      */
     public function getErrorPageTemplate($code)
     {
-        $errorPage = $this->getThemePath()."/error_{$code}.html.php";
+        $errorPage = $this->getThemePath()."/error_{$code}.html.twig";
         if (file_exists($errorPage)) {
-            return ":{$this->theme}:error_{$code}.html.php";
+            return ":{$this->theme}:error_{$code}.html.twig";
         } else {
             return false;
         }

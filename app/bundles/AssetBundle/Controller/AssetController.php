@@ -113,7 +113,7 @@ class AssetController extends FormController
                 'page'        => $page,
                 'security'    => $this->get('mautic.security'),
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:list.html.twig',
+            'contentTemplate' => '@MauticAsset/Asset/list.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -265,7 +265,7 @@ class AssetController extends FormController
                 'activeAsset'      => $activeAsset,
                 'assetDownloadUrl' => $model->generateUrl($activeAsset),
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:preview.html.twig',
+            'contentTemplate' => '@MauticAsset/Asset/preview.html.twig',
             'passthroughVars' => [
                 'route' => false,
             ],
@@ -398,7 +398,7 @@ class AssetController extends FormController
                 'extensions'       => $extensions,
                 'extensionError'   => $extensionError,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.twig',
+            'contentTemplate' => '@MauticAsset/Asset/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -564,7 +564,7 @@ class AssetController extends FormController
                 'extensions'       => $extensions,
                 'extensionError'   => $extensionError,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:form.html.twig',
+            'contentTemplate' => '@MauticAsset/Asset/form.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
@@ -763,7 +763,7 @@ class AssetController extends FormController
                 'integrations' => $integrations,
                 'tmpl'         => $tmpl,
             ],
-            'contentTemplate' => 'MauticAssetBundle:Remote:browse.html.twig',
+            'contentTemplate' => '@MauticAsset/Remote/browse.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',
