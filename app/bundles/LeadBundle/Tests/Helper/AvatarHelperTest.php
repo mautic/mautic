@@ -51,6 +51,9 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
             ->getMock();
         $this->assetsHelperMock        = new AssetsHelper($packagesMock);
         $this->pathsHelperMock         = $this->createMock(PathsHelper::class);
+        $this->pathsHelperMock->method('getSystemPath')
+        ->willReturn('http://localhost');
+        $this->assetsHelperMock->setPathsHelper($this->pathsHelperMock);
         $this->defaultAvatarHelperMock = new DefaultAvatarHelper($this->pathsHelperMock, $this->assetsHelperMock);
         $this->gravatarHelperMock      = new GravatarHelper($this->defaultAvatarHelperMock, $this->createMock(CoreParametersHelper::class), $this->createMock(RequestStack::class));
         $this->leadMock                = $this->createMock(Lead::class);
@@ -62,6 +65,11 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetAvatarWhenGravatar()
     {
+        $_SERVER['SERVER_PROTOCOL'] = 'HTTP/1.1';
+        $_SERVER['SERVER_PORT']     = '80';
+        $_SERVER['SERVER_NAME']     = 'localhost';
+        $_SERVER['REQUEST_URI']     = 'localhost';
+
         $this->leadMock->method('getPreferredProfileImage')
             ->willReturn('gravatar');
         $this->leadMock->method('getSocialCache')
@@ -69,7 +77,12 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $this->leadMock->method('getEmail')
             ->willReturn('mautic@acquia.com');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
-        $this->assertSame('gravatarImage', $avatar, 'Gravatar image should be returned');
+        $this->assertSame('https://www.gravatar.com/avatar/96f1b78c73c1ee806cf6a4168fe9bf77?s=250&d=http%3A%2F%2Flocalhost%2Fimages%2Favatar.png', $avatar, 'Gravatar image should be returned');
+
+        $_SERVER['SERVER_PROTOCOL'] = null;
+        $_SERVER['SERVER_PORT']     = null;
+        $_SERVER['SERVER_NAME']     = null;
+        $_SERVER['REQUEST_URI']     = null;
     }
 
     /**
@@ -84,6 +97,7 @@ class AvatarHelperTest extends \PHPUnit\Framework\TestCase
         $this->leadMock->method('getEmail')
             ->willReturn('');
         $avatar = $this->avatarHelper->getAvatar($this->leadMock);
-        $this->assertSame('defaultImage', $avatar, 'Default image image should be returned');
+
+        $this->assertSame('http://localhost/images/avatar.png', $avatar, 'Default image image should be returned');
     }
 }
