@@ -100,11 +100,6 @@ class DateTimeHelper
         }
     }
 
-    public function getLocal(): \DateTimeZone
-    {
-        return $this->local;
-    }
-
     /**
      * @param string $format
      *
