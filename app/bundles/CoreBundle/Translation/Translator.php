@@ -111,5 +111,5 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
         $jsLang = array_merge($defaultMessages, $messages, $oldKeys);
 
         return json_encode($jsLang, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
-    }    
+    }
 }
