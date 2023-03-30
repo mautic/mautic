@@ -158,7 +158,7 @@ class MauticFactory
      *
      * @return \Twig\Environment
      */
-    public function gettwig()
+    public function getTwig()
     {
         return $this->container->get('twig');
     }

@@ -886,7 +886,7 @@ class MailHelper
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
         if (null == $this->twig) {
-            $this->twig = $this->factory->gettwig();
+            $this->twig = $this->factory->getTwig();
         }
 
         $content = $this->twig->render($template, $vars);
