@@ -72,7 +72,7 @@ class EmailSubscriber implements EventSubscriberInterface
     public function onEmailPreSave(Events\EmailEvent $event)
     {
         if ($event->getEmail()->isVariant()) {
-            $this->emailModel->clonePublishStatusToChildren($event->getEmail());;
+            $this->emailModel->clonePublishStatusToChildren($event->getEmail());
         }
     }
 
