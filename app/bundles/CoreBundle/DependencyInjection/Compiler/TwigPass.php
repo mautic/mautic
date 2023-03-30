@@ -9,9 +9,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class TemplatingPass.
+ * Class TwigPass.
  */
-class TemplatingPass implements CompilerPassInterface
+class TwigPass implements CompilerPassInterface
 {
     /**
      * {@inheritdoc}

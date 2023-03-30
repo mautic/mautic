@@ -249,11 +249,6 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->formMock);
 
-        $this->containerMock->expects($this->once())
-            ->method('has')
-            ->with('twig')
-            ->willReturn(true);
-
         $this->twigMock->expects($this->once())
             ->method('render')
             ->willReturn('');

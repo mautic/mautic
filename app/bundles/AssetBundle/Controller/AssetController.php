@@ -315,10 +315,6 @@ class AssetController extends FormController
         $page   = $session->get('mautic.asset.page', 1);
         $action = $this->generateUrl('mautic_asset_action', ['objectAction' => 'new']);
 
-        // Get upload folder
-        $uploaderHelper = $this->container->get('oneup_uploader.templating.uploader_helper');
-        $uploadEndpoint = $uploaderHelper->endpoint('asset');
-
         //create the form
         $form = $model->createForm($entity, $this->get('form.factory'), $action);
 
@@ -390,7 +386,7 @@ class AssetController extends FormController
                 'assetDownloadUrl' => $model->generateUrl($entity),
                 'integrations'     => $integrations,
                 'startOnLocal'     => $entity->isLocal(),
-                'uploadEndpoint'   => $uploadEndpoint,
+                'uploadEndpoint'   => $this->render('@MauticAssets/Asset/upload_endpoint.html.twig'),
                 'maxSize'          => $maxSize,
                 'maxSizeError'     => $maxSizeError,
                 'extensions'       => $extensions,
