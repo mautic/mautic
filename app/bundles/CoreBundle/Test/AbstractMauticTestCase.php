@@ -138,13 +138,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
      *
      * @deprecated use testSymfonyCommand() instead
      */
-    protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0): string
+    protected function runCommand(string $name, array $params = [], Command $command = null, int $expectedStatusCode = 0, bool $catchExceptions = false): string
     {
         $params      = array_merge(['command' => $name], $params);
         $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);
         $application->setAutoExit(false);
-        $application->setCatchExceptions(false);
+        $application->setCatchExceptions($catchExceptions);
 
         if ($command) {
             // Register the command
@@ -154,11 +154,11 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $input      = new ArrayInput($params);
         $output     = new BufferedOutput();
         $statusCode = $application->run($input, $output);
-        $result     = $output->fetch();
+        $message    = $output->fetch();
 
-        Assert::assertSame($expectedStatusCode, $statusCode, $result);
+        Assert::assertSame($expectedStatusCode, $statusCode, $message);
 
-        return $result;
+        return $message;
     }
 
     protected function loginUser(string $username): void

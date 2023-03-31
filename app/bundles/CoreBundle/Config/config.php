@@ -486,10 +486,6 @@ return [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
             ],
-            'mautic.templating.name_parser' => [
-                'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-                'arguments' => 'kernel',
-            ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
                 'arguments' => [
@@ -619,17 +615,11 @@ return [
                     'kernel',
                 ],
             ],
-            'mautic.helper.templating' => [
-                'class'     => 'Mautic\CoreBundle\Helper\TemplatingHelper',
-                'arguments' => [
-                    'kernel',
-                ],
-            ],
             'mautic.helper.theme' => [
                 'class'     => \Mautic\CoreBundle\Helper\ThemeHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
-                    'mautic.helper.templating',
+                    'twig',
                     'translator',
                     'mautic.helper.core_parameters',
                     'mautic.filesystem',

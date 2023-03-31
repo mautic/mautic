@@ -180,7 +180,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         $event->setPostSubmitResponse(new Response(
             $this->twig->render(
-                $this->themeHelper->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.twig'),
+                $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,
                     'type'     => 'notice',
