@@ -151,7 +151,7 @@ class TokenHelper
      *
      * @return mixed
      */
-    public static function getFieldAlias($match)
+    private static function getFieldAlias($match)
     {
         $fallbackCheck = explode('|', $match);
 
