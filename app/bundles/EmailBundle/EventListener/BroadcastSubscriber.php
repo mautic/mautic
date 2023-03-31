@@ -72,6 +72,7 @@ class BroadcastSubscriber implements EventSubscriberInterface
                 }
                 // a/b test first sending without limit
                 $limit = null;
+                $batch = null;
                 // a/b test first sending without threads
                 if ($maxThreads && $threadId) {
                     if ($threadId > 1) {
