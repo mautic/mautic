@@ -36,9 +36,9 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
         };
 
         $dateTimeLocalization = new class($this->createMock(TranslatorInterface::class)) extends DateTimeLocalization {
-            public function localize(string $format): string
+            public function localize(string $date): string
             {
-                return $format;
+                return $date;
             }
         };
 

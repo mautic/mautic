@@ -2,11 +2,17 @@
 
 namespace Mautic\LeadBundle\Tests\Helper;
 
+use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;
 use Mautic\LeadBundle\Helper\TokenHelper;
 use ReflectionProperty;
 
 class TokenHelperTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var DateTimeLocalization|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private $dateTimeLocalizationMock;
+
     private $lead = [
         'firstname' => 'Bob',
         'lastname'  => 'Smith',
@@ -28,6 +34,14 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
             'date_format_timeonly' => 'g:i a',
         ]);
 
+        $this->dateTimeLocalizationMock = $this->createMock(DateTimeLocalization::class);
+        $this->dateTimeLocalizationMock->expects($this->any())->method('localize')->willReturnCallback(function ($value) {
+            return $value; // Just returning the same value in this example, but you can modify the behavior as needed
+        });
+
+        $reflectionProperty = new ReflectionProperty(DateTimeLocalization::class, 'service');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->dateTimeLocalizationMock);
         parent::setUp();
     }
 
@@ -205,5 +219,28 @@ class TokenHelperTest extends \PHPUnit\Framework\TestCase
         $token     = '{contactfield=date|time}';
         $tokenList = TokenHelper::findLeadTokens($token, $lead);
         $this->assertEmpty($tokenList[$token]);
+    }
+
+    public function testDateTimeLocalization(): void
+    {
+        $content = 'The event starts on {contactfield=event_date|datetime}';
+
+        $lead = [
+            'first_name'       => 'John',
+            'last_name'        => 'Doe',
+            'email'            => 'john.doe@example.com',
+            'preferred_locale' => 'en',
+            'event_date'       => '2023-04-01 15:00:00',
+        ];
+
+        $expectedResult = [
+            '{contactfield=event_date|datetime}' => 'April 1, 2023 3:00 pm',
+        ];
+
+        $result = TokenHelper::findLeadTokens($content, $lead);
+        $this->assertSame($expectedResult, $result);
+
+        $replacedContent = TokenHelper::findLeadTokens($content, $lead, true);
+        $this->assertSame('The event starts on April 1, 2023 3:00 pm', $replacedContent);
     }
 }

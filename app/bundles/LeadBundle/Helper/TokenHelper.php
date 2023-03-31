@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Helper;
 
+use Mautic\CoreBundle\Helper\DateTime\DateTimeLocalization;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
 
@@ -119,7 +120,8 @@ class TokenHelper
                             $value = $time;
                             break;
                     }
-                    break;
+
+                $value =  DateTimeLocalization::getService()->localize($value, $lead['preferred_locale'] ?? null);
             }
         }
         if (in_array($defaultValue, ['true', 'date', 'time', 'datetime'])) {

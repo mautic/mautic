@@ -769,6 +769,9 @@ return [
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
+                'methodCalls' => [
+                    'setService' => [],
+                ],
             ],
             // Logger
             'mautic.monolog.handler' => [

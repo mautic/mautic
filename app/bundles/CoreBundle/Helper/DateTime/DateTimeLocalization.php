@@ -7,6 +7,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeLocalization
 {
+    private static DateTimeLocalization $service;
+
     private CoreParametersHelper $coreParametersHelper;
 
     private TranslatorInterface $translator;
@@ -17,12 +19,12 @@ class DateTimeLocalization
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function localize(string $format, ?string $contactLocale = null): string
+    public function localize(string $date, ?string $contactLocale = null): string
     {
-        $locale     = $contactLocale ?: $this->coreParametersHelper->get('locale');
+        $locale     = $contactLocale ?? $this->coreParametersHelper->get('locale');
         $dictionary = $this->getDictionary($this->getTranslationLocaleCore($locale));
 
-        return str_replace($dictionary, array_keys($dictionary), $format);
+        return str_replace($dictionary, array_keys($dictionary), $date);
     }
 
     /**
@@ -76,5 +78,15 @@ class DateTimeLocalization
         }
 
         return $locale;
+    }
+
+    public function setService(): void
+    {
+        self::$service = $this;
+    }
+
+    public static function getService(): DateTimeLocalization
+    {
+        return self::$service;
     }
 }
