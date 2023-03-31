@@ -175,7 +175,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     private $submissionModel;
 
     /**
-     * @var ReflectionClass
+     * @var ReflectionClass<SubmissionModel>
      */
     private $submissionModelReflection;
 
