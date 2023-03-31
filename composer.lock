@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "865792219f0bb3cc186165e74f6ec539",
+    "content-hash": "8219eb5c0854742f26e9b708f016c518",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5366,6 +5366,73 @@
                 "source": "https://github.com/lightSAML/SymfonyBridgeBundle/tree/master"
             },
             "time": "2018-05-23T08:11:59+00:00"
+        },
+        {
+            "name": "litesaml/lightsaml",
+            "version": "1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/litesaml/lightsaml.git",
+                "reference": "377f04d1fb25f2fb2e72dabeff10b336f1cbe4c5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/litesaml/lightsaml/zipball/377f04d1fb25f2fb2e72dabeff10b336f1cbe4c5",
+                "reference": "377f04d1fb25f2fb2e72dabeff10b336f1cbe4c5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6",
+                "robrichards/xmlseclibs": "~2.0|~3.0|~4.0",
+                "symfony/event-dispatcher": "~2.3|~3.0|~4.0",
+                "symfony/http-foundation": "~2.3|~3.0|~4.0"
+            },
+            "require-dev": {
+                "monolog/monolog": "~1.3",
+                "phpunit/phpunit": ">=5.7",
+                "pimple/pimple": "~3.0",
+                "symfony/css-selector": "~2.3|~3.0|~4.0",
+                "symfony/dom-crawler": "~2.3|~3.0|~4.0"
+            },
+            "suggest": {
+                "lightsaml/sp-bundle": "Symfony 2 SP security bundle",
+                "lightsaml/symfony-bridge": "Symfony 2 build container bridge"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "LightSaml\\": "src/",
+                    "LightSaml\\Tests\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Milos Tomic",
+                    "email": "tmilos@gmail.com",
+                    "homepage": "https://github.com/tmilos/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Light SAML 2.0 PHP library",
+            "homepage": "https://www.lightsaml.com/",
+            "keywords": [
+                "SAML 2.0",
+                "Single Logout",
+                "Single SignOn",
+                "library",
+                "lightSAML",
+                "php"
+            ],
+            "support": {
+                "docs": "http://www.lightsaml.com/LightSAML-Core/",
+                "issues": "https://github.com/lightsaml/lightsaml/issues",
+                "source": "https://github.com/lightSAML/lightSAML"
+            },
+            "time": "2018-05-28T11:21:22+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -15427,16 +15494,16 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "1.7.0",
+            "version": "1.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "1534aea9bde19a5c85c5d1e1f834ab63f4c5dcf5"
+                "reference": "dfc078e8af9c99210337325ff5aa152872c98714"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/1534aea9bde19a5c85c5d1e1f834ab63f4c5dcf5",
-                "reference": "1534aea9bde19a5c85c5d1e1f834ab63f4c5dcf5",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/dfc078e8af9c99210337325ff5aa152872c98714",
+                "reference": "dfc078e8af9c99210337325ff5aa152872c98714",
                 "shasum": ""
             },
             "require": {
@@ -15479,9 +15546,9 @@
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
             "support": {
                 "issues": "https://github.com/phpDocumentor/TypeResolver/issues",
-                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.7.0"
+                "source": "https://github.com/phpDocumentor/TypeResolver/tree/1.7.1"
             },
-            "time": "2023-03-12T10:13:29+00:00"
+            "time": "2023-03-27T19:02:04+00:00"
         },
         {
             "name": "phpspec/prophecy",

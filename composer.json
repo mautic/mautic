@@ -22,6 +22,7 @@
     },
   "require": {
     "composer/installers": "^1.11",
+    "litesaml/lightsaml": "^1.4",
     "mautic/core-lib": "^4.0"
   },
   "require-dev": {
