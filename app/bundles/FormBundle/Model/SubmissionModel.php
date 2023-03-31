@@ -717,7 +717,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * @param array<string> $contentType
      */
-    public function setResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
+    private function setResponseHeaders(StreamedResponse $response, string $filename, array $contentType): void
     {
         foreach ($contentType as $ct) {
             $response->headers->set('Content-Type', $ct);
@@ -735,7 +735,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return false|int
      */
-    public function putCsvExportRow($handle, array $row): bool|int
+    private function putCsvExportRow($handle, array $row): bool|int
     {
         return fputcsv($handle, $row);
     }
@@ -745,7 +745,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    public function getExportRowForPage(array $values, string $format = 'csv'): array
+    private function getExportRowForPage(array $values, string $format = 'csv'): array
     {
         $row = [
             $values['id'],
@@ -768,7 +768,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<mixed>
      */
-    public function getExportRow(array $values, array $viewOnlyFields = []): array
+    private function getExportRow(array $values, array $viewOnlyFields = []): array
     {
         $row = [
             $values['id'],
@@ -794,7 +794,7 @@ class SubmissionModel extends CommonFormModel
     /**
      * @return array<string>
      */
-    public function getExportHeaderForPage(string $format = 'csv'): array
+    private function getExportHeaderForPage(string $format = 'csv'): array
     {
         $header = [
             $this->translator->trans('mautic.form.report.submission.id'),
@@ -816,7 +816,7 @@ class SubmissionModel extends CommonFormModel
      *
      * @return array<string>
      */
-    public function getExportHeader(Form $form, $viewOnlyFields): array
+    private function getExportHeader(Form $form, $viewOnlyFields): array
     {
         $fields = $form->getFields();
 
