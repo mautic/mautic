@@ -53,6 +53,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
+        EnvLoader::load();
 
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
@@ -60,15 +61,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $this->em         = self::$container->get('doctrine')->getManager();
         $this->connection = $this->em->getConnection();
-        $envVars          = [
-            'MYSQL_PWD'      => $this->connection->getPassword(),
-            'db_host'        => $this->connection->getHost(),
-            'db_port'        => $this->connection->getPort(),
-            'db_user'        => $this->connection->getUsername(),
-            'db_name'        => $this->connection->getDatabase(),
-        ];
 
-        var_dump($envVars);
         $this->router = self::$container->get('router');
         $scheme       = $this->router->getContext()->getScheme();
         $secure       = 0 === strcasecmp($scheme, 'https');
