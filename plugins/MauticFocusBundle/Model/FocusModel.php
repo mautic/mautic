@@ -139,9 +139,9 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param null $id
+     * @param int|null $id
      *
-     * @return Focus
+     * @return Focus|null
      */
     public function getEntity($id = null)
     {

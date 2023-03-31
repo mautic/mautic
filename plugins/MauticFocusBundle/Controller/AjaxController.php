@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticFocusBundle\Controller;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -71,11 +70,11 @@ class AjaxController extends CommonAjaxController
         if ($cacheItem->isHit()) {
             $viewsCount = $cacheItem->get();
         } else {
+            /** @var FocusModel $model */
             $model   = $this->getModel('focus');
 
-            /** @var Focus $focus */
             $focus = $model->getEntity($focusId);
-            if (!$focus) {
+            if (null === $focus) {
                 return $this->sendJsonResponse([
                     'success' => 0,
                     'message' => $this->translator->trans('mautic.api.call.notfound'),
