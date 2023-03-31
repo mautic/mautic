@@ -80,7 +80,7 @@ class LeadSubscriberTest extends CommonMocks
         $lead = $this->getLead();
         $date = new DateTime();
 
-        $this->mockFocusModelGetStatsViewByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, $date);
+        $this->mockFocusModelGetStatsByLead(Stat::TYPE_NOTIFICATION, self::FOCUS_NAME, 'getStatsViewByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
             FocusEventTypes::FOCUS_ON_VIEW, self::EVENT_TYPE_VIEW_NAME, self::FOCUS_NAME, $date, $lead
@@ -109,7 +109,7 @@ class LeadSubscriberTest extends CommonMocks
         $lead = $this->getLead();
         $date = new DateTime();
 
-        $this->mockFocusModelGetStatsViewByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, $date);
+        $this->mockFocusModelGetStatsByLead(Stat::TYPE_CLICK, self::FOCUS_NAME, 'getStatsClickByLead', $date);
 
         $timelineEvent = $this->getTimelineEvent(
             FocusEventTypes::FOCUS_ON_CLICK, self::EVENT_TYPE_CLICK_NAME, self::FOCUS_NAME, $date, $lead
@@ -129,24 +129,22 @@ class LeadSubscriberTest extends CommonMocks
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }
 
-    private function mockFocusModelGetStatsViewByLead(string $statType, string $focusName, DateTime $date): void
+    private function mockFocusModelGetStatsByLead(string $statType, string $focusName, string $method, DateTime $date): void
     {
         $stats = [
-            'result'=> [
+            'results'=> [
                 [
-                    'id'        => 1,
-                    'type'      => $statType,
-                    'dateAdded' => $date,
-                    'focus'     => [
-                        'id'   => 1,
-                        'name' => $focusName,
-                    ],
+                    'id'         => 1,
+                    'type'       => $statType,
+                    'date_added' => $date,
+                    'focus_id'   => 1,
+                    'focus_name' => $focusName,
                 ],
             ],
             'total'=> 1,
         ];
 
-        $this->statRepository->method('getStatsViewByLead')->willReturn($stats);
+        $this->statRepository->method($method)->willReturn($stats);
         $this->focusModel->method('getStatRepository')->willReturn($this->statRepository);
     }
 

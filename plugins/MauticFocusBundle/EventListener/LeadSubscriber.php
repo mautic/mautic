@@ -63,7 +63,7 @@ class LeadSubscriber implements EventSubscriberInterface
             $icon     = 'fa-search';
 
             // Add the view to the event array
-            foreach (array_merge($statsViewsByLead['results'], $statsClickByLead['results']) as $statsView) {
+            foreach (array_merge($statsViewsByLead['results'] ?? [], $statsClickByLead['results'] ?? []) as $statsView) {
                 if (((Stat::TYPE_CLICK == $statsView['type']) && $eventClickApplicable)
                     || ((Stat::TYPE_NOTIFICATION == $statsView['type']) && $eventViewApplicable)) {
                     $eventLabel = [
@@ -88,9 +88,9 @@ class LeadSubscriber implements EventSubscriberInterface
                 }
             }
             // Add to counter view
-            $event->addToCounter(FocusEventTypes::FOCUS_ON_VIEW, $statsViewsByLead['total']);
+            $event->addToCounter(FocusEventTypes::FOCUS_ON_VIEW, $statsViewsByLead['total'] ?? 0);
             // Add to counter click
-            $event->addToCounter(FocusEventTypes::FOCUS_ON_CLICK, $statsClickByLead['total']);
+            $event->addToCounter(FocusEventTypes::FOCUS_ON_CLICK, $statsClickByLead['total'] ?? 0);
         }
     }
 }
