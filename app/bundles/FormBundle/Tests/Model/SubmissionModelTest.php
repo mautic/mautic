@@ -33,6 +33,9 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\UserBundle\Entity\User;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -171,6 +174,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
      */
     private $submissionModel;
 
+    /**
+     * @var ReflectionClass
+     */
+    private $submissionModelReflection;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -226,6 +234,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->submissionModel->setEntityManager($this->entityManager);
         $this->submissionModel->setUserHelper($this->userHelper);
         $this->submissionModel->setLogger($this->mockLogger);
+
+        $this->submissionModelReflection = new ReflectionClass($this->submissionModel);
     }
 
     public function testSaveSubmission(): void
@@ -458,6 +468,17 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             }));
     }
 
+    /**
+     * @throws ReflectionException
+     */
+    public function getAccessibleReflectionMethod(string $name): ReflectionMethod
+    {
+        $method = $this->submissionModelReflection->getMethod($name);
+        $method->setAccessible(true);
+
+        return $method;
+    }
+
     public function testGetExportHeader(): void
     {
         $form   = new Form();
@@ -474,7 +495,12 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $expectedHeader = ['Submission ID', 'Contact ID', 'Date Submitted', 'IP address', 'Referrer', 'Email'];
         $this->mockTranslation();
 
-        $header = $this->submissionModel->getExportHeader($form, $viewOnlyFields);
+        try {
+            $getExportHeaderRef = $this->getAccessibleReflectionMethod('getExportHeader');
+            $header             = $getExportHeaderRef->invokeArgs($this->submissionModel, [$form, $viewOnlyFields]);
+        } catch (ReflectionException $e) {
+            $this->fail($e->getMessage());
+        }
 
         $this->assertCount(6, $header);
         $this->assertSame($expectedHeader, $header);
@@ -486,8 +512,13 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $expectedHeader = ['Submission ID', 'Contact ID', 'Form ID', 'Date Submitted', 'IP address', 'Referrer'];
         $this->mockTranslation();
 
-        $header1 = $this->submissionModel->getExportHeaderForPage();
-        $header2 = $this->submissionModel->getExportHeaderForPage('xlsx');
+        try {
+            $getExportHeaderForPageRef = $this->getAccessibleReflectionMethod('getExportHeaderForPage');
+            $header1                   = $getExportHeaderForPageRef->invokeArgs($this->submissionModel, []);
+            $header2                   = $getExportHeaderForPageRef->invokeArgs($this->submissionModel, ['xlsx']);
+        } catch (ReflectionException $e) {
+            $this->fail($e->getMessage());
+        }
 
         $this->assertCount(6, $header1);
         $this->assertCount(5, $header2);
@@ -501,7 +532,12 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $handle  = fopen($tmpFile, 'r+');
         $header  = ['Submission ID', 'Contact ID', 'Form ID'];
 
-        $this->submissionModel->putCsvExportRow($handle, $header);
+        try {
+            $putCsvExportRowRef = $this->getAccessibleReflectionMethod('putCsvExportRow');
+            $putCsvExportRowRef->invokeArgs($this->submissionModel, [$handle, $header]);
+        } catch (ReflectionException $e) {
+            $this->fail($e->getMessage());
+        }
 
         fclose($handle);
         $result = array_map('str_getcsv', file($tmpFile));
@@ -542,7 +578,12 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->with('28-03-2023 12:00')
             ->willReturn('2023-03-28 10:00:00');
 
-        $result = $this->submissionModel->getExportRow($fixture, $viewOnlyFields);
+        try {
+            $getExportRowRef = $this->getAccessibleReflectionMethod('getExportRow');
+            $result          = $getExportRowRef->invokeArgs($this->submissionModel, [$fixture, $viewOnlyFields]);
+        } catch (ReflectionException $e) {
+            $this->fail($e->getMessage());
+        }
 
         $this->assertIsArray($result);
         $this->assertSame([1, 123, '2023-03-28 10:00:00', '127.0.0.1', 'https://test.com', 'a@b.c'], $result);
@@ -573,8 +614,13 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->with('28-03-2023 12:00')
             ->willReturn('2023-03-28 10:00:00');
 
-        $row1 = $this->submissionModel->getExportRowForPage($fixture);
-        $row2 = $this->submissionModel->getExportRowForPage($fixture, 'xlsx');
+        try {
+            $getExportRowForPageRef = $this->getAccessibleReflectionMethod('getExportRowForPage');
+            $row1                   = $getExportRowForPageRef->invokeArgs($this->submissionModel, [$fixture]);
+            $row2                   = $getExportRowForPageRef->invokeArgs($this->submissionModel, [$fixture, 'xlsx']);
+        } catch (ReflectionException $e) {
+            $this->fail($e->getMessage());
+        }
 
         $this->assertIsArray($row1);
         $this->assertIsArray($row2);
