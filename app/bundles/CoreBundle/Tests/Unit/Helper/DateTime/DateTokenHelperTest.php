@@ -35,8 +35,8 @@ class DateTokenHelperTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $dateTimeLocalization = new class($this->createMock(TranslatorInterface::class)) extends DateTimeLocalization {
-            public function localize(string $date): string
+        $dateTimeLocalization = new class($this->createMock(TranslatorInterface::class), $this->createMock(CoreParametersHelper::class)) extends DateTimeLocalization {
+            public function localize(string $date, string $contactTimezone = null): string
             {
                 return $date;
             }
