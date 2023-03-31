@@ -1,14 +1,16 @@
 {% set mauticTemplateVars = mauticTemplateVars is defined ? mauticTemplateVars : [] %}
+{% set showConversionRate = showConversionRate is defined ? showConversionRate : false %}
 {% if trackables is not empty %}
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered click-list">
+        <table class="table table-hover table-striped table-bordered click-list"
+                {% if showConversionRate %} data-conversion-rate-table data-entity-id="{{ entity.id }}"{% endif %}>
             <thead>
             <tr>
                 <td>{{ 'mautic.trackable.click_url'|trans }}</td>
                 <td>{{ 'mautic.trackable.click_count'|trans }}</td>
                 <td>{{ 'mautic.trackable.click_unique_count'|trans }}</td>
                 {{ customContent('click_counts_headers', mauticTemplateVars) }}
-                {% if totalViews is defined %}
+                {% if showConversionRate %}
                     <td>{{ 'mautic.trackable.click_conversion_rate'|trans }}</td>
                 {% endif %}
                 <td>{{ 'mautic.trackable.click_track_id'|trans }}</td>
@@ -37,8 +39,8 @@
                         </span>
                             </td>
                             {{ customContent('click_counts', mauticTemplateVars|merge({'redirect_id' : link.redirect_id})) }}
-                            {% if totalViews is defined %}
-                                <td>{{ (totalViews > 0 ? link.hits / totalViews * 100 : 0)|round(4) }}%</td>
+                            {% if showConversionRate %}
+                                <td data-conversion-rate-cell data-unique-hits="{{ link.unique_hits }}"><div class="spinner"><i class="fa fa-spin fa-spinner"></i></div></td>
                             {% endif %}
                             <td>{{ link.redirect_id }}</td>
                         </tr>
@@ -61,8 +63,8 @@
                         {% endif %}
                         </span>
                     </td>
-                    {% if totalViews is defined %}
-                        <td>{{ (totalViews > 0 ? totalClicks / totalViews * 100 : 0)|round(4) }}%</td>
+                    {% if showConversionRate %}
+                        <td data-conversion-rate-total-cell><div class="spinner"><i class="fa fa-spin fa-spinner"></i></div></td>
                     {% endif %}
                     <td></td>
                 </tr>

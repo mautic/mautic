@@ -185,6 +185,10 @@ Mautic.focusOnLoad = function () {
     } else {
         Mautic.initDateRangePicker();
     }
+
+    if (mQuery('[data-conversion-rate-table]').length) {
+        Mautic.focusLoadConversionRateTable();
+    }
 };
 
 Mautic.launchFocusBuilder = function (forceFetch) {
@@ -412,4 +416,29 @@ Mautic.focusCreateIframe = function (url) {
         mQuery('.website-placeholder').hide();
         Mautic.focusUpdatePreview();
     }
+}
+
+Mautic.focusLoadConversionRateTable = function() {
+    var $conversionRateTable = mQuery('[data-conversion-rate-table]');
+    var $conversionRateCells = mQuery('[data-conversion-rate-cell]', $conversionRateTable);
+    var $conversionRateTotalCell = mQuery('[data-conversion-rate-total-cell]', $conversionRateTable);
+    var $focusTotalViewsCell = mQuery('[data-focus-total-views-cell]');
+    var focusId = $conversionRateTable.data('entity-id');
+
+    Mautic.ajaxActionRequest('plugin:focus:getViewsCount', {focusId: focusId}, function(response){
+        var views = response.views;
+        var totalUniqueHits = 0;
+
+        $conversionRateCells.each(function(i, el) {
+            var $cell = mQuery(el);
+            var uniqueHits = $cell.data('unique-hits');
+            var conversionRate = Math.round(uniqueHits / views * 10000) / 100;
+            $cell.html(conversionRate + '%');
+            totalUniqueHits += uniqueHits;
+        })
+
+        var totalConversionRate = Math.round(totalUniqueHits / views * 10000) / 100;
+        $conversionRateTotalCell.html(totalConversionRate + '%');
+        $focusTotalViewsCell.html(views);
+    }, false, true, "GET");
 }
