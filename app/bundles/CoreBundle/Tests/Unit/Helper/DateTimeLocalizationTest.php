@@ -9,9 +9,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeLocalizationTest extends TestCase
 {
-    private TranslatorInterface $translator;
-    private CoreParametersHelper $coreParametersHelper;
+    /**
+     * @var CoreParametersHelper|(CoreParametersHelper&\PHPUnit\Framework\MockObject\MockObject)|\PHPUnit\Framework\MockObject\MockObject
+     */
+    private CoreParametersHelper|\PHPUnit\Framework\MockObject\MockObject $coreParametersHelper;
+
     private DateTimeLocalization $dateTimeLocalization;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface|(TranslatorInterface&\PHPUnit\Framework\MockObject\MockObject)
+     */
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
     protected function setUp(): void
     {
@@ -52,6 +60,9 @@ class DateTimeLocalizationTest extends TestCase
         $this->assertSame($expectedLocalizedDate, $result);
     }
 
+    /**
+     * @return array<int, array<int, string>>
+     */
     public function localizationDataProvider(): array
     {
         return [
