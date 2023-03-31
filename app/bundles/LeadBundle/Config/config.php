@@ -1075,6 +1075,14 @@ return [
                     'mautic.helper.mailer',
                 ],
             ],
+            'mautic.lead.email.date.token.normalize.subscriber' => [
+                'class'     => \Mautic\LeadBundle\EventListener\EmailDateTokenNormalizeSubscriber::class,
+                'arguments' => [
+                    'mautic.lead.model.lead',
+                    'mautic.lead.model.company',
+                    'mautic.core.date.time.localization',
+                ],
+            ],
         ],
         'fixtures' => [
             'mautic.lead.fixture.company' => [

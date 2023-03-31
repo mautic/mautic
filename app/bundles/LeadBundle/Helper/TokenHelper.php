@@ -10,6 +10,8 @@ use Mautic\CoreBundle\Helper\ParamsLoaderHelper;
  */
 class TokenHelper
 {
+    public const REGEX = '/({|%7B)contactfield=(.*?)(}|%7D)/';
+
     /**
      * @var array
      */
@@ -31,7 +33,7 @@ class TokenHelper
 
         // Search for bracket or bracket encoded
         $tokenList    = [];
-        $foundMatches = preg_match_all('/({|%7B)contactfield=(.*?)(}|%7D)/', $content, $matches);
+        $foundMatches = preg_match_all(self::REGEX, $content, $matches);
 
         if ($foundMatches) {
             foreach ($matches[2] as $key => $match) {
@@ -147,7 +149,7 @@ class TokenHelper
      *
      * @return mixed
      */
-    private static function getFieldAlias($match)
+    public static function getFieldAlias($match)
     {
         $fallbackCheck = explode('|', $match);
 
