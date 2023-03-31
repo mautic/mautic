@@ -848,7 +848,7 @@ class PageController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,
