@@ -24,7 +24,6 @@ return function (ContainerConfigurator $configurator, ContainerInterface $contai
         }
 
         $excludes = [
-            'Controller', // Enabling this will require to refactor all controllers to use DI.
         ];
 
         $services->load($bundle['namespace'].'\\', $bundle['directory'])
