@@ -172,9 +172,8 @@ class CoreSubscriberTest extends TestCase
             ->method('getUser')
             ->willReturn($user);
 
-        $request    = $this->createMock(Request::class);
         $controller = $this->getMockBuilder(CommonController::class)
-            ->onlyMethods(['initialize', 'setRequest', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag', 'setModelFactory'])
+            ->onlyMethods(['initialize', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag', 'setModelFactory'])
             ->getMock();
         $controllers = [$controller];
 
@@ -182,13 +181,7 @@ class CoreSubscriberTest extends TestCase
         $event->expects(self::once())
             ->method('getController')
             ->willReturn($controllers);
-        $event->expects(self::once())
-            ->method('getRequest')
-            ->willReturn($request);
 
-        $controller->expects(self::once())
-            ->method('setRequest')
-            ->with($request);
         $controller->expects(self::once())
             ->method('setFactory')
             ->with($this->factory);

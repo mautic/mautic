@@ -230,11 +230,6 @@ class CoreSubscriber implements EventSubscriberInterface
 
         //only affect Mautic controllers
         if ($controller[0] instanceof MauticController) {
-            $request = $event->getRequest();
-
-            //also set the request for easy access throughout controllers
-            $controller[0]->setRequest($request);
-
             // set the factory for easy use access throughout the controllers
             // @deprecated To be removed in 3.0
             $controller[0]->setFactory($this->factory);

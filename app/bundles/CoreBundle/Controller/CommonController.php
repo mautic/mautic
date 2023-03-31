@@ -45,11 +45,6 @@ class CommonController extends AbstractController implements MauticController
     protected ModelFactory $modelFactory;
 
     /**
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
      * @var User
      */
     protected $user;
@@ -82,11 +77,6 @@ class CommonController extends AbstractController implements MauticController
      * @var FlashBag
      */
     private $flashBag;
-
-    public function setRequest(Request $request)
-    {
-        $this->request = $request;
-    }
 
     public function setFactory(MauticFactory $factory)
     {
@@ -153,7 +143,7 @@ class CommonController extends AbstractController implements MauticController
 
     protected function getCurrentRequest(): Request
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
+        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : null;
 
         if (null === $request) {
             throw new RuntimeException('Request is not set.');
@@ -229,8 +219,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function delegateView($args)
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-        assert(null !== $request);
+        $request = $this->getCurrentRequest();
 
         // Used for error handling
         defined('MAUTIC_DELEGATE_VIEW') || define('MAUTIC_DELEGATE_VIEW', 1);
@@ -284,8 +273,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function delegateRedirect($url)
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-        \assert(null !== $request);
+        $request = $this->getCurrentRequest();
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['redirect' => $url]);
@@ -490,8 +478,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function renderException(\Exception $e)
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-        \assert(null !== $request);
+        $request = $this->getCurrentRequest();
 
         $parameters = ['exception' => $e];
         $query      = ['ignoreAjax' => true, 'subrequest' => true];
@@ -545,8 +532,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function accessDenied($batch = false, $msg = 'mautic.core.url.error.401')
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-        \assert(null !== $request);
+        $request = $this->getCurrentRequest();
 
         $anonymous = $this->security->isAnonymous();
 
@@ -571,8 +557,7 @@ class CommonController extends AbstractController implements MauticController
      */
     public function notFound($msg = 'mautic.core.url.error.404')
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-        \assert(null !== $request);
+        $request = $this->getCurrentRequest();
 
         $page_404 = $this->coreParametersHelper->get('404_page');
         if (!empty($page_404)) {
@@ -618,8 +603,7 @@ class CommonController extends AbstractController implements MauticController
      */
     protected function setListFilters($name = null)
     {
-        $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-        \assert(null !== $request);
+        $request = $this->getCurrentRequest();
 
         $session = $request->getSession();
 
@@ -687,8 +671,7 @@ class CommonController extends AbstractController implements MauticController
     protected function getNotificationContent(Request $request = null)
     {
         if (null === $request) {
-            $request = null !== $this->requestStack ? $this->requestStack->getCurrentRequest() : $this->request;
-            \assert(null !== $request);
+            $request = $this->getCurrentRequest();
         }
 
         $afterId = $request->get('mauticLastNotificationId', null);

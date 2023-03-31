@@ -137,11 +137,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $permissionBase;
 
-    /**
-     * @var Request
-     */
-    protected $request;
-
     private RequestStack $requestStack;
 
     /**
@@ -400,11 +395,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     public function setModelFactory(ModelFactory $modelFactory): void
     {
         $this->modelFactory = $modelFactory;
-    }
-
-    public function setRequest(Request $request): void
-    {
-        $this->request = $request;
     }
 
     public function getCurrentRequest(): Request
