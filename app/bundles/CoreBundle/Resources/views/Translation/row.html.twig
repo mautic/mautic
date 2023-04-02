@@ -1,0 +1,43 @@
+{#
+  Variables
+    - translation
+    - translations
+    - actionRoute
+    - activeEntity
+    - model
+    - nameGetter
+#}
+{% set isCurrent = translation.id is same as activeEntity.id %}
+<li class="list-group-item bg-auto bg-{% if isCurrent %}dark{% else %}light{% endif %}-xs">
+    <div class="box-layout">
+        <div class="col-md-1 va-m">
+            <h3>
+                {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
+                        'item': translation,
+                        'model': model,
+                        'size': '',
+                        'query': 'size=',
+                }) }}
+            </h3>
+        </div>
+        <div class="col-md-7 va-m">
+            <h5 class="fw-sb text-primary">
+                <a href="{{ path(actionRoute, {'objectAction': 'view', 'objectId': translation.id}) }}" data-toggle="ajax">
+                    <span>{{ attribute(translation, nameGetter) }}</span>
+                </a>
+                {% if isCurrent %}
+                    &nbsp;<span class="label label-success">{{ 'mautic.core.current'|trans }}</span>
+                {% endif %}
+                {% if translations.parent.id is same as translation.id %}
+                    &nbsp;<span class="label label-warning">{{ 'mautic.core.parent'|trans }}</span>
+                {% endif %}
+            </h5>
+            {% if method_exists(translation, 'getAlias') %}
+                <span class="text-white dark-sm">{{ translation.alias }}</span>
+            {% endif %}
+        </div>
+        <div class="col-md-4 va-m text-right">
+            <em class="text-white dark-sm">{{ translation.language }}</em>
+        </div>
+    </div>
+</li>

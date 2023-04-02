@@ -68,7 +68,7 @@ class ReplySubscriber implements EventSubscriberInterface
             'sms',
             'sms',
             'reply',
-            'MauticSmsBundle:SubscribedEvents/Timeline:reply.html.php'
+            '@MauticSms/SubscribedEvents/Timeline/reply.html.twig'
         );
     }
 }

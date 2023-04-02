@@ -58,7 +58,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public static $memory_limit = '512M';
+    public const RECOMMENDED_MEMORY_LIMIT = '512M';
 
     /**
      * @param Configurator $configurator Configurator service
@@ -230,7 +230,7 @@ class CheckStep implements StepInterface
         }
 
         $memoryLimit    = FileHelper::convertPHPSizeToBytes(ini_get('memory_limit'));
-        $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::$memory_limit);
+        $suggestedLimit = FileHelper::convertPHPSizeToBytes(self::RECOMMENDED_MEMORY_LIMIT);
         if ($memoryLimit > -1 && $memoryLimit < $suggestedLimit) {
             $messages[] = 'mautic.install.memory.limit';
         }
@@ -261,7 +261,7 @@ class CheckStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:check.html.php';
+        return '@MauticInstall/Install/check.html.twig';
     }
 
     /**

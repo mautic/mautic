@@ -1,0 +1,11 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}user{% endblock %}
+{% block headerTitle %}{{ 'mautic.user.user.header.contact'|trans({'%name%': user.getName()}) }}{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <div class="panel-body pa-md">
+        {{ form(form) }}
+    </div>
+</div>
+{% endblock %}

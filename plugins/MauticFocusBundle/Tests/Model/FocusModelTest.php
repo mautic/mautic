@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticFocusBundle\Tests\Helper;
 
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Model\TrackableModel;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Rule\InvokedCount;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Templating\DelegatingEngine;
+use Twig\Environment;
 
 class FocusModelTest extends TestCase
 {
@@ -38,9 +38,9 @@ class FocusModelTest extends TestCase
     private $leadFieldModel;
 
     /**
-     * @var TemplatingHelper|mixed|MockObject
+     * @var Environment|mixed|MockObject
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var TrackableModel|mixed|MockObject
@@ -51,7 +51,7 @@ class FocusModelTest extends TestCase
     {
         $this->formModel      = $this->createMock(FormModel::class);
         $this->trackableModel = $this->createMock(TrackableModel::class);
-        $this->templating     = $this->createMock(TemplatingHelper::class);
+        $this->twig           = $this->createMock(Environment::class);
         $this->dispatcher     = $this->createMock(EventDispatcherInterface::class);
         $this->leadFieldModel = $this->createMock(FieldModel::class);
         $this->contactTracker = $this->createMock(ContactTracker::class);
@@ -63,9 +63,6 @@ class FocusModelTest extends TestCase
      */
     public function testGetContentWithForm(string $type, InvokedCount $count)
     {
-        $templating = $this->createMock(DelegatingEngine::class);
-        $this->templating->expects(self::once())->method('getTemplating')->willReturn($templating);
-
         $this->formModel->expects(self::once())->method('getPages')->willReturn(['', '']);
 
         $this->formModel->expects($count)->method('getEntity');
@@ -73,10 +70,11 @@ class FocusModelTest extends TestCase
         $focusModel = new FocusModel(
             $this->formModel,
             $this->trackableModel,
-            $this->templating,
+            $this->twig,
             $this->dispatcher,
             $this->leadFieldModel,
-            $this->contactTracker);
+            $this->contactTracker,
+            );
         $focus = [
             'form' => 'xxx',
             'type' => $type,

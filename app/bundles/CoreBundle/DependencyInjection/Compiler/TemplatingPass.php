@@ -2,12 +2,10 @@
 
 namespace Mautic\CoreBundle\DependencyInjection\Compiler;
 
-use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Templating\Helper\FormHelper;
 use Mautic\CoreBundle\Templating\Helper\SlotsHelper;
 use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
-use Mautic\CoreBundle\Templating\TemplateNameParser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -36,43 +34,9 @@ class TemplatingPass implements CompilerPassInterface
                 ->addMethodCall('setVersion', ['%mautic.secret_key%', MAUTIC_VERSION]);
         }
 
-        if ($container->hasDefinition('templating.engine.php')) {
-            $container->getDefinition('templating.engine.php')
-                ->setClass(PhpEngine::class)
-                ->addMethodCall(
-                    'setDispatcher',
-                    [new Reference('event_dispatcher')]
-                )
-                ->addMethodCall(
-                    'setRequestStack',
-                    [new Reference('request_stack')]
-                )
-                ->setPublic(true);
-        }
-
-        if ($container->hasDefinition('debug.templating.engine.php')) {
-            $container->getDefinition('debug.templating.engine.php')
-                ->setClass(PhpEngine::class)
-                ->addMethodCall(
-                    'setDispatcher',
-                    [new Reference('event_dispatcher')]
-                )
-                ->addMethodCall(
-                    'setRequestStack',
-                    [new Reference('request_stack')]
-                )
-                ->setPublic(true);
-        }
-
         if ($container->hasDefinition('templating.helper.slots')) {
             $container->getDefinition('templating.helper.slots')
                 ->setClass(SlotsHelper::class)
-                ->setPublic(true);
-        }
-
-        if ($container->hasDefinition('templating.name_parser')) {
-            $container->getDefinition('templating.name_parser')
-                ->setClass(TemplateNameParser::class)
                 ->setPublic(true);
         }
 

@@ -69,17 +69,16 @@ class ExceptionController extends CommonController
         }
 
         $anonymous    = $this->get('mautic.security')->isAnonymous();
-        $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
+        $baseTemplate = '@MauticCore/Default/slim.html.twig';
         if ($anonymous) {
             if ($templatePage = $this->get('mautic.helper.theme')->getTheme()->getErrorPageTemplate($code)) {
                 $baseTemplate = $templatePage;
             }
         }
 
-        $template   = "MauticCoreBundle:{$layout}:{$code}.html.php";
-        $templating = $this->get('mautic.helper.templating')->getTemplating();
-        if (!$templating->exists($template)) {
-            $template = "MauticCoreBundle:{$layout}:base.html.php";
+        $template   = "@MauticCore/{$layout}/{$code}.html.twig";
+        if (!$this->get('twig')->getLoader()->exists($template)) {
+            $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
         $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';

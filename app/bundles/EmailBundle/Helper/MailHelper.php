@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
  * Class MailHelper.
@@ -39,7 +40,7 @@ class MailHelper
     protected $transport;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     * @var Environment
      */
     protected $templating;
 
@@ -119,6 +120,8 @@ class MailHelper
      * @var Email|null
      */
     protected $email;
+
+    protected ?string $emailType = null;
 
     /**
      * @var array
@@ -886,7 +889,7 @@ class MailHelper
             $this->templating = $this->factory->getTemplating();
         }
 
-        $content = $this->templating->renderResponse($template, $vars)->getContent();
+        $content = $this->templating->render($template, $vars);
 
         unset($vars);
 
@@ -1344,6 +1347,16 @@ class MailHelper
         $this->source = $source;
     }
 
+    public function getEmailType(): ?string
+    {
+        return $this->emailType;
+    }
+
+    public function setEmailType(?string $emailType): void
+    {
+        $this->emailType = $emailType;
+    }
+
     /**
      * @return Email|null
      */
@@ -1432,7 +1445,7 @@ class MailHelper
 
             $this->processSlots($slots, $email);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.php');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
                 'slots'    => $slots,
@@ -1505,6 +1518,12 @@ class MailHelper
     public function getCustomHeaders()
     {
         $headers = array_merge($this->headers, $this->getSystemHeaders());
+
+        // Personal and transactional emails do not contain unsubscribe header
+        $email = $this->getEmail();
+        if (empty($email) || 'transactional' === $this->getEmailType()) {
+            return $headers;
+        }
 
         $listUnsubscribeHeader = $this->getUnsubscribeHeader();
         if ($listUnsubscribeHeader) {

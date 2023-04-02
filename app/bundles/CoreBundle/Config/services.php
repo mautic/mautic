@@ -27,7 +27,6 @@ return function (ContainerConfigurator $configurator) {
         'Predis/Replication/StrategyConfig.php',
         'Predis/Replication/MasterOnlyStrategy.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
-        'Templating/Engine/PhpEngine.php', // Will be removed in M5
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
@@ -41,6 +40,7 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set('mautic.http.client', \GuzzleHttp\Client::class)->autowire();
+
     $services->alias(\GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(\Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
 
@@ -49,6 +49,7 @@ return function (ContainerConfigurator $configurator) {
     $services->alias('templating.helper.assets', \Mautic\CoreBundle\Templating\Helper\AssetsHelper::class);
     $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
+    $services->alias('mautic.helper.email.address', \Mautic\CoreBundle\Helper\EmailAddressHelper::class);
 
     $services->get(\Mautic\CoreBundle\Templating\Helper\AssetsHelper::class)->tag('templating.helper', ['alias' => 'assets']);
 };

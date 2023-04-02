@@ -62,13 +62,11 @@ class MessageApiController extends CommonApiController
     {
         $event = $this->dispatcher->dispatch(new ChannelEvent(), ChannelEvents::ADD_CHANNEL);
 
-        if ($channels = $entity->getChannels()) {
-            foreach ($channels as $channel) {
-                $repository = $event->getRepositoryName($channel->getChannel());
-                $nameColumn = $event->getNameColumn($channel->getChannel());
-                $name       = $this->model->getChannelName($channel->getChannelId(), $repository, $nameColumn);
-                $channel->setChannelName($name);
-            }
+        foreach ($entity->getChannels() as $channel) {
+            $repository = $event->getRepositoryName($channel->getChannel());
+            $nameColumn = $event->getNameColumn($channel->getChannel());
+            $name       = $this->model->getChannelName($channel->getChannelId(), $repository, $nameColumn);
+            $channel->setChannelName($name);
         }
     }
 }

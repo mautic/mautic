@@ -24,7 +24,7 @@ class ResultController extends CommonFormController
             'mautic_form', // route base
             'mautic.formresult', // session base
             'mautic.form.result', // lang string base
-            'MauticFormBundle:Result', // template base
+            '@MauticForm/Result', // template base
             'mautic_form', // activeLink
             'formresult' // mauticContent
         );
@@ -161,7 +161,7 @@ class ResultController extends CommonFormController
                         $form->getCreatedBy()
                     ),
                 ],
-                'contentTemplate' => 'MauticFormBundle:Result:list.html.php',
+                'contentTemplate' => '@MauticForm/Result/list.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => 'mautic_form_index',
                     'mauticContent' => 'formresult',

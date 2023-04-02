@@ -94,7 +94,7 @@ class MessageController extends AbstractStandardFormController
                             'class' => 'visible-md visible-lg',
                         ],
                     ],
-                    'listItemTemplate'  => 'MauticChannelBundle:Message:list_item.html.php',
+                    'listItemTemplate'  => '@MauticChannel/Message/list_item.html.twig',
                     'enableCloneButton' => true,
                 ];
 
@@ -190,7 +190,7 @@ class MessageController extends AbstractStandardFormController
 
     protected function getTemplateBase(): string
     {
-        return 'MauticChannelBundle:Message';
+        return '@MauticChannel/Message';
     }
 
     /**
@@ -200,17 +200,7 @@ class MessageController extends AbstractStandardFormController
      */
     protected function getFormView(Form $form, $view)
     {
-        $themes = ['MauticChannelBundle:FormTheme'];
-        /** @var MessageModel $model */
-        $model    = $this->getModel($this->getModelName());
-        $channels = $model->getChannels();
-        foreach ($channels as $channel) {
-            if (isset($channel['formTheme'])) {
-                $themes[] = $channel['formTheme'];
-            }
-        }
-
-        return $this->setFormTheme($form, 'MauticChannelBundle:Message:form.html.php', $themes);
+        return $form->createView();
     }
 
     /**
