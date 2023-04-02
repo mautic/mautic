@@ -49,6 +49,7 @@ class LeadStageLog
 
         $builder->createField('dateFired', 'datetime')
             ->columnName('date_fired')
+            ->length(3)
             ->build();
     }
 

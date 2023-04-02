@@ -78,7 +78,7 @@ class PointsChangeLog
 
         $builder->addField('delta', 'integer');
 
-        $builder->addDateAdded();
+        $builder->addDateAdded(false, 3);
     }
 
     /**

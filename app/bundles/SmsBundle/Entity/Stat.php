@@ -102,6 +102,7 @@ class Stat
 
         $builder->createField('dateSent', 'datetime')
             ->columnName('date_sent')
+            ->length(3)
             ->build();
 
         $builder->createField('isFailed', 'boolean')

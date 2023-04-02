@@ -60,6 +60,7 @@ class StatDevice
 
         $builder->createField('dateOpened', 'datetime')
             ->columnName('date_opened')
+            ->length(3)
             ->build();
     }
 
