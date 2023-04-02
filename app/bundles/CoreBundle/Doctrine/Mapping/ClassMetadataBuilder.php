@@ -241,7 +241,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * Added dateAdded column.
      *
      * @param bool|false $nullable
-     * @param int|null   $nullable
+     * @param int|null   $length
      *
      * @return $this
      */
@@ -372,10 +372,10 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a field with a custom column name.
      *
-     * @param      $name
-     * @param      $type
-     * @param      $columnName
-     * @param bool $nullable
+     * @param          $name
+     * @param          $type
+     * @param          $columnName
+     * @param bool     $nullable
      * @param int|null $length
      *
      * @return $this
