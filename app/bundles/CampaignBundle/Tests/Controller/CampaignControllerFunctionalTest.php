@@ -238,7 +238,7 @@ class CampaignControllerFunctionalTest extends AbstractCampaignTest
                 SummarizeCommand::NAME,
                 [
                     '--env'       => 'test',
-                    '--max-hours' => 744,
+                    '--max-hours' => 768,
                 ]
             );
         }
