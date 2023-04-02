@@ -19,11 +19,11 @@ class UTCDateTimeType extends DateTimeType
     private static $utc;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        if (isset($column['version']) && $column['version'] === true) {
+        if (isset($column['version']) && true === $column['version']) {
             return 'TIMESTAMP';
         }
 
