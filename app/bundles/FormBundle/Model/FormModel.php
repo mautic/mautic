@@ -1135,7 +1135,7 @@ class FormModel extends CommonFormModel
                 $list = $contactFieldProps['list'] ?? [];
                 break;
             case 'boolean':
-                $list =     [['label'=> $contactFieldProps['no'], 'value' => 0], ['label'=>  $contactFieldProps['yes'], 'value' => 1]];
+                $list = [$contactFieldProps['no'], $contactFieldProps['yes']];
                 break;
             case 'country':
                 $list = ContactFieldHelper::getCountryChoices();
