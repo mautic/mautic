@@ -19,7 +19,7 @@ final class SummarizeCommandTest extends AbstractCampaignTest
             SummarizeCommand::NAME,
             [
                 '--env'       => 'test',
-                '--max-hours' => 730,
+                '--max-hours' => 744,
             ]
         );
 
@@ -45,7 +45,7 @@ final class SummarizeCommandTest extends AbstractCampaignTest
             SummarizeCommand::NAME,
             [
                 '--env'       => 'test',
-                '--max-hours' => 730,
+                '--max-hours' => 744,
             ]
         );
 
