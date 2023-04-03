@@ -376,7 +376,6 @@ class EmailController extends FormController
 
         // Get click through stats
         $trackableLinks = $model->getEmailClickStats($email->getId());
-        $deliveredCount = $model->getDeliveredCount($email);
 
         return $this->delegateView(
             [
@@ -388,12 +387,11 @@ class EmailController extends FormController
                     ]
                 ),
                 'viewParameters' => [
-                    'email'          => $email,
-                    'deliveredCount' => $deliveredCount,
-                    'trackables'     => $trackableLinks,
-                    'logs'           => $logs,
-                    'isEmbedded'     => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
-                    'variants'       => [
+                    'email'        => $email,
+                    'trackables'   => $trackableLinks,
+                    'logs'         => $logs,
+                    'isEmbedded'   => $this->request->get('isEmbedded') ? $this->request->get('isEmbedded') : false,
+                    'variants'     => [
                         'parent'     => $parent,
                         'children'   => $children,
                         'properties' => $properties,

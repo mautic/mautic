@@ -2,8 +2,10 @@
 
 namespace Mautic\EmailBundle\Controller;
 
+use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Controller\VariantAjaxControllerTrait;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\PlainTextHelper;
@@ -11,10 +13,18 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Form\Type\AbTestPropertiesType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class AjaxController extends CommonAjaxController
 {
     use VariantAjaxControllerTrait;
+
+    private CacheProvider $cacheProvider;
+
+    public function initialize(ControllerEvent $event)
+    {
+        $this->cacheProvider = $this->container->get('mautic.cache.provider');
+    }
 
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
@@ -324,5 +334,44 @@ class AjaxController extends CommonAjaxController
         }
 
         return new JsonResponse($data);
+    }
+
+    protected function getEmailDeliveredCountAction(Request $request): JsonResponse
+    {
+        $emailId = (int) InputHelper::clean($request->query->get('id'));
+
+        if (0 === $emailId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $this->cacheProvider->getItem('email.stats.delivered.'.$emailId);
+
+        if ($cacheItem->isHit()) {
+            $deliveredCount = $cacheItem->get();
+        } else {
+            /** @var EmailModel $model */
+            $model = $this->getModel('email');
+
+            $email = $model->getEntity($emailId);
+            if (null === $email) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $deliveredCount = $model->getDeliveredCount($email);
+            $cacheItem->set($deliveredCount);
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $this->cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'     => 1,
+            'delivered'   => $deliveredCount,
+        ]);
     }
 }
