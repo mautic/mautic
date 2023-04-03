@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Controller;
 
-use DateTime;
 use Mautic\CampaignBundle\Command\SummarizeCommand;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;

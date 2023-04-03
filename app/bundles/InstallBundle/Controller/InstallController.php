@@ -13,7 +13,6 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class InstallController extends CommonController
 {
@@ -25,11 +24,6 @@ class InstallController extends CommonController
     {
         $this->configurator = $configurator;
         $this->installer    = $installer;
-    }
-
-    public function initialize(ControllerEvent $event)
-    {
-        // nothing to initialize.
     }
 
     /**

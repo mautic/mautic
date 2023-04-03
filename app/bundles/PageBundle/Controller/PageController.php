@@ -482,9 +482,9 @@ class PageController extends FormController
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function editAction(
-        Request      $request,
+        Request $request,
         AssetsHelper $assetsHelper,
-        Translator   $translator,
+        Translator $translator,
                      $objectId,
                      $ignorePost = false
     ) {

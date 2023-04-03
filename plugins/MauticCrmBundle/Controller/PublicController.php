@@ -2,10 +2,10 @@
 
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
-use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use function assert;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

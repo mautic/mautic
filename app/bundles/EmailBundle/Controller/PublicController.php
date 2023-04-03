@@ -7,7 +7,6 @@ use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
 use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Twig\Helper\FormHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
