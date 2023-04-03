@@ -27,7 +27,6 @@ return function (ContainerConfigurator $configurator) {
         'Predis/Replication/StrategyConfig.php',
         'Predis/Replication/MasterOnlyStrategy.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
-        'Templating/Engine/PhpEngine.php', // Will be removed in M5
         'Templating/Helper/FormHelper.php',
         'Templating/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',

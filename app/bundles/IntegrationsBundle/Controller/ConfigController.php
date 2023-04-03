@@ -230,7 +230,7 @@ class ConfigController extends AbstractFormController
                     'useConfigFormNotes'  => $useConfigFormNotes,
                 ],
                 'contentTemplate' => $integrationObject->getConfigFormContentTemplate()
-                    ?: 'IntegrationsBundle:Config:form.html.twig',
+                    ?: 'Integrations/Config/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_plugin_index',
                     'mauticContent' => 'integrationsConfig',

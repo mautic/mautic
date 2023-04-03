@@ -80,7 +80,7 @@ class GrapesJsController extends CommonController
 
             return $this->json(false);
         }
-        $templateName = ':'.$template.':'.$objectType;
+        $templateName = '@themes/'.$template.'/html/'.$objectType;
         $content      = $entity->getContent();
         /** @var ThemeHelper $themeHelper */
         $themeHelper  = $this->get('mautic.helper.theme');
@@ -132,7 +132,7 @@ class GrapesJsController extends CommonController
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
 
         return $this->render(
-            'GrapesJsBuilderBundle:Builder:template.html.twig',
+            '@GrapesJsBuilder/Builder/template.html.twig',
             [
                 'templateHtml' => $renderedTemplateHtml,
                 'templateMjml' => $renderedTemplateMjml,
@@ -281,19 +281,15 @@ class GrapesJsController extends CommonController
         $slotsHelper->stop();
     }
 
+    /**
+     * @deprecated deprecated since version 5.0 - use mjml directly in email.html.twig
+     */
     private function checkForMjmlTemplate($template)
     {
-        $templatingHelper = $this->get('mautic.helper.templating');
+        $twig = $this->get('twig');
 
-        $parser     = $templatingHelper->getTemplateNameParser();
-        $templating = $templatingHelper->getTemplating();
-        $template   = $parser->parse($template);
-
-        $twigTemplate = clone $template;
-        $twigTemplate->set('engine', 'twig');
-
-        if ($templating->exists($twigTemplate)) {
-            return $twigTemplate->getLogicalName();
+        if ($twig->getLoader()->exists($template)) {
+            return $template;
         }
 
         return null;

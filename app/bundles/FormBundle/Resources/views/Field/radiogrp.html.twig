@@ -1,0 +1,10 @@
+{{ include('@MauticForm/Field/group.html.twig', {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+        'type': 'radio',
+        'mappedFields': mappedFields|default([]),
+}) }}

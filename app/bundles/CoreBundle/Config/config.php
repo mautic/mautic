@@ -412,19 +412,19 @@ return [
             'mautic.menu.admin' => [
                 'alias'   => 'admin',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:admin.html.twig',
+                    'template' => '@MauticCore/Menu/admin.html.twig',
                 ],
             ],
             'mautic.menu.extra' => [
                 'alias'   => 'extra',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:extra.html.twig',
+                    'template' => '@MauticCore/Menu/extra.html.twig',
                 ],
             ],
             'mautic.menu.profile' => [
                 'alias'   => 'profile',
                 'options' => [
-                    'template' => 'MauticCoreBundle:Menu:profile_inline.html.twig',
+                    'template' => '@MauticCore/Menu/profile_inline.html.twig',
                 ],
             ],
         ],
@@ -485,10 +485,6 @@ return [
             'mautic.factory' => [
                 'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
                 'arguments' => 'service_container',
-            ],
-            'mautic.templating.name_parser' => [
-                'class'     => 'Mautic\CoreBundle\Templating\TemplateNameParser',
-                'arguments' => 'kernel',
             ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
@@ -619,17 +615,11 @@ return [
                     'kernel',
                 ],
             ],
-            'mautic.helper.templating' => [
-                'class'     => 'Mautic\CoreBundle\Helper\TemplatingHelper',
-                'arguments' => [
-                    'kernel',
-                ],
-            ],
             'mautic.helper.theme' => [
                 'class'     => \Mautic\CoreBundle\Helper\ThemeHelper::class,
                 'arguments' => [
                     'mautic.helper.paths',
-                    'mautic.helper.templating',
+                    'twig',
                     'translator',
                     'mautic.helper.core_parameters',
                     'mautic.filesystem',
@@ -696,7 +686,7 @@ return [
                 'class'     => \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 'arguments' => [
                     'knp_menu.matcher',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
                 'tag'   => 'knp_menu.renderer',
                 'alias' => 'mautic',

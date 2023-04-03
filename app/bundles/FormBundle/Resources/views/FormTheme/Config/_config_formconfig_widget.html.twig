@@ -1,0 +1,26 @@
+{% block _config_formconfig_widget %}
+  <div class="panel panel-primary">
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.config.tab.formconfig'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+          {% for child in form.children|filter((v, k) => 'form_results_data_sources' is not same as k) %}
+              <div class="row">
+                  <div class="col-md-6">
+                      {{ form_row(child) }}
+                  </div>
+              </div>
+          {% endfor %}
+      </div>
+      <div class="panel-heading">
+          <h3 class="panel-title">{{ 'mautic.config.tab.formresultsconfig'|trans }}</h3>
+      </div>
+      <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.form_results_data_sources) }}
+                </div>
+            </div>
+      </div>
+  </div>
+{% endblock %}

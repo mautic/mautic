@@ -29,9 +29,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->segmentCountCacheHelper = self::$container->get('mautic.helper.segment.count.cache');
     }
 
-    public function tearDown(): void
+    public function beforeTearDown(): void
     {
-        parent::tearDown();
+        parent::beforeTearDown();
 
         putenv('CAMPAIGN_EXECUTIONER_SCHEDULER_ACKNOWLEDGE_SECONDS=0');
 

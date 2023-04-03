@@ -26,7 +26,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $event->addForm(
             [
                 'formAlias'  => 'social_config',
-                'formTheme'  => 'MauticSocialBundle:FormTheme:Config/_config_social_config_widget.html.twig',
+                'formTheme'  => '@MauticSocial/FormTheme/Config/_config_social_config_widget.html.twig',
                 'formType'   => ConfigType::class,
                 'parameters' => $event->getParametersFromConfig('MauticSocialBundle'),
             ]
