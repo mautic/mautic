@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Symfony\Component\Routing\RouterInterface;
 
 trait BuilderControllerTrait
@@ -12,11 +12,11 @@ trait BuilderControllerTrait
      */
     protected function getAssetsForBuilder()
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->get('templating.helper.assets');
+        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->get('twig.helper.assets');
         /** @var RouterInterface $routerHelper */
         $routerHelper = $this->get('router');
-        $translator   = $this->get('templating.helper.translator');
+        $translator   = $this->get('translator');
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
             ->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';")

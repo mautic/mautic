@@ -848,7 +848,7 @@ class PageController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
         return $this->render($logicalName, [
             'isNew'       => $isNew,
@@ -979,10 +979,10 @@ class PageController extends FormController
      */
     private function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->get('templating.helper.assets');
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->get('templating.helper.slots');
+        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->get('twig.helper.assets');
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('twig.helper.slots');
         $formFactory = $this->get('form.factory');
 
         $slotsHelper->inBuilder(true);

@@ -131,7 +131,7 @@ class ActionController extends CommonFormController
         }
 
         return $this->ajaxAction([
-            'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
+            'contentTemplate' => '@MauticForm/Builder/'.$viewParams['tmpl'].'.html.twig',
             'viewParameters'  => $viewParams,
             'passthroughVars' => $passthroughVars,
         ]);
@@ -264,7 +264,7 @@ class ActionController extends CommonFormController
             }
 
             return $this->ajaxAction([
-                'contentTemplate' => 'MauticFormBundle:Builder:'.$viewParams['tmpl'].'.html.twig',
+                'contentTemplate' => '@MauticForm/Builder/'.$viewParams['tmpl'].'.html.twig',
                 'viewParameters'  => $viewParams,
                 'passthroughVars' => $passthroughVars,
             ]);

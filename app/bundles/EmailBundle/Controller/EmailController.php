@@ -983,7 +983,7 @@ class EmailController extends FormController
 
         $this->processSlots($slots, $entity);
 
-        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.twig');
+        $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
         return $this->render(
             $logicalName,
@@ -1447,8 +1447,8 @@ class EmailController extends FormController
      */
     private function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->get('templating.helper.slots');
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('twig.helper.slots');
         $content     = $entity->getContent();
 
         //Set the slots

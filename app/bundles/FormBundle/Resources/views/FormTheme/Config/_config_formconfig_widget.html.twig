@@ -16,13 +16,11 @@
           <h3 class="panel-title">{{ 'mautic.config.tab.formresultsconfig'|trans }}</h3>
       </div>
       <div class="panel-body">
-          {% for child in form.children %}
-              <div class="row">
-                  <div class="col-md-6">
-                      {{ form_row(form.form_results_data_sources) }}
-                  </div>
-              </div>
-          {% endfor %}
+            <div class="row">
+                <div class="col-md-6">
+                    {{ form_row(form.form_results_data_sources) }}
+                </div>
+            </div>
       </div>
   </div>
 {% endblock %}

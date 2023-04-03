@@ -4,7 +4,7 @@
 {# load base template #}
 {% set template = null %}
 {% if not request.isXmlHttpRequest() and not modalView %}
-    {% set template = contentOnly ? 'MauticCoreBundle:Default:slim.html.twig' :  'MauticCoreBundle:Default:base.html.twig' %}
+    {% set template = contentOnly ? '@MauticCore/Default/slim.html.twig' :  '@MauticCore/Default/base.html.twig' %}
 {% elseif not modalView %}
     {% set template = '@MauticCore/Default/output.html.twig' %}
 {% endif %}

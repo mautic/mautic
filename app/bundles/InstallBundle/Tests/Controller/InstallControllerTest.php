@@ -8,7 +8,6 @@ use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\InstallBundle\Controller\InstallController;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
@@ -33,7 +32,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
     private $pathsHelper;
     private $formFactoryMock;
     private $formMock;
-    private $templatingMock;
 
     private $configurator;
     private $installer;
@@ -52,7 +50,6 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->templatingMock       = $this->createMock(DelegatingEngine::class);
 
         $this->configurator         = $this->createMock(Configurator::class);
         $this->installer            = $this->createMock(InstallService::class);

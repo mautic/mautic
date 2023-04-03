@@ -9,8 +9,8 @@ use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
@@ -180,7 +180,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         $event->setPostSubmitResponse(new Response(
             $this->twig->render(
-                $this->themeHelper->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.twig'),
+                $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,
                     'type'     => 'notice',

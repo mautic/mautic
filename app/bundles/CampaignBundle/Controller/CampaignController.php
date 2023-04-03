@@ -690,7 +690,7 @@ class CampaignController extends AbstractStandardFormController
 
     protected function getTemplateBase(): string
     {
-        return 'MauticCampaignBundle:Campaign';
+        return '@MauticCampaign/Campaign';
     }
 
     /**
@@ -982,7 +982,7 @@ class CampaignController extends AbstractStandardFormController
 
         $existingEvents = $entity->getEvents()->toArray();
         $translator     = $this->get('translator');
-        $dateHelper     = $this->get('mautic.helper.template.date');
+        $dateHelper     = $this->get('mautic.helper.twig.date');
         foreach ($existingEvents as $e) {
             $event = $e->convertToArray();
 

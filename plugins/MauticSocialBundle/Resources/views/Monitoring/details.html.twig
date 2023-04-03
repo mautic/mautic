@@ -3,7 +3,7 @@
     - isEmbeded
     - activeMonitoring
 #}
-{% extends isEmbedded ? 'MauticCoreBundle:Default:raw_output.html.twig' : 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends isEmbedded ? '@MauticCore/Default/raw_output.html.twig' : '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent 'monitoring' %}
 
@@ -11,7 +11,7 @@
 
 {% block actions %}
     {# @todo finish ACL here #}
-    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
         'item': activeMonitoring,
         'templateButtons': {
             'edit': securityIsGranted('mauticSocial:monitoring:edit'),
@@ -38,7 +38,7 @@
                           <div class="text-white dark-sm mb-0">{{ activeMonitoring.description|purify }}</div>
                       </div>
                       <div class="col-xs-2 text-right">
-                          {{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': activeMonitoring}) }}
+                          {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activeMonitoring}) }}
                       </div>
                   </div>
               </div>
@@ -49,7 +49,7 @@
                       <div class="panel shd-none mb-0">
                           <table class="table table-bordered table-striped mb-0">
                               <tbody>
-                                  {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': activeMonitoring}) }}
+                                  {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeMonitoring}) }}
                               </tbody>
                           </table>
                       </div>
@@ -72,11 +72,11 @@
                                       </h5>
                                   </div>
                                   <div class="col-md-9 va-m">
-                                      {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
                               <div class="pt-0 pl-15 pb-10 pr-15">
-                                  {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': leadStats, 'chartType': 'line', 'chartHeight': 300}) }}
+                                  {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': leadStats, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
                       </div>

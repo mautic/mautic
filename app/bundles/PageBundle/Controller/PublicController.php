@@ -223,7 +223,7 @@ class PublicController extends CommonFormController
             }
 
             // Generate contents
-            $analytics = $this->get('mautic.helper.template.analytics')->getCode();
+            $analytics = $this->get('mautic.helper.twig.analytics')->getCode();
 
             $BCcontent = $entity->getContent();
             $content   = $entity->getCustomHtml();
@@ -244,7 +244,7 @@ class PublicController extends CommonFormController
                     $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
                 }
 
-                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
+                $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
                 $response = $this->render(
                     $logicalName,
@@ -267,7 +267,7 @@ class PublicController extends CommonFormController
                 }
             }
 
-            $this->get('templating.helper.assets')->addScript(
+            $this->get('twig.helper.assets')->addScript(
                 $this->get('router')->generate('mautic_js', [], UrlGeneratorInterface::ABSOLUTE_URL),
                 'onPageDisplay_headClose',
                 true,
@@ -326,7 +326,7 @@ class PublicController extends CommonFormController
                 $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
             }
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':page.html.twig');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/page.html.twig');
 
             $response = $this->render(
                 $logicalName,
@@ -523,9 +523,9 @@ class PublicController extends CommonFormController
      */
     private function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
         $assetsHelper = $this->factory->getHelper('template.assets');
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();
