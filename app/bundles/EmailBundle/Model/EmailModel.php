@@ -483,7 +483,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function hitEmail($stat, $request, $viaBrowser = false, $activeRequest = true)
     {
-        $doNotTrackEmailBots = $this->coreParametersHelper->get('do_not_track_email_bots') ?? false;
+        $doNotTrackEmailBots = $this->coreParametersHelper && $this->coreParametersHelper->get('do_not_track_email_bots');
 
         //check for existing IP
         $ipAddress     = $this->ipLookupHelper->getIpAddress();
