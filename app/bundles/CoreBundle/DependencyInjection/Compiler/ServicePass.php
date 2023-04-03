@@ -37,7 +37,7 @@ final class ServicePass implements CompilerPassInterface
                             $defaultTag = 'form.type';
                             break;
                         case 'helpers':
-                            $defaultTag = 'templating.helper';
+                            $defaultTag = 'twig.helper';
                             break;
                         case 'menus':
                             $defaultTag = 'knp_menu.menu';

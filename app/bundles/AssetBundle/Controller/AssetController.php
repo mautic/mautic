@@ -175,8 +175,6 @@ class AssetController extends FormController
         \assert($auditLogModel instanceof AuditLogModel);
         $logs          = $auditLogModel->getLogForObject('asset', $activeAsset->getId(), $activeAsset->getDateAdded());
 
-        $templ = $this->request->get('templ') ?? 'twig';
-
         return $this->delegateView([
             'returnUrl'      => $action,
             'viewParameters' => [
@@ -211,7 +209,7 @@ class AssetController extends FormController
                 'logs'             => $logs,
                 'dateRangeForm'    => $dateRangeForm->createView(),
             ],
-            'contentTemplate' => 'MauticAssetBundle:Asset:'.$tmpl.'.html.'.$templ,
+            'contentTemplate' => '@MauticAsset/Asset/'.$tmpl.'.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_asset_index',
                 'mauticContent' => 'asset',

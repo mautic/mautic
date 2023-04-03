@@ -73,7 +73,7 @@ class PublicController extends CommonFormController
 
                 //check to ensure the form is published
                 $status             = $form->getPublishStatus();
-                $dateTemplateHelper = $this->get('mautic.helper.template.date');
+                $dateTemplateHelper = $this->get('mautic.helper.twig.date');
                 if ('pending' == $status) {
                     $error = $translator->trans(
                         'mautic.form.submit.error.pending',

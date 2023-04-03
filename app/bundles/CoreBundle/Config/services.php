@@ -27,8 +27,7 @@ return function (ContainerConfigurator $configurator) {
         'Predis/Replication/StrategyConfig.php',
         'Predis/Replication/MasterOnlyStrategy.php',
         'Session/Storage/Handler/RedisSentinelSessionHandler.php',
-        'Templating/Helper/FormHelper.php',
-        'Templating/Helper/ThemeHelper.php',
+        'Twig/Helper/ThemeHelper.php',
         'Translation/TranslatorLoader.php',
         'Helper/Dsn/Dsn.php',
         'Helper/Dsn/Dsn/DsnGenerator.php',
@@ -46,10 +45,10 @@ return function (ContainerConfigurator $configurator) {
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);
-    $services->alias('templating.helper.assets', \Mautic\CoreBundle\Templating\Helper\AssetsHelper::class);
+    $services->alias('twig.helper.assets', \Mautic\CoreBundle\Twig\Helper\AssetsHelper::class);
     $services->alias('transifex.factory', \Mautic\CoreBundle\Factory\TransifexFactory::class);
     $services->alias('mautic.helper.language', \Mautic\CoreBundle\Helper\LanguageHelper::class);
     $services->alias('mautic.helper.email.address', \Mautic\CoreBundle\Helper\EmailAddressHelper::class);
 
-    $services->get(\Mautic\CoreBundle\Templating\Helper\AssetsHelper::class)->tag('templating.helper', ['alias' => 'assets']);
+    $services->get(\Mautic\CoreBundle\Twig\Helper\AssetsHelper::class)->tag('twig.helper', ['alias' => 'assets']);
 };

@@ -213,7 +213,7 @@ return [
                     'mautic.form.helper.form_uploader',
                     'mautic.lead.service.device_tracking_service',
                     'mautic.form.service.field.value.transformer',
-                    'mautic.helper.template.date',
+                    'mautic.helper.twig.date',
                     'mautic.tracker.contact',
                     'mautic.lead.merger',
                 ],
