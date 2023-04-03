@@ -69,7 +69,7 @@ class PublicController extends CommonFormController
                 $content = '';
             }
 
-            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+            $content = $this->get('mautic.helper.twig.analytics')->addCode($content);
 
             // Add subject as title
             if (!empty($subject)) {
@@ -225,13 +225,11 @@ class PublicController extends CommonFormController
                     if ($savePrefsPresent) {
                         // set custom tag to inject end form
                         // update show pref center slots by looking for their presence in the html
-                        /** @var \Mautic\CoreBundle\Templating\Helper\FormHelper $formHelper */
-                        $formHelper =$this->get('templating.helper.form');
                         $params     = array_merge(
                             $viewParameters,
                             [
                                 'form'                         => $formView,
-                                'startform'                    => $formHelper->start($formView),
+                                'startform'                    => $this->render('@MauticCore/Default/form.html.twig', ['form' => $formView]),
                                 'custom_tag'                   => '<a name="end-'.$formView->vars['id'].'"></a>',
                                 'showContactFrequency'         => false !== strpos($html, 'data-slot="channelfrequency"') || false !== strpos($html, BuilderSubscriber::channelfrequency),
                                 'showContactSegments'          => false !== strpos($html, 'data-slot="segmentlist"') || false !== strpos($html, BuilderSubscriber::segmentListRegex),
@@ -532,7 +530,7 @@ class PublicController extends CommonFormController
         $content = $event->getContent(true);
 
         if ($this->get('mautic.security')->isAnonymous()) {
-            $content = $this->get('mautic.helper.template.analytics')->addCode($content);
+            $content = $this->get('mautic.helper.twig.analytics')->addCode($content);
         }
 
         return new Response($content);
@@ -544,7 +542,7 @@ class PublicController extends CommonFormController
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();

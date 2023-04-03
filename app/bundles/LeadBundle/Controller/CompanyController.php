@@ -295,7 +295,7 @@ class CompanyController extends FormController
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
+        $template = '@MauticLead/Company/form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [
@@ -483,7 +483,7 @@ class CompanyController extends FormController
         $fields = $model->organizeFieldsByGroup($fields);
         $groups = array_keys($fields);
         sort($groups);
-        $template = 'MauticLeadBundle:Company:form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
+        $template = '@MauticLead/Company/form_'.($this->request->get('modal', false) ? 'embedded' : 'standalone').'.html.twig';
 
         return $this->delegateView(
             [

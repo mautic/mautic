@@ -1447,8 +1447,8 @@ class EmailController extends FormController
      */
     private function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->get('templating.helper.slots');
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('twig.helper.slots');
         $content     = $entity->getContent();
 
         //Set the slots

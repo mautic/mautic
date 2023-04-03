@@ -148,8 +148,8 @@ class GrapesJsController extends CommonController
      */
     private function processEmailSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->get('templating.helper.slots');
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('twig.helper.slots');
         $content     = $entity->getContent();
 
         //Set the slots
@@ -179,10 +179,10 @@ class GrapesJsController extends CommonController
      */
     private function processPageSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->get('templating.helper.assets');
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
-        $slotsHelper = $this->get('templating.helper.slots');
+        /** @var \Mautic\CoreBundle\Twig\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->get('twig.helper.assets');
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('twig.helper.slots');
         $formFactory = $this->get('form.factory');
 
         $slotsHelper->inBuilder(true);

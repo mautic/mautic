@@ -13,7 +13,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
@@ -21,6 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -90,9 +90,9 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $formMock;
 
     /**
-     * @var MockObject|DelegatingEngine
+     * @var MockObject|Environment
      */
-    private $templatingMock;
+    private $twigMock;
 
     protected function setUp(): void
     {
@@ -110,7 +110,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->helperUserMock       = $this->createMock(UserHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->templatingMock       = $this->createMock(DelegatingEngine::class);
+        $this->twigMock             = $this->createMock(Environment::class);
         $this->controller           = new EmailController();
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
@@ -185,29 +185,19 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ->method('setSubject')
             ->with($this->stringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX));
 
-        $this->containerMock->expects($this->exactly(7))
-            ->method('get')
-            ->withConsecutive(
-                ['mautic.model.factory'],
-                ['mautic.security'],
-                ['router'],
-                ['mautic.helper.user'],
-                ['form.factory'],
-                ['templating'],
-                ['templating']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->modelFactoryMock,
-                $this->corePermissionsMock,
-                $this->routerMock,
-                $this->helperUserMock,
-                $this->formFactoryMock,
-                $this->templatingMock,
-                $this->templatingMock
-            );
+        $services = [
+            ['mautic.model.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->modelFactoryMock],
+            ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->corePermissionsMock],
+            ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->routerMock],
+            ['mautic.helper.user', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->helperUserMock],
+            ['form.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->formFactoryMock],
+            ['twig', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->twigMock],
+        ];
 
-        $this->templatingMock->method('supports')
-            ->willReturn(true);
+        $serviceExists = fn ($key) => count(array_filter($services, fn ($service) => $service[0] === $key));
+
+        $this->containerMock->method('has')->willReturnCallback($serviceExists);
+        $this->containerMock->method('get')->willReturnMap($services);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -252,12 +242,7 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->formMock);
 
-        $this->containerMock->expects($this->once())
-            ->method('has')
-            ->with('templating')
-            ->willReturn(true);
-
-        $this->templatingMock->expects($this->once())
+        $this->twigMock->expects($this->once())
             ->method('render')
             ->willReturn('');
 

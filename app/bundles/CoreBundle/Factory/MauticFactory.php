@@ -154,11 +154,11 @@ class MauticFactory
     }
 
     /**
-     * Retrieves templating service.
+     * Retrieves twig service.
      *
      * @return \Twig\Environment
      */
-    public function getTemplating()
+    public function getTwig()
     {
         return $this->container->get('twig');
     }
@@ -399,15 +399,15 @@ class MauticFactory
     {
         switch ($helper) {
             case 'template.assets':
-                return $this->container->get('templating.helper.assets');
+                return $this->container->get('twig.helper.assets');
             case 'template.slots':
-                return $this->container->get('templating.helper.slots');
+                return $this->container->get('twig.helper.slots');
             case 'template.form':
-                return $this->container->get('templating.helper.form');
+                return $this->container->get('twig.helper.form');
             case 'template.translator':
-                return $this->container->get('templating.helper.translator');
+                return $this->container->get('twig.helper.translator');
             case 'template.router':
-                return $this->container->get('templating.helper.router');
+                return $this->container->get('twig.helper.router');
             default:
                 return $this->container->get('mautic.helper.'.$helper);
         }

@@ -7,11 +7,12 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CookieHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
@@ -28,6 +29,7 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Monolog\Logger;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -223,9 +225,11 @@ class PublicControllerTest extends MauticMysqlTestCase
         $ipHelper->method('getIpAddress')
             ->will($this->returnValue(new IpAddress()));
 
-        $assetHelper = $this->getMockBuilder(AssetsHelper::class)
+        $packagesMock = $this->getMockBuilder(Packages::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $assetHelper = new AssetsHelper($packagesMock);
 
         $mauticSecurity = $this->getMockBuilder(CorePermissions::class)
             ->disableOriginalConstructor()
@@ -233,9 +237,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         $mauticSecurity->method('hasEntityAccess')
             ->will($this->returnValue(false));
 
-        $analyticsHelper = $this->getMockBuilder(AnalyticsHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $analyticsHelper = new AnalyticsHelper($this->createMock(CoreParametersHelper::class));
 
         $pageModel = $this->getMockBuilder(PageModel::class)
             ->disableOriginalConstructor()
@@ -279,10 +281,10 @@ class PublicControllerTest extends MauticMysqlTestCase
                 $this->returnValueMap(
                     [
                         ['mautic.helper.cookie', Container::EXCEPTION_ON_INVALID_REFERENCE, $cookieHelper],
-                        ['templating.helper.assets', Container::EXCEPTION_ON_INVALID_REFERENCE, $assetHelper],
+                        ['twig.helper.assets', Container::EXCEPTION_ON_INVALID_REFERENCE, $assetHelper],
                         ['mautic.helper.ip_lookup', Container::EXCEPTION_ON_INVALID_REFERENCE, $ipHelper],
                         ['mautic.security', Container::EXCEPTION_ON_INVALID_REFERENCE, $mauticSecurity],
-                        ['mautic.helper.template.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
+                        ['mautic.helper.twig.analytics', Container::EXCEPTION_ON_INVALID_REFERENCE, $analyticsHelper],
                         ['mautic.page.model.page', Container::EXCEPTION_ON_INVALID_REFERENCE, $pageModel],
                         ['mautic.lead.model.lead', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->leadModel],
                         ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $router],
