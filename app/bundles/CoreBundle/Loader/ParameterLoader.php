@@ -77,7 +77,7 @@ class ParameterLoader
         MessengerEnvLoader::load($this->parameterBag, $defaultParameters, $envVariables);
 
         // Load the values into the environment for cache use
-        $dotenv = new Dotenv();
+        $dotenv = new Dotenv(false);
         foreach ($envVariables->all() as $key => $value) {
             if (null === $value) {
                 $envVariables->set($key, '');
