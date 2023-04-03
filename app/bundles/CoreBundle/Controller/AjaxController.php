@@ -67,10 +67,7 @@ class AjaxController extends CommonController
      */
     public function delegateAjaxAction(
         Request $request,
-        AuthorizationCheckerInterface $authorizationChecker,
-        UpdateHelper $updateHelper,
-        CookieHelper $cookieHelper,
-        PathsHelper $pathsHelper
+        AuthorizationCheckerInterface $authorizationChecker
     ) {
         //process ajax actions
         $action     = $request->get('action');

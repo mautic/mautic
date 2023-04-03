@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticCrmBundle\Controller;
 
+use MauticPlugin\MauticCrmBundle\Integration\HubspotIntegration;
 use function assert;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -26,7 +27,7 @@ class PublicController extends CommonController
         $integration = 'Hubspot';
 
         $integrationObject = $integrationHelper->getIntegrationObject($integration);
-        assert(false !== $integrationObject);
+        assert($integrationObject instanceof HubspotIntegration);
 
         foreach ($data as $info) {
             $object = explode('.', $info['subscriptionType']);
@@ -34,7 +35,9 @@ class PublicController extends CommonController
 
             try {
                 switch ($object[0]) {
-                    case 'contact': $integrationObject->getContacts($id);
+                    case 'contact':
+                        $executed = [];
+                        $integrationObject->getLeads($id, null, $executed);
                         break;
                     case 'company':
                         $integrationObject->getCompanies($id);
