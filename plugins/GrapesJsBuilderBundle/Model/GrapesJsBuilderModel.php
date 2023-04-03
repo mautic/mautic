@@ -61,7 +61,7 @@ class GrapesJsBuilderModel extends AbstractCommonModel
             $grapesJsBuilder->setEmail($email);
         }
 
-        if ($this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
+        if ($this->requestStack->getCurrentRequest() && $this->requestStack->getCurrentRequest()->request->has('grapesjsbuilder')) {
             $data = $this->requestStack->getCurrentRequest()->get('grapesjsbuilder', '');
 
             if (isset($data['customMjml'])) {
