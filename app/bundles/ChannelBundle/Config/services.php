@@ -20,8 +20,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\ChannelBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\ChannelBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\ChannelBundle\\Entity\\', '../Entity/*Repository.php');
 };

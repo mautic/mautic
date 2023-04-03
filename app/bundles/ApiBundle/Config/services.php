@@ -22,9 +22,6 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\ApiBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\ApiBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\ApiBundle\\Entity\\oAuth2\\', '../Entity/oAuth2/*Repository.php');
 
     $services->get(\Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class)

@@ -13,13 +13,11 @@ return function (ContainerConfigurator $configurator) {
         ->public();
 
     $excludes = [
+        'Controller/UploadController.php',
     ];
 
     $services->load('Mautic\\AssetBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-
-    $services->load('Mautic\\AssetBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
 
     $services->load('Mautic\\AssetBundle\\Entity\\', '../Entity/*Repository.php');
     $services->alias('mautic.asset.helper.token', \Mautic\AssetBundle\Helper\TokenHelper::class);

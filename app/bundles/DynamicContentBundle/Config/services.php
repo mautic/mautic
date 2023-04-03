@@ -18,8 +18,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\DynamicContentBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\DynamicContentBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\DynamicContentBundle\\Entity\\', '../Entity/*Repository.php');
 };

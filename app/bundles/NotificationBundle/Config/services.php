@@ -18,8 +18,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\NotificationBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\NotificationBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\NotificationBundle\\Entity\\', '../Entity/*Repository.php');
 };

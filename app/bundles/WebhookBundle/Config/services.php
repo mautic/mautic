@@ -18,8 +18,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\WebhookBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\WebhookBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\WebhookBundle\\Entity\\', '../Entity/*Repository.php');
 };

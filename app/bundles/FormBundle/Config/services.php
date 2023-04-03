@@ -20,8 +20,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\FormBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\FormBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\FormBundle\\Entity\\', '../Entity/*Repository.php');
 };

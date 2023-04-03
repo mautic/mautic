@@ -18,9 +18,6 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\UserBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('Mautic\\UserBundle\\Controller\\Api\\', '../Controller/Api')
-        ->tag('controller.service_arguments');
-
     $services->load('Mautic\\UserBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->alias(\Mautic\UserBundle\Entity\UserTokenRepositoryInterface::class, \Mautic\UserBundle\Entity\UserTokenRepository::class);

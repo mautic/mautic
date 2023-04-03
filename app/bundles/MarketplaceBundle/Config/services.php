@@ -17,7 +17,4 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\MarketplaceBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-
-    $services->load('Mautic\\MarketplaceBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
 };
