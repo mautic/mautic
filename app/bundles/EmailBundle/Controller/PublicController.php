@@ -6,8 +6,8 @@ use LogicException;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\TrackingPixelHelper;
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Templating\Helper\FormHelper;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\FormHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -126,8 +126,6 @@ class PublicController extends CommonFormController
     public function unsubscribeAction(
         Request $request,
         ContactTracker $contactTracker,
-        FormHelper $formHelper,
-        \Mautic\LeadBundle\Model\DoNotContact $doNotContactModel,
         $idHash
     ) {
         // Find the email

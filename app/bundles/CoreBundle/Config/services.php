@@ -37,9 +37,6 @@ return function (ContainerConfigurator $configurator) {
     $services->load('Mautic\\CoreBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    // To be removed in M5. Used for autowiring.
-    $services->get(\Mautic\CoreBundle\Templating\Helper\FormHelper::class)->arg('$renderer', ref('twig.form.renderer'));
-
     $services->load('Mautic\\CoreBundle\\Entity\\', '../Entity/*Repository.php');
 
     $services->set('mautic.http.client', \GuzzleHttp\Client::class)->autowire();

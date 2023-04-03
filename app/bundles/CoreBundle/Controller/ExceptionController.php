@@ -72,7 +72,7 @@ class ExceptionController extends CommonController
         $anonymous    = $this->security->isAnonymous();
         $baseTemplate = '@MauticCore/Default/slim.html.twig';
         if ($anonymous) {
-            if ($templatePage = $themeHelper->getTheme()->getErrorPageTemplate($code)) {
+            if ($templatePage = $themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
                 $baseTemplate = $templatePage;
             }
         }

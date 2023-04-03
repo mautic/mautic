@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -12,7 +12,7 @@ trait BuilderControllerTrait
     /**
      * Get assets for builder.
      */
-    protected function getAssetsForBuilder(AssetsHelper $assetsHelper, TranslatorHelper $translatorHelper, Request $request)
+    protected function getAssetsForBuilder(AssetsHelper $assetsHelper, Translator $translatorHelper, Request $request)
     {
         /** @var RouterInterface $routerHelper */
         $routerHelper = $this->get('router');
