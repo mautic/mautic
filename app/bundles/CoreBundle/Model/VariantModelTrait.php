@@ -147,6 +147,10 @@ trait VariantModelTrait
      */
     public function clonePublishStatusToChildren($entity)
     {
+        if ($this->inConversion) {
+            return;
+        }
+
         $parent = $entity->getVariantParent() ?: $entity;
 
         $repo = $this->getRepository();
