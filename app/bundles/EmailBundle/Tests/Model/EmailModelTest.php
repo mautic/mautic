@@ -7,6 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Exception;
 use Mautic\ChannelBundle\Entity\MessageRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
@@ -201,6 +202,11 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
      */
     private $statsCollectionHelper;
 
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -233,6 +239,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->connection               = $this->createMock(Connection::class);
+        $this->coreParametersHelper     = $this->createMock(CoreParametersHelper::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -258,6 +265,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->setTranslator($this->translator);
         $this->emailModel->setEntityManager($this->entityManager);
         $this->emailModel->setSecurity($this->corePermissions);
+        $this->emailModel->setCoreParametersHelper($this->coreParametersHelper);
     }
 
     /**
@@ -707,6 +715,52 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->emailModel->setDispatcher($this->createMock(EventDispatcher::class));
 
         $this->emailModel->hitEmail($stat, $request);
+    }
+
+    public function setUpHitEmail(bool $isIpTrackable): void
+    {
+        $dispatcher    = new EventDispatcher();
+        $this->emailModel->setDispatcher($dispatcher);
+
+        $ipAddress     = $this->createMock(IpAddress::class);
+        $ipAddress->expects($this->any())
+            ->method('isTrackable')
+            ->willReturn($isIpTrackable);
+
+        $this->ipLookupHelper->expects($this->any())
+            ->method('getIpAddress')
+            ->willReturn($ipAddress);
+
+        $this->coreParametersHelper->expects($this->any())
+            ->method('get')
+            ->with('do_not_track_email_bots')
+            ->willReturn(true);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHitEmailIpAddressNotTrackable(): void
+    {
+        $stat          = new Stat();
+        $request       = new Request();
+        $this->setUpHitEmail(false);
+
+        $this->emailModel->hitEmail($stat, $request);
+        $this->assertFalse($stat->getIsRead());
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testHitEmailIpAddressTrackable(): void
+    {
+        $stat          = new Stat();
+        $request       = new Request();
+        $this->setUpHitEmail(true);
+
+        $this->emailModel->hitEmail($stat, $request);
+        $this->assertTrue($stat->getIsRead());
     }
 
     public function testGetLookupResultsWithNameIsKey(): void
