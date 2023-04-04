@@ -5,18 +5,18 @@
     - failedRows
     - importedRowsChart
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}asset{% endblock %}
 
 {% block headerTitle %}{{ item.name }}{% endblock %}
 
 {% block publishStatus %}
-  {{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': item}) }}
+  {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': item}) }}
 {% endblock %}
 
 {% block actions %}
-    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'routeBase': 'import',
             'langVar': 'lead.import',
             'templateButtons': {
@@ -58,57 +58,57 @@
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                                {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': item}) }}
+                                {{ include('@MauticCore/Helper/details.html.twig', {'entity': item}) }}
 
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.source.file',
                                     'value': item.originalFile,
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.status',
-                                    'value': include('MauticCoreBundle:Helper:_label.html.twig', {'text': 'mautic.lead.import.status.'~item.status, 'type': item.satusLabelClass}),
+                                    'value': include('@MauticCore/Helper/_label.html.twig', {'text': 'mautic.lead.import.status.'~item.status, 'type': item.satusLabelClass}),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.status.info',
                                     'value': item.statusInfo,
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.line.count',
                                     'value': item.lineCount,
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.date.started',
                                     'value': dateToFull(item.dateStarted),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.date.ended',
                                     'value': dateToFull(item.dateEnded),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.runtime',
                                     'value': item.runTime ? dateFormatRange(item.runTime) : '',
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.speed',
                                     'value': 'mautic.lead.import.speed.value'|trans({'%speed%': item.speed}),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.progress',
                                     'value': item.progressPercentage~'%',
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.mapped.fields',
                                     'value': _self.arrayToString(item.matchedFields),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.default.options',
                                     'value': _self.arrayToString(item.defaults),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.csv.headers',
                                     'value': item.headers|join(', '),
                                 }) }}
-                                {{ include('MauticCoreBundle:Helper:_detail_row.html.twig', {
+                                {{ include('@MauticCore/Helper/_detail_row.html.twig', {
                                     'label': 'mautic.lead.import.csv.parser.config',
                                     'value': _self.arrayToString(item.parserConfig),
                                 }) }}
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{ include('MauticCoreBundle:Helper:chart.html.twig', {
+                                {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': item.rowStatusesPieChart(translatorGetHelper()),
                                       'chartType': 'pie',
                                       'chartHeight': 210,
@@ -164,7 +164,7 @@
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{ include('MauticCoreBundle:Helper:chart.html.twig', {
+                                {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': importedRowsChart,
                                       'chartType': 'line',
                                       'chartHeight': 210,

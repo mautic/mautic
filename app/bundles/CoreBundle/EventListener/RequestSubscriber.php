@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +10,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class RequestSubscriber implements EventSubscriberInterface
 {
@@ -25,18 +25,18 @@ class RequestSubscriber implements EventSubscriberInterface
     private $translator;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         CsrfTokenManagerInterface $tokenManager,
         TranslatorInterface $translator,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->tokenManager = $tokenManager;
         $this->translator   = $translator;
-        $this->templating   = $templating;
+        $this->twig         = $twig;
     }
 
     /**
@@ -56,7 +56,7 @@ class RequestSubscriber implements EventSubscriberInterface
         if ($this->isAjaxPost($request) && $this->isSecurePath($request) && !$this->isCsrfTokenFromRequestHeaderValid($request)) {
             $message  = $this->translator->trans('mautic.core.error.csrf', [], 'flashes');
             $data     = ['flashes' => ['error' => $message]];
-            $content  = $this->templating->getTemplating()->render('@MauticCore/Notification/flash_messages.html.twig', $data);
+            $content  = $this->twig->render('@MauticCore/Notification/flash_messages.html.twig', $data);
             $response = new JsonResponse(['flashes' => $content], Response::HTTP_OK);
             $event->setResponse($response);
             $event->stopPropagation();

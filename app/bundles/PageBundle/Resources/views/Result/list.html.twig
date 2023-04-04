@@ -5,7 +5,7 @@
 #}
 {% set isIndex = 'index' == tmpl ? true : false %}
 {% set tmpl = 'list' %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent %}pageresult{% endblock %}
 
@@ -63,7 +63,7 @@
         'btnText': 'mautic.core.form.close'|trans,
   }]) %}
 
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {'customButtons': buttons}) }}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {'customButtons': buttons}) }}
 {% endblock %}
 
 {% block content %}

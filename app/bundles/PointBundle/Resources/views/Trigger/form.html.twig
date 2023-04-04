@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent 'pointTrigger' %}
 
@@ -10,7 +10,7 @@
   {%- endif -%}
 {%- endblock -%}
 
-{% block modal include('MauticCoreBundle:Helper:modal.html.twig', {
+{% block modal include('@MauticCore/Helper/modal.html.twig', {
   'id': 'triggerEventModal',
   'header': 'mautic.point.trigger.form.modalheader'|trans,
   'footerButtons': true

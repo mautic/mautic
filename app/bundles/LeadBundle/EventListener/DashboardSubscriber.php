@@ -109,7 +109,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
 
             return;
@@ -125,7 +125,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:chart.html.twig');
+            $event->setTemplate('@MauticCore/Helper/chart.html.twig');
             $event->stopPropagation();
 
             return;
@@ -140,7 +140,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                 ]);
             }
 
-            $event->setTemplate('MauticCoreBundle:Helper:map.html.twig');
+            $event->setTemplate('@MauticCore/Helper/map.html.twig');
             $event->stopPropagation();
 
             return;
@@ -292,7 +292,7 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'stages'      => $stages,
                     'devices'     => $deviceGranularity,
                 ]);
-                $event->setTemplate('MauticCoreBundle:Helper:lifecycle.html.twig');
+                $event->setTemplate('@MauticCore/Helper/lifecycle.html.twig');
                 $event->stopPropagation();
             }
 

@@ -4,7 +4,6 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
@@ -28,6 +27,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Process\Exception\InvalidArgumentException;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -62,9 +62,9 @@ class FormSubscriber implements EventSubscriberInterface
     /**
      * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         CitrixModel $citrixModel,
@@ -72,14 +72,14 @@ class FormSubscriber implements EventSubscriberInterface
         SubmissionModel $submissionModel,
         TranslatorInterface $translator,
         EntityManager $entityManager,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->citrixModel     = $citrixModel;
         $this->formModel       = $formModel;
         $this->submissionModel = $submissionModel;
         $this->translator      = $translator;
         $this->entityManager   = $entityManager;
-        $this->templating      = $templating;
+        $this->twig            = $twig;
     }
 
     public static function getSubscribedEvents()
@@ -506,7 +506,7 @@ class FormSubscriber implements EventSubscriberInterface
             $event->addFormField('plugin.citrix.select.'.$product, [
                 'label'    => 'plugin.citrix.'.$product.'.listfield',
                 'formType' => CitrixListType::class,
-                'template' => 'MauticCitrixBundle:Field:citrixlist.html.twig',
+                'template' => '@MauticCitrix/Field/citrixlist.html.twig',
                 'listType' => $product,
             ]);
 

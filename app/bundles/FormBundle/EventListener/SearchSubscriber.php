@@ -4,11 +4,11 @@ namespace Mautic\FormBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
@@ -28,20 +28,20 @@ class SearchSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         UserHelper $userHelper,
         FormModel $formModel,
         CorePermissions $security,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->userHelper = $userHelper;
         $this->formModel  = $formModel;
         $this->security   = $security;
-        $this->templating = $templating;
+        $this->twig       = $twig;
     }
 
     /**
@@ -82,20 +82,20 @@ class SearchSubscriber implements EventSubscriberInterface
             if (count($forms) > 0) {
                 $formResults = [];
                 foreach ($forms as $form) {
-                    $formResults[] = $this->templating->getTemplating()->renderResponse(
+                    $formResults[] = $this->twig->render(
                         '@MauticForm/SubscribedEvents\Search/global.html.twig',
                         ['form' => $form[0]]
-                    )->getContent();
+                    );
                 }
                 if (count($forms) > 5) {
-                    $formResults[] = $this->templating->getTemplating()->renderResponse(
+                    $formResults[] = $this->twig->render(
                         '@MauticForm/SubscribedEvents\Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => (count($forms) - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $formResults['count'] = count($forms);
                 $event->addResults('mautic.form.forms', $formResults);

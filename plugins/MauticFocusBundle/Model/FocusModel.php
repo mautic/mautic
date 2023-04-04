@@ -6,7 +6,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\LeadBundle\Entity\Lead;
@@ -19,6 +18,7 @@ use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -45,9 +45,9 @@ class FocusModel extends FormModel
     protected $trackableModel;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var FieldModel
@@ -60,29 +60,22 @@ class FocusModel extends FormModel
     protected $contactTracker;
 
     /**
-     * @var Environment
-     */
-    protected $twig;
-
-    /**
      * FocusModel constructor.
      */
     public function __construct(
         \Mautic\FormBundle\Model\FormModel $formModel,
         TrackableModel $trackableModel,
-        TemplatingHelper $templating,
+        Environment $twig,
         EventDispatcherInterface $dispatcher,
         FieldModel $leadFieldModel,
         ContactTracker $contactTracker,
-        Environment $twig
     ) {
         $this->formModel      = $formModel;
         $this->trackableModel = $trackableModel;
-        $this->templating     = $templating;
+        $this->twig           = $twig;
         $this->dispatcher     = $dispatcher;
         $this->leadFieldModel = $leadFieldModel;
         $this->contactTracker = $contactTracker;
-        $this->twig           = $twig;
     }
 
     /**
@@ -104,14 +97,13 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);
@@ -203,8 +195,8 @@ class FocusModel extends FormModel
                 );
             }
 
-            $javascript = $this->templating->getTemplating()->render(
-                'MauticFocusBundle:Builder:generate.js.twig',
+            $javascript = $this->twig->render(
+                '@MauticFocus/Builder/generate.js.twig',
                 [
                     'focus'    => $focus,
                     'preview'  => $isPreview,
@@ -264,8 +256,8 @@ class FocusModel extends FormModel
             $focus[$htmlMode] = htmlspecialchars_decode($focus[$htmlMode]);
         }
 
-        $content = $this->templating->getTemplating()->render(
-            'MauticFocusBundle:Builder:content.html.twig',
+        $content = $this->twig->render(
+            '@MauticFocus/Builder/content.html.twig',
             [
                 'focus'    => $focus,
                 'preview'  => $isPreview,
@@ -283,7 +275,7 @@ class FocusModel extends FormModel
             $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
             $displayManager = new DisplayManager($form, !empty($viewOnlyFields) ? $viewOnlyFields : []);
         }
-        $formContent        = (!empty($form)) ? $this->templating->getTemplating()->render(
+        $formContent        = (!empty($form)) ? $this->twig->render(
             '@MauticFocus/Builder/form.html.twig',
             [
                 'form'           => $form,

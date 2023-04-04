@@ -6,7 +6,7 @@
         <table class="table table-hover table-striped table-bordered focus-list" id="focusTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#focusTable',
                         'routeBase': 'focus',
@@ -15,7 +15,7 @@
                         },
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'focus',
                         'orderBy': 'f.name',
                         'text': 'mautic.core.name',
@@ -23,28 +23,28 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'focus',
                         'orderBy': 'c.title',
                         'text': 'mautic.core.category',
                         'class': 'visible-md visible-lg col-focus-category',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'focus',
                         'orderBy': 'f.type',
                         'text': 'mautic.focus.thead.type',
                         'class': 'visible-md visible-lg col-focus-type',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'focus',
                         'orderBy': 'f.style',
                         'text': 'mautic.focus.thead.style',
                         'class': 'visible-md visible-lg col-focus-style',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'focus',
                         'orderBy': 'f.id',
                         'text': 'mautic.core.id',
@@ -56,7 +56,7 @@
             {% for item in items %}
                 <tr>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
                                     'edit': securityHasEntityAccess(permissions['focus:items:editown'], permissions['focus:items:editother'], item.createdBy),
@@ -68,7 +68,7 @@
                     </td>
                     <td>
                         <div>
-                            {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'focus'}) }}
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'focus'}) }}
                             <a data-toggle="ajax" href="{{ path('mautic_focus_action', {'objectId': item.id, 'objectAction': 'view'}) }}">
                                 {{ item.name }}
                             </a>
@@ -94,7 +94,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
                 'totalItems': items|length,
                 'page': page,
                 'limit': limit,

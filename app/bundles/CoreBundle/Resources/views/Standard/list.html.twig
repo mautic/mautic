@@ -3,7 +3,7 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent %}
     {% if not slot('mauticContent') %}
@@ -27,7 +27,7 @@
 {% block headerTitle %}{{ headerTitle }}{% endblock %}
 
 {% block actions %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+    {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'templateButtons' : {
             'new' : permissions[permissionBase ~ ':create'],
@@ -41,7 +41,7 @@
 {% block content %}
     {% if isIndex %}
         <div class="panel panel-default bdr-t-wdh-0 mb-0">
-            {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig',
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig',
                 {
                     'searchValue'      : searchValue,
                     'searchHelp'       : searchHelp is defined ? searchHelp : '',
@@ -91,7 +91,7 @@
                 <thead>
                 <tr>
                     {% if ignoreStandardColumns is empty %}
-                        {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
+                        {{- include('@MauticCore/Helper/tableheader.html.twig',
                             {
                                 'checkall'        : 'true',
                                 'actionRoute'     : actionRoute,
@@ -101,7 +101,7 @@
                                 },
                         }) -}}
                         {{- include(
-                            'MauticCoreBundle:Helper:tableheader.html.twig',
+                            '@MauticCore/Helper/tableheader.html.twig',
                             {
                                 'sessionVar' : sessionVar,
                                 'orderBy'    : tablePrefix ~ '.name',
@@ -112,7 +112,7 @@
                         ) -}}
 
                         {% if attribute(firstItem, 'getCategory') is defined %}
-                            {{ include('MauticCoreBundle:Helper:tableheader.html.twig',
+                            {{ include('@MauticCore/Helper/tableheader.html.twig',
                                 {
                                     'sessionVar' : sessionVar,
                                     'orderBy'    : (categoryTablePrefix is defined ? categoryTablePrefix : 'cat') ~ '.title',
@@ -127,12 +127,12 @@
                                 {% if header.sessionVar is not defined %}
                                     {% set header = header|merge({'sessionVar': sessionVar}) %}
                                 {% endif %}
-                            {{- include('MauticCoreBundle:Helper:tableheader.html.twig', header) -}}
+                            {{- include('@MauticCore/Helper/tableheader.html.twig', header) -}}
                             {% endfor %}
                         {% endif %}
 
                         {% if ignoreStandardColumns is empty %}
-                        {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
+                        {{- include('@MauticCore/Helper/tableheader.html.twig',
                             {
                                 'sessionVar' : sessionVar,
                                 'orderBy'    : tablePrefix ~ '.id',
@@ -149,7 +149,7 @@
                     <tr>
                         {% if ignoreStandardColumns is empty %}
                             <td>
-                            {{- include('MauticCoreBundle:Helper:list_actions.html.twig',
+                            {{- include('@MauticCore/Helper/list_actions.html.twig',
                                     {
                                         'item'            : item,
                                         'templateButtons' : {
@@ -184,7 +184,7 @@
                                 <div>
                                     {% if attribute(item, 'isPublished') is defined %}
                                     {{ include(
-                                            'MauticCoreBundle:Helper:publishstatus_icon.html.twig',
+                                            '@MauticCore/Helper/publishstatus_icon.html.twig',
                                             {'item' : item, 'model' : modelName}
                                         ) }}
                                     {% endif %}
@@ -227,7 +227,7 @@
             </table>
         </div>
         <div class="panel-footer">
-            {{- include('MauticCoreBundle:Helper:pagination.html.twig',
+            {{- include('@MauticCore/Helper/pagination.html.twig',
                 {
                     'totalItems' : totalItems,
                     'page'       : page,
