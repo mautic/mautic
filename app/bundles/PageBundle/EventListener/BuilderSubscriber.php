@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Form\Type\SlotSocialShareType;
 use Mautic\CoreBundle\Form\Type\SlotSuccessMessageType;
 use Mautic\CoreBundle\Form\Type\SlotTextType;
 use Mautic\CoreBundle\Helper\BuilderTokenHelperFactory;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
@@ -35,6 +34,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class BuilderSubscriber implements EventSubscriberInterface
 {
@@ -64,9 +64,9 @@ class BuilderSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     /**
      * @var BuilderTokenHelperFactory
@@ -103,7 +103,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         BuilderTokenHelperFactory $builderTokenHelperFactory,
         TranslatorInterface $translator,
         Connection $connection,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->security                  = $security;
         $this->tokenHelper               = $tokenHelper;
@@ -112,7 +112,7 @@ class BuilderSubscriber implements EventSubscriberInterface
         $this->builderTokenHelperFactory = $builderTokenHelperFactory;
         $this->translator                = $translator;
         $this->connection                = $connection;
-        $this->templating                = $templating;
+        $this->twig                      = $twig;
     }
 
     /**
@@ -527,7 +527,7 @@ class BuilderSubscriber implements EventSubscriberInterface
             $content .= "</div>\n";
 
             //load the css into the header by calling the sharebtn_css view
-            $this->templating->getTemplating()->render('@MauticPage/SubscribedEvents\PageToken/sharebtn_css.html.twig');
+            $this->twig->render('@MauticPage/SubscribedEvents\PageToken/sharebtn_css.html.twig');
         }
 
         return $content;
@@ -552,7 +552,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-segmentlist' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->getTemplating()->render('@MauticCore/Slots/segmentlist.html.twig', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/segmentlist.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -568,7 +568,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-categorylist ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->getTemplating()->render('@MauticCore/Slots/categorylist.html.twig', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/categorylist.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -584,7 +584,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-preferredchannel'>\n";
-            $content .= $this->templating->getTemplating()->render('@MauticCore/Slots/preferredchannel.html.twig', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/preferredchannel.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -600,7 +600,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-channelfrequency'>\n";
-            $content .= $this->templating->getTemplating()->render('@MauticCore/Slots/channelfrequency.html.twig', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/channelfrequency.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -616,7 +616,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class='pref-saveprefs ' ".$this->getAttributeForFirtSlot().">\n";
-            $content .= $this->templating->getTemplating()->render('@MauticCore/Slots/saveprefsbutton.html.twig', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/saveprefsbutton.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -632,7 +632,7 @@ class BuilderSubscriber implements EventSubscriberInterface
 
         if (empty($content)) {
             $content = "<div class=\"pref-successmessage\">\n";
-            $content .= $this->templating->getTemplating()->render('@MauticCore/Slots/successmessage.html.twig', $params);
+            $content .= $this->twig->render('@MauticCore/Slots/successmessage.html.twig', $params);
             $content .= "</div>\n";
         }
 
@@ -705,7 +705,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $langbar = $this->templating->getTemplating()->render('@MauticPage/SubscribedEvents\PageToken/langbar.html.twig', ['pages' => $related]);
+            $langbar = $this->twig->render('@MauticPage/SubscribedEvents\PageToken/langbar.html.twig', ['pages' => $related]);
         }
 
         return $langbar;

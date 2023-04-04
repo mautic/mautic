@@ -8,9 +8,12 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait LeadDetailsTrait
 {
+    private ?RequestStack $requestStack = null;
+
     /**
      * @param int $page
      *
@@ -18,7 +21,7 @@ trait LeadDetailsTrait
      */
     protected function getAllEngagements(array $leads, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -171,7 +174,7 @@ trait LeadDetailsTrait
      */
     protected function getEngagementData(Lead $lead, \DateTime $fromDate = null, \DateTime $toDate = null)
     {
-        $translator = $this->get('translator');
+        $translator = $this->translator;
 
         if (null == $fromDate) {
             $fromDate = new \DateTime('first day of this month 00:00:00');
@@ -203,7 +206,7 @@ trait LeadDetailsTrait
      */
     protected function getAuditlogs(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -275,7 +278,7 @@ trait LeadDetailsTrait
      */
     protected function getEngagements(Lead $lead, array $filters = null, array $orderBy = null, $page = 1, $limit = 25)
     {
-        $session = $this->get('session');
+        $session = $this->requestStack->getCurrentRequest()->getSession();
 
         if (null == $filters) {
             $filters = $session->get(
@@ -384,7 +387,7 @@ trait LeadDetailsTrait
     protected function getCompanyEngagementsForGraph($contacts)
     {
         $graphData  = $this->getCompanyEngagementData($contacts);
-        $translator = $this->get('translator');
+        $translator = $this->translator;
 
         $fromDate = new \DateTime('first day of this month 00:00:00');
         $fromDate->modify('-6 months');
@@ -415,5 +418,13 @@ trait LeadDetailsTrait
                 'eventType' => ['action', 'condition'],
             ]
         );
+    }
+
+    /**
+     * @required
+     */
+    public function setRequestStackLeadDetailsTrait(?RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }

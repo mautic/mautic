@@ -5,12 +5,17 @@ namespace Mautic\ApiBundle\Tests\Controller;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CommonApiControllerTest extends CampaignTestAbstract
 {
@@ -55,7 +60,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
             ->disableOriginalConstructor()
             ->getMock();
 
-        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [], $request);
+        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request]);
 
         $this->assertEquals([], $result);
     }
@@ -78,18 +83,22 @@ class CommonApiControllerTest extends CampaignTestAbstract
         $request->method('get')
             ->willReturn($where);
 
-        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [], $request);
+        $result = $this->getResultFromProtectedMethod('getWhereFromRequest', [$request]);
 
         $this->assertEquals($where, $result);
     }
 
-    protected function getResultFromProtectedMethod($method, array $args, Request $request = null)
+    protected function getResultFromProtectedMethod($method, array $args)
     {
-        $controller = new CommonApiController();
-
-        if ($request) {
-            $controller->setRequest($request);
-        }
+        $controller = new CommonApiController(
+            $this->createMock(CorePermissions::class),
+            $this->createMock(Translator::class),
+            $this->createMock(EntityResultHelper::class),
+            $this->createMock(Router::class),
+            $this->createMock(FormFactoryInterface::class),
+            $this->createMock(AppVersion::class),
+            $this->createMock(RequestStack::class)
+        );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
         $method               = $controllerReflection->getMethod($method);
@@ -100,7 +109,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class() extends CommonApiController {
+        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), ) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors
@@ -113,12 +122,6 @@ class CommonApiControllerTest extends CampaignTestAbstract
                 return $this->getBatchEntities($parameters, $errors, false, 'id', $model);
             }
         };
-
-        $container = $this->createMock(ContainerInterface::class);
-        $container->method('get')
-            ->with('mautic.api.helper.entity_result')
-            ->willReturn(new EntityResultHelper());
-        $controller->setContainer($container);
 
         $errors     = [];
         $parameters = [

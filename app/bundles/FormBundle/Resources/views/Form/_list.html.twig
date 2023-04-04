@@ -14,7 +14,7 @@
         <table class="table table-hover table-striped table-bordered" id="formTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#formTable',
                         'routeBase': 'form',
@@ -37,35 +37,35 @@
                         ],
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'f.name',
                         'text': 'mautic.core.name',
                         'class': 'col-form-name',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'c.title',
                         'text': 'mautic.core.category',
                         'class': 'visible-md visible-lg col-form-category',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'submission_count',
                         'text': 'mautic.form.form.results',
                         'class': 'visible-md visible-lg col-form-submissions',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'f.dateAdded',
                         'text': 'mautic.lead.import.label.dateAdded',
                         'class': 'visible-md visible-lg col-form-dateAdded',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'f.dateModified',
                         'text': 'mautic.lead.import.label.dateModified',
@@ -73,14 +73,14 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'f.createdByUser',
                         'text': 'mautic.core.createdby',
                         'class': 'visible-md visible-lg col-form-createdby',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'form',
                         'orderBy': 'f.id',
                         'text': 'mautic.core.id',
@@ -93,7 +93,7 @@
                 {% set item = i[0] %}
                 <tr>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
                                     'edit': securityHasEntityAccess(permissions['form:forms:editown'], permissions['form:forms:editother'], item.createdBy),
@@ -124,7 +124,7 @@
                     </td>
                     <td>
                         <div>
-                            {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'form.form'}) }}
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'form.form'}) }}
                             <a href="{{ path('mautic_form_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax" data-menu-link="mautic_form_index">
                                 {{ item.name }}
                                 {% if 'campaign' == item.formType %}
@@ -161,7 +161,7 @@
             </tbody>
         </table>
         <div class="panel-footer">
-            {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
                     'totalItems': totalItems,
                     'page': page,
                     'limit': limit,

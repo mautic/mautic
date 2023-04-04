@@ -4,6 +4,7 @@ namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -25,7 +26,7 @@ class TimelineController extends CommonController
 
         $this->setListFilters();
 
-        $session = $this->get('session');
+        $session = $request->getSession();
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
@@ -72,7 +73,7 @@ class TimelineController extends CommonController
 
         $this->setListFilters();
 
-        $session = $this->get('session');
+        $session = $request->getSession();
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
@@ -92,7 +93,7 @@ class TimelineController extends CommonController
         // get all events grouped by lead
         $events = $this->getAllEngagements($leads, $filters, $order, $page, $limit);
 
-        $str = $this->request->server->get('QUERY_STRING');
+        $str = $request->server->get('QUERY_STRING');
         parse_str($str, $query);
 
         $tmpl = 'table';
@@ -110,7 +111,7 @@ class TimelineController extends CommonController
                     'page'        => $page,
                     'events'      => $events,
                     'integration' => $integration,
-                    'tmpl'        => (!$this->request->isXmlHttpRequest()) ? 'index' : '',
+                    'tmpl'        => (!$request->isXmlHttpRequest()) ? 'index' : '',
                     'newCount'    => (array_key_exists('count', $query) && $query['count']) ? $query['count'] : 0,
                 ],
                 'passthroughVars' => [
@@ -136,7 +137,7 @@ class TimelineController extends CommonController
 
         $this->setListFilters();
 
-        $session = $this->get('session');
+        $session = $request->getSession();
         if ('POST' === $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
@@ -155,7 +156,7 @@ class TimelineController extends CommonController
 
         $events = $this->getEngagements($lead, $filters, $order, $page);
 
-        $str = $this->request->server->get('QUERY_STRING');
+        $str = $request->server->get('QUERY_STRING');
         parse_str($str, $query);
 
         $tmpl = 'table';
@@ -186,9 +187,9 @@ class TimelineController extends CommonController
     }
 
     /**
-     * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\StreamedResponse
+     * @return array|Response
      */
-    public function batchExportAction(Request $request, $leadId)
+    public function batchExportAction(Request $request, DateHelper $dateHelper, $leadId)
     {
         if (empty($leadId)) {
             return $this->accessDenied();
@@ -201,7 +202,7 @@ class TimelineController extends CommonController
 
         $this->setListFilters();
 
-        $session = $this->get('session');
+        $session = $request->getSession();
         if ('POST' == $request->getMethod() && $request->request->has('search')) {
             $filters = [
                 'search'        => InputHelper::clean($request->request->get('search')),
@@ -218,9 +219,9 @@ class TimelineController extends CommonController
             $session->get('mautic.lead.'.$leadId.'.timeline.orderbydir'),
         ];
 
-        $dataType = $this->request->get('filetype', 'csv');
+        $dataType = $request->get('filetype', 'csv');
 
-        $resultsCallback = function ($event) {
+        $resultsCallback = function ($event) use ($dateHelper) {
             $eventLabel = (isset($event['eventLabel'])) ? $event['eventLabel'] : $event['eventType'];
             if (is_array($eventLabel)) {
                 $eventLabel = $eventLabel['label'];
@@ -229,7 +230,7 @@ class TimelineController extends CommonController
             return [
                 'eventName'      => $eventLabel,
                 'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
-                'eventTimestamp' => $this->get('mautic.helper.template.date')->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
+                'eventTimestamp' => $dateHelper->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 

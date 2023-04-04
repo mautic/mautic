@@ -21,6 +21,7 @@ $container->loadFromExtension('twig', [
     'paths'            => [
         '%kernel.project_dir%/app/bundles'                  => 'bundles',
         '%kernel.project_dir%/app/bundles/CoreBundle'       => 'MauticCore',
+        '%kernel.project_dir%/themes'                       => 'themes',
     ],
     'form_themes' => [
         // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
@@ -31,7 +32,8 @@ $container->loadFromExtension('twig', [
 $container->loadFromExtension('framework', [
     'test'    => true,
     'session' => [
-        'storage_id' => 'session.storage.filesystem',
+        'storage_id' => 'session.storage.mock_file',
+        'name'       => 'MOCKSESSION',
     ],
     'profiler' => [
         'collect' => false,

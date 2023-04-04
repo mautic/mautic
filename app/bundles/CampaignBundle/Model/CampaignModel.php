@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -119,7 +120,6 @@ class CampaignModel extends CommonFormModel
      * {@inheritdoc}
      *
      * @param object      $entity
-     * @param object      $formFactory
      * @param string|null $action
      * @param array       $options
      *
@@ -127,7 +127,7 @@ class CampaignModel extends CommonFormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Campaign) {
             throw new MethodNotAllowedHttpException(['Campaign']);

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 class CustomButtonEvent extends AbstractCustomRequestEvent
