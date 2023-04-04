@@ -51,7 +51,7 @@ class VariantType extends AbstractType
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
                 'class'           => 'form-control',
-                'tooltip'         => 'mautic.core.ab_test.form.traffic_total_weight.weight.help',
+                'tooltip'         => 'mautic.core.ab_test.form.traffic_weight.help',
                 'postaddon_text'  => '%',
             ],
         ]);
