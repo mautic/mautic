@@ -1083,8 +1083,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param string $address
-     * @param null   $name
+     * @param string      $address
+     * @param string|null $name
      *
      * @return bool
      */

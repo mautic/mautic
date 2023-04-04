@@ -129,8 +129,6 @@ class KickoffExecutioner implements ExecutionerInterface
     {
         $this->logger->debug('CAMPAIGN: Triggering kickoff events');
 
-        $this->progressBar  = null;
-
         $this->rootEvents = $this->campaign->getRootEvents();
         $totalRootEvents  = $this->rootEvents->count();
         if (!$totalRootEvents) {

@@ -11,6 +11,7 @@ use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotFoundException;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Helper\FieldHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldValidationHelper
@@ -36,7 +37,10 @@ class FieldValidationHelper
         $this->translator  = $translator;
     }
 
-    public function validateRequiredFields(Form $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
+    /**
+     * @param FormInterface<FormInterface> $form
+     */
+    public function validateRequiredFields(FormInterface $form, ConfigFormSyncInterface $integrationObject, array $fieldMappings): void
     {
         $integrationConfiguration = $integrationObject->getIntegrationConfiguration();
         if (!$integrationConfiguration->getIsPublished()) {
