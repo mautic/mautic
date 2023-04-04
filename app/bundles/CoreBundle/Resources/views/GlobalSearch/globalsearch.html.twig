@@ -1,0 +1,36 @@
+<li class="dropdown dropdown-custom" id="globalSearchDropdown">
+    <div class="dropdown-menu">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="panel-title">
+                    <h6 class="fw-sb">{% trans %}mautic.core.search.results{% endtrans %}</h6>
+                </div>
+            </div>
+            <div class="pt-0 pb-xs pl-0 pr-0">
+                <div class="scroll-content slimscroll" style="height:250px;" id="globalSearchResults">
+                    {{ include('@MauticCore/GlobalSearch/results.html.twig', {results: results}) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</li>
+<li>
+    <div class="search-container" id="globalSearchContainer">
+        <a href="javascript: void(0);" class="search-button">
+            <i class="fa fa-search fs-16"></i>
+        </a>
+        <input
+            type="search"
+            value="{{ searchString|escape }}"
+            class="form-control search"
+            id="globalSearchInput"
+            name="global_search"
+            placeholder="{% trans %}mautic.core.search.everything.placeholder{% endtrans %}"
+            autocomplete="false"
+            data-toggle="livesearch"
+            data-target="#globalSearchResults"
+            data-action="{{ path('mautic_core_ajax', {action: 'globalSearch'}) }}"
+            data-overlay="true"
+            data-overlay-text="{% trans %}mautic.core.search.livesearch{% endtrans %}" />
+    </div>
+</li>

@@ -88,7 +88,7 @@ return [
                 'class'     => \Mautic\ReportBundle\Model\ReportModel::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
-                    'mautic.helper.templating',
+                    'twig',
                     'mautic.channel.helper.channel_list',
                     'mautic.lead.model.field',
                     'mautic.report.helper.report',
@@ -99,14 +99,14 @@ return [
             'mautic.report.model.csv_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\CsvExporter::class,
                 'arguments' => [
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                     'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.report.model.excel_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\ExcelExporter::class,
                 'arguments' => [
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                 ],
             ],
             'mautic.report.model.scheduler_builder' => [

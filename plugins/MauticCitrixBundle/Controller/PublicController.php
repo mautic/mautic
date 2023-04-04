@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCitrixBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
@@ -20,15 +21,13 @@ class PublicController extends CommonController
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      * @throws \InvalidArgumentException
      */
-    public function proxyAction(Request $request)
+    public function proxyAction(Request $request, IntegrationHelper $integrationHelper)
     {
         $url = $request->query->get('url', null);
         if (!$url) {
             return $this->accessDenied(false, 'ERROR: url not specified');
         } else {
-            /** @var IntegrationHelper $integrationHelper */
-            $integrationHelper = $this->get('mautic.helper.integration');
-            $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
+            $myIntegration = $integrationHelper->getIntegrationObject('Gototraining');
 
             if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
                 return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
@@ -78,17 +77,17 @@ class PublicController extends CommonController
      * A POST will also be made when a customer joins the session and when the session ends
      * (whether or not a customer joined).
      *
+     * @param ModelFactory<object> $modelFactory
+     *
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      *
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
-    public function sessionChangedAction(Request $request)
+    public function sessionChangedAction(Request $request, IntegrationHelper $integrationHelper, ModelFactory $modelFactory)
     {
-        /** @var IntegrationHelper $integrationHelper */
-        $integrationHelper = $this->get('mautic.helper.integration');
-        $myIntegration     = $integrationHelper->getIntegrationObject('Gototraining');
+        $myIntegration = $integrationHelper->getIntegrationObject('Gototraining');
 
         if (!$myIntegration || !$myIntegration->getIntegrationSettings()->getIsPublished()) {
             return $this->accessDenied(false, 'ERROR: GoToTraining is not enabled');
@@ -98,7 +97,7 @@ class PublicController extends CommonController
 
         try {
             /** @var CitrixModel $citrixModel */
-            $citrixModel = $this->get('mautic.model.factory')->getModel('citrix.citrix');
+            $citrixModel = $modelFactory->getModel('citrix.citrix');
             $productId   = $post['sessionId'];
             $eventDesc   = sprintf('%s (%s)', $productId, $post['status']);
             $eventName   = CitrixHelper::getCleanString(

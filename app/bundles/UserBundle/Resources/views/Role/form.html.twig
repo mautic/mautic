@@ -1,0 +1,105 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+{% block mauticContent %}role{% endblock %}
+{% do assetAddScriptDeclaration('MauticVars.permissionList = ' ~ (permissionsConfig['list']|json_encode), 'bodyClose') %}
+
+{% set objectId = form.vars.data.getId() %}
+{% if objectId is not empty %}
+    {% set name = form.vars.data.getName() %}
+    {% set header = 'mautic.user.role.header.edit'|trans({'%name%' : name}) %}
+{% else %}
+    {% set header = 'mautic.user.role.header.new'|trans %}
+{% endif %}
+
+{% block headerTitle %}{{ header }}{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+	<div class="col-xs-12 bg-white height-auto">
+		<!-- tabs controls -->
+		<ul class="bg-auto nav nav-tabs pr-md pl-md">
+			<li class="active"><a href="#details-container" role="tab" data-toggle="tab">{% trans %}mautic.core.details{% endtrans %}</a></li>
+			<li class=""><a href="#permissions-container" role="tab" data-toggle="tab">{% trans %}mautic.user.role.permissions{% endtrans %}</a></li>
+		</ul>
+		<!--/ tabs controls -->
+
+		<div class="tab-content pa-md">
+			<div class="tab-pane fade in active bdr-w-0 height-auto" id="details-container">
+				<div class="row">
+					<div class="pa-md">
+						<div class="col-md-6">
+                            {{ form_row(form.name) }}
+						</div>
+						<div class="col-md-6">
+                            {{ form_row(form.isAdmin) }}
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="pa-md">
+                            {{ form_row(form.description) }}
+						</div>
+					</div>
+				</div>
+			</div>
+
+            {% set hidePerms = form.isAdmin.vars.data %}
+			<div class="tab-pane fade bdr-w-0" id="permissions-container">
+				<div id="rolePermissions"{% if hidePerms %}class="hide"{% endif %}>
+					<!-- start: box layout -->
+					<div class="box-layout">
+						<!-- step container -->
+						<div class="col-md-5 bg-white height-auto">
+							<div class="pr-lg pl-lg pt-md pb-md">
+
+								<!-- Nav tabs -->
+								<ul class="list-group list-group-tabs" role="tablist">
+                                    {% for bundle, config in permissionsConfig['config'] %}
+										<li role="presentation" class="list-group-item {{ loop.index0 is same as(0) ? 'in active' : '' }}">
+											<a href="#{{ bundle }}PermissionTab" aria-controls="{{ bundle }}PermissionTab" role="tab" data-toggle="tab" class="steps">
+												<span>{{ config['label'] }}</span>
+												<span class="permission-ratio"> (<span class="{{ bundle }}_granted">{{ config['ratio'][0] }}</span> / <span class="{{ bundle }}_total">{{ config['ratio'][1] }}</span>)</span>
+											</a>
+										</li>
+									{% endfor %}
+								</ul>
+							</div>
+						</div>
+
+						<!-- container -->
+						<div class="col-md-7 bg-auto height-auto bdr-l">
+							<div class="tab-content">
+								{% set permissions = form.permissions.children %}
+								{% for child in permissions %}
+									{% if 'newbundle' == child.vars.value %}
+										{% if loop.index0 > 0 %}
+											{# // Close tab panel #}
+											</div>{{ "\n" }}</div>{{ "\n" }}
+										{% endif %}
+										<div role="tabpanel" class="tab-pane fade{{ 0 is same as(loop.index0) ? ' in active' : '' }} bdr-w-0" id="{{ child.vars.name }}PermissionTab">{{ "\n" }}
+										<div class="pt-md pr-md pl-md pb-md"> {{ "\n" }}
+										{% do child.setRendered() %}
+									{% else %}
+										{{ form_row(child) }}
+									{% endif %}
+								{% endfor %}
+									{# //close last tab  #}
+									</div>{{ "\n" }}
+								{% do form.permissions.setRendered() %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="isAdminMessage"{% if not hidePerms %} class="hide"{% endif %}>
+					<div class="alert alert-warning">
+						<h4>{% trans %}mautic.user.role.permission.isadmin.header{% endtrans %}</h4>
+						<p>{% trans %}mautic.user.role.permission.isadmin.message{% endtrans %}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+    {{ form_end(form) }}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% block content %}
+    {% if showMore is defined and showMore is not empty %}
+        <a href="{{ url('mautic_client_index', {'search' : searchString}) }}" data-toggle="ajax">
+            <span>{{ 'mautic.core.search.more'|trans({'%count%' : remaining}) }}</span>
+        </a>
+    {% else %}
+        {% if canEdit %}
+            <a href="{{ url('mautic_client_action', {'objectAction' : 'edit', 'objectId' : client.getId()}) }}" data-toggle="ajax">
+                {{ client.getName() }}
+            </a>
+        {% else %}
+            <span>{{ client.getName() }}</span>
+        {% endif %}
+    {% endif %}
+{% endblock %}

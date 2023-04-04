@@ -1,0 +1,78 @@
+{#
+  Variables
+    - items
+    - leadCounts
+    - page
+    - limit
+#}
+{% if items|length > 0 %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped table-bordered" id="leadListTable">
+            <thead>
+            <tr>
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'checkall': 'true',
+                        'target': '#leadListTable',
+                        'langVar': 'lead.list',
+                        'routeBase': 'segment',
+                        'templateButtons': {
+                            'delete': permissions['lead:lists:deleteother'],
+                        },
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'lead.list',
+                        'orderBy': 'l.name',
+                        'text': 'mautic.core.name',
+                        'class': 'col-leadlist-name',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'lead.list',
+                        'text': 'mautic.lead.list.thead.leadcount',
+                        'class': 'visible-md visible-lg col-leadlist-leadcount',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'lead.list',
+                        'orderBy': 'l.dateAdded',
+                        'text': 'mautic.lead.import.label.dateAdded',
+                        'class': 'visible-md visible-lg col-leadlist-dateAdded',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'lead.list',
+                        'orderBy': 'l.dateModified',
+                        'text': 'mautic.lead.import.label.dateModified',
+                        'class': 'visible-md visible-lg col-leadlist-dateModified',
+                        'default': true,
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'lead.list',
+                        'orderBy': 'l.createdByUser',
+                        'text': 'mautic.core.createdby',
+                        'class': 'visible-md visible-lg col-leadlist-createdByUser',
+                }) }}
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
+                        'sessionVar': 'lead.list',
+                        'orderBy': 'l.id',
+                        'text': 'mautic.core.id',
+                        'class': 'visible-md visible-lg col-leadlist-id',
+                }) }}
+            </tr>
+            </thead>
+            <tbody>
+              {% for item in items %}
+                {{ include('@MauticLead/List/_list_row.html.twig', {'item': item}) }}
+              {% endfor %}
+            </tbody>
+        </table>
+        <div class="panel-footer">
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
+                    'totalItems': items|length,
+                    'page': page,
+                    'limit': limit,
+                    'baseUrl': path('mautic_segment_index'),
+                    'sessionVar': 'lead.list',
+            }) }}
+        </div>
+    </div>
+{% else %}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
+{% endif %}

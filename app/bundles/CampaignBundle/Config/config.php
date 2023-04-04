@@ -415,7 +415,7 @@ return [
                     'mautic.campaign.repository.lead',
                     'mautic.campaign.repository.lead_event_log',
                     'translator',
-                    'mautic.helper.template.date',
+                    'mautic.helper.twig.date',
                 ],
             ],
             'mautic.campaign.membership.event_dispatcher' => [

@@ -1,0 +1,87 @@
+{% set target = target is defined ? target : '.page-list' %}
+
+{% if checkall is defined and checkall is not empty %}
+    {{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
+    ) }}
+
+    {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+    {# Workaround to get variables from action_button_helper here #}
+    {{ restore('action_button_helper') }}
+
+    {% if templateButtons.delete is defined and templateButtons.delete is not empty %}
+        {{ buttonAdd({
+            confirm: {
+                message: translatorHasId(translationBase ~ '.form.confirmbatchdelete')
+                    ? (translationBase ~ '.form.confirmbatchdelete')|trans
+                    : 'mautic.core.form.confirmbatchdelete'|trans,
+                confirmAction: path(actionRoute, query|merge({objectAction: 'batchDelete'})),
+                template: 'batchdelete'
+            },
+            priority: -1
+        }) }}
+    {% endif %}
+<th class="col-actions" {% if tooltip is defined and tooltip is not empty %} data-toggle="tooltip" title="" data-placement="top" data-original-title="{{ tooltip|trans }}"{% endif %}>
+    <div class="input-group input-group-sm">
+        <span class="input-group-addon">
+            <input type="checkbox" id="customcheckbox-one0" value="1" data-toggle="checkall" data-target="{{ target }}">
+        </span>
+
+        <div class="input-group-btn">
+            <button type="button" disabled class="btn btn-default btn-sm dropdown-toggle btn-nospin" data-toggle="dropdown">
+                <i class="fa fa-angle-down "></i>
+            </button>
+            <ul class="pull-{{ pull }} page-list-actions dropdown-menu" role="menu"> 
+                {{ buttonsRender() }}
+            </ul>
+        </div>
+    </div>
+</th>
+{% elseif sessionVar is not defined or sessionVar is empty %}
+<th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
+    <span>{{ text|trans }}</span>
+</th>
+{% else %}
+{% set defaultOrder = default is defined and default is not empty ? orderBy : '' %}
+{% set order = order|default(app.session.get('mautic.' ~ sessionVar ~ '.orderby', defaultOrder)) %}
+{% set dir = dir|default(app.session.get('mautic.' ~ sessionVar ~ '.orderbydir', 'ASC')) %}
+{% set filters = filters|default(app.session.get('mautic.' ~ sessionVar ~ '.filters', [])) %}
+{% set tmpl = tmpl|default('list') %}
+<th{% if class is defined and class is not empty %} class="{{ class }}"{% endif %}>
+    <div class="thead-filter">
+        {% if orderBy is defined and orderBy is not empty %}
+        <a href="javascript: void(0);" onclick="Mautic.reorderTableData('{{ sessionVar }}','{{ orderBy }}','{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});">
+            <span>{{ text|trans }}</span>
+            {% if order == orderBy %}
+            <i class="fa fa-sort-amount-{{ dir|lower }}"></i>
+            {% endif %}
+        </a>
+        {% else %}
+            <span>{{ text|trans }}</span>
+        {% endif %}
+
+        {% if filterBy is defined and filterBy is not empty %}
+        {% set value = filters[filterBy] is defined ? filters[filterBy].value : '' %}
+        <div class="input-group input-group-sm">
+            <input
+                type="text"
+                placeholder="{% trans %}mautic.core.form.thead.filter{% endtrans %}"
+                autocomplete="false"
+                class="form-control input-sm"
+                value="{{ value|escape }}"
+                {% if dataToggle is defined and dataToggle is not empty %} data-toggle="{{ dataToggle }}"{% endif %}
+                onchange="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',this.value,'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"
+            />
+            <span class="input-group-btn">
+                <button
+                    class="btn btn-default btn-xs"
+                    onclick="Mautic.filterTableData('{{ sessionVar }}','{{ filterBy }}',{{ value is defined and value is not empty ? "''," : "mQuery(this).parent().prev().val()," }}'{{ tmpl }}','{{ target }}'{% if baseUrl is defined and baseUrl is not empty %},'{{ baseUrl }}'{% endif %});"                >
+                    <i class="fa fa-fw fa-lg {{ value is defined and value is not empty ? 'fa-times' : 'fa-filter' }}"></i>
+                </button>
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</th>
+{% endif %}

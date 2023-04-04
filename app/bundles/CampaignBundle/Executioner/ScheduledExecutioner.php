@@ -225,8 +225,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     private function prepareForExecution()
     {
-        $this->progressBar = null;
-        $this->now         = $this->now ?? new \Datetime();
+        $this->now = $this->now ?? new \Datetime();
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);

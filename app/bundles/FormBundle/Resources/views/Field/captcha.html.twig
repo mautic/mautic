@@ -1,0 +1,26 @@
+{% set required = true %}
+{% set type = 'text' %}
+
+{% if field.properties.captcha is not defined or field.properties.captcha is empty %}
+    {% set required = false %}
+    {% if inForm is not defined or inForm is empty or false == inForm %}
+        {# Use as a honeypot #}
+        {% set field = field|merge({
+                'containerAttributes': field.containerAttributes ~ ' style="display:none;"',
+        }) %}
+    {% else %}
+        {# Hide the input #}
+        {% set type = 'hidden' %}
+    {% endif %}
+{% endif %}
+
+{{ include('@MauticForm/Field/text.html.twig', {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'type': type,
+        'id': id,
+        'required': required,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}) }}
