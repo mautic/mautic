@@ -53,7 +53,13 @@
         {% for field, values in objects %}
             <tr>
             {% if values is iterable %}
-                {% if values|length >= 2 %}
+                {% if values|length == 2 and values|first is iterable %}
+                    <td>{{ field|e }}</td>
+                    {% for k, value in values %}
+                        {% set v = k ~ ': ' ~ value|join(', ')|e %}
+                        <td>{{ v }}</td>
+                    {% endfor %}
+                {% elseif values|length >= 2 %}
                     <td>{{ field|e }}</td>
                     <td>{% if values[1] is string %}{{ normalizeStringValue(values[1])|e }}{% endif %}</td>
                     <td>{% if values[0] is string %}{{ normalizeStringValue(values[0])|e }}{% endif %}</td>
