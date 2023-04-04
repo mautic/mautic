@@ -61,10 +61,8 @@ class PullTransifexCommandFunctionalTest extends MauticMysqlTestCase
         Assert::assertSame($someTranslation, $this->filesystem->readFile(self::FAKE_TRANSLATION_DIR.'/cs/WebhookBundle/flashes.ini'));
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
-        parent::tearDown();
-
         $this->filesystem->remove(self::FAKE_TRANSLATION_DIR);
     }
 }

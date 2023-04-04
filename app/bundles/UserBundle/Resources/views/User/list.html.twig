@@ -1,0 +1,137 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}user{% endblock %}
+{% block headerTitle %}{% trans %}mautic.user.users{% endtrans %}{% endblock %}
+{% block actions %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons' : {
+                'new' : permissions['create'],
+        },
+        'routeBase' : 'user',
+        'langVar'   : 'user.user',
+    }) -}}
+{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue' : searchValue,
+            'searchHelp'  : 'mautic.user.user.help.searchcommands',
+            'action'      : currentRoute,
+        }) -}}
+        <div class="page-list">
+            {{ block('listResults') }}
+        </div>
+    {% else %}
+        {{ block('listResults') }}
+    {% endif %}
+{% endblock %}
+
+{% block listResults %}
+<div class="table-responsive">
+    <table class="table table-hover table-striped table-bordered user-list" id="userTable">
+        <thead>
+        <tr>
+            {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'checkall'        : 'true',
+                    'target'          : '#userTable',
+                    'langVar'         : 'user.user',
+                    'routeBase'       : 'user',
+                    'templateButtons' : {
+                        'delete' : permissions['delete'],
+                    },
+            }) -}}
+            
+            <th class="visible-md visible-lg col-user-avatar"></th>
+            {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'user',
+                    'orderBy'    : 'u.lastName, u.firstName, u.username',
+                    'text'       : 'mautic.core.name',
+                    'class'      : 'col-user-name',
+                    'default'    : true,
+                }) -}}
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'user',
+                    'orderBy'    : 'u.username',
+                    'text'       : 'mautic.core.username',
+                    'class'      : 'col-user-username',
+                }) -}}
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'user',
+                    'orderBy'    : 'u.email',
+                    'text'       : 'mautic.core.type.email',
+                    'class'      : 'visible-md visible-lg col-user-email',
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'user',
+                    'orderBy'    : 'r.name',
+                    'text'       : 'mautic.user.role',
+                    'class'      : 'visible-md visible-lg col-user-role',
+                }) -}}
+
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
+                    'sessionVar' : 'user',
+                    'orderBy'    : 'u.id',
+                    'text'       : 'mautic.core.id',
+                    'class'      : 'visible-md visible-lg col-user-id',
+                }) -}}
+            
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in items %}
+            <tr>
+                <td>
+                   {{- include('@MauticCore/Helper/list_actions.html.twig', {
+                            'item'            : item,
+                            'templateButtons' : {
+                                'edit'   : permissions['edit'],
+                                'delete' : permissions['delete'],
+                            },
+                            'routeBase' : 'user',
+                            'langVar'   : 'user.user',
+                            'pull'      : 'left',
+                   }) -}}
+                </td>
+                <td class="visible-md visible-lg">
+                    <img class="img img-responsive img-thumbnail w-44" src="{{ gravatarGetImage(item.getEmail(), '50') }}"/>
+                </td>
+                <td>
+                    <div>
+                        {% if permissions['edit'] %}
+                            <a href="{{ path(
+                                'mautic_user_action',
+                                {'objectAction' : 'edit', 'objectId' : item.getId()}
+                            ) }}" data-toggle="ajax">
+                                {{ item.getName(true) }}
+                            </a>
+                        {% else %}
+                            {{ item.getName(true) }}
+                        {% endif %}
+                    </div>
+                    <div class="small"><em>{{ item.getPosition() }}</em></div>
+                </td>
+                <td>{{ item.getUsername() }}</td>
+                <td class="visible-md visible-lg">
+                    <a href="mailto: {{ item.getEmail() }}">{{ item.getEmail() }}</a>
+                </td>
+                <td class="visible-md visible-lg">{{ item.getRole().getName() }}</td>
+                <td class="visible-md visible-lg">{{ item.getId() }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="panel-footer">
+       {{- include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems' : items|length,
+            'page'       : page,
+            'limit'      : limit,
+            'baseUrl'    : path('mautic_user_index'),
+            'sessionVar' : 'user',
+       }) -}}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% set item = item is defined ? item : null %}
+{% set tooltip = tooltip is defined ? tooltip : null %}
+{{ buttonReset(
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_PAGE_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_BUTTON_DROPDOWN'),
+    item) }}
+{{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
+
+{# Workaround to get variables from action_button_helper here #}
+{{ restore('action_button_helper') }}
+{% if templateButtons is not empty %}
+    {{ buttonsAddFromTemplate(
+        templateButtons,
+        query,
+        actionRoute,
+        indexRoute,
+        langVar,
+        nameGetter,
+        editAttr,
+        routeVars,
+        item,
+        tooltip
+    ) }}
+{% endif %}
+
+<div class="std-toolbar btn-group">
+
+    {{ buttonsRender(
+        (
+            '<button type="button" class="btn btn-default btn-nospin dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="fa fa-caret-down"></i></button>\n'
+            ~ '<ul class="dropdown-menu dropdown-menu-right" role="menu">'
+        )
+        , '</ul>'
+    )|raw }}
+</div>
+
+{{ extraHtml|raw }}

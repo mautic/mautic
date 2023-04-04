@@ -9,14 +9,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ScheduleController extends CommonAjaxController
 {
-    public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
     {
-        /** @var DateBuilder $dateBuilder */
-        $dateBuilder = $this->container->get('mautic.report.model.scheduler_date_builder');
-        $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
         $html = $this->render(
-            'MauticReportBundle:Schedule:index.html.twig',
+            '@MauticReport/Schedule/index.html.twig',
             [
                 'dates' => $dates,
             ]
@@ -45,7 +43,7 @@ class ScheduleController extends CommonAjaxController
         $report = $model->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
-        $security = $this->container->get('mautic.security');
+        $security = $this->security;
 
         if (empty($report)) {
             $this->addFlash('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');

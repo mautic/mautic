@@ -51,9 +51,9 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-        $companyColumns = $this->companyReportData->getCompanyData();
-        $filters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+        $columns           = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $companyColumns    = $this->companyReportData->getCompanyData();
+        $leadFilter        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $utmTagColumns = [
             'utm.utm_campaign' => [
@@ -81,7 +81,7 @@ class ReportUtmTagSubscriber implements EventSubscriberInterface
         $data = [
             'display_name' => 'mautic.lead.report.utm.utm_tag',
             'columns'      => array_merge($columns, $companyColumns, $utmTagColumns),
-            'filters'      => $filters,
+            'filters'      => array_merge($columns, $companyColumns, $utmTagColumns, $leadFilter),
         ];
         $event->addTable(self::UTM_TAG, $data, ReportSubscriber::GROUP_CONTACTS);
     }

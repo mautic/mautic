@@ -62,6 +62,6 @@ final class OutlookIntegrationTest extends AbstractIntegrationTestCase
         $formNotes = $this->integration->getFormNotes('custom');
 
         $this->assertArrayHasKey('template', $formNotes);
-        $this->assertSame('MauticOutlookBundle:Integration:form.html.twig', $formNotes['template']);
+        $this->assertSame('@MauticOutlook/Integration/form.html.twig', $formNotes['template']);
     }
 }

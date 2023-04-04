@@ -3,9 +3,12 @@
 namespace Mautic\CoreBundle\Tests\Unit\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,11 +23,6 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     private $parameterBagMock;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Request
-     */
-    private $requestMock;
-
-    /**
      * @var \PHPUnit\Framework\MockObject\MockObject|Form
      */
     private $formMock;
@@ -34,16 +32,23 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
      */
     protected function setUp(): void
     {
-        $this->classFromAbstractFormController = new class() extends AbstractFormController {
+        $security                              = $this->createMock(CorePermissions::class);
+        $userHelper                            = $this->createMock(UserHelper::class);
+        $this->classFromAbstractFormController = new class($security, $userHelper) extends AbstractFormController {
             public function returnIsFormCancelled(Form $form): bool
             {
                 return $this->isFormCancelled($form);
             }
         };
         $this->parameterBagMock     = $this->createMock(ParameterBag::class);
-        $this->requestMock          = $this->createMock(Request::class);
-        $this->requestMock->request = $this->parameterBagMock;
         $this->formMock             = $this->createMock(Form::class);
+
+        $requestMock          = $this->createMock(Request::class);
+        $requestMock->request = $this->parameterBagMock;
+        $requestStack         = new RequestStack();
+        $requestStack->push($requestMock);
+
+        $this->classFromAbstractFormController->setRequestStack($requestStack);
     }
 
     /**
@@ -54,7 +59,6 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
         $this->parameterBagMock->method('get')
             ->with('company')
             ->willReturn(null);
-        $this->classFromAbstractFormController->setRequest($this->requestMock);
         $this->formMock->method('getName')
             ->willReturn('company');
         $isFormCancelled = $this->classFromAbstractFormController->returnIsFormCancelled($this->formMock);
@@ -69,7 +73,6 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
         $this->parameterBagMock->method('get')
             ->with('company_merge')
             ->willReturn(['buttons' => ['cancel' => null]]);
-        $this->classFromAbstractFormController->setRequest($this->requestMock);
         $this->formMock->method('getName')
             ->willReturn('company_merge');
         $isFormCancelled = $this->classFromAbstractFormController->returnIsFormCancelled($this->formMock);
@@ -84,7 +87,6 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
         $this->parameterBagMock->method('get')
             ->with('company_merge')
             ->willReturn(['buttons' => ['submit' => null]]);
-        $this->classFromAbstractFormController->setRequest($this->requestMock);
         $this->formMock->method('getName')
             ->willReturn('company_merge');
         $isFormCancelled = $this->classFromAbstractFormController->returnIsFormCancelled($this->formMock);
