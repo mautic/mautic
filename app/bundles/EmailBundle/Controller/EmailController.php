@@ -1112,7 +1112,7 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function absendAction($objectId)
+    public function absendAction(Request $request, $objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
@@ -1171,7 +1171,7 @@ class EmailController extends FormController
         }
 
         if ('template' == $entity->getEmailType()
-            || !$this->get('mautic.security')->hasEntityAccess(
+            || !$this->security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
                 $entity->getCreatedBy()
@@ -1203,7 +1203,7 @@ class EmailController extends FormController
         $pending  = $model->getPendingLeads($entity, null, true);
         $form     = $this->get('form.factory')->create(AbTestSendType::class, [], ['action' => $action]);
 
-        if ('POST' == $this->request->getMethod()) {
+        if ('POST' == $request->getMethod()) {
             $entity->setPublishUp(new \DateTime());
             $this->getModel('email.email')->saveEntity($entity);
             $viewParameters = [
