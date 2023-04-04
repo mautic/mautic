@@ -8,17 +8,17 @@ use Mautic\AssetBundle\Entity\Asset;
 use Mautic\AssetBundle\Form\Type\FormSubmitActionDownloadFileType;
 use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Templating\Helper\AnalyticsHelper;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
+use Mautic\CoreBundle\Twig\Helper\AnalyticsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Event\FormBuilderEvent;
 use Mautic\FormBundle\Event\SubmissionEvent;
 use Mautic\FormBundle\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class FormSubscriber implements EventSubscriberInterface
 {
@@ -43,14 +43,14 @@ class FormSubscriber implements EventSubscriberInterface
     private $assetsHelper;
 
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     private $themeHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templatingHelper;
+    private $twig;
 
     /**
      * @var CoreParametersHelper
@@ -62,8 +62,8 @@ class FormSubscriber implements EventSubscriberInterface
         TranslatorInterface $translator,
         AnalyticsHelper $analyticsHelper,
         AssetsHelper $assetsHelper,
-        ThemeHelper $themeHelper,
-        TemplatingHelper $templatingHelper,
+        ThemeHelperInterface $themeHelper,
+        Environment $twig,
         CoreParametersHelper $coreParametersHelper
     ) {
         $this->assetModel           = $assetModel;
@@ -71,7 +71,7 @@ class FormSubscriber implements EventSubscriberInterface
         $this->analyticsHelper      = $analyticsHelper;
         $this->assetsHelper         = $assetsHelper;
         $this->themeHelper          = $themeHelper;
-        $this->templatingHelper     = $templatingHelper;
+        $this->twig                 = $twig;
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
@@ -121,7 +121,7 @@ class FormSubscriber implements EventSubscriberInterface
         } elseif (null !== $categoryId) {
             try {
                 $asset = $this->assetModel->getRepository()->getLatestAssetForCategory($categoryId);
-            } catch (NoResultException | NonUniqueResultException $e) {
+            } catch (NoResultException|NonUniqueResultException $e) {
                 $asset = null;
             }
         }
@@ -160,7 +160,7 @@ class FormSubscriber implements EventSubscriberInterface
             'message'       => $message,
             'messengerMode' => $messengerMode,
         ]    = $event->getPostSubmitCallback('asset.download_file');
-        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]);
+        $url = $this->assetModel->generateUrl($asset, true, ['form', $form->getId()]).'&stream=0';
 
         if ($messengerMode) {
             $event->setPostSubmitResponse(['download' => $url]);
@@ -179,14 +179,14 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $event->setPostSubmitResponse(new Response(
-            $this->templatingHelper->getTemplating()->renderResponse(
-                $this->themeHelper->checkForTwigTemplate(':'.$this->coreParametersHelper->get('theme').':message.html.php'),
+            $this->twig->render(
+                $this->themeHelper->checkForTwigTemplate('@themes/'.$this->coreParametersHelper->get('theme').'/html/message.html.twig'),
                 [
                     'message'  => $msg,
                     'type'     => 'notice',
                     'template' => $this->coreParametersHelper->get('theme'),
                 ]
-            )->getContent()
+            )
         ));
     }
 }

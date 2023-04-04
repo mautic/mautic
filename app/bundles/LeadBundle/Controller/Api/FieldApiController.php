@@ -5,11 +5,12 @@ namespace Mautic\LeadBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Field\Exception\AbortColumnCreateException;
+use Mautic\LeadBundle\Model\FieldModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class FieldApiController.
+ * @extends CommonApiController<LeadField>
  */
 class FieldApiController extends CommonApiController
 {
@@ -20,10 +21,18 @@ class FieldApiController extends CommonApiController
      */
     protected $fieldObject;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var FieldModel|null
+     */
+    protected $model = null;
+
+    public function initialize(ControllerEvent $event)
     {
+        $fieldModel = $this->getModel('lead.field');
+        \assert($fieldModel instanceof FieldModel);
+
+        $this->model           = $fieldModel;
         $this->fieldObject     = $this->request->get('object');
-        $this->model           = $this->getModel('lead.field');
         $this->entityClass     = LeadField::class;
         $this->entityNameOne   = 'field';
         $this->entityNameMulti = 'fields';
@@ -93,10 +102,10 @@ class FieldApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param LeadField &$entity
+     * @param           $parameters
+     * @param           $form
+     * @param string    $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {

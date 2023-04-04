@@ -4,8 +4,8 @@ namespace Mautic\PageBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\Hit;
@@ -20,6 +20,7 @@ use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -45,7 +46,7 @@ class PageSubscriberTest extends TestCase
         $payload = $this->getNonEmptyPayload();
         $event   = new QueueConsumerEvent($payload);
 
-        $dispatcher->dispatch(QueueEvents::PAGE_HIT, $event);
+        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
 
         $this->assertEquals($event->getResult(), QueueConsumerResults::ACKNOWLEDGE);
     }
@@ -60,7 +61,7 @@ class PageSubscriberTest extends TestCase
         $payload = $this->getEmptyPayload();
         $event   = new QueueConsumerEvent($payload);
 
-        $dispatcher->dispatch(QueueEvents::PAGE_HIT, $event);
+        $dispatcher->dispatch($event, QueueEvents::PAGE_HIT);
 
         $this->assertEquals($event->getResult(), QueueConsumerResults::REJECT);
     }
@@ -72,7 +73,11 @@ class PageSubscriberTest extends TestCase
      */
     protected function getPageSubscriber()
     {
-        $assetsHelperMock   = $this->createMock(AssetsHelper::class);
+        $packagesMock = $this->getMockBuilder(Packages::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $assetsHelperMock   = new AssetsHelper($packagesMock);
         $ipLookupHelperMock = $this->createMock(IpLookupHelper::class);
         $auditLogModelMock  = $this->createMock(AuditLogModel::class);
         $pageModelMock      = $this->createMock(PageModel::class);

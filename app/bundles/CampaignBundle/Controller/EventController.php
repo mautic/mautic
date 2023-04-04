@@ -115,12 +115,11 @@ class EventController extends CommonFormController
             $closeModal = true;
         } else {
             $closeModal = false;
-            $formThemes = ['MauticCampaignBundle:FormTheme\Event'];
             if (isset($event['settings']['formTheme'])) {
-                $formThemes[] = $event['settings']['formTheme'];
+                $viewParams['formTheme'] = $event['settings']['formTheme'];
             }
 
-            $viewParams['form']             = $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes);
+            $viewParams['form']             = $form->createView();
             $viewParams['eventHeader']      = $this->get('translator')->trans($event['settings']['label']);
             $viewParams['eventDescription'] = (!empty($event['settings']['description'])) ? $this->get('translator')->trans(
                 $event['settings']['description']
@@ -141,7 +140,7 @@ class EventController extends CommonFormController
             $blank  = $entity->convertToArray();
             $event  = array_merge($blank, $event);
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
+            $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
                 : $event['settings']['template'];
 
             $passthroughVars['event']     = $event;
@@ -173,7 +172,7 @@ class EventController extends CommonFormController
                     ]
                 );
             } elseif ('date' == $event['triggerMode']) {
-                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
+                /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
                 $dh    = $this->factory->getHelper('template.date');
                 $label = 'mautic.campaign.connection.trigger.date.label';
                 if ('no' == $anchorName) {
@@ -198,7 +197,7 @@ class EventController extends CommonFormController
         } else {
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
+                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -322,21 +321,19 @@ class EventController extends CommonFormController
         ];
 
         if (!$cancelled && !$valid) {
-            $formThemes = ['MauticCampaignBundle:FormTheme\Event'];
-
             if (isset($event['settings']['formTheme'])) {
-                $formThemes[] = $event['settings']['formTheme'];
+                $viewParams['formTheme'] = $event['settings']['formTheme'];
             }
 
             $viewParams = array_merge($viewParams, [
-                'form'             => $this->setFormTheme($form, 'MauticCampaignBundle:Campaign:index.html.php', $formThemes),
+                'form'             => $form->createView(),
                 'eventHeader'      => $event['settings']['label'],
                 'eventDescription' => $event['settings']['description'],
             ]);
 
             return $this->ajaxAction(
                 [
-                    'contentTemplate' => 'MauticCampaignBundle:Event:form.html.php',
+                    'contentTemplate' => '@MauticCampaign/Event/form.html.twig',
                     'viewParameters'  => $viewParams,
                     'passthroughVars' => $passthroughVars,
                 ]
@@ -348,7 +345,7 @@ class EventController extends CommonFormController
             $event    = array_merge((new Event())->convertToArray(), $event);
             $template = isset($event['settings']['template'])
                 ? $event['settings']['template']
-                : 'MauticCampaignBundle:Event:generic.html.php';
+                : '@MauticCampaign/Event/_generic.html.twig';
 
             $passthroughVars = array_merge($passthroughVars, [
                 'event'      => $event,
@@ -391,8 +388,8 @@ class EventController extends CommonFormController
                     $label .= '_inaction';
                 }
 
-                /** @var \Mautic\CoreBundle\Templating\Helper\DateHelper $dh */
-                $dh                       = $this->get('mautic.helper.template.date');
+                /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
+                $dh                       = $this->get('mautic.helper.twig.date');
                 $passthroughVars['label'] = $this->translator->trans(
                     $label,
                     [
@@ -517,7 +514,7 @@ class EventController extends CommonFormController
                 $session->set('mautic.campaign.'.$campaignId.'.events.deleted', $deletedEvents);
             }
 
-            $template = (empty($event['settings']['template'])) ? 'MauticCampaignBundle:Event:generic.html.php'
+            $template = (empty($event['settings']['template'])) ? '@MauticCampaign/Event/_generic.html.twig'
                 : $event['settings']['template'];
 
             //prevent undefined errors

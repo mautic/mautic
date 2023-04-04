@@ -1,0 +1,79 @@
+{#
+  Variables
+    - items
+    - filters
+    - form
+    - viewOnlyFields
+    - page
+    - totalCount
+    - limit
+    - tmpl
+    - canDelete
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}formresult{% endblock %}
+
+{% block headerTitle %}
+  {{ 'mautic.form.result.header.index'|trans({'%name%': form.name}) }}
+{% endblock %}
+
+{% block actions %}
+  {% set buttons = [] %}
+  {% set buttons = buttons|merge([{
+      'attr': {
+          'target': '_new',
+          'data-toggle': '',
+          'class': 'btn btn-default btn-nospin',
+          'href': path('mautic_form_export', {'objectId': form.id, 'format': 'html'}),
+      },
+      'btnText': 'mautic.form.result.export.html'|trans,
+      'iconClass': 'fa fa-file-code-o',
+      'primary': true,
+  }]) %}
+
+  {% set buttons = buttons|merge([{
+      'attr': {
+          'data-toggle': '',
+          'class': 'btn btn-default btn-nospin',
+          'href': path('mautic_form_export', {'objectId': form.id, 'format': 'csv'}),
+      },
+      'btnText': 'mautic.form.result.export.csv'|trans,
+      'iconClass': 'fa fa-file-text-o',
+      'primary': true,
+  }]) %}
+
+  {# This is q quick way to check if the class exists, if the class exists add this btn #}
+  {% if constant('\\PhpOffice\\PhpSpreadsheet\\Spreadsheet::VISIBILITY_VISIBLE') is defined %}
+      {% set buttons = buttons|merge([{
+          'attr': {
+              'data-toggle': '',
+              'class': 'btn btn-default btn-nospin',
+              'href': path('mautic_form_export', {'objectId': form.id, 'format': 'xlsx'}),
+          },
+          'btnText': 'mautic.form.result.export.xlsx'|trans,
+          'iconClass': 'fa fa-file-excel-o',
+          'primary': true,
+      }]) %}
+  {% endif %}
+
+  {% set buttons = buttons|merge([{
+      'attr': {
+          'class': 'btn btn-default',
+          'href': path('mautic_form_action', {'objectAction': 'view', 'objectId': form.id}),
+          'data-toggle': 'ajax',
+      },
+      'iconClass': 'fa fa-remove',
+      'btnText': 'mautic.core.form.close'|trans,
+  }]) %}
+
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {'customButtons': buttons}) }}
+{% endblock %}
+
+{% block content %}
+  <div class="page-list">
+    {{ include('@MauticForm/Result/_list.html.twig') }}
+  </div>
+{% endblock %}

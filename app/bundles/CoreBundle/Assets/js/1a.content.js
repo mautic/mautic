@@ -134,7 +134,8 @@ Mautic.loadAjaxColumn = function(elementName, route, callback){
                     }
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         }
     }
@@ -370,10 +371,6 @@ Mautic.onPageLoad = function (container, response, inModal) {
     //initialize sortable lists
     mQuery(container + " *[data-toggle='sortablelist']").each(function (index) {
         Mautic.activateSortable(this);
-    });
-
-    mQuery(container + " div.sortable-panels").each(function () {
-        Mautic.activateSortablePanels(this);
     });
 
     //downloads
@@ -1768,9 +1765,33 @@ Mautic.closeGlobalSearchResults = function () {
  * @param link
  */
 Mautic.initiateFileDownload = function (link) {
+    if (mauticContactExportInBackground === 1 && link.indexOf('filetype=csv') >= 0) {
+        Mautic.processCsvContactExport(link);
+        return;
+    }
+
     //initialize download links
-    var iframe = mQuery("<iframe/>").attr({
+    mQuery("<iframe/>").attr({
         src: link,
         style: "visibility:hidden;display:none"
     }).appendTo(mQuery('body'));
+};
+
+Mautic.processCsvContactExport = function (route) {
+    mQuery.ajax({
+        showLoadingBar: true,
+        url: route,
+        type: "POST",
+        dataType: "json",
+        success: function (response) {
+            Mautic.processPageContent(response);
+
+            if (typeof callback == 'function') {
+                callback(response);
+            }
+        },
+        error: function (request, textStatus, errorThrown) {
+            Mautic.processAjaxError(request, textStatus, errorThrown);
+        }
+    });
 };

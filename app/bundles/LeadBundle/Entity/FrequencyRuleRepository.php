@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * FrequecyRuleRepository.
+ * @extends CommonRepository<FrequencyRule>
  */
 class FrequencyRuleRepository extends CommonRepository
 {

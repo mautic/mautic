@@ -8,8 +8,8 @@ use Mautic\LeadBundle\Entity\Lead;
 
 final class Contact implements ObjectInterface
 {
-    const NAME   = 'lead'; // kept as lead for BC
-    const ENTITY = Lead::class;
+    public const NAME   = 'lead'; // kept as lead for BC
+    public const ENTITY = Lead::class;
 
     /**
      * {@inheritdoc}

@@ -5,46 +5,43 @@ namespace Mautic\ConfigBundle\Model;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\InstallBundle\Configurator\Step\CheckStep;
+use Mautic\InstallBundle\Install\InstallService;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class SysinfoModel.
- */
 class SysinfoModel
 {
+    /**
+     * @var string|null
+     */
     protected $phpInfo;
+
+    /**
+     * @var array<string,bool>|null
+     */
     protected $folders;
 
-    /**
-     * @var PathsHelper
-     */
-    protected $pathsHelper;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    protected $coreParametersHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
+    protected PathsHelper $pathsHelper;
+    protected CoreParametersHelper $coreParametersHelper;
     protected Connection $connection;
+    private TranslatorInterface $translator;
+    private InstallService $installService;
+    private CheckStep $checkStep;
 
-    /**
-     * SysinfoModel constructor.
-     */
     public function __construct(
         PathsHelper $pathsHelper,
         CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
-        Connection $connection
+        Connection $connection,
+        InstallService $installService,
+        CheckStep $checkStep
     ) {
         $this->pathsHelper          = $pathsHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
         $this->connection           = $connection;
+        $this->installService       = $installService;
+        $this->checkStep            = $checkStep;
     }
 
     /**
@@ -83,6 +80,22 @@ class SysinfoModel
         }
 
         return $this->phpInfo;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRecommendations(): array
+    {
+        return $this->installService->checkOptionalSettings($this->checkStep);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getRequirements(): array
+    {
+        return $this->installService->checkRequirements($this->checkStep);
     }
 
     /**

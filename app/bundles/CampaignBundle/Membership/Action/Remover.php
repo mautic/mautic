@@ -6,12 +6,12 @@ use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
 use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Membership\Exception\ContactAlreadyRemovedFromCampaignException;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Remover
 {
-    const NAME = 'removed';
+    public const NAME = 'removed';
 
     /**
      * @var LeadRepository

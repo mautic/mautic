@@ -1,0 +1,43 @@
+{#
+  Form Theme is used at "Configuration" > "Notification Settings"
+
+  Variables
+    - form
+#}
+{% block _config_notification_config_widget %}
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.campaign_notification_config'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.campaign_send_notification_to_author) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.campaign_notification_email_addresses) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">{{ 'mautic.config.tab.webhook_notification_config'|trans }}</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.webhook_send_notification_to_author) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_row(form.webhook_notification_email_addresses) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

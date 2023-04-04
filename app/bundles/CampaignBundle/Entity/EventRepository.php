@@ -4,6 +4,9 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Event>
+ */
 class EventRepository extends CommonRepository
 {
     /**

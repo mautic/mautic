@@ -56,7 +56,7 @@ class AuditlogController extends CommonController
                     'mauticContent' => 'leadAuditlog',
                     'auditLogCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Auditlog:list.html.php',
+                'contentTemplate' => '@MauticLead/Auditlog/list.html.twig',
             ]
         );
     }
@@ -105,7 +105,7 @@ class AuditlogController extends CommonController
             return [
                 'eventName'      => $eventLabel,
                 'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
-                'eventTimestamp' => $this->get('mautic.helper.template.date')->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
+                'eventTimestamp' => $this->get('mautic.helper.twig.date')->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 

@@ -4,16 +4,13 @@ namespace Mautic\CampaignBundle\Command;
 
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class TriggerCampaignCommand.
- */
 class ValidateEventCommand extends Command
 {
     use WriteCountTrait;
@@ -33,9 +30,6 @@ class ValidateEventCommand extends Command
      */
     private $formatterHelper;
 
-    /**
-     * ValidateEventCommand constructor.
-     */
     public function __construct(InactiveExecutioner $inactiveExecutioner, TranslatorInterface $translator, FormatterHelper $formatterHelper)
     {
         parent::__construct();
@@ -76,11 +70,9 @@ class ValidateEventCommand extends Command
     }
 
     /**
-     * @return int|null
-     *
      * @throws \Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         defined('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED') or define('MAUTIC_CAMPAIGN_SYSTEM_TRIGGERED', 1);
 

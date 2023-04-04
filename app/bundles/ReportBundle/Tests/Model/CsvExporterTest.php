@@ -3,26 +3,29 @@
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
     public function testExport()
     {
-        $dateHelperMock = $this->createMock(DateHelper::class);
-
-        $dateHelperMock->expects($this->any())
-            ->method('toFullConcat')
-            ->willReturn('2017-10-01');
-
         $translator = $this->createMock(TranslatorInterface::class);
 
         $coreParametersHelperMock = $this->createMock(CoreParametersHelper::class);
+
+        $dateHelperMock =new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $translator,
+           $coreParametersHelperMock
+        );
 
         $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
 
@@ -72,56 +75,56 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
                 '',
                 'ConnectWise',
                 '',
-                '2017-10-01',
+                'October 10, 2017 12:00 am',
                 'connectwise@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                'October 10, 2017 12:00 am',
                 'mytest@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                'October 10, 2017 12:00 am',
                 'john@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                'October 10, 2017 12:00 am',
                 'bogus@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                'October 10, 2017 12:00 am',
                 'date-test@example.com',
             ],
             [
                 '',
                 'Bodega Club',
                 '',
-                '2017-10-01',
+                'October 10, 2017 12:00 am',
                 'club@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                'October 11, 2017 12:00 am',
                 'test@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                'October 12, 2017 12:00 am',
                 'test@example.com',
             ],
         ];

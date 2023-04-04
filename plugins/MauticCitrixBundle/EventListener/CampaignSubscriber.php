@@ -5,7 +5,6 @@ namespace MauticPlugin\MauticCitrixBundle\EventListener;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use MauticPlugin\MauticCitrixBundle\CitrixEvents;
 use MauticPlugin\MauticCitrixBundle\Entity\CitrixEventTypes;
 use MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType;
@@ -14,7 +13,8 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use MauticPlugin\MauticCitrixBundle\Model\CitrixModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -36,18 +36,18 @@ class CampaignSubscriber implements EventSubscriberInterface
     /**
      * ヽ(ಠ_ಠ)ノ Used in the CitrixStartTrait.
      *
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         CitrixModel $citrixModel,
         TranslatorInterface $translator,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->citrixModel = $citrixModel;
         $this->translator  = $translator;
-        $this->templating  = $templating;
+        $this->twig        = $twig;
     }
 
     /**

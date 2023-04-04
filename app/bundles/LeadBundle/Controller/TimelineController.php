@@ -56,7 +56,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'leadTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Timeline:list.html.php',
+                'contentTemplate' => '@MauticLead/Timeline/_list.html.twig',
             ]
         );
     }
@@ -118,7 +118,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.php', $tmpl),
+                'contentTemplate' => sprintf('@MauticLead/Timeline/plugin_%s.html.twig', $tmpl),
             ]
         );
     }
@@ -180,7 +180,7 @@ class TimelineController extends CommonController
                     'mauticContent' => 'pluginTimeline',
                     'timelineCount' => $events['total'],
                 ],
-                'contentTemplate' => sprintf('MauticLeadBundle:Timeline:plugin_%s.html.php', $tmpl),
+                'contentTemplate' => sprintf('@MauticLead/Timeline/plugin_%s.html.twig', $tmpl),
             ]
         );
     }
@@ -229,7 +229,7 @@ class TimelineController extends CommonController
             return [
                 'eventName'      => $eventLabel,
                 'eventType'      => isset($event['eventType']) ? $event['eventType'] : '',
-                'eventTimestamp' => $this->get('mautic.helper.template.date')->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
+                'eventTimestamp' => $this->get('mautic.helper.twig.date')->toText($event['timestamp'], 'local', 'Y-m-d H:i:s', true),
             ];
         };
 

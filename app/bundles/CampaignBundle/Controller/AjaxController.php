@@ -61,7 +61,7 @@ class AjaxController extends CommonAjaxController
         }
 
         // Format the date to match the view
-        $dataArray['formattedDate'] = $this->get('mautic.helper.template.date')->toFull($dataArray['date']);
+        $dataArray['formattedDate'] = $this->get('mautic.helper.twig.date')->toFull($dataArray['date']);
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -116,7 +116,8 @@ class AjaxController extends CommonAjaxController
                                     [
                                         'lead'  => $contactId,
                                         'event' => $eventId,
-                                    ]
+                                    ],
+                                    ['dateTriggered' => 'desc']
                                 );
 
                 if ($log && ($log->getTriggerDate() > new \DateTime())) {
