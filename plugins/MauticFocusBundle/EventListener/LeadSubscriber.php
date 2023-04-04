@@ -59,7 +59,6 @@ class LeadSubscriber implements EventSubscriberInterface
         $statsClickByLead = $this->focusModel->getStatRepository()->getStatsClickByLead($contactId, $event->getQueryOptions());
 
         if (!$event->isEngagementCount()) {
-            $template = 'MauticFocusBundle:SubscribedEvents\Timeline:index.html.php';
             $icon     = 'fa-search';
 
             // Add the view to the event array
@@ -80,7 +79,6 @@ class LeadSubscriber implements EventSubscriberInterface
                             'eventLabel'      => $eventLabel,
                             'eventType'       => (Stat::TYPE_NOTIFICATION == $statsView['type']) ? $eventViewTypeName : $eventClickTypeName,
                             'timestamp'       => $statsView['date_added'],
-                            'contentTemplate' => $template,
                             'icon'            => $icon,
                             'contactId'       => $contactId,
                         ]
