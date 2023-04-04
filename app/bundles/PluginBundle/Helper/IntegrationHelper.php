@@ -331,7 +331,7 @@ class IntegrationHelper
      *
      * @param $name
      *
-     * @return AbstractIntegration|bool
+     * @return AbstractIntegration|false
      */
     public function getIntegrationObject($name)
     {
