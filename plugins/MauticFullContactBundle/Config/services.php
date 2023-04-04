@@ -18,7 +18,4 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('MauticPlugin\\MauticFullContactBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-
-    $services->load('MauticPlugin\\MauticFullContactBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
 };

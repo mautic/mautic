@@ -18,8 +18,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('MauticPlugin\\MauticSocialBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('MauticPlugin\\MauticSocialBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('MauticPlugin\\MauticSocialBundle\\Entity\\', '../Entity/*Repository.php');
 };

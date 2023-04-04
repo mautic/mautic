@@ -18,8 +18,5 @@ return function (ContainerConfigurator $configurator) {
     $services->load('MauticPlugin\\MauticFocusBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
-    $services->load('MauticPlugin\\MauticFocusBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
-
     $services->load('MauticPlugin\\MauticFocusBundle\\Entity\\', '../Entity/*Repository.php');
 };

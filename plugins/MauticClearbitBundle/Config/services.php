@@ -18,7 +18,4 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('MauticPlugin\\MauticClearbitBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-
-    $services->load('MauticPlugin\\MauticClearbitBundle\\Controller\\', '../Controller')
-        ->tag('controller.service_arguments');
 };
