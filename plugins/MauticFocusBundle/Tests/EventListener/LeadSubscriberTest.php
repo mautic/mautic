@@ -172,7 +172,6 @@ class LeadSubscriberTest extends CommonMocks
             ],
             'eventType'       => $eventTypeName,
             'timestamp'       => $date,
-            'contentTemplate' => 'MauticFocusBundle:SubscribedEvents\Timeline:index.html.php',
             'icon'            => 'fa-search',
             'contactId'       => $lead->getId(),
         ];
