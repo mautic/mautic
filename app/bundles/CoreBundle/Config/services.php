@@ -42,6 +42,8 @@ return function (ContainerConfigurator $configurator) {
 
     $services->alias(\GuzzleHttp\Client::class, 'mautic.http.client');
     $services->alias(\Psr\Http\Client\ClientInterface::class, 'mautic.http.client');
+    $services->alias('mautic.factory', \Mautic\CoreBundle\Factory\MauticFactory::class);
+    $services->alias(\Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface::class, 'argument_resolver');
 
     $services->alias(\Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface::class, \Mautic\CoreBundle\Doctrine\Provider\VersionProvider::class);
     $services->alias('mautic.model.factory', \Mautic\CoreBundle\Factory\ModelFactory::class);

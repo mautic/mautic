@@ -142,7 +142,7 @@ return [
             ],
             'mautic_contact_export_download' => [
                 'path'       => '/contacts/export/download/{fileName}',
-                'controller' => 'MauticLeadBundle:Lead:downloadExport',
+                'controller' => 'Mautic\LeadBundle\Controller\LeadController::downloadExportAction',
             ],
         ],
         'api' => [

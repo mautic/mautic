@@ -13,8 +13,8 @@
                 <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
-        {{ render(controller('MauticCoreBundle:Default:notifications')) }}
-        {{ render(controller('MauticCoreBundle:Default:globalSearch')) }}
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
     </ul>
     <!--/ end: left nav -->
 
