@@ -485,7 +485,7 @@ class PublicController extends CommonFormController
                 $pageModel = $this->getModel('page');
 
                 try {
-                    $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+                    $lead                         = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
                     $query                        = array_merge($query, $pageModel->getHitQuery($request, $redirect));
                     $clickthrough && $query['ct'] = $clickthrough;
                     $pageModel->hitPage($redirect, $request, 200, $lead, $query);

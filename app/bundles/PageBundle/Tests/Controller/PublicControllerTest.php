@@ -6,6 +6,7 @@ use Exception;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\ClickthroughHelper;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
@@ -386,7 +387,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     public function testAssetRedirectUrlWithClickThrough(): void
     {
         $redirectId   = 'dummy_redirect_id';
-        $clickThrough = 'dummy_click_through';
+        $clickThrough = ClickthroughHelper::encodeArrayForUrl(['dummy_click_through']);
         $redirectUrl  = 'https://some.test.url/asset/1:examplefilejpg';
         $targetUrl    = $redirectUrl.'?ct='.$clickThrough;
 
@@ -441,8 +442,6 @@ class PublicControllerTest extends MauticMysqlTestCase
             ->willReturnMap([
                 ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $routerMock],
             ]);
-
-        $this->request->query->set('ct', $clickThrough);
 
         $controller = new PublicController(
             $this->createMock(CorePermissions::class),
