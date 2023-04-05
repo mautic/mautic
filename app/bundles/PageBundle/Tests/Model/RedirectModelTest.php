@@ -51,6 +51,24 @@ class RedirectModelTest extends PageTestAbstract
         $router = $this->createMock(Router::class);
         $router->expects($this->exactly(2))
             ->method('generate')
+            ->withConsecutive(
+                [
+                    'mautic_url_redirect',
+                    [
+                        'redirectId' => null,
+                        'ct'         => 'YToxOntzOjM6ImZvbyI7czozOiJiYXIiO30%3D',
+                    ],
+                    0,
+                ],
+                [
+                    'mautic_url_redirect',
+                    [
+                        'redirectId' => null,
+                        'ct'         => 'YToyOntzOjM6ImZvbyI7czozOiJiYXIiO3M6MzoiYmFyIjtzOjM6ImZvbyI7fQ%3D%3D',
+                    ],
+                    0,
+                ]
+            )
             ->willReturn($url);
         $model->setRouter($router);
 
@@ -59,7 +77,7 @@ class RedirectModelTest extends PageTestAbstract
 
         // URL should just have foo = bar in the CT
         $url = $model->generateRedirectUrl($redirect, $clickthrough);
-        $this->assertEquals('https://mautic.org?ct=YToxOntzOjM6ImZvbyI7czozOiJiYXIiO30%3D', $url);
+        $this->assertEquals('https://mautic.org', $url);
 
         // Add the listener to append something else to the CT
         $dispatcher->addListener(
@@ -69,6 +87,6 @@ class RedirectModelTest extends PageTestAbstract
             }
         );
         $url = $model->generateRedirectUrl($redirect, $clickthrough);
-        $this->assertEquals('https://mautic.org?ct=YToyOntzOjM6ImZvbyI7czozOiJiYXIiO3M6MzoiYmFyIjtzOjM6ImZvbyI7fQ%3D%3D', $url);
+        $this->assertEquals('https://mautic.org', $url);
     }
 }

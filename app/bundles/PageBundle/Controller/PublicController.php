@@ -437,7 +437,8 @@ class PublicController extends CommonFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $mauticLogger,
-        $redirectId
+        $redirectId,
+        ?string $ct = null
     ) {
         $logger = $mauticLogger;
 
@@ -463,9 +464,10 @@ class PublicController extends CommonFormController
         // Get query string
         $query = $request->query->all();
 
-        // Unset the clickthrough from the URL query
-        $ct = $query['ct'] ?? null;
-        unset($query['ct']);
+        // @aivie Tracking: The CT is added to the path of the URL. Not as parameter.
+        $clickthrough = $redirectModel->decodeArrayFromUrl($ct);
+        $utmTags      = $clickthrough['utmTags'] ?? [];
+        $query        = array_merge($query, $utmTags);
 
         // Tak on anything left to the URL
         if (count($query)) {
@@ -484,7 +486,9 @@ class PublicController extends CommonFormController
 
                 try {
                     $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    $query                        = array_merge($query, $pageModel->getHitQuery($request, $redirect));
+                    $clickthrough && $query['ct'] = $clickthrough;
+                    $pageModel->hitPage($redirect, $request, 200, $lead, $query);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it
                     // and process the request without it
