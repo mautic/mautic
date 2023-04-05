@@ -7,7 +7,7 @@
                     </div><div class="row equal">
                     {%- set rowCount = 0 -%}
                 {% endif %}
-                {{ include('MauticReportBundle:Graph:' ~ graphs[key].type|capitalize ~ '.html.twig', {
+                {{ include('@MauticReport/Graph/' ~ graphs[key].type|capitalize ~ '.html.twig', {
                       'graph': graphs[key].data,
                       'options': graphs[key].options,
                       'report': report
