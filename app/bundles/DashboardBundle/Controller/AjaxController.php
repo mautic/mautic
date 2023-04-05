@@ -2,10 +2,13 @@
 
 namespace Mautic\DashboardBundle\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\DashboardBundle\Entity\Widget;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Mautic\DashboardBundle\Model\DashboardModel;
+use Mautic\PageBundle\Entity\Hit;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -18,12 +21,12 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function viewingVisitorsAction(Request $request)
+    public function viewingVisitorsAction(EntityManagerInterface $entityManager)
     {
         $dataArray = ['success' => 0];
 
         /** @var \Mautic\PageBundle\Entity\PageRepository $pageRepository */
-        $pageRepository               = $this->get('doctrine.orm.entity_manager')->getRepository('MauticPageBundle:Hit');
+        $pageRepository               = $entityManager->getRepository(Hit::class);
         $dataArray['viewingVisitors'] = $pageRepository->countVisitors(60, true);
 
         $dataArray['success'] = 1;
@@ -36,7 +39,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateWidgetFormAction(Request $request)
+    public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory)
     {
         $data      = $request->request->get('widget');
         $dataArray = ['success' => 0];
@@ -47,7 +50,7 @@ class AjaxController extends CommonAjaxController
         }
 
         $widget   = new Widget();
-        $form     = $this->get('form.factory')->create(WidgetType::class, $widget);
+        $form     = $formFactory->create(WidgetType::class, $widget);
         $formHtml = $this->render('@MauticDashboard//Widget\\form.html.twig',
             ['form' => $form->submit($data)->createView()]
         )->getContent();
@@ -63,7 +66,7 @@ class AjaxController extends CommonAjaxController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateWidgetOrderingAction(Request $request)
+    public function updateWidgetOrderingAction(Request $request)
     {
         $data           = $request->request->get('ordering');
         $dashboardModel = $this->getModel('dashboard');
@@ -86,7 +89,7 @@ class AjaxController extends CommonAjaxController
         $dataArray = ['success' => 0];
 
         // @todo: build permissions
-        // if (!$this->get('mautic.security')->isGranted('dashobard:widgets:delete')) {
+        // if (!$this->security->isGranted('dashobard:widgets:delete')) {
         //     return $this->accessDenied();
         // }
 
