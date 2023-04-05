@@ -9,7 +9,8 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -23,8 +24,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AssetType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * @var TranslatorInterface
      */
@@ -160,8 +159,8 @@ class AssetType extends AbstractType
         ]);
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
-
-        $this->addPublishDateFields($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'tempId',

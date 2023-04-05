@@ -5,7 +5,8 @@ namespace Mautic\PageBundle\Form\Type;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Form\AbstractType;
@@ -15,8 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PagePublishDatesType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * {@inheritdoc}
      */
@@ -26,11 +25,9 @@ class PagePublishDatesType extends AbstractType
         $builder->addEventSubscriber(new FormExitSubscriber('page.page', $options));
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
-
-        $this->addPublishDateFields($builder);
-
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('sessionId', HiddenType::class);
-
         $builder->add('buttons', FormButtonsType::class, [
             'container_class' => 'lead-note-buttons',
             'apply_text'      => false,

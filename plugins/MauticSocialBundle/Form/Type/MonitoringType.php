@@ -5,7 +5,8 @@ namespace MauticPlugin\MauticSocialBundle\Form\Type;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use MauticPlugin\MauticSocialBundle\Model\MonitoringModel;
@@ -18,8 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonitoringType extends AbstractType
 {
-    use PublishDateTrait;
-
     /** @var MonitoringModel */
     private $monitoringModel;
 
@@ -49,9 +48,8 @@ class MonitoringType extends AbstractType
         ]);
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
-
-        $this->addPublishDateFields($builder);
-
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('networkType', ChoiceType::class, [
             'label'      => 'mautic.social.monitoring.type.list',
             'label_attr' => ['class' => 'control-label'],

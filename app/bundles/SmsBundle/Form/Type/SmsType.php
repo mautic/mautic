@@ -8,7 +8,8 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\LeadBundle\Form\Type\LeadListType;
 use Mautic\SmsBundle\Entity\Sms;
@@ -22,8 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SmsType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * @var EntityManager
      */
@@ -95,7 +94,8 @@ class SmsType extends AbstractType
                 ->addModelTransformer($transformer)
         );
 
-        $this->addPublishDateFields($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         //add category
         $builder->add(

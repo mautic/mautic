@@ -6,7 +6,8 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\PointBundle\Entity\Point;
@@ -20,8 +21,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PointType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * @var CorePermissions
      */
@@ -139,7 +138,8 @@ class PointType extends AbstractType
             ]
         );
 
-        $this->addPublishDateFields($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'category',

@@ -11,7 +11,8 @@ use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\DynamicContentBundle\Entity\DynamicContent;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
@@ -35,8 +36,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicContentType extends AbstractType
 {
-    use PublishDateTrait;
-
     private $em;
     private $translator;
     private $fieldChoices;
@@ -152,7 +151,8 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $this->addPublishDateFields($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'content',

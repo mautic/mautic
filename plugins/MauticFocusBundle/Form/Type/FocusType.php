@@ -7,7 +7,8 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\ButtonGroupType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Form\Type\EmailUtmTagsType;
@@ -22,8 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FocusType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * @var CorePermissions
      */
@@ -169,8 +168,8 @@ class FocusType extends AbstractType
             ]
         );
 
-        $this->addPublishDateFields($builder);
-
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
         $builder->add('properties', PropertiesType::class, ['data' => $options['data']->getProperties()]);
 
         // Will be managed by JS

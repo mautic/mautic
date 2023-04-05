@@ -15,8 +15,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 abstract class AbstractFormStandardType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * @var CorePermissions
      */
@@ -113,7 +111,8 @@ abstract class AbstractFormStandardType extends AbstractType
             );
 
             if (!$builder->has('publishUp') && method_exists($options['data'], 'getPublishUp')) {
-                $this->addPublishDateFields($builder, $readonly);
+                $builder->add('publishUp', PublishUpDateType::class, ['attr' => ['readonly' => $readonly]]);
+                $builder->add('publishDown', PublishDownDateType::class, ['attr' => ['readonly' => $readonly]]);
             }
         }
 

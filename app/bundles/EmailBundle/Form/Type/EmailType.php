@@ -11,7 +11,8 @@ use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\DynamicContentTrait;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -38,7 +39,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailType extends AbstractType
 {
-    use PublishDateTrait;
     use DynamicContentTrait;
 
     /**
@@ -510,7 +510,8 @@ class EmailType extends AbstractType
             );
         }
 
-        $this->addPublishDateFields($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);

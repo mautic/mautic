@@ -6,7 +6,8 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\EventListener\FormExitSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\PublishDateTrait;
+use Mautic\CoreBundle\Form\Type\PublishDownDateType;
+use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Form\AbstractType;
@@ -19,8 +20,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignType extends AbstractType
 {
-    use PublishDateTrait;
-
     /**
      * @var CorePermissions
      */
@@ -99,7 +98,8 @@ class CampaignType extends AbstractType
             'attr' => $attr,
         ]);
 
-        $this->addPublishDateFields($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add('sessionId', HiddenType::class, [
             'mapped' => false,
