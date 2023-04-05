@@ -510,7 +510,7 @@ class EmailType extends AbstractType
             );
         }
 
-        $this->addDynamicContentField($builder);
+        $this->addPublishDateFields($builder);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
