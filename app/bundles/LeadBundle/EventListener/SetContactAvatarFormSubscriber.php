@@ -8,7 +8,7 @@ use Mautic\FormBundle\Form\Type\FormFieldFileType;
 use Mautic\FormBundle\FormEvents;
 use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\LeadBundle\Model\LeadModel;
-use Mautic\LeadBundle\Templating\Helper\AvatarHelper;
+use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SetContactAvatarFormSubscriber implements EventSubscriberInterface

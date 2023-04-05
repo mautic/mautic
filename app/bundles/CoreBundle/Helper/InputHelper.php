@@ -288,12 +288,12 @@ class InputHelper
     /**
      * Removes all characters except those allowed in URLs.
      *
-     * @param            $value
-     * @param bool|false $urldecode
-     * @param null       $allowedProtocols
-     * @param null       $defaultProtocol
-     * @param array      $removeQuery
-     * @param bool|false $ignoreFragment
+     * @param                    $value
+     * @param bool|false         $urldecode
+     * @param array<string>|null $allowedProtocols
+     * @param mixed              $defaultProtocol
+     * @param array<string>      $removeQuery
+     * @param bool|false         $ignoreFragment
      *
      * @return mixed|string
      */

@@ -22,6 +22,7 @@ use Mautic\SmsBundle\Event\SmsSendEvent;
 use Mautic\SmsBundle\Form\Type\SmsType;
 use Mautic\SmsBundle\Sms\TransportChain;
 use Mautic\SmsBundle\SmsEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -131,7 +132,6 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param       $formFactory
      * @param null  $action
      * @param array $options
      *
@@ -140,7 +140,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Sms) {
             throw new MethodNotAllowedHttpException(['Sms']);
