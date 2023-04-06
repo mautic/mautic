@@ -15,7 +15,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function categoryListAction(Request $request)
+    public function categoryListAction(Request $request)
     {
         $bundle        = InputHelper::clean($request->query->get('bundle'));
         $filter        = InputHelper::clean($request->query->get('filter'));

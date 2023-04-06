@@ -1,6 +1,6 @@
 <?php
 
-namespace Mautic\CoreBundle\Test\Service;
+namespace Mautic\CoreBundle\Tests\Service;
 
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -63,16 +63,21 @@ class FlashBagTest extends TestCase
 
     public function testAddWithoutVars(): void
     {
-        $message         = 'message';
-        $messageVars     = [];
-        $level           = FlashBag::LEVEL_NOTICE;
-        $domain          = false;
-        $addNotification = false;
+        $message           = 'message';
+        $messageVars       = [];
+        $level             = FlashBag::LEVEL_NOTICE;
+        $domain            = '';
+        $addNotification   = false;
+        $translatedMessage = 'translated';
+
+        $this->translator->method('trans')
+            ->with($message, $messageVars, $domain)
+            ->willReturn($translatedMessage);
 
         $this->symfonyFlashBag
             ->expects($this->once())
             ->method('add')
-            ->with($level, $message);
+            ->with($level, $translatedMessage);
 
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
@@ -203,7 +208,7 @@ class FlashBagTest extends TestCase
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }
 
-    private function assertAddTypeCases($level, $expectedIcon): void
+    private function assertAddTypeCases(string $level, string $expectedIcon): void
     {
         $message              = 'message';
         $messageVars          = [];
