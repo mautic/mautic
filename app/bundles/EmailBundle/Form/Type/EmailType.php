@@ -227,8 +227,8 @@ class EmailType extends AbstractType
         );
 
         $builder->add('isPublished', YesNoButtonGroupType::class);
-
-        $this->addDynamicContentField($builder);
+        $builder->add('publishUp', PublishUpDateType::class);
+        $builder->add('publishDown', PublishDownDateType::class);
 
         $builder->add(
             'plainText',
@@ -510,8 +510,7 @@ class EmailType extends AbstractType
             );
         }
 
-        $builder->add('publishUp', PublishUpDateType::class);
-        $builder->add('publishDown', PublishDownDateType::class);
+        $this->addDynamicContentField($builder);
 
         if (!empty($options['action'])) {
             $builder->setAction($options['action']);
