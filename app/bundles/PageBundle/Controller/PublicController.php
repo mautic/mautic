@@ -19,6 +19,7 @@ use Mautic\PageBundle\Model\PageModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\Model\VideoModel;
 use Mautic\PageBundle\PageEvents;
+use Mautic\PageBundle\Token\Email\EmailStatToken;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,6 +28,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PublicController extends CommonFormController
 {
+    private EmailStatToken $emailStatToken;
+
+    public function __construct(EmailStatToken $emailStatToken)
+    {
+        $this->emailStatToken = $emailStatToken;
+    }
+
     /**
      * @param $slug
      *
@@ -495,8 +503,8 @@ class PublicController extends CommonFormController
                 /** @var PrimaryCompanyHelper $primaryCompanyHelper */
                 $primaryCompanyHelper = $this->get('mautic.lead.helper.primary_company');
                 $leadArray            = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
-
-                $url = TokenHelper::findLeadTokens($url, $leadArray, true);
+                $url                  = $this->emailStatToken->replace($ct, $url);
+                $url                  = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
             if (false !== strpos($url, $this->generateUrl('mautic_asset_download'))) {

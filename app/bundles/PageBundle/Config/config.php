@@ -90,6 +90,19 @@ return [
     ],
 
     'services' => [
+        'controllers' => [
+            'mautic.page.controller.page' => [
+                'class'     => \Mautic\PageBundle\Controller\PublicController::class,
+                'arguments' => [
+                    'mautic.page.stat.email.token',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+        ],
         'models' => [
             'mautic.page.model.page' => [
                 'class'     => \Mautic\PageBundle\Model\PageModel::class,
@@ -208,13 +221,14 @@ return [
             '301' => 'mautic.page.form.redirecttype.permanent',
             '302' => 'mautic.page.form.redirecttype.temporary',
         ],
-        'google_analytics_id'                   => null,
-        'google_analytics_trackingpage_enabled' => false,
-        'google_analytics_landingpage_enabled'  => false,
-        'google_analytics_anonymize_ip'         => false,
-        'facebook_pixel_id'                     => null,
-        'facebook_pixel_trackingpage_enabled'   => false,
-        'facebook_pixel_landingpage_enabled'    => false,
-        'do_not_track_404_anonymous'            => false,
+        'google_analytics_id'                                                             => null,
+        'google_analytics_trackingpage_enabled'                                           => false,
+        'google_analytics_landingpage_enabled'                                            => false,
+        'google_analytics_anonymize_ip'                                                   => false,
+        'facebook_pixel_id'                                                               => null,
+        'facebook_pixel_trackingpage_enabled'                                             => false,
+        'facebook_pixel_landingpage_enabled'                                              => false,
+        'do_not_track_404_anonymous'                                                      => false,
+        \Mautic\PageBundle\Token\Email\EmailStatToken::FROM_EMAIL_ID_START_REPLACE_TOKENS => null,
     ],
 ];
