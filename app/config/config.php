@@ -262,6 +262,11 @@ $container->loadFromExtension('framework', [
     ],
 ]);
 
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'exception_controller' => null,
+]);
+
 $rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
 $container->loadFromExtension('noxlogic_rate_limit', [
   'enabled'        => 0 === $rateLimit ? false : true,
