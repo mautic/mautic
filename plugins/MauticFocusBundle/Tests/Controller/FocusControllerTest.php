@@ -8,7 +8,7 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final class PopupControllerTest extends MauticMysqlTestCase
+final class FocusControllerTest extends MauticMysqlTestCase
 {
     public function testIndexActionIsSuccessful(): void
     {

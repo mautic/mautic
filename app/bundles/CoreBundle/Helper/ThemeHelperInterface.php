@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
 
 interface ThemeHelperInterface
 {
@@ -26,7 +26,7 @@ interface ThemeHelperInterface
     /**
      * @param string $themeName
      *
-     * @return TemplatingThemeHelper
+     * @return twigThemeHelper
      *
      * @throws BadConfigurationException
      * @throws FileNotFoundException
@@ -100,7 +100,7 @@ interface ThemeHelperInterface
      * @param string $theme
      * @param bool   $throwException
      *
-     * @return TemplatingThemeHelper
+     * @return twigThemeHelper
      *
      * @throws FileNotFoundException
      * @throws BadConfigurationException
