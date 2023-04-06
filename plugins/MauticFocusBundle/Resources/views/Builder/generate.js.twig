@@ -23,7 +23,7 @@
     {%- set timeout = useTimeout * 1000 -%}
 {%- endif -%}
 
-{%- set cssContent = include('MauticFocusBundle:Builder:style.less.twig', {
+{%- set cssContent = include('@MauticFocus/Builder/style.less.twig', {
         'preview': preview,
         'focus': focus,
 }, with_context=false) -%}

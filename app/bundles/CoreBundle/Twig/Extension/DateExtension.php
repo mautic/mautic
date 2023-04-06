@@ -97,7 +97,7 @@ class DateExtension extends AbstractExtension
      */
     public function toShort($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
     {
-        return $this->dateHelper->toTime($datetime, $timezone, $fromFormat);
+        return $this->dateHelper->toShort($datetime, $timezone, $fromFormat);
     }
 
     /**
