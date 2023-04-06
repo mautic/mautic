@@ -371,4 +371,15 @@ class EmailSendEvent extends CommonEvent
     {
         return $this->isDynamicContentParsing;
     }
+
+    public function getCombinedContent(): string
+    {
+        $content = $this->getSubject();
+        $content .= $this->getContent();
+        $content .= $this->getPlainText();
+        $content .= $this->getEmail() ? $this->getEmail()->getCustomHtml() : '';
+        $content .= implode(' ', $this->getTextHeaders());
+
+        return $content;
+    }
 }

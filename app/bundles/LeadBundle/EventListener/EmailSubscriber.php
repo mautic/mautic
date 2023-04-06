@@ -58,15 +58,9 @@ class EmailSubscriber implements EventSubscriberInterface
 
     public function onEmailGenerate(EmailSendEvent $event)
     {
-        // Combine all possible content to find tokens across them
-        $content = $event->getSubject();
-        $content .= $event->getContent();
-        $content .= $event->getPlainText();
-        $content .= implode(' ', $event->getTextHeaders());
-
         $lead = $event->getLead();
 
-        $tokenList = TokenHelper::findLeadTokens($content, $lead);
+        $tokenList = TokenHelper::findLeadTokens($event->getCombinedContent(), $lead);
         if (count($tokenList)) {
             $event->addTokens($tokenList);
             unset($tokenList);
