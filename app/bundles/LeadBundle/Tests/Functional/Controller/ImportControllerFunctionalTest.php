@@ -64,7 +64,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $html = $this->client->submit($form);
         Assert::assertStringContainsString(
             'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
+            $html->text(null, false)
         );
 
         $importButton = $html->selectButton('Import');
@@ -105,7 +105,7 @@ class ImportControllerFunctionalTest extends MauticMysqlTestCase
         $html = $this->client->submit($form);
         Assert::assertStringContainsString(
             'Match the columns from the imported file to Mautic\'s contact fields.',
-            $html->text()
+            $html->text(null, false)
         );
 
         // Run command to import CSV.
