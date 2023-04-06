@@ -16,6 +16,6 @@ class PublishUpDateType extends AbstractType
 
     public function getParent(): string
     {
-        return PublishDateType::class;
+        return DatePickerType::class;
     }
 }
