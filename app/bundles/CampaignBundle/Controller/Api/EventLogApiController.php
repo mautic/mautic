@@ -12,6 +12,7 @@ use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -63,13 +64,13 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * @return Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction(Request $request)
     {
         $this->serializerGroups[self::LOG_SERIALIZATION] = 'campaignEventStandaloneLogDetails';
         $this->serializerGroups[]                        = 'campaignEventStandaloneList';
         $this->serializerGroups[]                        = 'leadBasicList';
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request);
     }
 
     /**
@@ -80,7 +81,7 @@ class EventLogApiController extends FetchCommonApiController
      *
      * @return Response
      */
-    public function getContactEventsAction($contactId, $campaignId = null)
+    public function getContactEventsAction(Request $request, $contactId, $campaignId = null)
     {
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'view');
@@ -124,7 +125,7 @@ class EventLogApiController extends FetchCommonApiController
             'campaign_id' => $campaignId,
         ];
 
-        return $this->getEntitiesAction();
+        return $this->getEntitiesAction($request);
     }
 
     /**
@@ -133,9 +134,9 @@ class EventLogApiController extends FetchCommonApiController
      *
      * @return Response
      */
-    public function editContactEventAction($eventId, $contactId)
+    public function editContactEventAction(Request $request, $eventId, $contactId)
     {
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         // Ensure contact exists and user has access
         $contact = $this->checkLeadAccess($contactId, 'edit');
@@ -182,9 +183,9 @@ class EventLogApiController extends FetchCommonApiController
     /**
      * @return array|Response
      */
-    public function editEventsAction()
+    public function editEventsAction(Request $request)
     {
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         $valid = $this->validateBatchPayload($parameters);
         if ($valid instanceof Response) {

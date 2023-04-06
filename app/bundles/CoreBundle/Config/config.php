@@ -468,10 +468,6 @@ return [
                 'class'     => \Mautic\CoreBundle\Security\Cryptography\Cipher\Symmetric\OpenSSLCipher::class,
                 'arguments' => ['%kernel.environment%'],
             ],
-            'mautic.factory' => [
-                'class'     => 'Mautic\CoreBundle\Factory\MauticFactory',
-                'arguments' => 'service_container',
-            ],
             'mautic.route_loader' => [
                 'class'     => 'Mautic\CoreBundle\Loader\RouteLoader',
                 'arguments' => [
