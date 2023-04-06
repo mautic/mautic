@@ -20,5 +20,4 @@ return function (ContainerConfigurator $configurator) {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('Mautic\\PageBundle\\Entity\\', '../Entity/*Repository.php');
-    $services->alias('mautic.page.stat.email.token', \Mautic\PageBundle\Token\Email\EmailStatToken::class);
 };

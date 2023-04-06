@@ -90,19 +90,6 @@ return [
     ],
 
     'services' => [
-        'controllers' => [
-            'mautic.page.controller.page' => [
-                'class'     => \Mautic\PageBundle\Controller\PublicController::class,
-                'arguments' => [
-                    'mautic.page.stat.email.token',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-        ],
         'models' => [
             'mautic.page.model.page' => [
                 'class'     => \Mautic\PageBundle\Model\PageModel::class,

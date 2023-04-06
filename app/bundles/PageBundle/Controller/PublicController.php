@@ -32,13 +32,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PublicController extends CommonFormController
 {
-    private EmailStatToken $emailStatToken;
-
-    public function __construct(EmailStatToken $emailStatToken)
-    {
-        $this->emailStatToken = $emailStatToken;
-    }
-
     /**
      * @param $slug
      *
@@ -445,6 +438,7 @@ class PublicController extends CommonFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $mauticLogger,
+        EmailStatToken $emailStatToken,
         $redirectId
     ) {
         $logger = $mauticLogger;
@@ -506,8 +500,7 @@ class PublicController extends CommonFormController
                 }
 
                 $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
-                $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
-                $url       = $this->emailStatToken->replace($ct, $url);
+                $url       = $emailStatToken->replace($ct, $url);
                 $url       = TokenHelper::findLeadTokens($url, $leadArray, true);
             }
 
