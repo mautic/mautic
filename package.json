@@ -3,14 +3,13 @@
   "version": "0.0.0",
   "description": "Mautic Open Source Distribution",
   "devDependencies": {
-    "grunt": "^1.5.3",
+    "grunt": "^1.6.1",
     "grunt-autoprefixer": "^3.0.4",
     "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-cssmin": "^4.0.0",
     "grunt-contrib-less": "^3.0.0",
     "grunt-contrib-watch": "^1.1.0",
-    "grunt-remove": "^0.1.0",
     "load-grunt-tasks": "^5.1.0",
-    "time-grunt": "^1.4.0"
+    "time-grunt": "^2.0.0"
   }
 }

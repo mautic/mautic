@@ -4,6 +4,9 @@ namespace Mautic\CoreBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -23,7 +26,7 @@ class FileApiController extends CommonApiController
     {
         $this->entityNameOne     = 'file';
         $this->entityNameMulti   = 'files';
-        $this->allowedExtensions = $this->get('mautic.helper.core_parameters')->get('allowed_extensions');
+        $this->allowedExtensions = $this->coreParametersHelper->get('allowed_extensions');
 
         parent::initialize($event);
     }
@@ -33,24 +36,24 @@ class FileApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function createAction($dir)
+    public function createAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
     {
         try {
-            $path = $this->getAbsolutePath($dir, true);
+            $path = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir, true);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
 
         $response = [$this->entityNameOne => []];
-        if ($this->request->files) {
-            foreach ($this->request->files as $file) {
+        if ($request->files) {
+            foreach ($request->files as $file) {
                 $extension = $file->guessExtension() ? $file->guessExtension() : $file->getClientOriginalExtension();
                 if (in_array($extension, $this->allowedExtensions)) {
                     $fileName = md5(uniqid()).'.'.$extension;
                     $moved    = $file->move($path, $fileName);
 
                     if ('images' === substr($dir, 0, 6)) {
-                        $response[$this->entityNameOne]['link'] = $this->getMediaUrl().'/'.$fileName;
+                        $response[$this->entityNameOne]['link'] = $this->getMediaUrl($request).'/'.$fileName;
                     }
 
                     $response[$this->entityNameOne]['name'] = $fileName;
@@ -72,10 +75,10 @@ class FileApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function listAction($dir)
+    public function listAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir)
     {
         try {
-            $filePath = $this->getAbsolutePath($dir);
+            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -103,12 +106,12 @@ class FileApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteAction($dir, $file)
+    public function deleteAction(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $file)
     {
         $response = ['success' => false];
 
         try {
-            $filePath = $this->getAbsolutePath($dir).'/'.basename($file);
+            $filePath = $this->getAbsolutePath($request, $pathsHelper, $mauticLogger, $dir).'/'.basename($file);
         } catch (\Exception $e) {
             return $this->returnError($e->getMessage(), Response::HTTP_NOT_ACCEPTABLE);
         }
@@ -135,12 +138,12 @@ class FileApiController extends CommonApiController
      *
      * @return string
      */
-    protected function getAbsolutePath($dir, $createDir = false)
+    protected function getAbsolutePath(Request $request, PathsHelper $pathsHelper, LoggerInterface $mauticLogger, $dir, $createDir = false)
     {
         try {
             $possibleDirs = ['assets', 'images'];
             $dir          = InputHelper::alphanum($dir, true, false, ['_', '.']);
-            $subdir       = trim(InputHelper::alphanum($this->request->get('subdir', ''), true, false, ['/']));
+            $subdir       = trim(InputHelper::alphanum($request->get('subdir', ''), true, false, ['/']));
 
             // Dots in the dir name are slashes
             if (false !== strpos($dir, '.') && !$subdir) {
@@ -155,9 +158,9 @@ class FileApiController extends CommonApiController
             }
 
             if ('images' === $dir) {
-                $absoluteDir = realpath($this->get('mautic.helper.paths')->getSystemPath($dir, true));
+                $absoluteDir = realpath($pathsHelper->getSystemPath($dir, true));
             } elseif ('assets' === $dir) {
-                $absoluteDir = realpath($this->get('mautic.helper.core_parameters')->get('upload_dir'));
+                $absoluteDir = realpath($this->coreParametersHelper->get('upload_dir'));
             }
 
             if (false === $absoluteDir) {
@@ -182,7 +185,7 @@ class FileApiController extends CommonApiController
 
             return $path;
         } catch (\Exception $e) {
-            $this->get('monolog.logger.mautic')->error($e->getMessage(), ['exception' => $e]);
+            $mauticLogger->error($e->getMessage(), ['exception' => $e]);
 
             throw $e;
         }
@@ -193,12 +196,12 @@ class FileApiController extends CommonApiController
      *
      * @return string
      */
-    protected function getMediaUrl()
+    protected function getMediaUrl(Request $request)
     {
-        return $this->request->getScheme().'://'
-            .$this->request->getHttpHost()
-            .':'.$this->request->getPort()
-            .$this->request->getBasePath().'/'
-            .$this->get('mautic.helper.core_parameters')->get('image_path');
+        return $request->getScheme().'://'
+            .$request->getHttpHost()
+            .':'.$request->getPort()
+            .$request->getBasePath().'/'
+            .$this->coreParametersHelper->get('image_path');
     }
 }

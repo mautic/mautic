@@ -57,7 +57,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             'description'      => 'mautic.stage.campaign.event.change_descr',
             'batchEventName'   => StageEvents::ON_CAMPAIGN_BATCH_ACTION,
             'formType'         => StageActionChangeType::class,
-            'formTheme'        => 'MauticStageBundle:FormTheme:Action/_stageaction_properties_row.html.twig',
+            'formTheme'        => '@MauticStage/FormTheme/Action/_stageaction_properties_row.html.twig',
         ];
         $event->addAction('stage.change', $action);
     }

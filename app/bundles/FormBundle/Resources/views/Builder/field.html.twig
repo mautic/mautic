@@ -1,0 +1,279 @@
+{#
+  Variables
+    - field
+    - inForm (bool)
+    - id
+    - formId
+    - contactFields
+    - companyFields
+    - inBuilder (bool)
+#}
+{%- macro row_if_exists(form, field) %}
+  {% if form[field] is defined %}
+    <div class="col-md-6">
+      {{ form_row(form[field]) }}
+    </div>
+  {% endif %}
+{%- endmacro %}
+
+{% set template = '<div class="col-md-6">{content}</div>' %}
+{% set properties = form.properties|default([]) %}
+{% set validation = form.validation|default([]) %}
+
+{% set showAttributes = (form.labelAttributes is defined or form.inputAttributes is defined or form.containerAttributes is defined or properties.labelAttributes is defined or form.alias is defined) %}
+{% set showBehavior = (form.showWhenValueExists is defined or properties.showWhenValueExists is defined) %}
+{% set showConditions = form.parent is defined ? form.parent.vars.value : null %}
+
+{% set placeholder = '' %}
+{% if properties.placeholder is defined %}
+    {% set placeholder = _self.row_if_exists(properties, 'placeholder') %}
+    {% do properties.placeholder.setRendered() %}
+    {% do form.properties.placeholder.setRendered() %}
+{% endif %}
+
+{% set customAttributes = '' %}
+{% if properties.labelAttributes is defined %}
+    {% set customAttributes = _self.row_if_exists(properties, 'labelAttributes') %}
+    {% do properties.labelAttributes.setRendered() %}
+    {% do form.properties.labelAttributes.setRendered() %}
+{% endif %}
+
+{% set showProperties = false %}
+{% if form.properties is defined and form.properties|length > 0 %}
+    {# Only show if there is at least one non-hidden field #}
+    {% for property in form.properties %}
+        {% if 'hidden' != property.vars.block_prefixes[1] and false is same as property.isRendered %}
+            {% set showProperties = true %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+
+{# Check for validation errors to show on tabs #}
+{% set generalTabError = (form.label is defined and formContainsErrors(form.label)) %}
+{% set propertiesTabError = (form.properties is defined and formContainsErrors(form.properties)) %}
+{% set conditionsTabError = (form.conditions is defined and formContainsErrors(form.conditions)) %}
+
+
+<div class="bundle-form">
+    <div class="bundle-form-header">
+        <h3 class="mb-lg">{{ fieldHeader }}</h3>
+    </div>
+
+    {{ form_start(form) }}
+
+    <div role="tabpanel">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a class="{% if generalTabError %}text-danger{% endif %}" href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                    {{ 'mautic.form.field.section.general'|trans }}
+                    {% if generalTabError %}
+                        <i class="fa fa-warning"></i>
+                    {% endif %}
+                </a>
+            </li>
+
+            {% if showConditions %}
+                <li role="presentation">
+                    <a class="{% if conditionsTabError %}text-danger{% endif %}" href="#conditions" aria-controls="conditions" role="tab" data-toggle="tab">
+                        {{ 'mautic.form.field.form.condition'|trans }}
+                        {% if conditionsTabError %}
+                            <i class="fa fa-warning"></i>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endif %}
+
+            {% if form.mappedField is defined %}
+              <li role="presentation">
+                  <a href="#mappedfields" aria-controls="mappedfields" role="tab" data-toggle="tab">
+                      {{ 'mautic.form.field.section.mappedfield'|trans }}
+                  </a>
+              </li>
+            {% endif %}
+
+            {% if form.isRequired is defined %}
+              <li role="presentation">
+                  <a href="#required" aria-controls="required" role="tab" data-toggle="tab">
+                      {{ 'mautic.form.field.section.validation'|trans }}
+                  </a>
+              </li>
+            {% endif %}
+
+            {% if showProperties %}
+              <li role="presentation">
+                  <a class="{% if propertiesTabError %}text-danger{% endif %}" href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                      {{ 'mautic.form.field.section.properties'|trans }}
+                      {% if propertiesTabError %}
+                          <i class="fa fa-warning"></i>
+                      {% endif %}
+                  </a>
+              </li>
+            {% endif %}
+
+            {% if showAttributes %}
+              <li role="presentation">
+                  <a href="#attributes" aria-controls="attributes" role="tab" data-toggle="tab">
+                      {{ 'mautic.form.field.section.attributes'|trans }}
+                  </a>
+              </li>
+            {% endif %}
+
+            {% if showBehavior %}
+              <li role="progressive-profiling">
+                  <a href="#progressive-profiling" aria-controls="progressive-profiling" role="tab" data-toggle="tab">
+                      {{ 'mautic.form.field.section.progressive.profiling'|trans }}
+                  </a>
+              </li>
+            {% endif %}
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content pa-lg">
+            <div role="tabpanel" class="tab-pane active" id="general">
+                <div class="row">
+                    {{ _self.row_if_exists(form, 'label') }}
+                    {{ _self.row_if_exists(form, 'showLabel') }}
+                    {{ _self.row_if_exists(form, 'saveResult') }}
+                    {{ _self.row_if_exists(form, 'defaultValue') }}
+                    {{ _self.row_if_exists(form, 'helpMessage') }}
+                    {{ placeholder|raw }}
+                </div>
+            </div>
+
+            {% if form.mappedField is defined %}
+              <div role="tabpanel" class="tab-pane" id="mappedfields">
+                  <div class="row">
+                      {{ _self.row_if_exists(form, 'mappedObject') }}
+                      {{ _self.row_if_exists(form, 'mappedField') }}
+                  </div>
+              </div>
+            {% endif %}
+
+            {% if form.isRequired is defined %}
+              <div role="tabpanel" class="tab-pane" id="required">
+                      <div class="row">
+                          {%- if form.isRequired is defined %}<div class="col-md-4">{{ form_row(form.isRequired) }}</div>{% endif %}
+                          {%- if form.validationMessage is defined %}<div class="col-md-8">{{ form_row(form.validationMessage) }}</div>{% endif %}
+                      </div>
+                  <div class="row">
+                      {% for name, property in validation %}
+                          {% if not form.validation[name].isRendered and 'labelAttributes' != name %}
+                            {% if 'hiddin' == form.validation[name].vars.block_prefixes[1] %}
+                                {{ form_row(form.validation[name]) }}
+                            {% else %}
+                                {% set col = 8 %}
+                                {% if 'chocie' == form.validation[name].vars.block_prefixes[1] %}
+                                    {% set col = 4 %}
+                                {% endif %}
+                                <div class="col-md-{{ col }}">
+                                    {{ form_row(form.validation[name]) }}
+                                </div>
+                            {% endif %}
+                          {% endif %}
+                      {% endfor %}
+                  </div>
+              </div>
+            {% endif %}
+
+            {% if showProperties %}
+              <div role="tabpanel" class="tab-pane" id="properties">
+                  {{ form_errors(form.properties) }}
+                  {% if form.properties.syncList is defined %}
+                      <div class="row">
+                          <div class="col-md-12">
+                              {{ form_row(form.properties.syncList) }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  {% if form.properties.list is defined %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            {{ form_row(form.properties.list) }}
+                        </div>
+                    </div>
+                  {% endif %}
+                  {% if form.properties.optionlist is defined %}
+                      <div class="row">
+                          <div class="col-md-12">
+                              {{ form_row(form.properties.optionlist)|raw }}
+                          </div>
+                      </div>
+                  {% endif %}
+                  <div class="row">
+                      {% set i = 0 %}
+                      {% for name, property in properties %}
+                        {% if not form.properties[name].isRendered and name not in ['labelAttributes', 'placeholder'] %}
+                          {% if 'hidden' == form.properties[name].vars.block_prefixes[1] %}
+                              {{ form_row(form.properties[name]) }}
+                          {% else %}
+                              {% set col = 'text' == name ? 12 : 6 %}
+                              <div class="col-md-{{ col }}">
+                                  {{ form_row(form.properties[name]) }}
+                              </div>
+                              {% if 6 == col %}
+                                  {% set i = i + 1 %}
+                                  {% if i is divisible by(2) %}
+                                    <div class="clearfix"></div>
+                                  {% endif %}
+                              {% endif %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                  </div>
+              </div>
+            {% endif %}
+
+            {% if showAttributes %}
+              <div role="tabpanel" class="tab-pane" id="attributes">
+                  <div class="row">
+                      {{ _self.row_if_exists(form, 'alias') }}
+                      {{ _self.row_if_exists(form, 'labelAttributes') }}
+                      {{ _self.row_if_exists(form, 'inputAttributes') }}
+                      {{ _self.row_if_exists(form, 'containerAttributes') }}
+                      {{ customAttributes|raw }}
+                  </div>
+              </div>
+            {% endif %}
+
+            {{ form_row(form.parent) }}
+
+            {% if showConditions %}
+                <div role="tabpanel" class="tab-pane" id="conditions">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label data-toggle="tooltip" data-container="body" data-placement="top" data-original-title="{{ 'mautic.form.field.form.condition.show.only.tooltip'|trans }}">
+                                {{ 'mautic.form.field.form.condition.show.only'|trans }}
+                                <i class="fa fa-question-circle"></i>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>&nbsp;</label>
+                            {{ form_row(form.conditions.expr) }}
+                        </div>
+                        <div class="col-md-5">
+                            <label>&nbsp;</label>
+                            {{ form_row(form.conditions.values) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form_row(form.conditions.any) }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if showBehavior %}
+              <div role="tabpanel" class="tab-pane" id="progressive-profiling">
+                  <div class="row">
+                      {{ _self.row_if_exists(form, 'alwaysDisplay') }}
+                      {{ _self.row_if_exists(form, 'isAutoFill') }}
+                      {{ _self.row_if_exists(form, 'showWhenValueExists') }}
+                      {{ _self.row_if_exists(form, 'showAfterXSubmissions') }}
+                  </div>
+              </div>
+            {% endif %}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>

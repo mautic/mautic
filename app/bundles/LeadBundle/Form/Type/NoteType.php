@@ -73,6 +73,7 @@ class NoteType extends AbstractType
                     'preaddon'    => 'fa fa-calendar',
                 ],
                 'format' => 'yyyy-MM-dd HH:mm',
+                'html5'  => false,
                 'data'   => $data,
             ]
         );

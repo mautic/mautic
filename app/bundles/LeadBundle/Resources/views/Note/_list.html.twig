@@ -1,0 +1,22 @@
+<ul class="notes" id="LeadNotes">
+    {% for note in notes %}
+        {# Use a separate layout for AJAX generated content #}
+        {{ include('@MauticLead/Note/note.html.twig', {
+            'note': note,
+            'lead': lead,
+            'permissions': permissions,
+        }) }}
+    {% endfor %}
+</ul>
+{% if notes|length > 0 %}
+  <div class="notes-pagination">
+      {{ include('@MauticCore/Helper/pagination.html.twig', {
+          'totalItems': notes|length,
+          'target': '#NoteList',
+          'page': page,
+          'limit': limit,
+          'sessionVar': 'lead.'~lead.id~'.note',
+          'baseUrl': path('mautic_contactnote_index', {'leadId': lead.id}),
+      }) }}
+  </div>
+{% endif %}
