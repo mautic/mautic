@@ -1,0 +1,9 @@
+{{ include('@MauticForm/Field/text.html.twig', {
+        'field': field,
+        'fields': fields|default([]),
+        'inForm': inForm|default(false),
+        'type': 'number',
+        'id': id,
+        'formId': formId|default(0),
+        'formName': formName|default(''),
+}) }}

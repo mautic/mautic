@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\MauticCrmBundle\Command;
 
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticCrmBundle\Api\PipedriveApi;
 use MauticPlugin\MauticCrmBundle\Integration\Pipedrive\Import\AbstractImport;
@@ -21,20 +21,20 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class FetchPipedriveDataCommand extends Command
 {
     private IntegrationHelper $integrationHelper;
-    private TranslatorHelper $translatorHelper;
+    private Translator $translator;
     private OwnerImport $ownerImport;
     private CompanyImport $companyImport;
     private LeadImport $leadImport;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        TranslatorHelper $translatorHelper,
+        Translator $translator,
         OwnerImport $ownerImport,
         CompanyImport $companyImport,
         LeadImport $leadImport
     ) {
         $this->integrationHelper = $integrationHelper;
-        $this->translatorHelper  = $translatorHelper;
+        $this->translator        = $translator;
         $this->ownerImport       = $ownerImport;
         $this->companyImport     = $companyImport;
         $this->leadImport        = $leadImport;
@@ -81,7 +81,7 @@ class FetchPipedriveDataCommand extends Command
 
         if ($input->getOption('restart')) {
             $io->note(
-                $this->translatorHelper->trans(
+                $this->translator->trans(
                     'mautic.plugin.config.integration.restarted',
                     ['%integration%' => $integrationObject->getName()]
                 )

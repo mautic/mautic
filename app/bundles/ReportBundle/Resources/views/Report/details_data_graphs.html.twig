@@ -1,0 +1,19 @@
+{% if graphOrder is not empty and graphs is not empty %}
+    <div class="mt-lg pa-md" style="clear: both">
+        <div class="row equal">
+            {%- set rowCount = 0 -%}
+            {% for key in graphOrder|filter(v => graphs[v].data is defined) %}
+                {% if rowCount >= 12 %}
+                    </div><div class="row equal">
+                    {%- set rowCount = 0 -%}
+                {% endif %}
+                {{ include('@MauticReport/Graph/' ~ graphs[key].type|capitalize ~ '.html.twig', {
+                      'graph': graphs[key].data,
+                      'options': graphs[key].options,
+                      'report': report
+                }) }}
+                {%- set rowCount = rowCount + ('line' == graphs[key].type ? 12 : 4) -%}
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

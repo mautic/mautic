@@ -2,7 +2,7 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;

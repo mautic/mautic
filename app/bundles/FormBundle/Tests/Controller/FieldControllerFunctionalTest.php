@@ -26,7 +26,7 @@ final class FieldControllerFunctionalTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $payload        = json_decode($clientResponse->getContent(), true);
         Assert::assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        Assert::assertStringContainsString('<option value="email"  selected="selected">', $payload['newContent']);
+        Assert::assertStringContainsString('<option value="email" selected="selected">', $payload['newContent']);
     }
 
     public function testNewCaptchaFieldFormCanBeSaved(): void

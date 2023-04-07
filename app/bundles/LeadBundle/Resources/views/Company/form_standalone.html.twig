@@ -1,0 +1,61 @@
+{#
+  Variables
+    - entity
+    - form
+    - groups
+    - fields
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}company{% endblock %}
+
+{% block headerTitle %}
+  {%- if entity.id -%}
+    {{- 'mautic.company.menu.edit'|trans({'%name%': entity.name|purify}) -}}
+  {%- else -%}
+    {{- 'mautic.company.menu.new'|trans -}}
+  {%- endif -%}
+{% endblock %}
+
+{% block actions %}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {'item': entity, 'routeBase': 'company', 'langVar': 'lead.company'}) }}
+{% endblock %}
+
+{% block content %}
+{{ form_start(form) }}
+    <div class="box-layout">
+        <div class="col-md-3 bg-white height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                <ul class="list-group list-group-tabs">
+                    {% for g in groups %}
+                        {% if fields[g] is not empty %}
+                            <li class="list-group-item {% if loop.first %}active{% endif %}">
+                                <a href="#company-{{ g }}" class="steps" data-toggle="tab">
+                                    {{ ('mautic.lead.field.group.'~g)|trans }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <hr/>
+                <div>
+                    {{ form_row(form.score) }}
+                </div>
+                <hr/>
+                <div>
+                    {{ form_row(form.owner) }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9 bg-auto height-auto bdr-l">
+            <div class="tab-content">
+                {{ include('@MauticLead/Company/form_fields.html.twig', {
+                    'form': form,
+                    'groups': groups,
+                    'fields': fields,
+                }) }}
+            </div>
+        </div>
+    </div>
+{{ form_end(form) }}
+{% endblock %}
