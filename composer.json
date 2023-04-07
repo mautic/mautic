@@ -34,13 +34,13 @@
     "phpstan/phpstan": "^1.8.2",
     "phpunit/phpunit": "^9.5",
     "rector/rector": "^0.14",
-    "symfony/browser-kit": "~4.4.0",
-    "symfony/dom-crawler": "~4.4.0",
+    "symfony/browser-kit": "~5.4.0",
+    "symfony/dom-crawler": "~5.4.0",
     "symfony/maker-bundle": "^1.38",
-    "symfony/phpunit-bridge": "~5.1.0",
-    "symfony/var-dumper": "~4.4.0",
-    "symfony/web-profiler-bundle": "~4.4.0",
-    "webfactory/exceptions-bundle": "~4.3"
+    "symfony/phpunit-bridge": "~5.4.0",
+    "symfony/var-dumper": "~5.4.0",
+    "symfony/web-profiler-bundle": "~5.4.0",
+    "webfactory/exceptions-bundle": "~5.1"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
@@ -144,7 +144,8 @@
     "allow-plugins": {
       "composer/installers": true,
       "composer/package-versions-deprecated": true,
-      "symfony/flex": true
+      "symfony/flex": true,
+      "php-http/discovery": true
     }
   },
   "extra": {
