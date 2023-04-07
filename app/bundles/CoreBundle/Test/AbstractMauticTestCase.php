@@ -53,6 +53,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     protected function setUpSymfony(array $defaultConfigOptions = []): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
+        EnvLoader::load();
 
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
