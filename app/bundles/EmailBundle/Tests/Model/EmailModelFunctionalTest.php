@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 
 class EmailModelFunctionalTest extends MauticMysqlTestCase
 {
-    public function testSendEmailToLists()
+    public function testSendEmailToLists(): void
     {
         $contacts = $this->generateContacts(10);
         $segment  = $this->createSegment();
