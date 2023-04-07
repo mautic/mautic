@@ -13,11 +13,12 @@ use Mautic\LeadBundle\EventListener\WebhookSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\WebhookBundle\Model\WebhookModel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class WebhookSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var EventDispatcher|MockObject
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
