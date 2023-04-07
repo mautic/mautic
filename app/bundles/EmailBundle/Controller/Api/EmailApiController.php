@@ -11,6 +11,7 @@ use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\MonitoredEmail\Processor\Reply;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -59,7 +60,7 @@ class EmailApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction(Request $request)
     {
         //get parent level only
         $this->listFilters[] = [
@@ -67,7 +68,7 @@ class EmailApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request);
     }
 
     /**
@@ -79,7 +80,7 @@ class EmailApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendAction($id)
+    public function sendAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -91,9 +92,9 @@ class EmailApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $lists = $this->request->request->get('lists', null);
-        $limit = $this->request->request->get('limit', null);
-        $batch = $this->request->request->get('batch', null);
+        $lists = $request->request->get('lists', null);
+        $limit = $request->request->get('limit', null);
+        $batch = $request->request->get('batch', null);
 
         list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit, $batch);
 
@@ -119,7 +120,7 @@ class EmailApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function sendLeadAction($id, $leadId)
+    public function sendLeadAction(Request $request, $id, $leadId)
     {
         $entity = $this->model->getEntity($id);
         if (null !== $entity) {
@@ -133,7 +134,7 @@ class EmailApiController extends CommonApiController
                 return $lead;
             }
 
-            $post       = $this->request->request->all();
+            $post       = $request->request->all();
             $tokens     = (!empty($post['tokens'])) ? $post['tokens'] : [];
             $assetsIds  = (!empty($post['assetAttachments'])) ? $post['assetAttachments'] : [];
             $response   = ['success' => false];
@@ -187,14 +188,8 @@ class EmailApiController extends CommonApiController
      *
      * @return Response
      */
-    public function replyAction($trackingHash)
+    public function replyAction(Reply $replyService, RandomHelperInterface $randomHelper, $trackingHash)
     {
-        /** @var Reply $replyService */
-        $replyService = $this->get('mautic.message.processor.replier');
-
-        /** @var RandomHelperInterface $randomHelper */
-        $randomHelper = $this->get('mautic.helper.random');
-
         try {
             $replyService->createReplyByHash($trackingHash, "api-{$randomHelper->generate()}");
         } catch (EntityNotFoundException $e) {

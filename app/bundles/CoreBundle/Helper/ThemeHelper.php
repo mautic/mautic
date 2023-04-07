@@ -5,7 +5,7 @@ namespace Mautic\CoreBundle\Helper;
 use Mautic\CoreBundle\Exception\BadConfigurationException;
 use Mautic\CoreBundle\Exception\FileExistsException;
 use Mautic\CoreBundle\Exception\FileNotFoundException;
-use Mautic\CoreBundle\Templating\Helper\ThemeHelper as TemplatingThemeHelper;
+use Mautic\CoreBundle\Twig\Helper\ThemeHelper as twigThemeHelper;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Symfony\Component\Finder\Finder;
@@ -50,7 +50,7 @@ class ThemeHelper implements ThemeHelperInterface
     private $defaultTheme;
 
     /**
-     * @var TemplatingThemeHelper[]
+     * @var twigThemeHelper[]
      */
     private $themeHelpers = [];
 
@@ -143,7 +143,7 @@ class ThemeHelper implements ThemeHelperInterface
             $themeName = $this->defaultTheme;
         }
 
-        return new TemplatingThemeHelper($this->pathsHelper, $themeName);
+        return new twigThemeHelper($this->pathsHelper, $themeName);
     }
 
     /**
