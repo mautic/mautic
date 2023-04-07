@@ -1134,18 +1134,13 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 if (null != $limit) {
                     // Only retrieve the difference between what has already been sent and the limit
                     $limit -= $leadCount;
-                }
 
-                if (null !== $limit && $limit <= 0 && null !== $batch) {
-                    if (0 === $limit) {
-                        break;
+                    // recalculate
+                    if ($limit < 0) {
+                        $leads     = array_slice($leads, 0, $limit);
+                        $leadCount = count($leads);
+                        $limit     = 0;
                     }
-                    //recalculate because we should stop If limit is hit, but need process diff
-                    $leadCountOld = $leadCount;
-                    $leadCount    = $leadCountOld + $limit;
-                    $limit += $leadCountOld;
-                    $leads        = array_slice($leads, $leadCount);
-                    $limit -= $leadCount;
                 }
 
                 $sentCount += $leadCount;
@@ -1159,6 +1154,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     $failedCount += $listFailedCount;
 
                     $failedRecipientsByList[$options['listId']] = $listErrors;
+                }
+
+                if (null !== $limit && 0 == $limit) {
+                    break;
                 }
 
                 if ($batch) {
