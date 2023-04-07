@@ -3,22 +3,18 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\LeadBundle\Helper\CustomFieldValueHelper;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportNormalizeSubscriber implements EventSubscriberInterface
 {
-    private CompanyModel $companyModel;
+    private FieldModel $fieldModel;
 
-    private LeadModel $leadModel;
-
-    public function __construct(LeadModel $leadModel, CompanyModel $companyModel)
+    public function __construct(FieldModel $fieldModel)
     {
-        $this->leadModel    = $leadModel;
-        $this->companyModel = $companyModel;
+        $this->fieldModel = $fieldModel;
     }
 
     /**
@@ -37,7 +33,7 @@ class ReportNormalizeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $fields = array_merge($this->leadModel->getRepository()->getCustomFieldList('lead')[0], $this->companyModel->getRepository()->getCustomFieldList('company')[0]);
+        $fields = $this->fieldModel->getRepository()->getFields();
         $rows   = $event->getData();
         foreach ($rows as $key => $row) {
             foreach ($row as $key2 => $value) {
