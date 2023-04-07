@@ -76,6 +76,9 @@ class LeadFieldRepository extends CommonRepository
         return $queryBuilder->getQuery()->execute();
     }
 
+    /**
+     * @return array<int,string>
+     */
     public function getFields(): array
     {
         $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();

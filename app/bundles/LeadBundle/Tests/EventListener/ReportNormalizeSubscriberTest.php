@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use Mautic\LeadBundle\EventListener\ReportNormalizeSubscriber;
-use Mautic\LeadBundle\Model\CompanyModel;
-use Mautic\LeadBundle\Model\LeadModel;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use PHPUnit\Framework\TestCase;
@@ -22,8 +20,7 @@ class ReportNormalizeSubscriberTest extends TestCase
      */
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
-        $leadModel    = $this->createMock(LeadModel::class);
-        $companyModel = $this->createMock(CompanyModel::class);
+        $fieldModel    = $this->createMock(FieldModel::class);
 
         $fields = [
             'field1' => [
@@ -33,14 +30,9 @@ class ReportNormalizeSubscriberTest extends TestCase
             ],
         ];
 
-        $leadRepository = $this->createMock(LeadRepository::class);
-        $leadRepository->method('getCustomFieldList')->willReturn([$fields]);
-
-        $companyRepository = $this->createMock(CompanyRepository::class);
-        $companyRepository->method('getCustomFieldList')->willReturn([$fields]);
-
-        $leadModel->method('getRepository')->willReturn($leadRepository);
-        $companyModel->method('getRepository')->willReturn($companyRepository);
+        $leadRepository = $this->createMock(LeadFieldRepository::class);
+        $leadRepository->method('getFields')->willReturn($fields);
+        $fieldModel->method('getRepository')->willReturn($leadRepository);
 
         $rows = [
             [
@@ -51,7 +43,7 @@ class ReportNormalizeSubscriberTest extends TestCase
         $report = new Report();
         $report->setColumns(['l.firstname' => 'l.firstname']);
         $event      = new ReportDataEvent($report, $rows, [], []);
-        $subscriber = new ReportNormalizeSubscriber($leadModel, $companyModel);
+        $subscriber = new ReportNormalizeSubscriber($fieldModel);
         $subscriber->onReportDisplay($event);
 
         $this->assertEquals(
