@@ -53,14 +53,8 @@ class WebhookSubscriberFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertSame(1, $webhookQueueRepository->getQueueCountByWebhookId($webhook->getId()));
 
-        $payload = $this->em->getConnection()->createQueryBuilder()->select('payload')
-            ->from(MAUTIC_TABLE_PREFIX.'webhook_queue', 'wq')
-            ->where('wq'.'.webhook_id = :id')
-            ->setParameter('id', $webhook->getId())
-            ->execute()
-            ->fetchColumn();
-
-        $decodedPayload = json_decode($payload, true);
+        $queueWebhook   = $webhookQueueRepository->getEntity(1);
+        $decodedPayload = json_decode($queueWebhook->getPayload(), true);
         Assert::assertEquals('added', $decodedPayload['action']);
     }
 
