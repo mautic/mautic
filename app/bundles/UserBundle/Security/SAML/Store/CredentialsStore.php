@@ -76,8 +76,8 @@ class CredentialsStore implements CredentialStoreInterface
     {
         $reflection         = new \ReflectionClass(\Composer\Autoload\ClassLoader::class);
         $vendorPath         = dirname(dirname($reflection->getFileName()));
-        $certificateContent = file_get_contents($vendorPath.'/lightsaml/lightsaml/web/sp/saml.crt');
-        $privateKeyContent  = file_get_contents($vendorPath.'/lightsaml/lightsaml/web/sp/saml.key');
+        $certificateContent = file_get_contents($vendorPath.'/litesaml/lightsaml/web/sp/saml.crt');
+        $privateKeyContent  = file_get_contents($vendorPath.'/litesaml/lightsaml/web/sp/saml.key');
         $keyPassword        = '';
 
         return $this->createCredentials($certificateContent, $privateKeyContent, $keyPassword);
