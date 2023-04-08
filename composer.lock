@@ -5238,7 +5238,7 @@
                 "reference": "2d84638b98576b5147febb0def76fdca8edc6447"
             },
             "require": {
-                "litesaml/lightsaml": "~1.1",
+                "litesaml/lightsaml": "~1.1|~4.1",
                 "php": ">=5.5.1",
                 "symfony/dependency-injection": "~2.7|~3.0|~4.0|~5.0",
                 "symfony/framework-bundle": "~2.7|~3.0|~4.0|~5.0",
@@ -5681,7 +5681,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "e2f8841fa448434c93f6a49ba09289db42658fa9"
+                "reference": "07612d31073f6dab912f517571cc68131878f1d3"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5794,7 +5794,6 @@
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
-                        "[web-root]/offline.php": "assets/scaffold/files/offline.php",
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
                         "[web-root]/upgrade.php": "assets/scaffold/files/upgrade.php",
                         "[web-root]/translations/.htaccess": "assets/scaffold/files/translations.htaccess",
