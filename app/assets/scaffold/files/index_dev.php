@@ -17,7 +17,7 @@ if (extension_loaded('apcu') && in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1',
 
 ErrorHandler::register('dev');
 
-$kernel   = (new MiddlewareBuilder(new AppKernel('dev', false)))->resolve();
+$kernel   = (new MiddlewareBuilder(new AppKernel('dev', true)))->resolve();
 $request  = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();
