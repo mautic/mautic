@@ -16,15 +16,15 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
     public function testCleanupMaintenanceCommand(): void
     {
         $lead = new Lead();
-        $lead->setLastActive(new \DateTime('-100 years'));
+        $lead->setLastActive(new \DateTime('-1 year'));
         $this->em->persist($lead);
         $this->em->flush();
 
         $contactId = $lead->getId();
 
         // Delete unused IP address.
-        $this->runcommand('mautic:maintenance:cleanup', ['--days-old=180']);
+        $this->runcommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
-        self::assertFalse($this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId));
+        $this->assertNull($this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId));
     }
 }
