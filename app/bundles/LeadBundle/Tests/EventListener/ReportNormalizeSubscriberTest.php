@@ -20,19 +20,17 @@ class ReportNormalizeSubscriberTest extends TestCase
      */
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
-        $fieldModel    = $this->createMock(FieldModel::class);
+        $fieldModel = self::$container->get('mautic.lead.model.field');
+        \assert($fieldModel instanceof FieldModel::class);
+        
+        $field = new LeadField();
+        $field->setType($type);
+        $field->setObject('lead');
+        $field->setAlias('field1');
+        $field->setName($alias);
+        $field->setProperties($properties);
 
-        $fields = [
-            'field1' => [
-                'alias'      => 'field1',
-                'type'       => $type,
-                'properties' => $properties,
-            ],
-        ];
-
-        $leadRepository = $this->createMock(LeadFieldRepository::class);
-        $leadRepository->method('getFields')->willReturn($fields);
-        $fieldModel->method('getRepository')->willReturn($leadRepository);
+        $fieldModel->save($field);
 
         $rows = [
             [
