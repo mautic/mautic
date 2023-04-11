@@ -5681,7 +5681,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "07612d31073f6dab912f517571cc68131878f1d3"
+                "reference": "76c018568e0e318e58b60bdd3450c04a8316bc8e"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5732,7 +5732,6 @@
                 "simshaun/recurr": "^3.0",
                 "sparkpost/sparkpost": "^2.3",
                 "stack/builder": "^1.0",
-                "stack/run": "^1.0",
                 "symfony/asset": "~4.4.0",
                 "symfony/cache": "~4.4.0",
                 "symfony/config": "~4.4.0",
@@ -8608,59 +8607,6 @@
                 "source": "https://github.com/stackphp/builder/tree/v1.0.6"
             },
             "time": "2020-01-30T12:17:27+00:00"
-        },
-        {
-            "name": "stack/run",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/stackphp/run.git",
-                "reference": "ca5b0b958c024940c72eadead646e19ad1889d29"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/stackphp/run/zipball/ca5b0b958c024940c72eadead646e19ad1889d29",
-                "reference": "ca5b0b958c024940c72eadead646e19ad1889d29",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "symfony/http-foundation": "~2.7|~3.0|~4.0",
-                "symfony/http-kernel": "~2.7|~3.0|~4.0"
-            },
-            "require-dev": {
-                "stack/callable-http-kernel": "~1.0@dev"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/Stack/run.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Igor Wiedler",
-                    "email": "igor@wiedler.ch"
-                }
-            ],
-            "description": "Shortcut function for handling HttpKernel front-controller boilerplate.",
-            "keywords": [
-                "stack"
-            ],
-            "support": {
-                "issues": "https://github.com/stackphp/run/issues",
-                "source": "https://github.com/stackphp/run/tree/master"
-            },
-            "time": "2018-02-20T10:28:14+00:00"
         },
         {
             "name": "studio-42/elfinder",
