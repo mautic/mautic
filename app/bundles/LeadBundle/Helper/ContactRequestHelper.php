@@ -184,7 +184,7 @@ class ContactRequestHelper
         $this->eventDispatcher->dispatch($event, LeadEvents::ON_CLICKTHROUGH_IDENTIFICATION);
 
         if ($contact = $event->getIdentifiedContact()) {
-            $this->logger->addDebug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');
+            $this->logger->debug("LEAD: Contact ID# {$contact->getId()} tracked through clickthrough query by the ".$event->getIdentifier().' channel');
 
             // Merge tracked visitor into the clickthrough contact
             return $this->mergeWithTrackedContact($contact);
@@ -207,7 +207,7 @@ class ContactRequestHelper
         if ($email = $foundContact->getEmail()) {
             // Add email to query for checkForDuplicateContact to pick up and merge
             $this->queryFields['email'] = $email;
-            $this->logger->addDebug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
+            $this->logger->debug("LEAD: Contact ID# {$clickthrough['lead']} tracked through clickthrough query.");
 
             return;
         }
