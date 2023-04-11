@@ -86,6 +86,7 @@ class RequestSubscriber implements EventSubscriberInterface
     private function isCsrfTokenFromRequestHeaderValid(Request $request)
     {
         $csrfRequestToken = $request->headers->get('X-CSRF-Token');
+
         return $this->tokenManager->isTokenValid(new CsrfToken('mautic_ajax_post', $csrfRequestToken));
     }
 }
