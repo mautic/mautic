@@ -320,7 +320,7 @@ class CommonController extends AbstractController implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $flash['msg'],
                     !empty($flash['msgVars']) ? $flash['msgVars'] : [],
                     !empty($flash['type']) ? $flash['type'] : 'notice',
@@ -717,7 +717,7 @@ class CommonController extends AbstractController implements MauticController
      * @param string|null $domain
      * @param bool|null   $addNotification
      */
-    public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
+    public function addFlashMessage($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }

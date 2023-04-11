@@ -180,7 +180,7 @@ class ProfileController extends FormController
                                 $messageVars = $fetchLanguage['vars'];
                             }
 
-                            $this->addFlash($message, $messageVars);
+                            $this->addFlashMessage($message, $messageVars);
                         }
                     }
 

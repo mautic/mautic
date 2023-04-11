@@ -59,11 +59,11 @@ class BatchContactController extends AbstractFormController
             $this->channelActionModel->update($ids, $subscribedChannels);
             $this->frequencyActionModel->update($ids, $params, $preferredChannel);
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%'     => count($ids),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([

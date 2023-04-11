@@ -161,11 +161,11 @@ class UserController extends FormController
                                 $messageVars = $fetchLanguage['vars'];
                             }
 
-                            $this->addFlash($message, $messageVars);
+                            $this->addFlashMessage($message, $messageVars);
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
@@ -291,11 +291,11 @@ class UserController extends FormController
                                 $messageVars = $fetchLanguage['vars'];
                             }
 
-                            $this->addFlash($message, $messageVars);
+                            $this->addFlashMessage($message, $messageVars);
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
@@ -479,7 +479,7 @@ class UserController extends FormController
                     \assert($auditLogModel instanceof AuditLogModel);
                     $auditLogModel->writeToLog($log);
 
-                    $this->addFlash('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
+                    $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }
             }
             if ($cancelled || $valid) {

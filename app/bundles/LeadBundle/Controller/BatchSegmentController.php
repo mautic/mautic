@@ -47,11 +47,11 @@ class BatchSegmentController extends AbstractFormController
                 $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%' => count($contactIds),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([
