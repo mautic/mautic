@@ -82,7 +82,7 @@ class SecurityController extends CommonController implements EventSubscriberInte
                 $msg = $error->getMessage();
             }
 
-            $this->addFlash($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], 'error', null, false);
         }
         $request->query->set('tmpl', 'login');
 

@@ -213,7 +213,7 @@ class TriggerController extends FormController
 
                         $model->saveEntity($entity);
 
-                        $this->addFlash('mautic.core.notice.created', [
+                        $this->addFlashMessage('mautic.core.notice.created', [
                             '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_pointtrigger_index',
                             '%url%'       => $this->generateUrl('mautic_pointtrigger_action', [
@@ -362,7 +362,7 @@ class TriggerController extends FormController
                             $triggerEventModel->deleteEntities($deletedEvents);
                         }
 
-                        $this->addFlash('mautic.core.notice.updated', [
+                        $this->addFlashMessage('mautic.core.notice.updated', [
                             '%name%'      => $entity->getName(),
                             '%menu_link%' => 'mautic_pointtrigger_index',
                             '%url%'       => $this->generateUrl('mautic_pointtrigger_action', [
