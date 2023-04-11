@@ -105,7 +105,7 @@ class AppKernel extends Kernel
         return parent::handle($request, $type, $catch);
     }
 
-    public function registerBundles(): array
+    public function registerBundles(): iterable
     {
         $bundles = [
             // Symfony/Core Bundles
@@ -203,7 +203,6 @@ class AppKernel extends Kernel
 
         if (in_array($this->getEnvironment(), ['dev', 'test'])) {
             $bundles[] = new Symfony\Bundle\WebProfilerBundle\WebProfilerBundle();
-            $bundles[] = new Webfactory\Bundle\ExceptionsBundle\WebfactoryExceptionsBundle();
             $bundles[] = new Fidry\PsyshBundle\PsyshBundle();
             $bundles[] = new Symfony\Bundle\MakerBundle\MakerBundle();
         }
