@@ -1,4 +1,4 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent 'emailSend' %}
 
@@ -15,7 +15,7 @@
                             <div class="well mt-lg">
                                 <div class="input-group">
                                 <span class="input-group-btn text-center">
-                                    {{- include('MauticCoreBundle:Helper:confirm.html.twig', {
+                                    {{- include('@MauticCore/Helper/confirm.html.twig', {
                                         'message'         : 'mautic.email.form.confirmsend'|trans({'%name%' : email.getName()}),
                                         'confirmText'     : 'mautic.email.send'|trans,
                                         'confirmCallback' : 'submitSendForm',

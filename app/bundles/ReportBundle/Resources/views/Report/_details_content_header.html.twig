@@ -15,7 +15,7 @@
             <div class="panel shd-none mb-0">
                 <table class="table table-bordered table-striped mb-0">
                     <tbody>
-                      {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': report}) }}
+                      {{ include('@MauticCore/Helper/details.html.twig', {'entity': report}) }}
                     </tbody>
                 </table>
             </div>
@@ -26,7 +26,7 @@
             <div class="panel shd-none mb-0 pa-lg">
                 <div class="row">
                     <div class="col-sm-12 mb-10 {% if hideDateRangeFilter %}hide{% endif %}">
-                        {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
+                        {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm}) }}
                     </div>
                     {{ form_start(dynamicFilterForm) }}
                     {% for child in dynamicFilterForm.children|filter(v => 'hidden' != v.vars.block_prefixes[1]) %}

@@ -93,7 +93,7 @@ class UpdateHelper
 
             $data = $response->getBody()->getContents();
         } catch (\Exception $exception) {
-            $this->logger->addError('An error occurred while attempting to fetch the package: '.$exception->getMessage());
+            $this->logger->error('An error occurred while attempting to fetch the package: '.$exception->getMessage());
 
             return [
                 'error'   => true,

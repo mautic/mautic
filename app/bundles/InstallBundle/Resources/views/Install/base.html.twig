@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
     {% do addAssetScript('app/bundles/InstallBundle/Assets/install/install.js') %}
-    {{- include('MauticCoreBundle:Default:head.html.twig') -}}
+    {{- include('@MauticCore/Default/head.html.twig') -}}
     <body>
         <!-- start: app-wrapper -->
         <section id="app-wrapper">
@@ -16,7 +16,7 @@
 
                     <div class="mt-20 col-lg-6 col-lg-offset-3">
                         <div id="app-content" class="panel panel-default">
-                            {{- include('MauticCoreBundle:Notification:flashes.html.twig') -}}
+                            {{- include('@MauticCore/Notification/flashes.html.twig') -}}
                             {{ block('content') }}
                         </div>
                     </div>

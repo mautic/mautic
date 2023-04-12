@@ -1,7 +1,7 @@
 <ul class="notes" id="LeadNotes">
     {% for note in notes %}
         {# Use a separate layout for AJAX generated content #}
-        {{ include('MauticLeadBundle:Note:note.html.twig', {
+        {{ include('@MauticLead/Note/note.html.twig', {
             'note': note,
             'lead': lead,
             'permissions': permissions,
@@ -10,7 +10,7 @@
 </ul>
 {% if notes|length > 0 %}
   <div class="notes-pagination">
-      {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+      {{ include('@MauticCore/Helper/pagination.html.twig', {
           'totalItems': notes|length,
           'target': '#NoteList',
           'page': page,

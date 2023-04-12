@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Event as Events;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\ChannelTimelineInterface;
-use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -411,7 +411,7 @@ class LeadSubscriber implements EventSubscriberInterface
                         'extra'         => [
                             'ipDetails' => $ipAddresses[$row['ip_address']],
                         ],
-                        'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:ipadded.html.twig',
+                        'contentTemplate' => '@MauticLead/SubscribedEvents\Timeline/ipadded.html.twig',
                         'contactId'       => $row['lead_id'],
                     ]
                 );
@@ -540,7 +540,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'extra'      => [
                                 'utmtags' => $utmTag,
                             ],
-                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:utmadded.html.twig',
+                            'contentTemplate' => '@MauticLead/SubscribedEvents\Timeline/utmadded.html.twig',
                             'contactId'       => $utmTag['lead_id'],
                         ]
                     );
@@ -569,7 +569,7 @@ class LeadSubscriber implements EventSubscriberInterface
             foreach ($rows['results'] as $row) {
                 $row['reason'] = $this->dncReasonHelper->toText($row['reason']);
 
-                $template = 'MauticLeadBundle:SubscribedEvents\Timeline:donotcontact.html.twig';
+                $template = '@MauticLead/SubscribedEvents\Timeline/donotcontact.html.twig';
                 $icon     = 'fa-ban';
 
                 if (!empty($row['channel'])) {
@@ -672,7 +672,7 @@ class LeadSubscriber implements EventSubscriberInterface
                             'timestamp'       => $import['date_added'],
                             'icon'            => 'fa-download',
                             'extra'           => $import,
-                            'contentTemplate' => 'MauticLeadBundle:SubscribedEvents\Timeline:import.html.twig',
+                            'contentTemplate' => '@MauticLead/SubscribedEvents\Timeline/import.html.twig',
                             'contactId'       => $import['lead_id'],
                         ]
                     );

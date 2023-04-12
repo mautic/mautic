@@ -6,7 +6,7 @@
 #}
 
 {% if 'index' == tmpl %}
-    {% extends 'MauticInstallBundle:Install:content.html.twig' %}
+    {% extends '@MauticInstall/Install/content.html.twig' %}
 {% endif %}
 
 {% block content %}
@@ -50,7 +50,7 @@
                     <strong>{{ 'mautic.install.finalizing'|trans }}</strong>
                 </div>
             </div>
-            {{- include('MauticInstallBundle:Install:navbar.html.twig', {'step' : index, 'count' : count, 'completedSteps' : completedSteps}) -}}
+            {{- include('@MauticInstall/Install/navbar.html.twig', {'step' : index, 'count' : count, 'completedSteps' : completedSteps}) -}}
         </div>
         <div class="col-sm-3">
             {{ form_row(form.buttons) }}

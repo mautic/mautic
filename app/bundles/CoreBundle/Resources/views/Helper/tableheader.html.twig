@@ -2,11 +2,11 @@
 
 {% if checkall is defined and checkall is not empty %}
     {{ buttonReset(
-    constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
-    constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::TYPE_DROPDOWN')
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_BULK_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_DROPDOWN')
     ) }}
 
-    {{- include('MauticCoreBundle:Helper:action_button_helper.html.twig') -}}
+    {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
     {# Workaround to get variables from action_button_helper here #}
     {{ restore('action_button_helper') }}
 

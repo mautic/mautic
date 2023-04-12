@@ -63,7 +63,7 @@
         <table class="table table-hover table-striped table-bordered" id="leadTable">
             <thead>
                 <tr>
-                    {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#leadTable',
                         'templateButtons': {
@@ -76,7 +76,7 @@
                     }) }}
 
                     {% for column, label in columns %}
-                        {{ include([('MauticLeadBundle:Lead:_list_header_'~column~'.html.twig'), 'MauticLeadBundle:Lead:_list_header_default.html.twig'], {
+                        {{ include([('MauticLeadBundle:Lead:_list_header_'~column~'.html.twig'), '@MauticLead/Lead/_list_header_default.html.twig'], {
                               'label': label,
                               'column': column,
                               'class': (column in columns|keys) ? 'hidden-xs' : '',
@@ -85,7 +85,7 @@
                 </tr>
             </thead>
             <tbody>
-                {{ include('MauticLeadBundle:Lead:_list_rows.html.twig', {
+                {{ include('@MauticLead/Lead/_list_rows.html.twig', {
                     'items': items,
                     'columns': columns,
                     'security': security,
@@ -97,7 +97,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
             'totalItems': totalItems,
             'page': page,
             'limit': limit,
@@ -108,5 +108,5 @@
         }) }}
     </div>
 {% else %}
-    {{ include('MauticCoreBundle:Helper:noresults.html.twig') }}
+    {{ include('@MauticCore/Helper/noresults.html.twig') }}
 {% endif %}

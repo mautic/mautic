@@ -27,7 +27,7 @@ return [
                     'mautic.form.model.submission',
                     'translator',
                     'doctrine.orm.entity_manager',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
@@ -38,7 +38,7 @@ return [
                 'arguments' => [
                     'mautic.citrix.model.citrix',
                     'translator',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
@@ -58,7 +58,6 @@ return [
             'mautic.citrix.fixture.load_citrix_data' => [
                 'class'     => MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM\LoadCitrixData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager'],
                 'optional'  => true,
             ],
         ],

@@ -29,7 +29,7 @@ class FieldHelperTest extends TestCase
     private $variableExpresserHelper;
 
     /**
-     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var ChannelListHelper
      */
     private $channelListHelper;
 

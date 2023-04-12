@@ -17,7 +17,7 @@
 {% set required = [] %}
 
 <!-- START FOCUS FORM -->
-{{ include('MauticFormBundle:Builder:_script.html.twig', {'form': form, 'formName': formName}, with_context=false) }}
+{{ include('@MauticForm/Builder/_script.html.twig', {'form': form, 'formName': formName}, with_context=false) }}
 <script>
     var MauticFocusHandler = function (messageType, message) {
         // Store the HTML
@@ -104,7 +104,7 @@
   <input type="hidden" name="mauticform[focusId]" id="mauticform{{ formName }}_focus_id" value="{{ focusId }}"/>
 {% endset %}
 
-{{ include('MauticFormBundle:Builder:form.html.twig', {
+{{ include('@MauticForm/Builder/form.html.twig', {
         'form': form,
         'formPages': pages,
         'lastFormPage': lastPage,

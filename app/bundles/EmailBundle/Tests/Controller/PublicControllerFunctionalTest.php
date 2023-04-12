@@ -44,7 +44,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
         $this->assertEquals(1, $crawler->filter('#success-message-text')->count());
         $expectedMessage = self::$container->get('translator')->trans('mautic.email.preferences_center_success_message.text');
-        $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text()));
+        $this->assertEquals($expectedMessage, trim($crawler->filter('#success-message-text')->text(null, false)));
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 

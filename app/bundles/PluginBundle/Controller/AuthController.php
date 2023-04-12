@@ -7,6 +7,7 @@ use Mautic\PluginBundle\Event\PluginIntegrationAuthRedirectEvent;
 use Mautic\PluginBundle\PluginEvents;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class AuthController.
@@ -18,10 +19,10 @@ class AuthController extends FormController
      *
      * @return JsonResponse
      */
-    public function authCallbackAction($integration)
+    public function authCallbackAction(Request $request, $integration)
     {
-        $isAjax  = $this->request->isXmlHttpRequest();
-        $session = $this->get('session');
+        $isAjax  = $request->isXmlHttpRequest();
+        $session = $request->getSession();
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
         $integrationHelper = $this->factory->getHelper('integration');
@@ -76,11 +77,11 @@ class AuthController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function authStatusAction($integration)
+    public function authStatusAction(Request $request, $integration)
     {
-        $postAuthTemplate = 'MauticPluginBundle:Auth:postauth.html.twig';
+        $postAuthTemplate = '@MauticPlugin/Auth/postauth.html.twig';
 
-        $session     = $this->get('session');
+        $session     = $request->getSession();
         $postMessage = $session->get('mautic.integration.postauth.message');
         $userData    = [];
 
