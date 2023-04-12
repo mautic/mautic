@@ -4,11 +4,11 @@ image:
 
 # ddev and composer are running as part of the prebuild
 # when starting a workspace all docker images are ready
+# Remove index_dev.php but work to ir open with dev environment
 tasks:
   - name: Startup 
   - command: |
       bash .ddev/gitpod-setup-ddev.sh
-    # Remove index_dev.php but work to ir open with dev environment
       gp ports await 8080 && gp preview $(gp url 8080)/index_dev.php 
 
 # VScode xdebug extension
