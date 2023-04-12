@@ -228,7 +228,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
             $this->completeRun();
 
-            return $statusCode;
+            return (int) $statusCode;
         }
 
         // All published campaigns
