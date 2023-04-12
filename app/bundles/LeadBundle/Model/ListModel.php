@@ -36,7 +36,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -1193,7 +1193,7 @@ class ListModel extends FormModel
             ]
         );
         $dependents = [];
-        $accessor   = new PropertyAccessor();
+        $accessor   = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
