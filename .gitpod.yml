@@ -7,7 +7,8 @@ image:
 tasks:
   - name: Startup 
   - command: |
-      bash .ddev/gitpod-setup-ddev.sh 
+      bash .ddev/gitpod-setup-ddev.sh
+    # Remove index_dev.php but work to ir open with dev environment
       gp ports await 8080 && gp preview $(gp url 8080)/index_dev.php 
 
 # VScode xdebug extension

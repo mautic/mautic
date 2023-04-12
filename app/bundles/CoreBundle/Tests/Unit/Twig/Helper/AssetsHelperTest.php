@@ -107,7 +107,7 @@ class AssetsHelperTest extends TestCase
              ->getMock();
 
         $pathsHelper->method('getSystemPath')
-            ->willReturn('http://some.mautic/index_dev.php/');
+            ->willReturn('http://some.mautic/');
 
         $assetHelper = new AssetsHelper($this->createPackagesMock());
         $assetHelper->setPathsHelper($pathsHelper);

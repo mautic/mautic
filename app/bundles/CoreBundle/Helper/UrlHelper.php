@@ -99,7 +99,6 @@ class UrlHelper
         $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
-        $base = str_replace('/index_dev.php', '', $base);
         $base = str_replace('/index.php', '', $base);
 
         /* return if already absolute URL */
