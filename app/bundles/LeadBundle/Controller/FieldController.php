@@ -168,7 +168,7 @@ class FieldController extends FormController
                                 );
                             $valid = false;
                         }
-                        $this->addFlash(
+                        $this->addFlashMessage(
                                 $flashMessage,
                                 [
                                     '%name%'      => $field->getLabel(),
@@ -294,7 +294,7 @@ class FieldController extends FormController
                         //form is valid so process the data
                         $model->saveEntity($field, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                        $this->addFlash('mautic.core.notice.updated', [
+                        $this->addFlashMessage('mautic.core.notice.updated', [
                             '%name%'      => $field->getLabel(),
                             '%menu_link%' => 'mautic_contactfield_index',
                             '%url%'       => $this->generateUrl('mautic_contactfield_action', [

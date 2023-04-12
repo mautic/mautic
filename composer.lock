@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c178be9653f5db5140afa49fb4d4a684",
+    "content-hash": "dd412cb18cf72b72868217ec2b7f6822",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5238,7 +5238,7 @@
                 "reference": "2d84638b98576b5147febb0def76fdca8edc6447"
             },
             "require": {
-                "litesaml/lightsaml": "~1.1",
+                "litesaml/lightsaml": "~1.1|~4.1",
                 "php": ">=5.5.1",
                 "symfony/dependency-injection": "~2.7|~3.0|~4.0|~5.0",
                 "symfony/framework-bundle": "~2.7|~3.0|~4.0|~5.0",
@@ -5681,7 +5681,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "e2f8841fa448434c93f6a49ba09289db42658fa9"
+                "reference": "76c018568e0e318e58b60bdd3450c04a8316bc8e"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5732,7 +5732,6 @@
                 "simshaun/recurr": "^3.0",
                 "sparkpost/sparkpost": "^2.3",
                 "stack/builder": "^1.0",
-                "stack/run": "^1.0",
                 "symfony/asset": "~4.4.0",
                 "symfony/cache": "~4.4.0",
                 "symfony/config": "~4.4.0",
@@ -5794,7 +5793,6 @@
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
                         "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
-                        "[web-root]/offline.php": "assets/scaffold/files/offline.php",
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
                         "[web-root]/upgrade.php": "assets/scaffold/files/upgrade.php",
                         "[web-root]/translations/.htaccess": "assets/scaffold/files/translations.htaccess",
@@ -8609,59 +8607,6 @@
                 "source": "https://github.com/stackphp/builder/tree/v1.0.6"
             },
             "time": "2020-01-30T12:17:27+00:00"
-        },
-        {
-            "name": "stack/run",
-            "version": "v1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/stackphp/run.git",
-                "reference": "ca5b0b958c024940c72eadead646e19ad1889d29"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/stackphp/run/zipball/ca5b0b958c024940c72eadead646e19ad1889d29",
-                "reference": "ca5b0b958c024940c72eadead646e19ad1889d29",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0",
-                "symfony/http-foundation": "~2.7|~3.0|~4.0",
-                "symfony/http-kernel": "~2.7|~3.0|~4.0"
-            },
-            "require-dev": {
-                "stack/callable-http-kernel": "~1.0@dev"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "src/Stack/run.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Igor Wiedler",
-                    "email": "igor@wiedler.ch"
-                }
-            ],
-            "description": "Shortcut function for handling HttpKernel front-controller boilerplate.",
-            "keywords": [
-                "stack"
-            ],
-            "support": {
-                "issues": "https://github.com/stackphp/run/issues",
-                "source": "https://github.com/stackphp/run/tree/master"
-            },
-            "time": "2018-02-20T10:28:14+00:00"
         },
         {
             "name": "studio-42/elfinder",
@@ -17489,53 +17434,6 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
-        },
-        {
-            "name": "webfactory/exceptions-bundle",
-            "version": "4.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webfactory/exceptions-bundle.git",
-                "reference": "2d9c86117b19e4b87de5f406d85162f1f54598c3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webfactory/exceptions-bundle/zipball/2d9c86117b19e4b87de5f406d85162f1f54598c3",
-                "reference": "2d9c86117b19e4b87de5f406d85162f1f54598c3",
-                "shasum": ""
-            },
-            "require": {
-                "symfony/twig-bundle": "^2.2||^3.0||^4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0",
-                "symfony/framework-bundle": "^2.2||^3.0||^4.0"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "Webfactory\\Bundle\\ExceptionsBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "webfactory GmbH",
-                    "email": "info@webfactory.de",
-                    "homepage": "http://www.webfactory.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Building blocks for more user-friendly error pages, plus a simple controller to display error pages during development (helpful prior to Symfony 2.6.3)",
-            "homepage": "https://www.webfactory.de/blog/symfony2-exception-handling-and-custom-error-pages-explained",
-            "support": {
-                "issues": "https://github.com/webfactory/exceptions-bundle/issues",
-                "source": "https://github.com/webfactory/exceptions-bundle/tree/4.5.0"
-            },
-            "time": "2019-12-10T14:07:41+00:00"
         },
         {
             "name": "webmozart/assert",
