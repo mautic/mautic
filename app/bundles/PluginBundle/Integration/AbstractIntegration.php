@@ -1823,7 +1823,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 ));
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
+                $this->logger->warning($exception->getMessage());
 
                 return;
             }
@@ -2066,7 +2066,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+        $logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**

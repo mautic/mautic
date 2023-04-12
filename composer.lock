@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c178be9653f5db5140afa49fb4d4a684",
+    "content-hash": "dd412cb18cf72b72868217ec2b7f6822",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -17434,53 +17434,6 @@
                 }
             ],
             "time": "2021-07-28T10:34:58+00:00"
-        },
-        {
-            "name": "webfactory/exceptions-bundle",
-            "version": "4.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/webfactory/exceptions-bundle.git",
-                "reference": "2d9c86117b19e4b87de5f406d85162f1f54598c3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webfactory/exceptions-bundle/zipball/2d9c86117b19e4b87de5f406d85162f1f54598c3",
-                "reference": "2d9c86117b19e4b87de5f406d85162f1f54598c3",
-                "shasum": ""
-            },
-            "require": {
-                "symfony/twig-bundle": "^2.2||^3.0||^4.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "~4.0",
-                "symfony/framework-bundle": "^2.2||^3.0||^4.0"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "Webfactory\\Bundle\\ExceptionsBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "webfactory GmbH",
-                    "email": "info@webfactory.de",
-                    "homepage": "http://www.webfactory.de",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Building blocks for more user-friendly error pages, plus a simple controller to display error pages during development (helpful prior to Symfony 2.6.3)",
-            "homepage": "https://www.webfactory.de/blog/symfony2-exception-handling-and-custom-error-pages-explained",
-            "support": {
-                "issues": "https://github.com/webfactory/exceptions-bundle/issues",
-                "source": "https://github.com/webfactory/exceptions-bundle/tree/4.5.0"
-            },
-            "time": "2019-12-10T14:07:41+00:00"
         },
         {
             "name": "webmozart/assert",
