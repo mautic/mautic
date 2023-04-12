@@ -54,14 +54,14 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testStringToText(): void
     {
-        date_default_timezone_set('Etc/GMT-4');
+        $this->setDefaultLocalTimezone('Etc/GMT-4');
         $time = '2016-01-27 14:30:00';
         $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
     }
 
     public function testStringToTextUtc(): void
     {
-        date_default_timezone_set('UTC');
+        $this->setDefaultLocalTimezone('UTC');
         $time = '2016-01-27 14:30:00';
 
         $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($time, 'UTC', 'Y-m-d H:i:s', true));
@@ -69,14 +69,14 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testDateTimeToText(): void
     {
-        date_default_timezone_set('Etc/GMT-4');
+        $this->setDefaultLocalTimezone('Etc/GMT-4');
         $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
         $this->assertSame('January 27, 2016 6:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
     }
 
     public function testDateTimeToTextUtc(): void
     {
-        date_default_timezone_set('UTC');
+        $this->setDefaultLocalTimezone('UTC');
         $dateTime = new \DateTime('2016-01-27 14:30:00', new \DateTimeZone('UTC'));
 
         $this->assertSame('January 27, 2016 2:30 pm', $this->helper->toText($dateTime, 'UTC', 'Y-m-d H:i:s', true));
@@ -104,9 +104,22 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testFullConcat(): void
     {
-        date_default_timezone_set('Europe/Paris');
+        $this->setDefaultLocalTimezone('Europe/Paris');
         $dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', '2021-02-21 18:00:00', new \DateTimeZone('UTC'));
         $result   = $this->helper->toFullConcat($dateTime, 'UTC');
         $this->assertEquals($result, 'February 21, 2021 7:00 pm');
+    }
+
+    private function setDefaultLocalTimezone(string $timezone): void
+    {
+        $reflectedClass    = new \ReflectionClass($this->helper);
+        $reflectedProperty = $reflectedClass->getProperty('helper');
+        $reflectedProperty->setAccessible(true);
+        $dateTimeHelper     = $reflectedProperty->getValue($this->helper);
+
+        $reflectedClass     = new \ReflectionClass($dateTimeHelper);
+        $reflectedProperty2 = $reflectedClass->getProperty('defaultLocalTimezone');
+        $reflectedProperty2->setAccessible(true);
+        $reflectedProperty2->setValue($dateTimeHelper, $timezone);
     }
 }
