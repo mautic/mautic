@@ -55,6 +55,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
         EnvLoader::load();
 
+        self::ensureKernelShutdown();
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
@@ -72,7 +73,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
     /**
      * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
      */
-    protected function getContainer(): ContainerInterface
+    protected static function getContainer(): ContainerInterface
     {
         return self::$container;
     }
