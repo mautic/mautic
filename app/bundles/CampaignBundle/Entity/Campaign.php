@@ -118,7 +118,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
 
         $builder->createOneToMany('leads', Lead::class)
-            ->setIndexBy('lead_id')
             ->mappedBy('campaign')
             ->fetchExtraLazy()
             ->build();
