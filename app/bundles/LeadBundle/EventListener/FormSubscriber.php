@@ -304,8 +304,8 @@ class FormSubscriber implements EventSubscriberInterface
 
         $formResults = $event->getResults();
 
-        if (isset($formResults['email']) && !empty($formResults['email'])) {
-            $this->emailModel->removeDoNotContact($formResults['email']);
+        if (isset($formResults['`email`']) && !empty($formResults['`email`'])) {
+            $this->emailModel->removeDoNotContact($formResults['`email`']);
         }
     }
 }
