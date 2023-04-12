@@ -1,12 +1,15 @@
 #!/bin/bash
 
 setup_mautic() {
-    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}/index_dev.php"
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
     printf "Installing Mautic Composer dependencies...\n"
     composer install
+
+    sed -i.back "s/'env'.*=>.*'prod'/'debug' => 'dev'/g" app/config/environment.php
+    sed -i.back "s/'debug'.*=>.*false/'debug' => true/g" app/config/environment.php
 
     cp ./.ddev/local.config.php.dist ./app/config/local.php
     cp ./.env.dist ./.env
