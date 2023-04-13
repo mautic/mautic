@@ -490,7 +490,7 @@ class EmailController extends FormController
             $valid = false;
 
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->get('emailform');
+                $formData = $request->request->all()['emailform'] ?? [];
                 if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
                     $content = $entity->getCustomHtml();
 
@@ -693,7 +693,7 @@ class EmailController extends FormController
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->get('emailform');
+                $formData = $request->request->all()['emailform'] ?? [];
                 if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);

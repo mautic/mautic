@@ -60,7 +60,7 @@ class FieldController extends CommonFormController
         $session = $request->getSession();
 
         if ('POST' == $method) {
-            $formField = $request->request->get('formfield');
+            $formField = $request->request->all()['formfield'] ?? [];
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
         } else {

@@ -28,7 +28,7 @@ class TriggerEventController extends CommonFormController
         $session = $request->getSession();
 
         if ('POST' == $method) {
-            $triggerEvent = $request->request->get('pointtriggerevent');
+            $triggerEvent = $request->request->all()['pointtriggerevent'] ?? [];
             $eventType    = $triggerEvent['type'];
             $triggerId    = $triggerEvent['triggerId'];
         } else {

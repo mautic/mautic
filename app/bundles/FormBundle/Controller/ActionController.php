@@ -28,7 +28,7 @@ class ActionController extends CommonFormController
         $session = $request->getSession();
 
         if ('POST' == $method) {
-            $formAction = $request->request->get('formaction');
+            $formAction = $request->request->all()['formaction'] ?? [];
             $actionType = $formAction['type'];
             $formId     = $formAction['formId'];
         } else {

@@ -681,7 +681,7 @@ class AjaxController extends CommonAjaxController
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel   = $this->getModel('lead');
-        $post        = $request->request->get('lead_tags') ?? [];
+        $post        = $request->request->all()['lead_tags'] ?? [];
         $lead        = $leadModel->getEntity((int) $post['id']);
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];
@@ -937,7 +937,7 @@ class AjaxController extends CommonAjaxController
 
     public function getCampaignShareStatsAction(Request $request, SegmentCampaignShare $segmentCampaignShareService)
     {
-        $ids      = $request->query->get('ids');
+        $ids      = $request->query->all()['ids'] ?? [];
         $entityid = $request->query->get('entityId');
 
         $data = $segmentCampaignShareService->getCampaignsSegmentShare($entityid, $ids);

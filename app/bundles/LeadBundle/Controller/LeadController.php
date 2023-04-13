@@ -1554,7 +1554,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch') ?? [];
+            $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1677,7 +1677,7 @@ class LeadController extends FormController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
 
-            $data = $request->request->get('lead_batch_dnc') ?? [];
+            $data = $request->request->all()['lead_batch_dnc'] ?? [];
             $ids  = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1767,7 +1767,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_stage') ?? [];
+            $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1873,7 +1873,7 @@ class LeadController extends FormController
         if ('POST' == $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_owner') ?? [];
+            $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];

@@ -33,7 +33,7 @@ class AjaxController extends CommonAjaxController
     public function getIntegrationFieldsAction(Request $request, IntegrationHelper $helper)
     {
         $integration = $request->query->get('integration');
-        $settings    = $request->query->get('settings');
+        $settings    = $request->query->all()['settings'] ?? [];
         $page        = $request->query->get('page');
 
         $dataArray = ['success' => 0];
@@ -118,7 +118,7 @@ class AjaxController extends CommonAjaxController
     public function getIntegrationConfigAction(Request $request)
     {
         $integration = $request->query->get('integration');
-        $settings    = $request->query->get('settings');
+        $settings    = $request->query->all()['settings'] ?? [];
         $dataArray   = ['success' => 0];
 
         if (!empty($integration) && !empty($settings)) {
@@ -175,7 +175,7 @@ class AjaxController extends CommonAjaxController
     {
         $integration = $request->query->get('integration');
         $campaign    = $request->query->get('campaign');
-        $settings    = $request->query->get('settings');
+        $settings    = $request->query->all()['settings'] ?? [];
         $dataArray   = ['success' => 0];
         $statusData  = [];
         if (!empty($integration) && !empty($campaign)) {
