@@ -104,7 +104,7 @@ class OwnerSubscriber implements EventSubscriberInterface
             $token = $this->buildToken($ownerColumn);
             if (false !== strpos($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
-                $tokens[$token]        = ArrayHelper::getValue($ownerColumnNormalized, $owner);
+                $tokens[$token]        = $ownerColumnNormalized[$owner] ?? null;
             }
         }
 
