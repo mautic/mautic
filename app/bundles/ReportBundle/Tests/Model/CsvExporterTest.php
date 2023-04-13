@@ -3,8 +3,9 @@
 namespace Mautic\ReportBundle\Tests\Model;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Model\CsvExporter;
 use Mautic\ReportBundle\Tests\Fixtures;
@@ -12,6 +13,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CsvExporterTest extends \PHPUnit\Framework\TestCase
 {
+    public const DATEONLYFORMAT = 'F j, Y';
+
+    public const TIMEONLYFORMAT          = 'g:i a';
+
+    public function testExport()
     /**
      * @var CsvExporter
      */
@@ -39,12 +45,16 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
     public function setUp(): void
     {
-        $dateHelperMock = $this->createMock(DateHelper::class);
-        $dateHelperMock->expects($this->any())
-            ->method('toFullConcat')
-            ->willReturn('2017-10-01');
+        $dateHelperMock =new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            self::DATEONLYFORMAT,
+            self::TIMEONLYFORMAT,
+            $translator,
+            $coreParametersHelperMock
+        );
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
             ->with('mautic.report.report.groupby.totals')
@@ -53,6 +63,9 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
         $this->formatterHelperMock = new FormatterHelper($dateHelperMock, $this->translator);
         $coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
 
+
+
+        $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
         $this->csvExporter = new CsvExporter($this->formatterHelperMock, $coreParametersHelperMock, $this->translator);
         $this->tmpFile     = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
         $this->file        = fopen($this->tmpFile, 'w');
@@ -112,59 +125,72 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
                 '',
                 'ConnectWise',
                 '',
-                '2017-10-01',
+                '2017-10-10',
                 'connectwise@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                '2017-10-10',
                 'mytest@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                '2017-10-10',
                 'john@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                '2017-10-10',
                 'bogus@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                '2017-10-10',
                 'date-test@example.com',
             ],
             [
                 '',
                 'Bodega Club',
                 '',
-                '2017-10-01',
+                '2017-10-10',
                 'club@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                '2017-10-11',
                 'test@example.com',
             ],
             [
                 '',
                 '',
                 '',
-                '2017-10-01',
+                '2017-10-12',
                 'test@example.com',
             ],
         ];
+
+        $dateTimeHelper = new DateTimeHelper();
+        foreach ($expected as $key => $expect) {
+            if (0 === $key) {
+                continue;
+            }
+            if (!empty($expect[3])) {
+                $dateTimeHelper->setDateTime($expect[3]);
+                $expected[$key][3] = $dateTimeHelper->toLocalString(
+                    sprintf('%s %s', self::DATEONLYFORMAT, self::TIMEONLYFORMAT)
+                );
+            }
+        }
 
         $this->assertSame($expected, $result);
     }

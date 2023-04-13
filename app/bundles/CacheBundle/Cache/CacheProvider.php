@@ -93,9 +93,9 @@ final class CacheProvider implements CacheProviderInterface
         return $this->getCacheAdapter()->hasItem($key);
     }
 
-    public function clear(): bool
+    public function clear(string $prefix = ''): bool
     {
-        return $this->getCacheAdapter()->clear();
+        return $this->getCacheAdapter()->clear($prefix);
     }
 
     public function deleteItem($key): bool

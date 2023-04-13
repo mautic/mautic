@@ -8,6 +8,7 @@ use Mautic\CategoryBundle\Entity\CategoryRepository;
 use Mautic\CategoryBundle\Event\CategoryEvent;
 use Mautic\CategoryBundle\Form\Type\CategoryType;
 use Mautic\CoreBundle\Model\FormModel;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -96,7 +97,6 @@ class CategoryModel extends FormModel
      * {@inheritdoc}
      *
      * @param             $entity
-     * @param             $formFactory
      * @param string|null $action
      * @param array       $options
      *
@@ -104,7 +104,7 @@ class CategoryModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Category) {
             throw new MethodNotAllowedHttpException(['Category']);

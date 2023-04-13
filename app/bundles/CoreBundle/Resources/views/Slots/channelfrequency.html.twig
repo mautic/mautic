@@ -4,7 +4,7 @@
     {% for key, channel in form.lead_channels.subscribed_channels.vars.choices %}
         {%- set contactMe = leadChannels[channel.value] is defined %}
         {%- set checked = contactMe ? 'checked' : '' %}
-        {%- set channelName = channelGetChannelLabel(channel.value)|lower %}
+        {%- set channelName = getChannelLabel(channel.value)|lower %}
         <tr>
             <td>
                 <div class="text-left">

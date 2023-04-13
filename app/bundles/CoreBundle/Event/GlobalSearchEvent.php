@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -20,13 +21,13 @@ class GlobalSearchEvent extends Event
     protected $searchString;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Translation\Translator
+     * @var Translator
      */
     protected $translator;
 
     /**
-     * @param string                                                 $searchString
-     * @param \Symfony\Bundle\FrameworkBundle\Translation\Translator $translator
+     * @param string     $searchString
+     * @param Translator $translator
      */
     public function __construct($searchString, $translator)
     {

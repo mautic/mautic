@@ -9,11 +9,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ScheduleController extends CommonAjaxController
 {
-    public function indexAction($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
+    public function indexAction(DateBuilder $dateBuilder, $isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency)
     {
-        /** @var DateBuilder $dateBuilder */
-        $dateBuilder = $this->container->get('mautic.report.model.scheduler_date_builder');
-        $dates       = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
+        $dates = $dateBuilder->getPreviewDays($isScheduled, $scheduleUnit, $scheduleDay, $scheduleMonthFrequency);
 
         $html = $this->render(
             '@MauticReport/Schedule/index.html.twig',
@@ -45,22 +43,22 @@ class ScheduleController extends CommonAjaxController
         $report = $model->getEntity($reportId);
 
         /** @var \Mautic\CoreBundle\Security\Permissions\CorePermissions $security */
-        $security = $this->container->get('mautic.security');
+        $security = $this->security;
 
         if (empty($report)) {
-            $this->addFlash('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
+            $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
             return $this->flushFlash();
         }
 
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
-            $this->addFlash('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash();
         }
 
         if ($report->isScheduled()) {
-            $this->addFlash('mautic.report.scheduled.already', ['%id%' => $reportId], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.report.scheduled.already', ['%id%' => $reportId], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash();
         }
@@ -68,7 +66,7 @@ class ScheduleController extends CommonAjaxController
         $report->setAsScheduledNow($this->user->getEmail());
         $model->saveEntity($report);
 
-        $this->addFlash(
+        $this->addFlashMessage(
             'mautic.report.scheduled.to.now',
             ['%id%' => $reportId, '%email%' => $this->user->getEmail()]
         );

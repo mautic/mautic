@@ -15,9 +15,6 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Campaign.
- */
 class Campaign extends FormEntity implements PublishStatusIconAttributesInterface
 {
     /**
@@ -80,9 +77,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     private $allowRestart = false;
 
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         $this->events = new ArrayCollection();
@@ -107,7 +101,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('campaigns')
-            ->setCustomRepositoryClass('Mautic\CampaignBundle\Entity\CampaignRepository');
+            ->setCustomRepositoryClass(CampaignRepository::class);
 
         $builder->addIdColumns();
 
@@ -115,7 +109,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
 
         $builder->addCategory();
 
-        $builder->createOneToMany('events', 'Event')
+        $builder->createOneToMany('events', Event::class)
             ->setIndexBy('id')
             ->setOrderBy(['order' => 'ASC'])
             ->mappedBy('campaign')
@@ -123,20 +117,19 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('leads', 'Lead')
-            ->setIndexBy('id')
+        $builder->createOneToMany('leads', Lead::class)
             ->mappedBy('campaign')
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToMany('lists', 'Mautic\LeadBundle\Entity\LeadList')
+        $builder->createManyToMany('lists', LeadList::class)
             ->setJoinTable('campaign_leadlist_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('leadlist_id', 'id', false, false, 'CASCADE')
             ->addJoinColumn('campaign_id', 'id', true, false, 'CASCADE')
             ->build();
 
-        $builder->createManyToMany('forms', 'Mautic\FormBundle\Entity\Form')
+        $builder->createManyToMany('forms', Form::class)
             ->setJoinTable('campaign_form_xref')
             ->setIndexBy('id')
             ->addInverseJoinColumn('form_id', 'id', false, false, 'CASCADE')

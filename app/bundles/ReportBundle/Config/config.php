@@ -99,7 +99,7 @@ return [
             'mautic.report.model.csv_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\CsvExporter::class,
                 'arguments' => [
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                     'mautic.helper.core_parameters',
                     'translator',
                 ],
@@ -107,7 +107,7 @@ return [
             'mautic.report.model.excel_exporter' => [
                 'class'     => \Mautic\ReportBundle\Model\ExcelExporter::class,
                 'arguments' => [
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                     'translator',
                 ],
             ],

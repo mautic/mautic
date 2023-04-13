@@ -225,8 +225,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
      */
     private function prepareForExecution()
     {
-        $this->progressBar = null;
-        $this->now         = $this->now ?? new \Datetime();
+        $this->now = $this->now ?? new \Datetime();
 
         // Get counts by event
         $scheduledEvents       = $this->repo->getScheduledCounts($this->campaign->getId(), $this->now, $this->limiter);
@@ -286,7 +285,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
         $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         while ($logs->count()) {
             try {
-                $this->scheduledContactFinder->hydrateContacts($logs);
+                $fetchedContacts = $this->scheduledContactFinder->hydrateContacts($logs);
             } catch (NoContactsFoundException $e) {
                 break;
             }
@@ -302,7 +301,7 @@ class ScheduledExecutioner implements ExecutionerInterface, ResetInterface
             $this->executioner->executeLogs($event, $logs, $this->counter);
 
             // Get next batch
-            $this->scheduledContactFinder->clear();
+            $this->scheduledContactFinder->clear($fetchedContacts);
             $logs = $this->repo->getScheduled($eventId, $this->now, $this->limiter);
         }
     }
