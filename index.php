@@ -13,7 +13,6 @@ use Mautic\Middleware\MiddlewareBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
 $config = (new EnvironmentHandler())->getEnvParameters();
-
 ErrorHandler::register($config['ENV']);
 
 $kernel   = (new MiddlewareBuilder(new AppKernel($config['ENV'], $config['DEBUG'])))->resolve();
