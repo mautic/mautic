@@ -127,11 +127,11 @@ EOT
              'JOIN '.MAUTIC_TABLE_PREFIX.'ip_addresses ip ON x.ip_id = ip.id '.
              'WHERE ip.ip_address IN ('.$in.')';
 
-        $conn = $this->em->getConnection();
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
+        $conn   = $this->em->getConnection();
+        $stmt   = $conn->prepare($sql);
+        $result = $stmt->executeQuery();
 
-        return $stmt->fetchAll();
+        return $result->fetchAllAssociative();
     }
 
     private function purgeData(string $contactId, string $ip): bool

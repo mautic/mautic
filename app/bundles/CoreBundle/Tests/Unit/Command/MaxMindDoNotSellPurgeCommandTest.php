@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand;
@@ -10,13 +11,17 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 {
     public function testCommandDryRun(): void
     {
-        $mockEntityManager = $this->buildMockEntityManager(['test1', 'test2']);
+        $resultMock = $this->createMock(Result::class);
+        $resultMock->method('fetchAllAssociative')->willReturn(['test1', 'test2']);
+
+        $mockEntityManager = $this->buildMockEntityManager($resultMock);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $mockDoNotSellList);
@@ -33,7 +38,9 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testNoContactsFound(): void
     {
-        $mockEntityManager = $this->buildMockEntityManager([]);
+        $resultMock = $this->createMock(Result::class);
+        $resultMock->method('fetchAllAssociative')->willReturn([]);
+        $mockEntityManager = $this->buildMockEntityManager($resultMock);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $mockDoNotSellList);
@@ -49,7 +56,9 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testPurge(): void
     {
-        $mockEntityManager = $this->buildMockEntityManager([['id' => 1, 'ip_address' => '123.123.123.123']]);
+        $resultMock = $this->createMock(Result::class);
+        $resultMock->method('fetchAllAssociative')->willReturn([['id' => 1, 'ip_address' => '123.123.123.123']]);
+        $mockEntityManager = $this->buildMockEntityManager($resultMock);
         $mockDoNotSellList = $this->createMock(MaxMindDoNotSellList::class);
 
         $command       = new MaxMindDoNotSellPurgeCommand($mockEntityManager, $mockDoNotSellList);
@@ -64,10 +73,10 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(0, $result);
     }
 
-    private function buildMockEntityManager(array $dataToReturn): EntityManager
+    private function buildMockEntityManager(MockObject $dataToReturn): EntityManager
     {
         $mockStatement = $this->createMock(Statement::class);
-        $mockStatement->method('fetchAll')->withAnyParameters()->willReturn($dataToReturn);
+        $mockStatement->method('executeQuery')->withAnyParameters()->willReturn($dataToReturn);
 
         $mockConnection = $this->createMock(Connection::class);
         $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);
