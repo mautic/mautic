@@ -7,7 +7,6 @@ namespace Mautic\EmailBundle\Tests\Stats;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -46,11 +45,6 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
     private $queryBuilder;
 
     /**
-     * @var MockObject|Statement
-     */
-    private $statement;
-
-    /**
      * @var MockObject|Result
      */
     private $result;
@@ -67,7 +61,6 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->userHelperMock           = $this->createMock(UserHelper::class);
         $this->queryBuilder             = $this->createMock(QueryBuilder::class);
-        $this->statement                = $this->createMock(Statement::class);
         $this->result                   = $this->createMock(Result::class);
 
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
