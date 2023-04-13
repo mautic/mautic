@@ -11,11 +11,11 @@
 {% endfor %}
 {% if objects|length > 0 %}
     {% if 'create' == event.eventType %}
-        {% include '_table.html.twig' with {'objects': objects } %}
+        {{ include('@MauticLead/Auditlog/_table.html.twig', { 'objects': objects }) }}
     {% elseif 'delete' == event.eventType %}
         {{ 'mautic.lead.audit.deleted'|trans }}
     {% elseif 'update' == event.eventType %}
-        {% include '_table.html.twig' with {'objects': objects } %}
+        {{ include('@MauticLead/Auditlog/_table.html.twig', { 'objects': objects }) }}
     {% elseif 'identified' == event.eventType %}
         {{ 'mautic.lead.audit.identified'|trans }}
     {% elseif 'ipadded' == event.eventType %}
