@@ -14,6 +14,7 @@ use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -70,7 +71,6 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->versionProvider          = $this->createMock(VersionProviderInterface::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->connection               = $this->createMock(Connection::class);
-        $this->event                    = $this->createMock(ConsoleCommandEvent::class);
         $this->command                  = $this->createMock(Command::class);
         $this->output                   = $this->createMock(OutputInterface::class);
         $this->schemaManager            = $this->createMock(MySqlSchemaManager::class);
@@ -81,8 +81,10 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->connection
         );
 
-        $this->event->method('getCommand')->willReturn($this->command);
-        $this->event->method('getOutput')->willReturn($this->output);
+        $input = $this->createMock(InputInterface::class);
+
+        $this->event = new ConsoleCommandEvent($this->command, $input, $this->output);
+
         $this->connection->method('getSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
