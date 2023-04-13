@@ -28,7 +28,6 @@ bin/simple-phpunit
 build/*
 codeception.yml
 deleted_files.txt
-index_dev.php
 modified_files.txt
 node_modules/*
 package-lock.json

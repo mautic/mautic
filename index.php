@@ -12,7 +12,6 @@ use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
 use Mautic\Middleware\MiddlewareBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
-//ErrorHandler::register('prod');
 ErrorHandler::register($config['env']);
 
 if (
