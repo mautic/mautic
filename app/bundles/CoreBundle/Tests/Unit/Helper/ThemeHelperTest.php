@@ -278,7 +278,7 @@ class ThemeHelperTest extends TestCase
                  * @param ?\Traversable<mixed> $iterator
                  * @param mixed[]              $options
                  */
-                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = []): void
+                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/new-theme-name', $targetDir);
@@ -291,7 +291,7 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
-                public function dumpFile($filename, $content): void
+                public function dumpFile(string $filename, $content): void
                 {
                     Assert::assertSame('/path/to/themes/new-theme-name/config.json', $filename);
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
@@ -317,6 +317,7 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @return \ArrayIterator<int,\SplFileInfo>
                  */
+                #[\ReturnTypeWillChange]
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -377,7 +378,7 @@ class ThemeHelperTest extends TestCase
                  *
                  * @return void
                  */
-                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
+                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/requested-theme-dir', $targetDir);

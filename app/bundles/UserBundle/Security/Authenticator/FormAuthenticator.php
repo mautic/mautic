@@ -100,8 +100,10 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         }
 
         try {
+            /** @var User|string $user */
             $user = $userProvider->loadUserByUsername($credentials['username']);
         } catch (UsernameNotFoundException $e) {
+            /** @var string $user */
             $user = $credentials['username'];
         }
 
@@ -155,7 +157,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         return $credentials['password'];
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?RedirectResponse
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?RedirectResponse
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);

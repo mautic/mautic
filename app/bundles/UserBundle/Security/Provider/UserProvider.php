@@ -112,7 +112,7 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
         return User::class === $class || is_subclass_of($class, User::class);
     }
