@@ -22,10 +22,7 @@ class CsvExporter
      */
     private $coreParametersHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(FormatterHelper $formatterHelper, CoreParametersHelper $coreParametersHelper, TranslatorInterface $translator)
     {
@@ -65,10 +62,8 @@ class CsvExporter
 
     /**
      * @param resource $handle
-     *
-     * @return void
      */
-    public function putHeader(ReportDataResult $reportDataResult, $handle)
+    public function putHeader(ReportDataResult $reportDataResult, $handle): void
     {
         $this->putRow($handle, $reportDataResult->getHeaders());
     }
@@ -76,10 +71,8 @@ class CsvExporter
     /**
      * @param array<string> $totals
      * @param resource      $handle
-     *
-     * @return void
      */
-    public function putTotals(array $totals, $handle)
+    public function putTotals(array $totals, $handle): void
     {
         // Put label if the first item is empty
         $key = array_key_first($totals);

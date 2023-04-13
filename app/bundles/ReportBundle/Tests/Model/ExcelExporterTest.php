@@ -18,14 +18,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelExporterTest extends TestCase
 {
-    /**
-     * @var ExcelExporter
-     */
-    private $excelExporter;
-    /**
-     * @var false|string
-     */
-    private $tmpFile;
+    private ExcelExporter $excelExporter;
+
+    private string|false $tmpFile;
 
     public function setUp(): void
     {

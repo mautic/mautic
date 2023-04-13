@@ -30,47 +30,29 @@ class ReportDataResult
     /**
      * @var array<mixed>
      */
-    private $totals = [];
+    private array $totals = [];
 
     /**
      * @var array<string>
      */
-    private $columnKeys = [];
+    private array $columnKeys = [];
 
     /**
      * @var array<mixed>
      */
-    private $graphs = [];
+    private array $graphs = [];
 
-    /**
-     * @var DateTime|null
-     */
-    private $dateFrom;
+    private ?DateTime $dateFrom;
 
-    /**
-     * @var DateTime|null
-     */
-    private $dateTo;
+    private ?DateTime $dateTo;
 
-    /**
-     * @var int|null
-     */
-    private $limit;
+    private ?int $limit;
 
-    /**
-     * @var int
-     */
-    private $page;
+    private int $page;
 
-    /**
-     * @var int
-     */
-    private $preBatchSize;
+    private int $preBatchSize;
 
-    /**
-     * @var bool
-     */
-    private $isLastBatch;
+    private bool $isLastBatch;
 
     /**
      * @param array<mixed> $data
@@ -121,10 +103,7 @@ class ReportDataResult
         return $this->data;
     }
 
-    /**
-     * @return int
-     */
-    public function getDataCount()
+    public function getDataCount(): int
     {
         return count($this->data);
     }
@@ -150,7 +129,7 @@ class ReportDataResult
     /**
      * @return array<mixed>
      */
-    public function getTotals()
+    public function getTotals(): array
     {
         return $this->totals;
     }
@@ -158,23 +137,17 @@ class ReportDataResult
     /**
      * @return array<mixed>
      */
-    public function getGraphs()
+    public function getGraphs(): array
     {
         return $this->graphs;
     }
 
-    /**
-     * @return DateTime|null
-     */
-    public function getDateTo()
+    public function getDateTo(): ?DateTime
     {
         return $this->dateTo;
     }
 
-    /**
-     * @return DateTime|null
-     */
-    public function getDateFrom()
+    public function getDateFrom(): ?DateTime
     {
         return $this->dateFrom;
     }
@@ -182,7 +155,7 @@ class ReportDataResult
     /**
      * @return array<string>
      */
-    public function getTotalsToExport(FormatterHelper $formatterHelper)
+    public function getTotalsToExport(FormatterHelper $formatterHelper): array
     {
         if (empty($this->totals)) {
             return [];
@@ -200,10 +173,7 @@ class ReportDataResult
         return $totalsRow ?? [];
     }
 
-    /**
-     * @return bool
-     */
-    public function isLastPage()
+    public function isLastPage(): bool
     {
         // No limit set
         if (empty($this->limit)) {
@@ -216,7 +186,7 @@ class ReportDataResult
     /**
      * @return array<int, string>
      */
-    public function getColumnKeys()
+    public function getColumnKeys(): array
     {
         return $this->columnKeys;
     }
@@ -264,10 +234,8 @@ class ReportDataResult
 
     /**
      * @param array<mixed> $aggregatorVal
-     *
-     * @return float
      */
-    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, ?float $previousVal = null)
+    public function calcTotal(string $calcFunction, int $rowsCount, array &$aggregatorVal, ?float $previousVal = null): float|int|null
     {
         switch ($calcFunction) {
             case 'COUNT':
@@ -318,10 +286,7 @@ class ReportDataResult
         }
     }
 
-    /**
-     * @return string
-     */
-    private function getAggregatorCalcFunc(string $index, string $value)
+    private function getAggregatorCalcFunc(string $index, string $value): string
     {
         return trim(str_replace($value, '', $index));
     }

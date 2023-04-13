@@ -17,15 +17,9 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
     public const TIMEONLYFORMAT          = 'g:i a';
 
-    /**
-     * @var CsvExporter
-     */
-    private $csvExporter;
+    private CsvExporter $csvExporter;
 
-    /**
-     * @var false|string
-     */
-    private $tmpFile;
+    private string|false $tmpFile;
 
     /**
      * @var false|resource
@@ -35,12 +29,9 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
     /**
      * @var TranslatorInterface
      */
-    private $translator;
+    private mixed $translator;
 
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelperMock;
+    private FormatterHelper $formatterHelperMock;
 
     public function setUp(): void
     {

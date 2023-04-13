@@ -20,10 +20,7 @@ class ExcelExporter
      */
     protected $formatterHelper;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private TranslatorInterface $translator;
 
     public function __construct(FormatterHelper $formatterHelper, TranslatorInterface $translator)
     {
@@ -90,20 +87,16 @@ class ExcelExporter
 
     /**
      * @param array<string> $headers
-     *
-     * @return void
      */
-    public function putHeader(array $headers, Worksheet $activeSheet)
+    public function putHeader(array $headers, Worksheet $activeSheet): void
     {
         $activeSheet->fromArray($headers);
     }
 
     /**
      * @param array<string> $totals
-     *
-     * @return void
      */
-    public function putTotals(array $totals, Worksheet $activeSheet, string $startCell)
+    public function putTotals(array $totals, Worksheet $activeSheet, string $startCell): void
     {
         // Put label if the first item is empty
         $key = array_key_first($totals);
