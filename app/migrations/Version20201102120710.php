@@ -20,8 +20,8 @@ final class Version20201102120710 extends AbstractMauticMigration
 
         $sql  = 'SHOW INDEX FROM '.$this->table.' WHERE Key_name = "'.$this->index.'"';
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
-        $indexExists = (bool) $stmt->fetch();
+
+        $indexExists = (bool) $stmt->executeQuery()->fetchAllAssociative();
         $stmt->closeCursor();
 
         if (!$indexExists) {

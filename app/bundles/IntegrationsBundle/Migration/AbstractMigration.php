@@ -55,7 +55,7 @@ abstract class AbstractMigration implements MigrationInterface
 
         foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
-            $stmt->execute();
+            $stmt->executeStatement();
         }
     }
 

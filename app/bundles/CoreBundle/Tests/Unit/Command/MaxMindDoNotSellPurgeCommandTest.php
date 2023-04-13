@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Command\MaxMindDoNotSellPurgeCommand;
@@ -10,6 +11,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\IpLookup\DoNotSellList\MaxMindDoNotSellList;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
@@ -66,11 +68,18 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
 
     private function buildMockEntityManager(array $dataToReturn): EntityManager
     {
-        $mockStatement = $this->createMock(Statement::class);
-        $mockStatement->method('fetchAll')->withAnyParameters()->willReturn($dataToReturn);
-
+        /** @var MockObject&Connection $mockConnection */
         $mockConnection = $this->createMock(Connection::class);
-        $mockConnection->method('prepare')->withAnyParameters()->willReturn($mockStatement);
+
+        /** @var MockObject&Statement $mockStatement */
+        $mockStatement = $this->createMock(Statement::class);
+
+        /** @var MockObject&Result $mockResult */
+        $mockResult = $this->createMock(Result::class);
+
+        $mockConnection->method('prepare')->willReturn($mockStatement);
+        $mockStatement->method('executeQuery')->willReturn($mockResult);
+        $mockResult->method('fetchAllAssociative')->willReturn($dataToReturn);
 
         $ip = new IpAddress('123.123.123.123');
         $ip->setIpDetails(['city' => 'Boston', 'region' => 'MA', 'country' => 'United States', 'zipcode' => '02113']);
@@ -82,12 +91,14 @@ class MaxMindDoNotSellPurgeCommandTest extends \PHPUnit\Framework\TestCase
         $lead->setCountry('United States');
         $lead->setZipcode('02113');
 
+        /** @var MockObject&LeadRepository $mockLeadRepository */
         $mockLeadRepository = $this->createMock(LeadRepository::class);
         $mockLeadRepository->method('findOneBy')->with(['id' => 1])->willReturn($lead);
 
+        /** @var MockObject&EntityManager $mockEntityManager */
         $mockEntityManager = $this->createMock(EntityManager::class);
         $mockEntityManager->method('getConnection')->willReturn($mockConnection);
-        $mockEntityManager->method('getRepository')->withAnyParameters()->willReturn($mockLeadRepository);
+        $mockEntityManager->method('getRepository')->willReturn($mockLeadRepository);
 
         return $mockEntityManager;
     }

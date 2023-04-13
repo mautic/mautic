@@ -22,7 +22,7 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 
         $connection->query('SET FOREIGN_KEY_CHECKS=0;');
         foreach ($this->getLeadCampaignEventData($eventId) as $row) {
-            $insertStatement->execute($row);
+            $insertStatement->executeStatement($row);
         }
         $connection->query('SET FOREIGN_KEY_CHECKS=1;');
 
