@@ -209,7 +209,7 @@ class KickoffExecutioner implements ExecutionerInterface
                 $this->executioner->executeEventsForContacts($rootEvents, $contacts, $this->counter);
             }
 
-            $this->kickoffContactFinder->clear();
+            $this->kickoffContactFinder->clear($contacts);
 
             if ($this->limiter->getContactId()) {
                 // No use making another call
