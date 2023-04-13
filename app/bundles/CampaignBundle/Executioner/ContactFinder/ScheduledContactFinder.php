@@ -3,8 +3,10 @@
 namespace Mautic\CampaignBundle\Executioner\ContactFinder;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Executioner\Exception\NoContactsFoundException;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Psr\Log\LoggerInterface;
 
@@ -31,8 +33,10 @@ class ScheduledContactFinder
 
     /**
      * Hydrate contacts with custom field value, companies, etc.
+     *
+     * @return Collection<int, Lead>
      */
-    public function hydrateContacts(ArrayCollection $logs)
+    public function hydrateContacts(ArrayCollection $logs): Collection
     {
         $contactIds = [];
         /** @var LeadEventLog $log */
@@ -60,10 +64,17 @@ class ScheduledContactFinder
 
             $log->setLead($contact);
         }
+
+        return $contacts;
     }
 
-    public function clear()
+    /**
+     * Clear Lead entities from memory.
+     *
+     * @param Collection<int, Lead> $contacts
+     */
+    public function clear(Collection $contacts): void
     {
-        $this->leadRepository->clear();
+        $this->leadRepository->detachEntities($contacts->toArray());
     }
 }
