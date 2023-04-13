@@ -150,7 +150,7 @@ class ActionController extends CommonFormController
     {
         $session    = $request->getSession();
         $method     = $request->getMethod();
-        $formaction = $request->request->get('formaction', []);
+        $formaction = $request->request->get('formaction') ?? [];
         $formId     = 'POST' === $method ? ($formaction['formId'] ?? '') : $request->query->get('formId');
         $actions    = $session->get('mautic.form.'.$formId.'.actions.modified', []);
         $success    = 0;

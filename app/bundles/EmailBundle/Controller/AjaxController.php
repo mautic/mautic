@@ -121,7 +121,7 @@ class AjaxController extends CommonAjaxController
      */
     public function getAttachmentsSizeAction(Request $request)
     {
-        $assets = $request->query->get('assets', []);
+        $assets = $request->query->get('assets') ?? [];
         $size   = 0;
         if ($assets) {
             /** @var \Mautic\AssetBundle\Model\AssetModel $assetModel */

@@ -322,8 +322,8 @@ class AjaxController extends CommonAjaxController
     public function updateTimelineAction(Request $request)
     {
         $dataArray     = ['success' => 0];
-        $includeEvents = InputHelper::clean($request->request->get('includeEvents', []));
-        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents', []));
+        $includeEvents = InputHelper::clean($request->request->get('includeEvents') ?? []);
+        $excludeEvents = InputHelper::clean($request->request->get('excludeEvents') ?? []);
         $search        = InputHelper::clean($request->request->get('search'));
         $leadId        = (int) $request->request->get('leadId');
 
@@ -681,7 +681,7 @@ class AjaxController extends CommonAjaxController
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $leadModel */
         $leadModel   = $this->getModel('lead');
-        $post        = $request->request->get('lead_tags', [], true);
+        $post        = $request->request->get('lead_tags') ?? [];
         $lead        = $leadModel->getEntity((int) $post['id']);
         $updatedTags = (!empty($post['tags']) && is_array($post['tags'])) ? $post['tags'] : [];
         $data        = ['success' => 0];

@@ -132,7 +132,7 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
@@ -243,7 +243,7 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 

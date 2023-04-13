@@ -472,7 +472,7 @@ class EmailController extends FormController
         //set the page we came from
         $page         = $session->get('mautic.email.page', 1);
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'new']);
-        $emailForm    = $request->request->get('emailform', []);
+        $emailForm    = $request->request->get('emailform') ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailForm['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -677,7 +677,7 @@ class EmailController extends FormController
 
         //Create the form
         $action       = $this->generateUrl('mautic_email_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $emailform    = $request->request->get('emailform', []);
+        $emailform    = $request->request->get('emailform') ?? [];
         $updateSelect = 'POST' === $method
             ? ($emailform['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
