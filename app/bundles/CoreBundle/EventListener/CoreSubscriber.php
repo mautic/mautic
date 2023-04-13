@@ -182,6 +182,7 @@ class CoreSubscriber implements EventSubscriberInterface
 
         $session = $event->getRequest()->getSession();
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            /** @var User $user */
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in
