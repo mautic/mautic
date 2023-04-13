@@ -63,11 +63,15 @@ class EnvironmentHandler
         if (empty($envParameters)) {
             return self::loadDefaultEnvironmentSetup();
         }
-        dump(self::loadDefaultEnvironmentSetup(), $envParameters);
 
-        return array_merge_recursive(self::loadDefaultEnvironmentSetup(), $envParameters);
+        return array_merge(self::loadDefaultEnvironmentSetup(), $envParameters);
     }
 
+    /**
+     * @return array
+     *
+     * Returns the default environment setup
+     */
     private static function loadDefaultEnvironmentSetup(): array
     {
         return [
@@ -77,6 +81,9 @@ class EnvironmentHandler
         ];
     }
 
+    /*
+     * Clean the cache if the environment is set to dev and the IP is whitelisted.
+     */
     private function cleanCache(): void
     {
         if (
@@ -88,6 +95,11 @@ class EnvironmentHandler
         }
     }
 
+    /**
+     * @return array
+     *               Returns the environment parameters.
+     *               The environment parameters are the parameters defined in the environment.php file.
+     */
     public function getEnvParameters(): array
     {
         return $this->envParameters;
