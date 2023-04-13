@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\IntegrationsBundle\Event\ConfigAuthUrlEvent;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
+use Mautic\IntegrationsBundle\Event\KeysSaveEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Form\Type\IntegrationConfigType;
 use Mautic\IntegrationsBundle\Helper\ConfigIntegrationsHelper;
@@ -105,11 +106,18 @@ class ConfigController extends AbstractFormController
         }
 
         // Get the fields before the form binds partial data due to pagination
-        $settings      = $this->integrationConfiguration->getFeatureSettings();
-        $fieldMappings = $settings['sync']['fieldMappings'] ?? [];
+        $settings          = $this->integrationConfiguration->getFeatureSettings();
+        $fieldMappings     = $settings['sync']['fieldMappings'] ?? [];
+        $oldApiKeys        = $this->integrationConfiguration->getApiKeys();
 
         // Submit the form
-        $form->handleRequest($request);
+        $form->handleRequest($this->request);
+
+        $eventDispatcher = $this->get('event_dispatcher');
+        \assert($eventDispatcher instanceof EventDispatcherInterface);
+        $configEvent     = new KeysSaveEvent($this->integrationConfiguration, $oldApiKeys);
+        $eventDispatcher->dispatch(IntegrationEvents::INTEGRATION_API_KEYS_BEFORE_SAVE, $configEvent);
+
         if ($this->integrationObject instanceof ConfigFormSyncInterface) {
             $integration   = $this->integrationObject->getName();
             $settings      = $this->integrationConfiguration->getFeatureSettings();
