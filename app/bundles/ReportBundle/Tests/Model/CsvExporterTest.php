@@ -17,7 +17,6 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
     public const TIMEONLYFORMAT          = 'g:i a';
 
-    public function testExport()
     /**
      * @var CsvExporter
      */
@@ -45,27 +44,24 @@ class CsvExporterTest extends \PHPUnit\Framework\TestCase
 
     public function setUp(): void
     {
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->with('mautic.report.report.groupby.totals')
+            ->willReturn('Totals');
+        $coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
+
         $dateHelperMock =new DateHelper(
             'F j, Y g:i a T',
             'D, M d',
             self::DATEONLYFORMAT,
             self::TIMEONLYFORMAT,
-            $translator,
+            $this->translator,
             $coreParametersHelperMock
         );
 
-        $translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
-            ->method('trans')
-            ->with('mautic.report.report.groupby.totals')
-            ->willReturn('Totals');
-
         $this->formatterHelperMock = new FormatterHelper($dateHelperMock, $this->translator);
-        $coreParametersHelperMock  = $this->createMock(CoreParametersHelper::class);
 
-
-
-        $formatterHelperMock = new FormatterHelper($dateHelperMock, $translator);
         $this->csvExporter = new CsvExporter($this->formatterHelperMock, $coreParametersHelperMock, $this->translator);
         $this->tmpFile     = tempnam(sys_get_temp_dir(), 'mautic_csv_export_test_');
         $this->file        = fopen($this->tmpFile, 'w');

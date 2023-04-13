@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\ReportBundle\Tests\Crate;
 
 use DateTime;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Tests\Fixtures;
 

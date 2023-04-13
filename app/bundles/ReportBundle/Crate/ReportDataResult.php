@@ -3,7 +3,7 @@
 namespace Mautic\ReportBundle\Crate;
 
 use DateTime;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 
 class ReportDataResult
 {
