@@ -5,6 +5,7 @@ namespace Mautic\PageBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Model\PageModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
@@ -37,7 +38,7 @@ class PageApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction(Request $request)
     {
         //get parent level only
         $this->listFilters[] = [
@@ -50,6 +51,6 @@ class PageApiController extends CommonApiController
             'expr'   => 'isNull',
         ];
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request);
     }
 }

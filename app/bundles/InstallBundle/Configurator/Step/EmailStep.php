@@ -204,7 +204,7 @@ class EmailStep implements StepInterface
      */
     public function getTemplate()
     {
-        return 'MauticInstallBundle:Install:email.html.twig';
+        return '@MauticInstall/Install/email.html.twig';
     }
 
     /**

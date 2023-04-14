@@ -95,7 +95,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'       => 'mautic.lead.lead.submitaction.changepoints',
             'description' => 'mautic.lead.lead.submitaction.changepoints_descr',
             'formType'    => FormSubmitActionPointsChangeType::class,
-            'formTheme'   => 'MauticLeadBundle:FormTheme:FormActionChangePoints/_formaction_properties_row.html.twig',
+            'formTheme'   => '@MauticLead/FormTheme/FormActionChangePoints/_formaction_properties_row.html.twig',
             'eventName'   => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
         ]);
 
@@ -113,6 +113,7 @@ class FormSubscriber implements EventSubscriberInterface
             'description'       => 'mautic.lead.lead.events.changetags_descr',
             'formType'          => ModifyLeadTagsType::class,
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
+            'allowCampaignForm' => true,
         ]);
 
         $event->addSubmitAction('lead.addutmtags', [
@@ -120,7 +121,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.lead.lead.events.addutmtags',
             'description'       => 'mautic.lead.lead.events.addutmtags_descr',
             'formType'          => ActionAddUtmTagsType::class,
-            'formTheme'         => 'MauticLeadBundle:FormTheme:ActionAddUtmTags/_formaction_properties_row.html.twig',
+            'formTheme'         => '@MauticLead/FormTheme/FormActionAddUtmTags/_formaction_properties_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);

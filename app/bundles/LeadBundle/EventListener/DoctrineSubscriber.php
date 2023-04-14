@@ -113,7 +113,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 return;
             }
             //table doesn't exist or something bad happened so oh well
-            $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
+            $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
         }
     }
 }
