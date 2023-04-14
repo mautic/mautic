@@ -139,7 +139,7 @@ class PointController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_point_index',
                         '%url%'       => $this->generateUrl('mautic_point_action', [
@@ -272,7 +272,7 @@ class PointController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getName(),
                         '%menu_link%' => 'mautic_point_index',
                         '%url%'       => $this->generateUrl('mautic_point_action', [

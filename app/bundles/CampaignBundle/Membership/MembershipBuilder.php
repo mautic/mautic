@@ -154,7 +154,7 @@ class MembershipBuilder
             $this->manager->addContacts($contactCollection, $this->campaign, false);
 
             // Clear Lead entities from RAM
-            $this->leadRepository->clear();
+            $this->leadRepository->detachEntities($contactCollection->toArray());
 
             // Have we hit the run limit?
             if ($this->runLimit && $contactsProcessed >= $this->runLimit) {

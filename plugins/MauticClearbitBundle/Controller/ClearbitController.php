@@ -37,7 +37,7 @@ class ClearbitController extends FormController
             $lead->getPermissionUser()
         )
         ) {
-            $this->addFlash(
+            $this->addFlashMessage(
                 $this->translator->trans('mautic.plugin.clearbit.forbidden'),
                 [],
                 'error'
@@ -85,14 +85,14 @@ class ClearbitController extends FormController
             if ('POST' === $request->getMethod()) {
                 try {
                     $lookupHelper->lookupContact($lead, array_key_exists('notify', $data));
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.lead.batch_leads_affected',
                         [
                             '%count%'     => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $ex->getMessage(),
                         [],
                         'error'
@@ -171,7 +171,7 @@ class ClearbitController extends FormController
         }
 
         if (0 === $count) {
-            $this->addFlash(
+            $this->addFlashMessage(
                 $this->translator->trans('mautic.plugin.clearbit.empty'),
                 [],
                 'error'
@@ -185,7 +185,7 @@ class ClearbitController extends FormController
             );
         } else {
             if ($count > 20) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $this->translator->trans('mautic.plugin.clearbit.toomany'),
                     [],
                     'error'
@@ -235,7 +235,7 @@ class ClearbitController extends FormController
                         try {
                             $lookupHelper->lookupContact($lead, $notify);
                         } catch (\Exception $ex) {
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                     $ex->getMessage(),
                                     [],
                                     'error'
@@ -246,7 +246,7 @@ class ClearbitController extends FormController
                 }
 
                 if ($count) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                             'mautic.lead.batch_leads_affected',
                             [
                                 '%count%'     => $count,
@@ -297,7 +297,7 @@ class ClearbitController extends FormController
             $website = $company->getFieldValue('companywebsite');
 
             if (!$website) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $this->translator->trans('mautic.plugin.clearbit.compempty'),
                     [],
                     'error'
@@ -338,14 +338,14 @@ class ClearbitController extends FormController
             if ('POST' === $request->getMethod()) {
                 try {
                     $lookupHelper->lookupCompany($company, array_key_exists('notify', $data));
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.company.batch_companies_affected',
                         [
                             '%count%'     => 1,
                         ]
                     );
                 } catch (\Exception $ex) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $ex->getMessage(),
                         [],
                         'error'
@@ -423,7 +423,7 @@ class ClearbitController extends FormController
         }
 
         if (0 === $count) {
-            $this->addFlash(
+            $this->addFlashMessage(
                 $this->translator->trans('mautic.plugin.clearbit.compempty'),
                 [],
                 'error'
@@ -437,7 +437,7 @@ class ClearbitController extends FormController
             );
         } else {
             if ($count > 20) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $this->translator->trans('mautic.plugin.clearbit.comptoomany'),
                     [],
                     'error'
@@ -487,7 +487,7 @@ class ClearbitController extends FormController
                         try {
                             $lookupHelper->lookupCompany($company, $notify);
                         } catch (\Exception $ex) {
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 $ex->getMessage(),
                                 [],
                                 'error'
@@ -498,7 +498,7 @@ class ClearbitController extends FormController
                 }
 
                 if ($count) {
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.company.batch_companies_affected',
                         [
                             '%count%'     => $count,

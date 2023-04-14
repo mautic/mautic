@@ -229,7 +229,7 @@ class CategoryController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash('mautic.category.notice.created', [
+                    $this->addFlashMessage('mautic.category.notice.created', [
                         '%name%' => $entity->getTitle(),
                     ]);
                 }
@@ -335,7 +335,7 @@ class CategoryController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.category.notice.updated',
                         [
                             '%name%' => $entity->getTitle(),

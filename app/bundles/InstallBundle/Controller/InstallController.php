@@ -289,7 +289,7 @@ class InstallController extends CommonController
                 case 'warning':
                 case 'error':
                 case 'notice':
-                    $this->addFlash($message, [], $type);
+                    $this->addFlashMessage($message, [], $type);
                     break;
                 default:
                     // If type not a flash type, assume form field error

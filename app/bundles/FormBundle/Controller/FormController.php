@@ -354,7 +354,7 @@ class FormController extends CommonFormController
                             // Save and trigger listeners
                             $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 'mautic.core.notice.created',
                                 [
                                     '%name%'      => $entity->getName(),
@@ -632,7 +632,7 @@ class FormController extends CommonFormController
                             // Reset objectId to entity ID (can be session ID in case of cloned entity)
                             $objectId = $entity->getId();
 
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 'mautic.core.notice.updated',
                                 [
                                     '%name%'      => $entity->getName(),
