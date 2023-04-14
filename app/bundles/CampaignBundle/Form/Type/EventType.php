@@ -99,6 +99,7 @@ class EventType extends AbstractType
                         'data-toggle' => 'datetime',
                     ],
                     'widget' => 'single_text',
+                    'html5'  => false,
                     'format' => 'yyyy-MM-dd HH:mm',
                 ]
             );

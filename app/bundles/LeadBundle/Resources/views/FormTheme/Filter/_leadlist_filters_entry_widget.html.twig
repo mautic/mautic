@@ -2,9 +2,9 @@
   Variables
     - form
     - fields
+    - first
 #}
 {% block _leadlist_filters_entry_widget %}
-  {% set first = true %}
   {% set isPrototype = ('__name__' == form.vars.name) %}
   {% set filterType = form.field.vars.value %}
   {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue %}

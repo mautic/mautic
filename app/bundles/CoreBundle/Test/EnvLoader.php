@@ -15,7 +15,7 @@ final class EnvLoader
     {
         $root    = __DIR__.'/../../../../';
         $envFile = file_exists($root.'.env') ? $root.'.env' : $root.'.env.dist';
-        $dotenv  = new Dotenv();
+        $dotenv  = new Dotenv(false);
         $dotenv->load($envFile);
     }
 }

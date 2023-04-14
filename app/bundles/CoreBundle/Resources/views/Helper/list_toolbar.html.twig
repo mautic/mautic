@@ -1,8 +1,8 @@
 {% set wrap = true %}
 
 {{ buttonReset(
-    constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::LOCATION_TOOLBAR_ACTIONS'),
-    constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::TYPE_GROUP'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_TOOLBAR_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_GROUP'),
 ) }}
 
 {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Mautic\DashboardBundle\Tests\Controller;
 
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\DashboardBundle\Controller\DashboardController;
 use Mautic\DashboardBundle\Dashboard\Widget;
 use Mautic\DashboardBundle\Model\DashboardModel;
@@ -14,11 +16,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
 class DashboardControllerTest extends \PHPUnit\Framework\TestCase
@@ -34,7 +36,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
     private $securityMock;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translatorMock;
 
@@ -79,15 +81,17 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
 
         $this->requestMock        = $this->createMock(Request::class);
         $this->securityMock       = $this->createMock(CorePermissions::class);
-        $this->translatorMock     = $this->createMock(TranslatorInterface::class);
+        $this->translatorMock     = $this->createMock(Translator::class);
         $this->modelFactoryMock   = $this->createMock(ModelFactory::class);
         $this->dashboardModelMock = $this->createMock(DashboardModel::class);
         $this->routerMock         = $this->createMock(RouterInterface::class);
         $this->sessionMock        = $this->createMock(Session::class);
         $this->flashBagMock       = $this->createMock(FlashBag::class);
         $this->containerMock      = $this->createMock(Container::class);
-        $this->controller         = new DashboardController();
-        $this->controller->setRequest($this->requestMock);
+        $this->controller         = new DashboardController($this->securityMock, $this->createMock(UserHelper::class));
+        $requestStack             = new RequestStack();
+        $requestStack->push($this->requestMock);
+        $this->controller->setRequestStack($requestStack);
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
         $this->controller->setFlashBag($this->flashBagMock);
@@ -105,13 +109,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('isXmlHttpRequest')
             ->willReturn(false);
 
-        $this->containerMock->expects($this->once())
-            ->method('get')
-            ->with('mautic.security')
-            ->willReturn($this->securityMock);
+        $this->controller->setSecurity($this->securityMock);
 
         $this->expectException(AccessDeniedHttpException::class);
-        $this->controller->saveAction();
+        $this->controller->saveAction($this->requestMock);
     }
 
     public function testSaveWithPostNotAjaxWillCallAccessDenied(): void
@@ -124,17 +125,14 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->requestMock->method('isXmlHttpRequest')
             ->willReturn(false);
 
-        $this->containerMock->expects($this->once())
-            ->method('get')
-            ->with('mautic.security')
-            ->willReturn($this->securityMock);
+        $this->controller->setSecurity($this->securityMock);
 
         $this->translatorMock->expects($this->once())
             ->method('trans')
             ->with('mautic.core.url.error.401');
 
         $this->expectException(AccessDeniedHttpException::class);
-        $this->controller->saveAction();
+        $this->controller->saveAction($this->requestMock);
     }
 
     public function testSaveWithPostAjaxWillSave(): void
@@ -151,15 +149,13 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(['name'])
             ->willReturnOnConsecutiveCalls('mockName');
 
-        $this->containerMock->expects($this->exactly(3))
+        $this->containerMock->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
-                ['mautic.model.factory'],
                 ['router'],
                 ['router']
             )
             ->willReturnOnConsecutiveCalls(
-                $this->modelFactoryMock,
                 $this->routerMock,
                 $this->routerMock
             );
@@ -181,9 +177,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.notice.save');
 
-        // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
+        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
-        $this->controller->saveAction();
+        $this->controller->setModelFactory($this->modelFactoryMock);
+        $this->controller->saveAction($this->requestMock);
     }
 
     public function testSaveWithPostAjaxWillNotBeAbleToSave(): void
@@ -204,16 +201,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive(['name'])
             ->willReturnOnConsecutiveCalls('mockName');
 
-        $this->containerMock->expects($this->exactly(2))
+        $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(
-                ['mautic.model.factory'],
-                ['router']
-            )
-            ->willReturn(
-                $this->modelFactoryMock,
-                $this->routerMock
-            );
+            ->with('router')
+            ->willReturn($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -228,9 +219,10 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->method('trans')
             ->with('mautic.dashboard.error.save');
 
-        // This exception is thrown if templating is not set. Let's take it as success to avoid further mocking.
+        // This exception is thrown if twig is not set. Let's take it as success to avoid further mocking.
         $this->expectException(\LogicException::class);
-        $this->controller->saveAction();
+        $this->controller->setModelFactory($this->modelFactoryMock);
+        $this->controller->saveAction($this->requestMock);
     }
 
     public function testWidgetDirectRequest(): void
@@ -239,7 +231,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction(1);
+        $this->controller->widgetAction($this->requestMock, $this->createMock(Widget::class), 1);
     }
 
     public function testWidgetNotFound(): void
@@ -258,13 +250,11 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn(null);
 
-        $this->containerMock->expects(self::once())
-            ->method('get')
-            ->with('mautic.dashboard.widget')
-            ->willReturn($widgetService);
+        $this->containerMock->expects(self::never())
+            ->method('get');
 
         $this->expectException(NotFoundHttpException::class);
-        $this->controller->widgetAction($widgetId);
+        $this->controller->widgetAction($this->requestMock, $widgetService, $widgetId);
     }
 
     public function testWidget(): void
@@ -290,15 +280,12 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
             ->with((int) $widgetId)
             ->willReturn($widget);
 
-        $this->containerMock->expects(self::exactly(2))
+        $this->containerMock->expects(self::once())
             ->method('get')
-            ->withConsecutive(
-                ['mautic.dashboard.widget'],
-                ['twig']
-            )
-            ->willReturnOnConsecutiveCalls($widgetService, $twig, $twig);
+            ->with('twig')
+            ->willReturn($twig);
 
-        $response = $this->controller->widgetAction($widgetId);
+        $response = $this->controller->widgetAction($this->requestMock, $widgetService, $widgetId);
 
         self::assertSame('{"success":1,"widgetId":"1","widgetHtml":"lfsadkdhf\u016fasfjds","widgetWidth":null,"widgetHeight":null}', $response->getContent());
     }

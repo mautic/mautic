@@ -51,7 +51,7 @@
             }) }}
         </td>
         {% for column, label in columns %}
-            {{ include(['MauticLeadBundle:Lead/row:'~column~'.html.twig', '@MauticLead/Lead/row/default.html.twig'], {
+            {{ include(['@MauticLead/Lead/row/'~column~'.html.twig', '@MauticLead/Lead/row/default.html.twig'], {
                   'item': item,
                   'fields': fields,
                   'label': label,
