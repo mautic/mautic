@@ -77,7 +77,7 @@ class LeadFieldRepository extends CommonRepository
     }
 
     /**
-     * @return array<int|array<int, string>>
+     * @return array<int|string, array<string, mixed>>
      */
     public function getFields(): array
     {
