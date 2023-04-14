@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Tightenco\Collect\Support\Collection;
@@ -359,7 +360,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
         $form       = $saveButton->form();
-        $form['lead[companies]']->setValue([]);
+        /** @var ChoiceFormField $companyField */
+        $companyField = &$form['lead[companies]'];
+        $companyField->setValue([]);
         $this->client->submit($form);
         $companies  = $this->getCompanyLeads(1);
         $collection = new Collection($companies);
@@ -601,7 +604,9 @@ class LeadControllerTest extends MauticMysqlTestCase
         $crawler    = $this->client->request(Request::METHOD_GET, '/s/contacts/edit/1');
         $saveButton = $crawler->selectButton('lead[buttons][save]');
         $form       = $saveButton->form();
-        $form['lead[companies]']->setValue($expectedCompanies);
+        /** @var ChoiceFormField $companyField */
+        $companyField = &$form['lead[companies]'];
+        $companyField->setValue($expectedCompanies);
         $crawler    = $this->client->submit($form);
         $companies  = $this->getCompanyLeads($leadId);
         $collection = (new Collection($companies))->keyBy('company_id');
