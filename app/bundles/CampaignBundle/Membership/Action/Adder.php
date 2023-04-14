@@ -23,9 +23,6 @@ class Adder
      */
     private $leadEventLogRepository;
 
-    /**
-     * Adder constructor.
-     */
     public function __construct(LeadRepository $leadRepository, LeadEventLogRepository $leadEventLogRepository)
     {
         $this->leadRepository         = $leadRepository;
@@ -33,26 +30,31 @@ class Adder
     }
 
     /**
-     * @param $isManualAction
+     * @param bool $isManualAction
      *
      * @return CampaignMember
      */
     public function createNewMembership(Lead $contact, Campaign $campaign, $isManualAction)
     {
-        // BC support for prior to 2.14.
-        // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
-        // Start the new rotation at 2
-        $rotation = 1;
-        if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
-            $rotation = 2;
-        }
-
         $campaignMember = new CampaignMember();
         $campaignMember->setLead($contact);
         $campaignMember->setCampaign($campaign);
         $campaignMember->setManuallyAdded($isManualAction);
         $campaignMember->setDateAdded(new \DateTime());
-        $campaignMember->setRotation($rotation);
+        $campaignMember->setRotation(1);
+
+        // BC support for prior to 2.14.
+        // If the contact was in the campaign to start with then removed, their logs remained but the original membership was removed
+        // Start the new rotation at 2
+        if ($this->leadEventLogRepository->hasBeenInCampaignRotation($contact->getId(), $campaign->getId(), 1)) {
+            if (!$campaign->allowRestart()) {
+                $campaignMember->setManuallyRemoved(true);
+                $campaignMember->setDateLastExited(new \DateTime());
+            } else {
+                $campaignMember->setRotation(2);
+            }
+        }
+
         $this->saveCampaignMember($campaignMember);
 
         return $campaignMember;

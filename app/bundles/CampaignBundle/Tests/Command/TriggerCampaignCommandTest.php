@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
+use DateTime;
+use DateTimeZone;
+use Doctrine\DBAL\Connection;
 use Exception;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\Entity\Lead;
 use Mautic\CampaignBundle\Entity\LeadRepository;
-use Mautic\CampaignBundle\Executioner\InactiveExecutioner;
-use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
+use Mautic\LeadBundle\Entity\Lead as Contact;
+use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Entity\LeadRepository as ContactRepository;
 use Mautic\LeadBundle\Entity\ListLead;
 use Mautic\LeadBundle\Entity\ListLeadRepository;
 use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
@@ -41,7 +45,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     /**
      * @throws Exception
      */
-    public function testCampaignExecutionForAll()
+    public function testCampaignExecutionForAll(): void
     {
         // Process in batches of 10 to ensure batching is working as expected
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -89,8 +93,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->shiftEmailEventsToThePast();
+
+        // Execute the campaign again to send scheduled events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
 
         // Send email 1 should no longer be scheduled
@@ -132,8 +137,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[3]);
         $this->assertCount(25, $byEvent[10]);
 
-        // Wait another 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        $this->shiftEventsToThePast([4, 5]);
+        $eventDate = clone $this->eventDate;
+        $eventDate->modify('-40 second');
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '-l' => 10]);
@@ -155,14 +161,14 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(25, $byEvent[14]);
         $this->assertCount(25, $byEvent[15]);
 
-        $utcTimezone = new \DateTimeZone('UTC');
+        $utcTimezone = new DateTimeZone('UTC');
         foreach ($byEvent[14] as $log) {
             if (0 === (int) $log['is_scheduled']) {
                 $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (2 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
@@ -174,8 +180,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
                 $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (6 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
@@ -254,8 +260,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->shiftEmailEventsToThePast();
+
+        // Execute the campaign again to send scheduled events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
 
         // Send email 1 should no longer be scheduled
@@ -297,8 +304,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(1, $byEvent[3]);
         $this->assertCount(1, $byEvent[10]);
 
-        // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        $this->shiftEventsToThePast([4, 5]);
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-id' => 1]);
@@ -317,32 +323,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[14]);
         $this->assertCount(0, $byEvent[15]);
 
-        $utcTimezone = new \DateTimeZone('UTC');
-        foreach ($byEvent[14] as $log) {
-            if (0 === (int) $log['is_scheduled']) {
-                $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
-            }
-
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
-
-            if (2 !== $diff->i) {
-                $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
-            }
-        }
-
-        foreach ($byEvent[15] as $log) {
-            if (0 === (int) $log['is_scheduled']) {
-                $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
-            }
-
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
-
-            if (6 !== $diff->i) {
-                $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
-            }
-        }
         $byEvent = $this->getCampaignEventLogs([6, 7, 8, 9]);
         $tags    = $this->getTagCounts();
 
@@ -413,8 +393,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->fetchAll();
         $this->assertCount(0, $stats);
 
-        // Wait 6 seconds then execute the campaign again to send scheduled events
-        $this->getContainer()->get(ScheduledExecutioner::class)->setNowTime(new \DateTime('+'.self::CONDITION_SECONDS.' seconds'));
+        $this->shiftEmailEventsToThePast();
+
+        // Execute the campaign again to send scheduled events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
 
         // Send email 1 should no longer be scheduled
@@ -456,8 +437,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(2, $byEvent[3]);
         $this->assertCount(2, $byEvent[10]);
 
-        // Wait 6 seconds to go beyond the inaction timeframe
-        $this->getContainer()->get(InactiveExecutioner::class)->setNowTime(new \DateTime('+'.(self::CONDITION_SECONDS * 2).' seconds'));
+        $this->shiftEventsToThePast([4, 5]);
+        $eventDate = clone $this->eventDate;
+        $eventDate->modify('-40 second');
 
         // Execute the command again to trigger inaction related events
         $this->runCommand('mautic:campaigns:trigger', ['-i' => 1, '--contact-ids' => '1,2,3,4,19']);
@@ -479,14 +461,14 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(3, $byEvent[14]);
         $this->assertCount(3, $byEvent[15]);
 
-        $utcTimezone = new \DateTimeZone('UTC');
+        $utcTimezone = new DateTimeZone('UTC');
         foreach ($byEvent[14] as $log) {
             if (0 === (int) $log['is_scheduled']) {
                 $this->fail('Tag EmailNotOpen is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (2 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen should be scheduled for around 2 minutes ('.$diff->i.' minutes)');
@@ -498,8 +480,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
                 $this->fail('Tag EmailNotOpen Again is not scheduled for lead ID '.$log['lead_id']);
             }
 
-            $scheduledFor = new \DateTime($log['trigger_date'], $utcTimezone);
-            $diff         = $this->eventDate->diff($scheduledFor);
+            $scheduledFor = new DateTime($log['trigger_date'], $utcTimezone);
+            $diff         = $eventDate->diff($scheduledFor);
 
             if (6 !== $diff->i) {
                 $this->fail('Tag EmailNotOpen Again should be scheduled for around 6 minutes ('.$diff->i.' minutes)');
@@ -526,6 +508,141 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
 
         // No one should be tagged as EmailNotOpen because the actions are still scheduled
         $this->assertFalse(isset($tags['EmailNotOpen']));
+    }
+
+    public function testNonRepeatableCampaignBcForQueryOptimization(): void
+    {
+        /** @var ListLeadRepository $segmentContactsRepository */
+        $segmentContactsRepository = $this->em->getRepository(ListLead::class);
+
+        /** @var LeadRepository $campaignContactsRepository */
+        $campaignContactsRepository = $this->em->getRepository(Lead::class);
+
+        /** @var ContactRepository $contactsRepository */
+        $contactsRepository = $this->em->getRepository(Contact::class);
+
+        $campaign = $this->createCampaign('Campaign 1');
+        $segment  = $this->createSegment('Segment A', [['object' => 'lead', 'glue' => 'and', 'field' => 'firstname', 'type' => 'text', 'operator' => 'startsWith', 'properties' => ['filter' => 'Contact A']]]);
+        $contact1 = $this->createLead('Contact A1');
+
+        $this->createLead('Contact A2');
+        $this->createEvent('Add 2 points', $campaign, 'lead.changepoints', 'action', ['points' => 2]);
+        $this->createEvent('Remove 1 point', $campaign, 'lead.changepoints', 'action', ['points' => -1]);
+
+        $campaign->addList($segment);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->runCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $segmentContacts);
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(1, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNull($campaignContact->getDateLastExited());
+            Assert::assertFalse($campaignContact->getManuallyRemoved());
+            Assert::assertSame(1, $campaignContact->getRotation());
+        }
+
+        // Delete the campaign members manually and build again to see if the campaign will behave correctly.
+        // We used to delete the members when they were removed from the campaign. That's the BC we are mimicing here.
+        $campaignContactsRepository->deleteEntities($campaignContacts);
+
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(1, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNotNull($campaignContact->getDateLastExited());
+            Assert::assertTrue($campaignContact->getManuallyRemoved());
+            Assert::assertSame(1, $campaignContact->getRotation());
+        }
+    }
+
+    public function testRepeatableCampaignBcForQueryOptimization(): void
+    {
+        /** @var ListLeadRepository $segmentContactsRepository */
+        $segmentContactsRepository = $this->em->getRepository(ListLead::class);
+
+        /** @var LeadRepository $campaignContactsRepository */
+        $campaignContactsRepository = $this->em->getRepository(Lead::class);
+
+        /** @var ContactRepository $contactsRepository */
+        $contactsRepository = $this->em->getRepository(Contact::class);
+
+        $campaign = $this->createCampaign('Campaign 1');
+        $segment  = $this->createSegment('Segment A', [['object' => 'lead', 'glue' => 'and', 'field' => 'firstname', 'type' => 'text', 'operator' => 'startsWith', 'properties' => ['filter' => 'Contact A']]]);
+        $contact1 = $this->createLead('Contact A1');
+
+        $this->createLead('Contact A2');
+        $this->createEvent('Add 2 points', $campaign, 'lead.changepoints', 'action', ['points' => 2]);
+        $this->createEvent('Remove 1 point', $campaign, 'lead.changepoints', 'action', ['points' => -1]);
+
+        $campaign->addList($segment);
+        $campaign->setAllowRestart(true);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        $this->runCommand('mautic:segments:update', ['--list-id' => $segment->getId()]);
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $segmentContacts);
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(1, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNull($campaignContact->getDateLastExited());
+            Assert::assertFalse($campaignContact->getManuallyRemoved());
+            Assert::assertSame(1, $campaignContact->getRotation());
+        }
+
+        // Delete the campaign members manually and build again to see if the campaign will behave correctly.
+        // We used to delete the members when they were removed from the campaign. That's the BC we are mimicing here.
+        $campaignContactsRepository->deleteEntities($campaignContacts);
+
+        $this->runCommand('mautic:campaigns:update', ['--campaign-id' => $campaign->getId()]);
+        $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign->getId()]);
+
+        /** @var ListLead[] $segmentContacts */
+        $segmentContacts  = $segmentContactsRepository->findBy(['list' => $segment]);
+
+        /** @var Lead[] $campaignContacts */
+        $campaignContacts = $campaignContactsRepository->findBy(['campaign' => $campaign]);
+
+        Assert::assertCount(2, $campaignContacts);
+        Assert::assertSame(2, $contactsRepository->find($contact1->getId())->getPoints());
+
+        foreach ($campaignContacts as $campaignContact) {
+            Assert::assertNull($campaignContact->getDateLastExited());
+            Assert::assertFalse($campaignContact->getManuallyRemoved());
+            Assert::assertSame(2, $campaignContact->getRotation());
+        }
     }
 
     public function testCampaignActionChangeMembership(): void
@@ -612,9 +729,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
     }
 
     /**
-     * @return array
+     * @return int[]
      */
-    private function getTagCounts()
+    private function getTagCounts(): array
     {
         $tags = $this->db->createQueryBuilder()
             ->select('t.tag, count(*) as the_count')
@@ -645,5 +762,52 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         }
 
         return $nonActionCount;
+    }
+
+    private function shiftEmailEventsToThePast(): void
+    {
+        $this->shiftEventsToThePast([2]);
+        $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
+            ->set('trigger_date', ':trigger')
+            ->where('campaign_id = :id')
+            ->andWhere('trigger_date IS NOT NULL')
+            ->andWhere('event_id IN (:eventId)')
+            ->setParameter('trigger', (new DateTime('-40 second'))->format('Y-m-d H:i:s'))
+            ->setParameter('id', 1)
+            ->setParameter('eventId', [2], Connection::PARAM_INT_ARRAY)
+            ->execute();
+
+        $this->em->clear();
+    }
+
+    /**
+     * @param int[] $ids
+     */
+    private function shiftEventsToThePast(array $ids): void
+    {
+        $this->db->createQueryBuilder()->update(MAUTIC_TABLE_PREFIX.'campaign_events')
+            ->set('trigger_date', ':trigger')
+            ->where('trigger_date IS NOT NULL')
+            ->andWhere('id IN (:id)')
+            ->setParameter('trigger', (new DateTime('-40 second'))->format('Y-m-d H:i:s'))
+            ->setParameter('id', $ids, Connection::PARAM_INT_ARRAY)
+            ->execute();
+
+        $this->em->clear();
+    }
+
+    /**
+     * @param mixed[] $filters
+     */
+    protected function createSegment(string $alias, array $filters): LeadList
+    {
+        $segment = new LeadList();
+        $segment->setAlias($alias);
+        $segment->setName($alias);
+        $segment->setPublicName($alias);
+        $segment->setFilters($filters);
+        $this->em->persist($segment);
+
+        return $segment;
     }
 }

@@ -19,8 +19,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get the details of leads added to a campaign.
      *
-     * @param      $campaignId
-     * @param null $leads
+     * @param int        $campaignId
+     * @param int[]|null $leads
      *
      * @return array
      */
@@ -54,8 +54,8 @@ class LeadRepository extends CommonRepository
     /**
      * Get leads for a specific campaign.
      *
-     * @param      $campaignId
-     * @param null $eventId
+     * @param int      $campaignId
+     * @param int|null $eventId
      *
      * @return array
      */
@@ -95,8 +95,8 @@ class LeadRepository extends CommonRepository
     /**
      * Updates lead ID (e.g. after a lead merge).
      *
-     * @param $fromLeadId
-     * @param $toLeadId
+     * @param int $fromLeadId
+     * @param int $toLeadId
      */
     public function updateLead($fromLeadId, $toLeadId)
     {
@@ -337,7 +337,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @return array
      */
@@ -390,10 +390,6 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter, true);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
 
-        if (!$campaignCanBeRestarted) {
-            $this->updateQueryWithHistoryExclusion($campaignId, $qb);
-        }
-
         $result = $qb->execute()->fetch();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
@@ -428,10 +424,6 @@ class LeadRepository extends CommonRepository
 
         $this->updateQueryFromContactLimiter('ll', $qb, $limiter);
         $this->updateQueryWithExistingMembershipExclusion((int) $campaignId, $qb, (bool) $campaignCanBeRestarted);
-
-        if (!$campaignCanBeRestarted) {
-            $this->updateQueryWithHistoryExclusion($campaignId, $qb);
-        }
 
         $results = $qb->execute()->fetchAll();
 
@@ -472,7 +464,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @return array
      */
@@ -531,7 +523,7 @@ class LeadRepository extends CommonRepository
     }
 
     /**
-     * @param $campaignId
+     * @param int $campaignId
      *
      * @return array
      */
@@ -559,11 +551,13 @@ class LeadRepository extends CommonRepository
         return $segments;
     }
 
-    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false)
+    private function updateQueryWithExistingMembershipExclusion(int $campaignId, QueryBuilder $qb, bool $campaignCanBeRestarted = false): void
     {
-        $membershipConditions = $qb->expr()->and(
-            $qb->expr()->eq('cl.lead_id', 'll.lead_id'),
-            $qb->expr()->eq('cl.campaign_id', (int) $campaignId)
+        $qb->leftJoin(
+            'll',
+            MAUTIC_TABLE_PREFIX.'campaign_leads',
+            'cl',
+            "cl.lead_id = ll.lead_id AND cl.campaign_id = {$campaignId}"
         );
 
         if ($campaignCanBeRestarted) {
@@ -573,22 +567,10 @@ class LeadRepository extends CommonRepository
                 $qb->expr()->isNull('cl.date_last_exited'),
             );
 
-            $membershipConditions = $qb->expr()->and(
-                $membershipConditions,
-                $qb->expr()->or($alreadyInCampaign, $removedFromCampaignManually)
-            );
+            $qb->expr()->or($alreadyInCampaign, $removedFromCampaignManually, $qb->expr()->isNull('cl.lead_id'));
+        } else {
+            $qb->andWhere($qb->expr()->isNull('cl.lead_id'));
         }
-
-        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
-            ->where(
-                $qb->expr()->andX($membershipConditions)
-            );
-
-        $qb->andWhere(
-            sprintf('NOT EXISTS (%s)', $subq->getSQL())
-        );
     }
 
     private function updateQueryWithSegmentMembershipExclusion(array $segments, QueryBuilder $qb)
@@ -606,28 +588,6 @@ class LeadRepository extends CommonRepository
                     $qb->expr()->eq('ll.lead_id', 'cl.lead_id'),
                     $qb->expr()->eq('ll.manually_removed', 0),
                     $qb->expr()->in('ll.leadlist_id', $segments)
-                )
-            );
-
-        $qb->andWhere(
-            sprintf('NOT EXISTS (%s)', $subq->getSQL())
-        );
-    }
-
-    /**
-     * Exclude contacts with any previous campaign history; this is mainly BC for pre 2.14.0 where the membership entry was deleted.
-     *
-     * @param $campaignId
-     */
-    private function updateQueryWithHistoryExclusion($campaignId, QueryBuilder $qb)
-    {
-        $subq = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('null')
-            ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'el')
-            ->where(
-                $qb->expr()->andX(
-                    $qb->expr()->eq('el.lead_id', 'll.lead_id'),
-                    $qb->expr()->eq('el.campaign_id', (int) $campaignId)
                 )
             );
 
