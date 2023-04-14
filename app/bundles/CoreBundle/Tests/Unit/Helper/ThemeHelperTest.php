@@ -315,9 +315,8 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @return \ArrayIterator<int,\SplFileInfo>
+                 * @inheritDoc
                  */
-                #[\ReturnTypeWillChange]
                 public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
@@ -394,7 +393,7 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @return void
                  */
-                public function dumpFile($filename, $content)
+                public function dumpFile(string $filename, $content)
                 {
                     Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
@@ -420,9 +419,9 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @return \ArrayIterator<int,\SplFileInfo>
+                 * @inheritDoc
                  */
-                public function getIterator(): \ArrayIterator
+                public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
                 }

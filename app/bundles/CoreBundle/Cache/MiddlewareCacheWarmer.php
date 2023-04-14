@@ -32,10 +32,15 @@ class MiddlewareCacheWarmer implements CacheWarmerInterface
         $this->specs     = new SplPriorityQueue();
     }
 
+    /**
+     * @inerhitDoc
+     */
     public function warmUp(string $cacheDirectory)
     {
         $this->cacheFile = sprintf('%s/middlewares.cache.php', $cacheDirectory);
         $this->createCacheFile($cacheDirectory);
+
+        return [];
     }
 
     public function isOptional()
