@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\EventListener\ReportNormalizeSubscriber;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportDataEvent;
-use PHPUnit\Framework\TestCase;
 
-class ReportNormalizeSubscriberTest extends TestCase
+class ReportNormalizeSubscriberTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * @dataProvider normalizeData
      *
@@ -21,16 +23,15 @@ class ReportNormalizeSubscriberTest extends TestCase
     public function testOnReportDisplay(string $value, string $type, array $properties, string $expected): void
     {
         $fieldModel = self::$container->get('mautic.lead.model.field');
-        \assert($fieldModel instanceof FieldModel::class);
-        
+        \assert($fieldModel instanceof FieldModel);
         $field = new LeadField();
         $field->setType($type);
         $field->setObject('lead');
         $field->setAlias('field1');
-        $field->setName($alias);
+        $field->setName($field->getAlias());
         $field->setProperties($properties);
 
-        $fieldModel->save($field);
+        $fieldModel->saveEntity($field);
 
         $rows = [
             [

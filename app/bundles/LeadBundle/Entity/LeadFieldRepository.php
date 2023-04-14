@@ -87,8 +87,9 @@ class LeadFieldRepository extends CommonRepository
             ->where('f.is_published = :published')
             ->setParameter('published', true, 'boolean')
             ->addOrderBy('f.field_order', 'asc');
+        $results = $fq->execute()->fetchAllAssociative();
 
-        return $fq->execute()->fetchAll();
+        return array_column($results, null, 'alias');
     }
 
     /**
