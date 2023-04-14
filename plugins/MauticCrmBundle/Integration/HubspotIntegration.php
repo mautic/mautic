@@ -596,7 +596,7 @@ class HubspotIntegration extends CrmAbstractIntegration
                         $this->em->detach($company);
                     }
                 } catch (\Exception $exception) {
-                    $this->logger->addWarning($exception->getMessage());
+                    $this->logger->warning($exception->getMessage());
 
                     return;
                 }

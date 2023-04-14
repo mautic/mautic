@@ -37,10 +37,10 @@ class UrlHelper
             if (200 === $response->getStatusCode()) {
                 return rtrim($response->getBody());
             } else {
-                $this->logger->addWarning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
+                $this->logger->warning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
             }
         } catch (\Exception $exception) {
-            $this->logger->addError(
+            $this->logger->error(
                 $exception->getMessage(),
                 ['exception' => $exception]
             );

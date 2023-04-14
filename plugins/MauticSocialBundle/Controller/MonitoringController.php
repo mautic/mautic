@@ -153,7 +153,7 @@ class MonitoringController extends FormController
                     // update the audit log
                     $this->updateAuditLog($entity, $ipLookupHelper, 'create');
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getTitle(),
@@ -306,7 +306,7 @@ class MonitoringController extends FormController
                     // update the audit log
                     $this->updateAuditLog($entity, $ipLookupHelper, 'update');
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getTitle(),

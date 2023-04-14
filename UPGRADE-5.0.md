@@ -32,6 +32,7 @@
     * Transactional emails in campaigns ignore the DNC setting.
     * There are no unsubscribe headers in transactional emails.
     * The SortablePanels templates, JS and CSS was removed as unused.
+    * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
 
 # Dependency injection improvements
 

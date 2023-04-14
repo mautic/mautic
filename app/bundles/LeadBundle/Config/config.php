@@ -1088,7 +1088,7 @@ return [
             'mautic.lead.fixture.contact' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager', 'mautic.helper.core_parameters'],
+                'arguments' => ['mautic.helper.core_parameters'],
             ],
             'mautic.lead.fixture.segment' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadLeadListData::class,
@@ -1098,12 +1098,10 @@ return [
             'mautic.lead.fixture.category' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategoryData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.lead.fixture.categorizedleadlists' => [
                 'class'     => \Mautic\LeadBundle\DataFixtures\ORM\LoadCategorizedLeadListData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager'],
             ],
             'mautic.lead.fixture.test.page_hit' => [
                 'class'    => \Mautic\LeadBundle\Tests\DataFixtures\ORM\LoadPageHitData::class,
@@ -1153,7 +1151,7 @@ return [
         'segment_rebuild_time_warning'                                                          => 30,
         'segment_build_time_warning'                                                            => 30,
         'contact_export_in_background'                                                          => true,
-        'contact_export_dir'                                                                    => '%kernel.root_dir%/../media/files/temp',
+        'contact_export_dir'                                                                    => '%kernel.project_dir%/media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
         'contact_allow_multiple_companies'                                                      => true,
     ],
