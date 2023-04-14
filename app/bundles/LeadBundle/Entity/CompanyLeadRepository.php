@@ -48,9 +48,8 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Get companies by leadId.
      *
-     * @param int       $leadId
-     * @param int|null  $companyId
-     * @param bool|null $onlyPrimary
+     * @param int      $leadId
+     * @param int|null $companyId
      *
      * @return array
      *
