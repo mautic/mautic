@@ -22,7 +22,6 @@ class CleanupMaintenanceCommandTest extends MauticMysqlTestCase
 
         $contactId = $lead->getId();
 
-        // Delete unused IP address.
         $this->runcommand('mautic:maintenance:cleanup', ['--days-old' => 180, '--no-interaction' => true]);
 
         $this->assertNull($this->getContainer()->get('mautic.lead.model.lead')->getEntity($contactId));
