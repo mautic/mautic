@@ -65,7 +65,6 @@ final class HtmlExtension extends AbstractExtension
                 // Keeping index as 0, 1, 2, etc instead of 0, 3, 4, 6, etc. when
                 // there are too many spaces between values
                 $value = array_values($dirty);
-
             } elseif ('class' === $attr && !empty($value)) {
                 // for 'class' attribute, we convert single value to an array
                 $value = [$value];
