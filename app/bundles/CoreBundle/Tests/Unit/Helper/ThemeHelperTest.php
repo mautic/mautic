@@ -273,8 +273,6 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @param string               $originDir
-                 * @param string               $targetDir
                  * @param ?\Traversable<mixed> $iterator
                  * @param mixed[]              $options
                  */
@@ -315,7 +313,7 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @inheritDoc
+                 * {@inheritDoc}
                  */
                 public function getIterator()
                 {
@@ -374,8 +372,6 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @param ?\Traversable<mixed> $iterator
                  * @param array<mixed>         $options
-                 *
-                 * @return void
                  */
                 public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
                 {
@@ -419,7 +415,7 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @inheritDoc
+                 * {@inheritDoc}
                  */
                 public function getIterator()
                 {

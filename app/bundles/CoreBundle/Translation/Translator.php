@@ -44,7 +44,7 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function warmUp(string $cacheDir)
     {

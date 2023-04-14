@@ -15,8 +15,6 @@ class PluginFactory implements SecurityFactoryInterface
      * @param $config
      * @param $userProvider
      * @param $defaultEntryPoint
-     *
-     * @return array
      */
     public function create(ContainerBuilder $container, string $id, array $config, string $userProvider, ?string $defaultEntryPoint): array
     {
