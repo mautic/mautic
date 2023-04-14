@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -100,9 +100,9 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         }
 
         try {
-            /** @var User|string $user */
+            /** @var User $user */
             $user = $userProvider->loadUserByUsername($credentials['username']);
-        } catch (UsernameNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
             /** @var string $user */
             $user = $credentials['username'];
         }

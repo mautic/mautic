@@ -175,7 +175,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $firewall = 'mautic';
         $session  = self::$container->get('session');
-        $token    = new UsernamePasswordToken($user, null, $firewall, $user->getRoles());
+        $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
         $session->set('_security_'.$firewall, serialize($token));
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());
