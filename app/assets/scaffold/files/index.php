@@ -6,23 +6,16 @@ define('MAUTIC_ROOT_DIR', __DIR__);
 date_default_timezone_set('UTC');
 
 require_once 'autoload.php';
-$config = include 'app/config/environment.php';
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
+use Mautic\CoreBundle\Loader\EnvironmentHandler;
 use Mautic\Middleware\MiddlewareBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
-ErrorHandler::register($config['env']);
+$config = (new EnvironmentHandler())->getEnvParameters();
+ErrorHandler::register($config['ENV']);
 
-if (
-    'dev' === strtolower($config['env'])
-    && extension_loaded('apcu')
-    && in_array(@$_SERVER['REMOTE_ADDR'], $config['dev_ip_whitelist'])
-) {
-    @apcu_clear_cache();
-}
-
-$kernel   = (new MiddlewareBuilder(new AppKernel($config['env'], $config['debug'])))->resolve();
+$kernel   = (new MiddlewareBuilder(new AppKernel($config['ENV'], $config['DEBUG'])))->resolve();
 $request  = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();
