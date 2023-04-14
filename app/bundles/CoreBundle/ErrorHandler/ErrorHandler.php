@@ -484,25 +484,54 @@ namespace Mautic\CoreBundle\ErrorHandler {
             }
 
             if ('dev' == self::$environment || $this->displayErrors) {
-                $error['file'] = str_replace(self::$root, '', $error['file']);
-                $errorMessage  = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
-                $message       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
+                $error['file']          = str_replace(self::$root, '', $error['file']);
+                $errorMessage           = (isset($error['logMessage'])) ? $error['logMessage'] : $error['message'];
+                $error['message']       = "$errorMessage - in file {$error['file']} - at line {$error['line']}";
             } else {
-                if (!empty($error['showExceptionMessage'])) {
-                    $message = $error['message'];
-                } else {
-                    $message    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
-                    $submessage = 'System administrators, check server logs for errors.';
+                if (empty($error['showExceptionMessage'])) {
+                    unset($error);
+                    $error['message']    = 'The site is currently offline due to encountering an error. If the problem persists, please contact the system administrator.';
+                    $error['submessage'] = 'System administrators, check server logs for errors.';
                 }
-                unset($error);
             }
 
             defined('MAUTIC_OFFLINE') or define('MAUTIC_OFFLINE', 1);
 
             try {
-                ob_start();
-                include __DIR__.'/../../../../offline.php';
-                $content = ob_get_clean();
+                // Get the URLs base path
+                $base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
+
+                // Determine if there is an asset prefix
+                $root = self::$root;
+
+                /** @var array<string, mixed> $paths */
+                $paths = [];
+                include self::$root.'/app/config/paths.php';
+
+                $assetPrefix = $paths['asset_prefix'];
+                if (!empty($assetPrefix)) {
+                    if ('/' == substr($assetPrefix, -1)) {
+                        $assetPrefix = substr($assetPrefix, 0, -1);
+                    }
+                }
+                $assetBase          = $assetPrefix.$base.$paths['assets'];
+                $error['assetBase'] = $assetBase;
+
+                // Allow a custom error page
+                $loader             = new \Twig\Loader\FilesystemLoader(['app/bundles/CoreBundle/Resources/views/Offline', 'app/bundles/CoreBundle/Resources/views/Exception']);
+                $twig               = new \Twig\Environment($loader);
+                // This is the same filter Located at Mautic\CoreBundle\Twig\Extension\ExceptionExtension;
+                $twig->addFunction(new \Twig\TwigFunction('getRootPath', function () {
+                    $root = realpath(__DIR__.'/../../../../');
+
+                    return $root;
+                }));
+
+                if ($loader->exists('custom_offline.html.twig')) {
+                    $content = $twig->render('custom_offline.html.twig', ['error' => $error]);
+                } else {
+                    $content = $twig->render('offline.html.twig', ['error' => $error]);
+                }
             } catch (\Exception $exception) {
                 return $exception->getMessage();
             }

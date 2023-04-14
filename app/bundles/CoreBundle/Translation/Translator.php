@@ -95,4 +95,21 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
 
         return $this->trans($alternative, $parameters, $domain, $locale);
     }
+
+    public function getJsLang(): string
+    {
+        $defaultMessages = $this->translator->getCatalogue('en_US')->all('javascript');
+        $messages        = $this->translator->getCatalogue()->all('javascript');
+
+        $oldKeys = [
+            'chosenChooseOne'     => $this->translator->trans('mautic.core.form.chooseone'),
+            'chosenChooseMore'    => $this->translator->trans('mautic.core.form.choosemultiple'),
+            'chosenNoResults'     => $this->translator->trans('mautic.core.form.nomatches'),
+            'pleaseWait'          => $this->translator->trans('mautic.core.wait'),
+            'popupBlockerMessage' => $this->translator->trans('mautic.core.popupblocked'),
+        ];
+        $jsLang = array_merge($defaultMessages, $messages, $oldKeys);
+
+        return json_encode($jsLang, JSON_PRETTY_PRINT | JSON_FORCE_OBJECT);
+    }
 }

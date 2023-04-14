@@ -4,7 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;

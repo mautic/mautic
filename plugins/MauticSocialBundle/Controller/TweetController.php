@@ -4,6 +4,7 @@ namespace MauticPlugin\MauticSocialBundle\Controller;
 
 use Mautic\CoreBundle\Controller\FormController;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class TweetController.
@@ -49,7 +50,7 @@ class TweetController extends FormController
      */
     protected function getTemplateBase()
     {
-        return 'MauticSocialBundle:Tweet';
+        return '@MauticSocial/Tweet';
     }
 
     /**
@@ -88,9 +89,11 @@ class TweetController extends FormController
      */
     public function getUpdateSelect()
     {
-        return ('POST' == $this->request->getMethod())
-            ? $this->request->request->get('twitter_tweet[updateSelect]', false, true)
-            : $this->request->get('updateSelect', false);
+        $request = $this->getCurrentRequest();
+
+        return ('POST' === $request->getMethod())
+            ? $request->request->get('twitter_tweet[updateSelect]', false, true)
+            : $request->get('updateSelect', false);
     }
 
     /**
@@ -110,9 +113,9 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function indexAction($page = 1)
+    public function indexAction(Request $request, $page = 1)
     {
-        return parent::indexStandard($page);
+        return parent::indexStandard($request, $page);
     }
 
     /**
@@ -120,9 +123,9 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function newAction()
+    public function newAction(Request $request)
     {
-        return parent::newStandard();
+        return parent::newStandard($request);
     }
 
     /**
@@ -132,13 +135,13 @@ class TweetController extends FormController
      *
      * @return string
      */
-    protected function getTemplateName($file, string $engine = self::ENGINE_PHP)
+    protected function getTemplateName($file)
     {
-        if (('form.html.twig' === $file) && 1 == $this->request->get('modal')) {
-            return parent::getTemplateName('form.modal.html.twig');
+        if (('form.html.twig' === $file) && 1 == $this->getCurrentRequest()->get('modal')) {
+            return '@MauticSocial/Tweet/form_modal.html.twig';
         }
 
-        return parent::getTemplateName($file);
+        return '@MauticSocial/'.$file;
     }
 
     /**
@@ -149,9 +152,9 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|Response
      */
-    public function editAction($objectId, $ignorePost = false)
+    public function editAction(Request $request, $objectId, $ignorePost = false)
     {
-        return parent::editStandard($objectId, $ignorePost);
+        return parent::editStandard($request, $objectId, $ignorePost);
     }
 
     /**
@@ -175,9 +178,9 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function cloneAction($objectId)
+    public function cloneAction(Request $request, $objectId)
     {
-        return parent::cloneStandard($objectId);
+        return parent::cloneStandard($request, $objectId);
     }
 
     /**
@@ -187,9 +190,9 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteAction($objectId)
+    public function deleteAction(Request $request, $objectId)
     {
-        return parent::deleteStandard($objectId);
+        return parent::deleteStandard($request, $objectId);
     }
 
     /**
@@ -197,8 +200,8 @@ class TweetController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function batchDeleteAction()
+    public function batchDeleteAction(Request $request)
     {
-        return parent::batchDeleteStandard();
+        return parent::batchDeleteStandard($request);
     }
 }
