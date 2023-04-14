@@ -39,8 +39,7 @@
     "symfony/maker-bundle": "^1.38",
     "symfony/phpunit-bridge": "~5.1.0",
     "symfony/var-dumper": "~4.4.0",
-    "symfony/web-profiler-bundle": "~4.4.0",
-    "webfactory/exceptions-bundle": "~4.3"
+    "symfony/web-profiler-bundle": "~4.4.0"
   },
   "replace": {
     "mautic/grapes-js-builder-bundle": "self.version",
@@ -95,6 +94,14 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/FOSOAuthServerBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/SpBundle.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
     }
   ],
   "conflict": {

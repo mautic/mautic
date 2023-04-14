@@ -231,7 +231,7 @@ class ClientController extends FormController
                     }
                     $client->setRole($this->getUser()->getRole());
                     $model->saveEntity($client);
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.api.client.notice.created',
                         [
                             '%name%'         => $client->getName(),
@@ -342,7 +342,7 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     $model->saveEntity($client, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $client->getName(),

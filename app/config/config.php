@@ -166,10 +166,14 @@ $container->loadFromExtension('doctrine', [
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'        => '%kernel.project_dir%/app/migrations',
-    'namespace'       => 'Mautic\\Migrations',
-    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
-    'name'            => 'Mautic Migrations',
+    'migrations_paths' => [
+        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+    ],
+    'storage' => [
+        'table_storage' => [
+            'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+        ],
+    ],
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
@@ -260,6 +264,11 @@ $container->loadFromExtension('framework', [
             'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
         ],
     ],
+]);
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'exception_controller' => null,
 ]);
 
 $rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');
