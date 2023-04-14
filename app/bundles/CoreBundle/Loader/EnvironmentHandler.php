@@ -33,8 +33,12 @@ class EnvironmentHandler
         '172.17.0.1',
     ];
 
+    /**
+     * @var string
+     */
     public const ROOT_PATH = __DIR__.'/../../..';
 
+    /** @var array<mixed> */
     private array $envParameters = [];
 
     public function __construct()
@@ -44,7 +48,7 @@ class EnvironmentHandler
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      *
      * Responsible for loading the environment.php file and merging it with the default environment setup.
      * If the environment.php file is not present, the default environment setup will be used.
@@ -68,7 +72,7 @@ class EnvironmentHandler
     }
 
     /**
-     * @return array
+     * @return array<mixed>
      *
      * Returns the default environment setup
      */
@@ -96,9 +100,9 @@ class EnvironmentHandler
     }
 
     /**
-     * @return array
-     *               Returns the environment parameters.
-     *               The environment parameters are the parameters defined in the environment.php file.
+     * @return array<mixed>
+     *                      Returns the environment parameters.
+     *                      The environment parameters are the parameters defined in the environment.php file.
      */
     public function getEnvParameters(): array
     {
