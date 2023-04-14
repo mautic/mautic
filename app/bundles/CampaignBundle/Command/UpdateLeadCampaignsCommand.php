@@ -21,8 +21,6 @@ class UpdateLeadCampaignsCommand extends ModeratedCommand
 {
     private CampaignRepository $campaignRepository;
 
-    private CoreParametersHelper $coreParametersHelper;
-
     private TranslatorInterface $translator;
     private MembershipBuilder $membershipBuilder;
     private LoggerInterface $logger;
