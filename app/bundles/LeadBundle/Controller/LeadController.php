@@ -6,6 +6,7 @@ use function assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -300,7 +301,7 @@ class LeadController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, IntegrationHelper $integrationHelper, $objectId)
+    public function viewAction(Request $request, IntegrationHelper $integrationHelper, CoreParametersHelper $coreParametersHelper, $objectId)
     {
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
@@ -432,7 +433,7 @@ class LeadController extends FormController
                     //    ]
                     //)->getContent(),
                 ],
-                'allowMultipleCompanies' => $this->get('mautic.helper.core_parameters')->get('contact_allow_multiple_companies'),
+                'allowMultipleCompanies' => $coreParametersHelper->get('contact_allow_multiple_companies'),
                 'contentTemplate'        => '@MauticLead/Lead/lead.html.twig',
                 'passthroughVars'        => [
                     'activeLink'    => '#mautic_contact_index',
