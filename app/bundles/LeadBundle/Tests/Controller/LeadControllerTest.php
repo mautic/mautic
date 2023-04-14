@@ -24,6 +24,8 @@ use Tightenco\Collect\Support\Collection;
 
 class LeadControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     /**
      * @throws \Doctrine\ORM\ORMException
      */
@@ -727,5 +729,21 @@ class LeadControllerTest extends MauticMysqlTestCase
             'objectId' => $contact->getId(),
             'action'   => $action,
         ]);
+    }
+
+    public function testMultipleCompanyFeature(): void
+    {
+        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
+        self::assertSame('multiple', $multiple);
+    }
+
+    public function testSimpleCompanyFeature(): void
+    {
+        $this->setUpSymfony(array_merge($this->configParams, ['contact_allow_multiple_companies' => 0]));
+
+        $crawler     = $this->client->request('GET', 's/contacts/new/');
+        $multiple    = $crawler->filterXPath('//*[@id="lead_companies"]')->attr('multiple');
+        self::assertNull($multiple);
     }
 }

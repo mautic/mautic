@@ -46,12 +46,15 @@ class CompanyLeadRepository extends CommonRepository
     /**
      * Get companies by leadId.
      *
-     * @param $leadId
-     * @param $companyId
+     * @param int       $leadId
+     * @param int|null  $companyId
+     * @param bool|null $onlyPrimary
      *
      * @return array
+     *
+     * @throws \Doctrine\DBAL\Exception
      */
-    public function getCompaniesByLeadId($leadId, $companyId = null)
+    public function getCompaniesByLeadId($leadId, $companyId = null, bool $onlyPrimary = false)
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
@@ -65,6 +68,12 @@ class CompanyLeadRepository extends CommonRepository
             $q->andWhere(
                 $q->expr()->eq('cl.company_id', ':companyId')
             )->setParameter('companyId', $companyId);
+        }
+
+        if ($onlyPrimary) {
+            $q->andWhere(
+                $q->expr()->eq('cl.is_primary', true)
+            );
         }
 
         return $q->execute()->fetchAll();
@@ -174,6 +183,26 @@ class CompanyLeadRepository extends CommonRepository
             $qb->expr()->eq('lead_id', $leadId)
         )->andWhere(
             $qb->expr()->eq('is_primary', 1)
+        )->execute();
+    }
+
+    public function removeAllSecondaryCompanies(): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
+        $qb->where(
+            $qb->expr()->eq('is_primary', 0)
+        )->execute();
+    }
+
+    public function removeContactSecondaryCompanies(int $leadId): void
+    {
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
+        $qb->where(
+            $qb->expr()->eq('lead_id', $leadId)
+        )->andWhere(
+            $qb->expr()->eq('is_primary', 0)
         )->execute();
     }
 }

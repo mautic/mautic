@@ -721,6 +721,8 @@ return [
                 'arguments' => [
                     'mautic.lead.model.list',
                     'router',
+                    'mautic.helper.core_parameters',
+                    'mautic.lead.repository.company_lead',
                 ],
             ],
             'mautic.lead.repository.lead_segment_query_builder' => [
@@ -751,6 +753,7 @@ return [
                 'class'     => \Mautic\LeadBundle\Segment\TableSchemaColumnsCache::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.model.relative_date' => [
@@ -1152,5 +1155,6 @@ return [
         'contact_export_in_background'                                                          => true,
         'contact_export_dir'                                                                    => '%kernel.root_dir%/../media/files/temp',
         'contact_export_batch_size'                                                             => 20000,
+        'contact_allow_multiple_companies'                                                      => true,
     ],
 ];

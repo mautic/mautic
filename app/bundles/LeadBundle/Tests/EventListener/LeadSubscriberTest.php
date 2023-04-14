@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
+use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -66,16 +67,28 @@ class LeadSubscriberTest extends CommonMocks
      */
     private $modelFacotry;
 
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var CompanyLeadRepository
+     */
+    private $companyLeadRepository;
+
     protected function setUp(): void
     {
-        $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
-        $this->auditLogModel       = $this->createMock(AuditLogModel::class);
-        $this->leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper     = new DncReasonHelper($this->createMock(TranslatorInterface::class));
-        $this->entityManager       = $this->createMock(EntityManager::class);
-        $this->translator          = $this->createMock(TranslatorInterface::class);
-        $this->router              = $this->createMock(RouterInterface::class);
-        $this->modelFacotry        = $this->createMock(ModelFactory::class);
+        $this->ipLookupHelper        = $this->createMock(IpLookupHelper::class);
+        $this->auditLogModel         = $this->createMock(AuditLogModel::class);
+        $this->leadEventDispatcher   = $this->createMock(LeadChangeEventDispatcher::class);
+        $this->dncReasonHelper       = new DncReasonHelper($this->createMock(TranslatorInterface::class));
+        $this->entityManager         = $this->createMock(EntityManager::class);
+        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $this->router                = $this->createMock(RouterInterface::class);
+        $this->modelFacotry          = $this->createMock(ModelFactory::class);
+        $this->coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $this->companyLeadRepository = $this->createMock(CompanyLeadRepository::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice()
@@ -130,7 +143,9 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
-            $this->modelFacotry
+            $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository
         );
 
         $leadEvent = $this->createMock(LeadEvent::class);
@@ -217,6 +232,8 @@ class LeadSubscriberTest extends CommonMocks
             $this->translator,
             $this->router,
             $this->modelFacotry,
+            $this->coreParametersHelper,
+            $this->companyLeadRepository,
             true
         );
 

@@ -432,8 +432,9 @@ class LeadController extends FormController
                     //    ]
                     //)->getContent(),
                 ],
-                'contentTemplate' => '@MauticLead/Lead/lead.html.twig',
-                'passthroughVars' => [
+                'allowMultipleCompanies' => $this->get('mautic.helper.core_parameters')->get('contact_allow_multiple_companies'),
+                'contentTemplate'        => '@MauticLead/Lead/lead.html.twig',
+                'passthroughVars'        => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'lead',
                     'route'         => $this->generateUrl(
@@ -490,6 +491,10 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+
+                        if (!is_array($companies)) {
+                            $companies = [$companies];
+                        }
                     }
 
                     $model->setFieldValues($lead, $data, true);
@@ -698,6 +703,10 @@ class LeadController extends FormController
                     if (isset($data['companies'])) {
                         $companies = $data['companies'];
                         unset($data['companies']);
+
+                        if (!is_array($companies)) {
+                            $companies = [$companies];
+                        }
                     }
                     $model->setFieldValues($lead, $data, true);
 
