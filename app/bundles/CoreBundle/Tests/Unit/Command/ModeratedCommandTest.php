@@ -251,6 +251,7 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectException(LockAcquiringException::class);
 
         $this->fakeModeratedCommand->run($this->input, $this->output);
