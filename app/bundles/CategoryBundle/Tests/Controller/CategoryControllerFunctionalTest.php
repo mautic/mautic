@@ -89,4 +89,21 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertArrayHasKey('categoryId', $body);
         $this->assertArrayHasKey('categoryName', $body);
     }
+
+    public function testEditLockCategory()
+    {
+        /** @var CategoryModel $model */
+        $model      = self::$container->get('mautic.category.model.category');
+
+        $category = new Category();
+        $category->setTitle('New Category');
+        $category->setAlias('category');
+        $category->setBundle('global');
+        $category->setCheckedOutBy(2);
+        $category->setCheckedOut(new \DateTime('now'));
+        $model->saveEntity($category, false);
+
+        $this->client->request(Request::METHOD_GET, 's/categories/category/edit/'.$category->getId());
+        $this->assertStringContainsString('is currently checked out by', $this->client->getResponse()->getContent());
+    }
 }
