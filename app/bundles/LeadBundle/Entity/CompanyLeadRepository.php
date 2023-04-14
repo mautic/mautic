@@ -9,6 +9,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  */
 class CompanyLeadRepository extends CommonRepository
 {
+    public const DELETE_BATCH_SIZE = 1000;
+
     /**
      * @param CompanyLead[] $entities
      */
@@ -188,11 +190,11 @@ class CompanyLeadRepository extends CommonRepository
 
     public function removeAllSecondaryCompanies(): void
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->delete(MAUTIC_TABLE_PREFIX.'companies_leads');
-        $qb->where(
-            $qb->expr()->eq('is_primary', 0)
-        )->execute();
+        $table_name    = MAUTIC_TABLE_PREFIX.'companies_leads';
+        $sql           = "DELETE FROM {$table_name} WHERE is_primary = 0 LIMIT ".self::DELETE_BATCH_SIZE;
+        $conn          = $this->getEntityManager()->getConnection();
+        while ($conn->executeQuery($sql)->rowCount()) {
+        }
     }
 
     public function removeContactSecondaryCompanies(int $leadId): void

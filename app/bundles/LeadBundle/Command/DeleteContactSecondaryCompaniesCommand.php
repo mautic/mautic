@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Command;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class DeleteContactSecondaryCompaniesCommand extends ContainerAwareCommand
+class DeleteContactSecondaryCompaniesCommand extends Command
 {
     public const NAME = 'mautic:contact:delete:secondary-companies';
 
@@ -43,7 +43,7 @@ class DeleteContactSecondaryCompaniesCommand extends ContainerAwareCommand
             ->setDescription('Deletes all contact\'s secondary companies.')
             ->setHelp(
                 <<<'EOT'
-The <info>%command.name%</info> command deletes non primary companies of every contact.
+The <info>%command.name%</info> command deletes non-primary companies of every contact.
 
 <info>php %command.full_name%</info>
 EOT
