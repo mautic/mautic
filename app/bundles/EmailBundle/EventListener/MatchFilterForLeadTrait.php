@@ -105,6 +105,8 @@ trait MatchFilterForLeadTrait
                 default:
                     if (is_numeric($leadVal)) {
                         $leadVal   = (int) $leadVal;
+                    }
+                    if (is_numeric($filterVal)) {
                         $filterVal = (int) $filterVal;
                     }
                     break;

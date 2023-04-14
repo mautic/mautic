@@ -47,6 +47,15 @@ class MatchFilterForLeadTraitTest extends TestCase
         self::assertFalse($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
     }
 
+    public function testDWCContactWithRegex(): void
+    {
+        $this->lead['custom']        = 123;
+        $this->filter[0]['operator'] = 'regexp';
+        $this->filter[0]['filter']   = '(123|456)';
+
+        self::assertTrue($this->matchFilterForLeadTrait->match($this->filter, $this->lead));
+    }
+
     public function testDWCContactEndWidth(): void
     {
         $this->filter[0]['operator'] = 'endsWith';
