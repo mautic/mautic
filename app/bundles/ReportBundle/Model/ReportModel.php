@@ -734,21 +734,30 @@ class ReportModel extends FormModel
     }
 
     /**
-     * @return int
+     * Get the total of rows found by the query. Ignore pagination limits.
      */
-    private function getTotalCount(QueryBuilder $qb, array &$debugData)
+    private function getTotalCount(QueryBuilder $qb, array &$debugData): int
     {
         $countQb = clone $qb;
-        $countQb->resetQueryParts();
 
-        $countQb->select('count(*)')
-            ->from('('.$qb->getSQL().')', 'c');
+        // only COUNT the group by field(s) to comply with SQLs only_full_group_by mode
+        $groupBy = $qb->getQueryPart('groupBy');
+        if(!is_array($groupBy)){
+            throw new \Exception('A group by statement is required in order to get the total rows');
+        }
+        foreach ($groupBy as $field) {
+            $select = "COUNT(${field}),";
+        }
+        $countQb->add('select', substr($select,0,-1));
+
+        // get all results, ignore limit
+        $countQb->setMaxResults(null);
 
         if ($this->isDebugMode()) {
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->rowCount();
     }
 
     /**
