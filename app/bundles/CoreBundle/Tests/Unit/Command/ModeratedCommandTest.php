@@ -12,7 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\Lock\Exception\LockAcquiringException;
 
 class ModeratedCommandTest extends TestCase
 {
@@ -235,7 +234,7 @@ class ModeratedCommandTest extends TestCase
     {
         $this->coreParametersHelper->expects($this->once())
             ->method('get')
-            ->willReturn(['dsn' => 'redis://localhost']);
+            ->willReturn(['dsn' => null]);
 
         $this->input->method('getOption')
             ->willReturnCallback(
@@ -252,7 +251,6 @@ class ModeratedCommandTest extends TestCase
             );
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectException(LockAcquiringException::class);
 
         $this->fakeModeratedCommand->run($this->input, $this->output);
     }
