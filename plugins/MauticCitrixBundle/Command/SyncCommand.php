@@ -3,6 +3,7 @@
 namespace MauticPlugin\MauticCitrixBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
@@ -20,9 +21,9 @@ class SyncCommand extends ModeratedCommand
 {
     private CitrixModel $citrixModel;
 
-    public function __construct(CitrixModel $citrixModel, PathsHelper $pathsHelper)
+    public function __construct(CitrixModel $citrixModel, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->citrixModel = $citrixModel;
     }

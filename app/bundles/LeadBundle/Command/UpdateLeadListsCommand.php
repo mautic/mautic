@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\ListModel;
@@ -18,9 +19,9 @@ class UpdateLeadListsCommand extends ModeratedCommand
     private TranslatorInterface $translator;
     private ListModel $listModel;
 
-    public function __construct(ListModel $listModel, TranslatorInterface $translator, PathsHelper $pathsHelper)
+    public function __construct(ListModel $listModel, TranslatorInterface $translator, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->listModel  = $listModel;
         $this->translator = $translator;

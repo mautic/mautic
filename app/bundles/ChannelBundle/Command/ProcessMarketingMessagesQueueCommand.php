@@ -4,6 +4,7 @@ namespace Mautic\ChannelBundle\Command;
 
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,12 +16,12 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
     private TranslatorInterface $translator;
     private MessageQueueModel $messageQueueModel;
 
-    public function __construct(TranslatorInterface $translator, MessageQueueModel $messageQueueModel, PathsHelper $pathsHelper)
+    public function __construct(TranslatorInterface $translator, MessageQueueModel $messageQueueModel, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->translator        = $translator;
         $this->messageQueueModel = $messageQueueModel;
 
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
