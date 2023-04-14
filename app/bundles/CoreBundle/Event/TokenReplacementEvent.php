@@ -46,7 +46,7 @@ class TokenReplacementEvent extends CommonEvent
      * @param Lead|mixed[]|null        $lead
      * @param mixed                    $passthrough
      */
-    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null, $internalSend = false)
+    public function __construct($content, $lead = null, array $clickthrough = [], $passthrough = null, bool $internalSend = false)
     {
         if ($content instanceof CommonEntity) {
             $this->entity = $content;
