@@ -67,7 +67,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $scheme       = $this->router->getContext()->getScheme();
         $secure       = 0 === strcasecmp($scheme, 'https');
 
-        $this->client->setServerParameter('HTTPS', $secure);
+        $this->client->setServerParameter('HTTPS', (string) $secure);
     }
 
     /**
@@ -165,6 +165,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected function loginUser(string $username): void
     {
+        /** @var User|null $user */
         $user = $this->em->getRepository(User::class)
             ->findOneBy(['username' => $username]);
 
