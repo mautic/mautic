@@ -710,7 +710,9 @@ class CommonRepository extends ServiceEntityRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**

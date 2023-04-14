@@ -197,7 +197,9 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('userId', $this->currentUser->getId());
         }
 
-        return $query->execute()->fetchAll();
+        $run = $query->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -290,9 +292,10 @@ class LeadEventLogRepository extends CommonRepository
                 $q->getParameters(),
                 $q->getParameterTypes(),
                 new QueryCacheProfile(600, __METHOD__)
-            )->fetchAll();
+            )->fetchAllAssociative();
         } else {
-            $results = $q->execute()->fetchAll();
+            $run     = $q->executeQuery();
+            $results = $run->fetchAllAssociative();
         }
 
         $return = [];
@@ -331,7 +334,7 @@ class LeadEventLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $exists = [];
         foreach ($results as $r) {
             $exists[] = $r['event_id'];
@@ -504,7 +507,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $events = [];
 
@@ -532,7 +535,8 @@ class LeadEventLogRepository extends CommonRepository
                 )
             );
 
-        $results = $qb->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results =  $run->fetchAllAssociative();
 
         $dates = [];
         foreach ($results as $result) {
@@ -553,7 +557,8 @@ class LeadEventLogRepository extends CommonRepository
             ->orderBy('log.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results =  $run->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
     }
@@ -582,7 +587,8 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('rotation', (int) $rotation)
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results =  $run->fetchAllAssociative();
 
         return !empty($results);
     }

@@ -61,8 +61,9 @@ class SegmentCampaignShare
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
+        $run       = $q->executeQuery();
+        $campaigns = $run->fetchAllAssociative();
 
-        $campaigns = $q->execute()->fetchAll();
         foreach ($campaigns as &$campaign) {
             // just load from cache If exists
             if ($share  = $this->cacheStorageHelper->get($this->getCachedKey($segmentId, $campaign['id']))) {

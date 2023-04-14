@@ -81,12 +81,13 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(42, $tags['NonUS:Action']);
 
         // No emails should be sent till after 5 seconds and the command is ran again
-        $stats = $this->db->createQueryBuilder()
+        $run = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $stats = $run->fetchAllAssociative();
+
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -106,12 +107,13 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
-        $stats = $this->db->createQueryBuilder()
+        $run = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $stats = $run->fetchAllAssociative();
+
         $this->assertCount(25, $stats);
 
         // Now let's simulate email opens
@@ -246,12 +248,13 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(1, $tags['NonUS:Action']);
 
         // No emails should be sent till after 5 seconds and the command is ran again
-        $stats = $this->db->createQueryBuilder()
+        $run = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+
+        $stats = $run->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -271,12 +274,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
-        $stats = $this->db->createQueryBuilder()
+        $run = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $stats = $run->fetchAllAssociative();
         $this->assertCount(1, $stats);
 
         // Now let's simulate email opens
@@ -405,12 +408,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(4, $tags['NonUS:Action']);
 
         // No emails should be sent till after 5 seconds and the command is ran again
-        $stats = $this->db->createQueryBuilder()
+        $run = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $stats = $run->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -430,12 +433,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
-        $stats = $this->db->createQueryBuilder()
+        $run = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $stats = $run->fetchAllAssociative();
         $this->assertCount(2, $stats);
 
         // Now let's simulate email opens
@@ -621,8 +624,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'lead_tags', 't')
             ->join('t', $this->prefix.'lead_tags_xref', 'l', 't.id = l.tag_id')
             ->groupBy('t.tag')
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $tags = $tags->fetchAllAssociative();
 
         $tagCounts = [];
         foreach ($tags as $tag) {

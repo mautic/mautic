@@ -54,7 +54,8 @@ class StatRepository extends CommonRepository
             ->setParameter('leadId', $contactId)
             ->setParameter('emailId', $emailId);
 
-        $result = $q->execute()->fetchAll();
+        $run    = $q->executeQuery();
+        $result =  $run->fetchAllAssociative();
 
         if ($result) {
             foreach ($result as $row) {
@@ -163,7 +164,9 @@ class StatRepository extends CommonRepository
         $q->groupBy('s.id');
         $q->orderBy('s.id', 'DESC');
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -190,7 +193,8 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAll();
+        $run    = $q->executeQuery();
+        $result =  $run->fetchAllAssociative();
 
         //index by lead
         $stats = [];
@@ -307,7 +311,8 @@ class StatRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_sent', 's');
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -351,7 +356,8 @@ class StatRepository extends CommonRepository
         $sq->groupBy('e.email_id');
 
         //get a total number of sent emails first
-        $totalCounts = $sq->execute()->fetchAll();
+        $run         = $sq->executeQuery();
+        $totalCounts = $run->fetchAllAssociative();
 
         $return = [];
         foreach ($inIds as $id) {
@@ -371,7 +377,8 @@ class StatRepository extends CommonRepository
         //now get a read count
         $sq->andWhere('e.is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $readCounts = $sq->execute()->fetchAll();
+        $run        = $sq->executeQuery();
+        $readCounts = $run->fetchAllAssociative();
 
         foreach ($readCounts as $r) {
             $return[$r['email_id']]['readCount'] = (int) $r['the_count'];
@@ -410,7 +417,9 @@ class StatRepository extends CommonRepository
             $q->andWhere('s.list_id = '.(int) $listId);
         }
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -536,7 +545,9 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        $run = $query->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -568,7 +579,8 @@ class StatRepository extends CommonRepository
         $q->groupBy('e.email_id');
 
         //get a total number of sent emails first
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $counts = [];
 
@@ -674,7 +686,8 @@ class StatRepository extends CommonRepository
             ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy('s.lead_id');
 
-        $results = $query->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -740,7 +753,8 @@ class StatRepository extends CommonRepository
             ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy("{$leadAlias}.id");
 
-        $results = $queryBuilder->execute()->fetchAll();
+        $run     = $queryBuilder->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {

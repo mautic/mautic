@@ -103,7 +103,9 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -138,7 +140,8 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setMaxResults(1);
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -295,7 +298,9 @@ class IntegrationEntityRepository extends CommonRepository
         if ($limit) {
             $q->setMaxResults($limit);
         }
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
+
         $leads   = [];
 
         if ($integrationEntity) {
@@ -412,7 +417,9 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('dateTo', $toDate);
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
+
         if (false === $limit) {
             return (int) $results[0]['total'];
         }
@@ -467,7 +474,8 @@ class IntegrationEntityRepository extends CommonRepository
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
-            $rows    = $pq->execute()->fetchAll();
+            $run     = $pq->executeQuery();
+            $rows    = $run->fetchAllAssociative();
             $plugins = array_map(function ($i) {
                 return "'${i['name']}'";
             }, $rows);
@@ -500,7 +508,8 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setParameter('integrationEntity', $integrationEntity);
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         if (false === $limit && count($results) > 0) {
             return (int) $results[0]['total'];

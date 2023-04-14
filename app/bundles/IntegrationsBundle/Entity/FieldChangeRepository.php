@@ -96,7 +96,9 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results   = $qb->execute()->fetchAll();
+        $run     = $qb->executeQuery();
+        $results = $run->fetchAllAssociative();
+
         $objectIds = [];
         foreach ($results as $result) {
             $objectIds[] = (int) $result['object_id'];
@@ -122,7 +124,9 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAll();
+        $run = $qb->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -149,6 +153,8 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAll();
+        $run = $qb->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 }

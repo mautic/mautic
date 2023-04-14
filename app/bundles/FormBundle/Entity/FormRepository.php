@@ -187,7 +187,9 @@ class FormRepository extends CommonRepository
             $query->setMaxResults((int) $options['limit']);
         }
 
-        return $query->execute()->fetchAll();
+        $run = $query->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**

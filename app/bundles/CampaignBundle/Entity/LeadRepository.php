@@ -101,12 +101,12 @@ class LeadRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $run = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $results   = $run->fetchAllAssociative();
         $campaigns = [];
         foreach ($results as $r) {
             $campaigns[] = $r['campaign_id'];
@@ -244,7 +244,9 @@ class LeadRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $results  = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results =  $run->fetchAllAssociative();
+
         $contacts = [];
         foreach ($results as $result) {
             $contacts[$result['lead_id']] = new \DateTime($result['date_added'], new \DateTimeZone('UTC'));
@@ -355,7 +357,8 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
 
-        $results = $qb->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results =  $run->fetchAllAssociative();
 
         $contactRotations = [];
         foreach ($results as $result) {
@@ -433,7 +436,8 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $results = $qb->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results =  $run->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -494,7 +498,8 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $results = $qb->execute()->fetchAll();
+        $run     = $query->executeQuery();
+        $results =  $run->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -543,8 +548,8 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id and ll.is_published = 1')
             ->where('cl.campaign_id = '.(int) $campaignId)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $segmentResults = $segmentResults->fetchAllAssociative();
 
         if (empty($segmentResults)) {
             // No segments so no contacts

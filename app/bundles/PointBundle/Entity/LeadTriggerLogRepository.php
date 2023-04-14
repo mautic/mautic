@@ -18,13 +18,13 @@ class LeadTriggerLogRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $run = $this->_em->getConnection()->createQueryBuilder()
             ->select('pl.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
-            ->execute()
-            ->fetchAll();
-        $events = [];
+            ->executeQuery();
+        $results = $run->fetchAllAssociative();
+        $events  = [];
         foreach ($results as $r) {
             $events[] = $r['event_id'];
         }

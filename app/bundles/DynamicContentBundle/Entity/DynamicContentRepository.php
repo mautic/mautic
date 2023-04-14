@@ -210,7 +210,8 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAll();
+        $run    = $qb->executeQuery();
+        $result = $run->fetchAllAssociative();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

@@ -76,7 +76,8 @@ class TriggerEventRepository extends CommonRepository
         //make sure the published up and down dates are good
         $q->where($q->expr()->eq('x.lead_id', (int) $leadId));
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $return = [];
 
@@ -94,12 +95,12 @@ class TriggerEventRepository extends CommonRepository
      */
     public function getLeadsForEvent($eventId)
     {
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $run = $this->_em->getConnection()->createQueryBuilder()
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
             ->where('e.event_id = '.(int) $eventId)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+        $run = $run->fetchAllAssociative();
 
         $return = [];
 

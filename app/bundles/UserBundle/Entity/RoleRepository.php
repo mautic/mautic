@@ -132,7 +132,8 @@ class RoleRepository extends CommonRepository
         )
             ->groupBy('u.role_id');
 
-        $result = $q->execute()->fetchAll();
+        $run    = $q->executeQuery();
+        $result =  $run->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

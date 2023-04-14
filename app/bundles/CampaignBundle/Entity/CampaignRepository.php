@@ -144,7 +144,8 @@ class CampaignRepository extends CommonRepository
             $q->expr()->in('ll.leadlist_id', $leadLists)
         );
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $campaigns = [];
         foreach ($results as $result) {
@@ -187,7 +188,8 @@ class CampaignRepository extends CommonRepository
         }
 
         $lists   = [];
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         foreach ($results as $r) {
             $lists[] = $r['leadlist_id'];
@@ -214,7 +216,8 @@ class CampaignRepository extends CommonRepository
         );
 
         $lists   = [];
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         foreach ($results as $r) {
             $lists[$r['leadlist_id']] = $r['name'];
@@ -241,7 +244,8 @@ class CampaignRepository extends CommonRepository
         );
 
         $forms   = [];
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         foreach ($results as $r) {
             $forms[$r['form_id']] = $r['name'];
@@ -328,7 +332,9 @@ class CampaignRepository extends CommonRepository
         $expr = $this->getPublishedByDateExpression($q, 'c');
         $q->where($expr);
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -422,7 +428,9 @@ class CampaignRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
+
         $leads   = [];
         foreach ($results as $r) {
             $leads[] = $r['lead_id'];
@@ -501,9 +509,10 @@ class CampaignRepository extends CommonRepository
                 $q->getParameters(),
                 $q->getParameterTypes(),
                 new QueryCacheProfile(600, __METHOD__)
-            )->fetchAll();
+            )->fetchAllAssociative();
         } else {
-            $results = $q->execute()->fetchAll();
+            $run     = $q->executeQuery();
+            $results = $run->fetchAllAssociative();
         }
 
         return (int) $results[0]['lead_count'];
@@ -539,7 +548,9 @@ class CampaignRepository extends CommonRepository
                 ->setMaxResults($limit);
         }
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -587,7 +598,9 @@ class CampaignRepository extends CommonRepository
             $q->where($q->expr()->in('c.id', $campaignIds));
         }
 
-        return $q->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**

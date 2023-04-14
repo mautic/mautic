@@ -18,12 +18,14 @@ class ListLeadRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $run = $this->_em->getConnection()->createQueryBuilder()
             ->select('l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+
+        $results = $run->fetchAllAssociative();
+
         $lists = [];
         foreach ($results as $r) {
             $lists[] = $r['leadlist_id'];

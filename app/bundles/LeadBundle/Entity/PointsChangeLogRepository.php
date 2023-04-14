@@ -52,7 +52,9 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        $run = $query->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -68,7 +70,9 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        $run = $query->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**

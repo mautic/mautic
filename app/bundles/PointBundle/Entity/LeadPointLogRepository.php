@@ -18,12 +18,13 @@ class LeadPointLogRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $results = $this->_em->getConnection()->createQueryBuilder()
+        $run = $this->_em->getConnection()->createQueryBuilder()
             ->select('pl.point_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+
+        $results = $run->fetchAllAssociative();
         $actions = [];
         foreach ($results as $r) {
             $actions[] = $r['point_id'];

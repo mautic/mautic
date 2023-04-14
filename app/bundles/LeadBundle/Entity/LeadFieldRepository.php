@@ -46,7 +46,9 @@ class LeadFieldRepository extends CommonRepository
             )->setParameter('object', $object);
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
+
         $aliases = [];
         foreach ($results as $item) {
             $aliases[] = $item['alias'];

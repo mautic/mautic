@@ -109,7 +109,8 @@ class LeadDeviceRepository extends CommonRepository
         }
 
         //get totals
-        $device = $sq->execute()->fetchAll();
+        $run    = $sq->executeQuery();
+        $device = $run->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
     }
@@ -156,15 +157,15 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getLeadDevices(Lead $lead)
     {
-        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $run = $qb->select('*')
+        ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
+        ->where('lead_id = :leadId')
+        ->setParameter('leadId', (int) $lead->getId())
+        ->orderBy('date_added', 'desc')
+        ->executeQuery();
 
-        return $qb->select('*')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
-            ->where('lead_id = :leadId')
-            ->setParameter('leadId', (int) $lead->getId())
-            ->orderBy('date_added', 'desc')
-            ->execute()
-            ->fetchAll();
+        return $run->fetchAllAssociative();
     }
 
     /**

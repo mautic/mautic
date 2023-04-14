@@ -72,7 +72,8 @@ class StageRepository extends CommonRepository
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $return = [];
 

@@ -90,7 +90,9 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -113,7 +115,9 @@ class DownloadRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        $run = $q->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 
     /**
@@ -132,7 +136,9 @@ class DownloadRepository extends CommonRepository
             ->groupBy('ad.code')
             ->orderBy('count', 'DESC');
 
-        $results = $query->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
+
         $chart   = new PieChart();
 
         foreach ($results as $result) {
@@ -172,7 +178,8 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $downloads = [];
         foreach ($results as $r) {
@@ -215,7 +222,8 @@ class DownloadRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         $downloads = [];
         foreach ($results as $r) {

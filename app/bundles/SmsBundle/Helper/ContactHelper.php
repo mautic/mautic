@@ -52,7 +52,7 @@ class ContactHelper
 
         $qb = $this->connection->createQueryBuilder();
 
-        $foundContacts = $qb->select('l.id')
+        $run = $qb->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
                 $qb->expr()->orX(
@@ -61,8 +61,9 @@ class ContactHelper
                 )
             )
             ->setParameter('numbers', $searchForNumbers, Connection::PARAM_STR_ARRAY)
-            ->execute()
-            ->fetchAll();
+            ->executeQuery();
+
+        $foundContacts = $run->fetchAllAssociative();
 
         $ids = array_column($foundContacts, 'id');
         if (0 === count($ids)) {

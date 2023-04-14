@@ -77,6 +77,8 @@ final class Version20190724110039 extends AbstractMauticMigration
                 $qb->expr()->eq('lf.type', $qb->expr()->literal('multiselect'))
             );
 
-        return $qb->execute()->fetchAll();
+        $run = $qb->executeQuery();
+
+        return $run->fetchAllAssociative();
     }
 }

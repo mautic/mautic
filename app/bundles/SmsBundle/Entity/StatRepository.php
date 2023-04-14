@@ -56,7 +56,8 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAll();
+        $run    = $q->executeQuery();
+        $result =  $run->fetchAllAssociative();
 
         //index by lead
         $stats = [];
@@ -98,7 +99,8 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $results = $q->execute()->fetchAll();
+        $run     = $q->executeQuery();
+        $results = $run->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
