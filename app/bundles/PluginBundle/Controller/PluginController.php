@@ -418,7 +418,7 @@ class PluginController extends FormController
             return $this->accessDenied();
         }
 
-        $this->addFlash(
+        $this->addFlashMessage(
             $reloadFacade->reloadPlugins()
         );
 

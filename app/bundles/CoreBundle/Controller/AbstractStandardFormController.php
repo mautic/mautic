@@ -426,7 +426,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
                         $this->afterEntitySave($entity, $form, 'edit', $valid);
 
-                        $this->addFlash(
+                        $this->addFlashMessage(
                             'mautic.core.notice.updated',
                             [
                                 '%name%'      => $entity->getName(),

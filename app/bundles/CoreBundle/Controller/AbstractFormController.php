@@ -45,7 +45,7 @@ abstract class AbstractFormController extends CommonController
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
                     '%name%' => urldecode($request->get('name')),

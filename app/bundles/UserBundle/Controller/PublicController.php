@@ -35,9 +35,9 @@ class PublicController extends FormController
                 } else {
                     try {
                         $model->sendResetEmail($user);
-                        $this->addFlash('mautic.user.user.notice.passwordreset');
+                        $this->addFlashMessage('mautic.user.user.notice.passwordreset');
                     } catch (\Exception $exception) {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.error', [], 'error');
+                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.error', [], 'error');
                     }
 
                     return $this->redirectToRoute('login');
@@ -89,7 +89,7 @@ class PublicController extends FormController
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 
-                            $this->addFlash('mautic.user.user.notice.passwordreset.success');
+                            $this->addFlashMessage('mautic.user.user.notice.passwordreset.success');
 
                             $request->getSession()->remove('resetToken');
 
@@ -106,7 +106,7 @@ class PublicController extends FormController
                             ],
                         ]);
                     } else {
-                        $this->addFlash('mautic.user.user.notice.passwordreset.missingtoken');
+                        $this->addFlashMessage('mautic.user.user.notice.passwordreset.missingtoken');
 
                         return $this->redirectToRoute('mautic_user_passwordresetconfirm');
                     }

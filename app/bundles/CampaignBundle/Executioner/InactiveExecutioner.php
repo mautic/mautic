@@ -271,7 +271,7 @@ class InactiveExecutioner implements ExecutionerInterface
                     }
 
                     // Clear contacts from memory
-                    $this->inactiveContactFinder->clear();
+                    $this->inactiveContactFinder->clear($contacts);
 
                     if ($this->limiter->getContactId()) {
                         // No use making another call
