@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
