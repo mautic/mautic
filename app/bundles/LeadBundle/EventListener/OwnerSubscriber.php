@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -104,7 +103,7 @@ class OwnerSubscriber implements EventSubscriberInterface
             $token = $this->buildToken($ownerColumn);
             if (false !== strpos($combinedContent, $token)) {
                 $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
-                $tokens[$token]        = $ownerColumnNormalized[$owner] ?? null;
+                $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }
         }
 
