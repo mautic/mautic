@@ -37,13 +37,13 @@
                             <td>&nbsp;</td>
                         {% endif %}
                 {% elseif values[0] is defined or values[1] is defined %}
-                        {% if values[0] is defined and values[0] is not empty %}
-                            <td>{{ normalizeStringValue(values[0])|e }}</td>
+                        {% if values[1] is defined and values[1] is not empty %}
+                            <td>{{ normalizeStringValue(values[1])|e }}</td>
                         {% else %}
                             <td>&nbsp;</td>
                         {% endif %}
-                        {% if values[1] is defined and values[1] is not empty %}
-                            <td>{{ normalizeStringValue(values[1])|e }}</td>
+                        {% if values[0] is defined and values[0] is not empty %}
+                            <td>{{ normalizeStringValue(values[0])|e }}</td>
                         {% else %}
                             <td>&nbsp;</td>
                         {% endif %}
