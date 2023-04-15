@@ -1,21 +1,14 @@
 <?php
 
-define('MAUTIC_ROOT_DIR', __DIR__);
-
-// Fix for hosts that do not have date.timezone set, it will be reset based on users settings
-date_default_timezone_set('UTC');
-
-require_once 'autoload.php';
+require 'config/bootstrap.php';
 
 use Mautic\CoreBundle\ErrorHandler\ErrorHandler;
-use Mautic\CoreBundle\Loader\EnvironmentHandler;
 use Mautic\Middleware\MiddlewareBuilder;
 use Symfony\Component\HttpFoundation\Request;
 
-$config = (new EnvironmentHandler())->getEnvParameters();
-ErrorHandler::register($config['ENV']);
+ErrorHandler::register($_SERVER['APP_ENV']);
 
-$kernel   = (new MiddlewareBuilder(new AppKernel($config['ENV'], $config['DEBUG'])))->resolve();
+$kernel   = (new MiddlewareBuilder(new AppKernel($_SERVER['APP_ENV'], $_SERVER['APP_DEBUG'])))->resolve();
 $request  = Request::createFromGlobals();
 $response = $kernel->handle($request);
 $response->send();
