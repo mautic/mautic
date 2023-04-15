@@ -397,7 +397,6 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $cacheProvider->clear();
     }
 
-
     /**
      * Helper method to ensure booleans are strings in HTTP payloads.
      *
