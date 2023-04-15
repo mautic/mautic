@@ -19,12 +19,8 @@ class BundleMetadataBuilderTest extends TestCase
         // Used in paths_helper
         $root = __DIR__.'/../../../../../../../app';
 
-        /** @var array $paths */
+        $paths = [];
         include __DIR__.'/../../../../../../config/paths_helper.php';
-
-        if (!isset($paths)) {
-            throw new \Exception('$paths is not set');
-        }
 
         $this->paths = $paths;
     }
