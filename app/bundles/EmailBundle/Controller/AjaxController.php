@@ -301,7 +301,7 @@ class AjaxController extends CommonAjaxController
                 $queued  = $model->getQueuedCounts($email);
 
                 $data[] = [
-                    'id'          => $id,
+                    'id'          => $email->getId(),
                     'pending'     => 'list' === $email->getEmailType() && $pending ? $this->translator->trans(
                         'mautic.email.stat.leadcount',
                         ['%count%' => $pending]
