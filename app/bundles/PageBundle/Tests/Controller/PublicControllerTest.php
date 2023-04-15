@@ -461,7 +461,7 @@ class PublicControllerTest extends MauticMysqlTestCase
         );
         self::assertInstanceOf(RedirectResponse::class, $response);
         self::assertSame($targetUrl, $response->getTargetUrl());
-        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
     }
 
     /**
