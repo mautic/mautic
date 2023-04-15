@@ -933,7 +933,7 @@ class PageModel extends FormModel
             ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'));
         $q->groupBy('ds.device');
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $chart   = new PieChart();

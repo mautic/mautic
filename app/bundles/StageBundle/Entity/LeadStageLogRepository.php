@@ -22,7 +22,7 @@ class LeadStageLogRepository extends CommonRepository
             ->select('pl.stage_id')
             ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
-            ->executeQuery();
+            ->execute();
 
         $results = $run->fetchAllAssociative();
         $actions = [];

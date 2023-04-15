@@ -579,7 +579,7 @@ class LeadControllerTest extends MauticMysqlTestCase
         ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'c', 'c.id = cl.company_id')
         ->where("cl.lead_id = {$leadId}")
         ->orderBy('cl.company_id')
-        ->executeQuery();
+        ->execute();
 
         return $run->fetchAllAssociative();
     }

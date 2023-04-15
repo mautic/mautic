@@ -157,7 +157,7 @@ class HitRepository extends CommonRepository
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $hits = [];
@@ -286,7 +286,7 @@ class HitRepository extends CommonRepository
         $run        = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
-            ->executeQuery();
+            ->execute();
 
         $pages = $run->fetchAllAssociative();
 
@@ -322,7 +322,7 @@ class HitRepository extends CommonRepository
             ->where($expr)
             ->groupBy('h.page_id');
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         foreach ($results as $p) {
@@ -394,7 +394,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         //loop to structure
@@ -443,7 +443,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $times = [];
@@ -511,7 +511,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->executeQuery();
+        $run = $query->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -542,7 +542,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->executeQuery();
+        $run = $query->execute();
 
         return $run->fetchAllAssociative();
     }

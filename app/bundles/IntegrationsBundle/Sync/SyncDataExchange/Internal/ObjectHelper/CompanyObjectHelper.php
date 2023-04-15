@@ -165,7 +165,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -183,7 +183,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 $qb->expr()->in('id', $ids)
             );
 
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -200,7 +200,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        $run = $q->executeQuery();
+        $run = $q->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -218,7 +218,7 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->andWhere('c.id IN (:objectIds)');
         $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
 
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }

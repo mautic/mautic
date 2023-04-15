@@ -103,7 +103,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             ->join('log', $this->prefix.'leads', 'l', 'l.id = log.lead_id')
             ->where('log.campaign_id = 1')
             ->andWhere('log.event_id IN ('.implode(',', $ids).')')
-            ->executeQuery();
+            ->execute();
         $logs = $run->fetchAllAssociative();
 
         $byEvent = [];

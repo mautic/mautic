@@ -36,7 +36,7 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $run    = $q->executeQuery();
+        $run    = $q->execute();
         $result =  $run->fetchAllAssociative();
 
         return count($result);
@@ -67,7 +67,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $run    = $q->executeQuery();
+        $run    = $q->execute();
         $result =  $run->fetchAllAssociative();
 
         $return = [];

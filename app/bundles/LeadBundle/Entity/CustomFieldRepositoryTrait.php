@@ -233,7 +233,7 @@ trait CustomFieldRepositoryTrait
                 ->setMaxResults($limit);
         }
 
-        $run = $q->executeQuery();
+        $run = $q->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -381,7 +381,7 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('published', true, 'boolean')
                 ->setParameter('object', $object)
                 ->addOrderBy('f.field_order', 'asc');
-            $run     = $fq->executeQuery();
+            $run     = $fq->execute();
             $results = $run->fetchAllAssociative();
 
             $fields      = [];

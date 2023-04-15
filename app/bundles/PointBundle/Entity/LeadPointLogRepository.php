@@ -22,7 +22,7 @@ class LeadPointLogRepository extends CommonRepository
             ->select('pl.point_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_action_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
-            ->executeQuery();
+            ->execute();
 
         $results = $run->fetchAllAssociative();
         $actions = [];

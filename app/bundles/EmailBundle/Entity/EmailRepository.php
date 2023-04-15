@@ -37,7 +37,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $dnc = [];
@@ -65,7 +65,7 @@ class EmailRepository extends CommonRepository
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $dnc     = count($results) ? $results[0] : null;
@@ -207,7 +207,7 @@ class EmailRepository extends CommonRepository
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
-                ->executeQuery();
+                ->execute();
             $lists = $run->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
@@ -313,7 +313,7 @@ class EmailRepository extends CommonRepository
             return $q;
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {

@@ -219,7 +219,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -237,7 +237,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 $qb->expr()->in('id', $ids)
             );
 
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }
@@ -254,7 +254,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        $run = $q->executeQuery();
+        $run = $q->execute();
 
         return $run->fetchAllAssociative();
     }

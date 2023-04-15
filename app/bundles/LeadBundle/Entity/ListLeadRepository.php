@@ -22,7 +22,7 @@ class ListLeadRepository extends CommonRepository
             ->select('l.leadlist_id')
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
-            ->executeQuery();
+            ->execute();
 
         $results = $run->fetchAllAssociative();
 

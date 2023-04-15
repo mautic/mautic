@@ -105,7 +105,7 @@ class LeadRepository extends CommonRepository
             ->select('cl.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
-            ->executeQuery();
+            ->execute();
         $results   = $run->fetchAllAssociative();
         $campaigns = [];
         foreach ($results as $r) {
@@ -244,7 +244,7 @@ class LeadRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results =  $run->fetchAllAssociative();
 
         $contacts = [];
@@ -357,7 +357,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
 
-        $run     = $query->executeQuery();
+        $run     = $qb->execute();
         $results =  $run->fetchAllAssociative();
 
         $contactRotations = [];
@@ -436,7 +436,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $run     = $query->executeQuery();
+        $run     = $qb->execute();
         $results =  $run->fetchAllAssociative();
 
         $contacts = [];
@@ -498,7 +498,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $run     = $query->executeQuery();
+        $run     = $qb->execute();
         $results =  $run->fetchAllAssociative();
 
         $contacts = [];
@@ -548,7 +548,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id and ll.is_published = 1')
             ->where('cl.campaign_id = '.(int) $campaignId)
-            ->executeQuery();
+            ->execute();
         $segmentResults = $segmentResults->fetchAllAssociative();
 
         if (empty($segmentResults)) {

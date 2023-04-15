@@ -61,7 +61,7 @@ class SegmentCampaignShare
             ->from(MAUTIC_TABLE_PREFIX.'campaigns', 'c')
             ->where($this->campaignModel->getRepository()->getPublishedByDateExpression($q))
             ->orderBy('c.id', 'DESC');
-        $run       = $q->executeQuery();
+        $run       = $q->execute();
         $campaigns = $run->fetchAllAssociative();
 
         foreach ($campaigns as &$campaign) {

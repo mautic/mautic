@@ -928,7 +928,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         if (in_array(0, $segments)) {
@@ -946,7 +946,7 @@ class ListModel extends FormModel
             if (!empty($dateTo)) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
-            $run        = $qAll->executeQuery();
+            $run        = $qAll->execute();
             $resultsAll = $run->fetchAllAssociative();
             $results    = array_merge($results, $resultsAll);
         }
@@ -1032,7 +1032,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         foreach ($results as $result) {
@@ -1099,7 +1099,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         foreach ($results as $result) {

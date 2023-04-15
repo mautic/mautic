@@ -210,7 +210,7 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $run    = $qb->executeQuery();
+        $run    = $qb->execute();
         $result = $run->fetchAllAssociative();
 
         foreach ($result as $item) {

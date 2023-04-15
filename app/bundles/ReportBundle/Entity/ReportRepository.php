@@ -138,7 +138,7 @@ class ReportRepository extends CommonRepository
 
         $qb->orderBy('r.name');
 
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }

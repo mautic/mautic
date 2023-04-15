@@ -53,7 +53,7 @@ class SummaryRepository extends CommonRepository
                 ->setParameter('dateTo', $dateTo->getTimestamp(), PDO::PARAM_INT);
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $return = [];
@@ -80,7 +80,7 @@ class SummaryRepository extends CommonRepository
             ->orderBy('cs.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $run     = $query->executeQuery();
+        $run     = $qb->execute();
         $results =  $run->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new DateTime($results[0]['date_triggered']) : null;

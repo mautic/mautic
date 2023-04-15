@@ -85,7 +85,7 @@ trait TimelineTrait
                 $query->setFirstResult($options['start']);
             }
         }
-        $run     = $query->executeQuery();
+        $run     = $query->execute();
         $results = $run->fetchAllAssociative();
 
         if (!empty($serializedColumns) || !empty($dateTimeColumns) || is_callable($resultsParserCallback)) {

@@ -34,7 +34,7 @@ class TrackableRepository extends CommonRepository
             )
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
-            ->executeQuery();
+            ->execute();
 
         return $run->fetchAllAssociative();
     }

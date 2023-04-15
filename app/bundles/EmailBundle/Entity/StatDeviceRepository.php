@@ -49,7 +49,7 @@ class StatDeviceRepository extends CommonRepository
                 $qb->expr()->lte('es.date_read', $qb->expr()->literal($dt->toUtcString()))
             );
         }
-        $run = $qb->executeQuery();
+        $run = $qb->execute();
 
         return $run->fetchAllAssociative();
     }

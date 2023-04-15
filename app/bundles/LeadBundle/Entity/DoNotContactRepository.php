@@ -165,7 +165,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        $run     = $q->executeQuery();
+        $run     = $q->execute();
         $results = $run->fetchAllAssociative();
 
         $dnc = [];

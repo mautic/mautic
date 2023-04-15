@@ -639,7 +639,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $run       = $query->executeQuery();
+            $run       = $query->execute();
             $data      = $run->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 

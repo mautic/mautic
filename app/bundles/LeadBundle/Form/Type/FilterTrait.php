@@ -329,7 +329,7 @@ trait FilterTrait
                                     ->where('l.id REGEXP :regex')
                                     ->setParameter('regex', $this->prepareRegex($regex))
                                     ->setMaxResults(1)
-                                    ->executeQuery();
+                                    ->execute();
                                 $results = $run->fetchAllAssociative();
                             } catch (\Exception $exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
