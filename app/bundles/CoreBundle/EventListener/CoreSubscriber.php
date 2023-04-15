@@ -225,6 +225,10 @@ class CoreSubscriber implements EventSubscriberInterface
     {
         $controller = $event->getController();
 
+        if ($controller instanceof \Closure) {
+            $controller = [$controller()];
+        }
+
         if (!is_array($controller)) {
             return;
         }

@@ -23,6 +23,7 @@ use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -171,7 +172,7 @@ class CoreSubscriberTest extends TestCase
     {
         $user = $this->createMock(User::class);
 
-        $this->userHelper->expects(self::once())
+        $this->userHelper->expects(self::exactly(2))
             ->method('getUser')
             ->willReturn($user);
 
@@ -212,6 +213,8 @@ class CoreSubscriberTest extends TestCase
             ->method('initialize')
             ->with($event);
 
-        $this->subscriber->onKernelController($event);
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber($this->subscriber);
+        $eventDispatcher->dispatch($event, KernelEvents::CONTROLLER);
     }
 }
