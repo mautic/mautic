@@ -199,10 +199,7 @@ class SubmissionRepository extends CommonRepository
 
             if (!empty($results)) {
                 unset($results[0]['submission_id']);
-
-                if (isset($results[0])) {
-                    $entity->setResults($results[0]);
-                }
+                $entity->setResults($results[0]);
             }
         }
 
