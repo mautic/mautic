@@ -197,9 +197,12 @@ class SubmissionRepository extends CommonRepository
             $run     = $q->execute();
             $results = $run->fetchAllAssociative();
 
-            unset($results[0]['submission_id']);
-            if (isset($results[0])) {
-                $entity->setResults($results[0]);
+            if (!empty($results)) {
+                unset($results[0]['submission_id']);
+
+                if (isset($results[0])) {
+                    $entity->setResults($results[0]);
+                }
             }
         }
 

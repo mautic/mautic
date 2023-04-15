@@ -393,7 +393,7 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int $emailIds
      *
-     * @return int
+     * @return array<int, array<string, mixed>>
      */
     public function getOpenedStatIds($emailIds = null, $listId = null)
     {

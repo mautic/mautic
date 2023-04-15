@@ -569,7 +569,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Lead[]
+     * @return array<int, array<string, mixed>>
      */
     private function getCompanyLeads(int $leadId): array
     {
