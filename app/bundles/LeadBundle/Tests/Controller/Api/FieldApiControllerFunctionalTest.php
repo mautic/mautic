@@ -261,20 +261,4 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             'properties'          => [],
         ];
     }
-
-    /**
-     * Helper method to ensure booleans are strings in HTTP payloads.
-     *
-     * this ensures the payload is compatible with a change in Symfony 5.2
-     *
-     * @see https://github.com/symfony/browser-kit/commit/1d033e7dccc9978dd7a2bde778d06ebbbf196392
-     */
-    private function generateTypeSafePayload(mixed $payload): mixed
-    {
-        array_walk_recursive($payload, function (&$value) {
-            $value = is_bool($value) ? ($value ? '1' : '0') : $value;
-        });
-
-        return $payload;
-    }
 }
