@@ -82,9 +82,8 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         //get a total count
-        $result  = $fq->execute()->fetchAllAssociative();
-
-        $total  = $result[0]['count'];
+        $result  = $dq->execute()->fetchAllAssociative();
+        $total   = $result[0]['count'];
 
         //now get the actual paginated results
         $this->buildOrderByClause($dq, $args);

@@ -16,11 +16,6 @@ class LeadListRepositoryTest extends TestCase
 {
     use RepositoryConfiguratorTrait;
 
-    /**
-     * @var MockObject&ResultStatement<mixed>
-     */
-    private $stmt;
-
     private LeadListRepository $repository;
 
     /**
@@ -156,7 +151,7 @@ class LeadListRepositoryTest extends TestCase
             ->method('execute')
             ->willReturn($this->result);
 
-        $this->stmt->expects(self::once())
+        $this->result->expects(self::once())
             ->method('fetchAllAssociative')
             ->willReturn($queryResult);
     }
