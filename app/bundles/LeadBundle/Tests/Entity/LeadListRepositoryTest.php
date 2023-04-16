@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
 use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
@@ -38,7 +37,6 @@ class LeadListRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->stmt             = $this->createMock(ResultStatement::class);
         $this->queryBuilderMock = $this->createMock(QueryBuilder::class);
         $this->expressionMock   = $this->createMock(Expr::class);
 
@@ -156,10 +154,10 @@ class LeadListRepositoryTest extends TestCase
 
         $this->queryBuilderMock->expects(self::once())
             ->method('execute')
-            ->willReturn($this->stmt);
+            ->willReturn($this->result);
 
         $this->stmt->expects(self::once())
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturn($queryResult);
     }
 }
