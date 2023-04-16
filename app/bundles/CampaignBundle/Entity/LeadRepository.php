@@ -163,7 +163,7 @@ class LeadRepository extends CommonRepository
 
         $q->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -303,7 +303,7 @@ class LeadRepository extends CommonRepository
                 sprintf('NOT EXISTS (%s)', $eventQb->getSQL())
             );
 
-            $totalCount += (int) $q->execute()->fetchColumn();
+            $totalCount += (int) $q->execute()->fetchOne();
         }
 
         return $totalCount;

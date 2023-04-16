@@ -269,7 +269,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             ->setParameter('channel', $channel)
             ->setMaxResults(1);
 
-        $status = $q->execute()->fetchColumn();
+        $status = $q->execute()->fetchOne();
 
         if (false === $status) {
             return DoNotContact::IS_CONTACTABLE;

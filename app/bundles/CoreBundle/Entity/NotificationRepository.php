@@ -164,6 +164,6 @@ class NotificationRepository extends CommonRepository
             ->setMaxResults(1);
 
         return (bool) $qb->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

@@ -588,7 +588,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildWhereClauseFromArray($q, $where);
 
-        $count = $q->execute()->fetchColumn();
+        $count = $q->execute()->fetchOne();
 
         if ($select) {
             foreach ($select as &$column) {

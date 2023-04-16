@@ -57,7 +57,7 @@ class BroadcastQuery
         $query = $this->getBasicQuery($sms);
         $query->select('COUNT(DISTINCT l.id)');
 
-        return $query->execute()->fetchColumn();
+        return $query->execute()->fetchOne();
     }
 
     /**

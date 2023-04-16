@@ -42,7 +42,7 @@ class DownloadRepository extends CommonRepository
             )
             ->setParameter('id', $trackingId);
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**

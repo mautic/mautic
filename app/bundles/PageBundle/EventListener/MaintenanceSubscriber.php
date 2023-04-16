@@ -64,7 +64,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
 
-            $rows = $qb->execute()->fetchColumn();
+            $rows = $qb->execute()->fetchOne();
         } else {
             $subQb = $this->db->createQueryBuilder();
             $subQb->select('id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')

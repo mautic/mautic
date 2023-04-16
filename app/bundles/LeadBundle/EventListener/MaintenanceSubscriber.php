@@ -56,7 +56,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                   ));
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
-            $rows = $qb->execute()->fetchColumn();
+            $rows = $qb->execute()->fetchOne();
         } else {
             $qb->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
               ->where($qb->expr()->lte('l.last_active', ':date'));

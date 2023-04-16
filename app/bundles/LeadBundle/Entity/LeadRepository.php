@@ -1120,7 +1120,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('stageIds', $stages, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY)
             ->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -1149,7 +1149,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->setParameter('ownerIds', implode(',', $ownerIds))
             ->setParameter('leadId', $lead->getId());
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -1231,7 +1231,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $qb->expr()->isNotNull($this->getTableAlias().'.date_identified')
         );
 
-        return (int) $qb->execute()->fetchColumn();
+        return (int) $qb->execute()->fetchOne();
     }
 
     /**
@@ -1279,7 +1279,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->orderBy("$alias.id")
             ->setMaxResults(1);
 
-        $next = $qb->execute()->fetchColumn();
+        $next = $qb->execute()->fetchOne();
 
         return ($next) ? $this->getEntity($next) : null;
     }
@@ -1377,7 +1377,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where('l.id = '.$id)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

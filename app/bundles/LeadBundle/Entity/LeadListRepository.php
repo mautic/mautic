@@ -550,7 +550,7 @@ class LeadListRepository extends CommonRepository
         $tableName = MAUTIC_TABLE_PREFIX.'lead_lists';
         $result    = (int) $this->getEntityManager()->getConnection()
             ->executeQuery("SELECT EXISTS(SELECT 1 FROM {$tableName} WHERE id = {$id})")
-            ->fetchColumn();
+            ->fetchOne();
 
         return 1 === $result;
     }

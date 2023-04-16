@@ -155,7 +155,7 @@ class CompanyLeadRepository extends CommonRepository
         $q->where($q->expr()->eq('cl.company_id', ':companyId'))
             ->setParameter(':companyId', $company->getId())
             ->andWhere('cl.is_primary = 1');
-        $leadIds = $q->execute()->fetchColumn();
+        $leadIds = $q->execute()->fetchOne();
         if (!empty($leadIds)) {
             $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->update(MAUTIC_TABLE_PREFIX.'leads')

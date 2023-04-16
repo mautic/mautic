@@ -589,7 +589,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where("l.id = {$leadId}")
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

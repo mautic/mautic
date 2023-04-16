@@ -60,7 +60,7 @@ class HitRepository extends CommonRepository
         $q->select('u.is_unique')
             ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u');
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**

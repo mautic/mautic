@@ -748,7 +748,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->fetchOne();
     }
 
     /**

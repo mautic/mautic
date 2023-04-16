@@ -89,7 +89,7 @@ class LogRepository extends CommonRepository
             ->orderBy('id', 'DESC')
             ->setMaxResults(1)
             ->setFirstResult($logMax) // if log max limit is 1000 then it will fetch id of 1001'th record from last and we will delete all log which have id less than or equal to this id.
-            ->execute()->fetchColumn();
+            ->execute()->fetchOne();
 
         if ($id) {
             $sql = "DELETE FROM {$table_name} WHERE webhook_id = (?) and id <= (?) LIMIT ".self::LOG_DELETE_BATCH_SIZE;
