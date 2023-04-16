@@ -157,8 +157,7 @@ class HitRepository extends CommonRepository
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $hits = [];
         foreach ($results as $r) {
@@ -281,14 +280,12 @@ class HitRepository extends CommonRepository
     {
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
-        $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
-        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $run        = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
+        $hitsColumn   = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
+        $q            = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $pages        = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
-            ->execute();
-
-        $pages = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($pages as $p) {
@@ -322,8 +319,7 @@ class HitRepository extends CommonRepository
             ->where($expr)
             ->groupBy('h.page_id');
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $p) {
             $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
@@ -394,8 +390,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         //loop to structure
         $times  = [];
@@ -443,8 +438,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $times = [];
 
@@ -511,9 +505,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -542,9 +534,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

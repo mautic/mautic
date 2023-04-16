@@ -295,8 +295,7 @@ class LeadListRepository extends CommonRepository
             ->setParameter('false', false, 'boolean')
             ->groupBy('l.leadlist_id');
 
-        $run    = $q->execute();
-        $result =  $run->fetchAllAssociative();
+        $result =  $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

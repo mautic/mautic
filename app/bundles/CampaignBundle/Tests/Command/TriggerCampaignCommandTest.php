@@ -81,12 +81,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(42, $tags['NonUS:Action']);
 
         // No emails should be sent till after 5 seconds and the command is ran again
-        $run = $this->db->createQueryBuilder()
+        $stats = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute();
-        $stats = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
 
         $this->assertCount(0, $stats);
 
@@ -107,12 +106,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
-        $run = $this->db->createQueryBuilder()
+        $stats = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 25')
-            ->execute();
-        $stats = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
 
         $this->assertCount(25, $stats);
 
@@ -248,13 +246,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(1, $tags['NonUS:Action']);
 
         // No emails should be sent till after 5 seconds and the command is ran again
-        $run = $this->db->createQueryBuilder()
+        $stats = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute();
+            ->execute()->fetchAllAssociative();
 
-        $stats = $run->fetchAllAssociative();
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -274,12 +271,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
-        $run = $this->db->createQueryBuilder()
+        $stats = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
             ->execute();
-        $stats = $run->fetchAllAssociative();
+
         $this->assertCount(1, $stats);
 
         // Now let's simulate email opens
@@ -408,12 +405,12 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertEquals(4, $tags['NonUS:Action']);
 
         // No emails should be sent till after 5 seconds and the command is ran again
-        $run = $this->db->createQueryBuilder()
+        $stats = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute();
-        $stats = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
+
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events
@@ -433,12 +430,11 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->assertCount(0, $byEvent[4]);
 
         // Check that the emails actually sent
-        $run = $this->db->createQueryBuilder()
+        $stats = $this->db->createQueryBuilder()
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id <= 2')
-            ->execute();
-        $stats = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
         $this->assertCount(2, $stats);
 
         // Now let's simulate email opens

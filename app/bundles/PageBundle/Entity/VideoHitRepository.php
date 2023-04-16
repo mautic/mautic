@@ -113,9 +113,7 @@ class VideoHitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

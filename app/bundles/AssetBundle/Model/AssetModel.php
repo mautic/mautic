@@ -653,9 +653,7 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        $run = $q->executeQuery();
-
-        return $run->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -685,8 +683,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $run = $q->executeQuery();
-
-        return $run->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 }

@@ -55,8 +55,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $run    = $q->execute();
-        $result =  $run->fetchAllAssociative();
+        $result =  $q->execute()->fetchAllAssociative();
 
         //index by lead
         $stats = [];
@@ -98,8 +97,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -132,8 +130,7 @@ class StatRepository extends CommonRepository
 
         $q->andWhere('is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['read_count'] : 0;
     }
@@ -221,9 +218,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

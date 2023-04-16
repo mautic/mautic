@@ -26,8 +26,7 @@ class StatRepository extends CommonRepository
             ->where('s.dynamic_content_id = :dynamic_content')
             ->setParameter('dynamic_content', $dynamicContentId);
 
-        $run     = $q->execute();
-        $result  = $run->fetchAllAssociative();
+        $result  = $q->execute()->fetchAllAssociative();
 
         // index by lead
         $stats = [];
@@ -62,8 +61,7 @@ class StatRepository extends CommonRepository
             );
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -95,8 +93,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('e.dynamic_content_id');
 
         //get a total number of sent DC stats first
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
 

@@ -101,12 +101,12 @@ class LeadRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $run = $this->getEntityManager()->getConnection()->createQueryBuilder()
+        $results = $this->getEntityManager()->getConnection()->createQueryBuilder()
             ->select('cl.campaign_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
-            ->execute();
-        $results   = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
+
         $campaigns = [];
         foreach ($results as $r) {
             $campaigns[] = $r['campaign_id'];
@@ -244,8 +244,7 @@ class LeadRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $run     = $q->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $q->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -357,8 +356,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         $contactRotations = [];
         foreach ($results as $result) {
@@ -436,8 +434,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -498,8 +495,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {

@@ -313,8 +313,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('email = :search')
             ->setParameter('search', $email);
 
-        $run    = $q->execute();
-        $result =  $run->fetchAllAssociative();
+        $result =  $q->execute()->fetchAllAssociative();
 
         if (count($result)) {
             return $all ? $result : $result[0];
@@ -360,8 +359,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $fq->select('l.*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where('l.id = '.$id);
-        $run     = $fq->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $fq->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0] : [];
     }
@@ -1059,11 +1057,10 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getMaxLeadId()
     {
-        $run = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('max(id) as max_lead_id')
-            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-            ->execute();
-        $result = $run->fetchAllAssociative();
+        $result =         $this->getEntityManager()->getConnection()->createQueryBuilder()
+        ->select('max(id) as max_lead_id')
+        ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+        ->execute()->fetchAllAssociative();
 
         return $result[0]['max_lead_id'];
     }
@@ -1167,8 +1164,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $qb->expr()->in('l.id', $contactIds)
             );
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         if ($results) {
             $contacts = [];

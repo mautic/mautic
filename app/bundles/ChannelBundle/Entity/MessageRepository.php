@@ -80,8 +80,7 @@ class MessageRepository extends CommonRepository
             ->setParameter('messageId', $messageId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $channels = [];
         foreach ($results as $result) {

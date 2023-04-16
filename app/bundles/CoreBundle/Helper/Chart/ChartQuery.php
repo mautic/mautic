@@ -288,8 +288,7 @@ class ChartQuery extends AbstractChart
      */
     public function loadAndBuildTimeData($query)
     {
-        $run     = $query->execute();
-        $rawData =  $run->fetchAllAssociative();
+        $rawData =  $query->execute()->fetchAllAssociative();
 
         return $this->completeTimeData($rawData);
     }

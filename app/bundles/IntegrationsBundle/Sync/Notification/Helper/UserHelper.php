@@ -20,8 +20,8 @@ class UserHelper
 
     public function getAdminUsers(): array
     {
-        $qb      = $this->connection->createQueryBuilder();
-        $run     = $qb->select('u.id')
+        $qb          = $this->connection->createQueryBuilder();
+        $results     = $qb->select('u.id')
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
             ->join('u', MAUTIC_TABLE_PREFIX.'roles', 'r', 'r.id = u.role_id')
             ->where(
@@ -31,8 +31,7 @@ class UserHelper
                     $qb->expr()->eq('u.is_published', 1)
                 )
             )
-            ->execute();
-        $results = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
 
         $admins = [];
         foreach ($results as $result) {

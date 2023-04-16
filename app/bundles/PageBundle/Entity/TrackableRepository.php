@@ -23,7 +23,7 @@ class TrackableRepository extends CommonRepository
         $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
         $tableAlias = $this->getTableAlias();
 
-        $run =  $q->select('r.redirect_id, r.url, r.id, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
+        return $q->select('r.redirect_id, r.url, r.id, '.$tableAlias.'.hits, '.$tableAlias.'.unique_hits')
             ->from(MAUTIC_TABLE_PREFIX.'page_redirects', 'r')
             ->innerJoin('r', MAUTIC_TABLE_PREFIX.'channel_url_trackables', $tableAlias,
                 $q->expr()->andX(
@@ -34,9 +34,7 @@ class TrackableRepository extends CommonRepository
             )
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
-            ->execute();
-
-        return $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
     }
 
     /**
@@ -192,8 +190,7 @@ class TrackableRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_hit', 'ph');
         }
 
-        $run     = $q->executeQuery();
-        $results = $run->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return array of results

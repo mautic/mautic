@@ -54,13 +54,13 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 $table = $schema->getTable(MAUTIC_TABLE_PREFIX.$tableName);
 
                 //get a list of fields
-                $run = $args->getEntityManager()->getConnection()->createQueryBuilder()
+                $fields = $args->getEntityManager()->getConnection()->createQueryBuilder()
                     ->select('f.alias, f.is_unique_identifer as is_unique, f.type, f.object')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
-                    ->execute();
-                $fields = $run->fetchAllAssociative();
+                    ->execute()->fetchAllAssociative();
+
                 // Compile which ones are unique identifiers
                 // Email will always be included first
                 $uniqueFields = ('lead' === $object) ? ['email' => 'email'] : ['companyemail' => 'companyemail'];

@@ -197,9 +197,7 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('userId', $this->currentUser->getId());
         }
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -294,8 +292,7 @@ class LeadEventLogRepository extends CommonRepository
                 new QueryCacheProfile(600, __METHOD__)
             )->fetchAllAssociative();
         } else {
-            $run     = $q->execute();
-            $results = $run->fetchAllAssociative();
+            $results = $q->execute()->fetchAllAssociative();
         }
 
         $return = [];
@@ -535,8 +532,7 @@ class LeadEventLogRepository extends CommonRepository
                 )
             );
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         $dates = [];
         foreach ($results as $result) {
@@ -557,8 +553,7 @@ class LeadEventLogRepository extends CommonRepository
             ->orderBy('log.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
     }
@@ -587,8 +582,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('rotation', (int) $rotation)
             ->setMaxResults(1);
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         return !empty($results);
     }

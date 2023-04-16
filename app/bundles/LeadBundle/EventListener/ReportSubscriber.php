@@ -481,8 +481,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
 
                     $chart = new PieChart();
-                    $run   = $outerQb->execute();
-                    $data  = $run->fetchAllAssociative();
+                    $data  = $outerQb->execute()->fetchAllAssociative();
 
                     foreach ($data as $row) {
                         switch ($groupBy) {

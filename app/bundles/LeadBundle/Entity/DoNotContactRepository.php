@@ -98,8 +98,7 @@ class DoNotContactRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 
-        $run     = $q->executeQuery();
-        $results = $run->fetchAllAssociative();
+        $results = $q->executeQuery()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -165,8 +164,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {

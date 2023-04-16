@@ -18,13 +18,12 @@ class LeadStageLogRepository extends CommonRepository
     public function updateLead($fromLeadId, $toLeadId)
     {
         // First check to ensure the $toLead doesn't already exist
-        $run = $this->_em->getConnection()->createQueryBuilder()
+        $results = $this->_em->getConnection()->createQueryBuilder()
             ->select('pl.stage_id')
             ->from(MAUTIC_TABLE_PREFIX.'stage_lead_action_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
-            ->execute();
+            ->execute()->fetchAllAssociative();
 
-        $results = $run->fetchAllAssociative();
         $actions = [];
         foreach ($results as $r) {
             $actions[] = $r['stage_id'];

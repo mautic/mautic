@@ -143,9 +143,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
 
-        $run = $q->execute();
-
-        return $run->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -257,8 +255,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->orderBy('comp.companyname', 'ASC');
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $companies[$key] = $results;
 
@@ -290,8 +287,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         )
             ->groupBy('cl.company_id');
 
-        $run    = $q->execute();
-        $result =  $run->fetchAllAssociative();
+        $result =  $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {
@@ -347,8 +343,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             )->setParameter('state', $state);
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -372,8 +367,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-        $run       = $qb->execute();
-        $companies = $run->fetchAllAssociative();
+
+        $companies = $qb->execute()->fetchAllAssociative();
 
         // Group companies per contact
         $contactCompanies = [];
@@ -409,9 +404,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -426,9 +419,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        $run = $query->execute();
-
-        return $run->fetchAllAssociative();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -487,9 +478,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 ->setParameter('true', true, 'boolean');
         }
 
-        $run = $q->execute();
-
-        return $run->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

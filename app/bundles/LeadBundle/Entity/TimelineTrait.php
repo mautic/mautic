@@ -37,8 +37,7 @@ trait TimelineTrait
             $cq = $options['chartQuery'];
             $cq->modifyTimeDataQuery($query, $column, $tablePrefix);
             $cq->applyDateFilters($query, $column, $tablePrefix);
-            $run  = $query->executeQuery();
-            $data = $run->fetchAllAssociative();
+            $data = $query->executeQuery()->fetchAllAssociative();
 
             return $cq->completeTimeData($data);
         }
@@ -85,8 +84,8 @@ trait TimelineTrait
                 $query->setFirstResult($options['start']);
             }
         }
-        $run     = $query->execute();
-        $results = $run->fetchAllAssociative();
+
+        $results = $query->execute()->fetchAllAssociative();
 
         if (!empty($serializedColumns) || !empty($dateTimeColumns) || is_callable($resultsParserCallback)) {
             // Convert to array or \DateTime since we're using DBAL here

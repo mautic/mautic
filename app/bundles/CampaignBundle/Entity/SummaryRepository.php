@@ -53,8 +53,7 @@ class SummaryRepository extends CommonRepository
                 ->setParameter('dateTo', $dateTo->getTimestamp(), PDO::PARAM_INT);
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
         // Group by event id
@@ -80,8 +79,7 @@ class SummaryRepository extends CommonRepository
             ->orderBy('cs.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $run     = $qb->execute();
-        $results =  $run->fetchAllAssociative();
+        $results =  $qb->execute()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new DateTime($results[0]['date_triggered']) : null;
     }

@@ -933,8 +933,7 @@ class PageModel extends FormModel
             ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'));
         $q->groupBy('ds.device');
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $chart   = new PieChart();
 
@@ -984,9 +983,7 @@ class PageModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_hit');
 
-        $run = $q->executeQuery();
-
-        return $run->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**
@@ -1016,9 +1013,7 @@ class PageModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        $run = $q->executeQuery();
-
-        return $run->fetchAllAssociative();
+        return $q->executeQuery()->fetchAllAssociative();
     }
 
     /**

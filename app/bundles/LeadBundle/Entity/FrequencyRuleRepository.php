@@ -84,8 +84,7 @@ class FrequencyRuleRepository extends CommonRepository
             }
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $frequencyRules = [];
 
@@ -122,9 +121,7 @@ class FrequencyRuleRepository extends CommonRepository
                 ->setParameter('leadId', $leadId);
         }
 
-        $run = $q->execute();
-
-        return $run->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -168,9 +165,7 @@ class FrequencyRuleRepository extends CommonRepository
 
         $q->having("count(ch.$statContactColumn) >= fr.frequency_number");
 
-        $run = $q->execute();
-
-        return $run->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -231,8 +226,7 @@ class FrequencyRuleRepository extends CommonRepository
         $q->having("count(ch.$statContactColumn) >= :defaultNumber")
             ->setParameter('defaultNumber', $defaultFrequencyNumber);
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $key => $result) {
             $results[$key]['frequency_number'] = $defaultFrequencyNumber;

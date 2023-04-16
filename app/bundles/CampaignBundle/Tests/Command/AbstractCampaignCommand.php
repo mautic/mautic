@@ -96,15 +96,14 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
      */
     protected function getCampaignEventLogs(array $ids)
     {
-        $run = $this->db->createQueryBuilder()
+        $logs = $this->db->createQueryBuilder()
             ->select('l.email, l.country, event.name, event.event_type, event.type, log.*')
             ->from($this->prefix.'campaign_lead_event_log', 'log')
             ->join('log', $this->prefix.'campaign_events', 'event', 'event.id = log.event_id')
             ->join('log', $this->prefix.'leads', 'l', 'l.id = log.lead_id')
             ->where('log.campaign_id = 1')
             ->andWhere('log.event_id IN ('.implode(',', $ids).')')
-            ->execute();
-        $logs = $run->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
 
         $byEvent = [];
         foreach ($ids as $id) {

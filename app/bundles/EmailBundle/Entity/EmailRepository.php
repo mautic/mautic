@@ -37,8 +37,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {
@@ -65,8 +64,7 @@ class EmailRepository extends CommonRepository
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $dnc     = count($results) ? $results[0] : null;
 
@@ -203,12 +201,11 @@ class EmailRepository extends CommonRepository
         // Only include those who belong to the associated lead lists
         if (is_null($listIds)) {
             // Get a list of lists associated with this email
-            $run = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            $lists = $this->getEntityManager()->getConnection()->createQueryBuilder()
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
-                ->execute();
-            $lists = $run->fetchAllAssociative();
+                ->execute()->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
 
@@ -313,8 +310,7 @@ class EmailRepository extends CommonRepository
             return $q;
         }
 
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
