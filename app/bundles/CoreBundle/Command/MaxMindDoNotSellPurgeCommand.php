@@ -129,9 +129,9 @@ EOT
 
         $conn   = $this->em->getConnection();
         $stmt   = $conn->prepare($sql);
-        $result = $stmt->executeQuery();
+        $stmt   = $stmt->execute();
 
-        return $result->fetchAllAssociative();
+        return $stmt->fetchAllAssociative();
     }
 
     private function purgeData(string $contactId, string $ip): bool

@@ -969,7 +969,7 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->executeQuery()->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

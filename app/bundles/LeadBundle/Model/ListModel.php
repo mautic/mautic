@@ -882,7 +882,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->executeQuery()->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

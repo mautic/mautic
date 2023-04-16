@@ -544,8 +544,7 @@ class LeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leadlist_xref', 'cl')
             ->join('cl', MAUTIC_TABLE_PREFIX.'lead_lists', 'll', 'll.id = cl.leadlist_id and ll.is_published = 1')
             ->where('cl.campaign_id = '.(int) $campaignId)
-            ->execute();
-        $segmentResults = $segmentResults->fetchAllAssociative();
+            ->execute()->fetchAllAssociative();
 
         if (empty($segmentResults)) {
             // No segments so no contacts
