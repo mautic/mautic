@@ -107,7 +107,7 @@ class ReferenceResolverTest extends TestCase
     private function createQueryBuilder(...$returnValues)
     {
         $result = $this->createMock(Result::class);
-        $result->method('fetchColumn')
+        $result->method('fetchOne')
             ->willReturnOnConsecutiveCalls(...$returnValues);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);

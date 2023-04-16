@@ -11,11 +11,19 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class VersionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private $connection;
     /**
-     * @var Result|MockObject
+     * @var Connection|MockObject
+     */
+    private $connection;
+
+    /**
+     * @var MockObject&Result<mixed>
      */
     private $result;
+
+    /**
+     * @var VersionProvider
+     */
     private $provider;
 
     protected function setUp(): void
