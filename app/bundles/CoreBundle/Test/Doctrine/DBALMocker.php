@@ -250,6 +250,7 @@ class DBALMocker
                 'fetch',
                 'fetchAll',
                 'fetchColumn',
+                'fetchAllAssociative',
             ])
             ->getMock();
 
@@ -274,6 +275,10 @@ class DBALMocker
 
         $mock->expects($this->testCase->any())
             ->method('fetch')
+            ->willReturn($this->queryResponse);
+
+        $mock->expects($this->testCase->any())
+            ->method('fetchAllAssociative')
             ->willReturn($this->queryResponse);
 
         return $mock;
