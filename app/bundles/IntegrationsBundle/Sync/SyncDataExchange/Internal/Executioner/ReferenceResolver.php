@@ -81,7 +81,7 @@ final class ReferenceResolver implements ReferenceResolverInterface
         $qb->where('c.id = :id');
         $qb->setParameter('id', $id);
 
-        $name = $qb->execute()->fetchOne();
+        $name = $qb->execute()->fetchColumn();
 
         if (false === $name) {
             throw new ReferenceNotFoundException(sprintf('Company reference for ID "%d" not found', $id));
