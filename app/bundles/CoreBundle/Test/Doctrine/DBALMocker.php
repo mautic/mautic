@@ -249,7 +249,7 @@ class DBALMocker
                 'setFetchMode',
                 'fetch',
                 'fetchAll',
-                'fetchColumn',
+                'fetchOne',
                 'fetchAllAssociative',
             ])
             ->getMock();

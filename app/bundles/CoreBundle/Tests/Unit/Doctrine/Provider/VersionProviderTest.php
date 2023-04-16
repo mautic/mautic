@@ -31,7 +31,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->statement);
 
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn('5.7.23-23-log');
 
         $version = $this->provider->getVersion();
@@ -49,7 +49,7 @@ class VersionProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->statement);
 
         $this->statement->expects($this->once())
-            ->method('fetchColumn')
+            ->method('fetchOne')
             ->willReturn('10.3.9-MariaDB');
 
         $version = $this->provider->getVersion();

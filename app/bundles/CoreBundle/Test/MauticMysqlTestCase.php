@@ -370,7 +370,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function wasRollbackSuccessful(): bool
     {
-        return false === $this->connection->fetchColumn("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
+        return false === $this->connection->fetchOne("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
     }
 
     private function getTablePrefix(): string
