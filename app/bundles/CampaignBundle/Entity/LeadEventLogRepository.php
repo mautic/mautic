@@ -613,7 +613,7 @@ SQL;
         $stmt->bindParam('contactId', $contactId, \PDO::PARAM_INT);
         $stmt->bindParam('campaignId', $campaignId, \PDO::PARAM_INT);
         $stmt->bindParam('rotation', $rotation, \PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt::executeStatement();
 
         // Now unschedule them
         $qb = $connection->createQueryBuilder();

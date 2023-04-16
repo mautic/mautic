@@ -129,7 +129,7 @@ EOT
 
         $conn   = $this->em->getConnection();
         $stmt   = $conn->prepare($sql);
-        $stmt->execute();
+        $stmt::executeQuery();
 
         return $stmt->fetchAllAssociative();
     }

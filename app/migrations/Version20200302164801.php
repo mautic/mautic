@@ -26,7 +26,7 @@ class Version20200302164801 extends AbstractMauticMigration
         ";
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
+        $stmt::executeQuery();
         $found = (bool) $stmt->fetchAssociative();
 
         if (!$found) {

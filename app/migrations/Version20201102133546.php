@@ -14,7 +14,7 @@ final class Version20201102133546 extends AbstractMauticMigration
     {
         $sql  = "SHOW INDEX FROM {$this->getTableName()} WHERE Key_name = '{$this->getIndexName()}';";
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
+        $stmt::executeQuery();
         $found = (bool) $stmt->fetchAssociative();
         $stmt->closeCursor();
 

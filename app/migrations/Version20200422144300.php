@@ -70,7 +70,7 @@ class Version20200422144300 extends AbstractMauticMigration
 SQL;
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
+        $stmt::executeQuery();
         $this->rowsToMigrateLookup = $stmt->fetchAllAssociative();
     }
 
@@ -103,7 +103,7 @@ SQL;
 SQL;
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
+        $stmt::executeQuery();
         $this->rowsToMigrateSelectMultiselect = $stmt->fetchAllAssociative();
     }
 
