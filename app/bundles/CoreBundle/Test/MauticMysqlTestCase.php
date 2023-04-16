@@ -320,7 +320,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function resetCustomFields(): bool
     {
         $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAll(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
 
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';

@@ -28,7 +28,7 @@ class LogRepository extends CommonRepository
             function ($row) {
                 return (int) $row['webhook_id'];
             },
-            $qb->execute()->fetchAll()
+            $qb->execute()->fetchAllAssociative()
         );
     }
 

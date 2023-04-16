@@ -92,7 +92,7 @@ jobs:
         if [[ "${{ matrix.php-versions }}" == "8.0" ]] && [[ "${{ matrix.db-types }}" == "mariadb" ]]; then
           php -d pcov.enabled=1 bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=coverage.xml
         else
-          composer test -- --testdox
+          composer test
         fi
 
     - name: Upload coverage report

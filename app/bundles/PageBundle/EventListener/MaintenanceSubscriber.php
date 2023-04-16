@@ -86,7 +86,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
             while (true) {
                 $subQb->setMaxResults(10000)->setFirstResult($loop * 10000);
 
-                $leadsIds = array_column($subQb->execute()->fetchAll(), 'id');
+                $leadsIds = array_column($subQb->execute()->fetchAllAssociative(), 'id');
 
                 if (0 === sizeof($leadsIds)) {
                     break;
