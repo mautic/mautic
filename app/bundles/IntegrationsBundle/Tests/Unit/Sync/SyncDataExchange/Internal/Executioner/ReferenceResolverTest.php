@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\Executioner;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
@@ -106,7 +107,7 @@ class ReferenceResolverTest extends TestCase
     private function createQueryBuilder(...$returnValues)
     {
         $result = $this->createMock(Result::class);
-        $result->method('fetchOne')
+        $result->method('fetchColumn')
             ->willReturnOnConsecutiveCalls(...$returnValues);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
