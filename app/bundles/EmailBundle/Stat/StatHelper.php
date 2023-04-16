@@ -44,7 +44,7 @@ class StatHelper
         $this->stats[$emailAddress] = new Reference($stat);
 
         // clear stat from doctrine memory
-         $this->repo->detachEntity($stat);
+        $this->repo->detachEntity($stat);
     }
 
     public function deletePending()
