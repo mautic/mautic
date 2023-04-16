@@ -275,7 +275,7 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->select('*')
             ->from($this->prefix.'email_stats', 'stat')
             ->where('stat.lead_id = 1')
-            ->execute();
+            ->execute()->fetchAllAssociative();
 
         $this->assertCount(1, $stats);
 
@@ -621,8 +621,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->from($this->prefix.'lead_tags', 't')
             ->join('t', $this->prefix.'lead_tags_xref', 'l', 't.id = l.tag_id')
             ->groupBy('t.tag')
-            ->execute();
-        $tags = $tags->fetchAllAssociative();
+            ->execute()
+            ->fetchAllAssociative();
 
         $tagCounts = [];
         foreach ($tags as $tag) {

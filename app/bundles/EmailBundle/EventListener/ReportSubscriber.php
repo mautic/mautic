@@ -525,8 +525,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
-                    $statment = $queryBuilder->execute();
-                    $counts   = $statment->fetchOne();
+                    $counts   = $queryBuilder->execute()->fetchOne();
                     $chart    = new PieChart();
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.stat.read'),

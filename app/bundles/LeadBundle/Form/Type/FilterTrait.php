@@ -324,12 +324,12 @@ trait FilterTrait
                             // Let's test the regex's syntax by making a fake query
                             try {
                                 $qb = $this->connection->createQueryBuilder();
-                                $results = $qb->select('l.id')
+                                $qb->select('l.id')
                                     ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
                                     ->where('l.id REGEXP :regex')
                                     ->setParameter('regex', $this->prepareRegex($regex))
-                                    ->setMaxResults(1)
-                                    ->execute()->fetchAllAssociative();
+                                    ->setMaxResults(1);
+                                $qb->execute()->fetchAllAssociative();
                             } catch (\Exception $exception) {
                                 $context->buildViolation('mautic.core.regex.invalid')->addViolation();
                             }

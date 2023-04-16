@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\Migrations;
 
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
@@ -16,7 +15,7 @@ final class Version20201102133546 extends AbstractMauticMigration
         $sql  = "SHOW INDEX FROM {$this->getTableName()} WHERE Key_name = '{$this->getIndexName()}';";
         $stmt = $this->connection->prepare($sql);
         $stmt->execute();
-        $found = (bool) $stmt->fetch(FetchMode::ASSOCIATIVE);
+        $found = (bool) $stmt->fetchAssociative();
         $stmt->closeCursor();
 
         if (!$found) {

@@ -365,8 +365,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
-        $statment = $q->execute();
-        $result   = $statment->fetchOne();
+        $result = $q->execute()->fetchOne();
 
         return !empty($result['id']);
     }
