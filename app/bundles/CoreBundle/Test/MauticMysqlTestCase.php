@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Test;
 
 use AppKernel;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
 use Exception;
 use LogicException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
@@ -255,7 +254,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $content .= 'SET FOREIGN_KEY_CHECKS=0;'.PHP_EOL;
 
         $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getDatabase()])
-            ->fetchAll(FetchMode::COLUMN);
+            ->fetchFirstColumn();
 
         foreach ($tables as $table) {
             $content .= sprintf('DELETE FROM %s;'.PHP_EOL, $table);
