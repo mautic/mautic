@@ -22,6 +22,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['mailer_from_name'] = 'Mautic Admin';
         parent::setUp();
         $this->loadFixtures([LoadCategoryData::class]);
         $this->setUpMailer();
@@ -279,7 +280,6 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $contactId = $contact->getId();
-        $segmentId = $segment->getId();
 
         // Create an email:
         $createEmail = function () use ($segment) {
@@ -288,7 +288,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
             $email->setSubject('Email created via API test');
             $email->setEmailType('list');
             $email->addList($segment);
-            $email->setCustomHtml('<h1>Email content created by an API test</h1><br>{signature}');
+            $email->setCustomHtml('<h1>Email content created by an API test</h1>{custom-token}<br>{signature}');
             $email->setIsPublished(true);
             $email->setFromAddress('from@api.test');
             $email->setFromName('API Test');
@@ -304,35 +304,35 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailId = $email->getId();
 
         // Send to segment:
-        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
         $this->assertEquals($sendResponse, ['success' => true, 'sentCount' => 1, 'failedRecipients' => 0], $clientResponse->getContent());
 
-        $testEmail = function (): void {
+        $testEmail = function (string $customToken): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><br><img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1>'.$customToken.'<br>Best regards, Mautic Admin<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getBody());
             $this->assertSame($message->getTo(), ['jane@api.test' => 'Jane Doe']);
             $this->assertSame($message->getFrom(), ['from@api.test' => 'API Test']);
             $this->assertSame($message->getReplyTo(), ['reply@api.test' => null]);
             $this->assertSame($message->getBcc(), ['bcc@api.test' => null]);
         };
-        $testEmail();
+        $testEmail('\{custom-token\}');
 
         // Send to contact:
-        $this->client->request('POST', "/api/emails/${emailId}/contact/${contactId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send", ['tokens' => ['{custom-token}' => 'custom <b>value</b>']]);
         $clientResponse = $this->client->getResponse();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
-        $testEmail();
+        $testEmail('custom <b>value</b>');
 
         // Test use owner as mailer:
         $email = $createEmail();
@@ -342,7 +342,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $emailId = $email->getId();
 
         // Send to segment:
-        $this->client->request('POST', "/api/emails/${emailId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/send");
         $clientResponse = $this->client->getResponse();
         $sendResponse   = json_decode($clientResponse->getContent(), true);
 
@@ -352,7 +352,7 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer = function (): void {
             $message = $this->transport->sentMessage;
             $this->assertSame($message->getSubject(), 'Email created via API test');
-            $bodyRegExp = '#<h1>Email content created by an API test</h1><br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
+            $bodyRegExp = '#<h1>Email content created by an API test</h1>{custom-token}<br>Best regards, John Doe<img height="1" width="1" src="[^"]+" alt="" />#';
             $this->assertMatchesRegularExpression($bodyRegExp, $message->getBody());
             $this->assertSame($message->getTo(), ['jane@api.test' => 'Jane Doe']);
             $this->assertSame($message->getFrom(), ['john@api.test' => 'John Doe']);
@@ -362,12 +362,12 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $testEmailOwnerAsMailer();
 
         // Send to contact:
-        $this->client->request('POST', "/api/emails/${emailId}/contact/${contactId}/send");
+        $this->client->request('POST', "/api/emails/{$emailId}/contact/{$contactId}/send");
         $clientResponse = $this->client->getResponse();
 
         $this->assertSame(200, $clientResponse->getStatusCode(), $clientResponse->getContent());
 
-        $sendResponse   = json_decode($clientResponse->getContent(), true);
+        $sendResponse = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals($sendResponse, ['success' => true], $clientResponse->getContent());
         $testEmailOwnerAsMailer();
