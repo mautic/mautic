@@ -119,18 +119,6 @@ class InstallController extends CommonController
 
                         $complete = true;
                         break;
-
-                    case InstallService::EMAIL_STEP:
-                        $emailParam = (array) $formData;
-                        $messages   = $this->installer->setupEmailStep($step, $emailParam);
-
-                        if (!empty($messages)) {
-                            $this->handleInstallerErrors($form, $messages);
-                            break;
-                        }
-
-                        $complete = true;
-                        break;
                 }
             }
         } elseif (!empty($subIndex)) {
@@ -289,7 +277,7 @@ class InstallController extends CommonController
                 case 'warning':
                 case 'error':
                 case 'notice':
-                    $this->addFlash($message, [], $type);
+                    $this->addFlashMessage($message, [], $type);
                     break;
                 default:
                     // If type not a flash type, assume form field error

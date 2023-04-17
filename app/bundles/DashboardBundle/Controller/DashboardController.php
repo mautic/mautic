@@ -409,7 +409,7 @@ class DashboardController extends AbstractFormController
         $path = $dir.'/'.$name.'.json';
 
         if (!file_exists($path) || !is_readable($path)) {
-            $this->addFlash('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
+            $this->addFlashMessage('mautic.dashboard.upload.filenotfound', [], 'error', 'validators');
 
             return $this->redirectToRoute('mautic_dashboard_action', ['objectAction' => 'import']);
         }

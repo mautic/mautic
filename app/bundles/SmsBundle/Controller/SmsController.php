@@ -283,7 +283,7 @@ class SmsController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -445,7 +445,7 @@ class SmsController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),

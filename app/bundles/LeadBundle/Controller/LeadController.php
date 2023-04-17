@@ -526,7 +526,7 @@ class LeadController extends FormController
 
                     $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $identifier,
@@ -563,7 +563,7 @@ class LeadController extends FormController
                     }
 
                     $formErrors = $this->getFormErrorMessages($form);
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $this->getFormErrorMessage($formErrors),
                         [],
                         'error'
@@ -726,7 +726,7 @@ class LeadController extends FormController
 
                     $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $identifier,
@@ -742,7 +742,7 @@ class LeadController extends FormController
                     );
                 } else {
                     $formErrors = $this->getFormErrorMessages($form);
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $this->getFormErrorMessage($formErrors),
                         [],
                         'error'
@@ -1453,7 +1453,7 @@ class LeadController extends FormController
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 'mautic.lead.email.notice.sent',
                                 [
                                     '%subject%' => $subject,
@@ -1614,7 +1614,7 @@ class LeadController extends FormController
                 }
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -1713,7 +1713,7 @@ class LeadController extends FormController
                 $model->saveEntities($persistEntities);
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -1809,7 +1809,7 @@ class LeadController extends FormController
             }
             // Save entities
             $model->saveEntities($entities);
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -1908,7 +1908,7 @@ class LeadController extends FormController
             }
             // Save entities
             $model->saveEntities($entities);
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -2116,7 +2116,7 @@ class LeadController extends FormController
             LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
         );
 
-        $this->addFlash('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
+        $this->addFlashMessage('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
         $response['message'] = 'Contact export scheduled for CSV file type.';
         $response['flashes'] = $this->getFlashContent();
 
