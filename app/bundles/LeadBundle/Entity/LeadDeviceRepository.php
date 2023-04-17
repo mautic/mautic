@@ -159,11 +159,12 @@ class LeadDeviceRepository extends CommonRepository
         $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         return $qb->select('*')
-        ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
-        ->where('lead_id = :leadId')
-        ->setParameter('leadId', (int) $lead->getId())
-        ->orderBy('date_added', 'desc')
-        ->execute()->fetchAllAssociative();
+            ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
+            ->where('lead_id = :leadId')
+            ->setParameter('leadId', (int) $lead->getId())
+            ->orderBy('date_added', 'desc')
+            ->execute()
+            ->fetchAllAssociative();
     }
 
     /**

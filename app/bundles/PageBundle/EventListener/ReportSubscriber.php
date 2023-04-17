@@ -505,8 +505,8 @@ class ReportSubscriber implements EventSubscriberInterface
                     $queryBuilder->select('ph.page_language, COUNT(distinct(ph.id)) as the_count')
                         ->groupBy('ph.page_language')
                         ->andWhere($qb->expr()->isNotNull('ph.page_language'));
-                    $data     = $queryBuilder->execute()->fetchAllAssociative();
-                    $chart    = new PieChart();
+                    $data  = $queryBuilder->execute()->fetchAllAssociative();
+                    $chart = new PieChart();
 
                     foreach ($data as $lang) {
                         $chart->setDataset($lang['page_language'], $lang['the_count']);

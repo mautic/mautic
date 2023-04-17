@@ -574,12 +574,13 @@ class LeadControllerTest extends MauticMysqlTestCase
     private function getCompanyLeads(int $leadId): array
     {
         return $this->connection->createQueryBuilder()
-        ->select('cl.lead_id, cl.company_id, cl.is_primary, c.companyname')
-        ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
-        ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'c', 'c.id = cl.company_id')
-        ->where("cl.lead_id = {$leadId}")
-        ->orderBy('cl.company_id')
-        ->execute()->fetchAllAssociative();
+            ->select('cl.lead_id, cl.company_id, cl.is_primary, c.companyname')
+            ->from(MAUTIC_TABLE_PREFIX.'companies_leads', 'cl')
+            ->join('cl', MAUTIC_TABLE_PREFIX.'companies', 'c', 'c.id = cl.company_id')
+            ->where("cl.lead_id = {$leadId}")
+            ->orderBy('cl.company_id')
+            ->execute()
+            ->fetchAllAssociative();
     }
 
     private function getLeadPrimaryCompany(int $leadId): ?string

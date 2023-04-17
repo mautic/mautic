@@ -1057,10 +1057,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
      */
     public function getMaxLeadId()
     {
-        $result =        $this->getEntityManager()->getConnection()->createQueryBuilder()
-        ->select('max(id) as max_lead_id')
-        ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
-        ->execute()->fetchAllAssociative();
+        $result = $this->getEntityManager()->getConnection()->createQueryBuilder()
+            ->select('max(id) as max_lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
+            ->execute()
+            ->fetchAllAssociative();
 
         return $result[0]['max_lead_id'];
     }

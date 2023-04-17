@@ -106,8 +106,8 @@ class SyncServiceTest extends MauticMysqlTestCase
         $qb      = $this->connection->createQueryBuilder();
         $results = $qb->select('count(*) as the_count')
             ->from($prefix.'sync_object_mapping', 'm')
-            ->executeQuery();
-        $results = $results->fetchAllAssociative();
+            ->execute()
+            ->fetchAllAssociative();
         $this->assertEquals(50, $results[0]['the_count']);
     }
 }

@@ -280,9 +280,9 @@ class HitRepository extends CommonRepository
     {
         $inOrEq = (!is_array($pageIds)) ? 'eq' : 'in';
 
-        $hitsColumn   = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
-        $q            = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $pages        = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
+        $hitsColumn = ($isVariantCheck) ? 'variant_hits' : 'unique_hits';
+        $q          = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $pages      = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
             ->execute()

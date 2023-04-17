@@ -146,7 +146,7 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
                 ->execute()
-            ->fetchAllAssociative();
+                ->fetchAllAssociative();
     }
 
     /**
@@ -225,7 +225,7 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('lead', (int) $lead)
                 ->setParameter('value', $value);
 
-            $result = $q->execute()->fetch();
+            $result = $q->execute()->fetchAssociative();
 
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
