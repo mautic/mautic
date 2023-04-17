@@ -532,7 +532,7 @@ class LeadEventLogRepository extends CommonRepository
                 )
             );
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $dates = [];
         foreach ($results as $result) {
@@ -553,7 +553,7 @@ class LeadEventLogRepository extends CommonRepository
             ->orderBy('log.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
     }
@@ -582,7 +582,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('rotation', (int) $rotation)
             ->setMaxResults(1);
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         return !empty($results);
     }

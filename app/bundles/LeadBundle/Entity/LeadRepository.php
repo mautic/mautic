@@ -1164,7 +1164,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                 $qb->expr()->in('l.id', $contactIds)
             );
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         if ($results) {
             $contacts = [];

@@ -79,7 +79,7 @@ class SummaryRepository extends CommonRepository
             ->orderBy('cs.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new DateTime($results[0]['date_triggered']) : null;
     }

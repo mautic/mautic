@@ -245,7 +245,7 @@ class LeadRepository extends CommonRepository
             $q->setMaxResults($limiter->getCampaignLimitRemaining());
         }
 
-        $results =  $q->execute()->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -357,7 +357,7 @@ class LeadRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setParameter('contactIds', $contactIds, Connection::PARAM_INT_ARRAY);
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $contactRotations = [];
         foreach ($results as $result) {
@@ -435,7 +435,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -496,7 +496,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, false);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $results =  $qb->execute()->fetchAllAssociative();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
