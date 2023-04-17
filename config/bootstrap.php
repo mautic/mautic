@@ -17,10 +17,6 @@ if (is_array($env = @include dirname(__DIR__).'/.env.local.php') && (!isset($env
     (new Dotenv(false))->loadEnv(dirname(__DIR__).'/.env');
 }
 
-// Fix for hosts that do not have date.timezone set, it will be reset based on users settings
-date_default_timezone_set('UTC');
-define('MAUTIC_ROOT_DIR', __DIR__);
-
 $_SERVER += $_ENV;
 $_SERVER['APP_ENV']     = $_ENV['APP_ENV']     = ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null) ?: 'dev';
 $_SERVER['APP_DEBUG']   = $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? 'prod' !== $_SERVER['APP_DEBUG'];
