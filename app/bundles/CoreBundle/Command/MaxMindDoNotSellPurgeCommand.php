@@ -127,8 +127,8 @@ EOT
              'JOIN '.MAUTIC_TABLE_PREFIX.'ip_addresses ip ON x.ip_id = ip.id '.
              'WHERE ip.ip_address IN ('.$in.')';
 
-        $conn   = $this->em->getConnection();
-        $stmt   = $conn->prepare($sql);
+        $conn = $this->em->getConnection();
+        $stmt = $conn->prepare($sql);
         $stmt->executeQuery();
 
         return $stmt->fetchAllAssociative();

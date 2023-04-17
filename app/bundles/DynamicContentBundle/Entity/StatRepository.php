@@ -26,7 +26,7 @@ class StatRepository extends CommonRepository
             ->where('s.dynamic_content_id = :dynamic_content')
             ->setParameter('dynamic_content', $dynamicContentId);
 
-        $result  = $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         // index by lead
         $stats = [];

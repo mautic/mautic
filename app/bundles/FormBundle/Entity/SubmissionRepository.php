@@ -224,7 +224,7 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         //get a total count
-        $result  = $dq->execute()->fetchAllAssociative();
+        $result = $dq->execute()->fetchAllAssociative();
 
         $total  = $result[0]['count'];
 
