@@ -22,7 +22,8 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['mailer_from_name'] = 'Mautic Admin';
+        $this->configParams['mailer_from_name']       = 'Mautic Admin';
+        $this->configParams['default_signature_text'] = 'Best regards, |FROM_NAME|';
         parent::setUp();
         $this->loadFixtures([LoadCategoryData::class]);
         $this->setUpMailer();
