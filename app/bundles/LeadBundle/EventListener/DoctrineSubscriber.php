@@ -59,7 +59,8 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
-                    ->execute()->fetchAllAssociative();
+                    ->execute()
+            ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
                 // Email will always be included first

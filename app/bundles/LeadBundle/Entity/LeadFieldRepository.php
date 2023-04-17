@@ -129,7 +129,8 @@ class LeadFieldRepository extends CommonRepository
                 ->where($qb->expr()->eq('object', ':object'))
                 ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
-                ->execute()->fetchAllAssociative();
+                ->execute()
+            ->fetchAllAssociative();
     }
 
     /**

@@ -285,7 +285,8 @@ class HitRepository extends CommonRepository
         $pages        = $q->select("p.id, p.$hitsColumn as totalHits, p.title")
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
-            ->execute()->fetchAllAssociative();
+            ->execute()
+            ->fetchAllAssociative();
 
         $return = [];
         foreach ($pages as $p) {

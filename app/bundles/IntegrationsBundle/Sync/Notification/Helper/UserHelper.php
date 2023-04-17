@@ -31,7 +31,8 @@ class UserHelper
                     $qb->expr()->eq('u.is_published', 1)
                 )
             )
-            ->execute()->fetchAllAssociative();
+            ->execute()
+            ->fetchAllAssociative();
 
         $admins = [];
         foreach ($results as $result) {

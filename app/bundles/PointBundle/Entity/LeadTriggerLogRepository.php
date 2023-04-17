@@ -22,7 +22,8 @@ class LeadTriggerLogRepository extends CommonRepository
             ->select('pl.event_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'pl')
             ->where('pl.lead_id = '.$toLeadId)
-            ->execute()->fetchAllAssociative();
+            ->execute()
+            ->fetchAllAssociative();
 
         $events  = [];
         foreach ($results as $r) {

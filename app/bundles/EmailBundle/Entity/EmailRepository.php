@@ -205,7 +205,8 @@ class EmailRepository extends CommonRepository
                 ->select('el.leadlist_id')
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
-                ->execute()->fetchAllAssociative();
+                ->execute()
+            ->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
 

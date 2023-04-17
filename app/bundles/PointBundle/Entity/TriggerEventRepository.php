@@ -98,7 +98,8 @@ class TriggerEventRepository extends CommonRepository
             ->select('e.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'point_lead_event_log', 'e')
             ->where('e.event_id = '.(int) $eventId)
-            ->execute()->fetchAllAssociative();
+            ->execute()
+            ->fetchAllAssociative();
 
         $return = [];
 
