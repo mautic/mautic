@@ -56,7 +56,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result =  $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         //index by lead
         $stats = [];

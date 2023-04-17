@@ -55,7 +55,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result =  $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         //index by lead
         $stats = [];
@@ -247,8 +247,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('s.notification_id');
 
         //get a total number of sent notifications first
-        $run     = $q->execute();
-        $results = $run->fetchAllAssociative();
+        $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
 

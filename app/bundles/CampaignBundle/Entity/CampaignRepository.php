@@ -241,7 +241,6 @@ class CampaignRepository extends CommonRepository
         );
 
         $forms   = [];
-
         $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $r) {

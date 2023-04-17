@@ -60,7 +60,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
                     ->execute()
-            ->fetchAllAssociative();
+                    ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
                 // Email will always be included first

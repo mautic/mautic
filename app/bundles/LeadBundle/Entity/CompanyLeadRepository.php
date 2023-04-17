@@ -103,7 +103,7 @@ class CompanyLeadRepository extends CommonRepository
             ->setParameter('leadId', $leadId);
         $q->orderBy('cl.date_added', 'DESC');
 
-        $result =  $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         return !empty($result) ? $result[0] : [];
     }

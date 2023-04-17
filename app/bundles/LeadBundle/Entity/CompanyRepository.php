@@ -287,7 +287,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         )
             ->groupBy('cl.company_id');
 
-        $result =  $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

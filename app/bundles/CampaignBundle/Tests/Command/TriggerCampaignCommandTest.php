@@ -87,7 +87,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
             ->where('stat.lead_id <= 25')
             ->execute()
             ->fetchAllAssociative();
-
         $this->assertCount(0, $stats);
 
         // Wait 6 seconds then execute the campaign again to send scheduled events

@@ -54,7 +54,7 @@ class StatRepository extends CommonRepository
             ->setParameter('leadId', $contactId)
             ->setParameter('emailId', $emailId);
 
-        $result =  $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         if ($result) {
             foreach ($result as $row) {
@@ -190,7 +190,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result =  $q->execute()->fetchAllAssociative();
+        $result = $q->execute()->fetchAllAssociative();
 
         //index by lead
         $stats = [];
