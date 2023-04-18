@@ -199,6 +199,24 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
+     * Executes this query using the bound parameters and their types.
+     *
+     * @return Result<mixed>|int|string
+     *
+     * @throws \Exception
+     */
+    public function execute()
+    {
+        if (self::SELECT === $this->type) {
+            return Result::ensure(
+                $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes)
+            );
+        }
+
+        return $this->connection->executeStatement($this->getSQL(), $this->params, $this->paramTypes);
+    }
+
+    /**
      * Gets the complete SQL string formed by the current specifications of this QueryBuilder.
      *
      * <code>
