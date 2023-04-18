@@ -219,6 +219,16 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     }
 
     /**
+     * Prepares and executes an SQL query and returns the result as an array of associative arrays.
+     *
+     * @return array<int,array<string,mixed>>
+     **/
+    public function fetchAllAssociative(): array
+    {
+        return $this->connection->fetchAllAssociative($this->getSQL(), $this->params, $this->paramTypes);
+    }
+
+    /**
      * Gets the complete SQL string formed by the current specifications of this QueryBuilder.
      *
      * <code>
