@@ -905,7 +905,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        return $q->executeQuery()->fetchAllAssociative();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

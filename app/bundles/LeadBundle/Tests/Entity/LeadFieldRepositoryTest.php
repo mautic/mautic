@@ -38,7 +38,6 @@ final class LeadFieldRepositoryTest extends TestCase
         $builderCompare           = $this->createMock(QueryBuilder::class);
         $statementAlias           = $this->createMock(Statement::class);
         $statementAliasResult     = $this->createMock(Result::class);
-        $statementCompare         = $this->createMock(Statement::class);
         $statementCompareResult   = $this->createMock(Result::class);
         $exprCompare              = $this->createMock(ExpressionBuilder::class);
 
@@ -114,10 +113,10 @@ final class LeadFieldRepositoryTest extends TestCase
 
         $builderCompare->expects($this->once())
             ->method('execute')
-            ->willReturn($statementCompare);
+            ->willReturn($statementCompareResult);
 
         // No contact ID was found by the value so the result should be false.
-        $statementCompare->expects($this->once())
+        $statementCompareResult->expects($this->once())
             ->method('fetchOne')
             ->willReturn([]);
 
@@ -131,9 +130,7 @@ final class LeadFieldRepositoryTest extends TestCase
         $value                    = '2019-04-30';
         $builderAlias             = $this->createMock(QueryBuilder::class);
         $builderCompare           = $this->createMock(QueryBuilder::class);
-        $statementAlias           = $this->createMock(Statement::class);
         $statementAliasResult     = $this->createMock(Result::class);
-        $statementCompare         = $this->createMock(Statement::class);
         $statementCompareResult   = $this->createMock(Result::class);
         $exprCompare              = $this->createMock(ExpressionBuilder::class);
 
