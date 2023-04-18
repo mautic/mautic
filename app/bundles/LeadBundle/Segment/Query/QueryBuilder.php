@@ -3,8 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\ForwardCompatibility\DriverResultStatement;
-use Doctrine\DBAL\ForwardCompatibility\DriverStatement;
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
@@ -197,35 +196,6 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     public function getState()
     {
         return $this->state;
-    }
-
-    /**
-     * Executes this query using the bound parameters and their types.
-     *
-     * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
-     * for insert, update and delete statements.
-     *
-     * @return DriverStatement|DriverResultStatement|int|string
-     *
-     * @throws \Doctrine\DBAL\DBALException
-     */
-    public function execute()
-    {
-        if (self::SELECT == $this->type) {
-            return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
-        } else {
-            return $this->connection->executeStatement($this->getSQL(), $this->params, $this->paramTypes);
-        }
-    }
-
-    /**
-     * Prepares and executes an SQL query and returns the result as an array of associative arrays.
-     *
-     * @return array<int,array<string,mixed>>
-     **/
-    public function fetchAllAssociative(): array
-    {
-        return $this->connection->fetchAllAssociative($this->getSQL(), $this->params, $this->paramTypes);
     }
 
     /**
