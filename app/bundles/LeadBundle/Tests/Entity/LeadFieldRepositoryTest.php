@@ -117,7 +117,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         // No contact ID was found by the value so the result should be false.
         $statementCompareResult->expects($this->once())
-            ->method('fetchOne')
+            ->method('fetchAssociative')
             ->willReturn([]);
 
         $this->assertFalse($this->repository->compareDateValue($contactId, $fieldAlias, $value));
@@ -217,7 +217,7 @@ final class LeadFieldRepositoryTest extends TestCase
 
         // A contact ID was found by the value so the result should be true.
         $statementCompareResult->expects($this->once())
-            ->method('fetchOne')
+            ->method('fetchAssociative')
             ->willReturn(['id' => 456]);
 
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
