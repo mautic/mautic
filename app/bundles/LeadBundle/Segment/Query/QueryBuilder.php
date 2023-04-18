@@ -3,6 +3,8 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ForwardCompatibility\DriverResultStatement;
+use Doctrine\DBAL\ForwardCompatibility\DriverStatement;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
@@ -203,7 +205,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
      * for insert, update and delete statements.
      *
-     * @return ForwardCompatibility\DriverStatement|ForwardCompatibility\DriverResultStatement|int|string
+     * @return DriverStatement|DriverResultStatement|int|string
      *
      * @throws \Doctrine\DBAL\DBALException
      */

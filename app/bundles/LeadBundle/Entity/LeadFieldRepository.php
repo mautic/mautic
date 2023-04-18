@@ -382,7 +382,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
-        $result = $q->execute()->fetchOne();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }
