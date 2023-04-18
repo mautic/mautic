@@ -3,28 +3,28 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Mautic\CoreBundle\Exception\InvalidDecodedStringException;
+use Mautic\CoreBundle\Helper\Clickthrough\ClickthroughKeyConverter;
 
 class ClickthroughHelper
 {
-    /**
-     * Encode an array to append to a URL.
-     *
-     * @return string
-     */
-    public static function encodeArrayForUrl(array $array)
+    use ClickthroughHelperBCTrait;
+
+    private ClickthroughKeyConverter $shortKeyConverter;
+
+    public function __construct(ClickthroughKeyConverter $shortKeyConverter)
     {
-        return urlencode(base64_encode(serialize($array)));
+        $this->shortKeyConverter = $shortKeyConverter;
     }
 
-    /**
-     * Decode a string appended to URL into an array.
-     *
-     * @param      $string
-     * @param bool $urlDecode
-     *
-     * @return array
-     */
-    public static function decodeArrayFromUrl($string, $urlDecode = true)
+    public function encode(array $data): string
+    {
+        $data       = $this->shortKeyConverter->pack($data);
+        $serialized =  $this->isIgBinaryEnabled() ? igbinary_serialize($data) : serialize($data);
+
+        return urlencode(base64_encode($serialized));
+    }
+
+    public function decode(string $string, $urlDecode = true): array
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
@@ -33,10 +33,34 @@ class ClickthroughHelper
             return [];
         }
 
-        if (0 !== stripos($decoded, 'a')) {
-            throw new InvalidDecodedStringException($decoded);
+        if ($this->isSerialized($decoded)) {
+            return $this->shortKeyConverter->unpack(Serializer::decode($decoded));
         }
 
-        return Serializer::decode($decoded);
+        if ($this->isIgBinaryEnabled()) {
+            try {
+                return $this->shortKeyConverter->unpack(igbinary_unserialize($decoded));
+            } catch (\Exception $e) {
+            }
+        }
+
+        throw new InvalidDecodedStringException($raw);
+    }
+
+    public function isSerialized($string): bool
+    {
+        try {
+            $data = @unserialize($string);
+
+            return false !== $data || 'b:0;' === $string;
+        } catch (\Exception $exception) {
+        }
+
+        return false;
+    }
+
+    protected function isIgBinaryEnabled(): bool
+    {
+        return function_exists('igbinary_serialize');
     }
 }

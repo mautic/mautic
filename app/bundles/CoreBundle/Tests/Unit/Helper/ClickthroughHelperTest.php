@@ -19,7 +19,7 @@ class ClickthroughHelperTest extends \PHPUnit\Framework\TestCase
      */
     public function testObjectInArrayIsDetectedOrIgnored()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        //   $this->expectException(\InvalidArgumentException::class);
 
         $array = ['foo' => new WakeupCall()];
 

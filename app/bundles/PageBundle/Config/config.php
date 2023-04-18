@@ -37,11 +37,11 @@ return [
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::getContactIdAction',
             ],
             'mautic_url_redirect' => [
-                'path'       => '/r/{redirectId}',
+                'path'       => '/r/{redirectId}/{ct?}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_redirect' => [
-                'path'       => '/redirect/{redirectId}',
+                'path'       => '/redirect/{redirectId}/{ct?}',
                 'controller' => 'Mautic\PageBundle\Controller\PublicController::redirectAction',
             ],
             'mautic_page_preview' => [

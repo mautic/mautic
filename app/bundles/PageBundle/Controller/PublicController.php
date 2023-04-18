@@ -437,7 +437,8 @@ class PublicController extends CommonFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $mauticLogger,
-        $redirectId
+        $redirectId,
+        ?string $ct = null
     ) {
         $logger = $mauticLogger;
 
@@ -493,8 +494,11 @@ class PublicController extends CommonFormController
 
                     $request->request->set('ct', '');
                     $request->query->set('ct', '');
-                    $lead = $contactRequestHelper->getContactFromQuery();
-                    $pageModel->hitPage($redirect, $request, 200, $lead);
+                    try {
+                        $lead = $contactRequestHelper->getContactFromQuery();
+                        $pageModel->hitPage($redirect, $request, 200, $lead);
+                    } catch (InvalidDecodedStringException $e) {
+                    }
                 }
 
                 $leadArray = ($lead) ? $primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead) : [];
@@ -576,9 +580,7 @@ class PublicController extends CommonFormController
                 // Order slides
                 usort(
                     $options['slides'],
-                    function ($a, $b) {
-                        return strcmp($a['order'], $b['order']);
-                    }
+                    fn ($a, $b) => strcmp($a['order'], $b['order'])
                 );
 
                 $options['slot']   = $slot;

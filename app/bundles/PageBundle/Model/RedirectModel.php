@@ -63,18 +63,18 @@ class RedirectModel extends FormModel
             $clickthrough = $event->getClickthrough();
         }
 
+        if (!empty($utmTags)) {
+            $utmTags                                     = array_filter($utmTags);
+            !empty($utmTags) && $clickthrough['utmTags'] = $this->getUtmTagsForUrl($utmTags);
+        }
+
         $url = $this->buildUrl(
             'mautic_url_redirect',
-            ['redirectId' => $redirect->getRedirectId()],
-            true,
-            $clickthrough
+            [
+                'redirectId' => $redirect->getRedirectId(),
+                'ct'         => $this->encodeArrayForUrl($clickthrough),
+            ]
         );
-
-        if (!empty($utmTags)) {
-            $utmTags         = $this->getUtmTagsForUrl($utmTags);
-            $appendUtmString = http_build_query($utmTags, '', '&');
-            $url             = UrlHelper::appendQueryToUrl($url, $appendUtmString);
-        }
 
         if ($shortenUrl) {
             $url = $this->urlHelper->buildShortUrl($url);
