@@ -77,7 +77,7 @@ class PointRepository extends CommonRepository
         )
             ->setParameter('type', $type);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 
@@ -107,7 +107,7 @@ class PointRepository extends CommonRepository
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 

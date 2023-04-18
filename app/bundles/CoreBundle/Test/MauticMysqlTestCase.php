@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Test;
 
 use AppKernel;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
 use Exception;
 use LogicException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
@@ -255,7 +254,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $content .= 'SET FOREIGN_KEY_CHECKS=0;'.PHP_EOL;
 
         $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getDatabase()])
-            ->fetchAll(FetchMode::COLUMN);
+            ->fetchFirstColumn();
 
         foreach ($tables as $table) {
             $content .= sprintf('DELETE FROM %s;'.PHP_EOL, $table);
@@ -321,7 +320,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function resetCustomFields(): bool
     {
         $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAll(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
 
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
@@ -371,7 +370,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function wasRollbackSuccessful(): bool
     {
-        return false === $this->connection->fetchColumn("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
+        return false === $this->connection->fetchOne("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
     }
 
     private function getTablePrefix(): string

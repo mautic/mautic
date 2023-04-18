@@ -569,7 +569,7 @@ class LeadControllerTest extends MauticMysqlTestCase
     }
 
     /**
-     * @return Lead[]
+     * @return array<int, array<string, mixed>>
      */
     private function getCompanyLeads(int $leadId): array
     {
@@ -580,7 +580,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->where("cl.lead_id = {$leadId}")
             ->orderBy('cl.company_id')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     private function getLeadPrimaryCompany(int $leadId): ?string
@@ -590,7 +590,7 @@ class LeadControllerTest extends MauticMysqlTestCase
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where("l.id = {$leadId}")
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

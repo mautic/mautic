@@ -1885,7 +1885,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->addCampaignFilter($q, $campaignId);
         $this->addSegmentFilter($q, $segmentId);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $chart  = new BarChart(array_column($result, 'hour'));
         $counts = array_column($result, 'count');
@@ -2105,7 +2105,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chartQuery->applyDateFilters($q, 'date_read');
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2136,7 +2136,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

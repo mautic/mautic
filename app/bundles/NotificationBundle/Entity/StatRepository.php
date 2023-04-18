@@ -55,7 +55,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         //index by lead
         $stats = [];
@@ -97,7 +97,7 @@ class StatRepository extends CommonRepository
         $q->andWhere('s.is_failed = :false')
             ->setParameter('false', false, 'boolean');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['sent_count'] : 0;
     }
@@ -130,7 +130,7 @@ class StatRepository extends CommonRepository
 
         $q->andWhere('is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return (isset($results[0])) ? $results[0]['read_count'] : 0;
     }
@@ -218,7 +218,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -247,7 +247,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('s.notification_id');
 
         //get a total number of sent notifications first
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
 

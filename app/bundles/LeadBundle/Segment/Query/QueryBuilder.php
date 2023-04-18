@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 
@@ -200,20 +201,19 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * Executes this query using the bound parameters and their types.
      *
-     * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
-     * for insert, update and delete statements.
+     * @return Result<mixed>|int|string
      *
-     * @return \Doctrine\DBAL\Driver\Statement|int
-     *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Exception
      */
     public function execute()
     {
-        if (self::SELECT == $this->type) {
-            return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
-        } else {
-            return $this->connection->executeUpdate($this->getSQL(), $this->params, $this->paramTypes);
+        if (self::SELECT === $this->type) {
+            return Result::ensure(
+                $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes)
+            );
         }
+
+        return $this->connection->executeStatement($this->getSQL(), $this->params, $this->paramTypes);
     }
 
     /**
