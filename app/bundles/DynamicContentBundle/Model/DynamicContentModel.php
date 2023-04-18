@@ -160,7 +160,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
-        return $qb->execute()->fetch();
+        return $qb->execute()->fetchAssociative();
     }
 
     /**

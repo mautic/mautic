@@ -514,7 +514,7 @@ class SubmissionRepository extends CommonRepository
                 break;
         }
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }
@@ -530,7 +530,7 @@ class SubmissionRepository extends CommonRepository
         $query->where($query->expr()->eq('fs.form_id', ':id'))
                 ->setParameter('id', $form->getId());
 
-        return $query->execute()->fetch();
+        return $query->execute()->fetchAssociative();
     }
 
     /**

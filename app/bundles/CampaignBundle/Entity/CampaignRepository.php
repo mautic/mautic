@@ -369,7 +369,7 @@ class CampaignRepository extends CommonRepository
             );
         }
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
@@ -561,7 +561,7 @@ class CampaignRepository extends CommonRepository
             ->setParameter('campaignId', (int) $campaignId)
             ->setMaxResults(1)
             ->execute()
-            ->fetch();
+            ->fetchAssociative();
     }
 
     /**

@@ -105,6 +105,6 @@ class MessageRepository extends CommonRepository
             ->setParameter('channelId', $channelId)
             ->andWhere($q->expr()->eq('is_enabled', true, 'boolean'));
 
-        return $q->execute()->fetch();
+        return $q->execute()->fetchAssociative();
     }
 }

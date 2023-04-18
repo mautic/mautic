@@ -54,7 +54,8 @@ class LogRepository extends CommonRepository
         $count = $qb->select('count(id) as log_count')
             ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
             ->where('webhook_id = '.$webhookId)
-            ->execute()->fetch();
+            ->execute()
+            ->fetchAssociative();
 
         if ((int) $count['log_count'] >= (int) $logMax) {
             $qb = $this->_em->getConnection()->createQueryBuilder();
@@ -63,7 +64,8 @@ class LogRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'webhook_logs', $this->getTableAlias())
                 ->where('webhook_id = '.$webhookId)
                 ->orderBy('date_added', 'ASC')->setMaxResults(1)
-                ->execute()->fetch();
+                ->execute()
+                ->fetchAssociative();
 
             $qb = $this->_em->getConnection()->createQueryBuilder();
 
@@ -132,7 +134,7 @@ class LogRepository extends CommonRepository
             ->from(sprintf('(%s)', $selectqb->getSQL()), $this->getTableAlias())
             ->setParameter('webhookId', $webhookId);
 
-        $result = $countAllQb->execute()->fetch();
+        $result = $countAllQb->execute()->fetchAssociative();
 
         if (isset($result['thecount'])) {
             $allCount = (int) $result['thecount'];
@@ -148,7 +150,7 @@ class LogRepository extends CommonRepository
             ->andWhere($countSuccessQb->expr()->lt($this->getTableAlias().'.status_code', 300))
             ->setParameter('webhookId', $webhookId);
 
-        $result = $countSuccessQb->execute()->fetch();
+        $result = $countSuccessQb->execute()->fetchAssociative();
 
         if (isset($result['thecount'])) {
             $successCount = (int) $result['thecount'];

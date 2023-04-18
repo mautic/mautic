@@ -632,7 +632,7 @@ class CommonRepository extends ServiceEntityRepository
             ->where($this->getTableAlias().'.id = :id')
             ->setParameter('id', $id);
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         if (isset($result[$column])) {
             return $result[$column];

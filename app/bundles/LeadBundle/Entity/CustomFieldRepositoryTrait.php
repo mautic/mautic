@@ -190,7 +190,7 @@ trait CustomFieldRepositoryTrait
         }
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
-        $values = $q->execute()->fetch();
+        $values = $q->execute()->fetchAssociative();
 
         return $this->formatFieldValues($values, $byGroup, $object);
     }

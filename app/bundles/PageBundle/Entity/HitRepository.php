@@ -262,7 +262,7 @@ class HitRepository extends CommonRepository
         } else {
             $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
-        $result = $sq->execute()->fetch();
+        $result = $sq->execute()->fetchAssociative();
 
         return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }

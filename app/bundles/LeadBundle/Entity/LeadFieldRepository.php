@@ -352,7 +352,7 @@ class LeadFieldRepository extends CommonRepository
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);
             }
-            $result = $q->execute()->fetch();
+            $result = $q->execute()->fetchAssociative();
 
             return !empty($result['id']);
         }
@@ -413,7 +413,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('month', $value->format('m'))
             ->setParameter('day', $value->format('d'));
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }

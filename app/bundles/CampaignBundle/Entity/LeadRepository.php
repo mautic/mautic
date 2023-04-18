@@ -396,7 +396,7 @@ class LeadRepository extends CommonRepository
             $this->updateQueryWithHistoryExclusion($campaignId, $qb);
         }
 
-        $result = $qb->execute()->fetch();
+        $result = $qb->execute()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }
@@ -468,7 +468,7 @@ class LeadRepository extends CommonRepository
         $this->updateQueryFromContactLimiter('cl', $qb, $limiter, true);
         $this->updateQueryWithSegmentMembershipExclusion($segments, $qb);
 
-        $result = $qb->execute()->fetch();
+        $result = $qb->execute()->fetchAssociative();
 
         return new CountResult($result['the_count'], $result['min_id'], $result['max_id']);
     }

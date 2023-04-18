@@ -1085,7 +1085,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->where('u.id = :ownerId')
             ->setParameter('ownerId', (int) $ownerId);
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         // Fix the HTML markup
         if (is_array($result)) {

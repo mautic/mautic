@@ -496,7 +496,7 @@ class ChartQuery extends AbstractChart
      */
     public function fetchCount(QueryBuilder $query)
     {
-        $data = $query->execute()->fetch();
+        $data = $query->execute()->fetchAssociative();
 
         return (int) $data['count'];
     }
@@ -553,7 +553,7 @@ class ChartQuery extends AbstractChart
      */
     public function fetchCountDateDiff($query)
     {
-        $data = $query->execute()->fetch();
+        $data = $query->execute()->fetchAssociative();
 
         return (int) $data['count'];
     }

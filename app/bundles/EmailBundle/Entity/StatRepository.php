@@ -512,7 +512,7 @@ class StatRepository extends CommonRepository
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
-        $results = $query->execute()->fetch();
+        $results = $query->execute()->fetchAssociative();
 
         $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
         unset($results['sent']);
@@ -654,7 +654,7 @@ class StatRepository extends CommonRepository
             ->setParameter(':email', $emailId)
             ->setParameter(':contacts', $contacts);
 
-        return $query->execute()->fetch();
+        return $query->execute()->fetchAssociative();
     }
 
     /**
