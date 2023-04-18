@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Tests\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Portability\Statement;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Result;
@@ -36,7 +35,6 @@ final class LeadFieldRepositoryTest extends TestCase
         $value                    = '2019-04-30';
         $builderAlias             = $this->createMock(QueryBuilder::class);
         $builderCompare           = $this->createMock(QueryBuilder::class);
-        $statementAlias           = $this->createMock(Statement::class);
         $statementAliasResult     = $this->createMock(Result::class);
         $statementCompareResult   = $this->createMock(Result::class);
         $exprCompare              = $this->createMock(ExpressionBuilder::class);
