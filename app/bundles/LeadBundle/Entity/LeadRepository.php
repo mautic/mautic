@@ -1180,7 +1180,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection<int, Lead>
      */
     public function getContactCollection(array $ids)
     {
