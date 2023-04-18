@@ -203,7 +203,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      * Uses {@see Connection::executeQuery} for select statements and {@see Connection::executeUpdate}
      * for insert, update and delete statements.
      *
-     * @return \Doctrine\DBAL\Driver\Statement|int
+     * @return ForwardCompatibility\DriverStatement|ForwardCompatibility\DriverResultStatement|int|string
      *
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -212,7 +212,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
         if (self::SELECT == $this->type) {
             return $this->connection->executeQuery($this->getSQL(), $this->params, $this->paramTypes);
         } else {
-            return $this->connection->executeUpdate($this->getSQL(), $this->params, $this->paramTypes);
+            return $this->connection->executeStatement($this->getSQL(), $this->params, $this->paramTypes);
         }
     }
 
