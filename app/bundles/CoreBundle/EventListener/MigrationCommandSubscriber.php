@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\EventListener;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
 use Mautic\CoreBundle\Doctrine\Provider\VersionProviderInterface;
