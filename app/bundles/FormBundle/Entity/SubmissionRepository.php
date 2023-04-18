@@ -62,7 +62,6 @@ class SubmissionRepository extends CommonRepository
             )
             ->orderBy('f.field_order, f.id', 'ASC')
             ->setParameter('saveResult', true);
-
         $results = $fq->execute()->fetchAllAssociative();
 
         $fields = [];
@@ -450,7 +449,7 @@ class SubmissionRepository extends CommonRepository
             );
 
         $validIds = [];
-        $results  =  $q->execute()->fetchAllAssociative();
+        $results  = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $r) {
             $validIds[] = $r['id'];

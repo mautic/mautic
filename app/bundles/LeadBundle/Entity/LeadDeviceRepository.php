@@ -156,7 +156,7 @@ class LeadDeviceRepository extends CommonRepository
      */
     public function getLeadDevices(Lead $lead)
     {
-        $qb  = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
         return $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'lead_devices', 'es')
