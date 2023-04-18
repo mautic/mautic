@@ -137,7 +137,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param string     $slot
      * @param Lead|array $lead
      *
-     * @return DynamicContent
+     * @return array<string, mixed>|false
      */
     public function getSlotContentForLead($slot, $lead)
     {
