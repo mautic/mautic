@@ -398,7 +398,7 @@ class PublicController extends CommonFormController
             $template = $this->coreParametersHelper->get('theme');
         }
 
-        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
 
         if (!empty($analytics)) {
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);

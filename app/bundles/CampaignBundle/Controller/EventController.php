@@ -194,7 +194,7 @@ class EventController extends CommonFormController
                 );
             } elseif ('date' == $event['triggerMode']) {
                 /** @var \Mautic\CoreBundle\Twig\Helper\DateHelper $dh */
-                $dh    = $this->factory->getHelper('template.date');
+                $dh    = $this->factory->getHelper('twig.date');
                 $label = 'mautic.campaign.connection.trigger.date.label';
                 if ('no' == $anchorName) {
                     $label .= '_inaction';
