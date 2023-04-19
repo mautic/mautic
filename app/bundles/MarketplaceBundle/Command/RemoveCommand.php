@@ -26,7 +26,6 @@ class RemoveCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME);
-        $this->setDescription('Removes a plugin that is currently installed');
         $this->addArgument('package', InputArgument::REQUIRED, 'The Packagist package of the plugin to remove (e.g. mautic/example-plugin)');
 
         parent::configure();
@@ -58,4 +57,5 @@ class RemoveCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Removes a plugin that is currently installed';
 }

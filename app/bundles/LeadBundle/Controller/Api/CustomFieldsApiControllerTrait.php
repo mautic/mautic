@@ -197,9 +197,7 @@ trait CustomFieldsApiControllerTrait
         }
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setRequestStack(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;

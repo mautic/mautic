@@ -85,8 +85,8 @@ class CommonController extends AbstractController implements MauticController
 
     /**
      * @param ModelFactory<object> $modelFactory
-     * @required
      */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setModelFactory(ModelFactory $modelFactory): void
     {
         $this->modelFactory = $modelFactory;
@@ -117,25 +117,19 @@ class CommonController extends AbstractController implements MauticController
         $this->flashBag = $flashBag;
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setRequestStack(RequestStack $requestStack): void
     {
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setSecurity(CorePermissions $security): void
     {
         $this->security = $security;
     }
 
-    /**
-     * @required
-     */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setExportHelper(ExportHelper $exportHelper): void
     {
         $this->exportHelper = $exportHelper;

@@ -34,8 +34,7 @@ class DeleteWebhookLogsCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName(static::COMMAND_NAME)
-            ->setDescription('Retains a rolling number of log records.');
+        $this->setName(static::COMMAND_NAME);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -52,4 +51,5 @@ class DeleteWebhookLogsCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Retains a rolling number of log records.';
 }

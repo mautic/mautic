@@ -45,7 +45,6 @@ class FetchPipedriveDataCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:integration:pipedrive:fetch')
-            ->setDescription('Pulls the data from Pipedrive and sends it to Mautic')
             ->addOption(
                 '--restart',
                 null,
@@ -143,4 +142,5 @@ class FetchPipedriveDataCommand extends Command
                 throw new \Exception("Unknown type {$type}");
         }
     }
+    protected static $defaultDescription = 'Pulls the data from Pipedrive and sends it to Mautic';
 }

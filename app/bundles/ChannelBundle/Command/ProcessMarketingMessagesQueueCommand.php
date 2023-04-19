@@ -33,7 +33,6 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
                     'mautic:campaigns:messages',
                 ]
             )
-            ->setDescription('Process sending of messages queue.')
             ->addOption(
                 '--channel',
                 '-c',
@@ -75,4 +74,5 @@ class ProcessMarketingMessagesQueueCommand extends ModeratedCommand
 
         return 0;
     }
+    protected static $defaultDescription = 'Process sending of messages queue.';
 }

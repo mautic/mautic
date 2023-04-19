@@ -54,8 +54,7 @@ class SummarizeCommand extends ModeratedCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Rebuild existing data. To be used only if database exceptions have been known to cause inaccuracies.'
-            )
-            ->setDescription('Builds historical campaign summary statistics if they do not already exist.');
+            );
 
         parent::configure();
     }
@@ -83,4 +82,5 @@ class SummarizeCommand extends ModeratedCommand
 
         return 0;
     }
+    protected static $defaultDescription = 'Builds historical campaign summary statistics if they do not already exist.';
 }

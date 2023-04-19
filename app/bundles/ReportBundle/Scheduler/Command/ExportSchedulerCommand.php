@@ -37,7 +37,6 @@ class ExportSchedulerCommand extends Command
     {
         $this
             ->setName('mautic:reports:scheduler')
-            ->setDescription('Processes scheduler for report\'s export')
             ->addOption('--report', 'report', InputOption::VALUE_OPTIONAL, 'ID of report. Process all reports if not set.');
     }
 
@@ -66,4 +65,5 @@ class ExportSchedulerCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Processes scheduler for report\'s export';
 }

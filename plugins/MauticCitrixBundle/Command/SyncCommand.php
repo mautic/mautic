@@ -30,7 +30,6 @@ class SyncCommand extends ModeratedCommand
     protected function configure()
     {
         $this->setName('mautic:citrix:sync')
-            ->setDescription('Synchronizes registrant information from Citrix products')
             ->addOption(
                 'product',
                 'p',
@@ -118,4 +117,5 @@ class SyncCommand extends ModeratedCommand
 
         return 0;
     }
+    protected static $defaultDescription = 'Synchronizes registrant information from Citrix products';
 }

@@ -25,7 +25,6 @@ use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -54,7 +53,7 @@ class InstallService
 
     private ValidatorInterface $validator;
 
-    private UserPasswordEncoder $encoder;
+    private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder;
 
     private FixturesLoaderInterface $fixturesLoader;
 
@@ -66,7 +65,7 @@ class InstallService
         TranslatorInterface $translator,
         KernelInterface $kernel,
         ValidatorInterface $validator,
-        UserPasswordEncoder $encoder,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder,
         FixturesLoaderInterface $fixturesLoader
     ) {
         $this->configurator   = $configurator;

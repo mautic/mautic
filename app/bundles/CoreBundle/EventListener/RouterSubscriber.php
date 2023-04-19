@@ -77,7 +77,7 @@ class RouterSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$event->isMasterRequest()) {
+        if (!$event->isMainRequest()) {
             return;
         }
 

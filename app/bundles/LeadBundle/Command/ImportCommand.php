@@ -32,7 +32,6 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Imports data to Mautic')
             ->addOption('--id', '-i', InputOption::VALUE_OPTIONAL, 'Specific ID to import. Defaults to next in the queue.', false)
             ->addOption('--limit', '-l', InputOption::VALUE_OPTIONAL, 'Maximum number of records to import for this script execution.', 0)
             ->setHelp(
@@ -113,4 +112,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Imports data to Mautic';
 }

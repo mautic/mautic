@@ -28,7 +28,6 @@ class UnusedIpDeleteCommand extends ModeratedCommand
     protected function configure(): void
     {
         $this->setName('mautic:unusedip:delete')
-            ->setDescription('Deletes IP addresses that are not used in any other database table')
             ->addOption(
                 '--limit',
                 '-l',
@@ -66,4 +65,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Deletes IP addresses that are not used in any other database table';
 }

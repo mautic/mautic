@@ -10,7 +10,6 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -32,7 +31,7 @@ class UserCreator implements UserCreatorInterface
     private $userModel;
 
     /**
-     * @var UserPasswordEncoder
+     * @var \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
      */
     private $encoder;
 
@@ -55,7 +54,7 @@ class UserCreator implements UserCreatorInterface
         EntityManagerInterface $entityManager,
         UserMapper $userMapper,
         UserModel $userModel,
-        UserPasswordEncoder $encoder,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder,
         $defaultRole
     ) {
         $this->entityManager = $entityManager;

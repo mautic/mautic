@@ -96,7 +96,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:campaigns:trigger')
-            ->setDescription('Trigger timed events for published campaigns.')
             ->addOption(
                 '--campaign-id',
                 '-i',
@@ -385,4 +384,5 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+    protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

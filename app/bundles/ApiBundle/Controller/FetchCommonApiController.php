@@ -390,8 +390,8 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     /**
      * @param ModelFactory<E> $modelFactory
-     * @required
      */
+    #[\Symfony\Contracts\Service\Attribute\Required]
     public function setModelFactory(ModelFactory $modelFactory): void
     {
         $this->modelFactory = $modelFactory;

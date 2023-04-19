@@ -161,7 +161,7 @@ class CoreSubscriber implements EventSubscriberInterface
      */
     public function onKernelRequestAddGlobalJS(ControllerEvent $event)
     {
-        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMasterRequest()) {
+        if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMainRequest()) {
             return;
         }
 

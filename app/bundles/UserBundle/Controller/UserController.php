@@ -13,7 +13,6 @@ use Mautic\UserBundle\Form\Type\ContactType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends FormController
 {
@@ -104,7 +103,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder)
+    public function newAction(Request $request, LanguageHelper $languageHelper, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $encoder)
     {
         if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
@@ -210,7 +209,7 @@ class UserController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function editAction(Request $request, LanguageHelper $languageHelper, UserPasswordEncoderInterface $encoder, $objectId, $ignorePost = false)
+    public function editAction(Request $request, LanguageHelper $languageHelper, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $encoder, $objectId, $ignorePost = false)
     {
         if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();

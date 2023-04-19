@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
@@ -34,7 +33,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public const LOGIN_ROUTE = 'login';
 
-    private UserPasswordEncoder $encoder;
+    private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder;
 
     private EventDispatcherInterface $dispatcher;
 
@@ -55,7 +54,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        UserPasswordEncoder $encoder,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder,
         EventDispatcherInterface $dispatcher,
         RequestStack $requestStack,
         CsrfTokenManagerInterface $csrfTokenManager,

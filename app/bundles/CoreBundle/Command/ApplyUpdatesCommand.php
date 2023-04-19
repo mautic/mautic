@@ -39,7 +39,6 @@ class ApplyUpdatesCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:update:apply')
-            ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
                     new InputOption(
@@ -145,4 +144,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Updates the Mautic application';
 }

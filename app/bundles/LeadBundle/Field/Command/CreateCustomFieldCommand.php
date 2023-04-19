@@ -45,7 +45,6 @@ class CreateCustomFieldCommand extends ModeratedCommand
         parent::configure();
 
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Create custom field column in the background')
             ->addOption('--id', '-i', InputOption::VALUE_REQUIRED, 'LeadField ID.')
             ->addOption('--user', '-u', InputOption::VALUE_OPTIONAL, 'User ID - User which receives a notification.')
             ->setHelp(
@@ -122,4 +121,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Create custom field column in the background';
 }

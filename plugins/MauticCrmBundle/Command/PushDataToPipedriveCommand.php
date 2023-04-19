@@ -46,7 +46,6 @@ class PushDataToPipedriveCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:integration:pipedrive:push')
-            ->setDescription('Pushes the data from Mautic to Pipedrive')
             ->addOption(
                 '--restart',
                 null,
@@ -110,4 +109,5 @@ class PushDataToPipedriveCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Pushes the data from Mautic to Pipedrive';
 }

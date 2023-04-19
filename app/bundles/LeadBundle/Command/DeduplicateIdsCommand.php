@@ -30,7 +30,6 @@ class DeduplicateIdsCommand extends Command
         parent::configure();
 
         $this->setName(self::NAME)
-            ->setDescription('Merge contacts based on same unique identifiers')
             ->addOption(
                 '--newer-into-older',
                 null,
@@ -82,4 +81,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Merge contacts based on same unique identifiers';
 }

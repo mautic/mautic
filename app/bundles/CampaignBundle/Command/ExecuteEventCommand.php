@@ -45,7 +45,6 @@ class ExecuteEventCommand extends Command
     {
         $this
             ->setName('mautic:campaigns:execute')
-            ->setDescription('Execute specific scheduled events.')
             ->addOption(
                 '--scheduled-log-ids',
                 null,
@@ -70,4 +69,5 @@ class ExecuteEventCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Execute specific scheduled events.';
 }

@@ -25,7 +25,6 @@ class ConvertConfigCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:theme:json-config')
-            ->setDescription('Converts theme config to JSON from PHP')
             ->setDefinition([
                 new InputOption(
                     'theme', null, InputOption::VALUE_REQUIRED,
@@ -112,4 +111,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Converts theme config to JSON from PHP';
 }

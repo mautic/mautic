@@ -27,7 +27,6 @@ class ListCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME);
-        $this->setDescription('Lists plugins that are available at Packagist.org');
         $this->addOption('page', 'p', InputOption::VALUE_OPTIONAL, 'Page number', 1);
         $this->addOption('limit', 'l', InputOption::VALUE_OPTIONAL, 'Packages per page', 15);
         $this->addOption('filter', 'f', InputOption::VALUE_OPTIONAL, 'Filter the packages', '');
@@ -66,4 +65,5 @@ class ListCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Lists plugins that are available at Packagist.org';
 }

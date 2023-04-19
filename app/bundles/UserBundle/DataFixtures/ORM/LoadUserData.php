@@ -7,7 +7,6 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 
 class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
@@ -20,14 +19,14 @@ class LoadUserData extends AbstractFixture implements OrderedFixtureInterface, F
     }
 
     /**
-     * @var UserPasswordEncoder
+     * @var \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
      */
     private $encoder;
 
     /**
      * {@inheritdoc}
      */
-    public function __construct(UserPasswordEncoder $encoder)
+    public function __construct(\Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder)
     {
         $this->encoder = $encoder;
     }

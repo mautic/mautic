@@ -29,7 +29,6 @@ class ProcessWebhookQueuesCommand extends Command
     protected function configure()
     {
         $this->setName(self::COMMAND_NAME)
-            ->setDescription('Process queued webhook payloads')
             ->addOption(
                 '--webhook-id',
                 '-i',
@@ -91,4 +90,5 @@ class ProcessWebhookQueuesCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Process queued webhook payloads';
 }

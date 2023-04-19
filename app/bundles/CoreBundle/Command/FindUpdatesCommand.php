@@ -27,7 +27,6 @@ class FindUpdatesCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:update:find')
-            ->setDescription('Fetches updates for Mautic')
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command checks for updates for the Mautic application.
 
@@ -51,4 +50,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Fetches updates for Mautic';
 }

@@ -31,7 +31,6 @@ class PushLeadActivityCommand extends Command
                     'mautic:integration:pushactivity',
                 ]
             )
-            ->setDescription('Push lead activity to integration.')
             ->addOption(
                 '--integration',
                 '-i',
@@ -92,4 +91,5 @@ class PushLeadActivityCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Push lead activity to integration.';
 }

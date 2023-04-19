@@ -47,7 +47,6 @@ class MaxMindDoNotSellPurgeCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:max-mind:purge')
-            ->setDescription('Purge data connected to MaxMind Do Not Sell list.')
             ->addOption(
                 'dry-run',
                 'd',
@@ -164,4 +163,5 @@ EOT
 
         return false;
     }
+    protected static $defaultDescription = 'Purge data connected to MaxMind Do Not Sell list.';
 }

@@ -46,7 +46,6 @@ class ValidateEventCommand extends Command
     {
         $this
             ->setName('mautic:campaigns:validate')
-            ->setDescription('Validate if a contact has been inactive for a decision and execute events if so.')
             ->addOption(
                 '--decision-id',
                 null,
@@ -97,4 +96,5 @@ class ValidateEventCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Validate if a contact has been inactive for a decision and execute events if so.';
 }

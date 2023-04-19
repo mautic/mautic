@@ -10,7 +10,6 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -41,7 +40,7 @@ class UserProvider implements UserProviderInterface
     protected $dispatcher;
 
     /**
-     * @var UserPasswordEncoder
+     * @var \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
      */
     protected $encoder;
 
@@ -50,7 +49,7 @@ class UserProvider implements UserProviderInterface
         PermissionRepository $permissionRepository,
         Session $session,
         EventDispatcherInterface $dispatcher,
-        UserPasswordEncoder $encoder
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher $encoder
     ) {
         $this->userRepository       = $userRepository;
         $this->permissionRepository = $permissionRepository;

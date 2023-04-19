@@ -25,7 +25,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         ]
     );
 
-    $rectorConfig->parallel();
+    $rectorConfig->disableParallel();
 
     foreach (['dev', 'test', 'prod'] as $environment) {
         $environmentCap = ucfirst($environment);
@@ -41,7 +41,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
 
     // Define what rule sets will be applied
     $rectorConfig->sets([
-        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
+        \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_54,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE

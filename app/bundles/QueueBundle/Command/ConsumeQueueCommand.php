@@ -25,7 +25,6 @@ class ConsumeQueueCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:queue:process')
-            ->setDescription('Process queues')
             ->addOption(
                 '--queue-name',
                 '-i',
@@ -84,4 +83,5 @@ class ConsumeQueueCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Process queues';
 }

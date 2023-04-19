@@ -50,7 +50,6 @@ class PullTransifexCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Fetches translations for Mautic from Transifex')
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Optional language to pull', null)
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->addOption('path', null, InputOption::VALUE_OPTIONAL, 'Optional path to a directory where to store the traslations.', null)
@@ -157,4 +156,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Fetches translations for Mautic from Transifex';
 }

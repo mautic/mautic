@@ -31,7 +31,6 @@ class UpdateLeadListsCommand extends ModeratedCommand
         $this
             ->setName('mautic:segments:update')
             ->setAliases(['mautic:segments:rebuild'])
-            ->setDescription('Update contacts in smart segments based on new contact data.')
             ->addOption(
                 '--batch-limit',
                 '-b',
@@ -141,4 +140,5 @@ class UpdateLeadListsCommand extends ModeratedCommand
             );
         }
     }
+    protected static $defaultDescription = 'Update contacts in smart segments based on new contact data.';
 }

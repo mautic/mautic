@@ -27,7 +27,6 @@ class InstallDataCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:install:data')
-            ->setDescription('Installs Mautic with sample data')
             ->setDefinition([
                 new InputOption(
                     'force', null, InputOption::VALUE_NONE, 'Bypasses the verification check.'
@@ -116,4 +115,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Installs Mautic with sample data';
 }

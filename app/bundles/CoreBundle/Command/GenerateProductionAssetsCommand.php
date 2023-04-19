@@ -33,7 +33,6 @@ class GenerateProductionAssetsCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:assets:generate')
-            ->setDescription('Combines and minifies asset files from each bundle into single production files')
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command Combines and minifies files from each bundle's Assets/css/* and Assets/js/* folders into single production files stored in root/media/css and root/media/js respectively.
@@ -67,4 +66,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Combines and minifies asset files from each bundle into single production files';
 }

@@ -33,7 +33,6 @@ class UpdateDoNotSellListCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:donotsell:download')
-            ->setDescription('Fetch remote do not sell list from MaxMind')
             ->setHelp(
                 <<<'EOT'
                 The <info>%command.name%</info> command is used to update MaxMind Do Not Sell list.
@@ -71,4 +70,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Fetch remote do not sell list from MaxMind';
 }

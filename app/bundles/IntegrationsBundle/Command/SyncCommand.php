@@ -32,7 +32,6 @@ class SyncCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Fetch objects from integration.')
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,
@@ -127,4 +126,5 @@ class SyncCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Fetch objects from integration.';
 }

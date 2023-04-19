@@ -39,7 +39,6 @@ class ContactScheduledExportCommand extends Command
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Export contacts which are scheduled in `contact_export_scheduler` table.')
             ->addOption(
                 '--ids',
                 null,
@@ -75,4 +74,5 @@ class ContactScheduledExportCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Export contacts which are scheduled in `contact_export_scheduler` table.';
 }

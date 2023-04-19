@@ -24,7 +24,6 @@ class MauticSocialMonitoringCommand extends Command
     protected function configure()
     {
         $this->setName('mautic:social:monitoring')
-            ->setDescription('Looks at the records of monitors and iterates through them. ')
             ->addOption('mid', 'i', InputOption::VALUE_OPTIONAL, 'The id of a specific monitor record to process')
             ->addOption(
                 'batch-size',
@@ -139,4 +138,5 @@ class MauticSocialMonitoringCommand extends Command
 
         return $returnCode;
     }
+    protected static $defaultDescription = 'Looks at the records of monitors and iterates through them. ';
 }

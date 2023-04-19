@@ -41,7 +41,6 @@ class ProcessEmailQueueCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:emails:send')
-            ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
@@ -192,4 +191,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Processes SwiftMail\'s mail queue';
 }

@@ -27,8 +27,7 @@ class ReloadCommand extends Command
                     'mautic:plugins:install',
                     'mautic:plugins:update',
                 ]
-            )
-            ->setDescription('Installs, updates, enable and/or disable plugins.');
+            );
 
         parent::configure();
     }
@@ -39,4 +38,5 @@ class ReloadCommand extends Command
 
         return 0;
     }
+    protected static $defaultDescription = 'Installs, updates, enable and/or disable plugins.';
 }

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @extends CommonApiController<User>
@@ -28,7 +27,7 @@ class UserApiController extends CommonApiController
      */
     protected $model = null;
 
-    private UserPasswordEncoderInterface $encoder;
+    private \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $encoder;
 
     public function __construct(
         CorePermissions $security,
@@ -37,7 +36,7 @@ class UserApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        UserPasswordEncoderInterface $encoder,
+        \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $encoder,
         RequestStack $requestStack
     ) {
         $this->encoder = $encoder;

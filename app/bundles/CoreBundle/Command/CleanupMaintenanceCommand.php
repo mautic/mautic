@@ -32,7 +32,6 @@ class CleanupMaintenanceCommand extends ModeratedCommand
     protected function configure()
     {
         $this->setName('mautic:maintenance:cleanup')
-            ->setDescription('Updates the Mautic application')
             ->setDefinition(
                 [
                     new InputOption(
@@ -127,4 +126,5 @@ EOT
 
         return 0;
     }
+    protected static $defaultDescription = 'Updates the Mautic application';
 }
