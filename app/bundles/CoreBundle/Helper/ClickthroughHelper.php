@@ -30,7 +30,7 @@ class ClickthroughHelper
     /**
      * @return array<mixed>
      */
-    public function decode(string $string, bool $urlDecode = true): array
+    public function decode(?string $string, bool $urlDecode = true): array
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
@@ -39,13 +39,20 @@ class ClickthroughHelper
             return [];
         }
 
-        if ($this->isSerialized($decoded)) {
-            return $this->shortKeyConverter->unpack(Serializer::decode($decoded));
+        try {
+            $data = @unserialize($decoded);
+
+            if ((false !== $data || 'b:0;' === $string) && $unserialized = Serializer::decode($decoded)) {
+                return $this->shortKeyConverter->unpack($unserialized);
+            }
+        } catch (\Exception $exception) {
         }
 
         if ($this->isIgBinaryEnabled()) {
             try {
-                return $this->shortKeyConverter->unpack(igbinary_unserialize($decoded));
+                if ($unserialized = igbinary_unserialize($decoded)) {
+                    return $this->shortKeyConverter->unpack($unserialized);
+                }
             } catch (\Exception $e) {
             }
         }
@@ -53,21 +60,7 @@ class ClickthroughHelper
         throw new InvalidDecodedStringException($raw);
     }
 
-    /**
-     * @param string $string
-     */
-    public function isSerialized($string): bool
-    {
-        try {
-            $data = @unserialize($string);
-
-            return false !== $data || 'b:0;' === $string;
-        } catch (\Exception $exception) {
-        }
-
-        return false;
-    }
-
+    //  This method is public for test purposes only
     protected function isIgBinaryEnabled(): bool
     {
         return function_exists('igbinary_serialize');
