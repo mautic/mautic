@@ -140,7 +140,7 @@ class SummaryRepository extends CommonRepository
             ' triggered_count = s.triggered_count_i, '.
             ' log_counts_processed = s.log_counts_processed_i;';
 
-            $this->getEntityManager()->getConnection()->query($sql);
+            $this->getEntityManager()->getConnection()->executeQuery($sql);
         }
     }
 }
