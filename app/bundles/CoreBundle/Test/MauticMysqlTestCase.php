@@ -136,7 +136,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->query(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $connection->executeQuery(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 
@@ -165,7 +165,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $prefix = MAUTIC_TABLE_PREFIX;
 
         foreach ($tables as $table) {
-            $this->connection->query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
+            $this->connection->executeQuery("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
         }
     }
 
