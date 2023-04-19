@@ -9,8 +9,11 @@ class AssetGenerationHelper
     // Temporary array of libraries to load from node_modules before we switch
     // to Symfony Encore. This is the first step to load libraries from NPM.
     private const NODE_MODULES = [
-        'mousetrap/mousetrap.js',
-        'jquery/dist/jquery.js',
+        'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
+        'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
+        'history.js/scripts/bundled-uncompressed/html4+html5/jquery.history.js', // Needed for ajaxyfying the UI.
+        'js-cookie/src/js.cookie.js', // Needed for cookies.
+        'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
         // TODO: Add the rest of the libraries here.
     ];
 
