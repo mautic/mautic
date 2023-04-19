@@ -11621,6 +11621,11 @@ parameters:
 			path: app/bundles/CoreBundle/Entity/TranslationEntityInterface.php
 
 		-
+			message: "#^Trait Mautic\\\\CoreBundle\\\\Entity\\\\UpsertTrait is used zero times and is not analysed\\.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Entity/UpsertTrait.php
+
+		-
 			message: "#^Trait Mautic\\\\CoreBundle\\\\Entity\\\\UuidTrait is used zero times and is not analysed\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/UuidTrait.php
