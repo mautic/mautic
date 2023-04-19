@@ -137,7 +137,7 @@ class CustomFieldColumn
         } catch (DriverException $e) {
             $this->logger->warning($e->getMessage());
 
-            if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
+            if (1118 === $e->getCode() /* ER_TOO_BIG_ROWSIZE */) {
                 throw new CustomFieldLimitException('mautic.lead.field.max_column_error');
             }
 
