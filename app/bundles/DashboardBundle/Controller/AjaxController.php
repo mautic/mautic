@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
      */
     public function updateWidgetOrderingAction(Request $request)
     {
-        $data           = $request->request->get('ordering');
+        $data           = $request->request->all()['ordering'] ?? [];
         $dashboardModel = $this->getModel('dashboard');
         \assert($dashboardModel instanceof DashboardModel);
         $repo = $dashboardModel->getRepository();

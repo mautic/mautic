@@ -52,7 +52,7 @@ class EventController extends CommonFormController
         $method  = $request->getMethod();
         $session = $request->getSession();
         if ('POST' == $method) {
-            $event                = $request->request->get('campaignevent');
+            $event                = $request->request->all()['campaignevent'] ?? [];
             $type                 = $event['type'];
             $eventType            = $event['eventType'];
             $campaignId           = $event['campaignId'];
@@ -237,7 +237,7 @@ class EventController extends CommonFormController
         $session       = $request->getSession();
         $valid         = $cancelled = false;
         $method        = $request->getMethod();
-        $campaignEvent = $request->request->get('campaignevent', []);
+        $campaignEvent = $request->request->get('campaignevent') ?? [];
         $campaignId    = 'POST' === $method
             ? ($campaignEvent['campaignId'] ?? '')
             : $request->query->get('campaignId');

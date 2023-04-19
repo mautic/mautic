@@ -2,6 +2,7 @@
 
 namespace Mautic\InstallBundle\Tests\Controller;
 
+use AppKernel;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -13,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
 
@@ -52,7 +54,11 @@ class InstallControllerTest extends \PHPUnit\Framework\TestCase
             ->with('router')
             ->willReturn($this->routerMock);
 
-        $event = $this->createMock(ControllerEvent::class);
+        $kernel  = new AppKernel(MAUTIC_ENV, false);
+        $request = $this->createMock(Request::class);
+
+        $event = new ControllerEvent($kernel, fn () => $this->controller, $request, HttpKernelInterface::MAIN_REQUEST);
+
         $this->controller->initialize($event);
     }
 

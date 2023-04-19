@@ -43,9 +43,14 @@ class Translator implements TranslatorInterface, WarmableInterface, TranslatorBa
         return $this->translator->trans($id, $parameters, $domain, $locale);
     }
 
-    public function warmUp($cacheDir): void
+    /**
+     * {@inheritDoc}
+     */
+    public function warmUp(string $cacheDir)
     {
         $this->translator->warmUp($cacheDir);
+
+        return [];
     }
 
     public function getCatalogue($locale = null): MessageCatalogueInterface

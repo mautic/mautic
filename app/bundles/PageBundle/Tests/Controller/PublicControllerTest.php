@@ -31,7 +31,6 @@ use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\Tracking404Model;
 use Mautic\PageBundle\PageEvents;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -49,7 +48,7 @@ class PublicControllerTest extends MauticMysqlTestCase
      */
     private $internalContainer;
 
-    /** @var Logger */
+    /** @var \Psr\Log\LoggerInterface */
     private $logger;
 
     /** @var ModelFactory<object>&MockObject */
@@ -86,7 +85,7 @@ class PublicControllerTest extends MauticMysqlTestCase
     {
         $this->request              = new Request();
         $this->internalContainer    = $this->createMock(Container::class);
-        $this->logger               = $this->createMock(Logger::class);
+        $this->logger               = $this->createMock(\Psr\Log\LoggerInterface::class);
         $this->modelFactory         = $this->createMock(ModelFactory::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->redirect             = $this->createMock(Redirect::class);
@@ -498,6 +497,8 @@ class PublicControllerTest extends MauticMysqlTestCase
 
                     $response->set('tracking', $contact);
                     $response->set('foo', $request->get('foo'));
+
+                    return $event;
                 }
             );
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Tests\EventListener;
 
+use AppKernel;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\EventListener\CoreSubscriber;
@@ -22,9 +23,12 @@ use Mautic\UserBundle\Model\UserModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 use Symfony\Component\Security\Http\SecurityEvents;
@@ -168,19 +172,18 @@ class CoreSubscriberTest extends TestCase
     {
         $user = $this->createMock(User::class);
 
-        $this->userHelper->expects(self::once())
+        $this->userHelper->expects(self::exactly(2))
             ->method('getUser')
             ->willReturn($user);
 
         $controller = $this->getMockBuilder(CommonController::class)
             ->onlyMethods(['initialize', 'setFactory', 'setUser', 'setCoreParametersHelper', 'setDispatcher', 'setTranslator', 'setFlashBag', 'setModelFactory'])
             ->getMock();
-        $controllers = [$controller];
 
-        $event = $this->createMock(ControllerEvent::class);
-        $event->expects(self::once())
-            ->method('getController')
-            ->willReturn($controllers);
+        $kernel  = new AppKernel(MAUTIC_ENV, false);
+        $request = $this->createMock(Request::class);
+
+        $event = new ControllerEvent($kernel, fn () => $controller, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $controller->expects(self::once())
             ->method('setFactory')
@@ -210,6 +213,8 @@ class CoreSubscriberTest extends TestCase
             ->method('initialize')
             ->with($event);
 
-        $this->subscriber->onKernelController($event);
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addSubscriber($this->subscriber);
+        $eventDispatcher->dispatch($event, KernelEvents::CONTROLLER);
     }
 }
