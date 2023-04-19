@@ -5006,11 +5006,6 @@ parameters:
 			path: app/bundles/CampaignBundle/EventListener/SearchSubscriber.php
 
 		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\InactiveContactFinder\\:\\:clear\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/ContactFinder/InactiveContactFinder.php
-
-		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\InactiveContactFinder\\:\\:getContactCount\\(\\) has parameter \\$decisionEvents with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Executioner/ContactFinder/InactiveContactFinder.php
@@ -5046,11 +5041,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Executioner/ContactFinder/InactiveContactFinder.php
 
 		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\KickoffContactFinder\\:\\:clear\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/ContactFinder/KickoffContactFinder.php
-
-		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\KickoffContactFinder\\:\\:getContactCount\\(\\) has parameter \\$eventIds with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Executioner/ContactFinder/KickoffContactFinder.php
@@ -5079,16 +5069,6 @@ parameters:
 			message: "#^Property Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\Limiter\\\\ContactLimiter\\:\\:\\$contactIdList type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Executioner/ContactFinder/Limiter/ContactLimiter.php
-
-		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\ScheduledContactFinder\\:\\:clear\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/ContactFinder/ScheduledContactFinder.php
-
-		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\ScheduledContactFinder\\:\\:hydrateContacts\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Executioner/ContactFinder/ScheduledContactFinder.php
 
 		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Executioner\\\\ContactFinder\\\\ScheduledContactFinder\\:\\:hydrateContacts\\(\\) has parameter \\$logs with generic class Doctrine\\\\Common\\\\Collections\\\\ArrayCollection but does not specify its types\\: TKey, T$#"
@@ -6366,11 +6346,6 @@ parameters:
 			path: app/bundles/CampaignBundle/Membership/MembershipManager.php
 
 		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\Membership\\\\MembershipManager\\:\\:addContacts\\(\\) has parameter \\$contacts with generic class Doctrine\\\\Common\\\\Collections\\\\ArrayCollection but does not specify its types\\: TKey, T$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Membership/MembershipManager.php
-
-		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Membership\\\\MembershipManager\\:\\:advanceProgressBar\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Membership/MembershipManager.php
@@ -6382,11 +6357,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\CampaignBundle\\\\Membership\\\\MembershipManager\\:\\:removeContacts\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/CampaignBundle/Membership/MembershipManager.php
-
-		-
-			message: "#^Method Mautic\\\\CampaignBundle\\\\Membership\\\\MembershipManager\\:\\:removeContacts\\(\\) has parameter \\$contacts with generic class Doctrine\\\\Common\\\\Collections\\\\ArrayCollection but does not specify its types\\: TKey, T$#"
 			count: 1
 			path: app/bundles/CampaignBundle/Membership/MembershipManager.php
 
@@ -17126,21 +17096,6 @@ parameters:
 			path: app/bundles/CoreBundle/Tests/Unit/Doctrine/Provider/VersionProviderTest.php
 
 		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Doctrine\\\\Provider\\\\VersionProviderTest\\:\\:\\$connection has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Doctrine/Provider/VersionProviderTest.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Doctrine\\\\Provider\\\\VersionProviderTest\\:\\:\\$provider has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Doctrine/Provider/VersionProviderTest.php
-
-		-
-			message: "#^Property Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Doctrine\\\\Provider\\\\VersionProviderTest\\:\\:\\$statement has no type specified\\.$#"
-			count: 1
-			path: app/bundles/CoreBundle/Tests/Unit/Doctrine/Provider/VersionProviderTest.php
-
-		-
 			message: "#^Method Mautic\\\\CoreBundle\\\\Tests\\\\Unit\\\\Entity\\\\CommonRepositoryTest\\:\\:callBuildWhereClauseFromArray\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Tests/Unit/Entity/CommonRepositoryTest.php
@@ -19916,16 +19871,6 @@ parameters:
 			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
-
-		-
-			message: "#^Variable \\$data in empty\\(\\) always exists and is not falsy\\.$#"
-			count: 1
-			path: app/bundles/DynamicContentBundle/Helper/DynamicContentHelper.php
-
-		-
 			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Entity\\\\TranslationEntityInterface\\:\\:isVariant\\(\\)\\.$#"
 			count: 1
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
@@ -19992,11 +19937,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\DynamicContentBundle\\\\Model\\\\DynamicContentModel\\:\\:getSlotContentForLead\\(\\) has parameter \\$lead with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
-
-		-
-			message: "#^Method Mautic\\\\DynamicContentBundle\\\\Model\\\\DynamicContentModel\\:\\:getSlotContentForLead\\(\\) should return Mautic\\\\DynamicContentBundle\\\\Entity\\\\DynamicContent but returns array\\.$#"
 			count: 1
 			path: app/bundles/DynamicContentBundle/Model/DynamicContentModel.php
 
@@ -21757,11 +21697,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\StatRepository\\:\\:getOpenedStatIds\\(\\) has parameter \\$listId with no type specified\\.$#"
-			count: 1
-			path: app/bundles/EmailBundle/Entity/StatRepository.php
-
-		-
-			message: "#^Method Mautic\\\\EmailBundle\\\\Entity\\\\StatRepository\\:\\:getOpenedStatIds\\(\\) should return int but returns array\\.$#"
 			count: 1
 			path: app/bundles/EmailBundle/Entity/StatRepository.php
 
@@ -31016,11 +30951,6 @@ parameters:
 			path: app/bundles/InstallBundle/Command/InstallCommand.php
 
 		-
-			message: "#^Argument of an invalid type Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\EmailStep supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Command/InstallCommand.php
-
-		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Command\\\\InstallCommand\\:\\:configure\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Command/InstallCommand.php
@@ -31049,16 +30979,6 @@ parameters:
 			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Form\\\\DoctrineStepType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Configurator/Form/DoctrineStepType.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Form\\\\EmailStepType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Form/EmailStepType.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Form\\\\EmailStepType\\:\\:getTransportChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Form/EmailStepType.php
 
 		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Form\\\\UserStepType\\:\\:buildForm\\(\\) has no return type specified\\.$#"
@@ -31146,31 +31066,6 @@ parameters:
 			path: app/bundles/InstallBundle/Configurator/Step/DoctrineStep.php
 
 		-
-			message: "#^Argument of an invalid type Mautic\\\\CoreBundle\\\\Configurator\\\\Step\\\\StepInterface supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/EmailStep.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\EmailStep\\:\\:checkOptionalSettings\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/EmailStep.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\EmailStep\\:\\:checkRequirements\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/EmailStep.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\EmailStep\\:\\:update\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/EmailStep.php
-
-		-
-			message: "#^Property Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\EmailStep\\:\\:\\$mailer_auth_mode has no type specified\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Configurator/Step/EmailStep.php
-
-		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Configurator\\\\Step\\\\UserStep\\:\\:checkOptionalSettings\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Configurator/Step/UserStep.php
@@ -31227,7 +31122,7 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$form of method Mautic\\\\InstallBundle\\\\Controller\\\\InstallController\\:\\:handleInstallerErrors\\(\\) expects Symfony\\\\Component\\\\Form\\\\Form, Symfony\\\\Component\\\\Form\\\\FormInterface given\\.$#"
-			count: 6
+			count: 5
 			path: app/bundles/InstallBundle/Controller/InstallController.php
 
 		-
@@ -31377,16 +31272,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:saveConfiguration\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:setupEmailStep\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: app/bundles/InstallBundle/Install/InstallService.php
-
-		-
-			message: "#^Method Mautic\\\\InstallBundle\\\\Install\\\\InstallService\\:\\:setupEmailStep\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/InstallBundle/Install/InstallService.php
 
@@ -37686,11 +37571,6 @@ parameters:
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:getContactCollection\\(\\) return type with generic class Doctrine\\\\Common\\\\Collections\\\\ArrayCollection does not specify its types\\: TKey, T$#"
-			count: 1
-			path: app/bundles/LeadBundle/Entity/LeadRepository.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:getContacts\\(\\) has parameter \\$contactIds with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Entity/LeadRepository.php
@@ -43726,11 +43606,6 @@ parameters:
 			path: app/bundles/LeadBundle/Segment/Query/QueryBuilder.php
 
 		-
-			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder\\:\\:execute\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Segment/Query/QueryBuilder.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder\\:\\:getFromClauses\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Segment/Query/QueryBuilder.php
@@ -45011,16 +44886,6 @@ parameters:
 			path: app/bundles/LeadBundle/Tests/EventListener/SegmentSubscriberTest.php
 
 		-
-			message: "#^Call to method addSubscriber\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Tests\\\\EventListener\\\\MockObject\\.$#"
-			count: 5
-			path: app/bundles/LeadBundle/Tests/EventListener/WebhookSubscriberTest.php
-
-		-
-			message: "#^Call to method dispatch\\(\\) on an unknown class Mautic\\\\LeadBundle\\\\Tests\\\\EventListener\\\\MockObject\\.$#"
-			count: 5
-			path: app/bundles/LeadBundle/Tests/EventListener/WebhookSubscriberTest.php
-
-		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Tests\\\\EventListener\\\\WebhookSubscriberTest\\:\\:testChannelChangeIsPickedUpByWebhook\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/EventListener/WebhookSubscriberTest.php
@@ -45047,11 +44912,6 @@ parameters:
 
 		-
 			message: "#^Method Mautic\\\\LeadBundle\\\\Tests\\\\EventListener\\\\WebhookSubscriberTest\\:\\:testWebhookIsNotDeliveredIfContactIsAVisitor\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/bundles/LeadBundle/Tests/EventListener/WebhookSubscriberTest.php
-
-		-
-			message: "#^Property Mautic\\\\LeadBundle\\\\Tests\\\\EventListener\\\\WebhookSubscriberTest\\:\\:\\$dispatcher has unknown class Mautic\\\\LeadBundle\\\\Tests\\\\EventListener\\\\MockObject as its type\\.$#"
 			count: 1
 			path: app/bundles/LeadBundle/Tests/EventListener/WebhookSubscriberTest.php
 
