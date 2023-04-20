@@ -287,7 +287,7 @@ class VideoHit
     /**
      * Get dateHit.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateHit()
     {
@@ -295,7 +295,7 @@ class VideoHit
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLeft()
     {

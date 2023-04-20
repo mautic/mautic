@@ -177,7 +177,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -197,7 +197,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastSyncDate()
     {

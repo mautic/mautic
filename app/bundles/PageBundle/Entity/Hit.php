@@ -319,7 +319,7 @@ class Hit
     /**
      * Get dateHit.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateHit()
     {
@@ -327,7 +327,7 @@ class Hit
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLeft()
     {

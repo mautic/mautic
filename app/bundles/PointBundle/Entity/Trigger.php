@@ -297,7 +297,7 @@ class Trigger extends FormEntity
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

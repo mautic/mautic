@@ -131,7 +131,7 @@ class UserToken
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getExpiration()
     {

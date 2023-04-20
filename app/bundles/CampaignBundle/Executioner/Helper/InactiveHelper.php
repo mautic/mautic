@@ -164,7 +164,7 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */

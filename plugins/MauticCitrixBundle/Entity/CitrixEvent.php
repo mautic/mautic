@@ -209,7 +209,7 @@ class CitrixEvent
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getEventDate()
     {

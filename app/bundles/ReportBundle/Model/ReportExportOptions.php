@@ -67,7 +67,7 @@ class ReportExportOptions
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateFrom()
     {
@@ -83,7 +83,7 @@ class ReportExportOptions
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateTo()
     {

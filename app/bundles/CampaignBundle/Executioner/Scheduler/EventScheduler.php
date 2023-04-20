@@ -248,7 +248,7 @@ class EventScheduler
      *
      * @throws NotSchedulableException
      */
-    public function getSortedExecutionDates(ArrayCollection $events, \DateTime $lastActiveDate)
+    public function getSortedExecutionDates(ArrayCollection $events, \DateTimeInterface $lastActiveDate)
     {
         $eventExecutionDates = [];
 
@@ -281,7 +281,7 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    public function shouldSchedule(\DateTime $executionDate, \DateTimeInterface $now): bool
+    public function shouldSchedule(\DateTimeInterface $executionDate, \DateTimeInterface $now): bool
     {
         // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
         // is desired by system admin
@@ -294,7 +294,7 @@ class EventScheduler
         return $executionDate > $now;
     }
 
-    public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTimeInterface $now): bool
+    public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
     {
         if (null !== $event) {
             if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
@@ -309,7 +309,7 @@ class EventScheduler
     /**
      * @throws NotSchedulableException
      */
-    public function validateAndScheduleEventForContacts(Event $event, \DateTime $executionDateTime, ArrayCollection $contacts, \DateTime $comparedFromDateTime)
+    public function validateAndScheduleEventForContacts(Event $event, \DateTimeInterface $executionDateTime, ArrayCollection $contacts, \DateTimeInterface $comparedFromDateTime)
     {
         if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {
             $this->logger->debug(
