@@ -183,7 +183,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @param $eventId
      *
-     * @return \DateTimeInterface|null
+     * @return \DateTimeInterface
      */
     private function getGroupExecutionDateTime(
         $eventId,
@@ -246,10 +246,11 @@ class Interval implements ScheduleModeInterface
     /**
      * @param $eventId
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    private function getExecutionDateTimeFromHour(Lead $contact, \DateTime $hour, $eventId, \DateTime $compareFromDateTime)
+    private function getExecutionDateTimeFromHour(Lead $contact, \DateTimeInterface $hour, $eventId, \DateTimeInterface $compareFromDateTime)
     {
+        /** @var \DateTime $groupHour */
         $groupHour = clone $hour;
 
         // Set execution to UTC
@@ -263,6 +264,7 @@ class Interval implements ScheduleModeInterface
                 );
 
                 // Get now in the contacts timezone then add the number of days from now and the original execution date
+                /** @var \DateTime $groupExecutionDate */
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
 
@@ -277,6 +279,7 @@ class Interval implements ScheduleModeInterface
             }
         }
 
+        /** @var \DateTime $groupExecutionDate */
         $groupExecutionDate = clone $compareFromDateTime;
         $groupExecutionDate->setTimezone($this->getDefaultTimezone());
 
@@ -288,16 +291,18 @@ class Interval implements ScheduleModeInterface
     /**
      * @param $eventId
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     private function getExecutionDateTimeBetweenHours(
         Lead $contact,
-        \DateTime $startTime,
-        \DateTime $endTime,
+        \DateTimeInterface $startTime,
+        \DateTimeInterface $endTime,
         $eventId,
-        \DateTime $compareFromDateTime
+        \DateTimeInterface $compareFromDateTime
     ) {
+        /* @var \DateTime $startTime */
         $startTime = clone $startTime;
+        /* @var \DateTime $endTime */
         $endTime   = clone $endTime;
 
         if ($endTime < $startTime) {
@@ -319,6 +324,7 @@ class Interval implements ScheduleModeInterface
                 );
 
                 // Get now in the contacts timezone then add the number of days from now and the original execution date
+                /** @var \DateTime $groupExecutionDate */
                 $groupExecutionDate = clone $compareFromDateTime;
                 $groupExecutionDate->setTimezone($contactTimezone);
             } catch (\Exception $exception) {
@@ -330,14 +336,17 @@ class Interval implements ScheduleModeInterface
         }
 
         if (!isset($groupExecutionDate)) {
+            /** @var \DateTime $groupExecutionDate */
             $groupExecutionDate = clone $compareFromDateTime;
             $groupExecutionDate->setTimezone($this->getDefaultTimezone());
         }
 
         // Is the time between the start and end hours?
+        /* @var \DateTime $testStartDateTime */
         $testStartDateTime = clone $groupExecutionDate;
         $testStartDateTime->setTime($startTime->format('H'), $startTime->format('i'));
 
+        /* @var \DateTime $testStopDateTime */
         $testStopDateTime = clone $groupExecutionDate;
         $testStopDateTime->setTime($endTime->format('H'), $endTime->format('i'));
 

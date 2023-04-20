@@ -20,7 +20,7 @@ class GroupExecutionDateDAO
     /**
      * GroupExecutionDateDAO constructor.
      */
-    public function __construct(\DateTime $executionDate)
+    public function __construct(\DateTimeInterface $executionDate)
     {
         $this->executionDate = $executionDate;
         $this->contacts      = new ArrayCollection();

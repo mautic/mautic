@@ -787,7 +787,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getTriggerHour()
     {
