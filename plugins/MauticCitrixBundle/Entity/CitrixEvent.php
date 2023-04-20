@@ -10,7 +10,7 @@ use Mautic\LeadBundle\Entity\Lead;
 #[ORM\Entity]
 class CitrixEvent
 {
-    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     protected ?int $id = null;
@@ -20,22 +20,22 @@ class CitrixEvent
      */
     protected $lead;
 
-    #[ORM\Column(name: 'product', type: 'string', length: 20)]
+    #[ORM\Column(name: 'product', type: \Doctrine\DBAL\Types\Types::STRING, length: 20)]
     protected ?string $product = null;
 
-    #[ORM\Column(name: 'email', type: 'string', length: 255)]
+    #[ORM\Column(name: 'email', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $email = null;
 
-    #[ORM\Column(name: 'event_name', type: 'string', length: 255)]
+    #[ORM\Column(name: 'event_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $eventName = null;
 
-    #[ORM\Column(name: 'event_desc', type: 'string', length: 255)]
+    #[ORM\Column(name: 'event_desc', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $eventDesc = null;
 
-    #[ORM\Column(name: 'event_type', type: 'string', length: 50)]
+    #[ORM\Column(name: 'event_type', type: \Doctrine\DBAL\Types\Types::STRING, length: 50)]
     protected ?string $eventType = null;
 
-    #[ORM\Column(name: 'event_date', type: 'datetime')]
+    #[ORM\Column(name: 'event_date', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     protected ?\DateTimeInterface $eventDate = null;
 
     public function __construct()
