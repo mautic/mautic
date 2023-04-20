@@ -106,7 +106,7 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -227,7 +227,7 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLastExited()
     {

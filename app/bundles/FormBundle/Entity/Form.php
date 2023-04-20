@@ -473,7 +473,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -494,7 +494,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

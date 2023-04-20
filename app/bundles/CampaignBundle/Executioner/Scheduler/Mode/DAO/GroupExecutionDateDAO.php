@@ -32,7 +32,7 @@ class GroupExecutionDateDAO
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDate()
     {

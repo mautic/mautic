@@ -155,7 +155,7 @@ class Notification
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {

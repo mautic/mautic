@@ -161,7 +161,7 @@ class FieldChange
         return $this;
     }
 
-    public function getModifiedAt(): \DateTime
+    public function getModifiedAt(): \DateTimeInterface
     {
         return $this->modifiedAt;
     }

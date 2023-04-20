@@ -116,7 +116,7 @@ class EventScheduler
         $this->scheduleEventForContacts($event, $config, $executionDate, $contacts, $isInactiveEvent);
     }
 
-    public function reschedule(LeadEventLog $log, \DateTime $toBeExecutedOn)
+    public function reschedule(LeadEventLog $log, \DateTimeInterface $toBeExecutedOn)
     {
         $log->setTriggerDate($toBeExecutedOn);
         $this->eventLogger->persistLog($log);
@@ -271,7 +271,7 @@ class EventScheduler
         return $eventExecutionDates;
     }
 
-    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTime $now): \DateTime
+    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTimeInterface $now): \DateTime
     {
         if ($eventExecutionDate->getTimestamp() === $earliestExecutionDate->getTimestamp()) {
             // Inactivity is based on the "wait" period so execute now
@@ -281,7 +281,7 @@ class EventScheduler
         return $eventExecutionDate;
     }
 
-    public function shouldSchedule(\DateTime $executionDate, \DateTime $now): bool
+    public function shouldSchedule(\DateTime $executionDate, \DateTimeInterface $now): bool
     {
         // Mainly for functional tests so we don't have to wait minutes but technically can be used in an environment as well if this behavior
         // is desired by system admin

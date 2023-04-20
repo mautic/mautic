@@ -160,7 +160,7 @@ class Submission
     /**
      * Get dateSubmitted.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSubmitted()
     {

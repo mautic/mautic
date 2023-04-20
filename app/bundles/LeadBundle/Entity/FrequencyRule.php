@@ -157,7 +157,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -275,7 +275,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPauseFromDate()
     {
@@ -297,7 +297,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPauseToDate()
     {

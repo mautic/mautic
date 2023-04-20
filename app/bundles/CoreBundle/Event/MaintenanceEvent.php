@@ -66,7 +66,7 @@ class MaintenanceEvent extends Event
     /**
      * Returns a DateTime in UTC for the date to delete records older than the given date.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDate()
     {

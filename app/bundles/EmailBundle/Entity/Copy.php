@@ -75,7 +75,7 @@ class Copy
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateCreated()
     {

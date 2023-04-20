@@ -160,7 +160,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return ?\DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -181,7 +181,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return ?\DateTime
+     * @return ?\DateTimeInterface
      */
     public function getPublishDown()
     {

@@ -443,7 +443,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

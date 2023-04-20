@@ -272,7 +272,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDatePublished()
     {
@@ -288,7 +288,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -304,7 +304,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastAttempt()
     {
@@ -365,7 +365,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getScheduledDate()
     {

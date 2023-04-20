@@ -25,14 +25,14 @@ abstract class AbstractChart
     /**
      * Date from.
      *
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|\DateTime
      */
     protected $dateFrom;
 
     /**
      * Date to.
      *
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|\DateTime
      */
     protected $dateTo;
 

@@ -100,7 +100,7 @@ class EmailReply
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateReplied()
     {

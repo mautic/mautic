@@ -250,7 +250,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateRead()
     {
@@ -266,7 +266,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -558,7 +558,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getLastOpened()
     {

@@ -213,7 +213,7 @@ class FormEntity extends CommonEntity
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -238,7 +238,7 @@ class FormEntity extends CommonEntity
     /**
      * Get dateModified.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateModified()
     {
@@ -262,7 +262,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOut.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCheckedOut()
     {

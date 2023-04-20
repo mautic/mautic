@@ -41,11 +41,11 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime, \DateTime $comparedToDateTime)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime, \DateTimeInterface $comparedToDateTime)
     {
         $interval = $event->getTriggerInterval();
         $unit     = $event->getTriggerIntervalUnit();
@@ -181,7 +181,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @param $eventId
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     private function getGroupExecutionDateTime(
         $eventId,

@@ -50,7 +50,7 @@ class CompanyLead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

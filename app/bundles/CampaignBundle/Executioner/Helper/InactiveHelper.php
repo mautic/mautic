@@ -139,7 +139,7 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getEarliestInactiveDateTime()
     {

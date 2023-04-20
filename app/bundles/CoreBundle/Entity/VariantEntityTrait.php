@@ -24,7 +24,7 @@ trait VariantEntityTrait
     private $variantSettings = [];
 
     /**
-     * @var \DateTimeInterface
+     * @var \DateTimeInterface|null
      */
     private $variantStartDate;
 

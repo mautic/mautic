@@ -71,7 +71,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -131,7 +131,7 @@ class DynamicContentLeadData extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDataAdded()
     {
