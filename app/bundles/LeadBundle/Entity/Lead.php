@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -1123,7 +1124,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     /**
      * @return \Doctrine\Common\Collections\Collection<int, \Mautic\LeadBundle\Entity\DoNotContact>
      */
-    public function getDoNotContact()
+    public function getDoNotContact(): Collection
     {
         return $this->doNotContact;
     }
