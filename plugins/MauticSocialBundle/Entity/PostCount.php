@@ -97,7 +97,7 @@ class PostCount
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPostDate()
     {

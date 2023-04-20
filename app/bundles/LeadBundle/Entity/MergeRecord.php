@@ -79,7 +79,7 @@ class MergeRecord
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

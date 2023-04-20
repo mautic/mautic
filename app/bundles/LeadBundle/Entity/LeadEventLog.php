@@ -308,7 +308,7 @@ class LeadEventLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

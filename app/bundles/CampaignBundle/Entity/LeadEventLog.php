@@ -342,7 +342,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setTriggerDate(\DateTime $triggerDate = null)
+    public function setTriggerDate(\DateTimeInterface $triggerDate = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);

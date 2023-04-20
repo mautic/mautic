@@ -404,7 +404,7 @@ class LeadList extends FormEntity
         );
     }
 
-    public function getLastBuiltDate(): ?\DateTime
+    public function getLastBuiltDate(): ?\DateTimeInterface
     {
         return $this->lastBuiltDate;
     }

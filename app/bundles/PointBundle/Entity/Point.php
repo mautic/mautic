@@ -301,7 +301,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -322,7 +322,7 @@ class Point extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

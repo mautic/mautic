@@ -178,7 +178,7 @@ class EventScheduler
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      *
      * @throws NotSchedulableException
      */
@@ -371,7 +371,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    private function scheduleEventForContacts(Event $event, AbstractEventAccessor $config, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         foreach ($contacts as $contact) {
             // Create the entry

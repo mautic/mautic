@@ -144,7 +144,7 @@ class UtmTag
     /**
      * Get date added.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
