@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Table(name: 'monitoring_leads')]
 #[ORM\Entity]
-#[ORM\Entity(repositoryClass: 'MauticPlugin\MauticSocialBundle\Entity\LeadRepository')]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
 class Lead
 {
     /**

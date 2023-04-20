@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 #[ORM\Table(name: 'tweets')]
 #[ORM\Entity]
-#[ORM\Entity(repositoryClass: 'MauticPlugin\MauticSocialBundle\Entity\TweetRepository')]
+#[ORM\Entity(repositoryClass: TweetRepository::class)]
 class Tweet extends FormEntity
 {
     /**
