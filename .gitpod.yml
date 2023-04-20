@@ -8,8 +8,6 @@ tasks:
   - name: Startup 
   - command: |
       bash .ddev/gitpod-setup-ddev.sh
-      sed -i.back "s/'debug'.*=>.*false/'debug' => true/g" app/config/environment.php
-      sed -i.back "s/'env'.*=>.*'prod'/'env' => 'dev'/g" app/config/environment.php 
       gp ports await 8080 && gp preview $(gp url 8080) 
 
 # VScode xdebug extension
