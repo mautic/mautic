@@ -526,6 +526,8 @@ class ImportModel extends FormModel
         $filter['bundle'] = 'lead';
 
         // Clear the times for display by minutes
+        /** @var \DateTime $dateFrom */
+        /** @var \DateTime $dateTo */
         $dateFrom->modify('-1 minute');
         $dateFrom->setTime($dateFrom->format('H'), $dateFrom->format('i'), 0);
         $dateTo->modify('+1 minute');

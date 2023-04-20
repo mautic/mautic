@@ -214,7 +214,7 @@ class EventScheduler
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      *
      * @throws NotSchedulableException
      */

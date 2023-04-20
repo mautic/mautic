@@ -137,9 +137,9 @@ class ChartQuery extends AbstractChart
         if ($dateColumn) {
             if ($this->dateFrom && $this->dateTo) {
                 // Between is faster so if we know both dates...
-                /* @var \DateTime $dateFrom */
+                /** @var \DateTime $dateFrom */
                 $dateFrom = clone $this->dateFrom;
-                /* @var \DateTime $dateTo */
+                /** @var \DateTime $dateTo */
                 $dateTo   = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
