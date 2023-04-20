@@ -18,6 +18,7 @@ class AssetGenerationHelper
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices.
         'moment/min/moment.min.js', // Needed for date/time formatting.
         // 'jquery-color/dist/jquery.color.js', // I can't find why is this needed. Added in https://github.com/mautic/mautic/commit/918000351e8c7657b01ef132e22c097942cf0e99. Uncoment this if we find the place. Delete this dependency after some time.
+        'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
         // TODO: Add the rest of the libraries here.
     ];
 
