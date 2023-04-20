@@ -17,7 +17,7 @@ class FailedLeadEventLog
     private $log;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

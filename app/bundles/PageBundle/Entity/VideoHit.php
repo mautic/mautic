@@ -20,12 +20,12 @@ class VideoHit
     private $guid;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateHit;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLeft;
 

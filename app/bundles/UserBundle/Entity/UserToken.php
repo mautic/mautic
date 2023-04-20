@@ -28,7 +28,7 @@ class UserToken
     private $secret;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $expiration = null;
 

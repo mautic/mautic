@@ -16,7 +16,7 @@ class ObjectMapping
     private $id;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateCreated;
 

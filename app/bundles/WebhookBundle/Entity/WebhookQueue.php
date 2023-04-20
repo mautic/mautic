@@ -21,7 +21,7 @@ class WebhookQueue
     private $webhook;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateAdded;
 

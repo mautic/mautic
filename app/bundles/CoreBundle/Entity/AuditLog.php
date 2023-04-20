@@ -51,7 +51,7 @@ class AuditLog
     protected $details = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 

@@ -33,12 +33,12 @@ class IntegrationEntity extends CommonEntity
     private $integrationEntityId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastSyncDate;
 

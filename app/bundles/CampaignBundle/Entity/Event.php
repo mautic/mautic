@@ -63,7 +63,7 @@ class Event implements ChannelInterface
     private $properties = [];
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerDate;
 
@@ -78,17 +78,17 @@ class Event implements ChannelInterface
     private $triggerIntervalUnit;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerHour;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerRestrictedStartHour;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerRestrictedStopHour;
 

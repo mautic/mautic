@@ -41,7 +41,7 @@ class InactiveHelper
     private DecisionHelper $decisionHelper;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $earliestInactiveDate;
 

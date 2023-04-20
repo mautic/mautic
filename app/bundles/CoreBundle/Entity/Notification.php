@@ -36,7 +36,7 @@ class Notification
     protected $message;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateAdded;
 

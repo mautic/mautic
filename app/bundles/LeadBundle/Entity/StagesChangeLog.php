@@ -37,7 +37,7 @@ class StagesChangeLog
     private $actionName;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

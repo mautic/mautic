@@ -15,9 +15,9 @@ class CitrixEvent
     /**
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\GeneratedValue
      */
-    protected $id;
+    protected ?int $id = null;
 
     /**
      * @var Lead
@@ -27,32 +27,32 @@ class CitrixEvent
     /**
      * @ORM\Column(name="product", type="string", length=20)
      */
-    protected $product;
+    protected ?string $product = null;
 
     /**
      * @ORM\Column(name="email", type="string", length=255)
      */
-    protected $email;
+    protected ?string $email = null;
 
     /**
      * @ORM\Column(name="event_name", type="string", length=255)
      */
-    protected $eventName;
+    protected ?string $eventName = null;
 
     /**
      * @ORM\Column(name="event_desc", type="string", length=255)
      */
-    protected $eventDesc;
+    protected ?string $eventDesc = null;
 
     /**
      * @ORM\Column(name="event_type", type="string", length=50)
      */
-    protected $eventType;
+    protected ?string $eventType = null;
 
     /**
      * @ORM\Column(name="event_date", type="datetime")
      */
-    protected $eventDate;
+    protected ?\DateTimeInterface $eventDate = null;
 
     public function __construct()
     {

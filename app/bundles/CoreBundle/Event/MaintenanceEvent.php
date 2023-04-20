@@ -15,7 +15,7 @@ class MaintenanceEvent extends Event
     protected $daysOld;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $date;
 

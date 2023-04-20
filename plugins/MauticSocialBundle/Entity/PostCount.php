@@ -21,7 +21,7 @@ class PostCount
     private $monitor;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $postDate;
 

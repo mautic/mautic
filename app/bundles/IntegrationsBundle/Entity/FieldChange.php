@@ -32,7 +32,7 @@ class FieldChange
     private $objectType;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $modifiedAt;
 

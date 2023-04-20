@@ -46,7 +46,7 @@ class PointsChangeLog
     private $delta;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

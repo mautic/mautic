@@ -53,12 +53,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $content = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 

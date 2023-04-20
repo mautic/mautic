@@ -20,7 +20,7 @@ class EmailReply
     private $stat;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateReplied;
 

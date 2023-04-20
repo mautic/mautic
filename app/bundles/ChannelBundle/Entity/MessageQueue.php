@@ -68,22 +68,22 @@ class MessageQueue
     private $status = self::STATUS_PENDING;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $datePublished;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $scheduledDate;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastAttempt;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 

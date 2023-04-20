@@ -138,7 +138,7 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.dateAdded', 'DESC');
+            ->orderBy('n.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
 
         if ($limit) {
             $qb->setMaxResults($limit);

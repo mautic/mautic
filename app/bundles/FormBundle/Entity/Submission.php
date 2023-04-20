@@ -40,7 +40,7 @@ class Submission
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSubmitted;
 

@@ -35,7 +35,7 @@ class CampaignScheduledEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateScheduled;
 

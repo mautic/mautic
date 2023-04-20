@@ -27,7 +27,7 @@ class Log
     private $statusCode;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

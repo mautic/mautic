@@ -47,12 +47,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $category;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 

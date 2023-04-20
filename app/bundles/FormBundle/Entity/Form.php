@@ -61,12 +61,12 @@ class Form extends FormEntity
     private $postActionProperty;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -99,9 +99,9 @@ class Form extends FormEntity
      * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
      * @ORM\OrderBy({"dateSubmitted" = "DESC"})
      *
-     * @var ArrayCollection
+     * @var \Doctrine\Common\Collections\Collection<\Mautic\FormBundle\Entity\Submission>
      */
-    private $submissions;
+    private \Doctrine\Common\Collections\Collection $submissions;
 
     /**
      * @var int

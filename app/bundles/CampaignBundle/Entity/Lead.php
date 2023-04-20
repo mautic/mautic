@@ -22,12 +22,12 @@ class Lead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLastExited;
 

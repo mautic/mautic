@@ -121,12 +121,12 @@ class Import extends FormEntity
     private $status;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateStarted;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateEnded;
 

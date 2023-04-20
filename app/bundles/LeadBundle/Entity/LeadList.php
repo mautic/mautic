@@ -69,7 +69,7 @@ class LeadList extends FormEntity
     private $leads;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastBuiltDate;
 

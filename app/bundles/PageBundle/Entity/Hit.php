@@ -20,12 +20,12 @@ class Hit
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateHit;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLeft;
 

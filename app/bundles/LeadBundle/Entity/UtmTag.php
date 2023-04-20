@@ -15,7 +15,7 @@ class UtmTag
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

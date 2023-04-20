@@ -27,7 +27,7 @@ class LeadCategory
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

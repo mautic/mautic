@@ -59,12 +59,12 @@ class Monitoring extends FormEntity
     private $properties = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 

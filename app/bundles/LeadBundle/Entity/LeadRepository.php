@@ -236,8 +236,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->expr()->in('l.id', ':ids')
         )
             ->setParameter('ids', array_keys($leads))
-            ->orderBy('l.dateAdded', 'DESC')
-            ->addOrderBy('l.id', 'DESC');
+            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('l.id', \Doctrine\Common\Collections\Criteria::DESC);
         $entities = $q->getQuery()
             ->getResult();
 
@@ -337,7 +337,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $col = ($byId) ? 'i.id' : 'i.ipAddress';
         $q->where($col.' = :ip')
             ->setParameter('ip', $ip)
-            ->orderBy('l.dateAdded', 'DESC');
+            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
         $results = $q->getQuery()->getResult();
 
         /** @var Lead $lead */

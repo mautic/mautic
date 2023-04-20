@@ -18,7 +18,7 @@ class MergeRecord
     private $contact;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

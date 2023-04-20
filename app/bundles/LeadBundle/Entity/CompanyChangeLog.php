@@ -41,7 +41,7 @@ class CompanyChangeLog
     private $company;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

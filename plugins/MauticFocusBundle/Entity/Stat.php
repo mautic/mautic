@@ -34,7 +34,7 @@ class Stat
     private $typeId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 

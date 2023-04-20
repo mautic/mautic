@@ -17,12 +17,12 @@ class ReportExportOptions
     private $page;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateFrom;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateTo;
 

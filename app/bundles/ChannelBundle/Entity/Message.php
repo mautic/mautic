@@ -29,12 +29,12 @@ class Message extends FormEntity
     private $description;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var ?\DateTime
+     * @var ?\DateTimeInterface
      */
     private $publishDown;
 

@@ -33,12 +33,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $description;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 

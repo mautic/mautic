@@ -16,7 +16,7 @@ class FormEntity extends CommonEntity
     private $isPublished = true;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateAdded;
 
@@ -31,7 +31,7 @@ class FormEntity extends CommonEntity
     private $createdByUser;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateModified;
 
@@ -46,7 +46,7 @@ class FormEntity extends CommonEntity
     private $modifiedByUser;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $checkedOut;
 

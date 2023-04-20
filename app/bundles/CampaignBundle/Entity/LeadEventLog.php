@@ -36,7 +36,7 @@ class LeadEventLog implements ChannelInterface
     private $ipAddress;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      **/
     private $dateTriggered;
 
@@ -46,7 +46,7 @@ class LeadEventLog implements ChannelInterface
     private $isScheduled = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerDate;
 

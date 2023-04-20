@@ -60,7 +60,7 @@ class LeadEventLog
     protected $action;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 

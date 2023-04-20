@@ -16,12 +16,12 @@ class Calculator
     private $statsDAO;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $fromDateTime;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $toDateTime;
 

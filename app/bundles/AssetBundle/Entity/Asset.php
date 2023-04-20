@@ -98,12 +98,12 @@ class Asset extends FormEntity
     private $language = 'en';
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 

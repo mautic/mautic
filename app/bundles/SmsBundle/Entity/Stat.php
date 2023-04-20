@@ -40,7 +40,7 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 

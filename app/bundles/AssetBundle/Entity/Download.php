@@ -17,7 +17,7 @@ class Download
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateDownload;
 
