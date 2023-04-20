@@ -16,7 +16,7 @@ class ConfigBuilderEvent extends Event
      * @var string[]
      */
     private array $formThemes = [
-        'MauticConfigBundle:FormTheme:_config_file_row.html.twig',
+        '@MauticConfig/FormTheme/_config_file_row.html.twig',
     ];
 
     private BundleHelper $bundleHelper;

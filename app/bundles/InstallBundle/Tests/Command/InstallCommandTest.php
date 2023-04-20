@@ -41,6 +41,7 @@ class InstallCommandTest extends TestCase
         $command                = $this->createMock(Command::class);
 
         $inputDefinition->method('getOptions')->willReturn([]);
+        $inputDefinition->method('getArguments')->willReturn([]);
 
         $application->method('getHelperSet')->willReturn($this->createMock(HelperSet::class));
         $application->method('getDefinition')->willReturn($inputDefinition);

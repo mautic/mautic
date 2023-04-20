@@ -190,7 +190,7 @@ trait CustomFieldRepositoryTrait
         }
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
-        $values = $q->execute()->fetch();
+        $values = $q->execute()->fetchAssociative();
 
         return $this->formatFieldValues($values, $byGroup, $object);
     }
@@ -233,7 +233,7 @@ trait CustomFieldRepositoryTrait
                 ->setMaxResults($limit);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -379,7 +379,8 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('published', true, 'boolean')
                 ->setParameter('object', $object)
                 ->addOrderBy('f.field_order', 'asc');
-            $results = $fq->execute()->fetchAll();
+
+            $results = $fq->execute()->fetchAllAssociative();
 
             $fields      = [];
             $fixedFields = [];

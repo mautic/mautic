@@ -9,10 +9,12 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,10 +42,10 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->report               = $this->createMock(Report::class);
-        $this->queryBuilder         = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper    = $this->createMock(ChannelListHelper::class);
-        $this->reportGeneratorEvent = new ReportGeneratorEvent(
+        $this->report                = $this->createMock(Report::class);
+        $this->queryBuilder          = $this->createMock(QueryBuilder::class);
+        $this->channelListHelper     = new ChannelListHelper($this->createMock(EventDispatcher::class), $this->createMock(Translator::class));
+        $this->reportGeneratorEvent  = new ReportGeneratorEvent(
             $this->report,
             [], // Use the setter if you need different options
             $this->queryBuilder,

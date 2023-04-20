@@ -174,7 +174,7 @@ class AssetRepository extends CommonRepository
             ->where('a.id IN (:assetIds)')
             ->setParameter('assetIds', $assets, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         return (int) $result[0]['total_size'];
     }

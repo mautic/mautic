@@ -33,7 +33,7 @@ class Redirect extends FormEntity
     private $uniqueHits = 0;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, Trackable>
      */
     private $trackables;
 
