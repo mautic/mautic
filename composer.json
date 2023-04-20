@@ -127,7 +127,7 @@
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
     "phpstan": "php -d memory_limit=4G bin/phpstan analyse",
     "cs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v --dry-run --diff",
-    "fixcs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php --using-cache=no -v",
+    "fixcs": "bin/php-cs-fixer fix --config=.php-cs-fixer.php -v",
     "rector": "bin/rector process",
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf",
     "generate-assets": "bin/console mautic:assets:generate"
