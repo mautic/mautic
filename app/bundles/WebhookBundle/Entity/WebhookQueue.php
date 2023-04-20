@@ -91,7 +91,7 @@ class WebhookQueue
     }
 
     /**
-     * @return DateTimeInterface|null
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {

@@ -78,7 +78,7 @@ class EventScheduler
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function scheduleForContact(Event $event, \DateTime $executionDate, Lead $contact)
+    public function scheduleForContact(Event $event, \DateTimeInterface $executionDate, Lead $contact)
     {
         $contacts = new ArrayCollection([$contact]);
 
@@ -88,7 +88,7 @@ class EventScheduler
     /**
      * @param bool $isInactiveEvent
      */
-    public function schedule(Event $event, \DateTime $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
+    public function schedule(Event $event, \DateTimeInterface $executionDate, ArrayCollection $contacts, $isInactiveEvent = false)
     {
         $config = $this->collector->getEventConfig($event);
 
@@ -259,7 +259,7 @@ class EventScheduler
 
         uasort(
             $eventExecutionDates,
-            function (\DateTime $a, \DateTime $b) {
+            function (\DateTimeInterface $a, \DateTimeInterface $b) {
                 if ($a === $b) {
                     return 0;
                 }
@@ -271,7 +271,7 @@ class EventScheduler
         return $eventExecutionDates;
     }
 
-    public function getExecutionDateForInactivity(\DateTime $eventExecutionDate, \DateTime $earliestExecutionDate, \DateTimeInterface $now): \DateTime
+    public function getExecutionDateForInactivity(\DateTimeInterface $eventExecutionDate, \DateTimeInterface $earliestExecutionDate, \DateTimeInterface $now): \DateTimeInterface
     {
         if ($eventExecutionDate->getTimestamp() === $earliestExecutionDate->getTimestamp()) {
             // Inactivity is based on the "wait" period so execute now

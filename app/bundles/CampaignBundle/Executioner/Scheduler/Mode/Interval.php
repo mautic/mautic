@@ -54,6 +54,7 @@ class Interval implements ScheduleModeInterface
             $this->logger->debug(
                 'CAMPAIGN: ('.$event->getId().') Adding interval of '.$interval.$unit.' to '.$comparedToDateTime->format(self::LOG_DATE_FORMAT)
             );
+            /** @var \DateTime $comparedToDateTime */
             $comparedToDateTime->add((new DateTimeHelper())->buildInterval($interval, $unit));
         } catch (\Exception $exception) {
             $this->logger->error('CAMPAIGN: Determining interval scheduled failed with "'.$exception->getMessage().'"');
@@ -80,11 +81,11 @@ class Interval implements ScheduleModeInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      *
      * @throws NotSchedulableException
      */
-    public function validateExecutionDateTime(LeadEventLog $log, \DateTime $compareFromDateTime)
+    public function validateExecutionDateTime(LeadEventLog $log, \DateTimeInterface $compareFromDateTime)
     {
         $event         = $log->getEvent();
         $dateTriggered = clone $log->getDateTriggered();
@@ -97,6 +98,7 @@ class Interval implements ScheduleModeInterface
         $unit          = $event->getTriggerIntervalUnit();
 
         if ($interval && $unit) {
+            /** @var \DateTime $dateTriggered */
             $dateTriggered->add((new DateTimeHelper())->buildInterval($interval, $unit));
         }
 
@@ -118,7 +120,7 @@ class Interval implements ScheduleModeInterface
     /**
      * @return GroupExecutionDateDAO[]
      */
-    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTime $executionDate, \DateTime $compareFromDateTime = null)
+    public function groupContactsByDate(Event $event, ArrayCollection $contacts, \DateTimeInterface $executionDate, \DateTimeInterface $compareFromDateTime = null)
     {
         $groupedExecutionDates = [];
         $hour                  = $event->getTriggerHour();
@@ -186,10 +188,10 @@ class Interval implements ScheduleModeInterface
     private function getGroupExecutionDateTime(
         $eventId,
         Lead $contact,
-        \DateTime $compareFromDateTime,
-        \DateTime $hour = null,
-        \DateTime $startTime = null,
-        \DateTime $endTime = null,
+        \DateTimeInterface $compareFromDateTime,
+        \DateTimeInterface $hour = null,
+        \DateTimeInterface $startTime = null,
+        \DateTimeInterface $endTime = null,
         array $daysOfWeek = []
     ) {
         $this->logger->debug(
@@ -233,6 +235,7 @@ class Interval implements ScheduleModeInterface
 
             // Schedule for the next day of the week if applicable
             while (!in_array((int) $groupDateTime->format('w'), $daysOfWeek)) {
+                /** @var \DateTime $groupDateTime */
                 $groupDateTime->modify('+1 day');
             }
         }

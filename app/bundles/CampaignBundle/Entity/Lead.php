@@ -227,7 +227,7 @@ class Lead
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateLastExited()
     {

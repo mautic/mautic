@@ -520,7 +520,7 @@ class ImportModel extends FormModel
      *
      * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';

@@ -134,7 +134,7 @@ class UtmTag
      *
      * @return UtmTag
      */
-    public function setDateAdded(\DateTime $date)
+    public function setDateAdded(\DateTimeInterface $date)
     {
         $this->dateAdded = $date;
 
