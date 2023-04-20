@@ -8,11 +8,8 @@ setup_mautic() {
     printf "Installing Mautic Composer dependencies...\n"
     composer install
 
-    sed -i.back "s/'env'.*=>.*'prod'/'env' => 'dev'/g" app/config/environment.php
-    sed -i.back "s/'debug'.*=>.*false/'debug' => true/g" app/config/environment.php
-
     cp ./.ddev/local.config.php.dist ./app/config/local.php
-    cp ./.env.dist ./.env
+    cp ./.env.dist ./.env.test
 
     printf "Installing Mautic...\n"
     php bin/console mautic:install "${MAUTIC_URL}" \
