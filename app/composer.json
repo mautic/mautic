@@ -22,7 +22,6 @@
     "ext-zip": "*",
     "ext-imap": "*",
     "symfony/console": "~5.4.0",
-    "symfony/debug": "~4.4.0",
     "symfony/form": "~5.4.0",
     "symfony/intl": "~5.4.0",
     "symfony/options-resolver": "~5.4.0",

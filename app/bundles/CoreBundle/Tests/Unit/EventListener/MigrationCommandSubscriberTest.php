@@ -136,7 +136,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['generated_hit_date' => new \StdClass()]);
 
         $this->connection->expects($this->never())
-            ->method('query');
+            ->method('executeQuery');
 
         $this->subscriber->addGeneratedColumns($this->event);
     }
@@ -160,7 +160,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => new \StdClass()]);
 
         $this->connection->expects($this->once())
-            ->method('query');
+            ->method('executeQuery');
 
         $this->subscriber->addGeneratedColumns($this->event);
     }
