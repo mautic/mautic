@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "codemirror": "^5.15.2",
     "history.js": "^1.8.0",
     "jquery": "^3.3.1",
     "jquery-color": "^2.2.0",

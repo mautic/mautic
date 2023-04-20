@@ -19,6 +19,12 @@ class AssetGenerationHelper
         'moment/min/moment.min.js', // Needed for date/time formatting.
         // 'jquery-color/dist/jquery.color.js', // I can't find why is this needed. Added in https://github.com/mautic/mautic/commit/918000351e8c7657b01ef132e22c097942cf0e99. Uncoment this if we find the place. Delete this dependency after some time.
         'jquery.caret/dist/jquery.caret.js', // Needed for the text editor Twitter-like mentions (tokens).
+        'codemirror/lib/codemirror.js', // Needed for the legacy code-mode editor.
+        'codemirror/addon/hint/show-hint.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/xml/xml.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/javascript/javascript.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/htmlmixed/htmlmixed.js', // Needed for the legacy code-mode editor.
+        'codemirror/mode/css/css.js', // Needed for the legacy code-mode editor.
         // TODO: Add the rest of the libraries here.
     ];
 
