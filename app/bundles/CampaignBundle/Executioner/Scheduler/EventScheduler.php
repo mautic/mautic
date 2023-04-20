@@ -182,7 +182,7 @@ class EventScheduler
      *
      * @throws NotSchedulableException
      */
-    public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+    public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
     {
         if (null === $compareFromDateTime) {
             $compareFromDateTime = new \DateTime();
@@ -294,7 +294,7 @@ class EventScheduler
         return $executionDate > $now;
     }
 
-    public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
+    public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTimeInterface $now): bool
     {
         if (null !== $event) {
             if ($this->intervalScheduler->isContactSpecificExecutionDateRequired($event)) {

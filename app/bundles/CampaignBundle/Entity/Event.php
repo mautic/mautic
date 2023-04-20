@@ -787,7 +787,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getTriggerHour()
     {
@@ -984,7 +984,7 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedStartHour.
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getTriggerRestrictedStartHour()
     {
@@ -1016,7 +1016,7 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedStopHour.
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getTriggerRestrictedStopHour()
     {

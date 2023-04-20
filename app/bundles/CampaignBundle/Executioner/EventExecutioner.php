@@ -319,7 +319,7 @@ class EventExecutioner
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDate()
     {

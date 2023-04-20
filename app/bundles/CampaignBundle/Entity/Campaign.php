@@ -418,7 +418,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -428,7 +428,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Campaign
      */

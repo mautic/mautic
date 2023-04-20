@@ -217,7 +217,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateTriggered()
     {
@@ -227,7 +227,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setDateTriggered(\DateTime $dateTriggered = null)
+    public function setDateTriggered(\DateTimeInterface $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
@@ -332,7 +332,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getTriggerDate()
     {

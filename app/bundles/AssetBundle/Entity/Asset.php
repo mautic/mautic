@@ -514,7 +514,7 @@ class Asset extends FormEntity
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -524,7 +524,7 @@ class Asset extends FormEntity
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Asset
      */

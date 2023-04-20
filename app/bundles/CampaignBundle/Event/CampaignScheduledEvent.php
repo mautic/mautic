@@ -107,7 +107,7 @@ class CampaignScheduledEvent extends Event
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateScheduled()
     {

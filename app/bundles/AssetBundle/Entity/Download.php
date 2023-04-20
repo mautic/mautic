@@ -141,7 +141,7 @@ class Download
     /**
      * Get dateDownload.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateDownload()
     {
