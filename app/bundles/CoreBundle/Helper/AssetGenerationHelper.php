@@ -16,6 +16,7 @@ class AssetGenerationHelper
         'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         'jquery-ui-touch-punch/jquery.ui.touch-punch.js', // Needed for touch devices.
+        'moment/min/moment.min.js', // Needed for date/time formatting.
         // TODO: Add the rest of the libraries here.
     ];
 
