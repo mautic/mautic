@@ -130,7 +130,7 @@ class EventScheduler
     /**
      * @param ArrayCollection|LeadEventLog[] $logs
      */
-    public function rescheduleLogs(ArrayCollection $logs, \DateTime $toBeExecutedOn)
+    public function rescheduleLogs(ArrayCollection $logs, \DateTimeInterface $toBeExecutedOn)
     {
         foreach ($logs as $log) {
             $log->setTriggerDate($toBeExecutedOn);

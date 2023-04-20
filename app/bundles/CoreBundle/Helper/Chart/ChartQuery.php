@@ -153,6 +153,7 @@ class ChartQuery extends AbstractChart
             } else {
                 // Apply the start date/time if set
                 if ($this->dateFrom) {
+                    /** @var \DateTime $dateFrom */
                     $dateFrom = clone $this->dateFrom;
                     if ($this->isTimeUnit) {
                         $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
@@ -163,6 +164,7 @@ class ChartQuery extends AbstractChart
 
                 // Apply the end date/time if set
                 if ($this->dateTo) {
+                    /** @var \DateTime $dateTo */
                     $dateTo = clone $this->dateTo;
                     if ($this->isTimeUnit) {
                         $dateTo->setTimeZone(new \DateTimeZone('UTC'));

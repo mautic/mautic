@@ -131,9 +131,9 @@ abstract class AbstractChart
     public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
     {
         $this->timezone = $dateFrom->getTimezone();
-        /* @var \DateTime $dateFrom */
+        /** @var \DateTime $dateFrom */
         $this->dateFrom = clone $dateFrom;
-        /* @var \DateTime $dateTo */
+        /** @var \DateTime $dateTo */
         $this->dateTo   = clone $dateTo;
 
         // a diff of two identical dates returns 0, but we expect 24 hours
