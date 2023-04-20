@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 #[ORM\Table(name: 'monitoring_leads')]
-#[ORM\Entity]
 #[ORM\Entity(repositoryClass: LeadRepository::class)]
 class Lead
 {
