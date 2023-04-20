@@ -14,6 +14,7 @@ class AssetGenerationHelper
         'history.js/scripts/bundled-uncompressed/html4+html5/jquery.history.js', // Needed for ajaxyfying the UI.
         'js-cookie/src/js.cookie.js', // Needed for cookies.
         'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
+        'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
         // TODO: Add the rest of the libraries here.
     ];
 
