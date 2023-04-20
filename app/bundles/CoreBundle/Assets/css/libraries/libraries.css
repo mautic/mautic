@@ -5027,9 +5027,6 @@ a.badge:focus {
 .nav-pills > li > a > .badge {
   margin-left: 3px;
 }
-.label-as-badge {
-  border-radius: 9px !important;
-}
 .jumbotron {
   padding-top: 30px;
   padding-bottom: 30px;
@@ -5306,16 +5303,6 @@ a.thumbnail.active {
 .media-list {
   padding-left: 0;
   list-style: none;
-}
-.media-list .media-body {
-  width: auto;
-}
-.media-list .media-object {
-  padding-right: 0;
-  margin-right: 10px;
-}
-form[name="lead"] .media-body {
-  width: 100%;
 }
 .list-group {
   margin-bottom: 20px;

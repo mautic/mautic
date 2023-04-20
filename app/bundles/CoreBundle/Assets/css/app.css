@@ -4526,6 +4526,19 @@ a.inline-token .text-muted {
     width: 1140px;
   }
 }
+.label-as-badge {
+  border-radius: 9px !important;
+}
+.media-list .media-body {
+  width: auto;
+}
+.media-list .media-object {
+  padding-right: 0;
+  margin-right: 10px;
+}
+form[name="lead"] .media-body {
+  width: 100%;
+}
 .bg-auto .tabs-left > li.active > a,
 .bg-auto .tabs-left > li.active > a:hover,
 .bg-auto .tabs-left > li.active > a:focus {
