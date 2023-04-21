@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Loader\ParameterLoader;
 
 class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -61,5 +62,14 @@ class DateTimeHelperTest extends \PHPUnit\Framework\TestCase
         DateTimeHelper::validateMysqlDateTimeUnit('Y');
 
         $this->assertTrue(true, 'Just to avoid the risky test warning...');
+    }
+
+    public function testGetLocalTimezoneOffset(): void
+    {
+        $timezone = (new ParameterLoader())->getParameterBag()->get('default_timezone');
+        $helper   = new DateTimeHelper('now', DateTimeHelper::FORMAT_DB, $timezone);
+        $date     = new \DateTime();
+        $date->setTimezone(new \DateTimeZone($timezone));
+        $this->assertEquals($date->format('P'), $helper->getLocalTimezoneOffset());
     }
 }

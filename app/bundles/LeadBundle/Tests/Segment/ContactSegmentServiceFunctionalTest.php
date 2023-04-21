@@ -149,7 +149,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         // Remove the title from all contacts, rebuild the list, and check that list is updated
-        $this->em->getConnection()->query(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
+        $this->em->getConnection()->executeQuery(sprintf('UPDATE %sleads SET title = NULL;', MAUTIC_TABLE_PREFIX));
 
         $this->runCommand(
             'mautic:segments:update',
@@ -196,7 +196,7 @@ class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
         );
 
         // Change the url from page_hits with the right tracking_id, rebuild the list, and check that list is updated
-        $this->em->getConnection()->query(sprintf(
+        $this->em->getConnection()->executeQuery(sprintf(
             "UPDATE %spage_hits SET url = '%s' WHERE tracking_id = '%s';",
             MAUTIC_TABLE_PREFIX,
             'https://test/regex-segment-other.com',

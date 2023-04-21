@@ -26,13 +26,12 @@ bin/phpunit
 bin/security-checker
 bin/simple-phpunit
 build/*
-codeception.yml
 index_dev.php
 modified_files.txt
 node_modules/*
 package-lock.json
 package.json
-phpstan.neon
+phpstan*.neon
 rector.php
 tests/*
 vendor/babdev/*

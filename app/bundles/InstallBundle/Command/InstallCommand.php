@@ -7,7 +7,6 @@ namespace Mautic\InstallBundle\Command;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
-use Mautic\InstallBundle\Configurator\Step\EmailStep;
 use Mautic\InstallBundle\Install\InstallService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -160,90 +159,6 @@ class InstallCommand extends Command
                 InputOption::VALUE_REQUIRED,
                 'Admin user.',
                 null
-            )
-            ->addOption(
-                '--mailer_from_name',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'From name for email sent from Mautic.',
-                null
-            )
-            ->addOption(
-                '--mailer_from_email',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'From email sent from Mautic.',
-                null
-            )
-            ->addOption(
-                '--mailer_transport',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Mail transport.',
-                null
-            )
-            ->addOption(
-                '--mailer_host',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SMTP host.',
-                null
-            )
-            ->addOption(
-                '--mailer_port',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SMTP port.',
-                null
-            )
-            ->addOption(
-                '--mailer_user',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'SMTP username.',
-                null
-            )
-            ->addOption(
-                '--mailer_password',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'SMTP password.',
-                null
-            )
-            ->addOption(
-                '--mailer_encryption',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'SMTP encryption (null|tls|ssl).',
-                null
-            )
-            ->addOption(
-                '--mailer_auth_mode',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'SMTP auth mode (null|plain|login|cram-md5).',
-                null
-            )
-            ->addOption(
-                '--mailer_spool_type',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Spool mode (file|memory).',
-                null
-            )
-            ->addOption(
-                '--mailer_spool_path',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Spool path.',
-                null
-            )
-            ->addOption(
-                '--messenger_type',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Queue Enabled.',
-                null
             );
 
         parent::configure();
@@ -315,8 +230,6 @@ class InstallCommand extends Command
                     $allParams[$opt]           = $value;
                 } elseif (0 === strpos($opt, 'admin_')) {
                     $adminParam[substr($opt, 6)] = $value;
-                } elseif (0 === strpos($opt, 'mailer_')) {
-                    $allParams[$opt] = $value;
                 }
             }
         }
@@ -326,20 +239,6 @@ class InstallCommand extends Command
         } else {
             $siteUrl               = $input->getArgument('site_url');
             $allParams['site_url'] = $siteUrl;
-        }
-
-        if (empty($allParams['mailer_from_name'])
-            && isset($adminParam['firstname'])
-            && isset($adminParam['lastname'])) {
-            $allParams['mailer_from_name'] = $adminParam['firstname'].' '.$adminParam['lastname'];
-        }
-
-        if (empty($allParams['mailer_from_email']) && isset($adminParam['email'])) {
-            $allParams['mailer_from_email'] = $adminParam['email'];
-        }
-
-        if (empty($allParams['messenger_type'])) {
-            $allParams['messenger_type'] = 'sync';
         }
 
         $step = (float) $input->getArgument('step');
@@ -429,21 +328,6 @@ class InstallCommand extends Command
                 $messages = $this->stepAction($this->installer, $adminParam, $step);
                 if (!empty($messages)) {
                     $output->writeln('Errors in admin user configuration/installation:');
-                    $this->handleInstallerErrors($output, $messages);
-
-                    $output->writeln('Install canceled');
-
-                    return (int) -$step;
-                }
-                // Keep on with next step
-                $step = InstallService::EMAIL_STEP;
-
-                // no break
-            case InstallService::EMAIL_STEP:
-                $output->writeln($step.' - Email configuration...');
-                $messages = $this->stepAction($this->installer, $allParams, $step);
-                if (!empty($messages)) {
-                    $output->writeln('Errors in email configuration:');
                     $this->handleInstallerErrors($output, $messages);
 
                     $output->writeln('Install canceled');
@@ -543,20 +427,6 @@ class InstallCommand extends Command
             case InstallService::USER_STEP:
                 // Create admin user
                 $messages = $installer->createAdminUserStep($params);
-                break;
-
-            case InstallService::EMAIL_STEP:
-                // Save email configuration
-                $step = $installer->getStep($index);
-                if ($step instanceof EmailStep) {
-                    // Set all step fields based on parameters
-                    foreach ($step as $key => $value) {
-                        if (isset($params[$key])) {
-                            $step->$key = $params[$key];
-                        }
-                    }
-                }
-                $messages = $installer->setupEmailStep($step, $params);
                 break;
 
             case InstallService::FINAL_STEP:

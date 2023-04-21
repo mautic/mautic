@@ -144,20 +144,6 @@ return [
                 ],
             ],
         ],
-        'controllers' => [
-            'mautic.sms.controller.reply' => [
-                'class'     => \Mautic\SmsBundle\Controller\ReplyController::class,
-                'arguments' => [
-                    'mautic.sms.callback_handler_container',
-                    'mautic.sms.helper.reply',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-        ],
     ],
     'routes' => [
         'main' => [

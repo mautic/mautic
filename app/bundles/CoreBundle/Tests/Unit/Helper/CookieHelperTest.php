@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Helper;
 
+use AppKernel;
 use Mautic\CoreBundle\Helper\CookieHelper;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class CookieHelperTest extends TestCase
 {
@@ -56,10 +58,10 @@ class CookieHelperTest extends TestCase
 
         $response          = $this->createMock(Response::class);
         $response->headers = $headers;
-        $event             = $this->createMock(ResponseEvent::class);
-        $event->expects(self::once())
-            ->method('getResponse')
-            ->willReturn($response);
+        $kernel            = new AppKernel(MAUTIC_ENV, false);
+        $request           = $this->createMock(Request::class);
+
+        $event   = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cookieHelper->onResponse($event);
     }
@@ -92,10 +94,10 @@ class CookieHelperTest extends TestCase
 
         $response          = $this->createMock(Response::class);
         $response->headers = $headers;
-        $event             = $this->createMock(ResponseEvent::class);
-        $event->expects(self::once())
-            ->method('getResponse')
-            ->willReturn($response);
+        $kernel            = new AppKernel(MAUTIC_ENV, false);
+        $request           = $this->createMock(Request::class);
+
+        $event             = new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $cookieHelper->onResponse($event);
     }

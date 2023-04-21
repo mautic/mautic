@@ -951,7 +951,8 @@
       "profile": "http://rembo.me",
       "contributions": [
         "userTesting",
-        "code"
+        "code",
+        "review"
       ]
     },
     {
@@ -997,6 +998,15 @@
       "profile": "https://www.linkedin.com/in/pedro-de-jesus-a60527167",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "JeanMarcAivie",
+      "name": "Jean-Marc ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/127292186?v=4",
+      "profile": "https://github.com/JeanMarcAivie",
+      "contributions": [
+        "userTesting"
       ]
     }
   ],

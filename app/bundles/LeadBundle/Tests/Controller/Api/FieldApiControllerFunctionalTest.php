@@ -40,7 +40,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
             ],
         ];
 
-        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $payload);
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request(Request::METHOD_POST, '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $fieldResponse  = json_decode($clientResponse->getContent(), true);
 
@@ -115,7 +116,9 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
     private function assertCreateResponse(array $payload, int $expectedStatusCode): int
     {
         // Test creating a new field
-        $this->client->request('POST', '/api/fields/contact/new', $payload);
+
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request('POST', '/api/fields/contact/new', $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
@@ -155,7 +158,8 @@ final class FieldApiControllerFunctionalTest extends MauticMysqlTestCase
 
     private function assertPatchResponse(array $payload, int $id, string $alias): void
     {
-        $this->client->request('PATCH', sprintf('/api/fields/contact/%s/edit', $id), $payload);
+        $typeSafePayload = $this->generateTypeSafePayload($payload);
+        $this->client->request('PATCH', sprintf('/api/fields/contact/%s/edit', $id), $typeSafePayload);
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
         $response = json_decode($clientResponse->getContent(), true);

@@ -113,6 +113,6 @@ class TimelineEventLogCampaignSubscriber implements EventSubscriberInterface
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
     }
 }
