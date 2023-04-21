@@ -50,6 +50,6 @@ class StatDeviceRepository extends CommonRepository
             );
         }
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

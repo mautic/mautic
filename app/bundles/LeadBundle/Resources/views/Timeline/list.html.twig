@@ -1,0 +1,10 @@
+{#
+#}
+{{- include('@MauticLead/Timeline/_list_filter_form.html.twig') -}}
+<script>
+    mauticLang['showMore'] = '{{ 'mautic.core.more.show'|trans }}';
+    mauticLang['hideMore'] = '{{ 'mautic.core.more.hide'|trans }}';
+</script>
+<div id="timeline-table">
+  {{- include('@MauticLead/Timeline/_list.html.twig') -}}
+</div>

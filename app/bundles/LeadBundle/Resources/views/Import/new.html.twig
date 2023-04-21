@@ -1,0 +1,40 @@
+{#
+  Variables
+    - form
+    - objectName
+    - step
+    - currentRoute
+    - contentOnly
+    - modalView
+    - template
+#}
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}leadImport{% endblock %}
+
+{% block headerTitle %}
+  {{ 'mautic.lead.import.leads'|trans({'%object%': objectName|trans}) }}
+{% endblock %}
+
+{% block actions %}
+  {% if step is defined and constant('Mautic\\LeadBundle\\Controller\\ImportController::STEP_UPLOAD_CSV') == step %}
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
+            'routeBase': 'import',
+            'langVar': 'lead.import',
+            'templateButtons': {'close': true},
+            'routeVars': {
+                'close': {
+                    'object': app.request.get('object', 'contacts'),
+                },
+            },
+    }) -}}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if step is defined and constant('Mautic\\LeadBundle\\Controller\\ImportController::STEP_UPLOAD_CSV') == step %}
+    {{ include('@MauticLead/Import/_upload_form.html.twig') }}
+  {% else %}
+    {{ include('@MauticLead/Import/_mapping_form.html.twig') }}
+  {% endif %}
+{% endblock %}
