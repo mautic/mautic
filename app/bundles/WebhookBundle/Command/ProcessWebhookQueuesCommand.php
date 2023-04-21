@@ -39,7 +39,7 @@ class ProcessWebhookQueuesCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // check to make sure we are in queue mode
         if ($this->coreParametersHelper->get('queue_mode') != $this->webhookModel::COMMAND_PROCESS) {
@@ -73,7 +73,7 @@ class ProcessWebhookQueuesCommand extends Command
         if (!count($webhooks)) {
             $output->writeln('<error>No published webhooks found. Try again later.</error>');
 
-            return 0;
+            return 1;
         }
 
         $output->writeLn('<info>Processing Webhooks</info>');

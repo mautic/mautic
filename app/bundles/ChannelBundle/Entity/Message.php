@@ -11,47 +11,49 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Mapping\ClassMetadata as ValidationClassMetadata;
 
-/**
- * Class Message.
- */
 class Message extends FormEntity
 {
     /**
-     * @var int
+     * @var ?int
      */
     private $id;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $name;
 
     /**
-     * @var string
+     * @var ?string
      */
     private $description;
 
     /**
-     * @var \DateTime
+     * @var ?\DateTime
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var ?\DateTime
      */
     private $publishDown;
 
     /**
-     * @var Category
+     * @var ?Category
      */
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int,Channel>
      */
     private $channels;
 
-    public static function loadMetadata(ClassMetadata $metadata)
+    public function __clone()
+    {
+        $this->id = null;
+    }
+
+    public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
 
@@ -63,29 +65,25 @@ class Message extends FormEntity
             ->addIdColumns()
             ->addPublishDates()
             ->addCategory();
+
         $builder->createOneToMany('channels', Channel::class)
-                ->setIndexBy('channel')
-                ->orphanRemoval()
-                ->mappedBy('message')
-                ->cascadeMerge()
-                ->cascadePersist()
-                ->cascadeDetach()
-                ->build();
+            ->setIndexBy('channel')
+            ->orphanRemoval()
+            ->mappedBy('message')
+            ->cascadeMerge()
+            ->cascadePersist()
+            ->cascadeDetach()
+            ->build();
     }
 
-    public static function loadValidatorMetadata(ValidationClassMetadata $metadata)
+    public static function loadValidatorMetadata(ValidationClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new NotBlank([
             'message' => 'mautic.core.name.required',
         ]));
     }
 
-    /**
-     * Prepares the metadata for API usage.
-     *
-     * @param $metadata
-     */
-    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    public static function loadApiMetadata(ApiMetadataDriver $metadata): void
     {
         $metadata->setGroupPrefix('message')
             ->addListProperties(
@@ -106,16 +104,13 @@ class Message extends FormEntity
             ->build();
     }
 
-    /**
-     * Message constructor.
-     */
     public function __construct()
     {
         $this->channels = new ArrayCollection();
     }
 
     /**
-     * @return int
+     * @return ?int
      */
     public function getId()
     {
@@ -123,7 +118,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getName()
     {
@@ -131,7 +126,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @param string $name
+     * @param ?string $name
      *
      * @return Message
      */
@@ -144,7 +139,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return string
+     * @return ?string
      */
     public function getDescription()
     {
@@ -152,7 +147,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @param string $description
+     * @param ?string $description
      *
      * @return Message
      */
@@ -165,7 +160,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return ?\DateTime
      */
     public function getPublishUp()
     {
@@ -173,7 +168,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @param \DateTime $publishUp
+     * @param ?\DateTime $publishUp
      *
      * @return Message
      */
@@ -186,7 +181,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return ?\DateTime
      */
     public function getPublishDown()
     {
@@ -194,7 +189,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @param \DateTime $publishDown
+     * @param ?\DateTime $publishDown
      *
      * @return Message
      */
@@ -207,7 +202,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return Category
+     * @return ?Category
      */
     public function getCategory()
     {
@@ -215,7 +210,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @param Category $category
+     * @param ?Category $category
      *
      * @return Message
      */
@@ -228,7 +223,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @return Channel[]
+     * @return ArrayCollection<int,Channel>
      */
     public function getChannels()
     {
@@ -236,7 +231,7 @@ class Message extends FormEntity
     }
 
     /**
-     * @param ArrayCollection $channels
+     * @param ArrayCollection<int,Channel> $channels
      *
      * @return Message
      */
@@ -248,6 +243,9 @@ class Message extends FormEntity
         return $this;
     }
 
+    /**
+     * @return void
+     */
     public function addChannel(Channel $channel)
     {
         if (!$this->channels->contains($channel)) {
@@ -258,6 +256,9 @@ class Message extends FormEntity
         }
     }
 
+    /**
+     * @return void
+     */
     public function removeChannel(Channel $channel)
     {
         if ($channel->getId()) {

@@ -84,7 +84,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
         $content = ob_get_contents();
         ob_end_clean();
 
-        $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(Response::HTTP_OK, $response->getStatusCode(), $content);
         $this->assertNotEquals($this->expectedPngContent, $content);
         PageControllerTest::assertTrue($response->isOk());
 

@@ -160,7 +160,7 @@ Mautic.addReportRow = function (elId) {
         Mautic.updateReportGlueTriggers();
     } else if (typeof Mautic.reportPrototypeColumnOptions != 'undefined') {
         // Update the column options if applicable
-        mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions);
+        mQuery(newColumnId).html(Mautic.reportPrototypeColumnOptions.clone());
     }
 
     Mautic.activateChosenSelect(mQuery('#' + elId + '_' + index + '_column'));

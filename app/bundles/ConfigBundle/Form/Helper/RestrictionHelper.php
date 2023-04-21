@@ -8,28 +8,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RestrictionHelper
 {
-    const MODE_REMOVE = 'remove';
-    const MODE_MASK   = 'mask';
+    public const MODE_REMOVE = 'remove';
+    public const MODE_MASK   = 'mask';
+
+    private TranslatorInterface $translator;
 
     /**
-     * @var TranslatorInterface
+     * @var string[]
      */
-    private $translator;
+    private array $restrictedFields;
 
-    /**
-     * @var array
-     */
-    private $restrictedFields;
+    private string $displayMode;
 
-    /**
-     * @var string
-     */
-    private $displayMode;
-
-    /**
-     * RestrictionHelper constructor.
-     */
-    public function __construct(TranslatorInterface $translator, array $restrictedFields, $mode)
+    public function __construct(TranslatorInterface $translator, array $restrictedFields, string $mode)
     {
         $this->translator       = $translator;
         $this->restrictedFields = FieldHelper::prepareRestrictions($restrictedFields);

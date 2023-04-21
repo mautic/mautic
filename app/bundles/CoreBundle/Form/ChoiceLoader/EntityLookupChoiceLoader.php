@@ -30,7 +30,7 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $options;
 
     /**
-     * @var ModelFactory
+     * @var ModelFactory<object>
      */
     protected $modelFactory;
 
@@ -45,7 +45,8 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
     protected $connection;
 
     /**
-     * @param array $options
+     * @param ModelFactory<object> $modelFactory
+     * @param array                $options
      */
     public function __construct(ModelFactory $modelFactory, TranslatorInterface $translator, Connection $connection, $options = [])
     {

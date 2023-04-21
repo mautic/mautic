@@ -40,7 +40,7 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->ipService instanceof AbstractLocalDataLookup) {
             if ($this->ipService->downloadRemoteDataStore()) {

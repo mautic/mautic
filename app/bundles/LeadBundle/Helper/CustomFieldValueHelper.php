@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Helper;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\Serializer;
 
 /**
@@ -10,11 +9,11 @@ use Mautic\CoreBundle\Helper\Serializer;
  */
 class CustomFieldValueHelper
 {
-    const TYPE_BOOLEAN     = 'boolean';
+    public const TYPE_BOOLEAN     = 'boolean';
 
-    const TYPE_SELECT      = 'select';
+    public const TYPE_SELECT      = 'select';
 
-    const TYPE_MULTISELECT = 'multiselect';
+    public const TYPE_MULTISELECT = 'multiselect';
 
     /**
      * @return array
@@ -45,9 +44,46 @@ class CustomFieldValueHelper
      */
     private static function normalizeValue(array $field)
     {
-        $value      = ArrayHelper::getValue('value', $field, '');
-        $type       = ArrayHelper::getValue('type', $field);
-        $properties = ArrayHelper::getValue('properties', $field);
+        $value      = $field['value'] ?? '';
+        $type       = $field['type'] ?? null;
+        $properties = $field['properties'] ?? null;
+
+        return self::normalize($value, $type, $properties);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    public static function setValueFromPropertiesList(array $properties, $value)
+    {
+        if (isset($properties['list']) && is_array($properties['list'])) {
+            $list = $properties['list'];
+            if (!is_array($list)) {
+                return $value;
+            }
+            foreach ($list as $property) {
+                if (isset($property[$value])) {
+                    return $property[$value];
+                } elseif (isset($property['value']) && $property['value'] == $value) {
+                    return $property['label'];
+                }
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param mixed                          $value
+     * @param string|null                    $type
+     * @param string|array<int, string>|null $properties
+     *
+     * @return mixed|string
+     */
+    public static function normalize($value, $type, $properties)
+    {
         if ('' !== $value && $type && $properties) {
             if (!is_array($properties)) {
                 $properties = Serializer::decode($properties);
@@ -75,30 +111,6 @@ class CustomFieldValueHelper
                     }
                     $value = implode('|', $values);
                     break;
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * @param string $value
-     *
-     * @return string
-     */
-    public static function setValueFromPropertiesList(array $properties, $value)
-    {
-        if (isset($properties['list']) && is_array($properties['list'])) {
-            $list = $properties['list'];
-            if (!is_array($list)) {
-                return $value;
-            }
-            foreach ($list as $property) {
-                if (isset($property[$value])) {
-                    return $property[$value];
-                } elseif (isset($property['value']) && $property['value'] == $value) {
-                    return $property['label'];
-                }
             }
         }
 

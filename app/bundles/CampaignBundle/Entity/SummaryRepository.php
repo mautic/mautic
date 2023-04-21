@@ -11,6 +11,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 use PDO;
 
+/**
+ * @extends CommonRepository<Summary>
+ */
 class SummaryRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -50,7 +53,7 @@ class SummaryRepository extends CommonRepository
                 ->setParameter('dateTo', $dateTo->getTimestamp(), PDO::PARAM_INT);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
         // Group by event id
@@ -76,7 +79,7 @@ class SummaryRepository extends CommonRepository
             ->orderBy('cs.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new DateTime($results[0]['date_triggered']) : null;
     }
@@ -137,7 +140,7 @@ class SummaryRepository extends CommonRepository
             ' triggered_count = s.triggered_count_i, '.
             ' log_counts_processed = s.log_counts_processed_i;';
 
-            $this->getEntityManager()->getConnection()->query($sql);
+            $this->getEntityManager()->getConnection()->executeQuery($sql);
         }
     }
 }

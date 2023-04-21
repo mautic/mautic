@@ -9,6 +9,7 @@ use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Configurator\Step\StepInterface;
+use Mautic\CoreBundle\Doctrine\Loader\FixturesLoaderInterface;
 use Mautic\CoreBundle\Helper\CacheHelper;
 use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -20,8 +21,6 @@ use Mautic\InstallBundle\Exception\DatabaseVersionTooOldException;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
-use Psr\Container\ContainerInterface;
-use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -33,21 +32,31 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class InstallService
 {
-    const CHECK_STEP    = 0;
-    const DOCTRINE_STEP = 1;
-    const USER_STEP     = 2;
-    const EMAIL_STEP    = 3;
-    const FINAL_STEP    = 4;
+    public const CHECK_STEP = 0;
+
+    public const DOCTRINE_STEP = 1;
+
+    public const USER_STEP = 2;
+
+    public const FINAL_STEP = 3;
 
     private Configurator $configurator;
+
     private CacheHelper $cacheHelper;
+
     protected PathsHelper $pathsHelper;
+
     private EntityManager $entityManager;
+
     private TranslatorInterface $translator;
+
     private KernelInterface $kernel;
+
     private ValidatorInterface $validator;
+
     private UserPasswordEncoder $encoder;
-    private ContainerInterface $container;
+
+    private FixturesLoaderInterface $fixturesLoader;
 
     public function __construct(
         Configurator $configurator,
@@ -58,17 +67,17 @@ class InstallService
         KernelInterface $kernel,
         ValidatorInterface $validator,
         UserPasswordEncoder $encoder,
-        ContainerInterface $container
+        FixturesLoaderInterface $fixturesLoader
     ) {
-        $this->configurator  = $configurator;
-        $this->cacheHelper   = $cacheHelper;
-        $this->pathsHelper   = $pathsHelper;
-        $this->entityManager = $entityManager;
-        $this->translator    = $translator;
-        $this->kernel        = $kernel;
-        $this->validator     = $validator;
-        $this->encoder       = $encoder;
-        $this->container     = $container;
+        $this->configurator   = $configurator;
+        $this->cacheHelper    = $cacheHelper;
+        $this->pathsHelper    = $pathsHelper;
+        $this->entityManager  = $entityManager;
+        $this->translator     = $translator;
+        $this->kernel         = $kernel;
+        $this->validator      = $validator;
+        $this->encoder        = $encoder;
+        $this->fixturesLoader = $fixturesLoader;
     }
 
     /**
@@ -94,7 +103,7 @@ class InstallService
         if ((empty($params)
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
-            return $this->configurator->getStep(self::DOCTRINE_STEP);
+            return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
         }
 
         return $this->configurator->getStep($index)[0];
@@ -143,10 +152,10 @@ class InstallService
         /** @var \Mautic\CoreBundle\Configurator\Configurator $configurator */
         $params = $this->configurator->getParameters();
 
-        // if db_driver and mailer_from_name are present then it is assumed all the steps of the installation have been
+        // if db_driver and site_url are present then it is assumed all the steps of the installation have been
         // performed; manually deleting these values or deleting the config file will be required to re-enter
         // installation.
-        if (empty($params['db_driver']) || empty($params['mailer_from_name'])) {
+        if (empty($params['db_driver']) || empty($params['site_url'])) {
             return false;
         }
 
@@ -317,7 +326,7 @@ class InstallService
      */
     public function createSchemaStep(array $dbParams): array
     {
-        $schemaHelper  = new SchemaHelper($dbParams);
+        $schemaHelper = new SchemaHelper($dbParams);
         $schemaHelper->setEntityManager($this->entityManager);
 
         $messages = [];
@@ -326,13 +335,15 @@ class InstallService
                 $messages['error'] = $this->translator->trans(
                     'mautic.installer.error.no.metadata',
                     [],
-                    'flashes');
+                    'flashes'
+                );
             }
         } catch (\Exception $exception) {
             $messages['error'] = $this->translator->trans(
                 'mautic.installer.error.installing.data',
                 ['%exception%' => $exception->getMessage()],
-                'flashes');
+                'flashes'
+            );
         }
 
         return $messages;
@@ -365,20 +376,10 @@ class InstallService
      */
     public function installDatabaseFixtures(): void
     {
-        $paths  = [dirname(__DIR__).'/InstallFixtures/ORM'];
-        /** @phpstan-ignore-next-line */
-        $loader = new ContainerAwareLoader($this->container);
-
-        foreach ($paths as $path) {
-            if (is_dir($path)) {
-                $loader->loadFromDirectory($path);
-            }
-        }
-
-        $fixtures = $loader->getFixtures();
+        $fixtures = $this->fixturesLoader->getFixtures(['group_install']);
 
         if (!$fixtures) {
-            throw new \InvalidArgumentException(sprintf('Could not find any fixtures to load in: %s', "\n\n- ".implode("\n- ", $paths)));
+            throw new \InvalidArgumentException('Could not find any fixtures to load with the "group_install" group.');
         }
 
         $purger = new ORMPurger($this->entityManager);
@@ -437,7 +438,7 @@ class InstallService
             return $messages;
         }
 
-        $validations  = [];
+        $validations = [];
 
         $emailConstraint          = new Assert\Email();
         $emailConstraint->message = $this->translator->trans('mautic.core.email.required', [], 'validators');
@@ -494,53 +495,6 @@ class InstallService
         }
 
         return $messages;
-    }
-
-    /**
-     * Setup the email configuration.
-     */
-    public function setupEmailStep(StepInterface $step, array $data): array
-    {
-        $required = [
-            'mailer_from_name',
-            'mailer_from_email',
-        ];
-
-        $messages = [];
-        foreach ($required as $r) {
-            if (!isset($data[$r]) || empty($data[$r])) {
-                $messages[$r] = $this->translator->trans(
-                    'mautic.core.value.required',
-                    [],
-                    'validators'
-                );
-            }
-        }
-
-        if (!empty($messages)) {
-            return $messages;
-        }
-
-        $emailConstraint          = new Assert\Email();
-        $emailConstraint->message = $this->translator->trans('mautic.core.email.required',
-            [],
-            'validators'
-        );
-
-        $errors = $this->validator->validate(
-            $data['mailer_from_email'],
-            $emailConstraint
-        );
-
-        if (0 !== count($errors)) {
-            foreach ($errors as $error) {
-                $messages[] = $error->getMessage();
-            }
-
-            return $messages;
-        }
-
-        return $this->saveConfiguration($data, $step, true);
     }
 
     /**

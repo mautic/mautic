@@ -4,7 +4,7 @@ namespace MauticPlugin\MauticCrmBundle\Integration\Salesforce\Object;
 
 class Contact
 {
-    const OBJECT = 'Contact';
+    public const OBJECT = 'Contact';
 
     private $id;
     private $campaignId;

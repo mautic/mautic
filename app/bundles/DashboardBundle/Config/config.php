@@ -40,15 +40,6 @@ return [
         ],
     ],
     'services' => [
-        'forms' => [
-            'mautic.dashboard.form.type.widget' => [
-                'class'     => 'Mautic\DashboardBundle\Form\Type\WidgetType',
-                'arguments' => [
-                    'event_dispatcher',
-                    'mautic.security',
-                ],
-            ],
-        ],
         'models' => [
             'mautic.dashboard.model.dashboard' => [
                 'class'     => 'Mautic\DashboardBundle\Model\DashboardModel',
@@ -71,7 +62,7 @@ return [
         ],
     ],
     'parameters' => [
-        'dashboard_import_dir'      => '%kernel.root_dir%/../media/dashboards',
+        'dashboard_import_dir'      => '%kernel.project_dir%/media/dashboards',
         'dashboard_import_user_dir' => null,
     ],
 ];

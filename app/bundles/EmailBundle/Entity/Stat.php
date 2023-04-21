@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /** @var int Limit number of stored 'openDetails' */
-    const MAX_OPEN_DETAILS = 1000;
+    public const MAX_OPEN_DETAILS = 1000;
 
     /**
      * @var int|null

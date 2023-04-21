@@ -35,7 +35,7 @@ class MauticSocialMonitoringCommand extends Command
             ->addOption('query-count', null, InputOption::VALUE_OPTIONAL, 'The number of records to search for per iteration. Default is 100.', 100);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // get the mid from the cli
         $batchSize = $input->getOption('batch-size');
@@ -48,7 +48,7 @@ class MauticSocialMonitoringCommand extends Command
         if (!$monitorList->count()) {
             $output->writeln('No published monitors found. Make sure the id you supplied is published');
 
-            return;
+            return 0;
         }
 
         // max iterations

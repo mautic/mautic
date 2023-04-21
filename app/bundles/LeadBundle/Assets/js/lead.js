@@ -453,7 +453,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 var fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
-        } 
+        }
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -521,7 +521,7 @@ Mautic.reorderSegmentFilters = function() {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
-    
+
     // Extract the filter number
     var regExp = /_filters_(\d+)_operator/;
     var matches = regExp.exec(operatorSelect.attr('id'));
@@ -1140,10 +1140,10 @@ Mautic.reloadLeadImportProgress = function() {
     }
 };
 
-Mautic.removeBounceStatus = function (el, dncId) {
+Mautic.removeBounceStatus = function (el, dncId, channel) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
-    Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+    Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });

@@ -30,7 +30,7 @@ class SecurityController extends CommonController
             } else {
                 $msg = $error->getMessage();
             }
-            $this->addFlash($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], 'error', null, false);
         }
 
         if ($session->has('_security.target_path')) {
@@ -40,7 +40,7 @@ class SecurityController extends CommonController
         }
 
         return $this->render(
-            'MauticApiBundle:Security:login.html.php',
+            '@MauticApi/Security/login.html.twig',
             [
                 'last_username' => $session->get(Security::LAST_USERNAME),
                 'route'         => 'mautic_oauth2_server_auth_login_check',

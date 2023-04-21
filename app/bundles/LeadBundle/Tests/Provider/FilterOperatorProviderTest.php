@@ -46,7 +46,6 @@ final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE,
                 $this->callback(function (LeadListFiltersOperatorsEvent $event) {
                     // Emulate a subscriber.
                     $event->addOperator(
@@ -59,7 +58,8 @@ final class FilterOperatorProviderTest extends \PHPUnit\Framework\TestCase
                     );
 
                     return true;
-                })
+                }),
+                LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE
             );
 
         $this->translator->expects($this->once())

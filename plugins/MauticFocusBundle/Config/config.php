@@ -43,81 +43,17 @@ return [
     ],
 
     'services' => [
-        'events' => [
-            'mautic.focus.subscriber.form_bundle' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\FormSubscriber::class,
-                'arguments' => [
-                    'mautic.focus.model.focus',
-                ],
-            ],
-            'mautic.focus.subscriber.page_bundle' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\PageSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'mautic.focus.model.focus',
-                    'router',
-                    'mautic.helper.token_builder.factory',
-                ],
-            ],
-            'mautic.focus.subscriber.stat' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatSubscriber::class,
-                'arguments' => [
-                    'mautic.focus.model.focus',
-                    'request_stack',
-                ],
-            ],
-            'mautic.focus.subscriber.focus' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\FocusSubscriber::class,
-                'arguments' => [
-                    'router',
-                    'mautic.helper.ip_lookup',
-                    'mautic.core.model.auditlog',
-                    'mautic.page.model.trackable',
-                    'mautic.page.helper.token',
-                    'mautic.asset.helper.token',
-                    'mautic.focus.model.focus',
-                    'request_stack',
-                ],
-            ],
-            'mautic.focus.stats.subscriber' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.focus.campaignbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\EventListener\CampaignSubscriber::class,
-                'arguments' => [
-                    'mautic.page.helper.tracking',
-                    'router',
-                ],
-            ],
-        ],
-        'forms' => [
-            'mautic.focus.form.type.focus' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusType::class,
-                'arguments' => 'mautic.security',
-            ],
-            'mautic.focus.form.type.focusshow_list' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusShowType::class,
-                'arguments' => 'router',
-            ],
-            'mautic.focus.form.type.focus_list' => [
-                'class'     => \MauticPlugin\MauticFocusBundle\Form\Type\FocusListType::class,
-                'arguments' => 'mautic.focus.model.focus',
-            ],
-        ],
         'models' => [
             'mautic.focus.model.focus' => [
                 'class'     => \MauticPlugin\MauticFocusBundle\Model\FocusModel::class,
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
-                    'mautic.helper.templating',
+                    'twig',
                     'event_dispatcher',
                     'mautic.lead.model.field',
                     'mautic.tracker.contact',
+                    'twig',
                 ],
             ],
         ],
@@ -137,6 +73,18 @@ return [
                 ],
             ],
         ],
+//        'repositories' => [
+//            'mautic.focus.repository' => [
+//                'class'     => \Doctrine\ORM\EntityRepository::class,
+//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class,
+//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+//            ],
+//            'mautic.focus.stat.repository' => [
+//                'class'     => \Doctrine\ORM\EntityRepository::class,
+//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\StatRepository::class,
+//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+//            ],
+//        ]
     ],
 
     'menu' => [

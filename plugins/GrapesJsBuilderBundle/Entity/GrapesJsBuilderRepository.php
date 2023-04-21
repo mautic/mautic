@@ -6,6 +6,9 @@ namespace MauticPlugin\GrapesJsBuilderBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<GrapesJsBuilder>
+ */
 class GrapesJsBuilderRepository extends CommonRepository
 {
     /**

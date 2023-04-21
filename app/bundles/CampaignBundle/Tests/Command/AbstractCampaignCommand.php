@@ -16,6 +16,9 @@ use Mautic\LeadBundle\Entity\ListLead;
 
 class AbstractCampaignCommand extends MauticMysqlTestCase
 {
+    public const SEND_EMAIL_SECONDS = 3;
+    public const CONDITION_SECONDS  = 6;
+
     /**
      * @var array
      */
@@ -62,19 +65,17 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
         // Schedule event
         date_default_timezone_set('UTC');
         $this->eventDate = new \DateTime();
-        $this->eventDate->modify('+3 seconds');
+        $this->eventDate->modify('+'.self::SEND_EMAIL_SECONDS.' seconds');
         $sql = str_replace('{SEND_EMAIL_1_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
-        $this->eventDate->modify('+6 seconds');
+        $this->eventDate->modify('+'.self::CONDITION_SECONDS.' seconds');
         $sql = str_replace('{CONDITION_TIMESTAMP}', $this->eventDate->format('Y-m-d H:i:s'), $sql);
 
         $this->em->getConnection()->exec($sql);
     }
 
-    public function tearDown(): void
+    public function beforeTearDown(): void
     {
-        parent::tearDown();
-
         $this->clientServer = $this->defaultClientServer;
     }
 
@@ -103,7 +104,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             ->where('log.campaign_id = 1')
             ->andWhere('log.event_id IN ('.implode(',', $ids).')')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $byEvent = [];
         foreach ($ids as $id) {

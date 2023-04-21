@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
-    const DATE = '2019-07-07 15:00:00';
+    public const DATE = '2019-07-07 15:00:00';
 
     /** @var MessageQueueModel */
     protected $messageQueue;

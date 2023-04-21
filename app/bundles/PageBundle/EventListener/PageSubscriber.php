@@ -4,7 +4,7 @@ namespace Mautic\PageBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\PageBundle\Entity\HitRepository;
 use Mautic\PageBundle\Entity\PageRepository;
@@ -15,7 +15,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Event\QueueConsumerEvent;
 use Mautic\QueueBundle\Queue\QueueConsumerResults;
 use Mautic\QueueBundle\QueueEvents;
-use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class PageSubscriber implements EventSubscriberInterface
@@ -41,7 +41,7 @@ class PageSubscriber implements EventSubscriberInterface
     private $pageModel;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     private $logger;
 
@@ -70,7 +70,7 @@ class PageSubscriber implements EventSubscriberInterface
         IpLookupHelper $ipLookupHelper,
         AuditLogModel $auditLogModel,
         PageModel $pageModel,
-        Logger $logger,
+        LoggerInterface $logger,
         HitRepository $hitRepository,
         PageRepository $pageRepository,
         RedirectRepository $redirectRepository,
@@ -211,7 +211,7 @@ class PageSubscriber implements EventSubscriberInterface
 
             // Log the rejection with event payload as context.
             if ($this->logger) {
-                $this->logger->addNotice(
+                $this->logger->notice(
                     'QUEUE MESSAGE REJECTED: Lead or Hit not found',
                     $payload
                 );
@@ -235,7 +235,7 @@ class PageSubscriber implements EventSubscriberInterface
 
             // Log the exception with event payload as context.
             if ($this->logger) {
-                $this->logger->addError(
+                $this->logger->error(
                     'QUEUE CONSUMER ERROR ('.QueueEvents::PAGE_HIT.'): '.$e->getMessage(),
                     $payload
                 );

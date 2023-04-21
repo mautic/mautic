@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -100,8 +100,10 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         }
 
         try {
+            /** @var User $user */
             $user = $userProvider->loadUserByUsername($credentials['username']);
-        } catch (UsernameNotFoundException $e) {
+        } catch (UserNotFoundException $e) {
+            /** @var string $user */
             $user = $credentials['username'];
         }
 
@@ -126,7 +128,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
                 $this->authenticatingService,
                 $integrations
             );
-            $this->dispatcher->dispatch($authEvent);
+            $this->dispatcher->dispatch($authEvent, UserEvents::USER_FORM_AUTHENTICATION);
 
             if ($authEvent->isAuthenticated()) {
                 $user                        = $authEvent->getUser();
@@ -155,7 +157,7 @@ class FormAuthenticator extends AbstractFormLoginAuthenticator implements Passwo
         return $credentials['password'];
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?RedirectResponse
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $providerKey): ?RedirectResponse
     {
         if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
             return new RedirectResponse($targetPath);

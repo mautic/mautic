@@ -38,5 +38,5 @@ $output = (false !== $input->getParameterOption(['--no-interaction', '-n'])) ? n
 $kernel      = new AppKernel($env, $debug);
 $application = new Application($kernel);
 $application->setName('Mautic');
-$application->setVersion($kernel->getVersion().' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
+$application->setVersion($kernel->getVersion().' - app/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
 $application->run($input, $output);

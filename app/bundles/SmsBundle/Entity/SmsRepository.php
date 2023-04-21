@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class SmsRepository.
+ * @extends CommonRepository<Sms>
  */
 class SmsRepository extends CommonRepository
 {
@@ -163,7 +163,7 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

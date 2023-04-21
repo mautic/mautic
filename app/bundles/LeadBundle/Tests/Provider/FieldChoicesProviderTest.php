@@ -36,8 +36,8 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE,
-                $this->callback($this->setSomeChoicesLikeASubscriber())
+                $this->callback($this->setSomeChoicesLikeASubscriber()),
+                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE
             );
 
         $this->expectException(ChoicesNotFoundException::class);
@@ -49,8 +49,8 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE,
-                $this->callback($this->setSomeChoicesLikeASubscriber())
+                $this->callback($this->setSomeChoicesLikeASubscriber()),
+                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE
             );
 
         // Calling it twice to ensure the cache is working and the event is triggered only once.
@@ -65,8 +65,8 @@ final class FieldChoicesProviderTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE,
-                $this->callback($this->setSomeChoicesLikeASubscriber())
+                $this->callback($this->setSomeChoicesLikeASubscriber()),
+                LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE
             );
 
         // Calling it twice to ensure the cache is working and the event is triggered only once.

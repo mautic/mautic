@@ -4,6 +4,9 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Focus>
+ */
 class FocusRepository extends CommonRepository
 {
     /**
@@ -69,7 +72,7 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

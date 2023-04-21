@@ -25,7 +25,7 @@ class ActivityListType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'choices'    => $this->leadModel->getEngagementTypes(),
+                'choices'    => array_flip($this->leadModel->getEngagementTypes()),
                 'label'      => 'mautic.integration.feature.push_activity.included_events',
                 'label_attr' => [
                     'class'       => 'control-label',

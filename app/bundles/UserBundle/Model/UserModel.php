@@ -6,17 +6,23 @@ use Mautic\CoreBundle\Model\FormModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\UserBundle\Entity\Role;
 use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Entity\UserRepository;
 use Mautic\UserBundle\Entity\UserToken;
 use Mautic\UserBundle\Enum\UserTokenAuthorizator;
 use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<User>
+ */
 class UserModel extends FormModel
 {
     /**
@@ -37,12 +43,12 @@ class UserModel extends FormModel
         $this->userTokenService = $userTokenService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getRepository()
+    public function getRepository(): UserRepository
     {
-        return $this->em->getRepository(User::class);
+        $result = $this->em->getRepository(User::class);
+        \assert($result instanceof UserRepository);
+
+        return $result;
     }
 
     /**
@@ -90,7 +96,7 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordEncoder $encoder, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -111,7 +117,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -192,7 +198,7 @@ class UserModel extends FormModel
                 $event = new UserEvent($entity, $isNew);
                 $event->setEntityManager($this->em);
             }
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -281,7 +287,7 @@ class UserModel extends FormModel
         try {
             $this->em->flush();
         } catch (\Exception $exception) {
-            $this->logger->addError($exception->getMessage());
+            $this->logger->error($exception->getMessage());
             throw new \RuntimeException();
         }
         $resetLink  = $this->router->generate('mautic_user_passwordresetconfirm', ['token' => $resetToken->getSecret()], UrlGeneratorInterface::ABSOLUTE_URL);

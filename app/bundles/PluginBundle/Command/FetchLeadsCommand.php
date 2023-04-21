@@ -71,7 +71,7 @@ class FetchLeadsCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $integration   = $input->getOption('integration');
         $startDate     = $input->getOption('start-date');

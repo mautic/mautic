@@ -33,7 +33,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -47,7 +47,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -61,7 +61,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
-            ->with(EmailEvents::ON_EMAIL_VALIDATION)
+            ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
             ->willReturn($this->event);
 
         $this->event->expects($this->once())
@@ -75,7 +75,7 @@ class EmailValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher->expects($this->once())
         ->method('dispatch')
-        ->with(EmailEvents::ON_EMAIL_VALIDATION)
+        ->with($this->isInstanceOf(EmailValidationEvent::class), EmailEvents::ON_EMAIL_VALIDATION)
         ->willReturn($this->event);
 
         $this->event->expects($this->once())

@@ -28,15 +28,17 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
 
         $redisOptions = PRedisConnectionHelper::makeRedisOptions($redisConfiguration, 'session:'.$coreParametersHelper->get('db_name').':');
 
-        $this->redis = new Client(PRedisConnectionHelper::getRedisEndpoints($redisConfiguration['url']), $redisOptions);
+        $redisOptions['primaryOnly'] = $coreParametersHelper->get('redis_primary_only');
+
+        $this->redis = PRedisConnectionHelper::createClient(PRedisConnectionHelper::getRedisEndpoints($redisConfiguration['url']), $redisOptions);
     }
 
-    protected function doRead($sessionId): string
+    protected function doRead(string $sessionId): string
     {
         return $this->redis->get($sessionId) ?: '';
     }
 
-    protected function doWrite($sessionId, $data): bool
+    protected function doWrite(string $sessionId, string $data): bool
     {
         $expireTime = isset($this->redisConfiguration['session_expire_time']) ? (int) $this->redisConfiguration['session_expire_time'] : 1209600;
         $result     = $this->redis->setEx($sessionId, $expireTime, $data);
@@ -44,7 +46,7 @@ class RedisSentinelSessionHandler extends AbstractSessionHandler
         return $result && !$result instanceof ErrorInterface;
     }
 
-    protected function doDestroy($sessionId): bool
+    protected function doDestroy(string $sessionId): bool
     {
         $this->redis->del($sessionId);
 

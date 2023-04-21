@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticCrmBundle\Command;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Templating\Helper\TranslatorHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -22,20 +22,20 @@ class PushDataToPipedriveCommand extends Command
 {
     private SymfonyStyle $io;
     private IntegrationHelper $integrationHelper;
-    private TranslatorHelper $translatorHelper;
+    private Translator $translator;
     private EntityManager $entityManager;
     private CompanyExport $companyExport;
     private LeadExport $leadExport;
 
     public function __construct(
         IntegrationHelper $integrationHelper,
-        TranslatorHelper $translatorHelper,
+        Translator $translator,
         EntityManager $entityManager,
         CompanyExport $companyExport,
         LeadExport $leadExport
     ) {
         $this->integrationHelper = $integrationHelper;
-        $this->translatorHelper  = $translatorHelper;
+        $this->translator        = $translator;
         $this->entityManager     = $entityManager;
         $this->companyExport     = $companyExport;
         $this->leadExport        = $leadExport;
@@ -57,7 +57,7 @@ class PushDataToPipedriveCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var PipeDriveIntegration $integrationObject */
         $integrationObject = $this->integrationHelper
@@ -69,12 +69,12 @@ class PushDataToPipedriveCommand extends Command
         if (!$integrationObject || !$integrationObject->getIntegrationSettings()->getIsPublished()) {
             $this->io->note('Pipedrive integration is disabled.');
 
-            return;
+            return 0;
         }
 
         if ($input->getOption('restart')) {
             $this->io->note(
-                $this->translatorHelper->trans(
+                $this->translator->trans(
                     'mautic.plugin.config.integration.restarted',
                     ['%integration%' => $integrationObject->getName()]
                 )
@@ -107,5 +107,7 @@ class PushDataToPipedriveCommand extends Command
         $this->io->text('Pushed '.$pushed);
 
         $this->io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+
+        return 0;
     }
 }

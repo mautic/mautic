@@ -4,7 +4,7 @@ namespace Mautic\CoreBundle\Command;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
-use Symfony\Component\Console\Command\Command;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,14 +16,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * CLI Command to purge old data per settings.
  */
-class CleanupMaintenanceCommand extends Command
+class CleanupMaintenanceCommand extends ModeratedCommand
 {
     private TranslatorInterface $translator;
     private EventDispatcherInterface $dispatcher;
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher)
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
     {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
         $this->translator = $translator;
         $this->dispatcher = $dispatcher;
@@ -61,10 +61,15 @@ You can also optionally specify a dry run without deleting any records:
 <info>php %command.full_name% --days-old=365 --dry-run</info>
 EOT
             );
+        parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$this->checkRunStatus($input, $output)) {
+            return 0;
+        }
+
         $daysOld       = $input->getOption('days-old');
         $dryRun        = $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');
@@ -87,12 +92,14 @@ EOT
             );
 
             if (!$helper->ask($input, $output, $question)) {
+                $this->completeRun();
+
                 return 0;
             }
         }
 
         $event = new MaintenanceEvent($daysOld, !empty($dryRun), !empty($gdpr));
-        $this->dispatcher->dispatch(CoreEvents::MAINTENANCE_CLEANUP_DATA, $event);
+        $this->dispatcher->dispatch($event, CoreEvents::MAINTENANCE_CLEANUP_DATA);
         $stats = $event->getStats();
 
         $rows = [];
@@ -115,6 +122,8 @@ EOT
                 $output->writeln($query);
             }
         }
+
+        $this->completeRun();
 
         return 0;
     }

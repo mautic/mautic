@@ -20,15 +20,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_EMAILS       = 'emails';
-    const CONTEXT_EMAIL_STATS  = 'email.stats';
-    const EMAILS_PREFIX        = 'e';
-    const EMAIL_STATS_PREFIX   = 'es';
-    const EMAIL_VARIANT_PREFIX = 'vp';
-    const DNC_PREFIX           = 'dnc';
-    const CLICK_PREFIX         = 'cut';
+    public const CONTEXT_EMAILS       = 'emails';
+    public const CONTEXT_EMAIL_STATS  = 'email.stats';
+    public const EMAILS_PREFIX        = 'e';
+    public const EMAIL_STATS_PREFIX   = 'es';
+    public const EMAIL_VARIANT_PREFIX = 'vp';
+    public const DNC_PREFIX           = 'dnc';
+    public const CLICK_PREFIX         = 'cut';
 
-    const DNC_COLUMNS = [
+    public const DNC_COLUMNS = [
         'unsubscribed' => [
             'alias'   => 'unsubscribed',
             'label'   => 'mautic.email.report.unsubscribed',
@@ -57,7 +57,7 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    const EMAIL_STATS_COLUMNS = [
+    public const EMAIL_STATS_COLUMNS = [
         self::EMAIL_STATS_PREFIX.'.email_address' => [
             'label' => 'mautic.email.report.stat.email_address',
             'type'  => 'email',
@@ -98,7 +98,7 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    const EMAIL_VARIANT_COLUMNS = [
+    public const EMAIL_VARIANT_COLUMNS = [
         self::EMAIL_VARIANT_PREFIX.'.id' => [
             'label' => 'mautic.email.report.variant_parent_id',
             'type'  => 'int',
@@ -109,7 +109,7 @@ class ReportSubscriber implements EventSubscriberInterface
         ],
     ];
 
-    const CLICK_COLUMNS = [
+    public const CLICK_COLUMNS = [
         'hits' => [
             'alias'   => 'hits',
             'label'   => 'mautic.email.report.hits_count',
@@ -288,18 +288,23 @@ class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
             ];
 
-            $filters = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+            $columns = array_merge(
+                $columns,
+                self::EMAIL_STATS_COLUMNS,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $this->companyReportData->getCompanyData()
+            );
+
+            $filters = array_merge(
+                $columns,
+                $this->fieldsBuilder->getLeadFilter('l.', 's.')
+            );
 
             $data = [
                 'display_name' => 'mautic.email.stats.report.table',
-                'columns'      => array_merge(
-                    $columns,
-                    self::EMAIL_STATS_COLUMNS,
-                    $event->getCampaignByChannelColumns(),
-                    $event->getLeadColumns(),
-                    $event->getIpColumn(),
-                    $this->companyReportData->getCompanyData()
-                ),
+                'columns'      => $columns,
                 'filters'      => $filters,
             ];
             $event->addTable(self::CONTEXT_EMAIL_STATS, $data, self::CONTEXT_EMAILS);
@@ -520,7 +525,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
-                    $counts = $queryBuilder->execute()->fetch();
+                    $counts = $queryBuilder->execute()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.stat.read'),

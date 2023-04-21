@@ -12,9 +12,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FlashBag
 {
-    const LEVEL_ERROR     = 'error';
-    const LEVEL_WARNING   = 'warning';
-    const LEVEL_NOTICE    = 'notice';
+    public const LEVEL_ERROR     = 'error';
+    public const LEVEL_WARNING   = 'warning';
+    public const LEVEL_NOTICE    = 'notice';
 
     /**
      * @var Session

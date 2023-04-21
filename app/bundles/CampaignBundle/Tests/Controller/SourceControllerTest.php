@@ -33,7 +33,7 @@ class SourceControllerTest extends MauticMysqlTestCase
         $this->assertSame(200, $clientResponse->getStatusCode(), $responseContent);
 
         $html = json_decode($responseContent, true)['newContent'];
-        $this->assertStringContainsString("<option value=\"{$form1->getId()}\" >test ({$form1->getId()})</option>", $html);
-        $this->assertStringContainsString("<option value=\"{$form2->getId()}\" >test ({$form2->getId()})</option>", $html);
+        $this->assertStringContainsString("<option value=\"{$form1->getId()}\">test ({$form1->getId()})</option>", $html);
+        $this->assertStringContainsString("<option value=\"{$form2->getId()}\">test ({$form2->getId()})</option>", $html);
     }
 }

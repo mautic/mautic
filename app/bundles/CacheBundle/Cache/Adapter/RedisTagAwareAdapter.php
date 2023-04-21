@@ -11,7 +11,7 @@ use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
 class RedisTagAwareAdapter extends TagAwareAdapter
 {
-    public function __construct(array $servers, string $namespace, int $lifetime)
+    public function __construct(array $servers, string $namespace, int $lifetime, bool $primaryOnly)
     {
         if (!isset($servers['dsn'])) {
             throw new InvalidArgumentException('Invalid redis configuration. No server specified.');
@@ -19,7 +19,9 @@ class RedisTagAwareAdapter extends TagAwareAdapter
 
         $options = array_key_exists('options', $servers) ? $servers['options'] : [];
 
-        $client = new \Predis\Client(PRedisConnectionHelper::getRedisEndpoints($servers['dsn']), $options);
+        $options['primaryOnly'] = $primaryOnly;
+
+        $client = PRedisConnectionHelper::createClient(PRedisConnectionHelper::getRedisEndpoints($servers['dsn']), $options);
 
         parent::__construct(
             new RedisAdapter($client, $namespace, $lifetime),

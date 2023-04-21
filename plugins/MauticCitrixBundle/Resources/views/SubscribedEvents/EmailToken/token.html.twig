@@ -1,0 +1,8 @@
+{% set prodName = product is defined ? product : 'product' %}
+{% set link = productLink is defined ? productLink : '#' %}
+{% set text = productText is defined ? productText : 'Start GoTo' ~ prodName|capitalize %}
+<link rel="stylesheet" href="{{ getAssetUrl('plugins/MauticCitrixBundle/Assets/css/citrix.css') }}" type="text/css"/>
+<a class="citrix-start-button" href="{{ link }}" target="_blank">
+    {{ text|purify }}
+</a>
+<div style="clear:both"></div>

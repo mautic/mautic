@@ -14,13 +14,10 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-/**
- * Class UserProvider.
- */
 class UserProvider implements UserProviderInterface
 {
     /**
@@ -66,8 +63,6 @@ class UserProvider implements UserProviderInterface
      * @param string $username
      *
      * @return User
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function loadUserByUsername($username)
     {
@@ -87,7 +82,7 @@ class UserProvider implements UserProviderInterface
                 'Unable to find an active admin MauticUserBundle:User object identified by "%s".',
                 $username
             );
-            throw new UsernameNotFoundException($message, 0);
+            throw new UserNotFoundException($message, 0);
         }
 
         //load permissions
@@ -115,10 +110,9 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
-        return $this->userRepository->getClassName() === $class
-        || is_subclass_of($class, $this->userRepository->getClassName());
+        return User::class === $class || is_subclass_of($class, User::class);
     }
 
     /**
@@ -175,13 +169,13 @@ class UserProvider implements UserProviderInterface
         $event = new UserEvent($user, $isNew);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_PRE_SAVE)) {
-            $event = $this->dispatcher->dispatch(UserEvents::USER_PRE_SAVE, $event);
+            $event = $this->dispatcher->dispatch($event, UserEvents::USER_PRE_SAVE);
         }
 
         $this->userRepository->saveEntity($user);
 
         if ($this->dispatcher->hasListeners(UserEvents::USER_POST_SAVE)) {
-            $this->dispatcher->dispatch(UserEvents::USER_POST_SAVE, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_POST_SAVE);
         }
 
         return $user;
@@ -197,11 +191,11 @@ class UserProvider implements UserProviderInterface
             $user = $this->loadUserByUsername($user->getUsername());
 
             return $user;
-        } catch (UsernameNotFoundException $exception) {
+        } catch (UserNotFoundException $exception) {
             // Try by email
             try {
                 return $this->loadUserByUsername($user->getEmail());
-            } catch (UsernameNotFoundException $exception) {
+            } catch (UserNotFoundException $exception) {
             }
         }
 

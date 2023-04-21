@@ -15,6 +15,9 @@ use Mautic\CoreBundle\Helper\ProgressBarHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * @extends AbstractCommonModel<Summary>
+ */
 class SummaryModel extends AbstractCommonModel
 {
     /**

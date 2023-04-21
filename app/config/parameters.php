@@ -1,6 +1,6 @@
 <?php
 
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 include __DIR__.'/paths_helper.php';
 
 //load default parameters from bundle files

@@ -5,20 +5,22 @@ namespace Mautic\FormBundle\Controller\Api;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
+use Mautic\FormBundle\Model\SubmissionModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 /**
- * Class SubmissionApiController.
+ * @extends CommonApiController<Submission>
  */
 class SubmissionApiController extends CommonApiController
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('form.submission');
+        $formSubmissionModel = $this->getModel('form.submission');
+        \assert($formSubmissionModel instanceof SubmissionModel);
+
+        $this->model            = $formSubmissionModel;
         $this->entityClass      = Submission::class;
         $this->entityNameOne    = 'submission';
         $this->entityNameMulti  = 'submissions';
@@ -35,7 +37,7 @@ class SubmissionApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntitiesAction($formId = null)
+    public function getEntitiesAction(Request $request, $formId = null)
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -52,7 +54,7 @@ class SubmissionApiController extends CommonApiController
             ]
         );
 
-        return parent::getEntitiesAction();
+        return parent::getEntitiesAction($request);
     }
 
     /**
@@ -63,7 +65,7 @@ class SubmissionApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntitiesForContactAction($formId, $contactId)
+    public function getEntitiesForContactAction(Request $request, $formId, $contactId)
     {
         $filter = [
             'filter' => [
@@ -79,7 +81,7 @@ class SubmissionApiController extends CommonApiController
 
         $this->extraGetEntitiesArguments = array_merge($this->extraGetEntitiesArguments, $filter);
 
-        return $this->getEntitiesAction($formId);
+        return $this->getEntitiesAction($request, $formId);
     }
 
     /**
@@ -89,7 +91,7 @@ class SubmissionApiController extends CommonApiController
      *
      * @return Response
      */
-    public function getEntityAction($formId = null, $submissionId = null)
+    public function getEntityAction(Request $request, $formId = null, $submissionId = null)
     {
         $form = $this->getFormOrResponseWithError($formId);
 
@@ -97,7 +99,7 @@ class SubmissionApiController extends CommonApiController
             return $form;
         }
 
-        return parent::getEntityAction($submissionId);
+        return parent::getEntityAction($request, $submissionId);
     }
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\Driver\PDOStatement;
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -28,6 +28,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -141,7 +142,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $leadColumns = [
         'xx.yy' => [
-            'label' => null,
+            'label' => '',
             'type'  => 'bool',
             'alias' => 'first',
         ],
@@ -179,8 +180,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translatorMock                   = $this->createMock(Translator::class);
         $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
-        $this->channelListHelperMock            = $this->createMock(ChannelListHelper::class);
-        $this->reportHelperMock                 = $this->createMock(ReportHelper::class);
+        $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->reportHelperMock                 = new ReportHelper();
         $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
@@ -392,9 +393,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         if ('companies' != $event) {
             $this->fieldsBuilderMock->expects($this->once())
-            ->method('getLeadFieldsColumns')
-            ->with('l.')
-            ->willReturn($this->leadColumns);
+                ->method('getLeadFieldsColumns')
+                ->with('l.')
+                ->willReturn($this->leadColumns);
 
             $this->fieldsBuilderMock->expects($this->once())
                 ->method('getLeadFilter')
@@ -402,13 +403,13 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 ->willReturn($this->leadFilters);
 
             $this->companyReportDataMock->expects($this->once())
-            ->method('getCompanyData')
-            ->willReturn($this->companyColumns);
+                ->method('getCompanyData')
+                ->willReturn($this->companyColumns);
         } else {
             $this->fieldsBuilderMock->expects($this->once())
-            ->method('getCompanyFieldsColumns')
-            ->with('comp.')
-            ->willReturn($this->companyColumns);
+                ->method('getCompanyFieldsColumns')
+                ->with('comp.')
+                ->willReturn($this->companyColumns);
         }
 
         $reportBuilderEvent = new ReportBuilderEvent($this->translatorMock, $this->channelListHelperMock, $event, [], $this->reportHelperMock);
@@ -441,7 +442,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                         'type'  => 'text',
                         'alias' => 'name',
                     ],
-                    ],
+                ],
                 'group' => 'contacts',
             ],
         ];
@@ -450,19 +451,18 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                 $expected['leads']['columns']['l.stage_id'] = [
                     'label' => '',
                     'type'  => 'int',
-                    'link'  => 'mautic_stage_action',
                     'alias' => 'stage_id',
                 ];
-                $expected['leads']['columns']['s.name'] = [
+                $expected['leads']['columns']['ss.name'] = [
                     'alias' => 'stage_name',
                     'label' => '',
                     'type'  => 'string',
                 ];
-                $expected['leads']['columns']['s.date_added'] = [
+                $expected['leads']['columns']['ss.date_added'] = [
                     'alias'   => 'stage_date_added',
-                    'label'   => '',
+                    'label'   => null,
                     'type'    => 'string',
-                    'formula' => '(SELECT MAX(stage_log.date_added) FROM '.MAUTIC_TABLE_PREFIX.'lead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)',
+                    'formula' => sprintf('(SELECT MAX(stage_log.date_added) FROM %slead_stages_change_log stage_log WHERE stage_log.stage_id = l.stage_id AND stage_log.lead_id = l.id)', MAUTIC_TABLE_PREFIX),
                 ];
                 break;
             case 'contact.frequencyrules':
@@ -510,7 +510,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'alias' => 'pause_to_date',
                         ],
                         'lf.date_added' => [
-                            'label'          => '',
+                            'label'          => null,
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lf.date_added)',
                             'alias'          => 'date_added',
@@ -558,7 +558,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'alias' => 'pause_to_date',
                         ],
                         'lf.date_added' => [
-                            'label'          => '',
+                            'label'          => null,
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lf.date_added)',
                             'alias'          => 'date_added',
@@ -607,7 +607,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'alias' => 'delta',
                         ],
                         'lp.date_added' => [
-                            'label'          => '',
+                            'label'          => null,
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
@@ -655,7 +655,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'alias' => 'delta',
                         ],
                         'lp.date_added' => [
-                            'label'          => '',
+                            'label'          => null,
                             'type'           => 'datetime',
                             'groupByFormula' => 'DATE(lp.date_added)',
                             'alias'          => 'date_added',
@@ -711,10 +711,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                             'l.stage_id' => [
                                 'label' => '',
                                 'type'  => 'int',
-                                'link'  => 'mautic_stage_action',
                                 'alias' => 'stage_id',
                             ],
-                            's.name' => [
+                            'ss.name' => [
                                 'alias' => 'stage_name',
                                 'label' => '',
                                 'type'  => 'string',
@@ -765,7 +764,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                                 'alias' => 'campaign_id',
                             ],
                             'log.date_triggered' => [
-                                'label'          => '',
+                                'label'          => null,
                                 'type'           => 'datetime',
                                 'groupByFormula' => 'DATE(log.date_triggered)',
                                 'alias'          => 'date_triggered',
@@ -783,7 +782,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                                 ],
                                 'alias' => 'stage_id',
                             ],
-                            's.name' => [
+                            'ss.name' => [
                                 'alias' => 'stage_name',
                                 'label' => '',
                                 'type'  => 'string',
@@ -814,30 +813,30 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
                     ];
 
                 break;
-                case 'companies':
-                    unset($expected['leads']);
-                    $expected['companies'] = [
-                        'display_name' => 'mautic.lead.lead.companies',
-                        'columns'      => [
-                            'comp.name' => [
-                                'label' => '',
-                                'type'  => 'text',
-                                'alias' => 'name',
-                            ],
+            case 'companies':
+                unset($expected['leads']);
+                $expected['companies'] = [
+                    'display_name' => 'mautic.lead.lead.companies',
+                    'columns'      => [
+                        'comp.name' => [
+                            'label' => '',
+                            'type'  => 'text',
+                            'alias' => 'name',
                         ],
-                        'filters' => [
-                            'comp.name' => [
-                                'label' => '',
-                                'type'  => 'text',
-                                'alias' => 'name',
-                            ],
+                    ],
+                    'filters' => [
+                        'comp.name' => [
+                            'label' => '',
+                            'type'  => 'text',
+                            'alias' => 'name',
                         ],
+                    ],
                     'group' => 'companies',
                 ];
                 break;
         }
 
-        $this->assertSame($expected, $reportBuilderEvent->getTables());
+        $this->assertEquals($expected, $reportBuilderEvent->getTables());
     }
 
     /**
@@ -899,9 +898,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($this->companyRepositoryMock);
 
-        $mockStmt = $this->getMockBuilder(PDOStatement::class)
+        $mockStmt = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['fetchAll'])
+            ->onlyMethods(['fetchAllAssociative'])
             ->getMock();
 
         $this->reportGraphEventMock->expects($this->once())

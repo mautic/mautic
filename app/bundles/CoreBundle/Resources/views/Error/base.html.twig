@@ -1,0 +1,56 @@
+{# 
+/*
+ # @copyright   2014 Mautic Contributors. All rights reserved
+ # @author      Mautic
+ #
+ # @link        http://mautic.org
+ #
+ # @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+ #}
+
+{% set isInline = inline ?? false %}
+{% set isAjax = app.request.isxmlhttprequest ?? false %}
+{% set src = src|default(mautibotGetImage('wave'))  %}
+{% set message = message|default('mautic.core.error.generic') %}
+{% set status_code = status_code | default('') %}
+
+{% set pageTitle = pageTitle|default('') %}
+
+{% if isAjax == false %}
+    {% extends baseTemplate %}
+
+    {% set pageTitle = (isInline == false) ? status_text : pageTitle|default('') %}
+{% endif %}
+
+{% block pageTitle %}{{ pageTitle }}{% endblock %}
+
+{% block _content %}
+    <div class="pa-20 mautibot-error{% if isInline %} inline well{% endif %}">
+        <div class="row mt-lg pa-md">
+            {% if isInline %}
+                <div class="mautibot-content col-xs-12">
+                    <h1><i class="fa fa-warning fa-fw text-danger"></i>{{ message|trans({'%code%': status_code}) }}</h1>
+                    <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
+                </div>
+            {% else %}
+
+            <div class="mautibot-image col-xs-4 col-md-3">
+                <img class="img-responsive" src="{{src}}" />
+            </div>
+            <div class="mautibot-content col-xs-8 col-md-9">
+                <blockquote class="np break-word">
+                    <h1><i class="fa fa-quote-left"></i> {{ message|trans({'%code%': status_code}) }} <i class="fa fa-quote-right"></i></h1>
+                    <h4 class="mt-5"><strong>{{ status_code }}</strong> {{ status_text }}</h4>
+
+                    <footer class="text-right">Mautibot</footer>
+                </blockquote>
+                <div class="pull-right">
+                    <a class="text-muted" href="http://mau.tc/report-issue" target="_new">{{ 'mautic.core.report_issue' | trans }}</a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="clearfix"></div>
+{% endblock %}

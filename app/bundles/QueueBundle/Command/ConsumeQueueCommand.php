@@ -51,7 +51,7 @@ class ConsumeQueueCommand extends Command
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->queueService->isQueueEnabled()) {
             $output->writeLn('You have not configured mautic to use queue mode, nothing will be processed');

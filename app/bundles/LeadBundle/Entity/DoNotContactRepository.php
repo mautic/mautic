@@ -6,6 +6,9 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
+/**
+ * @extends CommonRepository<DoNotContact>
+ */
 class DoNotContactRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -95,7 +98,7 @@ class DoNotContactRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_added', 'dnc');
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -161,7 +164,7 @@ class DoNotContactRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {

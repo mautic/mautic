@@ -19,6 +19,7 @@ use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\UtmTag;
+use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -35,10 +36,14 @@ use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @extends FormModel<Page>
+ */
 class PageModel extends FormModel
 {
     use TranslationModelTrait;
@@ -110,9 +115,8 @@ class PageModel extends FormModel
      */
     private $contactTracker;
 
-    /**
-     * PageModel constructor.
-     */
+    private ContactRequestHelper $contactRequestHelper;
+
     public function __construct(
         CookieHelper $cookieHelper,
         IpLookupHelper $ipLookupHelper,
@@ -124,7 +128,8 @@ class PageModel extends FormModel
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
-        CoreParametersHelper $coreParametersHelper
+        CoreParametersHelper $coreParametersHelper,
+        ContactRequestHelper $contactRequestHelper
     ) {
         $this->cookieHelper         = $cookieHelper;
         $this->ipLookupHelper       = $ipLookupHelper;
@@ -138,6 +143,7 @@ class PageModel extends FormModel
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
+        $this->contactRequestHelper = $contactRequestHelper;
     }
 
     /**
@@ -253,7 +259,7 @@ class PageModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Page) {
             throw new MethodNotAllowedHttpException(['Page']);
@@ -326,7 +332,7 @@ class PageModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         }
@@ -459,7 +465,7 @@ class PageModel extends FormModel
 
         // Get lead if required
         if (null == $lead) {
-            $lead = $this->leadModel->getContactFromRequest($query);
+            $lead = $this->contactRequestHelper->getContactFromQuery($query);
 
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
@@ -503,7 +509,7 @@ class PageModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -637,7 +643,7 @@ class PageModel extends FormModel
             try {
                 $this->getRepository()->upHitCount($page->getId(), 1, $isUnique, !empty($isVariant));
             } catch (\Exception $exception) {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -660,7 +666,7 @@ class PageModel extends FormModel
                 if (MAUTIC_ENV === 'dev') {
                     throw $exception;
                 } else {
-                    $this->logger->addError(
+                    $this->logger->error(
                         $exception->getMessage(),
                         ['exception' => $exception]
                     );
@@ -708,7 +714,7 @@ class PageModel extends FormModel
             if (MAUTIC_ENV === 'dev') {
                 throw $exception;
             } else {
-                $this->logger->addError(
+                $this->logger->error(
                     $exception->getMessage(),
                     ['exception' => $exception]
                 );
@@ -717,7 +723,7 @@ class PageModel extends FormModel
 
         if ($this->dispatcher->hasListeners(PageEvents::PAGE_ON_HIT)) {
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
-            $this->dispatcher->dispatch(PageEvents::PAGE_ON_HIT, $event);
+            $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
     }
 
@@ -761,7 +767,7 @@ class PageModel extends FormModel
     public function getBuilderComponents(Page $page = null, $requestedComponents = 'all', $tokenFilter = null)
     {
         $event = new PageBuilderEvent($this->translator, $page, $requestedComponents, $tokenFilter);
-        $this->dispatcher->dispatch(PageEvents::PAGE_ON_BUILD, $event);
+        $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_BUILD);
 
         return $this->getCommonBuilderComponents($requestedComponents, $event);
     }
@@ -927,7 +933,8 @@ class PageModel extends FormModel
             ->setParameter('date_to', $dateTo->format('Y-m-d'.' 23:59:59'));
         $q->groupBy('ds.device');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         $chart   = new PieChart();
 
         if (empty($results)) {
@@ -976,7 +983,7 @@ class PageModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_hit');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -1006,7 +1013,7 @@ class PageModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

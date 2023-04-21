@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use DateTime;
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Tests\CommonMocks;
@@ -17,7 +18,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
@@ -41,7 +42,7 @@ class LeadSubscriberTest extends CommonMocks
     private $leadEventDispatcher;
 
     /**
-     * @var DncReasonHelper|MockObject
+     * @var DncReasonHelper
      */
     private $dncReasonHelper;
 
@@ -60,15 +61,21 @@ class LeadSubscriberTest extends CommonMocks
      */
     private $router;
 
+    /**
+     * @var ModelFactory<object>&MockObject
+     */
+    private $modelFacotry;
+
     protected function setUp(): void
     {
         $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel       = $this->createMock(AuditLogModel::class);
         $this->leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper     = $this->createMock(DncReasonHelper::class);
+        $this->dncReasonHelper     = new DncReasonHelper($this->createMock(TranslatorInterface::class));
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->router              = $this->createMock(RouterInterface::class);
+        $this->modelFacotry        = $this->createMock(ModelFactory::class);
     }
 
     public function testOnLeadPostSaveWillNotProcessTheSameLeadTwice()
@@ -122,7 +129,8 @@ class LeadSubscriberTest extends CommonMocks
             $this->dncReasonHelper,
             $this->entityManager,
             $this->translator,
-            $this->router
+            $this->router,
+            $this->modelFacotry
         );
 
         $leadEvent = $this->createMock(LeadEvent::class);
@@ -208,13 +216,14 @@ class LeadSubscriberTest extends CommonMocks
             $this->entityManager,
             $this->translator,
             $this->router,
+            $this->modelFacotry,
             true
         );
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber($subscriber);
 
-        $dispatcher->dispatch(LeadEvents::TIMELINE_ON_GENERATE, $leadEvent);
+        $dispatcher->dispatch($leadEvent, LeadEvents::TIMELINE_ON_GENERATE);
 
         $this->assertSame([$timelineEvent], $leadEvent->getEvents());
     }

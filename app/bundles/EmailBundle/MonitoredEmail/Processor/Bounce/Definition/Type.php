@@ -7,12 +7,12 @@ namespace Mautic\EmailBundle\MonitoredEmail\Processor\Bounce\Definition;
  */
 final class Type
 {
-    const AUTOREPLY    = 'autoreply';
-    const BLOCKED      = 'blocked';
-    const HARD         = 'hard';
-    const GENERIC      = 'generic';
-    const UNKNOWN      = 'unknown';
-    const UNRECOGNIZED = 'unrecognized';
-    const SOFT         = 'soft';
-    const TEMPORARY    = 'temporary';
+    public const AUTOREPLY    = 'autoreply';
+    public const BLOCKED      = 'blocked';
+    public const HARD         = 'hard';
+    public const GENERIC      = 'generic';
+    public const UNKNOWN      = 'unknown';
+    public const UNRECOGNIZED = 'unrecognized';
+    public const SOFT         = 'soft';
+    public const TEMPORARY    = 'temporary';
 }

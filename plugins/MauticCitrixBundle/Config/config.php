@@ -27,17 +27,10 @@ return [
                     'mautic.form.model.submission',
                     'translator',
                     'doctrine.orm.entity_manager',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
-                ],
-            ],
-            'mautic.citrix.leadbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\LeadSubscriber::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
                 ],
             ],
             'mautic.citrix.campaignbundle.subscriber' => [
@@ -45,53 +38,10 @@ return [
                 'arguments' => [
                     'mautic.citrix.model.citrix',
                     'translator',
-                    'mautic.helper.templating',
+                    'twig',
                 ],
                 'methodCalls' => [
                     'setEmailModel' => ['mautic.email.model.email'],
-                ],
-            ],
-            'mautic.citrix.emailbundle.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\EmailSubscriber::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                    'event_dispatcher',
-                    'mautic.helper.templating',
-                ],
-            ],
-            'mautic.citrix.stats.subscriber' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\StatsSubscriber::class,
-                'arguments' => [
-                    'mautic.security',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'mautic.citrix.integration.request' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\EventListener\IntegrationRequestSubscriber::class,
-            ],
-        ],
-        'forms' => [
-            'mautic.form.type.fieldslist.citrixlist' => [
-                'class' => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixListType::class,
-            ],
-            'mautic.form.type.citrix.submitaction' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixActionType::class,
-                'arguments' => [
-                    'mautic.form.model.field',
-                ],
-            ],
-            'mautic.form.type.citrix.campaignevent' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignEventType::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'translator',
-                ],
-            ],
-            'mautic.form.type.citrix.campaignaction' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Form\Type\CitrixCampaignActionType::class,
-                'arguments' => [
-                    'translator',
                 ],
             ],
         ],
@@ -108,18 +58,7 @@ return [
             'mautic.citrix.fixture.load_citrix_data' => [
                 'class'     => MauticPlugin\MauticCitrixBundle\Tests\DataFixtures\ORM\LoadCitrixData::class,
                 'tag'       => \Doctrine\Bundle\FixturesBundle\DependencyInjection\CompilerPass\FixturesCompilerPass::FIXTURE_TAG,
-                'arguments' => ['doctrine.orm.entity_manager'],
                 'optional'  => true,
-            ],
-        ],
-        'commands' => [
-            'mautic.citrix.command.sync' => [
-                'class'     => \MauticPlugin\MauticCitrixBundle\Command\SyncCommand::class,
-                'arguments' => [
-                    'mautic.citrix.model.citrix',
-                    'mautic.helper.paths',
-                ],
-                'tag' => 'console.command',
             ],
         ],
         'integrations' => [

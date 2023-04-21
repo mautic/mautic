@@ -10,12 +10,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Class CategoryListType.
- */
 class CategoryListType extends AbstractType
 {
     /**
@@ -34,14 +31,11 @@ class CategoryListType extends AbstractType
     private $translator;
 
     /**
-     * @var Router
+     * @var RouterInterface
      */
     private $router;
 
-    /**
-     * CategoryListType constructor.
-     */
-    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, Router $router)
+    public function __construct(EntityManager $em, TranslatorInterface $translator, CategoryModel $model, RouterInterface $router)
     {
         $this->em         = $em;
         $this->translator = $translator;

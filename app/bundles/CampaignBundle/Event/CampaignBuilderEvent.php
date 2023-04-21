@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Event\Exception\KeyAlreadyRegisteredException;
 use Mautic\CoreBundle\Event\ComponentValidationTrait;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignBuilderEvent extends Event

@@ -221,7 +221,7 @@ class ContactSegmentQueryBuilder
         }
 
         $event = new LeadListQueryBuilderGeneratedEvent($segment, $queryBuilder);
-        $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED);
     }
 
     /**
@@ -245,7 +245,7 @@ class ContactSegmentQueryBuilder
 
             $alias = $this->generateRandomParameterName();
             $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
-            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_ON_FILTERING);
             if ($event->isFilteringDone()) {
                 $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
 

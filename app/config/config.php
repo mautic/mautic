@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Reference;
 /** @var \Symfony\Component\DependencyInjection\ContainerBuilder $container */
 
 // Include path settings
-$root = $container->getParameter('kernel.root_dir');
+$root = $container->getParameter('kernel.project_dir').'/app';
 
 /** @var array $paths */
 include __DIR__.'/paths_helper.php';
@@ -38,9 +38,6 @@ $parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
 $configParameterBag      = $parameterLoader->getParameterBag();
 $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
-// Set template engines
-$engines = ['php', 'twig'];
-
 // Decide on secure cookie based on site_url setting or the request if in installer
 // This cannot be set dynamically
 
@@ -55,7 +52,7 @@ if (defined('MAUTIC_INSTALLER')) {
 $container->loadFromExtension('framework', [
     'secret' => '%mautic.secret_key%',
     'router' => [
-        'resource'            => '%kernel.root_dir%/config/routing.php',
+        'resource'            => '%kernel.project_dir%/app/config/routing.php',
         'strict_requirements' => null,
     ],
     'form'            => null,
@@ -63,26 +60,43 @@ $container->loadFromExtension('framework', [
     'validation'      => [
         'enable_annotations' => false,
     ],
-    'templating' => [
-        'engines' => $engines,
-        'form'    => [
-            'resources' => [
-                'MauticCoreBundle:FormTheme\\Custom',
-            ],
-        ],
-    ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [
         'enabled'  => true,
         'fallback' => 'en_US',
     ],
     'session'         => [ //handler_id set to null will use default session handler from php.ini
-        'handler_id'    => null,
-        'name'          => '%env(MAUTIC_SESSION_NAME)%',
-        'cookie_secure' => $secureCookie,
+        'handler_id'           => null,
+        'name'                 => '%env(MAUTIC_SESSION_NAME)%',
+        'cookie_secure'        => $secureCookie,
+        'cookie_samesite'      => 'lax',
     ],
     'fragments'            => null,
     'http_method_override' => true,
+    'messenger'            => [
+        'default_bus' => 'email.bus',
+        'buses'       => [
+            'email.bus' => null,
+        ],
+        'transports'  => [
+            'email_transport' => [
+                'dsn'            => '%env(MAUTIC_MESSENGER_TRANSPORT_DSN)%',
+                'options'        => [
+                    'table_name' => MAUTIC_TABLE_PREFIX.'messenger_messages',
+                ],
+                'retry_strategy' => [
+                    'max_retries' => $configParameterBag->get('messenger_retry_strategy_max_retries', 3),
+                    'delay'       => $configParameterBag->get('messenger_retry_strategy_delay', 1000),
+                    'multiplier'  => $configParameterBag->get('messenger_retry_strategy_multiplier', 2),
+                    'max_delay'   => $configParameterBag->get('messenger_retry_strategy_max_delay', 0),
+                ],
+            ],
+        ],
+        'routing' => [
+            // TODO: Enable this line when you want to merge symfony/mailer
+            // 'Symfony\Component\Mailer\Messenger\SendEmailMessage' => 'email_transport',
+        ],
+    ],
 
     /*'validation'           => array(
         'static_method' => array('loadValidatorMetadata')
@@ -118,7 +132,23 @@ $dbalSettings = [
     ],
     'server_version' => '%env(mauticconst:MAUTIC_DB_SERVER_VERSION)%',
     'wrapper_class'  => \Mautic\CoreBundle\Doctrine\Connection\ConnectionWrapper::class,
+    'schema_filter'  => '~^(?!'.MAUTIC_TABLE_PREFIX.'messenger_messages)~',
 ];
+
+if (!empty($localConfigParameterBag->get('db_host_ro'))) {
+    $dbalSettings['wrapper_class']   = \Mautic\CoreBundle\Doctrine\Connection\PrimaryReadReplicaConnectionWrapper::class;
+    $dbalSettings['keep_replica']    = true;
+    $dbalSettings['replicas']        = [
+        'replica1' => [
+            'host'                  => '%mautic.db_host_ro%',
+            'port'                  => '%mautic.db_port%',
+            'dbname'                => '%mautic.db_name%',
+            'user'                  => '%mautic.db_user%',
+            'password'              => '%mautic.db_password%',
+            'charset'               => 'utf8mb4',
+        ],
+    ];
+}
 
 $container->loadFromExtension('doctrine', [
     'dbal' => $dbalSettings,
@@ -136,11 +166,15 @@ $container->loadFromExtension('doctrine', [
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'        => '%kernel.root_dir%/migrations',
-    'namespace'       => 'Mautic\\Migrations',
-    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
-    'name'            => 'Mautic Migrations',
-    'custom_template' => '%kernel.root_dir%/migrations/Migration.template',
+    'migrations_paths' => [
+        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+    ],
+    'storage' => [
+        'table_storage' => [
+            'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+        ],
+    ],
+    'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
 // Swiftmailer Configuration
@@ -160,8 +194,6 @@ $container->loadFromExtension('swiftmailer', [
 
 //KnpMenu Configuration
 $container->loadFromExtension('knp_menu', [
-    'twig'             => false,
-    'templating'       => true,
     'default_renderer' => 'mautic',
 ]);
 
@@ -232,6 +264,11 @@ $container->loadFromExtension('framework', [
             'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
         ],
     ],
+]);
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'exception_controller' => null,
 ]);
 
 $rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');

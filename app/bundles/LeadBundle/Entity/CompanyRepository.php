@@ -10,7 +10,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class CompanyRepository.
+ * @extends CommonRepository<Company>
  */
 class CompanyRepository extends CommonRepository implements CustomFieldRepositoryInterface
 {
@@ -98,10 +98,11 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
     /**
      * @param $order
+     * @param mixed[] $args
      *
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getEntitiesOrmQueryBuilder($order)
+    public function getEntitiesOrmQueryBuilder($order, array $args=[])
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select($this->getTableAlias().','.$order)
@@ -142,7 +143,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->andWhere('comp.id = :companyId')->setParameter('companyId', $companyId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -184,7 +185,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         if ($this->dispatcher) {
             $event = new CompanyBuildSearchEvent($filter->string, $filter->command, $unique, $filter->not, $q);
-            $this->dispatcher->dispatch(LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::COMPANY_BUILD_SEARCH_COMMANDS);
             if ($event->isSearchDone()) {
                 $returnParameter = $event->getReturnParameters();
                 $filter->strict  = $event->getStrict();
@@ -237,8 +238,9 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             return $companies[$key];
         }
 
-        $q->select('comp.*')
-            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp');
+        $q->select('comp.*, cl.is_primary')
+            ->from(MAUTIC_TABLE_PREFIX.'companies', 'comp')
+            ->leftJoin('comp', MAUTIC_TABLE_PREFIX.'companies_leads', 'cl', 'cl.company_id = comp.id');
 
         if (!empty($id)) {
             $q->where(
@@ -253,7 +255,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
 
         $q->orderBy('comp.companyname', 'ASC');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $companies[$key] = $results;
 
@@ -285,7 +287,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         )
             ->groupBy('cl.company_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {
@@ -341,7 +343,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             )->setParameter('state', $state);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -365,7 +367,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             )
             ->orderBy('l.date_added, l.company_id', 'DESC'); // primary should be [0]
-        $companies = $qb->execute()->fetchAll();
+
+        $companies = $qb->execute()->fetchAllAssociative();
 
         // Group companies per contact
         $contactCompanies = [];
@@ -401,7 +404,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 )
             );
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -416,7 +419,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
         $query->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -475,13 +478,36 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 ->setParameter('true', true, 'boolean');
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
-    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null)
+    /**
+     * Get list of company Ids by unique field data.
+     *
+     * @param iterable<mixed> $uniqueFieldsWithData An array of columns & values to filter by
+     * @param int|null        $companyId            The current company id. Added to query to skip and find other companies
+     * @param int|null        $limit                Limit count of results to return
+     *
+     * @return array<array{id: string}>
+     */
+    public function getCompanyIdsByUniqueFields($uniqueFieldsWithData, ?int $companyId = null, ?int $limit = null): array
+    {
+        return $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.id', $companyId, $limit);
+    }
+
+    /**
+     * Get list of company Ids by unique field data.
+     *
+     * @param iterable<mixed> $uniqueFieldsWithData An array of columns & values to filter by
+     * @param int|null        $companyId            The current company id. Added to query to skip and find other companies
+     * @param int|null        $limit                Limit count of results to return
+     *
+     * @return array<array{id: string}>
+     */
+    public function getCompanyFieldsByUniqueFields($uniqueFieldsWithData, string $select, ?int $companyId = null, ?int $limit = null): array
     {
         $q = $this->getEntityManager()->getConnection()->createQueryBuilder()
-            ->select('c.*')
+            ->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c');
 
         // loop through the fields and
@@ -490,23 +516,28 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
                 ->setParameter($col, $val);
         }
 
-        // if we have a lead ID lets use it
-        if (!empty($companyId)) {
-            // make sure that its not the id we already have
+        // if we have a company ID lets use it
+        if ($companyId > 0) {
+            // make sure that it's not the id we already have
             $q->andWhere('c.id != :companyId')
                 ->setParameter('companyId', $companyId);
         }
 
-        if ($limit) {
+        if ($limit > 0) {
             $q->setMaxResults($limit);
         }
 
-        $results = $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
+    }
+
+    public function getCompaniesByUniqueFields(array $uniqueFieldsWithData, int $companyId = null, int $limit = null)
+    {
+        $results = $this->getCompanyFieldsByUniqueFields($uniqueFieldsWithData, 'c.*', $companyId, $limit);
 
         // Collect the IDs
         $companies = [];
         foreach ($results as $r) {
-            $companies[$r['id']] = $r;
+            $companies[(int) $r['id']] = $r;
         }
 
         // Get entities

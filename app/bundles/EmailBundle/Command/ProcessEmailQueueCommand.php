@@ -58,7 +58,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $options     = $input->getOptions();
         $env         = (!empty($options['env'])) ? $options['env'] : 'dev';
@@ -119,7 +119,7 @@ EOT
                         $tryAgain = false;
                         if ($this->eventDispatcher->hasListeners(EmailEvents::EMAIL_RESEND)) {
                             $event = new QueueEmailEvent($message);
-                            $this->eventDispatcher->dispatch(EmailEvents::EMAIL_RESEND, $event);
+                            $this->eventDispatcher->dispatch($event, EmailEvents::EMAIL_RESEND);
                             $tryAgain = $event->shouldTryAgain();
                         }
 
@@ -128,7 +128,7 @@ EOT
                         } catch (\Swift_TransportException $e) {
                             if (!$tryAgain && $this->eventDispatcher->hasListeners(EmailEvents::EMAIL_FAILED)) {
                                 $event = new QueueEmailEvent($message);
-                                $this->eventDispatcher->dispatch(EmailEvents::EMAIL_FAILED, $event);
+                                $this->eventDispatcher->dispatch($event, EmailEvents::EMAIL_FAILED);
                             }
                         }
                     } else {
@@ -187,7 +187,7 @@ EOT
         $this->completeRun();
 
         if (0 !== $returnCode) {
-            return $returnCode;
+            return (int) $returnCode;
         }
 
         return 0;

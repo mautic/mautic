@@ -2,37 +2,41 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use DateTime;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * Class WebhookQueue.
- */
 class WebhookQueue
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
     /**
-     * @var Webhook
+     * @var Webhook|null
      */
     private $webhook;
 
     /**
-     * @var \DateTime
+     * @var DateTime|null
      */
     private $dateAdded;
 
     /**
-     * @var string
+     * @var string|null
      */
-    private $payload;
+    private $payload; // @phpstan-ignore-line (BC: plain payload is fetched by ORM)
 
     /**
-     * @var Event
+     * @var string|resource|null
+     */
+    private $payloadCompressed;
+
+    /**
+     * @var Event|null
      **/
     private $event;
 
@@ -45,8 +49,13 @@ class WebhookQueue
         $builder->createManyToOne('webhook', 'Webhook')
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
-        $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
-        $builder->addField('payload', Type::TEXT);
+        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
+        $builder->addNullableField('payload', Types::TEXT);
+        $builder->createField('payloadCompressed', Types::BLOB)
+            ->columnName('payload_compressed')
+            ->nullable()
+            ->length(MySqlPlatform::LENGTH_LIMIT_MEDIUMBLOB)
+            ->build();
         $builder->createManyToOne('event', 'Event')
             ->inversedBy('queues')
             ->addJoinColumn('event_id', 'id', false, false, 'CASCADE')
@@ -54,9 +63,7 @@ class WebhookQueue
     }
 
     /**
-     * Get id.
-     *
-     * @return int
+     * @return int|null
      */
     public function getId()
     {
@@ -64,7 +71,7 @@ class WebhookQueue
     }
 
     /**
-     * @return mixed
+     * @return Webhook|null
      */
     public function getWebhook()
     {
@@ -72,7 +79,9 @@ class WebhookQueue
     }
 
     /**
-     * @param mixed $webhook
+     * @param Webhook|null $webhook
+     *
+     * @return WebhookQueue
      */
     public function setWebhook($webhook)
     {
@@ -82,7 +91,7 @@ class WebhookQueue
     }
 
     /**
-     * @return mixed
+     * @return DateTime|null
      */
     public function getDateAdded()
     {
@@ -90,7 +99,9 @@ class WebhookQueue
     }
 
     /**
-     * @param mixed $dateAdded
+     * @param DateTime|null $dateAdded
+     *
+     * @return WebhookQueue
      */
     public function setDateAdded($dateAdded)
     {
@@ -100,25 +111,44 @@ class WebhookQueue
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getPayload()
     {
-        return $this->payload;
+        if (null !== $this->payload) {
+            // BC: plain payload is fetched by ORM
+            return $this->payload;
+        }
+
+        if (null === $this->payloadCompressed) {
+            // no payload is set
+            return null;
+        }
+
+        $payloadCompressed = $this->payloadCompressed;
+
+        if (is_resource($payloadCompressed)) {
+            // compressed payload is fetched by ORM
+            $payloadCompressed = stream_get_contents($this->payloadCompressed);
+        }
+
+        return gzuncompress($payloadCompressed);
     }
 
     /**
-     * @param mixed $payload
+     * @param string $payload
+     *
+     * @return WebhookQueue
      */
     public function setPayload($payload)
     {
-        $this->payload = $payload;
+        $this->payloadCompressed = gzcompress($payload, 9);
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return Event|null
      */
     public function getEvent()
     {
@@ -126,7 +156,9 @@ class WebhookQueue
     }
 
     /**
-     * @param mixed $event
+     * @param Event|null $event
+     *
+     * @return WebhookQueue
      */
     public function setEvent($event)
     {

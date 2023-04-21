@@ -10,6 +10,9 @@ use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\DoNotContact;
 
+/**
+ * @extends CommonRepository<Email>
+ */
 class EmailRepository extends CommonRepository
 {
     /**
@@ -34,7 +37,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {
@@ -61,7 +64,8 @@ class EmailRepository extends CommonRepository
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         $dnc     = count($results) ? $results[0] : null;
 
         if (null === $dnc) {
@@ -202,7 +206,7 @@ class EmailRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
                 ->execute()
-                ->fetchAll();
+                ->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
 
@@ -307,7 +311,7 @@ class EmailRepository extends CommonRepository
             return $q;
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
@@ -473,7 +477,7 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportDNCSubscriber implements EventSubscriberInterface
 {
-    const DNC = 'contact.dnc';
+    public const DNC = 'contact.dnc';
 
     /**
      * @var FieldsBuilder
@@ -77,9 +77,9 @@ class ReportDNCSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $columns        = $this->fieldsBuilder->getLeadFieldsColumns('l.');
-        $companyColumns = $this->companyReportData->getCompanyData();
-        $filters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+        $columns            = $this->fieldsBuilder->getLeadFieldsColumns('l.');
+        $companyColumns     = $this->companyReportData->getCompanyData();
+        $leadFilters        = $this->fieldsBuilder->getLeadFilter('l.', 's.');
 
         $dncColumns = [
             'dnc.reason' => [
@@ -108,7 +108,7 @@ class ReportDNCSubscriber implements EventSubscriberInterface
         $data = [
             'display_name' => 'mautic.lead.report.dnc',
             'columns'      => array_merge($columns, $companyColumns, $dncColumns),
-            'filters'      => $filters,
+            'filters'      => array_merge($columns, $companyColumns, $dncColumns, $leadFilters),
         ];
         $event->addTable(self::DNC, $data, ReportSubscriber::GROUP_CONTACTS);
     }

@@ -127,6 +127,6 @@ class FieldModelTest extends MauticMysqlTestCase
             ."$table' AND COLUMN_NAME = '$column'"
         );
 
-        return $stmt->fetchAll();
+        return $stmt->fetchAllAssociative();
     }
 }

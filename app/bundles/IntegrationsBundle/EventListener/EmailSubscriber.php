@@ -83,8 +83,8 @@ class EmailSubscriber implements EventSubscriberInterface
 
         $mappedObjectTokens = new MappedIntegrationObjectTokenEvent();
         $this->eventDispatcher->dispatch(
-            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT,
-            $mappedObjectTokens
+            $mappedObjectTokens,
+            IntegrationEvents::INTEGRATION_OBJECT_TOKEN_EVENT
         );
 
         foreach ($mappedObjectTokens->getTokens() as $integration => $t) {

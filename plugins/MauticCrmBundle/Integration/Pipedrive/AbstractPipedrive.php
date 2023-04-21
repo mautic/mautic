@@ -8,11 +8,11 @@ use MauticPlugin\MauticCrmBundle\Integration\PipedriveIntegration;
 
 abstract class AbstractPipedrive
 {
-    const PERSON_ENTITY_TYPE          = 'person';
-    const LEAD_ENTITY_TYPE            = 'lead';
-    const ORGANIZATION_ENTITY_TYPE    = 'organization';
-    const COMPANY_ENTITY_TYPE         = 'company';
-    const NO_ALLOWED_FIELDS_TO_EXPORT = ['ID'];
+    public const PERSON_ENTITY_TYPE          = 'person';
+    public const LEAD_ENTITY_TYPE            = 'lead';
+    public const ORGANIZATION_ENTITY_TYPE    = 'organization';
+    public const COMPANY_ENTITY_TYPE         = 'company';
+    public const NO_ALLOWED_FIELDS_TO_EXPORT = ['ID'];
 
     /**
      * @var PipedriveIntegration

@@ -25,8 +25,14 @@ trait MatchFilterForLeadTrait
             $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
             $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
 
-            if (!array_key_exists($data['field'], $lead) && !$isCompanyField) {
-                continue;
+            if ($isCompanyField) {
+                if (empty($primaryCompany)) {
+                    continue;
+                }
+            } else {
+                if (!array_key_exists($data['field'], $lead)) {
+                    continue;
+                }
             }
 
             /*
