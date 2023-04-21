@@ -373,6 +373,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
+            $this->pageModel,
             $redirectId
         );
         self::assertInstanceOf(RedirectResponse::class, $response);
@@ -457,6 +458,7 @@ class PublicControllerTest extends MauticMysqlTestCase
             $this->primaryCompanyHelper,
             $this->ipLookupHelper,
             $this->logger,
+            $this->pageModel,
             $redirectId
         );
         self::assertInstanceOf(RedirectResponse::class, $response);
