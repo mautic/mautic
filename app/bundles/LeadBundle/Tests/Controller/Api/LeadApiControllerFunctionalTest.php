@@ -581,7 +581,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($contactId, $response['contacts'][0]['id']);
         $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
         $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
-        $this->assertEmpty($response[0]['contacts'][0]['fields']['all']['lastname']);
+        $this->assertEmpty($response['contacts'][0]['fields']['all']['lastname']);
         $this->assertSame(4, $response['contacts'][0]['points']);
         $this->assertSame(4, $response['contacts'][0]['fields']['all']['points']);
         $this->assertEquals(2, count($response['contacts'][0]['tags']));
@@ -706,7 +706,7 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($contactId, $response['contacts'][0]['id']);
         $this->assertEquals($payload[0]['email'], $response['contacts'][0]['fields']['all']['email']);
         $this->assertEquals($payload[0]['firstname'], $response['contacts'][0]['fields']['all']['firstname']);
-        $this->assertEmpty($response[0]['contacts'][0]['fields']['all']['lastname']);
+        $this->assertEmpty($response['contacts'][0]['fields']['all']['lastname']);
     }
 
     public function testBatchDncAddAndRemove(): void
