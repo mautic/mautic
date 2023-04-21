@@ -239,7 +239,6 @@ class AppKernel extends Kernel
         $parameterLoader = $this->getParameterLoader();
         $parameterLoader->loadIntoEnvironment();
         if (!defined('MAUTIC_TABLE_PREFIX')) {
-
             // Set the table prefix before boot.
             // Firstly look into environment variables.
             $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
