@@ -5,10 +5,9 @@ namespace Mautic\CoreBundle\ErrorHandler {
     use Mautic\CoreBundle\Exception\ErrorHandlerException;
     use Psr\Log\LoggerInterface;
     use Psr\Log\LogLevel;
-    use Symfony\Component\Debug\Exception\FatalErrorException;
-    use Symfony\Component\Debug\Exception\FatalThrowableError;
-    use Symfony\Component\Debug\Exception\OutOfMemoryException;
     use Symfony\Component\ErrorHandler\Debug;
+        use Symfony\Component\ErrorHandler\Error\FatalError;
+    use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
     use Symfony\Component\ErrorHandler\Exception\FlattenException;
 
     class ErrorHandler
@@ -217,22 +216,18 @@ namespace Mautic\CoreBundle\ErrorHandler {
                         $this->log(LogLevel::ERROR, "PHP $name: {$error['message']} - in file {$error['file']} - at line {$error['line']}");
 
                         if (0 === strpos($error['message'], 'Allowed memory') || 0 === strpos($error['message'], 'Out of memory')) {
-                            $exception = new OutOfMemoryException(
+                            $exception = new OutOfMemoryError(
                                 $this->getErrorName($error['type']).': '.$error['message'],
                                 0,
-                                $error['type'],
-                                $error['file'],
-                                $error['line'],
+                                $error,
                                 2,
                                 false
                             );
                         } else {
-                            $exception = new FatalErrorException(
+                            $exception = new FatalError(
                                 $this->getErrorName($error['type']).': '.$error['message'],
                                 0,
-                                $error['type'],
-                                $error['file'],
-                                $error['line'],
+                                $error,
                                 2,
                                 true
                             );
@@ -258,7 +253,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             if (!$exception instanceof \Exception && !$exception instanceof FlattenException) {
                 if ($exception instanceof \Throwable) {
-                    $exception = new FatalThrowableError($exception);
+                    $exception = new FatalError($exception->getMessage(), $exception->getCode(), ['file' => $exception->getFile(), 'line' => $exception->getLine()], 2, true);
                     $inline    = false;
                 } else {
                     return false;

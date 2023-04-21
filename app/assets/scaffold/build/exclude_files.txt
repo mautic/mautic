@@ -26,7 +26,6 @@ bin/phpunit
 bin/security-checker
 bin/simple-phpunit
 build/*
-codeception.yml
 deleted_files.txt
 modified_files.txt
 node_modules/*

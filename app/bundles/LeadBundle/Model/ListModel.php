@@ -36,7 +36,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -882,7 +882,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -926,7 +926,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if (in_array(0, $segments)) {
             $qAll = $this->em->getConnection()->createQueryBuilder();
@@ -943,7 +943,7 @@ class ListModel extends FormModel
             if (!empty($dateTo)) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
-            $resultsAll = $qAll->execute()->fetchAll();
+            $resultsAll = $qAll->execute()->fetchAllAssociative();
             $results    = array_merge($results, $resultsAll);
         }
 
@@ -1028,7 +1028,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr($result['stage'], 0, 12);
@@ -1094,7 +1094,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
@@ -1193,7 +1193,7 @@ class ListModel extends FormModel
             ]
         );
         $dependents = [];
-        $accessor   = new PropertyAccessor();
+        $accessor   = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {

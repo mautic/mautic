@@ -1990,7 +1990,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2018,7 +2018,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2050,7 +2050,8 @@ class LeadModel extends FormModel
         if (empty($options['includeAnonymous'])) {
             $q->andWhere($q->expr()->isNotNull('t.date_identified'));
         }
-        $results = $q->execute()->fetchAll();
+
+        $results = $q->execute()->fetchAllAssociative();
 
         if ($results) {
             foreach ($results as &$result) {

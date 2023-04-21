@@ -64,7 +64,7 @@ class NoteController extends FormController
         ];
 
         $tmpl     = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $noteType = InputHelper::clean($request->request->get('noteTypes', [], true));
+        $noteType = InputHelper::clean($request->request->get('noteTypes') ?? []);
         if (empty($noteType) && 'index' === $tmpl) {
             $noteType = $session->get('mautic.lead.'.$lead->getId().'.notetype.filter', []);
         }

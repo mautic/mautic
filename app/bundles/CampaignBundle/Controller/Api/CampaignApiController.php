@@ -274,8 +274,8 @@ class CampaignApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $where = InputHelper::clean($request->query->get('where', []));
-        $order = InputHelper::clean($request->query->get('order', []));
+        $where = InputHelper::clean($request->query->get('where') ?? []);
+        $order = InputHelper::clean($request->query->get('order') ?? []);
         $start = (int) $request->query->get('start', 0);
         $limit = (int) $request->query->get('limit', 100);
 

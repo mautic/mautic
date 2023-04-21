@@ -129,7 +129,7 @@ class StageController extends AbstractFormController
         //set the page we came from
         $page       = $request->getSession()->get('mautic.stage.page', 1);
         $method     = $request->getMethod();
-        $stage      = $request->request->get('stage', []);
+        $stage      = $request->request->get('stage') ?? [];
         $actionType = 'POST' === $method ? ($stage['type'] ?? '') : '';
         $action     = $this->generateUrl('mautic_stage_action', ['objectAction' => 'new']);
         $actions    = $model->getStageActions();

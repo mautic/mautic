@@ -226,10 +226,12 @@ class ClientController extends FormController
                 if ($valid = $this->isFormValid($form)) {
                     //form is valid so process the data
                     // If the admin is creating API credentials, enable 'Client Credential' grant type
-                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $this->getUser()->getRole()->isAdmin()) {
+                    /** @var User $user */
+                    $user = $this->getUser();
+                    if (ClientModel::API_MODE_OAUTH2 == $apiMode && $user->getRole()->isAdmin()) {
                         $client->addGrantType(OAuth2::GRANT_TYPE_CLIENT_CREDENTIALS);
                     }
-                    $client->setRole($this->getUser()->getRole());
+                    $client->setRole($user->getRole());
                     $model->saveEntity($client);
                     $this->addFlashMessage(
                         'mautic.api.client.notice.created',

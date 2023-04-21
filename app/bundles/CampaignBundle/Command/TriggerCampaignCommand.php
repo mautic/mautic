@@ -217,16 +217,18 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         // Specific campaign;
         if ($id) {
+            $statusCode = 0;
             /** @var \Mautic\CampaignBundle\Entity\Campaign $campaign */
             if ($campaign = $this->campaignRepository->getEntity($id)) {
                 $this->triggerCampaign($campaign);
             } else {
                 $output->writeln('<error>'.$this->translator->trans('mautic.campaign.rebuild.not_found', ['%id%' => $id]).'</error>');
+                $statusCode = 1;
             }
 
             $this->completeRun();
 
-            return 0;
+            return (int) $statusCode;
         }
 
         // All published campaigns
