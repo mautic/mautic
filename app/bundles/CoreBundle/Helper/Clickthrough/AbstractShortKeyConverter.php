@@ -4,8 +4,16 @@ namespace Mautic\CoreBundle\Helper\Clickthrough;
 
 abstract class AbstractShortKeyConverter
 {
+    /**
+     * @var array<int|string, int|string>
+     */
     protected array $shortKeys;
 
+    /**
+     * @param array<mixed> $input
+     *
+     * @return array<mixed>
+     */
     public function pack(array $input): array
     {
         $packed = [];
@@ -19,6 +27,11 @@ abstract class AbstractShortKeyConverter
         return $packed;
     }
 
+    /**
+     * @param array<mixed> $input
+     *
+     * @return array<mixed>
+     */
     public function unpack(array $input): array
     {
         $unpacked = [];
