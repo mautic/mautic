@@ -23,11 +23,11 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
 
         $emailModel                                             =  self::$container->get('mautic.email.model.email');
         \assert($emailModel instanceof EmailModel);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 1);
+        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 8);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 2);
+        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
         $this->assertEquals($sentCount, 8);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, null, null, null, null, 3, 3);
+        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
         $this->assertEquals($sentCount, 7);
     }
 
@@ -64,7 +64,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param Lea[] $contacts
+     * @param Lead[] $contacts
      */
     private function addContactsToSegment(array $contacts, LeadList $segment): void
     {
