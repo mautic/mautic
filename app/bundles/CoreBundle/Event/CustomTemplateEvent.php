@@ -63,7 +63,7 @@ class CustomTemplateEvent extends AbstractCustomRequestEvent
     }
 
     /**
-     * @param arrat $vars
+     * @param array<string, mixed> $vars
      *
      * @return CustomTemplateEvent
      */

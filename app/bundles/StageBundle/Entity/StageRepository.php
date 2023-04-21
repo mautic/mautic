@@ -5,7 +5,7 @@ namespace Mautic\StageBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class StageRepository.
+ * @extends CommonRepository<Stage>
  */
 class StageRepository extends CommonRepository
 {
@@ -72,7 +72,7 @@ class StageRepository extends CommonRepository
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 

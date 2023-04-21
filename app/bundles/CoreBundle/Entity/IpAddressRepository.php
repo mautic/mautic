@@ -6,7 +6,7 @@ use Doctrine\DBAL\Exception;
 use PDO;
 
 /**
- * IpAddressRepository.
+ * @extends CommonRepository<IpAddress>
  */
 class IpAddressRepository extends CommonRepository
 {
@@ -89,7 +89,7 @@ SQL;
         $params = [':limit' => $limit];
         $types  = [':limit' => PDO::PARAM_INT];
 
-        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchAll(PDO::FETCH_COLUMN, 0);
+        return $this->_em->getConnection()->executeQuery($sql, $params, $types)->fetchFirstColumn();
     }
 
     /**

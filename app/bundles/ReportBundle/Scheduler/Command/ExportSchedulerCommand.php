@@ -9,7 +9,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExportSchedulerCommand extends Command
 {
@@ -44,7 +44,7 @@ class ExportSchedulerCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $report = $input->getOption('report');
 
@@ -53,7 +53,7 @@ class ExportSchedulerCommand extends Command
         } catch (\InvalidArgumentException $e) {
             $output->writeln('<error>'.$this->translator->trans('mautic.report.schedule.command.invalid_parameter').'</error>');
 
-            return;
+            return 0;
         }
 
         try {
@@ -62,8 +62,8 @@ class ExportSchedulerCommand extends Command
             $output->writeln('<info>'.$this->translator->trans('mautic.report.schedule.command.finished').'</info>');
         } catch (FileIOException $e) {
             $output->writeln('<error>'.$e->getMessage().'</error>');
-
-            return;
         }
+
+        return 0;
     }
 }

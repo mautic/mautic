@@ -6,7 +6,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * RoleRepository.
+ * @extends CommonRepository<Role>
  */
 class RoleRepository extends CommonRepository
 {
@@ -132,7 +132,7 @@ class RoleRepository extends CommonRepository
         )
             ->groupBy('u.role_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

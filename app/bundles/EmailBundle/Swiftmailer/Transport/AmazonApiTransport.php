@@ -12,7 +12,7 @@ use Mautic\EmailBundle\Helper\PlainTextMessageHelper;
 use Mautic\EmailBundle\Swiftmailer\Amazon\AmazonCallback;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_Transport, TokenTransportInterface, CallbackTransportInterface
 {
@@ -183,7 +183,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
                 throw new \Exception('Your AWS SES quota is currently exceeded');
             }
 
-            $this->concurrency   = floor($account->get('SendQuota')['MaxSendRate']);
+            $this->concurrency   = (int) floor($account->get('SendQuota')['MaxSendRate']);
 
             $this->started = true;
         }
@@ -339,7 +339,7 @@ class AmazonApiTransport extends AbstractTokenArrayTransport implements \Swift_T
             }
             $replyTo = $message->getReplyTo();
             if (!empty($replyTo)) {
-                $sesArray['ReplyToAddresses'] = [key($replyTo)];
+                $sesArray['ReplyToAddresses'] = [key((array) $replyTo)];
             }
             $headers            = $message->getHeaders();
             if ($headers->has('X-SES-CONFIGURATION-SET')) {

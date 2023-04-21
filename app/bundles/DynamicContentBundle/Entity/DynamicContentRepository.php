@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Serializer;
 
 /**
- * DynamicContentRepository.
+ * @extends CommonRepository<DynamicContent>
  */
 class DynamicContentRepository extends CommonRepository
 {
@@ -101,7 +101,7 @@ class DynamicContentRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {
@@ -210,7 +210,7 @@ class DynamicContentRepository extends CommonRepository
             ->setParameter('slot', '%'.$slot.'%')
             ->orderBy('c.is_published');
 
-        $result = $qb->execute()->fetchAll();
+        $result = $qb->execute()->fetchAllAssociative();
 
         foreach ($result as $item) {
             $properties = Serializer::decode($item['properties']);

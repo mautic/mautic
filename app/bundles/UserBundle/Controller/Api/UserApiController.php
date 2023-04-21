@@ -3,22 +3,54 @@
 namespace Mautic\UserBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
- * Class UserApiController.
+ * @extends CommonApiController<User>
  */
 class UserApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var UserModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model = null;
+
+    private UserPasswordEncoderInterface $encoder;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        UserPasswordEncoderInterface $encoder,
+        RequestStack $requestStack
+    ) {
+        $this->encoder = $encoder;
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+    }
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('user.user');
-        $this->entityClass      = 'Mautic\UserBundle\Entity\User';
+        $userModel = $this->getModel('user.user');
+        \assert($userModel instanceof UserModel);
+
+        $this->model            = $userModel;
+        $this->entityClass      = User::class;
         $this->entityNameOne    = 'user';
         $this->entityNameMulti  = 'users';
         $this->serializerGroups = ['userDetails', 'roleList', 'publishDetails'];
@@ -44,23 +76,22 @@ class UserApiController extends CommonApiController
     /**
      * Creates a new user.
      */
-    public function newEntityAction()
+    public function newEntityAction(Request $request)
     {
         $entity = $this->model->getEntity();
 
-        if (!$this->get('mautic.security')->isGranted('user:users:create')) {
+        if (!$this->security->isGranted('user:users:create')) {
             return $this->accessDenied();
         }
 
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         if (isset($parameters['plainPassword']['password'])) {
             $submittedPassword = $parameters['plainPassword']['password'];
-            $encoder           = $this->get('security.password_encoder');
-            $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
+            $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
         }
 
-        return $this->processForm($entity, $parameters, 'POST');
+        return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
     /**
@@ -72,19 +103,19 @@ class UserApiController extends CommonApiController
      *
      * @throws NotFoundHttpException
      */
-    public function editEntityAction($id)
+    public function editEntityAction(Request $request, $id)
     {
         $entity     = $this->model->getEntity($id);
-        $parameters = $this->request->request->all();
-        $method     = $this->request->getMethod();
+        $parameters = $request->request->all();
+        $method     = $request->getMethod();
 
-        if (!$this->get('mautic.security')->isGranted('user:users:edit')) {
+        if (!$this->security->isGranted('user:users:edit')) {
             return $this->accessDenied();
         }
 
         if (null === $entity) {
             if ('PATCH' === $method ||
-                ('PUT' === $method && !$this->get('mautic.security')->isGranted('user:users:create'))
+                ('PUT' === $method && !$this->security->isGranted('user:users:create'))
             ) {
                 //PATCH requires that an entity exists or must have create access for PUT
                 return $this->notFound();
@@ -92,8 +123,7 @@ class UserApiController extends CommonApiController
                 $entity = $this->model->getEntity();
                 if (isset($parameters['plainPassword']['password'])) {
                     $submittedPassword = $parameters['plainPassword']['password'];
-                    $encoder           = $this->get('security.password_encoder');
-                    $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword));
+                    $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword));
                 }
             }
         } else {
@@ -115,7 +145,7 @@ class UserApiController extends CommonApiController
             }
         }
 
-        return $this->processForm($entity, $parameters, $method);
+        return $this->processForm($request, $entity, $parameters, $method);
     }
 
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
@@ -131,8 +161,7 @@ class UserApiController extends CommonApiController
                     }
                 }
 
-                $encoder = $this->get('security.password_encoder');
-                $entity->setPassword($this->model->checkNewPassword($entity, $encoder, $submittedPassword, true));
+                $entity->setPassword($this->model->checkNewPassword($entity, $this->encoder, $submittedPassword, true));
                 break;
         }
     }
@@ -147,14 +176,14 @@ class UserApiController extends CommonApiController
      * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
      */
-    public function isGrantedAction($id)
+    public function isGrantedAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
         if (!$entity instanceof $this->entityClass) {
             return $this->notFound();
         }
 
-        $permissions = $this->request->request->get('permissions');
+        $permissions = $request->request->all()['permissions'] ?? [];
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');
@@ -162,7 +191,7 @@ class UserApiController extends CommonApiController
             $permissions = [$permissions];
         }
 
-        $return = $this->get('mautic.security')->isGranted($permissions, 'RETURN_ARRAY', $entity);
+        $return = $this->security->isGranted($permissions, 'RETURN_ARRAY', $entity);
         $view   = $this->view($return, Response::HTTP_OK);
 
         return $this->handleView($view);
@@ -173,9 +202,9 @@ class UserApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getRolesAction()
+    public function getRolesAction(Request $request)
     {
-        if (!$this->get('mautic.security')->isGranted(
+        if (!$this->security->isGranted(
             ['user:users:create', 'user:users:edit'],
             'MATCH_ONE'
         )
@@ -183,9 +212,9 @@ class UserApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $filter = $this->request->query->get('filter', null);
-        $limit  = $this->request->query->get('limit', null);
-        $roles  = $this->getModel('user')->getLookupResults('role', $filter, $limit);
+        $filter = $request->query->get('filter', null);
+        $limit  = $request->query->get('limit', null);
+        $roles  = $this->model->getLookupResults('role', $filter, $limit);
 
         $view    = $this->view($roles, Response::HTTP_OK);
         $context = $view->getContext()->setGroups(['roleList']);

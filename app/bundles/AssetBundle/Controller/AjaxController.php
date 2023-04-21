@@ -5,6 +5,7 @@ namespace Mautic\AssetBundle\Controller;
 use Gaufrette\Filesystem;
 use Mautic\AssetBundle\AssetEvents;
 use Mautic\AssetBundle\Event\RemoteAssetBrowseEvent;
+use Mautic\AssetBundle\Model\AssetModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,11 +18,13 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function categoryListAction(Request $request)
+    public function categoryListAction(Request $request)
     {
-        $filter    = InputHelper::clean($request->query->get('filter'));
-        $results   = $this->getModel('asset')->getLookupResults('category', $filter, 10);
-        $dataArray = [];
+        $assetModel = $this->getModel('asset');
+        \assert($assetModel instanceof AssetModel);
+        $filter     = InputHelper::clean($request->query->get('filter'));
+        $results    = $assetModel->getLookupResults('category', $filter, 10);
+        $dataArray  = [];
         foreach ($results as $r) {
             $dataArray[] = [
                 'label' => $r['title']." ({$r['id']})",
@@ -37,7 +40,7 @@ class AjaxController extends CommonAjaxController
      *
      * @throws \Exception
      */
-    protected function fetchRemoteFilesAction(Request $request)
+    public function fetchRemoteFilesAction(Request $request)
     {
         $provider   = InputHelper::string($request->request->get('provider'));
         $path       = InputHelper::string($request->request->get('path', ''));
@@ -56,7 +59,7 @@ class AjaxController extends CommonAjaxController
 
         $event = new RemoteAssetBrowseEvent($integration);
 
-        $dispatcher->dispatch($name, $event);
+        $dispatcher->dispatch($event, $name);
 
         if (!$adapter = $event->getAdapter()) {
             return $this->sendJsonResponse(['success' => 0]);
@@ -65,7 +68,7 @@ class AjaxController extends CommonAjaxController
         $connector = new Filesystem($adapter);
 
         $output = $this->renderView(
-            'MauticAssetBundle:Remote:list.html.php',
+            '@MauticAsset/Remote/list.html.twig',
             [
                 'connector'   => $connector,
                 'integration' => $integration,

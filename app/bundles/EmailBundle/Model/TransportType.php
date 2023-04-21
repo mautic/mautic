@@ -4,13 +4,13 @@ namespace Mautic\EmailBundle\Model;
 
 class TransportType
 {
-    const TRANSPORT_ALIAS = 'transport_alias';
+    public const TRANSPORT_ALIAS = 'transport_alias';
 
-    const FIELD_HOST     = 'field_host';
-    const FIELD_PORT     = 'field_port';
-    const FIELD_USER     = 'field_user';
-    const FIELD_PASSWORD = 'field_password';
-    const FIELD_API_KEY  = 'field_api_key';
+    public const FIELD_HOST     = 'field_host';
+    public const FIELD_PORT     = 'field_port';
+    public const FIELD_USER     = 'field_user';
+    public const FIELD_PASSWORD = 'field_password';
+    public const FIELD_API_KEY  = 'field_api_key';
 
     /**
      * @var array
@@ -229,6 +229,14 @@ class TransportType
     public function getAmazonService()
     {
         return $this->getString($this->showAmazonRegion);
+    }
+
+    /**
+     * @return string
+     */
+    public function getSparkPostService()
+    {
+        return '"mautic.transport.sparkpost"';
     }
 
     /**

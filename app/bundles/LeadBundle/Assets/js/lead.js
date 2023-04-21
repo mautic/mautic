@@ -168,6 +168,8 @@ Mautic.leadOnLoad = function (container, response) {
             });
         }
     });
+
+    Mautic.lazyLoadContactStatsOnLeadLoad();
 };
 
 Mautic.leadTimelineOnLoad = function (container, response) {
@@ -279,7 +281,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                     elem.html(response.html);
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         });
     }
@@ -450,7 +453,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 var fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
-        } 
+        }
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -518,7 +521,7 @@ Mautic.reorderSegmentFilters = function() {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
-    
+
     // Extract the filter number
     var regExp = /_filters_(\d+)_operator/;
     var matches = regExp.exec(operatorSelect.attr('id'));
@@ -583,7 +586,7 @@ Mautic.activateSegmentFilterTypeahead = function(displayId, filterId, fieldOptio
 
     mQuery('#' + displayId).attr('data-lookup-callback', 'updateLookupListFilter');
 
-    Mautic.activateFieldTypeahead(displayId, filterId, [], 'lead:fieldList')
+    Mautic.activateFieldTypeahead(displayId, filterId, [], mQuery('#' + displayId).data('action') || 'lead:fieldList');
 
     mQuery = mQueryBackup;
 };
@@ -1119,7 +1122,7 @@ Mautic.reloadLeadImportProgress = function() {
                     mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
                 }
             }
-        });
+        }, false, false, "GET");
 
         // Initiate import
         mQuery.ajax({
@@ -1137,10 +1140,10 @@ Mautic.reloadLeadImportProgress = function() {
     }
 };
 
-Mautic.removeBounceStatus = function (el, dncId) {
+Mautic.removeBounceStatus = function (el, dncId, channel) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
-    Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+    Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
@@ -1271,7 +1274,7 @@ Mautic.getLeadEmailContent = function (el) {
         mQuery('#'+idPrefix+'subject').val(response.subject);
 
         Mautic.removeLabelLoadingIndicator();
-    });
+    }, false, false, "GET");
 };
 
 Mautic.updateLeadTags = function () {
@@ -1468,7 +1471,7 @@ Mautic.initUniqueIdentifierFields = function() {
                 } else {
                     input.parent().find('div.exists-warning').remove();
                 }
-            });
+            }, false, false, "GET");
         });
     }
 };
@@ -1646,6 +1649,22 @@ Mautic.lazyLoadContactListOnSegmentDetail = function() {
 
     const segmentContactUrl = container.data('target-url');
     mQuery.get(segmentContactUrl, function(response) {
+        response.target = containerId;
+        Mautic.processPageContent(response);
+    });
+};
+
+Mautic.lazyLoadContactStatsOnLeadLoad = function() {
+    const containerId = '#lead-stats';
+    const container = mQuery(containerId);
+
+    // Load the contact stats only if the container exists.
+    if (!container.length) {
+        return;
+    }
+
+    const contactStatsUrl = container.data('target-url');
+    mQuery.get(contactStatsUrl, function(response) {
         response.target = containerId;
         Mautic.processPageContent(response);
     });

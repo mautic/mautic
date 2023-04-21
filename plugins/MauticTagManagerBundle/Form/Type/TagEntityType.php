@@ -44,7 +44,7 @@ class TagEntityType extends AbstractType
                 'required'   => false,
                 'label'      => 'mautic.core.description',
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control', 'readonly' => $tagReadOnly],
+                'attr'       => ['class' => 'form-control editor', 'readonly' => $tagReadOnly],
             ]
         );
 

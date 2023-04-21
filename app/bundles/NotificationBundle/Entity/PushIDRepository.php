@@ -5,7 +5,7 @@ namespace Mautic\NotificationBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * PushIDRepository.
+ * @extends CommonRepository<PushID>
  */
 class PushIDRepository extends CommonRepository
 {

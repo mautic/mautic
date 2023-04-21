@@ -5,7 +5,7 @@ namespace Mautic\UserBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class UserTokenRepository.
+ * @extends CommonRepository<UserToken>
  */
 final class UserTokenRepository extends CommonRepository implements UserTokenRepositoryInterface
 {

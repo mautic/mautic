@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -12,7 +11,7 @@ use Mautic\EmailBundle\EventListener\BuilderSubscriber;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\PageBundle\Model\RedirectModel;
 use Mautic\PageBundle\Model\TrackableModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,14 +25,12 @@ class BuilderSubscriberTest extends \PHPUnit\Framework\TestCase
         $trackableModel       = $this->createMock(TrackableModel::class);
         $redirectModel        = $this->createMock(RedirectModel::class);
         $translator           = $this->createMock(TranslatorInterface::class);
-        $entityManager        = $this->createMock(EntityManager::class);
         $builderSubscriber    = new BuilderSubscriber(
             $coreParametersHelper,
             $emailModel,
             $trackableModel,
             $redirectModel,
-            $translator,
-            $entityManager
+            $translator
         );
 
         $coreParametersHelper->method('get')->willReturnCallback(function ($key) {

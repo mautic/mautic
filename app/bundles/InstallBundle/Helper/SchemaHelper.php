@@ -43,7 +43,7 @@ class SchemaHelper
     public function __construct(array $dbParams)
     {
         //suppress display of errors as we know its going to happen while testing the connection
-        ini_set('display_errors', 0);
+        ini_set('display_errors', '0');
 
         // Support for env variables
         foreach ($dbParams as &$v) {
@@ -173,7 +173,7 @@ class SchemaHelper
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->db->query($q);
+                    $this->db->executeQuery($q);
                 } catch (\Exception $exception) {
                     $this->db->close();
 

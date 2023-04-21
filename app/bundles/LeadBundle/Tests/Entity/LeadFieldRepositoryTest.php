@@ -2,64 +2,44 @@
 
 namespace Mautic\LeadBundle\Tests\Entity;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Portability\Statement;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
+final class LeadFieldRepositoryTest extends TestCase
 {
-    /**
-     * @var MockObject|EntityManager
-     */
-    private $entityManager;
+    use RepositoryConfiguratorTrait;
 
-    /**
-     * @var MockObject|ClassMetadata
-     */
-    private $classMetadata;
-
-    /**
-     * @var MockObject|Connection
-     */
-    private $connection;
-
-    /**
-     * @var LeadFieldRepository
-     */
-    private $repository;
+    private LeadFieldRepository $repository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->classMetadata = $this->createMock(ClassMetadata::class);
-        $this->connection    = $this->createMock(Connection::class);
-        $this->repository    = new LeadFieldRepository($this->entityManager, $this->classMetadata);
+        $this->repository = $this->configureRepository(LeadField::class);
     }
 
-    public function testCompareDateValueForContactField()
+    public function testCompareDateValueForContactField(): void
     {
-        $contactId        = 12;
-        $fieldAlias       = 'date_field';
-        $value            = '2019-04-30';
-        $builderAlias     = $this->createMock(QueryBuilder::class);
-        $builderCompare   = $this->createMock(QueryBuilder::class);
-        $statementAlias   = $this->createMock(Statement::class);
-        $statementCompare = $this->createMock(Statement::class);
-        $exprCompare      = $this->createMock(ExpressionBuilder::class);
+        $contactId                = 12;
+        $fieldAlias               = 'date_field';
+        $value                    = '2019-04-30';
+        $builderAlias             = $this->createMock(QueryBuilder::class);
+        $builderCompare           = $this->createMock(QueryBuilder::class);
+        $statementAliasResult     = $this->createMock(Result::class);
+        $statementCompareResult   = $this->createMock(Result::class);
+        $exprCompare              = $this->createMock(ExpressionBuilder::class);
 
-        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        // $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
         $builderCompare->method('expr')->willReturn($exprCompare);
 
@@ -93,11 +73,11 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $builderAlias->expects($this->once())
             ->method('execute')
-            ->willReturn($statementAlias);
+            ->willReturn($statementAliasResult);
 
         // No company column found. Therefore it's a contact field.
-        $statementAlias->expects($this->once())
-            ->method('fetchAll')
+        $statementAliasResult->expects($this->once())
+            ->method('fetchAllAssociative')
             ->willReturn([]);
 
         $exprCompare->expects($this->exactly(2))
@@ -131,26 +111,26 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $builderCompare->expects($this->once())
             ->method('execute')
-            ->willReturn($statementCompare);
+            ->willReturn($statementCompareResult);
 
         // No contact ID was found by the value so the result should be false.
-        $statementCompare->expects($this->once())
-            ->method('fetch')
+        $statementCompareResult->expects($this->once())
+            ->method('fetchAssociative')
             ->willReturn([]);
 
         $this->assertFalse($this->repository->compareDateValue($contactId, $fieldAlias, $value));
     }
 
-    public function testCompareDateValueForCompanyField()
+    public function testCompareDateValueForCompanyField(): void
     {
-        $contactId        = 12;
-        $fieldAlias       = 'date_field';
-        $value            = '2019-04-30';
-        $builderAlias     = $this->createMock(QueryBuilder::class);
-        $builderCompare   = $this->createMock(QueryBuilder::class);
-        $statementAlias   = $this->createMock(Statement::class);
-        $statementCompare = $this->createMock(Statement::class);
-        $exprCompare      = $this->createMock(ExpressionBuilder::class);
+        $contactId                = 12;
+        $fieldAlias               = 'date_field';
+        $value                    = '2019-04-30';
+        $builderAlias             = $this->createMock(QueryBuilder::class);
+        $builderCompare           = $this->createMock(QueryBuilder::class);
+        $statementAliasResult     = $this->createMock(Result::class);
+        $statementCompareResult   = $this->createMock(Result::class);
+        $exprCompare              = $this->createMock(ExpressionBuilder::class);
 
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $builderAlias->method('expr')->willReturn(new ExpressionBuilder($this->connection));
@@ -186,11 +166,11 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $builderAlias->expects($this->once())
             ->method('execute')
-            ->willReturn($statementAlias);
+            ->willReturn($statementAliasResult);
 
         // A company column found. Therefore it's a company field.
-        $statementAlias->expects($this->once())
-            ->method('fetchAll')
+        $statementAliasResult->expects($this->once())
+            ->method('fetchAllAssociative')
             ->willReturn([['alias' => $fieldAlias]]);
 
         $exprCompare->expects($this->exactly(2))
@@ -231,14 +211,41 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $builderCompare->expects($this->once())
             ->method('execute')
-            ->willReturn($statementCompare);
+            ->willReturn($statementCompareResult);
 
         // A contact ID was found by the value so the result should be true.
-        $statementCompare->expects($this->once())
-            ->method('fetch')
+        $statementCompareResult->expects($this->once())
+            ->method('fetchAssociative')
             ->willReturn(['id' => 456]);
 
         $this->assertTrue($this->repository->compareDateValue($contactId, $fieldAlias, $value));
+    }
+
+    public function testGetListablePublishedFields(): void
+    {
+        $query = $this->createQueryMock();
+        $this->entityManager->expects($this->once())
+            ->method('createQuery')
+            ->with('SELECT f FROM  f INDEX BY f.id WHERE f.isListable = 1 AND f.isPublished = 1 ORDER BY f.object ASC')
+            ->willReturn($query);
+
+        $query->method('execute')->willReturn([]);
+
+        $this->assertInstanceOf(ArrayCollection::class, $this->repository->getListablePublishedFields());
+    }
+
+    public function testGetFieldSchemaData(): void
+    {
+        $query = $this->createQueryMock();
+        $this->entityManager->expects($this->once())
+            ->method('createQuery')
+            ->with('SELECT f.alias, f.label, f.type, f.isUniqueIdentifer FROM  f INDEX BY f.alias WHERE f.object = :object')
+            ->willReturn($query);
+
+        $result = [];
+        $query->method('execute')->willReturn($result);
+
+        $this->assertSame($result, $this->repository->getFieldSchemaData('lead'));
     }
 
     public function testGetFieldThatIsMissingColumnWhenMutlipleColumsMissing(): void
@@ -294,5 +301,31 @@ class LeadFieldRepositoryTest extends \PHPUnit\Framework\TestCase
             $leadField,
             $this->repository->getFieldThatIsMissingColumn()
         );
+    }
+
+    private function createQueryMock(): MockObject
+    {
+        // This is terrible, but the Query class is final and AbstractQuery doesn't have some methods used.
+        $query = $this->getMockBuilder(AbstractQuery::class)
+            ->disableOriginalConstructor()
+            ->setMethods([
+                'setParameters',
+                'setFirstResult',
+                'setMaxResults',
+                'getSingleResult',
+                'getSQL',
+                '_doExecute',
+                'execute',
+            ])
+            ->getMock();
+
+        $ormBuilder = new OrmQueryBuilder($this->entityManager);
+        $this->entityManager->method('createQueryBuilder')->willReturn($ormBuilder);
+        $this->entityManager->method('createQuery')->willReturn($query);
+        $query->method('setParameters')->willReturnSelf();
+        $query->method('setFirstResult')->willReturnSelf();
+        $query->method('setMaxResults')->willReturnSelf();
+
+        return $query;
     }
 }

@@ -6,17 +6,16 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueCustomField;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * Class Company.
- */
-class Company extends FormEntity implements CustomFieldEntityInterface
+class Company extends FormEntity implements CustomFieldEntityInterface, IdentifierFieldEntityInterface
 {
     use CustomFieldEntityTrait;
 
-    const FIELD_ALIAS = 'company';
+    public const FIELD_ALIAS = 'company';
 
     /**
      * @var int
@@ -29,12 +28,12 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     private $score = 0;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var User
      */
     private $owner;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $socialCache = [];
 
@@ -70,9 +69,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get social cache.
-     *
-     * @return mixed
+     * @return mixed[]
      */
     public function getSocialCache()
     {
@@ -80,9 +77,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set social cache.
-     *
-     * @param $cache
+     * @param mixed[] $cache
      */
     public function setSocialCache($cache)
     {
@@ -93,7 +88,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('companies')
-            ->setCustomRepositoryClass('Mautic\LeadBundle\Entity\CompanyRepository');
+            ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
             ->isPrimaryKey()
@@ -171,6 +166,23 @@ class Company extends FormEntity implements CustomFieldEntityInterface
             ->build();
     }
 
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addConstraint(new UniqueCustomField(['object' => 'company']));
+    }
+
+    public static function getDefaultIdentifierFields(): array
+    {
+        return [
+            'companyname',
+            'companyemail',
+            'companywebsite',
+            'city',
+            'state',
+            'country',
+        ];
+    }
+
     /**
      * @param string $prop
      * @param mixed  $val
@@ -196,8 +208,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get id.
-     *
      * @return int
      */
     public function getId()
@@ -220,8 +230,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set owner.
-     *
      * @param User $owner
      *
      * @return Company
@@ -235,8 +243,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get owner.
-     *
      * @return User
      */
     public function getOwner()
@@ -255,8 +261,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Set score.
-     *
      * @param User $score
      *
      * @return Company
@@ -272,8 +276,6 @@ class Company extends FormEntity implements CustomFieldEntityInterface
     }
 
     /**
-     * Get score.
-     *
      * @return int
      */
     public function getScore()

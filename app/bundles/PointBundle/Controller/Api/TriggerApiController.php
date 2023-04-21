@@ -3,19 +3,53 @@
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\PointBundle\Entity\Trigger;
+use Mautic\PointBundle\Model\TriggerEventModel;
+use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @extends CommonApiController<Trigger>
+ */
 class TriggerApiController extends CommonApiController
 {
     /**
-     * {@inheritdoc}
+     * @var TriggerModel|null
      */
-    public function initialize(FilterControllerEvent $event)
+    protected $model = null;
+
+    private ?RequestStack $requestStack = null;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack
+    ) {
+        $this->requestStack = $requestStack;
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+    }
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model            = $this->getModel('point.trigger');
-        $this->entityClass      = 'Mautic\PointBundle\Entity\Trigger';
+        $triggerModel = $this->getModel('point.trigger');
+        \assert($triggerModel instanceof TriggerModel);
+
+        $this->model            = $triggerModel;
+        $this->entityClass      = Trigger::class;
         $this->entityNameOne    = 'trigger';
         $this->entityNameMulti  = 'triggers';
         $this->serializerGroups = ['triggerDetails', 'categoryList', 'publishDetails'];
@@ -28,7 +62,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $method            = $this->request->getMethod();
+        $method            = $this->requestStack->getCurrentRequest()->getMethod();
         $triggerEventModel = $this->getModel('point.triggerevent');
         $isNew             = false;
 
@@ -61,7 +95,7 @@ class TriggerApiController extends CommonApiController
                 $triggerEventForm = $this->createTriggerEventEntityForm($triggerEventEntity);
                 $triggerEventForm->submit($eventParams, 'PATCH' !== $method);
 
-                if (!$triggerEventForm->isValid()) {
+                if (!($triggerEventForm->isSubmitted() && $triggerEventForm->isValid())) {
                     $formErrors = $this->getFormErrorMessages($triggerEventForm);
                     $msg        = $this->getFormErrorMessage($formErrors);
 
@@ -91,9 +125,12 @@ class TriggerApiController extends CommonApiController
      */
     protected function createTriggerEventEntityForm($entity)
     {
-        return $this->getModel('point.triggerevent')->createForm(
+        $triggerEventModel = $this->getModel('point.triggerevent');
+        \assert($triggerEventModel instanceof TriggerEventModel);
+
+        return $triggerEventModel->createForm(
             $entity,
-            $this->get('form.factory'),
+            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,
@@ -142,7 +179,7 @@ class TriggerApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $eventsToDelete = $this->request->get('events');
+        $eventsToDelete = $this->requestStack->getCurrentRequest()->get('events');
         $currentEvents  = $entity->getEvents();
 
         if (!is_array($eventsToDelete)) {

@@ -48,7 +48,7 @@ class LogoutHandler implements LogoutHandlerInterface
     {
         if ($this->dispatcher->hasListeners(UserEvents::USER_LOGOUT)) {
             $event = new LogoutEvent($this->user, $request);
-            $this->dispatcher->dispatch(UserEvents::USER_LOGOUT, $event);
+            $this->dispatcher->dispatch($event, UserEvents::USER_LOGOUT);
         }
 
         // Clear session

@@ -2,6 +2,7 @@
 
 namespace Mautic\CampaignBundle\Executioner\Event;
 
+use function assert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -14,7 +15,7 @@ use Mautic\CampaignBundle\Executioner\Result\EvaluatedContacts;
 
 class ConditionExecutioner implements EventInterface
 {
-    const TYPE = 'condition';
+    public const TYPE = 'condition';
 
     /**
      * @var ConditionDispatcher
@@ -36,6 +37,7 @@ class ConditionExecutioner implements EventInterface
      */
     public function execute(AbstractEventAccessor $config, ArrayCollection $logs)
     {
+        assert($config instanceof ConditionAccessor);
         $evaluatedContacts = new EvaluatedContacts();
 
         /** @var LeadEventLog $log */

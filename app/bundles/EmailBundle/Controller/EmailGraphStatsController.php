@@ -3,11 +3,14 @@
 namespace Mautic\EmailBundle\Controller;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\EmailBundle\Model\EmailModel;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class EmailGraphStatsController extends Controller
+class EmailGraphStatsController extends AbstractController
 {
     /**
      * Loads a specific form into the detailed panel.
@@ -21,20 +24,25 @@ class EmailGraphStatsController extends Controller
      *
      * @throws \Exception
      */
-    public function viewAction(Request $request, $objectId, $isVariant, $dateFrom = null, $dateTo = null)
-    {
-        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
-        $model = $this->get('mautic.email.model.email');
-
+    public function viewAction(
+        Request $request,
+        EmailModel $model,
+        FormFactoryInterface $formFactory,
+        CorePermissions $security,
+        $objectId,
+        $isVariant,
+        $dateFrom = null,
+        $dateTo = null
+    ) {
         /** @var \Mautic\EmailBundle\Entity\Email $email */
         $email = $model->getEntity($objectId);
 
         // Init the date range filter form
         $dateRangeValues = ['date_from' => $dateFrom, 'date_to' => $dateTo];
         $action          = $this->generateUrl('mautic_email_action', ['objectAction' => 'view', 'objectId' => $objectId]);
-        $dateRangeForm   = $this->get('form.factory')->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
+        $dateRangeForm   = $formFactory->create(DateRangeType::class, $dateRangeValues, ['action' => $action]);
 
-        if (null === $email || !$this->get('mautic.security')->hasEntityAccess(
+        if (null === $email || !$security->hasEntityAccess(
                 'email:emails:viewown',
                 'email:emails:viewother',
                 $email->getCreatedBy()
@@ -43,10 +51,10 @@ class EmailGraphStatsController extends Controller
         }
 
         //get A/B test information
-        list($parent, $children) = $email->getVariants();
+        [$parent, $children] = $email->getVariants();
 
         //get related translations
-        list($translationParent, $translationChildren) = $email->getTranslations();
+        [$translationParent, $translationChildren] = $email->getTranslations();
 
         // Prepare stats for bargraph
         if ($chartStatsSource = $request->query->get('stats', false)) {
@@ -83,7 +91,7 @@ class EmailGraphStatsController extends Controller
         );
 
         return $this->render(
-            'MauticEmailBundle:Email:graph.html.php',
+            '@MauticEmail/Email/graph.html.twig',
             [
                 'email'         => $email,
                 'stats'         => $stats,

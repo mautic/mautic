@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\InstallBundle\Install\InstallService;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SysinfoModel
 {
@@ -155,7 +155,7 @@ class SysinfoModel
     public function getDbInfo(): array
     {
         return [
-            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchColumn(),
+            'version'  => $this->connection->executeQuery('SELECT VERSION()')->fetchOne(),
             'driver'   => $this->connection->getDriver()->getName(),
             'platform' => get_class($this->connection->getDatabasePlatform()),
         ];

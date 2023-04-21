@@ -7,6 +7,9 @@ namespace Mautic\IntegrationsBundle\Entity;
 use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<FieldChange>
+ */
 class FieldChangeRepository extends CommonRepository
 {
     /**
@@ -93,7 +96,8 @@ class FieldChangeRepository extends CommonRepository
             );
         }
 
-        $results   = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
+
         $objectIds = [];
         foreach ($results as $result) {
             $objectIds[] = (int) $result['object_id'];
@@ -119,7 +123,7 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectType', $objectType)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     /**
@@ -146,6 +150,6 @@ class FieldChangeRepository extends CommonRepository
             ->setParameter('objectId', (int) $objectId)
             ->orderBy('f.modified_at'); // Newer updated fields must override older updated fields
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

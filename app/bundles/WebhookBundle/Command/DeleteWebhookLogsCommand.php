@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DeleteWebhookLogsCommand extends Command
 {
-    const COMMAND_NAME = 'mautic:webhooks:delete_logs';
+    public const COMMAND_NAME = 'mautic:webhooks:delete_logs';
 
     /** @var LogRepository */
     private $logRepository;
@@ -40,7 +40,7 @@ class DeleteWebhookLogsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $logMaxLimit  = $this->coreParametersHelper->get('webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX);
+        $logMaxLimit  = (int) $this->coreParametersHelper->get('webhook_log_max', WebhookModel::WEBHOOK_LOG_MAX);
         $webHookIds   = $this->logRepository->getWebhooksBasedOnLogLimit($logMaxLimit);
         $webhookCount = count($webHookIds);
         $output->writeln("<info>There is {$webhookCount} webhooks with logs more than defined limit.</info>");

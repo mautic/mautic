@@ -3,42 +3,32 @@
 namespace Mautic\ReportBundle\Tests\Entity;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
-use Mautic\ReportBundle\Entity\SchedulerRepository;
+use Mautic\CoreBundle\Test\Doctrine\RepositoryConfiguratorTrait;
+use Mautic\ReportBundle\Entity\Scheduler;
 use Mautic\ReportBundle\Scheduler\Option\ExportOption;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SchedulerRepositoryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetScheduledReportsForExportNoID()
+    use RepositoryConfiguratorTrait;
+
+    public function testGetScheduledReportsForExportNoID(): void
     {
-        $entityManagerMock = $this->getMockBuilder(EntityManager::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $schedulerRepository = $this->configureRepository(Scheduler::class);
 
-        $classMetadataMock = $this->getMockBuilder(ClassMetadata::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $queryBuilderMock = $this->getQueryBuilderMock();
-
-        $entityManagerMock->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('createQueryBuilder')
             ->with()
-            ->willReturn($queryBuilderMock);
+            ->willReturn($this->getQueryBuilderMock());
 
-        $schedulerRepository = new SchedulerRepository($entityManagerMock, $classMetadataMock);
-
-        $exportOption = new ExportOption(null);
-
-        $result = $schedulerRepository->getScheduledReportsForExport($exportOption);
+        $result = $schedulerRepository->getScheduledReportsForExport(new ExportOption(null));
 
         $this->assertSame([], $result);
     }
 
     /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
+     * @return QueryBuilder|MockObject
      */
     private function getQueryBuilderMock()
     {

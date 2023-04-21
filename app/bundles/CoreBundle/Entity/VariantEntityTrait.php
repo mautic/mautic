@@ -245,7 +245,7 @@ trait VariantEntityTrait
      *
      * @param bool $publishedOnly
      *
-     * @return array
+     * @return array<int,int|string>
      */
     public function getRelatedEntityIds($publishedOnly = false)
     {

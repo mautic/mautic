@@ -272,7 +272,7 @@ class ChartQuery extends AbstractChart
      *
      * @return array
      */
-    public function fetchSumTimeData($table, $column, $filters = [], $sumColumn)
+    public function fetchSumTimeData($table, $column, $filters, $sumColumn)
     {
         $query = $this->prepareTimeDataQuery($table, $column, $filters, $sumColumn, 'sum');
 
@@ -288,7 +288,7 @@ class ChartQuery extends AbstractChart
      */
     public function loadAndBuildTimeData($query)
     {
-        $rawData = $query->execute()->fetchAll();
+        $rawData =  $query->execute()->fetchAllAssociative();
 
         return $this->completeTimeData($rawData);
     }
@@ -496,7 +496,7 @@ class ChartQuery extends AbstractChart
      */
     public function fetchCount(QueryBuilder $query)
     {
-        $data = $query->execute()->fetch();
+        $data = $query->execute()->fetchAssociative();
 
         return (int) $data['count'];
     }
@@ -553,7 +553,7 @@ class ChartQuery extends AbstractChart
      */
     public function fetchCountDateDiff($query)
     {
-        $data = $query->execute()->fetch();
+        $data = $query->execute()->fetchAssociative();
 
         return (int) $data['count'];
     }

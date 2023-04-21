@@ -86,7 +86,7 @@ class BackgroundService
 
         try {
             $this->customFieldColumn->processCreateLeadColumn($leadField, false);
-        } catch (DriverException | SchemaException | \Mautic\CoreBundle\Exception\SchemaException $e) {
+        } catch (DriverException|SchemaException|\Mautic\CoreBundle\Exception\SchemaException $e) {
             $this->customFieldNotification->customFieldCannotBeCreated($leadField, $userId);
             throw $e;
         } catch (CustomFieldLimitException $e) {

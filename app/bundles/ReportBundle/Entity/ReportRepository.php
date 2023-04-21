@@ -6,7 +6,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * ReportRepository.
+ * @extends CommonRepository<Report>
  */
 class ReportRepository extends CommonRepository
 {
@@ -138,6 +138,6 @@ class ReportRepository extends CommonRepository
 
         $qb->orderBy('r.name');
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

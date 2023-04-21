@@ -3,9 +3,13 @@
 namespace Mautic\LeadBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\LeadBundle\Form\Type\BatchType;
+use Mautic\LeadBundle\Model\ListModel;
+use Mautic\LeadBundle\Model\SegmentActionModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpFoundation\Request;
 
 class BatchSegmentController extends AbstractFormController
 {
@@ -13,14 +17,12 @@ class BatchSegmentController extends AbstractFormController
 
     private $segmentModel;
 
-    /**
-     * Initialize object props here to simulate constructor
-     * and make the future controller refactoring easier.
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, SegmentActionModel $segmentModel, ListModel $listModel)
     {
-        $this->actionModel  = $this->container->get('mautic.lead.model.segment.action');
-        $this->segmentModel = $this->container->get('mautic.lead.model.list');
+        parent::__construct($security, $userHelper);
+
+        $this->actionModel  = $listModel;
+        $this->segmentModel = $segmentModel;
     }
 
     /**
@@ -28,9 +30,9 @@ class BatchSegmentController extends AbstractFormController
      *
      * @return JsonResponse
      */
-    public function setAction()
+    public function setAction(Request $request)
     {
-        $params     = $this->request->get('lead_batch', []);
+        $params     = $request->get('lead_batch', []);
         $contactIds = empty($params['ids']) ? [] : json_decode($params['ids']);
 
         if ($contactIds && is_array($contactIds)) {
@@ -45,11 +47,11 @@ class BatchSegmentController extends AbstractFormController
                 $this->actionModel->removeContacts($contactIds, $segmentsToRemove);
             }
 
-            $this->addFlash('mautic.lead.batch_leads_affected', [
+            $this->addFlashMessage('mautic.lead.batch_leads_affected', [
                 '%count%' => count($contactIds),
             ]);
         } else {
-            $this->addFlash('mautic.core.error.ids.missing');
+            $this->addFlashMessage('mautic.core.error.ids.missing');
         }
 
         return new JsonResponse([
@@ -85,7 +87,7 @@ class BatchSegmentController extends AbstractFormController
                         ]
                     )->createView(),
                 ],
-                'contentTemplate' => 'MauticLeadBundle:Batch:form.html.php',
+                'contentTemplate' => '@MauticLead/Batch/form.html.twig',
                 'passthroughVars' => [
                     'activeLink'    => '#mautic_contact_index',
                     'mauticContent' => 'leadBatch',

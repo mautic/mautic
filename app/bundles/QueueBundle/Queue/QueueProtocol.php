@@ -7,6 +7,6 @@ namespace Mautic\QueueBundle\Queue;
  */
 class QueueProtocol
 {
-    const BEANSTALKD = 'beanstalkd';
-    const RABBITMQ   = 'rabbitmq';
+    public const BEANSTALKD = 'beanstalkd';
+    public const RABBITMQ   = 'rabbitmq';
 }

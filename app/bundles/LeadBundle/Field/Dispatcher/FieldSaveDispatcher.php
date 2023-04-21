@@ -46,43 +46,12 @@ class FieldSaveDispatcher
     }
 
     /**
-     * @deprecated Use method dispatchEvent directly
-     */
-    public function dispatchEventBc(string $action, LeadField $entity, bool $isNew = false, LeadFieldEvent $event = null): ?LeadFieldEvent
-    {
-        switch ($action) {
-            case 'pre_save':
-                $name = LeadEvents::FIELD_PRE_SAVE;
-                break;
-            case 'post_save':
-                $name = LeadEvents::FIELD_POST_SAVE;
-                break;
-            case 'pre_delete':
-                $name = LeadEvents::FIELD_PRE_DELETE;
-                break;
-            case 'post_delete':
-                $name = LeadEvents::FIELD_POST_DELETE;
-                break;
-            default:
-                return null;
-        }
-
-        try {
-            return $this->dispatchEvent($name, $entity, $isNew, $event);
-        } catch (NoListenerException $e) {
-            return null;
-        }
-    }
-
-    /**
-     * @param string $action - Use constant from LeadEvents class (e.g. LeadEvents::FIELD_PRE_SAVE)
-     *
      * @throws NoListenerException
      */
-    private function dispatchEvent(string $action, LeadField $entity, bool $isNew, LeadFieldEvent $event = null): LeadFieldEvent
+    public function dispatchEvent(string $action, LeadField $entity, bool $isNew, ?LeadFieldEvent $event = null): LeadFieldEvent
     {
         if (!$this->dispatcher->hasListeners($action)) {
-            throw new NoListenerException('There is no Listener for this event');
+            throw new NoListenerException('There is no Listener for '.$action.' event');
         }
 
         if (null === $event) {
@@ -90,7 +59,7 @@ class FieldSaveDispatcher
             $event->setEntityManager($this->entityManager);
         }
 
-        $this->dispatcher->dispatch($action, $event);
+        $this->dispatcher->dispatch($event, $action);
 
         return $event;
     }

@@ -4,7 +4,7 @@ namespace Mautic\LeadBundle\Event;
 
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ListChangeEvent.
@@ -44,21 +44,21 @@ class ListChangeEvent extends Event
     }
 
     /**
-     * Returns batch array of leads.
-     *
-     * @return array
-     */
-    public function getLeads()
-    {
-        return $this->leads;
-    }
-
-    /**
      * @return LeadList
      */
     public function getList()
     {
         return $this->list;
+    }
+
+    /**
+     * Returns batch array of leads.
+     *
+     * @return array|null
+     */
+    public function getLeads()
+    {
+        return $this->leads;
     }
 
     /**

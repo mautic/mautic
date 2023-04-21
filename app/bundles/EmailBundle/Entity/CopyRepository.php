@@ -6,6 +6,9 @@ use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 
+/**
+ * @extends CommonRepository<Copy>
+ */
 class CopyRepository extends CommonRepository
 {
     /**

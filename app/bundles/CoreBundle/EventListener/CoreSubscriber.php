@@ -8,12 +8,13 @@ use Mautic\CoreBundle\Event\IconEvent;
 use Mautic\CoreBundle\Event\MenuEvent;
 use Mautic\CoreBundle\Event\RouteEvent;
 use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\BundleHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
@@ -22,14 +23,14 @@ use Mautic\UserBundle\UserEvents;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\SecurityEvents;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CoreSubscriber implements EventSubscriberInterface
 {
@@ -54,7 +55,7 @@ class CoreSubscriber implements EventSubscriberInterface
     private $assetsHelper;
 
     /**
-     * @var AuthorizationChecker
+     * @var AuthorizationCheckerInterface
      */
     private $securityContext;
 
@@ -94,23 +95,32 @@ class CoreSubscriber implements EventSubscriberInterface
     private $factory;
 
     /**
+     * @var ModelFactory<object>
+     */
+    private $modelFactory;
+
+    /**
      * @var FlashBag
      */
     private $flashBag;
 
+    /**
+     * @param ModelFactory<object> $modelFactory
+     */
     public function __construct(
         BundleHelper $bundleHelper,
         MenuHelper $menuHelper,
         UserHelper $userHelper,
         AssetsHelper $assetsHelper,
         CoreParametersHelper $coreParametersHelper,
-        AuthorizationChecker $securityContext,
+        AuthorizationCheckerInterface $securityContext,
         UserModel $userModel,
         EventDispatcherInterface $dispatcher,
         TranslatorInterface $translator,
         RequestStack $requestStack,
         FormRepository $formRepository,
         MauticFactory $factory,
+        ModelFactory $modelFactory,
         FlashBag $flashBag
     ) {
         $this->bundleHelper         = $bundleHelper;
@@ -125,6 +135,7 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->requestStack         = $requestStack;
         $this->formRepository       = $formRepository;
         $this->factory              = $factory;
+        $this->modelFactory         = $modelFactory;
         $this->flashBag             = $flashBag;
     }
 
@@ -148,7 +159,7 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Add mauticForms in js script tag for Froala.
      */
-    public function onKernelRequestAddGlobalJS(FilterControllerEvent $event)
+    public function onKernelRequestAddGlobalJS(ControllerEvent $event)
     {
         if (defined('MAUTIC_INSTALLER') || $this->userHelper->getUser()->isGuest() || !$event->isMasterRequest()) {
             return;
@@ -171,6 +182,7 @@ class CoreSubscriber implements EventSubscriberInterface
 
         $session = $event->getRequest()->getSession();
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            /** @var User $user */
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in
@@ -199,7 +211,7 @@ class CoreSubscriber implements EventSubscriberInterface
             //dispatch on login events
             if ($this->dispatcher->hasListeners(UserEvents::USER_LOGIN)) {
                 $loginEvent = new LoginEvent($this->userHelper->getUser());
-                $this->dispatcher->dispatch(UserEvents::USER_LOGIN, $loginEvent);
+                $this->dispatcher->dispatch($loginEvent, UserEvents::USER_LOGIN);
             }
         } else {
             $session->remove('mautic.user');
@@ -209,9 +221,13 @@ class CoreSubscriber implements EventSubscriberInterface
     /**
      * Populates namespace, bundle, controller, and action into request to be used throughout application.
      */
-    public function onKernelController(FilterControllerEvent $event)
+    public function onKernelController(ControllerEvent $event)
     {
         $controller = $event->getController();
+
+        if ($controller instanceof \Closure) {
+            $controller = [$controller()];
+        }
 
         if (!is_array($controller)) {
             return;
@@ -219,14 +235,11 @@ class CoreSubscriber implements EventSubscriberInterface
 
         //only affect Mautic controllers
         if ($controller[0] instanceof MauticController) {
-            $request = $event->getRequest();
-
-            //also set the request for easy access throughout controllers
-            $controller[0]->setRequest($request);
-
             // set the factory for easy use access throughout the controllers
             // @deprecated To be removed in 3.0
             $controller[0]->setFactory($this->factory);
+
+            $controller[0]->setModelFactory($this->modelFactory);
 
             // set the user as well
             $controller[0]->setUser($this->userHelper->getUser());
@@ -347,7 +360,7 @@ class CoreSubscriber implements EventSubscriberInterface
                                 $standardDetails,
                                 [
                                     'path'       => $pathBase.$standardDetails['path'],
-                                    'controller' => $controller.':'.$standardDetails['action'],
+                                    'controller' => $controller.':'.$standardDetails['action'].'Action',
                                     'method'     => $standardDetails['method'],
                                 ]
                             );

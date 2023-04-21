@@ -11,14 +11,20 @@ defaults:
   run:
     working-directory: plugins/GrapesJsBuilderBundle
 
+permissions:
+  contents: read
+
 jobs:
   build-js:
+    permissions:
+      contents: write  # for peter-evans/create-pull-request to create branch
+      pull-requests: write  # for peter-evans/create-pull-request to create a PR
     runs-on: ubuntu-latest
     if: github.repository == 'mautic/mautic'
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
       with:
         node-version: '16'
     - name: Install dependencies

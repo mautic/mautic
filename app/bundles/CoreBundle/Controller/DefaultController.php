@@ -21,7 +21,7 @@ class DefaultController extends CommonController
         $root = $this->coreParametersHelper->get('webroot');
 
         if (empty($root)) {
-            return $this->redirect($this->generateUrl('mautic_dashboard_index'));
+            return $this->redirectToRoute('mautic_dashboard_index');
         } else {
             /** @var \Mautic\PageBundle\Model\PageModel $pageModel */
             $pageModel = $this->getModel('page');
@@ -35,27 +35,27 @@ class DefaultController extends CommonController
 
             $request->attributes->set('ignore_mismatch', true);
 
-            return $this->forward('MauticPageBundle:Public:index', ['slug' => $slug]);
+            return $this->forward('Mautic\PageBundle\Controller\PublicController::indexAction', ['slug' => $slug]);
         }
     }
 
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function globalSearchAction()
+    public function globalSearchAction(Request $request)
     {
-        $searchStr = $this->request->get('global_search', $this->get('session')->get('mautic.global_search', ''));
-        $this->get('session')->set('mautic.global_search', $searchStr);
+        $searchStr = $request->get('global_search', $request->getSession()->get('mautic.global_search', ''));
+        $request->getSession()->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {
-            $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-            $this->get('event_dispatcher')->dispatch(CoreEvents::GLOBAL_SEARCH, $event);
+            $event = new GlobalSearchEvent($searchStr, $this->translator);
+            $this->dispatcher->dispatch($event, CoreEvents::GLOBAL_SEARCH);
             $results = $event->getResults();
         } else {
             $results = [];
         }
 
-        return $this->render('MauticCoreBundle:GlobalSearch:globalsearch.html.twig',
+        return $this->render('@MauticCore/GlobalSearch/globalsearch.html.twig',
             [
                 'results'      => $results,
                 'searchString' => $searchStr,
@@ -75,7 +75,7 @@ class DefaultController extends CommonController
 
         return $this->delegateView(
             [
-                'contentTemplate' => 'MauticCoreBundle:Notification:notifications.html.twig',
+                'contentTemplate' => '@MauticCore/Notification/notifications.html.twig',
                 'viewParameters'  => [
                     'showNewIndicator' => $showNewIndicator,
                     'notifications'    => $notifications,

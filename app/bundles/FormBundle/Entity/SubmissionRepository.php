@@ -2,13 +2,14 @@
 
 namespace Mautic\FormBundle\Entity;
 
-use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * IpAddressRepository.
+ * @extends CommonRepository<Submission>
  */
 class SubmissionRepository extends CommonRepository
 {
@@ -59,9 +60,9 @@ class SubmissionRepository extends CommonRepository
                 $fq->expr()->notIn('f.type', $viewOnlyFields),
                 $fq->expr()->eq('f.save_result', ':saveResult')
             )
-            ->orderBy('f.field_order', 'ASC')
+            ->orderBy('f.field_order, f.id', 'ASC')
             ->setParameter('saveResult', true);
-        $results = $fq->execute()->fetchAll();
+        $results = $fq->execute()->fetchAllAssociative();
 
         $fields = [];
         foreach ($results as $r) {
@@ -80,17 +81,21 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = $result[0]['count'];
+        $result  = $dq->execute()->fetchAllAssociative();
+        $total   = $result[0]['count'];
 
         //now get the actual paginated results
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $fieldAliasSql = (!empty($fieldAliases)) ? ', '.implode(',r.', $fieldAliases) : '';
+        $fieldAliasSql = ',';
+        foreach ($fieldAliases as $fieldAlias) {
+            $fieldAliasSql .= 'r.`'.$fieldAlias.'`,';
+        }
+        $fieldAliasSql = substr($fieldAliasSql, 0, -1);
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
-        $results = $dq->execute()->fetchAll();
+        $results = $dq->execute()->fetchAllAssociative();
 
         //loop over results to put form submission results in something that can be assigned to the entities
         $values         = [];
@@ -185,9 +190,10 @@ class SubmissionRepository extends CommonRepository
                 ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
                 ->where('r.submission_id = :id')
                 ->setParameter('id', $id);
-            $results = $q->execute()->fetchAll();
-            unset($results[0]['submission_id']);
-            if (isset($results[0])) {
+            $results = $q->execute()->fetchAllAssociative();
+
+            if (!empty($results)) {
+                unset($results[0]['submission_id']);
                 $entity->setResults($results[0]);
             }
         }
@@ -217,7 +223,8 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         //get a total count
-        $result = $dq->execute()->fetchAll();
+        $result = $dq->execute()->fetchAllAssociative();
+
         $total  = $result[0]['count'];
 
         //now get the actual paginated results
@@ -226,7 +233,7 @@ class SubmissionRepository extends CommonRepository
 
         $dq->resetQueryPart('select');
         $dq->select('s.id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.form_id as formId, s.referer, i.ip_address as ipAddress');
-        $results = $dq->execute()->fetchAll();
+        $results = $dq->execute()->fetchAllAssociative();
 
         return [
             'count'   => $total,
@@ -235,24 +242,25 @@ class SubmissionRepository extends CommonRepository
     }
 
     /**
-     * {@inheritdoc}
+     * @param QueryBuilder|DbalQueryBuilder $q
+     * @param array<mixed>                  $filter
      */
-    public function getFilterExpr(&$q, $filter, $parameterName = null)
+    public function getFilterExpr($q, array $filter, ?string $unique = null): array
     {
-        if ('s.date_submitted' == $filter['column']) {
+        if ('s.date_submitted' === $filter['column']) {
             $date       = (new DateTimeHelper($filter['value'], 'Y-m-d'))->toUtcString();
             $date1      = $this->generateRandomParameterName();
             $date2      = $this->generateRandomParameterName();
             $parameters = [$date1 => $date.' 00:00:00', $date2 => $date.' 23:59:59'];
-            $expr       = $q->expr()->andX(
+            $expr       = $q->expr()->and(
                 $q->expr()->gte('s.date_submitted', ":$date1"),
                 $q->expr()->lte('s.date_submitted', ":$date2")
             );
 
             return [$expr, $parameters];
-        } else {
-            return parent::getFilterExpr($q, $filter);
         }
+
+        return parent::getFilterExpr($q, $filter);
     }
 
     /**
@@ -301,9 +309,9 @@ class SubmissionRepository extends CommonRepository
     /**
      * Get list of forms ordered by it's count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param DbalQueryBuilder $query
+     * @param int              $limit
+     * @param int              $offset
      *
      * @return array
      *
@@ -318,15 +326,15 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
      * Get list of forms ordered by it's count.
      *
-     * @param QueryBuilder $query
-     * @param int          $limit
-     * @param int          $offset
+     * @param DbalQueryBuilder $query
+     * @param int              $limit
+     * @param int              $offset
      *
      * @return array
      *
@@ -343,7 +351,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
@@ -367,7 +375,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -402,7 +410,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -441,7 +449,7 @@ class SubmissionRepository extends CommonRepository
             );
 
         $validIds = [];
-        $results  = $q->execute()->fetchAll();
+        $results  = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $r) {
             $validIds[] = $r['id'];
@@ -506,7 +514,7 @@ class SubmissionRepository extends CommonRepository
                 break;
         }
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }
@@ -522,7 +530,7 @@ class SubmissionRepository extends CommonRepository
         $query->where($query->expr()->eq('fs.form_id', ':id'))
                 ->setParameter('id', $form->getId());
 
-        return $query->execute()->fetch();
+        return $query->execute()->fetchAssociative();
     }
 
     /**

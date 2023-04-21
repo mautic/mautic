@@ -6,11 +6,11 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 
 class CallbackEnum
 {
-    const BOUNCE            = 'bounce';
-    const DROPPED           = 'dropped';
-    const SPAM_REPORT       = 'spamreport';
-    const UNSUBSCRIBE       = 'unsubscribe';
-    const GROUP_UNSUBSCRIBE = 'group_unsubscribe';
+    public const BOUNCE            = 'bounce';
+    public const DROPPED           = 'dropped';
+    public const SPAM_REPORT       = 'spamreport';
+    public const UNSUBSCRIBE       = 'unsubscribe';
+    public const GROUP_UNSUBSCRIBE = 'group_unsubscribe';
 
     /**
      * @see https://sendgrid.com/docs/API_Reference/Webhooks/event.html#-Event-Types

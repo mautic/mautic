@@ -7,7 +7,7 @@ use Mautic\EmailBundle\Event\ParseEmailEvent;
 use Mautic\EmailBundle\MonitoredEmail\Accessor\ConfigAccessor;
 use Mautic\EmailBundle\MonitoredEmail\Organizer\MailboxOrganizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class Fetcher
 {
@@ -67,7 +67,7 @@ class Fetcher
     public function fetch($limit = null)
     {
         /** @var ParseEmailEvent $event */
-        $event = $this->dispatcher->dispatch(EmailEvents::EMAIL_PRE_FETCH, new ParseEmailEvent());
+        $event = $this->dispatcher->dispatch(new ParseEmailEvent(), EmailEvents::EMAIL_PRE_FETCH);
 
         // Get a list of criteria and group by it
         $organizer = new MailboxOrganizer($event, $this->getConfigs());
@@ -95,7 +95,7 @@ class Fetcher
                     if ($messages) {
                         $event->setMessages($messages)
                             ->setKeys($mailboxes);
-                        $this->dispatcher->dispatch(EmailEvents::EMAIL_PARSE, $event);
+                        $this->dispatcher->dispatch($event, EmailEvents::EMAIL_PARSE);
                     }
 
                     $this->log[] = $this->translator->trans(

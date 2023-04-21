@@ -4,6 +4,9 @@ namespace MauticPlugin\MauticFocusBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Focus>
+ */
 class FocusRepository extends CommonRepository
 {
     /**
@@ -20,11 +23,6 @@ class FocusRepository extends CommonRepository
         );
     }
 
-    /**
-     * Get a list of entities.
-     *
-     * @return Paginator
-     */
     public function getEntities(array $args = [])
     {
         $alias = $this->getTableAlias();
@@ -74,7 +72,7 @@ class FocusRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

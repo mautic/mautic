@@ -1,3 +1,0 @@
-parameters:
-	ignoreErrors:
-		- '#.*|PHPUnit_Framework_MockObject_MockObject given$#'

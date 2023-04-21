@@ -122,7 +122,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      * @param $type
      * @param $properties
      *
-     * @return bool
+     * @return array{0: bool, 1:string}
      */
     public static function validateProperties($type, &$properties)
     {
@@ -225,10 +225,10 @@ class FormFieldHelper extends AbstractFormFieldHelper
     public function getDateChoices()
     {
         return [
-            $this->translator->trans('mautic.campaign.event.timed.choice.anniversary') => 'anniversary',
-            $this->translator->trans('mautic.campaign.event.timed.choice.today')       => '+P0D',
-            $this->translator->trans('mautic.campaign.event.timed.choice.yesterday')   => '-P1D',
-            $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow')    => '+P1D',
+            'anniversary' => $this->translator->trans('mautic.campaign.event.timed.choice.anniversary'),
+            '+P0D'        => $this->translator->trans('mautic.campaign.event.timed.choice.today'),
+            '-P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.yesterday'),
+            '+P1D'        => $this->translator->trans('mautic.campaign.event.timed.choice.tomorrow'),
         ];
     }
 }

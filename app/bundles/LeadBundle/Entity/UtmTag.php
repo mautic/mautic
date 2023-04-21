@@ -320,6 +320,7 @@ class UtmTag
      */
     public function setUtmContent($utmContent)
     {
+        $utmContent       = mb_strlen($utmContent) <= ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH ? $utmContent : mb_substr($utmContent, 0, ClassMetadataBuilder::MAX_VARCHAR_INDEXED_LENGTH);
         $this->utmContent = $utmContent;
 
         return $this;

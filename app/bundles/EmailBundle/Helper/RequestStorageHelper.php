@@ -13,7 +13,7 @@ class RequestStorageHelper
     /**
      * Separator between the transport class name and random hash.
      */
-    const KEY_SEPARATOR = ':webhook_request:';
+    public const KEY_SEPARATOR = ':webhook_request:';
 
     /**
      * @var CacheStorageHelper

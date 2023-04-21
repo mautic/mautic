@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead;
 
 class Adder
 {
-    const NAME = 'added';
+    public const NAME = 'added';
 
     /**
      * @var LeadRepository
@@ -69,13 +69,13 @@ class Adder
         if (!($wasRemoved && $isManualAction) && !$campaignMember->getCampaign()->allowRestart()) {
             // A contact cannot restart this campaign
 
-            throw new ContactCannotBeAddedToCampaignException();
+            throw new ContactCannotBeAddedToCampaignException('Contacts cannot restart the campaign');
         }
 
         if ($wasRemoved && !$isManualAction && null === $campaignMember->getDateLastExited()) {
             // Prevent contacts from being added back if they were manually removed but automatically added back
 
-            throw new ContactCannotBeAddedToCampaignException();
+            throw new ContactCannotBeAddedToCampaignException('Contact was manually removed');
         }
 
         if ($wasRemoved && $isManualAction) {

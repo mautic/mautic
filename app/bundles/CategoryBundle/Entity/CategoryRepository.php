@@ -6,7 +6,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class CategoryRepository.
+ * @extends CommonRepository<Category>
  */
 class CategoryRepository extends CommonRepository
 {
@@ -133,7 +133,7 @@ class CategoryRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

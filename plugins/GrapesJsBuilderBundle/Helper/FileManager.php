@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Finder;
 
 class FileManager
 {
-    const GRAPESJS_IMAGES_DIRECTORY = '';
+    public const GRAPESJS_IMAGES_DIRECTORY = '';
 
     /**
      * @var FileUploader

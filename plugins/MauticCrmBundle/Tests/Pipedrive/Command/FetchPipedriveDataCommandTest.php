@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\MauticCrmBundle\Tests\Pipedrive\Command;
 
+use GuzzleHttp\Psr7\Response;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\Lead;
@@ -11,10 +14,11 @@ use MauticPlugin\MauticCrmBundle\Tests\Pipedrive\PipedriveTest;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class FetchPipedriveDataCommandTest extends PipedriveTest
 {
-    public function testCommandWithdisableIntegration()
+    public function testCommandWithdisableIntegration(): void
     {
         $this->installPipedriveIntegration(false,
             [
@@ -52,8 +56,14 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
         $this->assertEquals(count($integrationEntities), 0);
     }
 
-    public function testCommand()
+    public function testCommand(): void
     {
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Get/organizations')));
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Get/personFields'))); // organization fields actually
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Get/users')));
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Get/persons')));
+        $this->mockHandler->append(new Response(SymfonyResponse::HTTP_OK, [], self::getData('Api/Get/personFields')));
+
         $this->installPipedriveIntegration(true,
             [
                 'objects' => [
@@ -98,7 +108,7 @@ class FetchPipedriveDataCommandTest extends PipedriveTest
         $this->assertEquals($companyLeads[1]->getCompany()->getName(), $companies[1]->getName());
     }
 
-    private function executeCommand()
+    private function executeCommand(): void
     {
         $kernel      = self::$container->get('kernel');
         $application = new Application($kernel);

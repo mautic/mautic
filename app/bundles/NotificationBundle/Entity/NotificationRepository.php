@@ -7,7 +7,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class NotificationRepository.
+ * @extends CommonRepository<Notification>
  */
 class NotificationRepository extends CommonRepository
 {
@@ -119,7 +119,7 @@ class NotificationRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

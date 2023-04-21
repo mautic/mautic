@@ -2,6 +2,7 @@
 
 namespace Mautic\ReportBundle\Event;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
@@ -10,10 +11,11 @@ use Mautic\ReportBundle\Model\ReportModel;
 
 class ReportGeneratorEvent extends AbstractReportEvent
 {
-    const CATEGORY_PREFIX    = 'c';
-    const CONTACT_PREFIX     = 'l';
-    const COMPANY_PREFIX     = 'comp';
-    const IP_ADDRESS_PREFIX  = 'i';
+    public const CATEGORY_PREFIX         = 'c';
+    public const CONTACT_PREFIX          = 'l';
+    public const COMPANY_PREFIX          = 'comp';
+    public const COMPANY_LEAD_PREFIX     = 'companies_lead';
+    public const IP_ADDRESS_PREFIX       = 'i';
 
     /**
      * @var array
@@ -72,11 +74,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
      */
     public function getQueryBuilder()
     {
-        if ($this->queryBuilder instanceof QueryBuilder) {
-            return $this->queryBuilder;
-        }
-
-        throw new \RuntimeException('QueryBuilder not set.');
+        return $this->queryBuilder;
     }
 
     /**
@@ -105,7 +103,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         // Default content template
-        return 'MauticReportBundle:Report:details_data.html.php';
+        return '@MauticReport/Report/details.html.twig';
     }
 
     /**
@@ -312,13 +310,14 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * Add company left join.
      */
-    public function addCompanyLeftJoin(QueryBuilder $queryBuilder, $companyPrefix = self::COMPANY_PREFIX, $contactPrefix = self::CONTACT_PREFIX)
+    public function addCompanyLeftJoin(QueryBuilder $queryBuilder, string $companyPrefix = self::COMPANY_PREFIX, string $contactPrefix = self::CONTACT_PREFIX): void
     {
-        $queryParts    =  $queryBuilder->getQueryParts();
-        $alreadyJoined = isset($queryParts['join']['companies_lead']);
-        if (!$alreadyJoined && $this->usesColumnWithPrefix($companyPrefix)) {
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', 'companies_lead', $contactPrefix.'.id = companies_lead.lead_id');
-            $queryBuilder->leftJoin('companies_lead', MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, 'companies_lead.company_id = '.$companyPrefix.'.id');
+        if ($this->usesColumnWithPrefix($companyPrefix) || $this->usesColumnWithPrefix(self::COMPANY_LEAD_PREFIX)) {
+            if ($this->isJoined($queryBuilder, MAUTIC_TABLE_PREFIX.'companies_leads', 'l', self::COMPANY_LEAD_PREFIX)) {
+                return;
+            }
+            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'companies_leads', self::COMPANY_LEAD_PREFIX, $contactPrefix.'.id ='.self::COMPANY_LEAD_PREFIX.'.lead_id');
+            $queryBuilder->leftJoin(self::COMPANY_LEAD_PREFIX, MAUTIC_TABLE_PREFIX.'companies', $companyPrefix, self::COMPANY_LEAD_PREFIX.'.company_id = '.$companyPrefix.'.id');
         }
     }
 
@@ -359,6 +358,30 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         return $this;
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     */
+    public function applyTagFilter(CompositeExpression $groupExpr, array $filter): void
+    {
+        $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
+        $tagSubQuery->select('DISTINCT lead_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'ltx');
+
+        if (in_array($filter['condition'], ['in', 'notIn']) && !empty($filter['value'])) {
+            $tagSubQuery->where($tagSubQuery->expr()->in('ltx.tag_id', $filter['value']));
+        }
+
+        if (in_array($filter['condition'], ['in', 'notEmpty'])) {
+            $groupExpr->add(
+                $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
+            );
+        } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
+            $groupExpr->add(
+                $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
+            );
+        }
     }
 
     public function hasColumnWithPrefix(string $prefix): bool
@@ -507,5 +530,21 @@ class ReportGeneratorEvent extends AbstractReportEvent
         foreach ($filters as $field) {
             $this->sortedFilters[$field['column']] = true;
         }
+    }
+
+    private function isJoined(QueryBuilder $query, string $table, string $fromAlias, string $alias): bool
+    {
+        $queryParts = $query->getQueryParts();
+        $joins      =   !empty($queryParts) && $queryParts['join'] ? $queryParts['join'] : null;
+        if (empty($joins) || (!empty($joins) && empty($joins[$fromAlias]))) { //@phpstan-ignore-line
+            return false;
+        }
+        foreach ($joins[$fromAlias] as $join) {
+            if ($join['joinTable'] == $table && $join['joinAlias'] == $alias) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

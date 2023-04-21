@@ -7,10 +7,11 @@ namespace Mautic\CampaignBundle\Command;
 use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SummarizeCommand extends ModeratedCommand
 {
@@ -18,21 +19,15 @@ class SummarizeCommand extends ModeratedCommand
 
     public const NAME = 'mautic:campaigns:summarize';
 
-    /**
-     * @var SummaryModel
-     */
-    private $summaryModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
+    private SummaryModel $summaryModel;
+    private TranslatorInterface $translator;
 
     public function __construct(
         TranslatorInterface $translator,
-        SummaryModel $summaryModel
+        SummaryModel $summaryModel,
+        PathsHelper $pathsHelper
     ) {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
         $this->translator   = $translator;
         $this->summaryModel = $summaryModel;
