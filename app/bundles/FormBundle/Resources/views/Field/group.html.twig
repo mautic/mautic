@@ -226,32 +226,34 @@
   {% endif %}
   {% if field.helpMessage is not empty %}<span class="mauticform-helpmessage">{{ field.helpMessage }}</span>{% endif %}
 
-  {% for listValue, listLabel in list %}
-    {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
-    {% set checkboxBrackets = ('checkbox' == type) ? '[]' : '' %}
-    {% set inputAttributes = inputAttributes|merge({
-            'name': 'mauticform[' ~ field.alias ~ ']' ~ checkboxBrackets,
-            'id': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
-            'type': type,
-            'value': listValue|e,
-    }) %}
-    {% if field.defaultValue == listValue %}
+  {% if list is defined %}
+    {% for listValue, listLabel in list %}
+      {% set id = field.alias ~ '_' ~ inputAlphanum(inputTransliterate(listValue)) ~ loop.index0 %}
+      {% set checkboxBrackets = ('checkbox' == type) ? '[]' : '' %}
       {% set inputAttributes = inputAttributes|merge({
-              'checked': 'checked',
+              'name': 'mauticform[' ~ field.alias ~ ']' ~ checkboxBrackets,
+              'id': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
+              'type': type,
+              'value': listValue|e,
       }) %}
-    {% endif %}
+      {% if field.defaultValue == listValue %}
+        {% set inputAttributes = inputAttributes|merge({
+                'checked': 'checked',
+        }) %}
+      {% endif %}
 
-    {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
+      {% if wrapDiv %}<div class="mauticform-{{ containerType }}-row">{% endif %}
 
-    <input {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
-    {% set optionLabelAttr = optionLabelAttr|merge({
-            'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
-            'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
-    }) %}
-    <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel }}</label>
+      <input {% for attrName, attrValue in inputAttributes %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %} />
+      {% set optionLabelAttr = optionLabelAttr|merge({
+              'id': 'mauticform_' ~ containerType ~ '_label_' ~ id,
+              'for': 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ id,
+      }) %}
+      <label {% for attrName, attrValue in optionLabelAttr %}{{ attrName }}="{% if attrValue is iterable %}{{ attrValue|join(' ') }}{% else %}{{ attrValue }}{% endif %}"{% endfor %}>{{ listLabel }}</label>
 
-    {% if wrapDiv %}</div>{% endif %}
-  {% endfor %}
+      {% if wrapDiv %}</div>{% endif %}
+    {% endfor %}
+  {% endif %}
 
   <span class="mauticform-errormsg" style="display:none;">{{ validationMessage }}</span>
 </div>
