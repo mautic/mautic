@@ -131,7 +131,7 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user', []);
+                $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -261,7 +261,7 @@ class UserController extends FormController
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user', []);
+                $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -432,7 +432,7 @@ class UserController extends FormController
         $currentUser = $this->user;
 
         if ('POST' === $request->getMethod()) {
-            $contact   = $request->request->get('contact', []);
+            $contact   = $request->request->get('contact') ?? [];
             $formUrl   = $contact['returnUrl'] ?? '';
             $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;

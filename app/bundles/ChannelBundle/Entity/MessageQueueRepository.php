@@ -100,7 +100,7 @@ class MessageQueueRepository extends CommonRepository
                 ]
             )
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

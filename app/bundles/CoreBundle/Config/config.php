@@ -283,7 +283,7 @@ return [
                 ],
                 'alias' => 'version',
             ],
-            'mautic.helper.tiwg.security' => [
+            'mautic.helper.twig.security' => [
                 'class'     => \Mautic\CoreBundle\Twig\Helper\SecurityHelper::class,
                 'arguments' => [
                     'mautic.security',

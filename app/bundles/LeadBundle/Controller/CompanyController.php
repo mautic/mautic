@@ -203,7 +203,7 @@ class CompanyController extends FormController
         $page         = $request->getSession()->get('mautic.company.page', 1);
         $method       = $request->getMethod();
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
-        $company      = $request->request->get('company', []);
+        $company      = $request->request->get('company') ?? [];
         $updateSelect = InputHelper::clean(
             'POST' === $method
                 ? ($company['updateSelect'] ?? false)
@@ -381,7 +381,7 @@ class CompanyController extends FormController
 
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $method       = $request->getMethod();
-        $company      = $request->request->get('company', []);
+        $company      = $request->request->get('company') ?? [];
         $updateSelect = 'POST' === $method
             ? ($company['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
