@@ -8,9 +8,9 @@ use Mautic\UserBundle\Entity\User;
 class PathsHelper
 {
     /**
-     * @var array
+     * @var array<string, string>
      */
-    private $paths;
+    private array $paths;
 
     /**
      * @var string
