@@ -46,7 +46,8 @@ class LeadFieldRepository extends CommonRepository
             )->setParameter('object', $object);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         $aliases = [];
         foreach ($results as $item) {
             $aliases[] = $item['alias'];
@@ -74,6 +75,22 @@ class LeadFieldRepository extends CommonRepository
         $queryBuilder->setParameter('object', $object);
 
         return $queryBuilder->getQuery()->execute();
+    }
+
+    /**
+     * @return array<int|string, array<string, mixed>>
+     */
+    public function getFields(): array
+    {
+        $fq = $this->getEntityManager()->getConnection()->createQueryBuilder();
+        $fq->select('f.id, f.label, f.alias, f.type, f.field_group as "group", f.object, f.is_fixed, f.properties, f.default_value')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
+            ->where('f.is_published = :published')
+            ->setParameter('published', true, 'boolean')
+            ->addOrderBy('f.field_order', 'asc');
+        $results = $fq->execute()->fetchAllAssociative();
+
+        return array_column($results, null, 'alias');
     }
 
     /**
@@ -128,7 +145,8 @@ class LeadFieldRepository extends CommonRepository
                 ->where($qb->expr()->eq('object', ':object'))
                 ->setParameter('object', $object)
                 ->orderBy('f.field_order', 'ASC')
-                ->execute()->fetchAll();
+                ->execute()
+                ->fetchAllAssociative();
     }
 
     /**
@@ -207,7 +225,7 @@ class LeadFieldRepository extends CommonRepository
                 ->setParameter('lead', (int) $lead)
                 ->setParameter('value', $value);
 
-            $result = $q->execute()->fetch();
+            $result = $q->execute()->fetchAssociative();
 
             if (('eq' === $operatorExpr) || ('like' === $operatorExpr)) {
                 return !empty($result['id']);
@@ -334,7 +352,7 @@ class LeadFieldRepository extends CommonRepository
                 $q->orderBy('u.date_added', 'DESC');
                 $q->setMaxResults(1);
             }
-            $result = $q->execute()->fetch();
+            $result = $q->execute()->fetchAssociative();
 
             return !empty($result['id']);
         }
@@ -356,7 +374,7 @@ class LeadFieldRepository extends CommonRepository
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),
                     $q->expr()->eq($property, ':value')
                 )
@@ -364,7 +382,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('lead', (int) $lead)
             ->setParameter('value', $value);
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }
@@ -395,7 +413,7 @@ class LeadFieldRepository extends CommonRepository
             ->setParameter('month', $value->format('m'))
             ->setParameter('day', $value->format('d'));
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }

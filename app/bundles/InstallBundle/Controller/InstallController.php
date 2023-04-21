@@ -119,18 +119,6 @@ class InstallController extends CommonController
 
                         $complete = true;
                         break;
-
-                    case InstallService::EMAIL_STEP:
-                        $emailParam = (array) $formData;
-                        $messages   = $this->installer->setupEmailStep($step, $emailParam);
-
-                        if (!empty($messages)) {
-                            $this->handleInstallerErrors($form, $messages);
-                            break;
-                        }
-
-                        $complete = true;
-                        break;
                 }
             }
         } elseif (!empty($subIndex)) {

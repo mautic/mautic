@@ -24,7 +24,7 @@ class FullContactController extends FormController
     public function lookupPersonAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
     {
         if ('POST' === $request->getMethod()) {
-            $data     = $request->request->get('fullcontact_lookup', [], true);
+            $data     = $request->request->all()['fullcontact_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
@@ -121,9 +121,9 @@ class FullContactController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead');
         if ('GET' === $request->getMethod()) {
-            $data = $request->query->get('fullcontact_batch_lookup', [], true);
+            $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
         } else {
-            $data = $request->request->get('fullcontact_batch_lookup', [], true);
+            $data = $request->request->all()['fullcontact_batch_lookup'] ?? [];
         }
 
         $entities = [];
@@ -278,7 +278,7 @@ class FullContactController extends FormController
     public function lookupCompanyAction(Request $request, LookupHelper $lookupHelper, $objectId = '')
     {
         if ('POST' === $request->getMethod()) {
-            $data     = $request->request->get('fullcontact_lookup', [], true);
+            $data     = $request->request->all()['fullcontact_lookup'] ?? [];
             $objectId = $data['objectId'];
         }
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
@@ -374,9 +374,9 @@ class FullContactController extends FormController
         /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
         $model = $this->getModel('lead.company');
         if ('GET' === $request->getMethod()) {
-            $data = $request->query->get('fullcontact_batch_lookup', [], true);
+            $data = $request->query->all()['fullcontact_batch_lookup'] ?? [];
         } else {
-            $data = $request->request->get('fullcontact_batch_lookup', [], true);
+            $data = $request->request->all()['fullcontact_batch_lookup'] ?? [];
         }
 
         $entities = [];

@@ -70,7 +70,7 @@ class StagesChangeLogRepository extends CommonRepository
             ->setParameter('value', $leadId)
             ->orderBy('date_added', 'DESC');
 
-        $result = $query->execute()->fetch();
+        $result = $query->execute()->fetchAssociative();
 
         return (isset($result['stage'])) ? (int) $result['stage'] : null;
     }

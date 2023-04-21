@@ -25,7 +25,7 @@ class SourceController extends CommonFormController
         $method  = $request->getMethod();
         $session = $request->getSession();
         if ('POST' == $method) {
-            $source     = $request->request->get('campaign_leadsource');
+            $source     = $request->request->all()['campaign_leadsource'] ?? [];
             $sourceType = $source['sourceType'];
         } else {
             $sourceType = $request->query->get('sourceType');
@@ -130,7 +130,7 @@ class SourceController extends CommonFormController
         $method          = $request->getMethod();
         $modifiedSources = $selectedSources = $session->get('mautic.campaign.'.$objectId.'.leadsources.modified', []);
         if ('POST' == $method) {
-            $source     = $request->request->get('campaign_leadsource');
+            $source     = $request->request->all()['campaign_leadsource'] ?? [];
             $sourceType = $source['sourceType'];
         } else {
             $sourceType = $request->query->get('sourceType');

@@ -65,9 +65,10 @@ final class EmailOrEmailTokenListValidatorTest extends TestCase
         $dispatcher = new class() extends EventDispatcher {
             public function __construct()
             {
+                parent::__construct();
             }
 
-            public function dispatch($event)
+            public function dispatch(object $event, string $eventName = null): object
             {
                 return $event;
             }

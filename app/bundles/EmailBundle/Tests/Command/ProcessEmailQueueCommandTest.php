@@ -64,8 +64,8 @@ class ProcessEmailQueueCommandTest extends \PHPUnit\Framework\TestCase
         $this->application->method('getDefinition')
             ->willReturn($inputDefinition);
 
-        $inputDefinition->method('getOptions')
-            ->willReturn([]);
+        $inputDefinition->method('getOptions')->willReturn([]);
+        $inputDefinition->method('getArguments')->willReturn([]);
 
         $this->command = new ProcessEmailQueueCommand(
             $this->transport,

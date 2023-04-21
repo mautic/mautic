@@ -60,7 +60,7 @@ class FieldController extends CommonFormController
         $session = $request->getSession();
 
         if ('POST' == $method) {
-            $formField = $request->request->get('formfield');
+            $formField = $request->request->all()['formfield'] ?? [];
             $fieldType = $formField['type'];
             $formId    = $formField['formId'];
         } else {
@@ -218,7 +218,7 @@ class FieldController extends CommonFormController
     {
         $session   = $request->getSession();
         $method    = $request->getMethod();
-        $formfield = $request->request->get('formfield', []);
+        $formfield = $request->request->get('formfield') ?? [];
         $formId    = 'POST' === $method ? ($formfield['formId'] ?? '') : $request->query->get('formId');
         $fields    = $session->get('mautic.form.'.$formId.'.fields.modified', []);
         $success   = 0;
