@@ -14,7 +14,7 @@ if (is_array($env = @include dirname(__DIR__).'/.env.local.php') && (!isset($env
     (new Dotenv(false))->populate($env);
 } else {
     // load all the .env files
-    (new Dotenv())->loadEnv(dirname(__DIR__).'/.env',null,'prod');
+    (new Dotenv())->loadEnv(dirname(__DIR__).'/.env', null, 'prod');
 }
 
 $_SERVER += $_ENV;
