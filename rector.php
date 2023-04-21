@@ -43,6 +43,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->sets([
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
+        \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE

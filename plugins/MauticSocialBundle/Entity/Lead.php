@@ -5,11 +5,8 @@ namespace MauticPlugin\MauticSocialBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="monitoring_leads")
- * @ORM\Entity(repositoryClass="MauticPlugin\MauticSocialBundle\Entity\LeadRepository")
- */
+#[ORM\Table(name: 'monitoring_leads')]
+#[ORM\Entity(repositoryClass: LeadRepository::class)]
 class Lead
 {
     /**
