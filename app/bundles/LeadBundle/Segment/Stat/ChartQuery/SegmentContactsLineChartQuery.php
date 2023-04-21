@@ -68,7 +68,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
     }
 
-    public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
     {
         parent::setDateRange($dateFrom, $dateTo);
         $this->init();
