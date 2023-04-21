@@ -1,3 +1,4 @@
+// Mautic note: There is a hack in this library. Search for "hack" to find it. So it cannot be loaded via npm.
 /*!
 Chosen, a Select Box Enhancer for jQuery and Prototype
 by Patrick Filler for Harvest, http://getharvest.com
