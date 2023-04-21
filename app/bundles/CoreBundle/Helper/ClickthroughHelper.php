@@ -16,6 +16,9 @@ class ClickthroughHelper
         $this->shortKeyConverter = $shortKeyConverter;
     }
 
+    /**
+     * @param array<mixed> $data
+     */
     public function encode(array $data): string
     {
         $data       = $this->shortKeyConverter->pack($data);
@@ -24,7 +27,10 @@ class ClickthroughHelper
         return urlencode(base64_encode($serialized));
     }
 
-    public function decode(string $string, $urlDecode = true): array
+    /**
+     * @return array<mixed>
+     */
+    public function decode(string $string, bool $urlDecode = true): array
     {
         $raw     = $urlDecode ? urldecode($string) : $string;
         $decoded = base64_decode($raw);
@@ -47,6 +53,9 @@ class ClickthroughHelper
         throw new InvalidDecodedStringException($raw);
     }
 
+    /**
+     * @param string $string
+     */
     public function isSerialized($string): bool
     {
         try {
