@@ -437,6 +437,7 @@ class PublicController extends CommonFormController
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
         LoggerInterface $mauticLogger,
+        PageModel $pageModel,
         $redirectId,
         ?string $ct = null
     ) {
@@ -465,8 +466,20 @@ class PublicController extends CommonFormController
         $query = $request->query->all();
 
         // Unset the clickthrough from the URL query
-        $ct = $query['ct'] ?? null;
+        $ct = $query['ct'] ?? $query['ct'] = $request->attributes->get('ct');
         unset($query['ct']);
+
+        try {
+            $clickthrough = $pageModel->decodeArrayFromUrl($ct);
+            $utmTags      = $clickthrough['utmTags'] ?? [];
+            if (!empty($utmTags)) {
+                $query = array_merge($query, $utmTags);
+                unset($clickthrough['utmTags']);
+                $ct          = $pageModel->encodeArrayForUrl($clickthrough);
+                $query['ct'] = $ct;
+            }
+        } catch (InvalidDecodedStringException $invalidDecodedStringException) {
+        }
 
         // Tak on anything left to the URL
         if (count($query)) {
