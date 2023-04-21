@@ -78,14 +78,16 @@ class StatRepository extends CommonRepository
 
         $q->where($q->expr()->andX(
             $q->expr()->eq('s.lead_id', (int) $leadId),
-            $q->expr()->like('s.type', '"'.$type.'"')
+            $q->expr()->eq('s.type', ':type')
         ));
+
+        $q->setParameter('type', $type);
 
         if (isset($options['search']) && $options['search']) {
             $q->andWhere($q->expr()->orX(
-                $q->expr()->like('f.name', $q->expr()->literal('%'.$options['search'].'%')),
-                $q->expr()->like('f.description', $q->expr()->literal('%'.$options['search'].'%')),
-                $q->expr()->like('s.type', $q->expr()->literal($options['search']))
+                $q->expr()->like('f.name', $q->expr()->literal($options['search'].'%')),
+                $q->expr()->like('f.description', $q->expr()->literal($options['search'].'%')),
+                $q->expr()->eq('s.type', $q->expr()->literal($options['search']))
             ));
         }
 

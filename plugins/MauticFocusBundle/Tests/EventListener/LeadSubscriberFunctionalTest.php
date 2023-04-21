@@ -31,7 +31,7 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
     {
         $this->assertCount(3, $this->searchPhrase('bar', $this->lead, $this->focusModel));
         $this->assertCount(4, $this->searchPhrase('popup', $this->lead, $this->focusModel));
-        $this->assertCount(7, $this->searchPhrase('focus', $this->lead, $this->focusModel));
+        $this->assertCount(2, $this->searchPhrase('popup focus B', $this->lead, $this->focusModel));
     }
 
     public function testSearchPhraseInTypeFocusStat(): void
@@ -53,12 +53,12 @@ class LeadSubscriberFunctionalTest extends MauticMysqlTestCase
 
     private function setTestsData(Lead $lead, FocusModel $focusModel): void
     {
-        $focusPopupA = $this->createFocus('focus popup A');
-        $focusPopupB = $this->createFocus('focus popup B');
-        $focusPopupC = $this->createFocus('focus popup C');
+        $focusPopupA = $this->createFocus('popup focus A');
+        $focusPopupB = $this->createFocus('popup focus B');
+        $focusPopupC = $this->createFocus('popup focus C');
 
-        $focusBarA   = $this->createFocus('focus bar A');
-        $focusBarB   = $this->createFocus('focus bar B');
+        $focusBarA   = $this->createFocus('bar focus A');
+        $focusBarB   = $this->createFocus('bar focus B');
 
         $this->focusModel->saveEntity($focusPopupA);
         $this->focusModel->saveEntity($focusPopupB);

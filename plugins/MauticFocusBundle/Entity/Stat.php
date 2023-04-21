@@ -39,7 +39,7 @@ class Stat
     private $dateAdded;
 
     /**
-     * @var Lead
+     * @var ?Lead
      */
     private $lead;
 
@@ -157,7 +157,7 @@ class Stat
     }
 
     /**
-     * @return Lead
+     * @return ?Lead
      */
     public function getLead()
     {
