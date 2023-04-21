@@ -120,14 +120,14 @@ class MembershipManager
     }
 
     /**
-     * @param bool $isManualAction
+     * @param ArrayCollection<int, Lead> $contacts
+     * @param bool                       $isManualAction
      */
     public function addContacts(ArrayCollection $contacts, Campaign $campaign, $isManualAction = true)
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
 
-        /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $this->advanceProgressBar();
 
@@ -167,7 +167,7 @@ class MembershipManager
         }
 
         // Clear entities from RAM
-        $this->leadRepository->clear();
+        $this->leadRepository->detachEntities($contacts->toArray());
     }
 
     /**
@@ -208,15 +208,15 @@ class MembershipManager
     }
 
     /**
-     * @param bool $isExit If true, the contact can be added by a segment/source. If false, the contact can only be added back
-     *                     by a manual process.
+     * @param ArrayCollection<int, Lead> $contacts
+     * @param bool                       $isExit   If true, the contact can be added by a segment/source. If false, the contact can only be added back
+     *                                             by a manual process.
      */
     public function removeContacts(ArrayCollection $contacts, Campaign $campaign, $isExit = false)
     {
         // Get a list of existing campaign members
         $campaignMembers = $this->leadRepository->getCampaignMembers($contacts->getKeys(), $campaign);
 
-        /** @var Lead $contact */
         foreach ($contacts as $contact) {
             $this->advanceProgressBar();
 
@@ -250,7 +250,7 @@ class MembershipManager
         }
 
         // Clear entities from RAM
-        $this->leadRepository->clear();
+        $this->leadRepository->detachEntities($campaignMembers);
     }
 
     public function setProgressBar(ProgressBar $progressBar = null)

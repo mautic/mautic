@@ -38,7 +38,7 @@ class SendGridApiResponseTest extends \PHPUnit\Framework\TestCase
         $response           = new Response(401);
 
         $logger->expects($this->once())
-            ->method('addError')
+            ->method('error')
             ->with('SendGrid response: 401', ['response' => $response]);
 
         $this->expectException(SendGridBadLoginException::class);
@@ -54,7 +54,7 @@ class SendGridApiResponseTest extends \PHPUnit\Framework\TestCase
         $response           = new Response(410, $body);
 
         $logger->expects($this->once())
-            ->method('addError')
+            ->method('error')
             ->with('SendGrid response: 410', ['response' => $response]);
 
         $this->expectException(SendGridBadRequestException::class);

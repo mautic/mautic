@@ -5,14 +5,21 @@ namespace Mautic\ApiBundle\Controller;
 use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @template E of object
@@ -42,14 +49,26 @@ class CommonApiController extends FetchCommonApiController
      */
     protected $entityRequestParameters = [];
 
+    protected RouterInterface $router;
+
+    protected FormFactoryInterface $formFactory;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack)
+    {
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack);
+
+        $this->router      = $router;
+        $this->formFactory = $formFactory;
+    }
+
     /**
      * Delete a batch of entities.
      *
      * @return array|Response
      */
-    public function deleteEntitiesAction()
+    public function deleteEntitiesAction(Request $request)
     {
-        $parameters = $this->request->query->all();
+        $parameters = $request->query->all();
 
         $valid = $this->validateBatchPayload($parameters);
         if ($valid instanceof Response) {
@@ -122,9 +141,9 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return array|Response
      */
-    public function editEntitiesAction()
+    public function editEntitiesAction(Request $request)
     {
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         $valid = $this->validateBatchPayload($parameters);
         if ($valid instanceof Response) {
@@ -136,7 +155,7 @@ class CommonApiController extends FetchCommonApiController
         $entities    = $this->getBatchEntities($parameters, $errors);
 
         foreach ($parameters as $key => $params) {
-            $method = $this->request->getMethod();
+            $method = $request->getMethod();
             $entity = (isset($entities[$key])) ? $entities[$key] : null;
 
             $statusCode = Response::HTTP_OK;
@@ -165,7 +184,7 @@ class CommonApiController extends FetchCommonApiController
                 continue;
             }
 
-            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
+            $this->processBatchForm($request, $key, $entity, $params, $method, $errors, $entities);
 
             if (isset($errors[$key])) {
                 $statusCodes[$key] = $errors[$key]['code'];
@@ -196,11 +215,11 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return Response
      */
-    public function editEntityAction($id)
+    public function editEntityAction(Request $request, $id)
     {
         $entity     = $this->model->getEntity($id);
-        $parameters = $this->request->request->all();
-        $method     = $this->request->getMethod();
+        $parameters = $request->request->all();
+        $method     = $request->getMethod();
 
         if (null === $entity || !$entity->getId()) {
             if ('PATCH' === $method) {
@@ -219,7 +238,7 @@ class CommonApiController extends FetchCommonApiController
             return $this->accessDenied();
         }
 
-        return $this->processForm($entity, $parameters, $method);
+        return $this->processForm($request, $entity, $parameters, $method);
     }
 
     /**
@@ -227,7 +246,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return array|Response
      */
-    public function newEntitiesAction()
+    public function newEntitiesAction(Request $request)
     {
         $entity = $this->model->getEntity();
 
@@ -235,7 +254,7 @@ class CommonApiController extends FetchCommonApiController
             return $this->accessDenied();
         }
 
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         $valid = $this->validateBatchPayload($parameters);
         if ($valid instanceof Response) {
@@ -260,7 +279,7 @@ class CommonApiController extends FetchCommonApiController
                     continue;
                 }
             }
-            $this->processBatchForm($key, $entity, $params, $method, $errors, $entities);
+            $this->processBatchForm($request, $key, $entity, $params, $method, $errors, $entities);
 
             if (isset($errors[$key])) {
                 $statusCodes[$key] = $errors[$key]['code'];
@@ -291,16 +310,16 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return Response
      */
-    public function newEntityAction()
+    public function newEntityAction(Request $request)
     {
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
         $entity     = $this->getNewEntity($parameters);
 
         if (!$this->checkEntityAccess($entity, 'create')) {
             return $this->accessDenied();
         }
 
-        return $this->processForm($entity, $parameters, 'POST');
+        return $this->processForm($request, $entity, $parameters, 'POST');
     }
 
     /**
@@ -312,7 +331,7 @@ class CommonApiController extends FetchCommonApiController
     {
         return $this->model->createForm(
             $entity,
-            $this->get('form.factory'),
+            $this->formFactory,
             null,
             array_merge(
                 [
@@ -359,7 +378,7 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         return $parameters;
     }
@@ -372,10 +391,10 @@ class CommonApiController extends FetchCommonApiController
      * @param $errors
      * @param $entities
      */
-    protected function processBatchForm($key, $entity, $params, $method, &$errors, &$entities)
+    protected function processBatchForm(Request $request, $key, $entity, $params, $method, &$errors, &$entities)
     {
         $this->inBatchMode = true;
-        $formResponse      = $this->processForm($entity, $params, $method);
+        $formResponse      = $this->processForm($request, $entity, $params, $method);
         if ($formResponse instanceof Response) {
             if (!$formResponse instanceof RedirectResponse) {
                 // Assume an error
@@ -410,13 +429,13 @@ class CommonApiController extends FetchCommonApiController
      *
      * @return mixed
      */
-    protected function processForm($entity, $parameters = null, $method = 'PUT')
+    protected function processForm(Request $request, $entity, $parameters = null, $method = 'PUT')
     {
         $categoryId = null;
 
         if (null === $parameters) {
             //get from request
-            $parameters = $this->request->request->all();
+            $parameters = $request->request->all();
         }
 
         // Store the original parameters from the request so that callbacks can have access to them as needed
@@ -461,7 +480,7 @@ class CommonApiController extends FetchCommonApiController
         }
 
         $form         = $this->createEntityForm($entity);
-        $submitParams = $this->prepareParametersForBinding($parameters, $entity, $action);
+        $submitParams = $this->prepareParametersForBinding($request, $parameters, $entity, $action);
 
         if ($submitParams instanceof Response) {
             return $submitParams;
@@ -487,7 +506,7 @@ class CommonApiController extends FetchCommonApiController
 
             try {
                 if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_PRE_SAVE)) {
-                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request), ApiEvents::API_ON_ENTITY_PRE_SAVE);
+                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $request), ApiEvents::API_ON_ENTITY_PRE_SAVE);
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());
@@ -498,7 +517,7 @@ class CommonApiController extends FetchCommonApiController
             $headers = [];
             //return the newly created entities location if applicable
             if (in_array($statusCode, [Response::HTTP_CREATED, Response::HTTP_ACCEPTED])) {
-                $route = (null !== $this->get('router')->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone'))
+                $route = (null !== $this->router->getRouteCollection()->get('mautic_api_'.$this->entityNameMulti.'_getone'))
                     ? 'mautic_api_'.$this->entityNameMulti.'_getone' : 'mautic_api_get'.$this->entityNameOne;
                 $headers['Location'] = $this->generateUrl(
                     $route,
@@ -509,7 +528,7 @@ class CommonApiController extends FetchCommonApiController
 
             try {
                 if ($this->dispatcher->hasListeners(ApiEvents::API_ON_ENTITY_POST_SAVE)) {
-                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $this->request), ApiEvents::API_ON_ENTITY_POST_SAVE);
+                    $this->dispatcher->dispatch(new ApiEntityEvent($entity, $this->entityRequestParameters, $request), ApiEvents::API_ON_ENTITY_POST_SAVE);
                 }
             } catch (\Exception $e) {
                 return $this->returnError($e->getMessage(), $e->getCode());

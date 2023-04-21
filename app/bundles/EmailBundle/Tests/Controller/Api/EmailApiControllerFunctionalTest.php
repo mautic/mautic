@@ -38,13 +38,11 @@ class EmailApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->transport  = $transport;
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
         // Clear owners cache (to leave a clean environment for future tests):
         $mailHelper = self::$container->get('mautic.helper.mailer');
         $this->setPrivateProperty($mailHelper, 'leadOwners', []);
-
-        parent::tearDown();
     }
 
     protected function beforeBeginTransaction(): void

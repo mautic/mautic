@@ -35,7 +35,7 @@ class TrackableRepository extends CommonRepository
             ->setParameter('channel', $channel)
             ->orderBy('r.url')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**
@@ -191,7 +191,7 @@ class TrackableRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_hit', 'ph');
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return array of results

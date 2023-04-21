@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
@@ -53,25 +52,18 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         EmailModel $emailModel,
         TrackableModel $trackableModel,
         RedirectModel $redirectModel,
-        TranslatorInterface $translator,
-        EntityManager $entityManager
+        TranslatorInterface $translator
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->emailModel           = $emailModel;
         $this->pageTrackableModel   = $trackableModel;
         $this->pageRedirectModel    = $redirectModel;
         $this->translator           = $translator;
-        $this->entityManager        = $entityManager;
     }
 
     /**
@@ -144,7 +136,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'text',
                 $this->translator->trans('mautic.core.slot.label.text'),
                 'font',
-                'MauticCoreBundle:Slots:text.html.twig',
+                '@MauticCore/Slots/text.html.twig',
                 SlotTextType::class,
                 1000
             );
@@ -152,7 +144,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'image',
                 $this->translator->trans('mautic.core.slot.label.image'),
                 'image',
-                'MauticCoreBundle:Slots:image.html.twig',
+                '@MauticCore/Slots/image.html.twig',
                 SlotImageCardType::class,
                 900
             );
@@ -160,7 +152,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'imagecard',
                 $this->translator->trans('mautic.core.slot.label.imagecard'),
                 'id-card-o',
-                'MauticCoreBundle:Slots:imagecard.html.twig',
+                '@MauticCore/Slots/imagecard.html.twig',
                 SlotImageCardType::class,
                 870
             );
@@ -168,7 +160,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'imagecaption',
                 $this->translator->trans('mautic.core.slot.label.imagecaption'),
                 'image',
-                'MauticCoreBundle:Slots:imagecaption.html.twig',
+                '@MauticCore/Slots/imagecaption.html.twig',
                 SlotImageCaptionType::class,
                 850
             );
@@ -176,7 +168,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'button',
                 $this->translator->trans('mautic.core.slot.label.button'),
                 'external-link',
-                'MauticCoreBundle:Slots:button.html.twig',
+                '@MauticCore/Slots/button.html.twig',
                 SlotButtonType::class,
                 800
             );
@@ -184,7 +176,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'socialfollow',
                 $this->translator->trans('mautic.core.slot.label.socialfollow'),
                 'twitter',
-                'MauticCoreBundle:Slots:socialfollow.html.twig',
+                '@MauticCore/Slots/socialfollow.html.twig',
                 SlotSocialFollowType::class,
                 600
             );
@@ -192,7 +184,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'codemode',
                 $this->translator->trans('mautic.core.slot.label.codemode'),
                 'code',
-                'MauticCoreBundle:Slots:codemode.html.twig',
+                '@MauticCore/Slots/codemode.html.twig',
                 SlotCodeModeType::class,
                 500
             );
@@ -200,7 +192,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'separator',
                 $this->translator->trans('mautic.core.slot.label.separator'),
                 'minus',
-                'MauticCoreBundle:Slots:separator.html.twig',
+                '@MauticCore/Slots/separator.html.twig',
                 SlotSeparatorType::class,
                 400
             );
@@ -209,7 +201,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'dynamicContent',
                 $this->translator->trans('mautic.core.slot.label.dynamiccontent'),
                 'tag',
-                'MauticCoreBundle:Slots:dynamiccontent.html.twig',
+                '@MauticCore/Slots/dynamiccontent.html.twig',
                 SlotDynamicContentType::class,
                 300
             );
@@ -220,7 +212,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'one-column',
                 $this->translator->trans('mautic.core.slot.label.onecolumn'),
                 'file-text-o',
-                'MauticCoreBundle:Sections:one-column.html.twig',
+                '@MauticCore/Sections/one-column.html.twig',
                 null,
                 1000
             );
@@ -228,7 +220,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'two-column',
                 $this->translator->trans('mautic.core.slot.label.twocolumns'),
                 'columns',
-                'MauticCoreBundle:Sections:two-column.html.twig',
+                '@MauticCore/Sections/two-column.html.twig',
                 null,
                 900
             );
@@ -236,7 +228,7 @@ class BuilderSubscriber implements EventSubscriberInterface
                 'three-column',
                 $this->translator->trans('mautic.core.slot.label.threecolumns'),
                 'th',
-                'MauticCoreBundle:Sections:three-column.html.twig',
+                '@MauticCore/Sections/three-column.html.twig',
                 null,
                 800
             );
@@ -393,9 +385,19 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             $convertedContent[$event->getContentHash()] = $trackables;
 
-            // Don't need to preserve Trackable or Redirect entities in memory
-            $this->entityManager->clear(Redirect::class);
-            $this->entityManager->clear(Trackable::class);
+            foreach ($trackables as $trackable) {
+                $trackableRepository = $this->pageTrackableModel->getRepository();
+                $redirectRepository  = $this->pageRedirectModel->getRepository();
+
+                if ($trackable instanceof Trackable) {
+                    $trackableRepository->detachEntity($trackable);
+                    $redirectRepository->detachEntity($trackable->getRedirect());
+                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                } else {
+                    $redirectRepository->detachEntity($trackable);
+                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                }
+            }
 
             unset($html, $text, $trackables);
         }

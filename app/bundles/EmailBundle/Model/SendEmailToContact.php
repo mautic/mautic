@@ -235,9 +235,6 @@ class SendEmailToContact
      */
     public function reset()
     {
-        [];
-        [];
-        [];
         $this->badEmails         = [];
         $this->errorMessages     = [];
         $this->failedContacts    = [];
@@ -248,8 +245,6 @@ class SendEmailToContact
         $this->listId            = null;
         $this->statBatchCounter  = 0;
         $this->contact           = [];
-
-        $this->dncModel->clearEntities();
 
         $this->mailer->reset();
     }

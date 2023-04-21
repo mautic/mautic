@@ -3,15 +3,14 @@
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\EventListener\RequestSubscriber;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -41,6 +40,12 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(new CsrfToken($aCsrfTokenId, $aCsrfTokenValue));
 
+        $csrfTokenManagerMock
+          ->method('isTokenValid')
+          ->will($this->returnCallback(function (CsrfToken $token) use ($aCsrfTokenValue) {
+              return $token->getValue() === $aCsrfTokenValue;
+          }));
+
         $this->request = new Request();
 
         $this->event = $this->getMockBuilder(RequestEvent::class)
@@ -56,16 +61,12 @@ class RequestSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRequest')
             ->willReturn($this->request);
 
-        $templatingHelper = $this->createMock(TemplatingHelper::class);
-
-        $templatingHelper
-            ->method('getTemplating')
-            ->willReturn($this->createMock(DelegatingEngine::class));
+        $twig = $this->createMock(Environment::class);
 
         $this->subscriber = new RequestSubscriber(
             $csrfTokenManagerMock,
             $this->createMock(TranslatorInterface::class),
-            $templatingHelper
+            $twig
         );
     }
 
