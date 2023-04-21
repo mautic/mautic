@@ -72,8 +72,9 @@ class RedirectModel extends FormModel
             'mautic_url_redirect',
             [
                 'redirectId' => $redirect->getRedirectId(),
-                'ct'         => $this->encodeArrayForUrl($clickthrough),
-            ]
+            ],
+            true,
+            $clickthrough
         );
 
         if ($shortenUrl) {
