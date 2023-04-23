@@ -61,4 +61,37 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
     $rectorConfig->rule(\Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
+
+    // Add Doctrine Rules
+    /**
+     * TODO: Add these rules at some point
+     * Rector\Doctrine\Rector\Class_\AddEntityIdByConditionRector
+     * Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector.
+     */
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\BlameableBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\ChangeBigIntEntityPropertyToIntTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\MethodCall\ChangeSetParametersArrayToArrayCollectionRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\ClassAnnotationToNamedArgumentConstructorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\CorrectDefaultTypesOnEntityPropertyRector::class);
+    $rectorConfig->rule(Rector\Doctrine\Rector\Property\ImproveDoctrineCollectionDocTypeInEntityRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\InitializeDefaultEntityCollectionRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\LoggableBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\MakeEntityDateTimePropertyDateTimeInterfaceRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\ClassMethod\MakeEntitySetterNullabilityInSyncWithPropertyRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\ManagerRegistryGetManagerToEntityManagerRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\MoveCurrentDateTimeDefaultInEntityToConstructorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\MoveRepositoryFromParentToConstructorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRedundantDefaultClassAnnotationValuesRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\RemoveRedundantDefaultPropertyAnnotationValuesRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRepositoryFromEntityAnnotationRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\MethodCall\ReplaceParentRepositoryCallsByRepositoryPropertyRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\ClassMethod\ServiceEntityRepositoryParentCallToDIRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\SluggableBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\SoftDeletableBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\TimestampableBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\TranslationBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\TreeBehaviorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromColumnTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromToManyRelationTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromToOneRelationTypeRector::class);
 };
