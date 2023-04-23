@@ -150,7 +150,7 @@ class SubmissionRepository extends CommonRepository
                     $q->expr()->in('s.id', ':ids')
                 )->setParameter('ids', $ids);
 
-                $q->orderBy('ORD', 'ASC');
+                $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
                 $results = $returnEntities ? $q->getQuery()->getResult() : $q->getQuery()->getArrayResult();
 
                 foreach ($results as &$r) {

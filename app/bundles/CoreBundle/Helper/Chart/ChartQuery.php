@@ -137,7 +137,9 @@ class ChartQuery extends AbstractChart
         if ($dateColumn) {
             if ($this->dateFrom && $this->dateTo) {
                 // Between is faster so if we know both dates...
+                /** @var \DateTime $dateFrom */
                 $dateFrom = clone $this->dateFrom;
+                /** @var \DateTime $dateTo */
                 $dateTo   = clone $this->dateTo;
                 if ($this->isTimeUnit) {
                     $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
@@ -151,6 +153,7 @@ class ChartQuery extends AbstractChart
             } else {
                 // Apply the start date/time if set
                 if ($this->dateFrom) {
+                    /** @var \DateTime $dateFrom */
                     $dateFrom = clone $this->dateFrom;
                     if ($this->isTimeUnit) {
                         $dateFrom->setTimeZone(new \DateTimeZone('UTC'));
@@ -161,6 +164,7 @@ class ChartQuery extends AbstractChart
 
                 // Apply the end date/time if set
                 if ($this->dateTo) {
+                    /** @var \DateTime $dateTo */
                     $dateTo = clone $this->dateTo;
                     if ($this->isTimeUnit) {
                         $dateTo->setTimeZone(new \DateTimeZone('UTC'));
@@ -304,6 +308,7 @@ class ChartQuery extends AbstractChart
         $averageCounts = [];
         $oneUnit       = $this->getUnitInterval();
         $limit         = $this->countAmountFromDateRange();
+        /** @var \DateTime $previousDate */
         $previousDate  = clone $this->dateFrom;
         $utcTz         = new \DateTimeZone('UTC');
 
