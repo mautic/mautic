@@ -8,8 +8,6 @@ use Symfony\Component\Validator\Constraints\Length as SymfonyLength;
  * @Annotation
  * @Target({"PROPERTY", "METHOD", "ANNOTATION"})
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
- * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
- * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  */
 class Length extends SymfonyLength
 {
