@@ -6,11 +6,21 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * @Annotation
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  */
 class UniqueUserAlias extends Constraint
 {
     public $message = 'This alias is already in use.';
     public $field   = '';
+
+    public function __construct($message, $field)
+    {
+        $this->message = $message;
+        $this->field   = $field;
+    }
 
     public function validatedBy()
     {
