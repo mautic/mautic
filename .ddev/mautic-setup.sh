@@ -11,9 +11,7 @@ setup_mautic() {
     cp ./.ddev/local.config.php.dist ./app/config/local.php
 
     printf "Installing Mautic...\n"
-    php bin/console mautic:install "${MAUTIC_URL}" \
-            --mailer_from_name="DDEV" --mailer_from_email="mautic@ddev.local" \
-            --mailer_transport="smtp" --mailer_host="localhost" --mailer_port="1025" --messenger_type="sync"
+    php bin/console mautic:install "${MAUTIC_URL}"
     php bin/console cache:warmup --no-interaction --env=dev
 
     printf "Enabling plugins...\n"
