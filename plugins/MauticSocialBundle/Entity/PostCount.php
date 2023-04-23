@@ -21,7 +21,7 @@ class PostCount
     private $monitor;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $postDate;
 
@@ -97,7 +97,7 @@ class PostCount
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPostDate()
     {

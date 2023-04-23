@@ -230,7 +230,7 @@ class UserType extends AbstractType
                         'query_builder' => function (EntityRepository $er) {
                             return $er->createQueryBuilder('r')
                                 ->where('r.isPublished = true')
-                                ->orderBy('r.name', 'ASC');
+                                ->orderBy('r.name', \Doctrine\Common\Collections\Criteria::ASC);
                         },
                     ]
                 )

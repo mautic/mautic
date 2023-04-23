@@ -28,7 +28,6 @@ bin/simple-phpunit
 build/*
 deleted_files.txt
 modified_files.txt
-node_modules/*
 package-lock.json
 package.json
 phpstan*.neon
