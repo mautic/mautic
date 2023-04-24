@@ -29,6 +29,7 @@ class AssetGenerationHelper
         'jsplumb/dist/js/jsplumb.js', // Needed for the campaign builder.
         'typeahead.js/dist/typeahead.bundle.js', // Needed for the Twitter-like mentions (tokens).
         'jquery-datetimepicker/build/jquery.datetimepicker.full.js', // Needed for the date/time UI selector.
+        'shufflejs/dist/shuffle.js', // Needed for the plugin list page.
         // TODO: Add the rest of the libraries here.
     ];
 
