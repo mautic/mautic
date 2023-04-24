@@ -16,17 +16,21 @@ use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\RequestTrait;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -133,13 +137,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $permissionBase;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    private RequestStack $requestStack;
 
     /**
-     * @var \Mautic\CoreBundle\Security\Permissions\CorePermissions
+     * @var CorePermissions
      */
     protected $security;
 
@@ -158,17 +159,32 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected $user;
 
+    protected ContainerBagInterface $parametersContainer;
+
+    protected EntityResultHelper $entityResultHelper;
+
+    private AppVersion $appVersion;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, AppVersion $appVersion, RequestStack $requestStack)
+    {
+        $this->security           = $security;
+        $this->translator         = $translator;
+        $this->entityResultHelper = $entityResultHelper;
+        $this->appVersion         = $appVersion;
+        $this->requestStack       = $requestStack;
+    }
+
     /**
      * Obtains a list of entities as defined by the API URL.
      *
      * @return Response
      */
-    public function getEntitiesAction()
+    public function getEntitiesAction(Request $request)
     {
         $repo          = $this->model->getRepository();
         $tableAlias    = $repo->getTableAlias();
-        $publishedOnly = $this->request->get('published', 0);
-        $minimal       = $this->request->get('minimal', 0);
+        $publishedOnly = $request->get('published', 0);
+        $minimal       = $request->get('minimal', 0);
 
         try {
             if (!$this->security->isGranted($this->permissionBase.':view')) {
@@ -204,29 +220,29 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
         $args = array_merge(
             [
-                'start'  => $this->request->query->get('start', 0),
-                'limit'  => $this->request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
+                'start'  => $request->query->get('start', 0),
+                'limit'  => $request->query->get('limit', $this->coreParametersHelper->get('default_pagelimit')),
                 'filter' => [
-                    'string' => $this->request->query->get('search', ''),
+                    'string' => $request->query->get('search', ''),
                     'force'  => $this->listFilters,
                 ],
-                'orderBy'        => $this->addAliasIfNotPresent($this->request->query->get('orderBy', ''), $tableAlias),
-                'orderByDir'     => $this->request->query->get('orderByDir', 'ASC'),
+                'orderBy'        => $this->addAliasIfNotPresent($request->query->get('orderBy', ''), $tableAlias),
+                'orderByDir'     => $request->query->get('orderByDir', 'ASC'),
                 'withTotalCount' => true, //for repositories that break free of Paginator
             ],
             $this->extraGetEntitiesArguments
         );
 
-        if ($select = InputHelper::cleanArray($this->request->get('select', []))) {
+        if ($select = InputHelper::cleanArray($request->get('select', []))) {
             $args['select']              = $select;
             $this->customSelectRequested = true;
         }
 
-        if ($where = $this->getWhereFromRequest()) {
+        if ($where = $this->getWhereFromRequest($request)) {
             $args['filter']['where'] = $where;
         }
 
-        if ($order = $this->getOrderFromRequest()) {
+        if ($order = $this->getOrderFromRequest($request)) {
             $args['filter']['order'] = $order;
         }
 
@@ -251,9 +267,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array<mixed>
      */
-    protected function getWhereFromRequest()
+    protected function getWhereFromRequest(Request $request)
     {
-        $where = InputHelper::cleanArray($this->request->get('where', []));
+        $where = InputHelper::cleanArray($request->get('where', []));
 
         $this->sanitizeWhereClauseArrayFromRequest($where);
 
@@ -265,9 +281,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return array<mixed>
      */
-    protected function getOrderFromRequest(): array
+    protected function getOrderFromRequest(Request $request): array
     {
-        return InputHelper::cleanArray($this->request->get('order', []));
+        return InputHelper::cleanArray($request->get('order', []));
     }
 
     /**
@@ -305,10 +321,10 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      *
      * @return Response
      */
-    public function getEntityAction($id)
+    public function getEntityAction(Request $request, $id)
     {
         $args = [];
-        if ($select = InputHelper::cleanArray($this->request->get('select', []))) {
+        if ($select = InputHelper::cleanArray($request->get('select', []))) {
             $args['select']              = $select;
             $this->customSelectRequested = true;
         }
@@ -340,7 +356,6 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     public function initialize(ControllerEvent $event)
     {
-        $this->security = $this->get('mautic.security');
         if (null !== $this->model && !$this->permissionBase && method_exists($this->model, 'getPermissionBase')) {
             $this->permissionBase = $this->model->getPermissionBase();
         }
@@ -382,9 +397,15 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         $this->modelFactory = $modelFactory;
     }
 
-    public function setRequest(Request $request): void
+    public function getCurrentRequest(): Request
     {
-        $this->request = $request;
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
+            throw new \RuntimeException('Request is not set.');
+        }
+
+        return $request;
     }
 
     public function setTranslator(Translator $translator): void
@@ -395,6 +416,11 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     public function setFlashBag(FlashBag $flashBag): void
     {
         // @see \Mautic\CoreBundle\EventListener\CoreSubscriber::onKernelController()
+    }
+
+    public function setParametersContainer(ContainerBagInterface $parametersContainer): void
+    {
+        $this->parametersContainer = $parametersContainer;
     }
 
     public function setUser(User $user): void
@@ -641,12 +667,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $totalCount = count($results);
         }
 
-        /**
-         * @var EntityResultHelper $entityResultHelper
-         */
-        $entityResultHelper = $this->get('mautic.api.helper.entity_result');
-
-        $entities = $entityResultHelper->getArray($results, $callback);
+        $entities = $this->entityResultHelper->getArray($results, $callback);
 
         return [$entities, $totalCount];
     }
@@ -718,7 +739,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         }
 
         $errors[$key] = [
-            'message' => $this->get('translator')->hasId($msg, 'flashes') ? $this->get('translator')->trans($msg, [], 'flashes') : $msg,
+            'message' => $this->translator->hasId($msg, 'flashes') ? $this->translator->trans($msg, [], 'flashes') : $msg,
             'code'    => $code,
             'type'    => 'api',
         ];
@@ -766,9 +787,9 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
      */
     protected function validateBatchPayload(array $parameters)
     {
-        $batchLimit = (int) $this->get('mautic.config')->getParameter('api_batch_max_limit', 200);
+        $batchLimit = (int) $this->coreParametersHelper->getParameter('api_batch_max_limit', 200);
         if (count($parameters) > $batchLimit) {
-            return $this->returnError($this->get('translator')->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
+            return $this->returnError($this->translator->trans('mautic.api.call.batch_exception', ['%limit%' => $batchLimit]));
         }
 
         return true;
@@ -787,7 +808,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
             $data = $data->getIterator()->getArrayCopy();
         }
 
-        $headers['Mautic-Version'] = $this->get('kernel')->getVersion();
+        $headers['Mautic-Version'] = $this->appVersion->getVersion();
 
         return parent::view($data, $statusCode, $headers);
     }

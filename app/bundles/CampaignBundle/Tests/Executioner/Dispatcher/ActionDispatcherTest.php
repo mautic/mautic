@@ -118,6 +118,8 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                         $event->pass($logs->get(1));
                         $event->fail($logs->get(2), 'just because');
                     }
+
+                    return $event;
                 }
             );
 
@@ -195,6 +197,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                 function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
                     $pendingEvent->pass($logs->get(1));
 
+                    return $pendingEvent;
                     // One log is not processed so the exception should be thrown
                 }
             );
@@ -255,6 +258,7 @@ class ActionDispatcherTest extends \PHPUnit\Framework\TestCase
                 function (PendingEvent $pendingEvent, string $eventName) use ($logs) {
                     $pendingEvent->fail($logs->get(2), 'something');
 
+                    return $pendingEvent;
                     // One log is not processed so the exception should be thrown
                 }
             );

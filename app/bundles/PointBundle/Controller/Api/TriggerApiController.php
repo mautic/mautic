@@ -3,12 +3,19 @@
 namespace Mautic\PointBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
+use Mautic\CoreBundle\Helper\AppVersion;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PointBundle\Entity\Trigger;
 use Mautic\PointBundle\Model\TriggerEventModel;
 use Mautic\PointBundle\Model\TriggerModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @extends CommonApiController<Trigger>
@@ -19,6 +26,22 @@ class TriggerApiController extends CommonApiController
      * @var TriggerModel|null
      */
     protected $model = null;
+
+    private ?RequestStack $requestStack = null;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack
+    ) {
+        $this->requestStack = $requestStack;
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+    }
 
     public function initialize(ControllerEvent $event)
     {
@@ -39,7 +62,7 @@ class TriggerApiController extends CommonApiController
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $method            = $this->request->getMethod();
+        $method            = $this->requestStack->getCurrentRequest()->getMethod();
         $triggerEventModel = $this->getModel('point.triggerevent');
         $isNew             = false;
 
@@ -107,7 +130,7 @@ class TriggerApiController extends CommonApiController
 
         return $triggerEventModel->createForm(
             $entity,
-            $this->get('form.factory'),
+            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,
@@ -156,7 +179,7 @@ class TriggerApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $eventsToDelete = $this->request->get('events');
+        $eventsToDelete = $this->requestStack->getCurrentRequest()->get('events');
         $currentEvents  = $entity->getEvents();
 
         if (!is_array($eventsToDelete)) {

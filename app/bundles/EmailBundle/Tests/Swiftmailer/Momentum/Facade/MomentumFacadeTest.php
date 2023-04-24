@@ -118,7 +118,7 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
             ->willThrowException($swiftMessageValidationExceptionMock);
 
         $this->loggerMock->expects($this->once())
-            ->method('addError')
+            ->method('error')
             ->with('Momentum send exception', [
                 'message' => $exceptionMessage,
             ]);
@@ -228,7 +228,7 @@ class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
             ->willReturn($responseBody);
 
         $this->loggerMock->expects($this->exactly(2))
-            ->method('addError')
+            ->method('error')
             ->withConsecutive(
                 [
                     'Momentum send: 500', [
