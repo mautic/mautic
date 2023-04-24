@@ -25,6 +25,7 @@
     "js-cookie": "^2.0.2",
     "jsplumb": "^2.12.8",
     "moment": "^2.8.1",
-    "mousetrap": "^1.4.6"
+    "mousetrap": "^1.4.6",
+    "typeahead.js": "^0.10.2"
   }
 }
