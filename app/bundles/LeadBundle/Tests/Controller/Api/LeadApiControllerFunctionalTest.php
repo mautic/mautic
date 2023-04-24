@@ -549,9 +549,6 @@ class LeadApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload[0]['timezone'], $response['contacts'][0]['fields']['all']['timezone']);
         $this->assertEquals($payload[0]['owner'], $response['contacts'][0]['owner']['id']);
 
-        // without overwriteWithBlank lastname is not set empty
-        $payload[0]['lastname'] = '';
-
         // with overwriteWithBlank lastname is empty
         $payload[0]['overwriteWithBlank'] = true;
         $payload[0]['lastname']           = '';
