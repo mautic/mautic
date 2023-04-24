@@ -21,6 +21,7 @@
     "jquery-form": "^4.2.2",
     "jquery-ui-touch-punch": "^0.2.3",
     "jquery.caret": "^0.3.1",
+    "jquery.cookie": "^1.4.1",
     "js-cookie": "^2.0.2",
     "moment": "^2.8.1",
     "mousetrap": "^1.4.6"
