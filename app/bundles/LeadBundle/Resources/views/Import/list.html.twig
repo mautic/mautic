@@ -1,0 +1,35 @@
+{#
+  Variables
+    -
+#}
+{% set isIndex = 'index' == tmpl ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}{{ mauticContent }}{% endblock %}
+
+{% block headerTitle %}{{ 'mautic.lead.import.list'|trans }}{% endblock %}
+
+{% block actions %}
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
+        'templateButtons': {
+            'new': permissions[permissionBase~':create'],
+        },
+        'routeBase': 'import',
+        'query': {'object': app.request.get('object', 'contacts')},
+  }) }}
+{% endblock %}
+
+{% block content %}
+  {% if isIndex %}
+    <div class="panel panel-default bdr-t-wdh-0 mb-0">
+      <div class="page-list">
+  {% endif %}
+
+  {{ include('@MauticLead/Import/_list.html.twig') }}
+
+  {% if isIndex %}
+        </div>
+    </div>
+  {% endif %}
+{% endblock %}

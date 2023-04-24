@@ -63,7 +63,7 @@ class ObjectMappingRepository extends CommonRepository
             ->setParameter('internalObjectId', $internalObjectId)
             ->setParameter('integrationObjectName', $integrationObjectName);
 
-        $result = $qb->execute()->fetch();
+        $result = $qb->execute()->fetchAssociative();
 
         return $result ?: null;
     }

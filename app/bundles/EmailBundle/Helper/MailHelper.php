@@ -18,6 +18,7 @@ use Mautic\EmailBundle\Swiftmailer\Transport\TokenTransportInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Twig\Environment;
 
 /**
  * Class MailHelper.
@@ -39,9 +40,9 @@ class MailHelper
     protected $transport;
 
     /**
-     * @var \Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var null
@@ -884,11 +885,11 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->templating) {
-            $this->templating = $this->factory->getTemplating();
+        if (null == $this->twig) {
+            $this->twig = $this->factory->getTwig();
         }
 
-        $content = $this->templating->renderResponse($template, $vars)->getContent();
+        $content = $this->twig->render($template, $vars);
 
         unset($vars);
 
@@ -1082,8 +1083,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param string $address
-     * @param null   $name
+     * @param string      $address
+     * @param string|null $name
      *
      * @return bool
      */
@@ -1444,7 +1445,7 @@ class MailHelper
 
             $this->processSlots($slots, $email);
 
-            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate(':'.$template.':email.html.twig');
+            $logicalName = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/email.html.twig');
 
             $customHtml = $this->setTemplate($logicalName, [
                 'slots'    => $slots,
@@ -2043,7 +2044,7 @@ class MailHelper
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();

@@ -219,7 +219,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             ->setFirstResult($start)
             ->setMaxResults($limit);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     public function findObjectsByIds(array $ids): array
@@ -235,7 +235,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 $qb->expr()->in('id', $ids)
             );
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     public function findObjectsByFieldValues(array $fields): array
@@ -250,7 +250,7 @@ class ContactObjectHelper implements ObjectHelperInterface
                 ->setParameter($col, $val);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     public function getDoNotContactStatus(int $contactId, string $channel): int
@@ -269,7 +269,7 @@ class ContactObjectHelper implements ObjectHelperInterface
             ->setParameter('channel', $channel)
             ->setMaxResults(1);
 
-        $status = $q->execute()->fetchColumn();
+        $status = $q->execute()->fetchOne();
 
         if (false === $status) {
             return DoNotContact::IS_CONTACTABLE;
@@ -291,7 +291,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->andWhere('c.id IN (:objectIds)');
         $qb->setParameter('objectIds', $objectIds, Connection::PARAM_INT_ARRAY);
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 
     private function getAvailableFields(): array
