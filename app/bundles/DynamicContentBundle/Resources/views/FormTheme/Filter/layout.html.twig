@@ -3,7 +3,7 @@
 {%- set filterType = form.field.vars.value -%}
 {%- set inGroup = form.vars.data.glue is defined and 'and' is same as form.vars.data.glue -%}
 {%- set isBehavior = fields.behaviors[filterType].label is defined -%}
-{%- set icon = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'fa-builder' : 'fa-user' -%}
+{%- set icon = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'fa-building' : 'fa-user' -%}
 
 {%- if isBehavior -%}
     {%- set object = 'behaviors' -%}
