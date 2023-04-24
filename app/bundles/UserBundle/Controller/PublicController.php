@@ -6,9 +6,9 @@ use Mautic\CoreBundle\Controller\FormController;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
+use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Mautic\UserBundle\Model\UserModel;
 
 class PublicController extends FormController
 {
