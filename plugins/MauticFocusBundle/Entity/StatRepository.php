@@ -86,7 +86,6 @@ class StatRepository extends CommonRepository
         if (isset($options['search']) && $options['search']) {
             $q->andWhere($q->expr()->orX(
                 $q->expr()->like('f.name', $q->expr()->literal($options['search'].'%')),
-                $q->expr()->like('f.description', $q->expr()->literal($options['search'].'%')),
                 $q->expr()->eq('s.type', $q->expr()->literal($options['search']))
             ));
         }
