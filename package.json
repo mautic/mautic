@@ -13,6 +13,7 @@
     "time-grunt": "^2.0.0"
   },
   "dependencies": {
+    "@claviska/jquery-minicolors": "^2.2.4",
     "bootstrap": "^3.3.7",
     "codemirror": "^5.15.2",
     "history.js": "^1.8.0",

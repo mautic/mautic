@@ -30,6 +30,7 @@ class AssetGenerationHelper
         'typeahead.js/dist/typeahead.bundle.js', // Needed for the Twitter-like mentions (tokens).
         'jquery-datetimepicker/build/jquery.datetimepicker.full.js', // Needed for the date/time UI selector.
         'shufflejs/dist/shuffle.js', // Needed for the plugin list page.
+        '@claviska/jquery-minicolors/jquery.minicolors.js', // Needed for the color picker.
         // TODO: Add the rest of the libraries here.
     ];
 
