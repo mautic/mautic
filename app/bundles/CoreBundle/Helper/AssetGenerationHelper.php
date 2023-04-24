@@ -28,7 +28,7 @@ class AssetGenerationHelper
         'jquery.cookie/jquery.cookie.js', // A simple, lightweight jQuery plugin for reading, writing and deleting cookies.
         'jsplumb/dist/js/jsplumb.js', // Needed for the campaign builder.
         'typeahead.js/dist/typeahead.bundle.js', // Needed for the Twitter-like mentions (tokens).
-        'php-date-formatter/js/php-date-formatter.js', // Needed for the date/time with PHP formatting.
+        'jquery-datetimepicker/build/jquery.datetimepicker.full.js', // Needed for the date/time UI selector.
         // TODO: Add the rest of the libraries here.
     ];
 
