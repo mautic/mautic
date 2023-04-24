@@ -26,6 +26,7 @@ class AssetGenerationHelper
         'codemirror/mode/htmlmixed/htmlmixed.js', // Needed for the legacy code-mode editor.
         'codemirror/mode/css/css.js', // Needed for the legacy code-mode editor.
         'jquery.cookie/jquery.cookie.js', // A simple, lightweight jQuery plugin for reading, writing and deleting cookies.
+        'jsplumb/dist/js/jsplumb.js', // Needed for the campaign builder.
         // TODO: Add the rest of the libraries here.
     ];
 
