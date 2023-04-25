@@ -9,7 +9,7 @@ setup_mautic() {
     composer install
 
     cp ./.ddev/local.config.php.dist ./app/config/local.php
-    cp ./.env.test.local ./.env.test.local
+    cp ./.ddev/.env.test.local ./.env.test.local
 
     printf "Installing Mautic...\n"
     php bin/console mautic:install "${MAUTIC_URL}"
