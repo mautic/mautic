@@ -16,6 +16,7 @@
     "@claviska/jquery-minicolors": "^2.2.4",
     "bootstrap": "^3.3.7",
     "codemirror": "^5.15.2",
+    "dropzone": "^4.0.1",
     "history.js": "^1.8.0",
     "jquery": "^3.3.1",
     "jquery-color": "^2.2.0",

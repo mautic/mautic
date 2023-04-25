@@ -31,6 +31,7 @@ class AssetGenerationHelper
         'jquery-datetimepicker/build/jquery.datetimepicker.full.js', // Needed for the date/time UI selector.
         'shufflejs/dist/shuffle.js', // Needed for the plugin list page.
         '@claviska/jquery-minicolors/jquery.minicolors.js', // Needed for the color picker.
+        'dropzone/dist/dropzone.js', // Needed for the file upload in the asset detail page.
         // TODO: Add the rest of the libraries here.
     ];
 
