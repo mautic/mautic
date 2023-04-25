@@ -209,28 +209,6 @@ var Mautic = {
     },
 
     /**
-     * Setups browser notifications
-     */
-    setupBrowserNotifier: function () {
-        //request notification support
-        notify.requestPermission();
-        notify.config({
-            autoClose: 10000
-        });
-
-        Mautic.browserNotifier = {
-            isSupported: notify.isSupported,
-            permissionLevel: notify.permissionLevel()
-        };
-
-        Mautic.browserNotifier.isSupported = notify.isSupported;
-        Mautic.browserNotifier.permissionLevel = notify.permissionLevel();
-        Mautic.browserNotifier.createNotification = function (title, options) {
-            return notify.createNotification(title, options);
-        }
-    },
-
-    /**
      * Stops the ajax page loading indicator
      */
     stopPageLoadingBar: function () {
@@ -739,23 +717,6 @@ var Mautic = {
         elDiv.append(elSpan);
 
         return elDiv;
-    },
-
-    /**
-     * Set browser notifications
-     *
-     * @param notifications
-     */
-    setBrowserNotifications: function (notifications) {
-        mQuery.each(notifications, function (key, notification) {
-            Mautic.browserNotifier.createNotification(
-                notification.title,
-                {
-                    body: notification.message,
-                    icon: notification.icon
-                }
-            );
-        });
     },
 
     /**
