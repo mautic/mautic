@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\DataTransformer\SecondsConversionTransformer;
@@ -12,9 +14,6 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 
-/**
- * @codeCoverageIgnore
- */
 class CampaignConditionLeadPageHitType extends AbstractType
 {
     /**
