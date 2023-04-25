@@ -13,9 +13,6 @@ final class EnvLoader
      */
     public static function load(): void
     {
-        $root    = __DIR__.'/../../../../';
-        $envFile = file_exists($root.'.env.test.local') ? $root.'.env.test.local' : $root.'.env.test';
-        $dotenv  = new Dotenv();
-        $dotenv->load($envFile);
+        (new Dotenv())->loadEnv(__DIR__.'/../../../../.env');
     }
 }

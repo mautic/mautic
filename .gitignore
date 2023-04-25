@@ -13,6 +13,7 @@
 !.ddev/commands/web/dd
 .php_cs.cache
 /.env.local
+/.env.local.php
 /.env.*.local
 /composer.phar
 /coverage.xml

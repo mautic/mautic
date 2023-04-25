@@ -376,12 +376,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getTablePrefix(): string
     {
-        $prefix = self::$container->getParameter('mautic.db_table_prefix');
-        if (is_null($prefix)) {
-            return '';
-        }
-
-        return $prefix;
+        return (string) self::$container->getParameter('mautic.db_table_prefix');
     }
 
     private function isDatabasePrepared(): bool
