@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 final class CampaignConditionLeadPageHitTypeTest extends AbstractMauticTestCase
 {
-    private $campaignConditionPageHitType;
+    private CampaignConditionLeadPageHitType $campaignConditionPageHitType;
     /** @var FormBuilderInterface&MockObject */
     private FormBuilderInterface $formBuilderInterface;
 
