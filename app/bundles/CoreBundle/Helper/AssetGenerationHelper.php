@@ -33,6 +33,7 @@ class AssetGenerationHelper
         '@claviska/jquery-minicolors/jquery.minicolors.js', // Needed for the color picker.
         'dropzone/dist/dropzone.js', // Needed for the file upload in the asset detail page.
         'multiselect/js/jquery.multi-select.js', // Needed for the multiselect UI component.
+        'chart.js/dist/Chart.js', // Needed for the charts.
         // TODO: Add the rest of the libraries here.
     ];
 

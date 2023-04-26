@@ -15,6 +15,7 @@
   "dependencies": {
     "@claviska/jquery-minicolors": "^2.2.4",
     "bootstrap": "^3.3.7",
+    "chart.js": "^2.3.0",
     "codemirror": "^5.15.2",
     "dropzone": "^4.0.1",
     "history.js": "^1.8.0",
