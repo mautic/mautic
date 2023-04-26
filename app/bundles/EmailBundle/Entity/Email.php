@@ -375,7 +375,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
                     $violations = $validator->validate(
                         $email->getLists(),
                         [
-                            new LeadListAccess(),
+                            new LeadListAccess('mautic.lead.lists.failed'),
                             new NotBlank(
                                 [
                                     'message' => 'mautic.lead.lists.required',

@@ -230,9 +230,7 @@ class Notification extends FormEntity
                         $notification->getLists(),
                         [
                             new LeadListAccess(
-                                [
-                                    'message' => 'mautic.lead.lists.required',
-                                ]
+                                'mautic.lead.lists.required',
                             ),
                             new NotBlank(
                                 [

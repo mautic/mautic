@@ -176,7 +176,7 @@ class Sms extends FormEntity
                                     'message' => 'mautic.lead.lists.required',
                                 ]
                             ),
-                            new LeadListAccess(),
+                            new LeadListAccess('mautic.lead.lists.failed'),
                         ]
                     );
 
