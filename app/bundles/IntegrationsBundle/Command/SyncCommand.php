@@ -32,7 +32,6 @@ class SyncCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Fetch objects from integration.')
             ->addArgument(
                 'integration',
                 InputOption::VALUE_REQUIRED,
@@ -106,7 +105,7 @@ class SyncCommand extends Command
         } catch (InvalidValueException $e) {
             $io->error($e->getMessage());
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         try {
@@ -120,11 +119,12 @@ class SyncCommand extends Command
 
             $io->error($e->getMessage());
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Fetch objects from integration.';
 }

@@ -8,7 +8,7 @@ use Mautic\UserBundle\Form\Type\PasswordResetConfirmType;
 use Mautic\UserBundle\Form\Type\PasswordResetType;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class PublicController extends FormController
 {
@@ -55,7 +55,7 @@ class PublicController extends FormController
         ]);
     }
 
-    public function passwordResetConfirmAction(Request $request, UserPasswordEncoderInterface $encoder): mixed
+    public function passwordResetConfirmAction(Request $request, UserPasswordHasherInterface $hasher): mixed
     {
         /** @var \Mautic\UserBundle\Model\UserModel $model */
         $model = $this->getModel('user');
@@ -86,7 +86,7 @@ class PublicController extends FormController
                         $resetToken = $request->getSession()->get('resetToken');
 
                         if ($model->confirmResetToken($user, $resetToken)) {
-                            $encodedPassword = $model->checkNewPassword($user, $encoder, $data['plainPassword']);
+                            $encodedPassword = $model->checkNewPassword($user, $hasher, $data['plainPassword']);
                             $user->setPassword($encodedPassword);
                             $model->saveEntity($user);
 

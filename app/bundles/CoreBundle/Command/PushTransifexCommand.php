@@ -45,7 +45,6 @@ class PushTransifexCommand extends Command
     protected function configure(): void
     {
         $this->setName(self::NAME)
-            ->setDescription('Pushes Mautic translation resources to Transifex')
             ->addOption('bundle', null, InputOption::VALUE_OPTIONAL, 'Optional bundle to pull. Example value: WebhookBundle', null)
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command is used to push translation resources to Transifex
@@ -71,7 +70,7 @@ EOT
                 'mautic.core.command.transifex_no_credentials')
             );
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $resources = $transifex->getConnector(Resources::class);
@@ -136,6 +135,7 @@ EOT
             }
         );
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Pushes Mautic translation resources to Transifex';
 }

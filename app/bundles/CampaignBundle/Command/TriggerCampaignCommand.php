@@ -98,7 +98,6 @@ class TriggerCampaignCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:campaigns:trigger')
-            ->setDescription('Trigger timed events for published campaigns.')
             ->addOption(
                 '--campaign-id',
                 '-i',
@@ -204,7 +203,7 @@ class TriggerCampaignCommand extends ModeratedCommand
         if ($threadId && $maxThreads && (int) $threadId > (int) $maxThreads) {
             $this->output->writeln('--thread-id cannot be larger than --max-thread');
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $this->limiter = new ContactLimiter($batchLimit, $contactId, $contactMinId, $contactMaxId, $contactIds, $threadId, $maxThreads, $campaignLimit);
@@ -214,7 +213,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $moderationKey = sprintf('%s-%s', $id, $threadId);
         if (!$this->checkRunStatus($input, $this->output, $moderationKey)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         // Specific campaign;
@@ -248,7 +247,7 @@ class TriggerCampaignCommand extends ModeratedCommand
 
         $this->completeRun();
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
@@ -387,4 +386,5 @@ class TriggerCampaignCommand extends ModeratedCommand
             $this->segmentCountCacheHelper->setSegmentContactCount($segmentId, (int) $totalLeadCount);
         }
     }
+    protected static $defaultDescription = 'Trigger timed events for published campaigns.';
 }

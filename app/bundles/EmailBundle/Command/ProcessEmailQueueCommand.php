@@ -40,7 +40,6 @@ class ProcessEmailQueueCommand extends ModeratedCommand
     {
         $this
             ->setName('mautic:emails:send')
-            ->setDescription('Processes SwiftMail\'s mail queue')
             ->addOption('--message-limit', null, InputOption::VALUE_OPTIONAL, 'Limit number of messages sent at a time. Defaults to value set in config.')
             ->addOption('--time-limit', null, InputOption::VALUE_OPTIONAL, 'Limit the number of seconds per batch. Defaults to value set in config.')
             ->addOption('--do-not-clear', null, InputOption::VALUE_NONE, 'By default, failed messages older than the --recover-timeout setting will be attempted one more time then deleted if it fails again.  If this is set, sending of failed messages will continue to be attempted.')
@@ -70,11 +69,11 @@ EOT
         if ('file' != $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         if (!$this->checkRunStatus($input, $output, $lockName)) {
-            return 0;
+            return \Symfony\Component\Console\Command\Command::SUCCESS;
         }
 
         if (empty($timeout)) {
@@ -189,6 +188,7 @@ EOT
             return (int) $returnCode;
         }
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
+    protected static $defaultDescription = 'Processes SwiftMail\'s mail queue';
 }

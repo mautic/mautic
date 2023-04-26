@@ -155,7 +155,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (false === $twitterIntegration || false === $twitterIntegration->getIntegrationSettings()->getIsPublished()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         \assert($twitterIntegration instanceof TwitterIntegration);
@@ -164,7 +164,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (!$this->twitter->isAuthorized()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.configured'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         // get the mid from the cli
@@ -173,7 +173,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (!$mid) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.mid.empty'));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         $this->twitterCommandHelper->setOutput($output);
@@ -183,7 +183,7 @@ abstract class MonitorTwitterBaseCommand extends Command
         if (!$monitor || !$monitor->getId()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.monitor.does.not.exist', ['%id%' => $mid]));
 
-            return 1;
+            return \Symfony\Component\Console\Command\Command::FAILURE;
         }
 
         // process the monitor
@@ -194,7 +194,7 @@ abstract class MonitorTwitterBaseCommand extends Command
             SocialEvents::MONITOR_POST_PROCESS
         );
 
-        return 0;
+        return \Symfony\Component\Console\Command\Command::SUCCESS;
     }
 
     /**
