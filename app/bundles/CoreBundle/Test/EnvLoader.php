@@ -9,7 +9,7 @@ use Symfony\Component\Dotenv\Dotenv;
 final class EnvLoader
 {
     /**
-     * Loads the env variables from .env.dist or .env file for PHPUNIT tests.
+     * Loads the env variables from .env(.*) files for PHPUNIT tests.
      */
     public static function load(): void
     {
