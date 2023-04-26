@@ -116,15 +116,10 @@ class DateMonthLastTest extends \PHPUnit\Framework\TestCase
         $dateDecorator    = $this->createMock(DateDecorator::class);
         $timezoneResolver = $this->createMock(TimezoneResolver::class);
 
-        $date = new DateTimeHelper(DateMonthLast::MIDNIGHT_FIRST_DAY_OF_LAST_MONTH, null, 'Europe/Paris');
-
+        $date = new DateTimeHelper(DateMonthLast::MIDNIGHT_FIRST_DAY_OF_LAST_MONTH, null, 'local');
         $timezoneResolver->method('getDefaultDate')
             ->with()
             ->willReturn($date);
-
-        $timezoneResolver->method('getDefaultTimezone')
-            ->with()
-            ->willReturn('Europe/Paris');
 
         $filter        = [
             'operator' => '!=',
@@ -138,7 +133,6 @@ class DateMonthLastTest extends \PHPUnit\Framework\TestCase
         $startDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
         $date->modify('+1 month -1 second');
         $endDate = $date->toUtcString(DateOptionAbstract::Y_M_D_H_I_S);
-
         $this->assertEquals([$startDate, $endDate], $filterDecorator->getParameterValue($contactSegmentFilterCrate));
     }
 }

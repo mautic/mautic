@@ -13,6 +13,6 @@ class DateDayYesterday extends DateDayAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime(self::MIDNIGHT_YESTERDAY, null, $this->dateOptionParameters->getDefaultTimezone());
+        $dateTimeHelper->setDateTime(self::MIDNIGHT_YESTERDAY, null);
     }
 }

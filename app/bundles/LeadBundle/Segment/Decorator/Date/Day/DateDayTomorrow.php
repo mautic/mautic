@@ -13,6 +13,6 @@ class DateDayTomorrow extends DateDayAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime(self::MIDNIGHT_TOMORROW, null, $this->dateOptionParameters->getDefaultTimezone());
+        $dateTimeHelper->setDateTime(self::MIDNIGHT_TOMORROW, null);
     }
 }

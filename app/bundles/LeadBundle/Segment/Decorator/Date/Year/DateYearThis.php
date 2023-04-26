@@ -13,6 +13,6 @@ class DateYearThis extends DateYearAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime(self::MIDNIGHT_FIRST_DAY_OF_JANUARY_THIS_YEAR, null, $this->dateOptionParameters->getDefaultTimezone());
+        $dateTimeHelper->setDateTime(self::MIDNIGHT_FIRST_DAY_OF_JANUARY_THIS_YEAR, null);
     }
 }

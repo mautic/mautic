@@ -24,7 +24,6 @@ abstract class DateMonthAbstract extends DateOptionAbstract
         if (!$this->dateOptionParameters->hasTimePart()) {
             return $dateTimeHelper->getString('Y-m-%');
         }
-
         $dateFormat = 'Y-m-d H:i:s';
         $startWith  = $dateTimeHelper->toUtcString($dateFormat);
 

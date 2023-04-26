@@ -13,6 +13,6 @@ class DateDayToday extends DateDayAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime(self::BASE_DATE, null, $this->dateOptionParameters->getDefaultTimezone());
+        $dateTimeHelper->setDateTime(self::BASE_DATE, null);
     }
 }

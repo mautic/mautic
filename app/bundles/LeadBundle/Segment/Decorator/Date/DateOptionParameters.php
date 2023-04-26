@@ -32,8 +32,6 @@ class DateOptionParameters
      */
     private $dateTimeHelper;
 
-    private string $defaultTimezone;
-
     public function __construct(
         ContactSegmentFilterCrate $leadSegmentFilterCrate,
         array $relativeDateStrings,
@@ -45,7 +43,6 @@ class DateOptionParameters
         $this->shouldUseLastDayOfRange = in_array($leadSegmentFilterCrate->getOperator(), ['gt', 'lte'], true);
 
         $this->setDateTimeHelper($timezoneResolver);
-        $this->defaultTimezone = $timezoneResolver->getDefaultTimezone();
     }
 
     /**
@@ -54,11 +51,6 @@ class DateOptionParameters
     public function hasTimePart()
     {
         return $this->hasTimePart;
-    }
-
-    public function getDefaultTimezone(): string
-    {
-        return $this->defaultTimezone;
     }
 
     /**

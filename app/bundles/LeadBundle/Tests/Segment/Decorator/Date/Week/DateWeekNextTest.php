@@ -180,10 +180,6 @@ class DateWeekNextTest extends \PHPUnit\Framework\TestCase
             ->with()
             ->willReturn($date);
 
-        $timezoneResolver->method('getDefaultTimezone')
-            ->with()
-            ->willReturn('Europe/Paris');
-
         $filter        = [
             'operator' => '!=',
             'type'     => 'datetime',

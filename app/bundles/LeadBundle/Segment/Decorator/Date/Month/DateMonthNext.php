@@ -13,6 +13,6 @@ class DateMonthNext extends DateMonthAbstract
      */
     protected function modifyBaseDate(DateTimeHelper $dateTimeHelper)
     {
-        $dateTimeHelper->setDateTime(self::MIDNIGHT_FIRST_DAY_OF_NEXT_MONTH, null, $this->dateOptionParameters->getDefaultTimezone());
+        $dateTimeHelper->setDateTime(self::MIDNIGHT_FIRST_DAY_OF_NEXT_MONTH, null);
     }
 }

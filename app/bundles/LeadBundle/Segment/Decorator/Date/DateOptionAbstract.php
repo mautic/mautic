@@ -106,7 +106,6 @@ abstract class DateOptionAbstract implements FilterDecoratorInterface
         $this->modifyBaseDate($dateTimeHelper);
 
         $dateFormat = $this->dateOptionParameters->hasTimePart() ? self::Y_M_D_H_I_S : self::Y_M_D;
-
         if ($this->dateOptionParameters->isBetweenRequired()) {
             return $this->getValueForBetweenRange($dateTimeHelper);
         }

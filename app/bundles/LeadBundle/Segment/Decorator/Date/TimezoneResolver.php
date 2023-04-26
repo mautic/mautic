@@ -2,22 +2,10 @@
 
 namespace Mautic\LeadBundle\Segment\Decorator\Date;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class TimezoneResolver
 {
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(
-        CoreParametersHelper $coreParametersHelper
-    ) {
-        $this->coreParametersHelper = $coreParametersHelper;
-    }
-
     /**
      * @param bool $hasTimePart
      *
@@ -38,13 +26,6 @@ class TimezoneResolver
          */
         $time     = $hasTimePart ? 'now' : 'midnight today';
 
-        $date = new \DateTime($time, new \DateTimeZone($this->getDefaultTimezone()));
-
-        return new DateTimeHelper($date, null, $this->getDefaultTimezone());
-    }
-
-    public function getDefaultTimezone(): string
-    {
-        return $this->coreParametersHelper->get('default_timezone', 'UTC');
+        return new DateTimeHelper($time, null, 'local');
     }
 }
