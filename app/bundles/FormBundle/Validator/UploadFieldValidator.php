@@ -33,7 +33,7 @@ class UploadFieldValidator
     {
         $files = $request->files->get('mauticform');
 
-        if (!array_key_exists($field->getAlias(), $files) || !$files[$field->getAlias()]) {
+        if (!$files || !isset($files[$field->getAlias()])) {
             throw new NoFileGivenException();
         }
 
