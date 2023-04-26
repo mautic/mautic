@@ -19,7 +19,7 @@ final class VisitedPageConditionControllerFunctionalTest extends MauticMysqlTest
      * @param array<mixed,mixed> $accumulativeTime
      * @param array<mixed,mixed> $page
      */
-    public function testCreateContactConditionOnStateField(
+    public function testCreatePageHitConditionForm(
         array $pageUrl,
         array $startDate,
         array $endDate,
