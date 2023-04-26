@@ -745,12 +745,6 @@ var Mautic = {
                 mQuery('#notificationMautibot').addClass('hide');
             }
         }
-
-        if (notifications.sound) {
-            mQuery('.playSound').remove();
-
-            mQuery.playSound(notifications.sound);
-        }
     },
 
     /**
