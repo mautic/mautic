@@ -512,6 +512,7 @@ final class AssetsHelper
         return [
             $base.'ckeditor.js?v'.$this->version,
             $base.'adapters/jquery.js?v'.$this->version,
+            'media/js/mautic-token.js?v'.$this->version,
         ];
     }
 
