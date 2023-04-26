@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use Mautic\LeadBundle\Form\Validator\Constraints\LeadListAccess;
+use Mautic\LeadBundle\Form\Validator\Constraints\UniqueUserAlias;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator) {
@@ -30,4 +32,9 @@ return function (ContainerConfigurator $configurator) {
 
     $services->load('Mautic\\LeadBundle\\Entity\\', '../Entity/*Repository.php');
     $services->alias('mautic.lead.model.lead', \Mautic\LeadBundle\Model\LeadModel::class);
+    $services->set(LeadListAccess::class)
+        ->arg('$message', 'mautic.lead.lists.failed');
+    $services->set(UniqueUserAlias::class)
+        ->arg('$message', 'This alias is already in use.')
+        ->arg('$field', '');
 };
