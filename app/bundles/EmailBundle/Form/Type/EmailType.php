@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Form\Type\PublishUpDateType;
 use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\ThemeListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\EmailBundle\Entity\Email;
@@ -540,7 +541,7 @@ class EmailType extends AbstractType
         $view->vars['countries'] = FormFieldHelper::getCountryChoices();
         $view->vars['regions']   = FormFieldHelper::getRegionChoices();
         $view->vars['timezones'] = FormFieldHelper::getTimezonesChoices();
-        $view->vars['locales']   = FormFieldHelper::getLocaleChoices();
+        $view->vars['locales']   = ArrayHelper::flipArray(FormFieldHelper::getLocaleChoices());
         $view->vars['stages']    = $stageChoices;
     }
 

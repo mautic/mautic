@@ -97,11 +97,6 @@ trait MatchFilterForLeadTrait
                     $leadVal   = (int) $leadVal;
                     $filterVal = (int) $filterVal;
                     break;
-                case 'select':
-                    if (!is_array($filterVal)) {
-                        $filterVal = explode('|', $filterVal);
-                    }
-                    break;
                 default:
                     if (is_numeric($leadVal)) {
                         $leadVal   = (int) $leadVal;
