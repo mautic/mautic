@@ -29,6 +29,7 @@
     "jsplumb": "^2.12.8",
     "moment": "^2.8.1",
     "mousetrap": "^1.4.6",
+    "multiselect": "^0.9.12",
     "shufflejs": "^5.2.2",
     "typeahead.js": "^0.10.2"
   }
