@@ -32,6 +32,7 @@
     "mousetrap": "^1.4.6",
     "multiselect": "^0.9.12",
     "shufflejs": "^5.2.2",
-    "typeahead.js": "^0.10.2"
+    "typeahead.js": "^0.10.2",
+    "vimeo-froogaloop2": "^0.1.1"
   }
 }
