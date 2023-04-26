@@ -729,7 +729,7 @@ class CommonRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return string
+     * @return literal-string
      */
     public function getTableAlias()
     {
