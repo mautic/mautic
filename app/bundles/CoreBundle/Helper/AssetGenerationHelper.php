@@ -11,6 +11,7 @@ class AssetGenerationHelper
     private const NODE_MODULES = [
         'mousetrap/mousetrap.js',
         'jquery/dist/jquery.js',
+        'chosen-js/chosen.jquery.js',
         // TODO: Add the rest of the libraries here.
     ];
 
