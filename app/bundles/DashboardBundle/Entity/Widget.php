@@ -93,12 +93,12 @@ class Widget extends FormEntity
         $builder->setTable('widgets');
         $builder->setCustomRepositoryClass(WidgetRepository::class);
         $builder->addIdColumns('name', false);
-        $builder->addField('type', Type::STRING);
-        $builder->addField('width', Type::INTEGER);
-        $builder->addField('height', Type::INTEGER);
-        $builder->addNullableField('cacheTimeout', Type::INTEGER, 'cache_timeout');
-        $builder->addNullableField('ordering', Type::INTEGER);
-        $builder->addNullableField('params', Type::TARRAY);
+        $builder->addField('type', \Doctrine\DBAL\Types\Types::STRING);
+        $builder->addField('width', \Doctrine\DBAL\Types\Types::INTEGER);
+        $builder->addField('height', \Doctrine\DBAL\Types\Types::INTEGER);
+        $builder->addNullableField('cacheTimeout', \Doctrine\DBAL\Types\Types::INTEGER, 'cache_timeout');
+        $builder->addNullableField('ordering', \Doctrine\DBAL\Types\Types::INTEGER);
+        $builder->addNullableField('params', \Doctrine\DBAL\Types\Types::ARRAY);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)

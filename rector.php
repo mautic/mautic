@@ -43,9 +43,15 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     // Define what rule sets will be applied
     $rectorConfig->sets([
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
         //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_25,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
@@ -63,11 +69,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
     $rectorConfig->rule(\Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
 
-    // Add Doctrine Rules
-    /**
-     * TODO: Add these rules at some point
-     * Rector\Doctrine\Rector\Class_\AddEntityIdByConditionRector.
-     */
     $rectorConfig->rule(\Rector\Doctrine\Rector\MethodCall\ChangeSetParametersArrayToArrayCollectionRector::class);
     $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\ClassAnnotationToNamedArgumentConstructorRector::class);
     $rectorConfig->ruleWithConfiguration(EntityAliasToClassConstantReferenceRector::class, [

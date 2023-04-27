@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Command;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\PathsHelper;
@@ -61,7 +60,7 @@ class SummarizeCommand extends ModeratedCommand
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

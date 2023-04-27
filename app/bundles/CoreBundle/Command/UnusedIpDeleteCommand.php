@@ -2,7 +2,6 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\LeadBundle\Model\IpAddressModel;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +55,7 @@ EOT
             $limit       = $input->getOption('limit');
             $deletedRows = $this->ipAddressModel->deleteUnusedIpAddresses((int) $limit);
             $output->writeln(sprintf('<info>%s unused IP addresses have been deleted</info>', $deletedRows));
-        } catch (DBALException $e) {
+        } catch (\Doctrine\DBAL\Exception $e) {
             $output->writeln(sprintf('<error>Deletion of unused IP addresses failed because of database error: %s</error>', $e->getMessage()));
             $this->completeRun();
 

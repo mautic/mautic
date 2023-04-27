@@ -5,7 +5,6 @@ namespace Mautic\CampaignBundle\Entity;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
-use Doctrine\DBAL\Types\Type;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -432,7 +431,7 @@ class LeadEventLogRepository extends CommonRepository
             )
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
-            ->setParameter('true', true, Type::BOOLEAN);
+            ->setParameter('true', true, \Doctrine\DBAL\Types\Types::BOOLEAN);
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 
@@ -486,7 +485,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->eq('l.campaign_id', ':campaignId'),
             $q->expr()->eq('l.is_scheduled', ':true'),
             $q->expr()->lte('l.trigger_date', ':now'),
@@ -526,7 +525,7 @@ class LeadEventLogRepository extends CommonRepository
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('log.event_id', $eventId),
                     $qb->expr()->in('log.lead_id', $contactIds)
                 )
@@ -571,7 +570,7 @@ class LeadEventLogRepository extends CommonRepository
         $qb->select('log.rotation')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('log.lead_id', ':contactId'),
                     $qb->expr()->eq('log.campaign_id', ':campaignId'),
                     $qb->expr()->in('log.rotation', ':rotation')
@@ -590,7 +589,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * @param string $message
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function unscheduleEvents(Lead $campaignMember, $message)
     {

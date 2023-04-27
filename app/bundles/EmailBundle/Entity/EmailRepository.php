@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\Entity;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -260,7 +259,7 @@ class EmailRepository extends CommonRepository
 
         // Has an email
         $q->andWhere(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->isNotNull('l.email'),
                 $q->expr()->neq('l.email', $q->expr()->literal(''))
             )
@@ -551,7 +550,7 @@ class EmailRepository extends CommonRepository
                 $q->execute();
 
                 return;
-            } catch (DBALException $e) {
+            } catch (\Doctrine\DBAL\Exception $e) {
                 --$retrialLimit;
                 if (0 === $retrialLimit) {
                     throw $e;
