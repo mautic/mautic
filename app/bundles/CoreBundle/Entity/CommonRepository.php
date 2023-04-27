@@ -22,7 +22,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @template T
+ * @template T of object
  * @extends ServiceEntityRepository<T>
  */
 class CommonRepository extends ServiceEntityRepository
@@ -143,6 +143,7 @@ class CommonRepository extends ServiceEntityRepository
     public function createFromArray($className, &$data)
     {
         $entity        = new $className();
+        /** @var class-string $className */
         $meta          = $this->_em->getClassMetadata($className);
         $ormProperties = $this->getBaseColumns($className, true);
 
@@ -340,7 +341,7 @@ class CommonRepository extends ServiceEntityRepository
             $q = $this->_em
                 ->createQueryBuilder()
                 ->select($alias)
-                ->from($this->_entityName, $alias, "{$alias}.id");
+                ->from($this->_entityName, $alias, '{$alias}.id');
 
             if ($this->getClassMetadata()->hasAssociation('category')) {
                 $q->leftJoin($this->getTableAlias().'.category', 'cat');

@@ -49,7 +49,7 @@ class MessageQueueModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticChannelBundle:MessageQueue');
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\MessageQueueRepository::class);
     }
 
     /**
