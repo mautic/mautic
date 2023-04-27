@@ -72,7 +72,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\ChannelBundle\Entity\MessageRepository
+     * @return \Mautic\ChannelBundle\Entity\MessageRepository
      */
     public function getRepository()
     {

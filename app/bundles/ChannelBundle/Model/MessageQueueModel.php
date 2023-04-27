@@ -45,7 +45,7 @@ class MessageQueueModel extends FormModel
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\ChannelBundle\Entity\MessageQueueRepository
+     * @return \Mautic\ChannelBundle\Entity\MessageQueueRepository
      */
     public function getRepository()
     {
