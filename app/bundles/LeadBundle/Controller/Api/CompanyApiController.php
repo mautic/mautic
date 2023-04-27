@@ -8,7 +8,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -39,27 +38,16 @@ class CompanyApiController extends CommonApiController
         parent::initialize($event);
     }
 
-    /**
-     * If an existing company is matched, it'll be merged. Otherwise it'll be created.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function newEntityAction(Request $request)
+    public function getNewEntity(array $params)
     {
-        // Check for an email to see if the lead already exists
-        $parameters = $request->request->all();
-
-        if (empty($parameters['force'])) {
-            $leadCompanyModel = $this->getModel('lead.company');
-            \assert($leadCompanyModel instanceof CompanyModel);
-            list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
-
-            if (count($companyEntities)) {
-                return $this->editEntityAction($request, $company['id']);
-            }
+        $leadCompanyModel = $this->getModel('lead.company');
+        \assert($leadCompanyModel instanceof CompanyModel);
+        [$company, $companyEntities] = IdentifyCompanyHelper::findCompany($params, $leadCompanyModel);
+        if (count($companyEntities)) {
+            return $this->model->getEntity($company['id']);
         }
 
-        return parent::newEntityAction($request);
+        return $this->model->getEntity();
     }
 
     /**
