@@ -167,8 +167,6 @@ class CitrixEventRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
