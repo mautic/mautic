@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraint;
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  */
 class LeadListAccess extends Constraint
 {

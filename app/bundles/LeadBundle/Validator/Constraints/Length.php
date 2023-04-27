@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints\Length as SymfonyLength;
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
+ * @\Doctrine\Common\Annotations\Annotation\NamedArgumentConstructor
  */
 class Length extends SymfonyLength
 {
