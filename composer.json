@@ -118,12 +118,14 @@
       "@auto-scripts",
       "@remove-git-submodules",
       "@npm-ci",
+      "@npx-patch-package",
       "@generate-assets"
     ],
     "post-update-cmd": [
       "@auto-scripts",
       "@remove-git-submodules",
       "@npm-ci",
+      "@npx-patch-package",
       "@generate-assets"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
@@ -133,6 +135,7 @@
     "rector": "bin/rector process",
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf",
     "npm-ci": "npm ci",
+    "npx-patch-package": "npx patch-package",
     "generate-assets": "bin/console mautic:assets:generate"
   },
   "config": {
