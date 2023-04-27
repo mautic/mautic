@@ -331,7 +331,7 @@ class ContactSegmentService
         try {
             $start = microtime(true);
 
-            $result = $qb->execute()->fetch(\PDO::FETCH_ASSOC);
+            $result = $qb->execute()->fetchAssociative();
 
             $end = microtime(true) - $start;
 
@@ -361,7 +361,7 @@ class ContactSegmentService
     {
         try {
             $start  = microtime(true);
-            $result = $qb->execute()->fetchAll(\PDO::FETCH_ASSOC);
+            $result = $qb->execute()->fetchAllAssociative();
 
             $end = microtime(true) - $start;
 

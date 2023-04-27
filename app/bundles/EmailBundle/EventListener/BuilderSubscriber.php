@@ -2,7 +2,6 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\Mapping\MappingException;
 use Mautic\CoreBundle\Form\Type\SlotButtonType;
 use Mautic\CoreBundle\Form\Type\SlotCodeModeType;
@@ -53,25 +52,18 @@ class BuilderSubscriber implements EventSubscriberInterface
      */
     private $translator;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         EmailModel $emailModel,
         TrackableModel $trackableModel,
         RedirectModel $redirectModel,
-        TranslatorInterface $translator,
-        EntityManager $entityManager
+        TranslatorInterface $translator
     ) {
         $this->coreParametersHelper = $coreParametersHelper;
         $this->emailModel           = $emailModel;
         $this->pageTrackableModel   = $trackableModel;
         $this->pageRedirectModel    = $redirectModel;
         $this->translator           = $translator;
-        $this->entityManager        = $entityManager;
     }
 
     /**
@@ -393,9 +385,19 @@ class BuilderSubscriber implements EventSubscriberInterface
 
             $convertedContent[$event->getContentHash()] = $trackables;
 
-            // Don't need to preserve Trackable or Redirect entities in memory
-            $this->entityManager->clear(Redirect::class);
-            $this->entityManager->clear(Trackable::class);
+            foreach ($trackables as $trackable) {
+                $trackableRepository = $this->pageTrackableModel->getRepository();
+                $redirectRepository  = $this->pageRedirectModel->getRepository();
+
+                if ($trackable instanceof Trackable) {
+                    $trackableRepository->detachEntity($trackable);
+                    $redirectRepository->detachEntity($trackable->getRedirect());
+                    $trackableRepository->detachEntities($trackable->getRedirect()->getTrackableList()->toArray());
+                } else {
+                    $redirectRepository->detachEntity($trackable);
+                    $trackableRepository->detachEntities($trackable->getTrackableList()->toArray());
+                }
+            }
 
             unset($html, $text, $trackables);
         }

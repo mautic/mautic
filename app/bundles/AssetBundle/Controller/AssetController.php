@@ -307,7 +307,7 @@ class AssetController extends FormController
         ], 'validators');
 
         // Create temporary asset ID
-        $asset  = $request->request->get('asset', []);
+        $asset  = $request->request->get('asset') ?? [];
         $tempId = 'POST' === $method ? ($asset['tempId'] ?? '') : uniqid('tmp_');
         $entity->setTempId($tempId);
 
@@ -475,7 +475,7 @@ class AssetController extends FormController
         }
 
         // Create temporary asset ID
-        $asset  = $request->request->get('asset', []);
+        $asset  = $request->request->get('asset') ?? [];
         $tempId = 'POST' === $method ? ($asset['tempId'] ?? '') : uniqid('tmp_');
         $entity->setTempId($tempId);
 

@@ -17,7 +17,7 @@ class FailedLeadEventLog
     private $log;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -87,7 +87,7 @@ class FailedLeadEventLog
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

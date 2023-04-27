@@ -16,7 +16,7 @@ class ObjectMapping
     private $id;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateCreated;
 
@@ -163,7 +163,7 @@ class ObjectMapping
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateCreated()
     {

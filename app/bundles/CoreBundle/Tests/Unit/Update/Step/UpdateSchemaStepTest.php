@@ -119,6 +119,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 
@@ -142,6 +144,8 @@ class UpdateSchemaStepTest extends AbstractStepTest
                             $event->enableCommand();
                             break;
                     }
+
+                    return $event;
                 }
             );
 

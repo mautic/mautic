@@ -18,10 +18,9 @@ final class Version20201102120710 extends AbstractMauticMigration
         $this->table = $this->getTableName();
         $this->index = $this->generatePropertyName($this->table, 'idx', ['email_id']);
 
-        $sql  = 'SHOW INDEX FROM '.$this->table.' WHERE Key_name = "'.$this->index.'"';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
-        $indexExists = (bool) $stmt->fetch();
+        $sql         = 'SHOW INDEX FROM '.$this->table.' WHERE Key_name = "'.$this->index.'"';
+        $stmt        = $this->connection->prepare($sql);
+        $indexExists = (bool) $stmt->executeQuery()->fetchAssociative();
         $stmt->closeCursor();
 
         if (!$indexExists) {

@@ -32,7 +32,7 @@ class FieldChange
     private $objectType;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $modifiedAt;
 
@@ -161,7 +161,7 @@ class FieldChange
         return $this;
     }
 
-    public function getModifiedAt(): \DateTime
+    public function getModifiedAt(): \DateTimeInterface
     {
         return $this->modifiedAt;
     }

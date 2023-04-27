@@ -42,7 +42,6 @@ class CampaignApiControllerFunctionalTest extends MauticMysqlTestCase
                         'email'      => $email->getId(),
                         'email_type' => 'transactional',
                     ],
-                    'triggerDate'         => null,
                     'triggerInterval'     => 1,
                     'triggerIntervalUnit' => 'd',
                     'triggerMode'         => 'interval',

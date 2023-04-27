@@ -18,7 +18,7 @@ class MergeRecord
     private $contact;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -79,7 +79,7 @@ class MergeRecord
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
