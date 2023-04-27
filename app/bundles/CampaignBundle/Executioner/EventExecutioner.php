@@ -70,7 +70,7 @@ class EventExecutioner
     private $removedContactTracker;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $executionDate;
 
@@ -319,7 +319,7 @@ class EventExecutioner
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getExecutionDate()
     {

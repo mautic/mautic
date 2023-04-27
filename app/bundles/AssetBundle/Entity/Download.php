@@ -17,7 +17,7 @@ class Download
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateDownload;
 
@@ -141,7 +141,7 @@ class Download
     /**
      * Get dateDownload.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateDownload()
     {

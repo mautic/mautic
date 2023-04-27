@@ -21,7 +21,7 @@ class WebhookQueue
     private $webhook;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateAdded;
 
@@ -91,7 +91,7 @@ class WebhookQueue
     }
 
     /**
-     * @return DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
