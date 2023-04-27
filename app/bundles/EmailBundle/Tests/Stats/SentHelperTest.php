@@ -10,6 +10,7 @@ use Doctrine\DBAL\Result;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\EmailBundle\Stats\Helper\SentHelper;
@@ -21,6 +22,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class SentHelperTest extends \PHPUnit\Framework\TestCase
 {
     private Collector $collector;
+
+    private DateTimeHelper $dateTimeHelper;
 
     private SentHelper $sentHelper;
 
@@ -62,6 +65,7 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
         $this->userHelperMock           = $this->createMock(UserHelper::class);
         $this->queryBuilder             = $this->createMock(QueryBuilder::class);
         $this->result                   = $this->createMock(Result::class);
+        $this->dateTimeHelper           = new DateTimeHelper();
 
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
 
@@ -95,7 +99,7 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with("DATE_FORMAT(t.generated_sent_date, '%Y-%m-%d') AS date, COUNT(*) AS count")
+            ->with("DATE_FORMAT(CONVERT_TZ(t.generated_sent_date, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d') AS date, COUNT(*) AS count")
             ->willReturnSelf();
 
         $this->result->method('fetchAllAssociative')->willReturn([
@@ -139,7 +143,7 @@ class SentHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with("DATE_FORMAT(t.date_sent, '%Y-%m-%d %H:00') AS date, COUNT(*) AS count")
+            ->with("DATE_FORMAT(CONVERT_TZ(t.date_sent, '+00:00', '".$this->dateTimeHelper->getLocalTimezoneOffset()."'), '%Y-%m-%d %H:00') AS date, COUNT(*) AS count")
             ->willReturnSelf();
 
         $this->result->expects($this->once())
