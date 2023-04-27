@@ -19,6 +19,10 @@ class LeadListAccess extends Constraint
     public function __construct(string $message)
     {
         $this->message = $message;
+
+        parent::__construct([
+            'message' => 'mautic.lead.lists.failed',
+        ]);
     }
 
     public function validatedBy()

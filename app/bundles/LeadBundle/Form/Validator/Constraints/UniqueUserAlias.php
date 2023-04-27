@@ -21,6 +21,11 @@ class UniqueUserAlias extends Constraint
     {
         $this->message = $message;
         $this->field   = $field;
+
+        parent::__construct([
+            'field'   => 'alias',
+            'message' => 'mautic.lead.list.alias.unique',
+        ]);
     }
 
     public function validatedBy()
