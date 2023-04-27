@@ -49,7 +49,7 @@ class RoleModel extends FormModel
 
         if (!$isNew) {
             //delete all existing
-            $this->em->getRepository('MauticUserBundle:Permission')->purgeRolePermissions($entity);
+            $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->purgeRolePermissions($entity);
         }
 
         parent::saveEntity($entity, $unlock);
@@ -89,7 +89,7 @@ class RoleModel extends FormModel
             throw new MethodNotAllowedHttpException(['Role'], 'Entity must be of class Role()');
         }
 
-        $users = $this->em->getRepository('MauticUserBundle:User')->findByRole($entity);
+        $users = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
         if (count($users)) {
             throw new PreconditionRequiredHttpException($this->translator->trans('mautic.user.role.error.deletenotallowed', ['%name%' => $entity->getName()], 'flashes'));
         }

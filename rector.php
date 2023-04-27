@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
@@ -44,7 +45,7 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE,
+        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
@@ -65,9 +66,40 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     // Add Doctrine Rules
     /**
      * TODO: Add these rules at some point
-     * Rector\Doctrine\Rector\Class_\AddEntityIdByConditionRector
-     * Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector.
+     * Rector\Doctrine\Rector\Class_\AddEntityIdByConditionRector.
      */
     $rectorConfig->rule(\Rector\Doctrine\Rector\MethodCall\ChangeSetParametersArrayToArrayCollectionRector::class);
     $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\ClassAnnotationToNamedArgumentConstructorRector::class);
+    $rectorConfig->ruleWithConfiguration(EntityAliasToClassConstantReferenceRector::class, [
+        EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
+            'MauticApiBundle'                         => 'Mautic\ApiBundle\Entity',
+            'MauticAssetBundle'                       => 'Mautic\AssetBundle\Entity',
+            'MauticCampaignBundle'                    => 'Mautic\CampaignBundle\Entity',
+            'MauticCategoryBundle'                    => 'Mautic\CategoryBundle\Entity',
+            'MauticChannelBundle'                     => 'Mautic\ChannelBundle\Entity',
+            'MauticCoreBundle'                        => 'Mautic\CoreBundle\Entity',
+            'MauticDashboardBundle'                   => 'Mautic\DashboardBundle\Entity',
+            'MauticDynamicContentBundle'              => 'Mautic\DynamicContentBundle\Entity',
+            'MauticEmailBundle'                       => 'Mautic\EmailBundle\Entity',
+            'MauticFormBundle'                        => 'Mautic\FormBundle\Entity',
+            'MauticIntegrationBundle'                 => 'Mautic\IntegrationBundle\Entity',
+            'MauticLeadBundle'                        => 'Mautic\LeadBundle\Entity',
+            'MauticNotificationBundle'                => 'Mautic\NotificationBundle\Entity',
+            'MauticPageBundle'                        => 'Mautic\PageBundle\Entity',
+            'MauticPluginBundle'                      => 'Mautic\PluginBundle\Entity',
+            'MauticPointBundle'                       => 'Mautic\PointBundle\Entity',
+            'MauticReportBundle'                      => 'Mautic\ReportBundle\Entity',
+            'MauticSmsBundle'                         => 'Mautic\SmsBundle\Entity',
+            'MauticStageBundle'                       => 'Mautic\StageBundle\Entity',
+            'MauticUserBundle'                        => 'Mautic\UserBundle\Entity',
+            'MauticWebhookBundle'                     => 'Mautic\WebhookBundle\Entity',
+            'MauticPluginMauticSocialBundle'          => 'MauticPlugin\MauticSocialBundle\Entity',
+            'MauticPluginMauticCitrixBundle'          => 'MauticPlugin\MauticCitrixBundle\Entity',
+            'MauticPluginMauticCrmBundle'             => 'MauticPlugin\MauticCrmBundle\Entity',
+            'MauticPluginMauticTagManagerBundle'      => 'MauticPlugin\MauticTagManagerBundle\Entity',
+            'MauticPluginMauticFocusBundle'           => 'MauticPlugin\MauticFocusBundle\Entity',
+            'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
+            'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
+        ],
+    ]);
 };

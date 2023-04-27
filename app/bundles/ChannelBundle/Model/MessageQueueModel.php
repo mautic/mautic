@@ -49,7 +49,7 @@ class MessageQueueModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticChannelBundle:MessageQueue');
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\MessageQueue::class);
     }
 
     /**
@@ -81,7 +81,7 @@ class MessageQueueModel extends FormModel
         $leadIds = array_combine($leadIds, $leadIds);
 
         /** @var \Mautic\LeadBundle\Entity\FrequencyRuleRepository $frequencyRulesRepo */
-        $frequencyRulesRepo     = $this->em->getRepository('MauticLeadBundle:FrequencyRule');
+        $frequencyRulesRepo     = $this->em->getRepository(\Mautic\LeadBundle\Entity\FrequencyRule::class);
         $defaultFrequencyNumber = $this->coreParametersHelper->get($channel.'_frequency_number');
         $defaultFrequencyTime   = $this->coreParametersHelper->get($channel.'_frequency_time');
 

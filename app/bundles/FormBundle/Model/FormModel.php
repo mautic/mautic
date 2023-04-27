@@ -130,7 +130,7 @@ class FormModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticFormBundle:Form');
+        return $this->em->getRepository(\Mautic\FormBundle\Entity\Form::class);
     }
 
     /**

@@ -51,7 +51,7 @@ class StageModel extends CommonFormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticStageBundle:Stage');
+        return $this->em->getRepository(\Mautic\StageBundle\Entity\Stage::class);
     }
 
     /**

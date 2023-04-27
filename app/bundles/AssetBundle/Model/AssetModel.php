@@ -202,7 +202,7 @@ class AssetModel extends FormModel
                 }
 
                 if (!empty($clickthrough['email'])) {
-                    $emailRepo = $this->em->getRepository('MauticEmailBundle:Email');
+                    $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
                     if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                         $download->setEmail($emailEntity);
                     }
@@ -333,7 +333,7 @@ class AssetModel extends FormModel
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticAssetBundle:Asset');
+        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Asset::class);
     }
 
     /**
@@ -341,7 +341,7 @@ class AssetModel extends FormModel
      */
     public function getDownloadRepository()
     {
-        return $this->em->getRepository('MauticAssetBundle:Download');
+        return $this->em->getRepository(\Mautic\AssetBundle\Entity\Download::class);
     }
 
     /**

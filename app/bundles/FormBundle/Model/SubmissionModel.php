@@ -1023,7 +1023,7 @@ class SubmissionModel extends CommonFormModel
 
         // Check for duplicate lead
         /** @var \Mautic\LeadBundle\Entity\Lead[] $leads */
-        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository('MauticLeadBundle:Lead')->getLeadsByUniqueFields(
+        $leads = (!empty($uniqueFieldsWithData)) ? $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->getLeadsByUniqueFields(
             $uniqueFieldsWithData,
             $leadId
         ) : [];

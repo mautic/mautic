@@ -387,9 +387,9 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->getDoctrine()->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->getDoctrine()->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
 
         $integrationRepo = $this->getDoctrine()->getRepository(IntegrationEntity::class);
         assert($integrationRepo instanceof IntegrationEntityRepository);
@@ -1413,7 +1413,7 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->getDoctrine()->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
 

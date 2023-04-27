@@ -181,7 +181,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (isset($data['data'])) {
             $entity = null;
             /** @var IntegrationEntityRepository $integrationEntityRepo */
-            $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+            $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
             $objects               = $data['data'];
             /** @var array $rows */
             // foreach ($rows as $row) {
@@ -441,7 +441,7 @@ class ZohoIntegration extends CrmAbstractIntegration
                 }
             }
 
-            $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+            $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
             $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
             //}
             unset($integrationEntities);
@@ -852,7 +852,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             $params['end']   = null;
         }
         $config                = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $fieldsToUpdateInZoho  = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields            = array_unique(array_values($config['leadFields']));
         $totalUpdated          = $totalCreated = $totalErrors = 0;
@@ -1098,7 +1098,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         $mapper = new Mapper($availableFields);
         $mapper->setObject($zObject);
 
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Zoho', $zObject, 'lead', $lead->getId());
 
         $counter      = 0;

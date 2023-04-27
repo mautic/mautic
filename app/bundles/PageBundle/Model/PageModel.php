@@ -159,7 +159,7 @@ class PageModel extends FormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticPageBundle:Page');
+        $repo = $this->em->getRepository(\Mautic\PageBundle\Entity\Page::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -170,7 +170,7 @@ class PageModel extends FormModel
      */
     public function getHitRepository()
     {
-        return $this->em->getRepository('MauticPageBundle:Hit');
+        return $this->em->getRepository(\Mautic\PageBundle\Entity\Hit::class);
     }
 
     /**
@@ -575,7 +575,7 @@ class PageModel extends FormModel
             }
 
             if (!empty($clickthrough['email'])) {
-                $emailRepo = $this->em->getRepository('MauticEmailBundle:Email');
+                $emailRepo = $this->em->getRepository(\Mautic\EmailBundle\Entity\Email::class);
                 if ($emailEntity = $emailRepo->getEntity($clickthrough['email'])) {
                     $hit->setEmail($emailEntity);
                 }
@@ -1076,7 +1076,7 @@ class PageModel extends FormModel
                 $utmTags->setUtmSource($query['utm_source']);
             }
 
-            $repo = $this->em->getRepository('MauticLeadBundle:UtmTag');
+            $repo = $this->em->getRepository(\Mautic\LeadBundle\Entity\UtmTag::class);
             $repo->saveEntity($utmTags);
 
             $this->leadModel->setUtmTags($lead, $utmTags);

@@ -511,7 +511,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         }
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $startDate             = new \DateTime($query['start']);
         $endDate               = new \DateTime($query['end']);
         $limit                 = 100;
@@ -782,8 +782,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         $entity = null;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
-        $companyRepo           = $this->em->getRepository('MauticLeadBundle:Company');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
+        $companyRepo           = $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class);
 
         $sugarRejectedLeads = [];
         if (isset($data['entry_list'])) {
@@ -978,7 +978,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     ++$count;
                 }
 
-                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
+                $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($integrationEntities);
                 $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
             }
             unset($data);
@@ -1121,7 +1121,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
         //Check if lead has alredy been synched
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         //Check if it is a sugar CRM alredy synched lead
         $integrationId = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', $object, 'lead', $lead->getId());
         if (empty($integrationId)) {
@@ -1262,7 +1262,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         list($fromDate, $toDate) = $this->getSyncTimeframeDates($params);
         $limit                   = $params['limit'];
         $config                  = $this->mergeConfigToFeatureSettings();
-        $integrationEntityRepo   = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo   = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $mauticData              = $leadsToUpdate              = $fields              = [];
         $fieldsToUpdateInSugar   = isset($config['update_mautic']) ? array_keys($config['update_mautic'], 0) : [];
         $leadFields              = $config['leadFields'];
@@ -1561,7 +1561,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
     public function getSugarLeadId($lead)
     {
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         //try searching for lead as this has been changed before in updated done to the plugin
         $result = $integrationEntityRepo->getIntegrationsEntityId('Sugarcrm', null, 'lead', $lead->getId());
 
@@ -1717,7 +1717,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
             }
 
             if ($persistEntities) {
-                $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+                $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
                 unset($persistEntities);
                 $this->em->clear(IntegrationEntity::class);
             }

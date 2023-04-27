@@ -141,7 +141,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      */
     public function getCompanyLeadRepository()
     {
-        return $this->em->getRepository('MauticLeadBundle:CompanyLead');
+        return $this->em->getRepository(\Mautic\LeadBundle\Entity\CompanyLead::class);
     }
 
     /**
@@ -202,7 +202,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $user = (!$this->security->isGranted('lead:leads:viewother')) ?
             $this->userHelper->getUser() : false;
 
-        return $this->em->getRepository('MauticLeadBundle:Company')->getCompanies($user);
+        return $this->em->getRepository(\Mautic\LeadBundle\Entity\Company::class)->getCompanies($user);
     }
 
     /**
@@ -833,7 +833,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['dateModified']);
 
         if (!empty($fields['createdByUser']) && !empty($data[$fields['createdByUser']])) {
-            $userRepo      = $this->em->getRepository('MauticUserBundle:User');
+            $userRepo      = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class);
             $createdByUser = $userRepo->findByIdentifier($data[$fields['createdByUser']]);
             if (null !== $createdByUser) {
                 $company->setCreatedBy($createdByUser);
@@ -842,7 +842,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['createdByUser']);
 
         if (!empty($fields['modifiedByUser']) && !empty($data[$fields['modifiedByUser']])) {
-            $userRepo       = $this->em->getRepository('MauticUserBundle:User');
+            $userRepo       = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class);
             $modifiedByUser = $userRepo->findByIdentifier($data[$fields['modifiedByUser']]);
             if (null !== $modifiedByUser) {
                 $company->setModifiedBy($modifiedByUser);
@@ -955,6 +955,6 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         $lead->addUpdatedField('company', $primaryCompanyName)
             ->setDateModified(new \DateTime());
-        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
     }
 }
