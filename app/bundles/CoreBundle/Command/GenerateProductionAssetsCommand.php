@@ -5,7 +5,9 @@ namespace Mautic\CoreBundle\Command;
 use Mautic\CoreBundle\Helper\AssetGenerationHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -45,6 +47,8 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->installElFinderAssets();
+
         // Combine and minify bundle assets
         $this->assetGenerationHelper->getAssets(true);
 
@@ -66,5 +70,12 @@ EOT
         $output->writeln('<info>'.$this->translator->trans('mautic.core.command.asset_generate_success').'</info>');
 
         return 0;
+    }
+
+    private function installElFinderAssets(): void
+    {
+        $command = $this->getApplication()->find('elfinder:install');
+
+        $command->run(new ArrayInput(['--docroot' => 'node_modules']), new NullOutput());
     }
 }
