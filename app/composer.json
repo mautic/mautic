@@ -131,6 +131,7 @@
   "extra": {
     "mautic-scaffold": {
       "file-mapping": {
+        "[project-root]/.env": "assets/scaffold/files/.env",
         "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
         "[project-root]/package.json": "assets/scaffold/files/package.json",
         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
