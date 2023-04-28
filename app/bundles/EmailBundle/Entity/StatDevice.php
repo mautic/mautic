@@ -34,7 +34,7 @@ class StatDevice
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateOpened;
 

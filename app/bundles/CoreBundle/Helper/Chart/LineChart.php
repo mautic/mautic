@@ -97,6 +97,7 @@ class LineChart extends AbstractChart implements ChartInterface
             throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');
         }
 
+        /** @var \DateTime $date */
         $date    = clone $this->dateFrom;
         $oneUnit = $this->getUnitInterval();
         $format  = !empty($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];
