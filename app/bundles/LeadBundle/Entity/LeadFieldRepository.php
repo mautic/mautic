@@ -422,7 +422,7 @@ class LeadFieldRepository extends CommonRepository
     {
         $qb = $this->createQueryBuilder($this->getTableAlias());
         $qb->where($qb->expr()->eq("{$this->getTableAlias()}.columnIsNotCreated", 1));
-        $qb->orderBy("{$this->getTableAlias()}.dateAdded", 'ASC');
+        $qb->orderBy("{$this->getTableAlias()}.dateAdded", \Doctrine\Common\Collections\Criteria::ASC);
         $qb->setMaxResults(1);
 
         return $qb->getQuery()->getOneOrNullResult();

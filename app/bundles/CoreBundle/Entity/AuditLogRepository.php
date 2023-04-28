@@ -190,7 +190,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', 'DESC')
+        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();

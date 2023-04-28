@@ -22,12 +22,12 @@ class Lead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLastExited;
 
@@ -106,7 +106,7 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -227,7 +227,7 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateLastExited()
     {

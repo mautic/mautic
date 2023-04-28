@@ -31,7 +31,7 @@ final class HtmlExtensionTest extends TestCase
     {
         yield ['id="test-id" class="test-class"', [
             'id'    => 'test-id',
-            'class' => 'test-class',
+            'class' => ['test-class'],
         ]];
 
         yield ['id="test-id" class="test-class-one test-class-two"', [
