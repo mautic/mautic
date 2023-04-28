@@ -76,6 +76,6 @@ EOT
     {
         $command = $this->getApplication()->find('elfinder:install');
 
-        $command->run(new ArrayInput(['--docroot' => 'node_modules']), new NullOutput());
+        $command->run(new ArrayInput(['--docroot' => 'media']), new NullOutput());
     }
 }
