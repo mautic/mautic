@@ -476,7 +476,6 @@ class PublicController extends CommonFormController
                 $query = array_merge($query, $utmTags);
                 unset($clickthrough['utmTags']);
                 $ct          = $pageModel->encodeArrayForUrl($clickthrough);
-                $query['ct'] = $ct;
             }
         } catch (InvalidDecodedStringException $invalidDecodedStringException) {
         }
