@@ -33,7 +33,7 @@ class PendingEvent extends AbstractLogCollectionEvent
     private $channelId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $now;
 
