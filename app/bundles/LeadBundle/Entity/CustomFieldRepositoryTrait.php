@@ -136,7 +136,7 @@ trait CustomFieldRepositoryTrait
                     $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                     $this->buildSelectClause($dq, $args);
 
-                    $q->orderBy('ORD', 'ASC');
+                    $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
                 }
 
                 //only pull the leads as filtered via DBAL

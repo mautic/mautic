@@ -14,11 +14,8 @@ use Mautic\PageBundle\Entity\Page;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="tweets")
- * @ORM\Entity(repositoryClass="MauticPlugin\MauticSocialBundle\Entity\TweetRepository")
- */
+#[ORM\Table(name: 'tweets')]
+#[ORM\Entity(repositoryClass: TweetRepository::class)]
 class Tweet extends FormEntity
 {
     /**

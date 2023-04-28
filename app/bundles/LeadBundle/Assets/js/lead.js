@@ -1480,8 +1480,13 @@ Mautic.updateFilterPositioning = function (el) {
     var $el       = mQuery(el);
     var $parentEl = $el.closest('.panel');
     var list      = $parentEl.parent().children('.panel');
+    const isFirst = list.index($parentEl) === 0;
 
-    if ($el.val() == 'and' && list.index($parentEl) !== 0) {
+    if (isFirst) {
+        $el.val('and');
+    }
+
+    if ($el.val() === 'and' && !isFirst) {
         $parentEl.addClass('in-group');
     } else {
         $parentEl.removeClass('in-group');

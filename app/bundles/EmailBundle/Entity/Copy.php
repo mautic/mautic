@@ -16,7 +16,7 @@ class Copy
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateCreated;
 
@@ -75,7 +75,7 @@ class Copy
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateCreated()
     {
