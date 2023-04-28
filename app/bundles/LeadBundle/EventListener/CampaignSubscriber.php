@@ -531,14 +531,22 @@ class CampaignSubscriber implements EventSubscriberInterface
                 );
             }
         } elseif ($event->checkContext('lead.dnc')) {
-            $condition = $event->getConfig()['condition'] ? 1 : 0;
             $channels  = $event->getConfig()['channels'];
+            $reason    = $event->getConfig()['reason'] ?? null;
             foreach ($channels as $channel) {
                 $isLeadDNC = $this->doNotContact->isContactable($lead, $channel);
-                if (1 === $condition && $isLeadDNC) {
-                    $result = true;
-                } elseif (0 === $condition && !$isLeadDNC) {
-                    $result = true;
+                if (!empty($reason)) {
+                    if ($isLeadDNC === $reason) {
+                        $result = true;
+                    } else {
+                        $result = false;
+                    }
+                } else {
+                    if (0 !== $isLeadDNC) {
+                        $result = true;
+                    } else {
+                        $result = false;
+                    }
                 }
             }
         }

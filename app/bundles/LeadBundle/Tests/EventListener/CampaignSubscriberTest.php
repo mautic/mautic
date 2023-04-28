@@ -31,21 +31,47 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
-    /**
-     * @var array<string,mixed>
-     */
-    private array $dncConditionForm = [
-        'condition'   => 0,
-        'channels'    => ['email'],
-    ];
-
-    /**
-     * @var array<string,mixed>
-     */
-    private array $dncConditionForm2 = [
-        'condition'   => 1,
-        'channels'    => ['email'],
-    ];
+    public function provideFormDNC(): array
+    {
+        return [
+            [
+                'reason'   => 1,
+                'channels' => ['email'],
+                'expected' => true,
+                'dncLead'  => 1,
+            ],
+            [
+                'reason'   => 2,
+                'channels' => ['email'],
+                'expected' => false,
+                'dncLead'  => 1,
+            ],
+            [
+                'reason'   => 3,
+                'channels' => ['email'],
+                'expected' => false,
+                'dncLead'  => 1,
+            ],
+            [
+                'reason'   => 2,
+                'channels' => ['email'],
+                'expected' => true,
+                'dncLead'  => 2,
+            ],
+            [
+                'reason'   => null,
+                'channels' => ['email'],
+                'expected' => true,
+                'dncLead'  => 2,
+            ],
+            [
+                'reason'   => null,
+                'channels' => ['email'],
+                'expected' => false,
+                'dncLead'  => 0,
+            ],
+        ];
+    }
 
     public function testOnCampaignTriggerActiononUpdateCompany()
     {
@@ -133,7 +159,10 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
 
-    public function testOnCampaignTriggerConditionDNCFlag(): void
+    /**
+     * @dataProvider provideFormDNC
+     */
+    public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
         $mockLeadModel      = $this->createMock(LeadModel::class);
@@ -148,6 +177,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('default_timezone')
             ->willReturn('UTC');
 
+        $doNotContact->expects($this->once())->method('isContactable')->willReturn($dncLead);
+
         $subscriber = new CampaignSubscriber(
             $mockIpLookupHelper,
             $mockLeadModel,
@@ -161,23 +192,14 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $lead = new Lead();
         $lead->setId(99);
-
         $args = [
             'lead'  => $lead,
             'event' => [
                 'type'       => 'lead.dnc',
-                'properties' => $this->dncConditionForm,
-            ],
-            'eventDetails'    => [],
-            'systemTriggered' => true,
-            'eventSettings'   => [],
-        ];
-
-        $args2 = [
-            'lead'  => $lead,
-            'event' => [
-                'type'       => 'lead.dnc',
-                'properties' => $this->dncConditionForm2,
+                'properties' => [
+                    'reason'   => $reason,
+                    'channels' => $channels,
+                ],
             ],
             'eventDetails'    => [],
             'systemTriggered' => true,
@@ -186,10 +208,6 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $event = new CampaignExecutionEvent($args, true);
         $subscriber->onCampaignTriggerCondition($event);
-        $this->assertTrue($event->getResult());
-
-        $event = new CampaignExecutionEvent($args2, true);
-        $subscriber->onCampaignTriggerCondition($event);
-        $this->assertFalse($event->getResult());
+        $this->assertSame($expected, $event->getResult());
     }
 }
