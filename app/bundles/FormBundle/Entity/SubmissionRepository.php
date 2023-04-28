@@ -29,6 +29,17 @@ class SubmissionRepository extends CommonRepository
         $results['form_id']       = $form->getId();
 
         if (!empty($results)) {
+            // Check that alias is SQL safe since it will be used for the column name
+            $databasePlatform = $this->_em->getConnection()->getDatabasePlatform();
+            $reservedWords    = $databasePlatform->getReservedKeywordsList();
+
+            foreach ($results as $alias => $value) {
+                if ($reservedWords->isKeyword($alias)) {
+                    $results['`'.$alias.'`'] = $value;
+                    unset($results[$alias]);
+                }
+            }
+
             $this->_em->getConnection()->insert($this->getResultsTableName($form->getId(), $form->getAlias()), $results);
         }
     }
