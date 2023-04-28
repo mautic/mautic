@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\QueueEmailEvent;
@@ -71,11 +72,11 @@ EOT
         if ('file' != $queueMode) {
             $output->writeln('Mautic is not set to queue email.');
 
-            return 0;
+            return ExitCode::SUCCESS;
         }
 
         if (!$this->checkRunStatus($input, $output, $lockName)) {
-            return 0;
+            return ExitCode::SUCCESS;
         }
 
         if (empty($timeout)) {
@@ -190,6 +191,6 @@ EOT
             return (int) $returnCode;
         }
 
-        return 0;
+        return $returnCode;
     }
 }

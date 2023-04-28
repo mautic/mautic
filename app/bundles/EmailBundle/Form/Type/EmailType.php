@@ -370,26 +370,29 @@ class EmailType extends AbstractType
             ]
         );
 
-        $variantSettingsModifier = function (FormEvent $event, $isVariant) {
-            if ($isVariant) {
-                $event->getForm()->add(
-                    'variantSettings',
-                    VariantType::class,
-                    [
-                        'label' => false,
-                    ]
-                );
-            }
+        $variantSettingsModifier = function (FormEvent $event, bool $isParent, bool $isExisting = false) {
+            $event->getForm()->add(
+                'variantSettings',
+                VariantType::class,
+                [
+                    'label'       => 'mautic.core.ab_test.form.abtest_settings',
+                    'required'    => false,
+                    'is_parent'   => $isParent,
+                    'is_existing' => $isExisting,
+                ]
+            );
         };
 
         // Building the form
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
             function (FormEvent $event) use ($variantSettingsModifier) {
-                $variantSettingsModifier(
-                    $event,
-                    $event->getData()->getVariantParent()
-                );
+                /** @var Email $emailEntity */
+                $emailEntity = $event->getData();
+                $variantChildren = $emailEntity->getVariantChildren();
+                $isParent = $variantChildren && count($variantChildren) > 0 || $event->getData()->isNew();
+                $isExisting = $event->getData()->getId() > 0;
+                $variantSettingsModifier($event, $isParent, $isExisting);
             }
         );
 
@@ -398,15 +401,18 @@ class EmailType extends AbstractType
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) use ($variantSettingsModifier) {
                 $data = $event->getData();
-                $variantSettingsModifier(
-                    $event,
-                    !empty($data['variantParent'])
-                );
 
-                if (isset($data['emailType']) && 'list' == $data['emailType']) {
-                    $data['translationParent'] = isset($data['segmentTranslationParent']) ? $data['segmentTranslationParent'] : null;
+                /** @var Email $emailEntity */
+                $emailEntity = $event->getForm()->getData();
+                $variantChildren = $emailEntity->getVariantChildren();
+                $isParent = $variantChildren && count($variantChildren) > 0;
+
+                $variantSettingsModifier($event, $isParent);
+
+                if (isset($data['emailType']) && 'list' === $data['emailType']) {
+                    $data['translationParent'] = $data['segmentTranslationParent'] ?? null;
                 } else {
-                    $data['translationParent'] = isset($data['templateTranslationParent']) ? $data['templateTranslationParent'] : null;
+                    $data['translationParent'] = $data['templateTranslationParent'] ?? null;
                 }
 
                 $event->setData($data);

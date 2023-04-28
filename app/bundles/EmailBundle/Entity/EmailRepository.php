@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Entity;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -420,7 +421,7 @@ class EmailRepository extends CommonRepository
      */
     protected function addSearchCommandWhereClause($q, $filter)
     {
-        list($expr, $parameters) = $this->addStandardSearchCommandWhereClause($q, $filter);
+        [$expr, $parameters] = $this->addStandardSearchCommandWhereClause($q, $filter);
         if ($expr) {
             return [$expr, $parameters];
         }
@@ -639,5 +640,29 @@ class EmailRepository extends CommonRepository
             ->innerJoin('lc', MAUTIC_TABLE_PREFIX.'emails', 'e', 'e.category_id = lc.category_id')
             ->where($qb->expr()->eq('e.id', $emailId))
             ->andWhere('lc.manually_removed = 1');
+    }
+
+    /**
+     * Gets emails with published variants.
+     *
+     * @return array
+     */
+    public function getPublishedEmailsWithVariant()
+    {
+        $qb = $this->getEntityManager()
+            ->createQueryBuilder();
+        $expr = $this->getPublishedByDateExpression($qb, $this->getTableAlias());
+
+        $qb->select($this->getTableAlias())
+            ->from('MauticEmailBundle:Email', $this->getTableAlias())
+            ->innerJoin('MauticEmailBundle:Email', 'v', Expr\Join::WITH, $qb->expr()->andX(
+                $qb->expr()->eq($this->getTableAlias(), 'v.variantParent'),
+                $qb->expr()->eq('v.isPublished', true)
+            ))
+            ->where($expr);
+
+        $result = $qb->getQuery()->getResult();
+
+        return $result;
     }
 }

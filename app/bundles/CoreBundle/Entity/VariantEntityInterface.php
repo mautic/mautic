@@ -10,6 +10,23 @@ use Doctrine\Common\Collections\ArrayCollection;
 interface VariantEntityInterface
 {
     /**
+     * Get id.
+     *
+     * @return int
+     */
+    public function getId();
+
+    /**
+     * Check publish status with option to check against category, publish up and down dates.
+     *
+     * @param bool $checkPublishStatus
+     * @param bool $checkCategoryStatus
+     *
+     * @return bool
+     */
+    public function isPublished($checkPublishStatus = true, $checkCategoryStatus = true);
+
+    /**
      * Get translation parent.
      *
      * @return VariantEntityInterface
@@ -18,6 +35,8 @@ interface VariantEntityInterface
 
     /**
      * Set entity this is a translation of.
+     *
+     * @param VariantEntityInterface $parent
      *
      * @return mixed
      */
@@ -78,4 +97,18 @@ interface VariantEntityInterface
      * @return bool
      */
     public function isVariant($isChild = false);
+
+    /**
+     * Sets settings array for the variant.
+     *
+     * @param array $variantSettings
+     */
+    public function setVariantSettings($variantSettings);
+
+    /**
+     * @param $variantStartDate
+     *
+     * @return $this
+     */
+    public function setVariantStartDate($variantStartDate);
 }

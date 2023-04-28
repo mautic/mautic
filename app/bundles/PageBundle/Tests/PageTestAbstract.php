@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Helper\ContactRequestHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -150,7 +151,8 @@ class PageTestAbstract extends TestCase
                 ->with('transliterate_page_title')
                 ->willReturn($transliterationEnabled);
 
-        $deviceTrackerMock = $this->createMock(DeviceTracker::class);
+        $deviceTrackerMock           = $this->createMock(DeviceTracker::class);
+        $variantConverterServiceMock = $this->createMock(VariantConverterService::class);
 
         $pageModel = new PageModel(
             $cookieHelper,

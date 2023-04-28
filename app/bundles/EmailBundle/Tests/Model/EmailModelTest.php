@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
 use Mautic\CoreBundle\Translation\Translator;
@@ -27,6 +28,7 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Event\EmailEvent;
 use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Helper\StatsCollectionHelper;
+use Mautic\EmailBundle\Model\AbTest\EmailVariantConverterService;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToContact;
 use Mautic\EmailBundle\MonitoredEmail\Mailbox;
@@ -194,6 +196,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|CorePermissions
      */
+    private $abTestSettingsService;
+    private $variantConverterService;
     private $corePermissions;
 
     /**
@@ -231,6 +235,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->contactTracker           = $this->createMock(ContactTracker::class);
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
+        $this->abTestSettingsService    = new AbTestSettingsService();
+        $this->variantConverterService  = $this->createMock(EmailVariantConverterService::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
         $this->connection               = $this->createMock(Connection::class);
 
@@ -251,8 +257,10 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions,
-            $this->connection
+            $this->connection,
+            $this->abTestSettingsService,
+            $this->variantConverterService,
+            $this->corePermissions
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -637,7 +645,9 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->doNotContact,
             $this->statsCollectionHelper,
             $this->corePermissions,
-            $this->connection
+            $this->connection,
+            $this->abTestSettingsService,
+            $this->variantConverterService
         );
 
         $emailModel->setTranslator($this->translator);

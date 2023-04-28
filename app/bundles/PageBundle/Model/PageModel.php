@@ -3,6 +3,7 @@
 namespace Mautic\PageBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\CoreBundle\Entity\VariantEntityInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\PieChart;
@@ -11,6 +12,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use Mautic\CoreBundle\Model\AbTest\VariantConverterService;
 use Mautic\CoreBundle\Model\BuilderModelTrait;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Model\TranslationModelTrait;
@@ -109,6 +111,10 @@ class PageModel extends FormModel
      * @var CompanyModel
      */
     private $companyModel;
+    /**
+     * @var VariantConverterService
+     */
+    private $variantConverterService;
 
     /**
      * @var ContactTracker
@@ -129,21 +135,23 @@ class PageModel extends FormModel
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
         CoreParametersHelper $coreParametersHelper,
-        ContactRequestHelper $contactRequestHelper
+        ContactRequestHelper $contactRequestHelper,
+        VariantConverterService $variantConverterService
     ) {
-        $this->cookieHelper         = $cookieHelper;
-        $this->ipLookupHelper       = $ipLookupHelper;
-        $this->leadModel            = $leadModel;
-        $this->leadFieldModel       = $leadFieldModel;
-        $this->pageRedirectModel    = $pageRedirectModel;
-        $this->pageTrackableModel   = $pageTrackableModel;
-        $this->dateTimeHelper       = new DateTimeHelper();
-        $this->queueService         = $queueService;
-        $this->companyModel         = $companyModel;
-        $this->deviceTracker        = $deviceTracker;
-        $this->contactTracker       = $contactTracker;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->contactRequestHelper = $contactRequestHelper;
+        $this->cookieHelper             = $cookieHelper;
+        $this->ipLookupHelper           = $ipLookupHelper;
+        $this->leadModel                = $leadModel;
+        $this->leadFieldModel           = $leadFieldModel;
+        $this->pageRedirectModel        = $pageRedirectModel;
+        $this->pageTrackableModel       = $pageTrackableModel;
+        $this->dateTimeHelper           = new DateTimeHelper();
+        $this->queueService             = $queueService;
+        $this->companyModel             = $companyModel;
+        $this->deviceTracker            = $deviceTracker;
+        $this->contactTracker           = $contactTracker;
+        $this->coreParametersHelper     = $coreParametersHelper;
+        $this->variantConverterService  = $variantConverterService;
+        $this->contactRequestHelper     = $contactRequestHelper;
     }
 
     /**
@@ -1202,12 +1210,25 @@ class PageModel extends FormModel
         return $pageURL.$request->server->get('SERVER_NAME').$request->server->get('REQUEST_URI');
     }
 
-    /*
+    /**
+     * Converts a variant to the main item and the original main item a variant.
+     */
+    public function convertWinnerVariant(VariantEntityInterface $entity)
+    {
+        //let saveEntities() know it does not need to set variant start dates
+        $this->inConversion = true;
+
+        $this->variantConverterService->convertWinnerVariant($entity);
+        $save = $this->variantConverterService->getUpdatedVariants();
+
+        //save the entities
+        $this->saveEntities($save, false);
+    }
+
+    /**
      * Cleans query params saving url values.
      *
      * @param $query array
-     *
-     * @return array
      */
     private function cleanQuery(array $query): array
     {

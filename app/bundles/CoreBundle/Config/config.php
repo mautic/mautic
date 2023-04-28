@@ -432,6 +432,19 @@ return [
             'symfony.finder' => [
                 'class' => \Symfony\Component\Finder\Finder::class,
             ],
+            'mautic.core.variant.converter'=> [
+                'class'     => \Mautic\CoreBundle\Model\AbTest\VariantConverterService::class,
+            ],
+            'mautic.core.variant.abtest_settings'=> [
+                'class'     => \Mautic\CoreBundle\Model\AbTest\AbTestSettingsService::class,
+            ],
+            'mautic.core.variant.abtest_result'=> [
+                'class'     => \Mautic\CoreBundle\Model\AbTest\AbTestResultService::class,
+                'arguments' => [
+                    'mautic.factory',
+                    'event_dispatcher',
+                ],
+            ],
             // Error handler
             'mautic.core.errorhandler.subscriber' => [
                 'class'     => 'Mautic\CoreBundle\EventListener\ErrorHandlingListener',

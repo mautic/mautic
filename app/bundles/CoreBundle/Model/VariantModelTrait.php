@@ -17,13 +17,15 @@ trait VariantModelTrait
 
     /**
      * Converts a variant to the main item and the original main item a variant.
+     *
+     * @deprecated use VariantConverterService instead
      */
     public function convertVariant(VariantEntityInterface $entity)
     {
         //let saveEntities() know it does not need to set variant start dates
         $this->inConversion = true;
 
-        list($parent, $children) = $entity->getVariants();
+        [$parent, $children] = $entity->getVariants();
 
         $save = [];
 

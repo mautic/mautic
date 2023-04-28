@@ -26,6 +26,7 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Form\Type\AbTestSendType;
 use Mautic\EmailBundle\Form\Type\BatchSendType;
 use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
@@ -314,38 +315,7 @@ class EmailController extends FormController
         }
 
         //get A/B test information
-        [$parent, $children]     = $email->getVariants();
-        $properties              = [];
-        $variantError            = false;
-        $weight                  = 0;
-        if (count($children)) {
-            foreach ($children as $c) {
-                $variantSettings = $c->getVariantSettings();
-
-                if (is_array($variantSettings) && isset($variantSettings['winnerCriteria'])) {
-                    if ($c->isPublished()) {
-                        if (!isset($lastCriteria)) {
-                            $lastCriteria = $variantSettings['winnerCriteria'];
-                        }
-
-                        //make sure all the variants are configured with the same criteria
-                        if ($lastCriteria != $variantSettings['winnerCriteria']) {
-                            $variantError = true;
-                        }
-
-                        $weight += $variantSettings['weight'];
-                    }
-                } else {
-                    $variantSettings['winnerCriteria'] = '';
-                    $variantSettings['weight']         = 0;
-                }
-
-                $properties[$c->getId()] = $variantSettings;
-            }
-
-            $properties[$parent->getId()]['weight']         = 100 - $weight;
-            $properties[$parent->getId()]['winnerCriteria'] = '';
-        }
+        [$parent, $children] = $email->getVariants();
 
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
@@ -362,12 +332,17 @@ class EmailController extends FormController
 
                 $event = new DetermineWinnerEvent($args);
                 $this->dispatcher->dispatch(
-                    $event,
-                    $testSettings['event']
+                    $testSettings['event'],
+                    $event
                 );
 
                 $abTestResults = $event->getAbTestResults();
             }
+
+        if (count($children) > 0) {
+            $abTestSettings      = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
+            $abTestResultService = $this->get('mautic.core.variant.abtest_result');
+            $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
         }
 
         //get related translations
@@ -396,10 +371,12 @@ class EmailController extends FormController
                     'logs'         => $logs,
                     'isEmbedded'   => $request->get('isEmbedded') ? $request->get('isEmbedded') : false,
                     'variants'     => [
-                        'parent'     => $parent,
-                        'children'   => $children,
-                        'properties' => $properties,
-                        'criteria'   => $criteria['criteria'],
+                        'parent'             => $parent,
+                        'children'           => $children,
+                        'properties'         => isset($abTestSettings) ? $abTestSettings['variants'] : null,
+                        'criteria'           => $criteria['criteria'],
+                        'winnerCriteria'     => isset($abTestSettings) ? $abTestSettings['winnerCriteria'] : null,
+                        'configurationError' => isset($abTestSettings) ? $abTestSettings['configurationError'] : null,
                     ],
                     'translations' => [
                         'parent'   => $translationParent,
@@ -481,6 +458,8 @@ class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
+
+        $entity->clearVariantSettings();
 
         //create the form
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
@@ -686,6 +665,17 @@ class EmailController extends FormController
             // Force type to template
             $entity->setEmailType('template');
         }
+
+        // Variant settings for an email with variants, helpful for BC
+        if ($entity->isVariant()) {
+            $abTestSettings                    = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
+            $variantSettings                   = $entity->getVariantSettings();
+            $variantSettings['enableAbTest']   = true;
+            $variantSettings['winnerCriteria'] = $abTestSettings['winnerCriteria'];
+            $variantSettings['totalWeight']    = $abTestSettings['totalWeight'];
+            $entity->setVariantSettings($variantSettings);
+        }
+
         /** @var Form $form */
         $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
 
@@ -1033,6 +1023,18 @@ class EmailController extends FormController
                 return $this->accessDenied();
             }
 
+            $variantSettings = $entity->getVariantSettings();
+            if (!array_key_exists('enableAbTest', $variantSettings) || false == $variantSettings['enableAbTest']) {
+                $flashes[] = [
+                    'type'    => 'error',
+                    'msg'     => 'mautic.core.error.disabled_abtest',
+                ];
+
+                return $this->postActionRedirect([
+                    'flashes' => $flashes,
+                ]);
+            }
+
             // Note this since it's cleared on __clone()
             $emailType = $entity->getEmailType();
 
@@ -1092,7 +1094,7 @@ class EmailController extends FormController
                 return $this->isLocked($postActionVars, $entity, 'email');
             }
 
-            $model->convertVariant($entity);
+            $model->convertWinnerVariant($entity);
 
             $flashes[] = [
                 'type'    => 'notice',
@@ -1107,7 +1109,7 @@ class EmailController extends FormController
                 'objectAction' => 'view',
                 'objectId'     => $objectId,
             ];
-            $postActionVars['returnUrl']       = $this->generateUrl('mautic_page_action', $postActionVars['viewParameters']);
+            $postActionVars['returnUrl']       = $this->generateUrl('mautic_email_action', $postActionVars['viewParameters']);
             $postActionVars['contentTemplate'] = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
         } //else don't do anything
 
@@ -1126,12 +1128,157 @@ class EmailController extends FormController
      *
      * @param $objectId
      *
+     * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+     */
+    public function absendAction($objectId)
+    {
+        /** @var \Mautic\EmailBundle\Model\EmailModel $model */
+        $model   = $this->getModel('email');
+        $entity  = $model->getEntity($objectId);
+        $session = $this->container->get('session');
+        $page    = $session->get('mautic.email.page', 1);
+        //set the return URL
+        $returnUrl = $this->generateUrl('mautic_email_index', ['page' => $page]);
+
+        $postActionVars = [
+            'returnUrl'       => $returnUrl,
+            'viewParameters'  => ['page' => $page],
+            'contentTemplate' => 'MauticEmailBundle:Email:index',
+            'passthroughVars' => [
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email',
+            ],
+        ];
+
+        //not found
+        if (null === $entity) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.notfound',
+                                'msgVars' => ['%id%' => $objectId],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        if (!$entity->isPublished()) {
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'flashes' => [
+                            [
+                                'type'    => 'error',
+                                'msg'     => 'mautic.email.error.send.unpublished',
+                                'msgVars' => [
+                                    '%id%'   => $objectId,
+                                    '%name%' => $entity->getName(),
+                                ],
+                            ],
+                        ],
+                    ]
+                )
+            );
+        }
+
+        if ('template' == $entity->getEmailType()
+            || !$this->get('mautic.security')->hasEntityAccess(
+                'email:emails:viewown',
+                'email:emails:viewother',
+                $entity->getCreatedBy()
+            )
+        ) {
+            return $this->accessDenied();
+        }
+
+        // Check that the parent is getting sent
+        if ($variantParent = $entity->getVariantParent()) {
+            return $this->redirect($this->generateUrl('mautic_email_action',
+                [
+                    'objectAction' => 'send',
+                    'objectId'     => $variantParent->getId(),
+                ]
+            ));
+        }
+
+        if ($translationParent = $entity->getTranslationParent()) {
+            return $this->redirect($this->generateUrl('mautic_email_action',
+                [
+                    'objectAction' => 'send',
+                    'objectId'     => $translationParent->getId(),
+                ]
+            ));
+        }
+
+        $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'absend', 'objectId' => $objectId]);
+        $pending  = $model->getPendingLeads($entity, null, true);
+        $form     = $this->get('form.factory')->create(AbTestSendType::class, [], ['action' => $action]);
+
+        if ('POST' == $this->request->getMethod()) {
+            $entity->setPublishUp(new \DateTime());
+            $this->getModel('email.email')->saveEntity($entity);
+            $viewParameters = [
+                'objectAction' => 'view',
+                'objectId'     => $entity->getId(),
+            ];
+            $template       = 'MauticEmailBundle:Email:view';
+            $passthrough    = [
+                'activeLink'    => 'mautic_email_index',
+                'mauticContent' => 'email',
+            ];
+
+            return $this->postActionRedirect(
+                array_merge(
+                    $postActionVars,
+                    [
+                        'returnUrl'       => $this->generateUrl('mautic_email_action', $viewParameters),
+                        'viewParameters'  => $viewParameters,
+                        'contentTemplate' => $template,
+                        'passthroughVars' => $passthrough,
+                    ]
+                )
+            );
+        }
+
+        //process and send
+        $contentTemplate = 'MauticEmailBundle:Send:abform.html.php';
+        $viewParameters  = [
+            'form'    => $form->createView(),
+            'email'   => $entity,
+            'pending' => $entity->getVariantsPendingCount($pending),
+        ];
+
+        return $this->delegateView(
+            [
+                'viewParameters'  => $viewParameters,
+                'contentTemplate' => $contentTemplate,
+                'passthroughVars' => [
+                    'mauticContent' => 'emailSend',
+                    'route'         => $action,
+                ],
+            ]
+        );
+    }
+
+    /**
+     * Manually sends emails.
+     *
+     * @param $objectId
+     *
      * @return Response
      */
     public function sendAction(Request $request, $objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model   = $this->getModel('email');
+        /** @var Email $entity */
         $entity  = $model->getEntity($objectId);
         $session = $request->getSession();
         $page    = $session->get('mautic.email.page', 1);
@@ -1210,6 +1357,15 @@ class EmailController extends FormController
                 'objectAction' => 'send',
                 'objectId'     => $translationParent->getId(),
             ]);
+        }
+
+        if ($entity->isEnableAbTest()) {
+            return $this->redirect($this->generateUrl('mautic_email_action',
+                [
+                    'objectAction' => 'absend',
+                    'objectId'     => $entity->getId(),
+                ]
+            ));
         }
 
         $action   = $this->generateUrl('mautic_email_action', ['objectAction' => 'send', 'objectId' => $objectId]);

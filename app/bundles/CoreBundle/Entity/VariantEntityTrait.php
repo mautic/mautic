@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 
 trait VariantEntityTrait
 {
@@ -14,14 +15,24 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var Page
+     * @var VariantEntityInterface
      **/
     private $variantParent;
 
     /**
      * @var array
      */
-    private $variantSettings = [];
+    private $variantSettingsKeys = ['weight', 'winnerCriteria'];
+
+    /**
+     * @var array
+     */
+    private $parentSettingsKeys = ['totalWeight', 'enableAbTest', 'winnerCriteria', 'sendWinnerDelay'];
+
+    /**
+     * @var array
+     */
+    private $variantSettings = ['totalWeight' => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT, 'enableAbTest' => false];
 
     /**
      * @var \DateTimeInterface|null
@@ -43,6 +54,7 @@ trait VariantEntityTrait
             ->setIndexBy('id')
             ->setOrderBy(['isPublished' => 'DESC'])
             ->mappedBy('variantParent')
+            ->cascadePersist()
             ->build();
 
         $builder->createField('variantSettings', 'array')
@@ -64,7 +76,7 @@ trait VariantEntityTrait
     public function addVariantChild(VariantEntityInterface $child)
     {
         if (!$this->variantChildren->contains($child)) {
-            $this->variantChildren[] = $child;
+            $this->variantChildren->add($child);
         }
 
         return $this;
@@ -137,7 +149,13 @@ trait VariantEntityTrait
             $this->isChanged('variantSettings', $variantSettings);
         }
 
-        $this->variantSettings = $variantSettings;
+        $this->variantSettings = [];
+
+        foreach ($this->getSettingsKeys() as $key) {
+            if (array_key_exists($key, $variantSettings)) {
+                $this->variantSettings[$key] = $variantSettings[$key];
+            }
+        }
 
         return $this;
     }
@@ -249,7 +267,7 @@ trait VariantEntityTrait
      */
     public function getRelatedEntityIds($publishedOnly = false)
     {
-        list($parent, $children) = $this->getVariants();
+        [$parent, $children] = $this->getVariants();
 
         // If parent is not published and only published has been requested, no need to proceed
         if ($parent && $publishedOnly && !$parent->isPublished()) {
@@ -274,6 +292,55 @@ trait VariantEntityTrait
         return array_unique($ids);
     }
 
+    private function getSettingsKeys()
+    {
+        if ($this->getVariantParent()) {
+            return $this->variantSettingsKeys;
+        } else {
+            return $this->parentSettingsKeys;
+        }
+    }
+
+    public function clearVariantSettings()
+    {
+        if (!$this->getVariantParent()) {
+            $this->variantSettings = [
+                'enableAbTest' => false,
+                'totalWeight'  => AbTestSettingsService::DEFAULT_TOTAL_WEIGHT,
+            ];
+        } else {
+            $this->variantSettings = [];
+        }
+    }
+
+    public function isEnableAbTest(): bool
+    {
+        if ($this->getVariantParent()) {
+            return (bool) $this->getVariantParent()->getVariantSettings()['enableAbTest'] ?? false;
+        }
+
+        return (bool) ($this->variantSettings['enableAbTest'] ?? false);
+    }
+
+    public function getVariantsPendingCount(int $pendingCount): int
+    {
+        if (!$this->isEnableAbTest()) {
+            return $pendingCount;
+        }
+
+        $totalWeight = $this->variantSettings['totalWeight'];
+        if ($this->getVariantParent()) {
+            $totalWeight =  $this->getVariantParent()->getVariantSettings()['totalWeight'];
+        }
+        $totalWeight =  (int) ($totalWeight ?? AbTestSettingsService::DEFAULT_TOTAL_WEIGHT);
+
+        $variants           = $this->getVariantChildren();
+        $variantCount       = count($variants) + 1;
+        $singleVariantCount = ceil(($pendingCount / $variantCount) * ($totalWeight / 100));
+
+        return $singleVariantCount * $variantCount;
+    }
+
     /**
      * @param $getter
      *
@@ -281,7 +348,7 @@ trait VariantEntityTrait
      */
     protected function getAccumulativeVariantCount($getter)
     {
-        list($parent, $children) = $this->getVariants();
+        [$parent, $children]     = $this->getVariants();
         $count                   = $parent->$getter();
 
         if ($checkTranslations = method_exists($parent, 'getAccumulativeTranslationCount')) {
@@ -316,7 +383,7 @@ trait VariantEntityTrait
 
         /** @var TranslationEntityInterface $parentTranslation */
         /** @var ArrayCollection $childrenTranslations */
-        list($parentTranslation, $childrenTranslations) = $entity->getTranslations();
+        [$parentTranslation, $childrenTranslations] = $entity->getTranslations();
         if ($entity->getId() && $parentTranslation != $entity) {
             if (!$publishedOnly || $parentTranslation->isPublished()) {
                 $ids[] = $parentTranslation->getId();
