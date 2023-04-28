@@ -98,9 +98,9 @@ class FormUploaderTest extends \PHPUnit\Framework\TestCase
         $formUploader->uploadFiles($filesToUpload, $submission);
 
         $expected = [
-            'key'     => 'value',
-            '`file1`' => 'upload1.jpg',
-            '`file2`' => 'upload2.txt',
+            'key'   => 'value',
+            'file1' => 'upload1.jpg',
+            'file2' => 'upload2.txt',
         ];
 
         $this->assertSame($expected, $submission->getResults());
