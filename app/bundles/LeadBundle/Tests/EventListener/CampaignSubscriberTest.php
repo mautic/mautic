@@ -31,6 +31,9 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companemail' => 'mautic@mauticsecond.com',
     ];
 
+    /**
+     * @return array<int, array<string, array<int, string>|bool|int|null>>
+     */
     public function provideFormDNC(): array
     {
         return [
@@ -161,6 +164,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider provideFormDNC
+     *
+     * @param array<string> $channels
      */
     public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
     {
