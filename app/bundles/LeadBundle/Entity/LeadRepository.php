@@ -573,9 +573,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $q               = $this->getEntityManager()->createQueryBuilder();
         $joinIpAddresses = true;
 
-        if (isset($args['joinIpAddresses'])) {
-            $joinIpAddresses = $args['joinIpAddresses'];
-        }
+        $joinIpAddresses = $args['joinIpAddresses'] ?? true;
 
         if ($joinIpAddresses) {
             $select[] = 'i';
