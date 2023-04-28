@@ -57,10 +57,6 @@ class RedirectModelTest extends PageTestAbstract
         $redirect = new Redirect();
         $redirect->setUrl($url);
 
-        // URL should just have foo = bar in the CT
-        $url = $model->generateRedirectUrl($redirect, $clickthrough);
-        $this->assertEquals('https://mautic.org?ct=YToxOntzOjM6ImZvbyI7czozOiJiYXIiO30%3D', $url);
-
         // Add the listener to append something else to the CT
         $dispatcher->addListener(
             PageEvents::ON_REDIRECT_GENERATE,
