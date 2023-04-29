@@ -147,12 +147,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $category;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\EmailBundle\Entity\Stat>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
 
@@ -177,7 +177,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\AssetBundle\Entity\Asset>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\AssetBundle\Entity\Asset>
      */
     private $assetAttachments;
 

@@ -93,7 +93,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $updatedPoints;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\PointsChangeLog>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\PointsChangeLog>
      */
     private $pointsChangeLog;
 
@@ -103,27 +103,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $actualPoints;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\DoNotContact>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\CoreBundle\Entity\IpAddress>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\CoreBundle\Entity\IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\NotificationBundle\Entity\PushID>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\NotificationBundle\Entity\PushID>
      */
     private $pushIds;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadEventLog>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadEventLog>
      */
     private $eventLog;
 
@@ -165,7 +165,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $dateIdentified;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadNote>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadNote>
      */
     private $notes;
 
@@ -180,7 +180,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public $imported = false;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\Tag>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\Tag>
      */
     private $tags;
 
@@ -190,12 +190,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $stage;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\StagesChangeLog>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\UtmTag>
+     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\UtmTag>
      */
     private $utmtags;
 
