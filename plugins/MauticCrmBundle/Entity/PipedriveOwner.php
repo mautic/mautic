@@ -18,7 +18,7 @@ class PipedriveOwner
     private $email;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $ownerId;
 
