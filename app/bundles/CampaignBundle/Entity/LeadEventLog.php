@@ -16,12 +16,12 @@ class LeadEventLog implements ChannelInterface
     private $id;
 
     /**
-     * @var Event|null
+     * @var Event
      */
     private $event;
 
     /**
-     * @var LeadEntity|null
+     * @var LeadEntity
      */
     private $lead;
 
@@ -61,7 +61,7 @@ class LeadEventLog implements ChannelInterface
     private $metadata = [];
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $nonActionPathTaken = false;
 

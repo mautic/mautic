@@ -28,7 +28,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -43,27 +43,27 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $publishDown;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\CampaignBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\CampaignBundle\Entity\Lead>
      */
     private $leads;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\FormBundle\Entity\Form>
      */
     private $forms;
 
@@ -73,7 +73,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var bool
+     * @var int
      */
     private $allowRestart = false;
 

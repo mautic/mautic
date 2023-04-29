@@ -18,17 +18,17 @@ class Summary
     private $id;
 
     /**
-     * @var \DateTimeInterface|null
+     * @var \DateTimeImmutable|null
      **/
     private $dateTriggered;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $scheduledCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $triggeredCount = 0;
 
@@ -38,12 +38,12 @@ class Summary
     private $nonActionPathTakenCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $failedCount = 0;
 
     /**
-     * @var Event|null
+     * @var Event
      */
     private $event;
 
