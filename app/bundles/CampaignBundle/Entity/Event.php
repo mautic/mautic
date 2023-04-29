@@ -108,7 +108,7 @@ class Event implements ChannelInterface
     private $campaign;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\CampaignBundle\Entity\Event>
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      **/
     private $children;
 
@@ -128,7 +128,7 @@ class Event implements ChannelInterface
     private $tempId;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\CampaignBundle\Entity\LeadEventLog>
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog>
      */
     private $log;
 

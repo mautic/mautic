@@ -33,7 +33,7 @@ class Summary
     private $triggeredCount = 0;
 
     /**
-     * @var int|null
+     * @var int
      */
     private $nonActionPathTakenCount = 0;
 
@@ -154,7 +154,7 @@ class Summary
         return $this->dateTriggered;
     }
 
-    public function setDateTriggered(\DateTimeInterface $dateTriggered = null): void
+    public function setDateTriggered(\DateTimeImmutable $dateTriggered = null): void
     {
         $this->dateTriggered = $dateTriggered;
     }

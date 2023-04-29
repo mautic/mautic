@@ -22,7 +22,7 @@ use Mautic\UserBundle\Entity\User;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * @template T
+ * @template T of object
  * @extends ServiceEntityRepository<T>
  */
 class CommonRepository extends ServiceEntityRepository

@@ -12,7 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 class Download
 {
     /**
-     * @var int|null
+     * @var int
      */
     private $id;
 
@@ -37,7 +37,7 @@ class Download
     private $lead;
 
     /**
-     * @var string|null
+     * @var int
      */
     private $code;
 

@@ -48,22 +48,22 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $category;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\CampaignBundle\Entity\Event>
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\CampaignBundle\Entity\Lead>
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Lead>
      */
     private $leads;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\FormBundle\Entity\Form>
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Form>
      */
     private $forms;
 
@@ -73,7 +73,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var int
+     * @var bool
      */
     private $allowRestart = false;
 
@@ -141,7 +141,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->nullable()
             ->build();
 
-        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
+        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
