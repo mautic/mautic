@@ -65,7 +65,7 @@ class PipedriveOwner
     }
 
     /**
-     * @return string
+     * @return int|null
      */
     public function getOwnerId()
     {
@@ -73,7 +73,7 @@ class PipedriveOwner
     }
 
     /**
-     * @param string $ownerId
+     * @param int|null $ownerId
      *
      * @return PipedriveOwner
      */
