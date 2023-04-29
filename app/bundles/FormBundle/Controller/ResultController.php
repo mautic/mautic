@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Factory\PageHelperFactoryInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -21,7 +22,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ResultController extends CommonFormController
 {
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine)
     {
         $this->setStandardParameters(
             'form.submission', // model name
@@ -34,7 +35,7 @@ class ResultController extends CommonFormController
             'formresult' // mauticContent
         );
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**
