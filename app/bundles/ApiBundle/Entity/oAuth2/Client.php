@@ -25,7 +25,7 @@ class Client extends BaseClient
     protected $name;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\UserBundle\Entity\User>
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\UserBundle\Entity\User>
      */
     protected $users;
 

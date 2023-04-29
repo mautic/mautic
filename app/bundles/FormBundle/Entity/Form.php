@@ -72,12 +72,12 @@ class Form extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\FormBundle\Entity\Field>
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection|iterable<Mautic\FormBundle\Entity\Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection\Doctrine\Common\Collections\Collection&iterable<Mautic\FormBundle\Entity\Action>
+     * @var ArrayCollection\Doctrine\Common\Collections\Collection|iterable<Mautic\FormBundle\Entity\Action>
      */
     private $actions;
 

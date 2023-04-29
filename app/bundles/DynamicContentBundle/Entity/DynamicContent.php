@@ -72,7 +72,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $sentCount = 0;
 
     /**
-     * @var ArrayCollectionDoctrine\Common\Collections\Collection&iterable<Mautic\DynamicContentBundle\Entity\Stat>
+     * @var ArrayCollectionDoctrine\Common\Collections\Collection|iterable<Mautic\DynamicContentBundle\Entity\Stat>
      */
     private $stats;
 
