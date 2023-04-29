@@ -28,14 +28,14 @@ class Tweet extends FormEntity
     /**
      * ID of the Twitter media object attached to the tweet.
      *
-     * @var string
+     * @var string|null
      */
     private $mediaId;
 
     /**
      * Path to the local media file.
      *
-     * @var string
+     * @var string|null
      */
     private $mediaPath;
 
@@ -56,47 +56,47 @@ class Tweet extends FormEntity
     /**
      * Internal Mautic description.
      *
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $language = 'en';
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sentCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $favoriteCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retweetCount = 0;
 
     /**
-     * @var Page
+     * @var Page|null
      */
     private $page;
 
     /**
-     * @var Asset
+     * @var Asset|null
      */
     private $asset;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, TweetStat>
      */
     private $stats;
 
@@ -244,7 +244,7 @@ class Tweet extends FormEntity
     }
 
     /**
-     * @param int $description
+     * @param string|null $description
      *
      * @return $this
      */
