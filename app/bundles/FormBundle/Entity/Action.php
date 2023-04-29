@@ -24,7 +24,7 @@ class Action
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -44,7 +44,7 @@ class Action
     private $properties = [];
 
     /**
-     * @var Form|null
+     * @var Form
      */
     private $form;
 

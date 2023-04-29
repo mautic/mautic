@@ -23,7 +23,7 @@ class Field
     private $label;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $showLabel = true;
 
@@ -48,7 +48,7 @@ class Field
     private $customParameters = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $defaultValue;
 
@@ -58,17 +58,17 @@ class Field
     private $isRequired = false;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $validationMessage;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $helpMessage;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $order = 0;
 
@@ -88,32 +88,32 @@ class Field
     private $conditions = [];
 
     /**
-     * @var Form|null
+     * @var Form
      */
     private $form;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $labelAttributes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $inputAttributes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $containerAttributes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $leadField;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $saveResult = true;
 
@@ -130,32 +130,32 @@ class Field
     private $sessionId;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $showWhenValueExists;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $showAfterXSubmissions;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $alwaysDisplay;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $parent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mappedObject;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $mappedField;
 

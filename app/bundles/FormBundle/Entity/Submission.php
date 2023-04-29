@@ -30,12 +30,12 @@ class Submission
     private $ipAddress;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
@@ -50,7 +50,7 @@ class Submission
     private $referer;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $page;
 

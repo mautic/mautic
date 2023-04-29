@@ -27,12 +27,12 @@ class Form extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formAttributes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -42,12 +42,12 @@ class Form extends FormEntity
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cachedHtml;
 
@@ -57,7 +57,7 @@ class Form extends FormEntity
     private $postAction = 'return';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $postActionProperty;
 
@@ -72,27 +72,27 @@ class Form extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\FormBundle\Entity\Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection\Doctrine\Common\Collections\Collection&iterable<Mautic\FormBundle\Entity\Action>
      */
     private $actions;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $inKioskMode = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $renderStyle = false;
 
@@ -114,12 +114,12 @@ class Form extends FormEntity
     private $formType;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $noIndex;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $progressiveProfilingLimit;
 
