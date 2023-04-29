@@ -28,7 +28,7 @@ class Report extends FormEntity implements SchedulerInterface
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -73,7 +73,7 @@ class Report extends FormEntity implements SchedulerInterface
     private $aggregators = [];
 
     /**
-     * @var array
+     * @var array|null
      */
     private $settings = [];
 
