@@ -24,7 +24,7 @@ class AccessToken extends BaseAccessToken
     protected $client;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var \Mautic\UserBundle\Entity\User|null
      */
     protected $user;
 
@@ -34,12 +34,12 @@ class AccessToken extends BaseAccessToken
     protected $token;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $expiresAt;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $scope;
 

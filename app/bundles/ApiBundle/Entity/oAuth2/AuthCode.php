@@ -34,12 +34,12 @@ class AuthCode extends BaseAuthCode
     protected $token;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $expiresAt;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $scope;
 
