@@ -111,7 +111,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), ) extends CommonApiController {
+        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors

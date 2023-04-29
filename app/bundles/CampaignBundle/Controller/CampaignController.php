@@ -4,6 +4,7 @@ namespace Mautic\CampaignBundle\Controller;
 
 use function assert;
 use Doctrine\DBAL\Cache\CacheException;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
@@ -91,13 +92,14 @@ class CampaignController extends AbstractStandardFormController
         FormFieldHelper $fieldHelper,
         RequestStack $requestStack,
         EventCollector $eventCollector,
-        DateHelper $dateHelper
+        DateHelper $dateHelper,
+        ManagerRegistry $managerRegistry
     ) {
         $this->requestStack   = $requestStack;
         $this->eventCollector = $eventCollector;
         $this->dateHelper     = $dateHelper;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $managerRegistry);
     }
 
     /**

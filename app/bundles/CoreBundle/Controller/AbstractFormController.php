@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use RuntimeException;
@@ -18,10 +19,12 @@ abstract class AbstractFormController extends CommonController
 
     protected UserHelper $userHelper;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, ManagerRegistry $managerRegistry)
     {
         $this->security   = $security;
         $this->userHelper = $userHelper;
+
+        parent::__construct($managerRegistry);
     }
 
     /**
