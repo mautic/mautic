@@ -36,7 +36,7 @@ class Widget extends FormEntity
     private $height;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $ordering;
 
@@ -71,7 +71,7 @@ class Widget extends FormEntity
     private $loadTime = 0;
 
     /**
-     * @var int (minutes)
+     * @var int|null (minutes)
      */
     private $cacheTimeout;
 
