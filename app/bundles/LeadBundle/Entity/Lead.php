@@ -93,7 +93,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $updatedPoints;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\PointsChangeLog>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\PointsChangeLog>
      */
     private $pointsChangeLog;
 
@@ -103,27 +103,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $actualPoints;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\CompanyChangeLog>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\DoNotContact>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\CoreBundle\Entity\IpAddress>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\CoreBundle\Entity\IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\NotificationBundle\Entity\PushID>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\NotificationBundle\Entity\PushID>
      */
     private $pushIds;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadEventLog>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\LeadEventLog>
      */
     private $eventLog;
 
@@ -165,7 +165,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $dateIdentified;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadNote>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\LeadNote>
      */
     private $notes;
 
@@ -180,7 +180,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public $imported = false;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\Tag>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\Tag>
      */
     private $tags;
 
@@ -190,17 +190,17 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $stage;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\StagesChangeLog>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\UtmTag>
+     * @var \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\UtmTag>
      */
     private $utmtags;
 
     /**
-     * @var FrequencyRule[]|Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\FrequencyRule>
+     * @var \Doctrine\Common\Collections\Collection|iterable<\Mautic\LeadBundle\Entity\FrequencyRule>
      */
     private $frequencyRules;
 
@@ -1069,7 +1069,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection&iterable<\Mautic\NotificationBundle\Entity\PushID>
      */
     public function getPushIDs()
     {
@@ -1119,7 +1119,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\Collection&iterable<\Mautic\LeadBundle\Entity\DoNotContact>
      */
     public function getDoNotContact()
     {
