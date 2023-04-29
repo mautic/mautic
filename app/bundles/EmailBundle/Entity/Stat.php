@@ -31,7 +31,7 @@ class Stat
     private $lead;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $emailAddress;
 
@@ -76,7 +76,7 @@ class Stat
     private $trackingHash;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
@@ -101,7 +101,7 @@ class Stat
     private $storedCopy;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $openCount = 0;
 

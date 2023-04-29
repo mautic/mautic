@@ -47,42 +47,42 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $subject;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $useOwnerAsMailer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $replyToAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $bccAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
@@ -97,17 +97,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $utmTags = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $plainText;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customHtml;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $emailType = 'template';
 
@@ -122,7 +122,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $publishDown;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $publicPreview = 0;
 
@@ -142,17 +142,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
 
@@ -167,7 +167,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form
+     * @var \Mautic\FormBundle\Entity\Form|null
      */
     private $unsubscribeForm;
 
@@ -177,7 +177,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\AssetBundle\Entity\Asset>
      */
     private $assetAttachments;
 

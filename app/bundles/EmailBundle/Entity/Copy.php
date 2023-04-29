@@ -21,7 +21,7 @@ class Copy
     private $dateCreated;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $body;
 

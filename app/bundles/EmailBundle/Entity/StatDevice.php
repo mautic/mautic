@@ -19,17 +19,17 @@ class StatDevice
     private $id;
 
     /**
-     * @var array
+     * @var \Mautic\EmailBundle\Entity\Stat|null
      */
     private $stat;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadDevice
+     * @var \Mautic\LeadBundle\Entity\LeadDevice|null
      */
     private $device;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
