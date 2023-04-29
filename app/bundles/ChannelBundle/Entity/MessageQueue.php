@@ -33,7 +33,7 @@ class MessageQueue
     private $channelId;
 
     /**
-     * @var Event
+     * @var Event|null
      */
     private $event;
 
