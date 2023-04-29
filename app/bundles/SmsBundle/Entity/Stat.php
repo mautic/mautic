@@ -15,27 +15,27 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var Sms
+     * @var Sms|null
      */
     private $sms;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList
+     * @var \Mautic\LeadBundle\Entity\LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
@@ -45,17 +45,17 @@ class Stat
     private $dateSent;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingHash;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -70,7 +70,7 @@ class Stat
     private $details = [];
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isFailed = false;
 
@@ -156,7 +156,7 @@ class Stat
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
