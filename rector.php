@@ -5,7 +5,13 @@ declare(strict_types=1);
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
-    $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
+//    $rectorConfig->paths([__DIR__.'/plugins/MauticSocialBundle/Entity/TweetStat.php']);
+    $rectorConfig->paths(
+        [
+            __DIR__.'/app/bundles/*/Entity/*.php',
+            __DIR__.'/plugins/*/Entity/*.php',
+        ]
+    );
     $rectorConfig->skip(
         [
             __DIR__.'/*/test/*',
@@ -78,4 +84,5 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRedundantDefaultClassAnnotationValuesRector::class);
     $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRepositoryFromEntityAnnotationRector::class);
     $rectorConfig->rule(\Rector\Doctrine\Rector\ClassMethod\MakeEntitySetterNullabilityInSyncWithPropertyRector::class);
+    $rectorConfig->rule(\Rector\Php74\Rector\Property\TypedPropertyRector::class);
 };
