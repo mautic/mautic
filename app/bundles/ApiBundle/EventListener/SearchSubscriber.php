@@ -63,7 +63,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit       = $this->security->isGranted('api:clients:edit');
                 foreach ($clients as $client) {
                     $clientResults[] = $this->twig->render(
-                        '@MauticApi/SubscribedEvents\Search/global.html.twig',
+                        '@MauticApi/SubscribedEvents/Search/global.html.twig',
                         [
                             'client'  => $client,
                             'canEdit' => $canEdit,
@@ -72,7 +72,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($clients) > 5) {
                     $clientResults[] = $this->twig->render(
-                        '@MauticApi/SubscribedEvents\Search/global.html.twig',
+                        '@MauticApi/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

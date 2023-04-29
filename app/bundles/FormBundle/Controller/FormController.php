@@ -993,7 +993,7 @@ class FormController extends CommonFormController
             return $this->render($logicalName, $viewParams);
         }
 
-        return $this->render('@MauticForm//form.html.twig', $viewParams);
+        return $this->render('@MauticForm/form.html.twig', $viewParams);
     }
 
     /**
