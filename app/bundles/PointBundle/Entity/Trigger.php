@@ -23,7 +23,7 @@ class Trigger extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -53,12 +53,12 @@ class Trigger extends FormEntity
     private $triggerExistingLeads = false;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PointBundle\Entity\TriggerEvent>
      */
     private $events;
 
