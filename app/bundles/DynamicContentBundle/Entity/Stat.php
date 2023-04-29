@@ -18,12 +18,12 @@ class Stat
     private $id;
 
     /**
-     * @var DynamicContent
+     * @var DynamicContent|null
      */
     private $dynamicContent;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
@@ -33,7 +33,7 @@ class Stat
     private $dateSent;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sentCount;
 
@@ -48,12 +48,12 @@ class Stat
     private $sentDetails = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
