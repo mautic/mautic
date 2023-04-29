@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class IdEntry
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -94,7 +94,7 @@ class IdEntry
     }
 
     /**
-     * @param int $id
+     * @param string $id
      *
      * @return IdEntry
      */
