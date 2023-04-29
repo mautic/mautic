@@ -2,6 +2,7 @@
 
 namespace Mautic\WebhookBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -33,10 +34,11 @@ class WebhookApiController extends CommonApiController
         RouterInterface $router,
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine
     ) {
         $this->requestStack = $requestStack;
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
     }
 
     public function initialize(ControllerEvent $event)
