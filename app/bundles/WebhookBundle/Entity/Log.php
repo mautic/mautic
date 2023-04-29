@@ -32,12 +32,12 @@ class Log
     private $dateAdded;
 
     /**
-     * @var float
+     * @var float|null
      */
     private $runtime;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $note;
 
