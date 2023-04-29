@@ -12,7 +12,7 @@ use Mautic\EmailBundle\Entity\Email;
 class Download
 {
     /**
-     * @var int
+     * @var int|null
      */
     private $id;
 
@@ -22,7 +22,7 @@ class Download
     private $dateDownload;
 
     /**
-     * @var Asset
+     * @var Asset|null
      */
     private $asset;
 
@@ -32,17 +32,17 @@ class Download
     private $ipAddress;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $code;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $referer;
 
@@ -52,17 +52,17 @@ class Download
     private $trackingId;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var string
+     * @var int|null
      */
     private $sourceId;
 
     /**
-     * @var \Mautic\EmailBundle\Entity\Email
+     * @var \Mautic\EmailBundle\Entity\Email|null
      */
     private $email;
 
