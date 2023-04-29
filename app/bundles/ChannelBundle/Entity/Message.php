@@ -19,9 +19,9 @@ class Message extends FormEntity
     private $id;
 
     /**
-     * @var ?string
+     * @var string|null
      */
-    private ?string $name;
+    private string $name;
 
     /**
      * @var ?string
