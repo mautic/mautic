@@ -16,7 +16,7 @@ class Notification
     protected $id;
 
     /**
-     * @var User|null
+     * @var User
      */
     protected $user;
 
@@ -31,7 +31,7 @@ class Notification
     protected $header;
 
     /**
-     * @var string|null
+     * @var string
      */
     protected $message;
 
@@ -46,7 +46,7 @@ class Notification
     protected $iconClass;
 
     /**
-     * @var bool|null
+     * @var bool
      */
     protected $isRead = false;
 

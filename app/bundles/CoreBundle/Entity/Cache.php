@@ -18,7 +18,7 @@ class Cache
     private $data;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $lifetime;
 
