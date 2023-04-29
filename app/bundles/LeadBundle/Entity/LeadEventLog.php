@@ -25,27 +25,27 @@ class LeadEventLog
     protected $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     protected $lead;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $userId;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $userName;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $bundle;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $object;
 
@@ -55,7 +55,7 @@ class LeadEventLog
     protected $objectId;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $action;
 
@@ -65,7 +65,7 @@ class LeadEventLog
     protected $dateAdded;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $properties = [];
 

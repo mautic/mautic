@@ -78,7 +78,7 @@ class Import extends FormEntity
     /**
      * Name of the original uploaded file.
      *
-     * @var string
+     * @var string|null
      */
     private $originalFile;
 
@@ -136,7 +136,7 @@ class Import extends FormEntity
     private $object = 'lead';
 
     /**
-     * @var array<mixed>
+     * @var array<mixed>|null
      */
     private $properties = [];
 

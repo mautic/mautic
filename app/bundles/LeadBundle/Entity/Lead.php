@@ -66,14 +66,14 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $zipcode;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $timezone;
 
     private $country;
 
     /**
-     * @var User
+     * @var User|null
      */
     private $owner;
 
@@ -93,7 +93,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $updatedPoints;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\PointsChangeLog>
      */
     private $pointsChangeLog;
 
@@ -103,27 +103,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $actualPoints;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\CompanyChangeLog>
      */
     private $companyChangeLog;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\DoNotContact>
      */
     private $doNotContact;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\CoreBundle\Entity\IpAddress>
      */
     private $ipAddresses;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\NotificationBundle\Entity\PushID>
      */
     private $pushIds;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\LeadEventLog>
      */
     private $eventLog;
 
@@ -165,12 +165,12 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $dateIdentified;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\LeadNote>
      */
     private $notes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $preferredProfileImage = 'gravatar';
 
@@ -180,27 +180,27 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     public $imported = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\Tag>
      */
     private $tags;
 
     /**
-     * @var Stage
+     * @var Stage|null
      */
     private $stage;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\StagesChangeLog>
      */
     private $stageChangeLog;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\UtmTag>
      */
     private $utmtags;
 
     /**
-     * @var FrequencyRule[]
+     * @var FrequencyRule[]|Doctrine\Common\Collections\Collection&iterable<Mautic\LeadBundle\Entity\FrequencyRule>
      */
     private $frequencyRules;
 

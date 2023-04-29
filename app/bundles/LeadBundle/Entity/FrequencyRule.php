@@ -32,12 +32,12 @@ class FrequencyRule extends CommonEntity
     private $dateAdded;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $frequencyNumber;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $frequencyTime;
 

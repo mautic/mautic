@@ -32,12 +32,12 @@ class LeadDevice
     private $device;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsShortName;
 
@@ -47,22 +47,22 @@ class LeadDevice
     private $deviceOsVersion;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsPlatform;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceBrand;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceModel;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
