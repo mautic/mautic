@@ -97,7 +97,7 @@ class CommonApiController extends FetchCommonApiController
             }
 
             $this->model->deleteEntity($entity);
-            $this->getDoctrine()->getManager()->detach($entity);
+            $this->doctrine->getManager()->detach($entity);
         }
 
         if (!empty($errors)) {
@@ -415,7 +415,7 @@ class CommonApiController extends FetchCommonApiController
             $errors[$key] = $formResponse;
         }
 
-        $this->getDoctrine()->getManager()->detach($entity);
+        $this->doctrine->getManager()->detach($entity);
 
         $this->inBatchMode = false;
     }
@@ -576,7 +576,7 @@ class CommonApiController extends FetchCommonApiController
     protected function setCategory($entity, $categoryId)
     {
         if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
-            $category = $this->getDoctrine()->getManager()->find(Category::class, $categoryId);
+            $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
             if (null === $category) {
                 throw new \UnexpectedValueException("Category $categoryId does not exist");

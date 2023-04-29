@@ -1127,12 +1127,12 @@ class CampaignController extends AbstractStandardFormController
     {
         if ($this->coreParametersHelper->get('campaign_use_summary')) {
             /** @var SummaryRepository $summaryRepo */
-            $summaryRepo                = $this->getDoctrine()->getManager()->getRepository(Summary::class);
+            $summaryRepo                = $this->doctrine->getManager()->getRepository(Summary::class);
             $campaignLogCounts          = $summaryRepo->getCampaignLogCounts($id, $dateFrom, $dateToPlusOne);
             $campaignLogCountsProcessed = $this->getCampaignLogCountsProcessed($campaignLogCounts);
         } else {
             /** @var LeadEventLogRepository $eventLogRepo */
-            $eventLogRepo               = $this->getDoctrine()->getManager()->getRepository(LeadEventLog::class);
+            $eventLogRepo               = $this->doctrine->getManager()->getRepository(LeadEventLog::class);
             $campaignLogCounts          = $eventLogRepo->getCampaignLogCounts($id, false, false, true, $dateFrom, $dateToPlusOne);
             $campaignLogCountsProcessed = $eventLogRepo->getCampaignLogCounts($id, false, false, false, $dateFrom, $dateToPlusOne);
         }
