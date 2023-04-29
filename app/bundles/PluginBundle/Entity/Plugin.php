@@ -25,7 +25,7 @@ class Plugin extends CommonEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -50,17 +50,17 @@ class Plugin extends CommonEntity
     private $bundle;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $version;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $author;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\PluginBundle\Entity\Integration>
      */
     private $integrations;
 
