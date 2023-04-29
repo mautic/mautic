@@ -2,6 +2,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
@@ -53,9 +54,9 @@ class CommonApiController extends FetchCommonApiController
 
     protected FormFactoryInterface $formFactory;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine)
     {
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine);
 
         $this->router      = $router;
         $this->formFactory = $formFactory;
