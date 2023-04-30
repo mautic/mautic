@@ -71627,4 +71627,13 @@ parameters:
 			path: plugins/MauticTagManagerBundle/Tests/Unit/Security/Permissions/TagManagerPermissionsTest.php
 
 		- '#\$id type mapping mismatch: database can contain string but property expects int.#'
+
+		-
+			message: "#^Property Mautic\\\\CoreBundle\\\\Entity\\\\AuditLog\\:\\:\\$objectId type mapping mismatch: database can contain string but property expects int.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Entity/AuditLog.php
 			
+		-
+			message: "#^Property Mautic\\\\IntegrationsBundle\\\\Entity\\\\ObjectMapping\\:\\:\\$internalObjectId type mapping mismatch: database can contain string but property expects int.$#"
+			count: 1
+			path: app/bundles/IntegrationsBundle/Entity/ObjectMapping.php
