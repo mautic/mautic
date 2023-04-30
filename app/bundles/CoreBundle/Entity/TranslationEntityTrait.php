@@ -16,7 +16,7 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<TranslationEntityInterface>
+     * @var \Doctrine\Common\Collections\Collection<int, TranslationEntityInterface>
      **/
     private $translationChildren;
 
