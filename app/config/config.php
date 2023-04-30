@@ -123,7 +123,6 @@ $dbalSettings = [
         'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
         'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
         'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
-        'bigint'    => \Mautic\CoreBundle\Doctrine\Type\BigIntType::class,
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [

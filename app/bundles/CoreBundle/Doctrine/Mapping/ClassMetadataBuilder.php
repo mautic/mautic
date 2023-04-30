@@ -8,7 +8,6 @@ use Doctrine\ORM\Mapping\Builder\FieldBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Doctrine\Type\BigIntType;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -148,7 +147,7 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
                 'columnName' => $columnName,
                 'id'         => $isPrimary,
                 'nullable'   => $isNullable,
-                'type'       => BigIntType::class,
+                'type'       => Types::BIGINT,
                 'options'    => [
                     'unsigned' => true,
                 ],
