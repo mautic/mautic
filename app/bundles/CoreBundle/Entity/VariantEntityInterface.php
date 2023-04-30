@@ -12,7 +12,7 @@ interface VariantEntityInterface
     /**
      * Get translation parent.
      *
-     * @return VariantEntityInterface
+     * @return \Doctrine\Common\Collections\Collection<VariantEntityInterface>
      */
     public function getVariantParent();
 
