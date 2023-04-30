@@ -16,12 +16,12 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection<int, mixed>
+     * \Doctrine\Common\Collections\Collection&iterable<\Mautic\EmailBundle\Entity\Email | \Mautic\PageBundle\Entity\Page>.
      **/
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface
+     * @var \Mautic\PageBundle\Entity\Page|\Mautic\DynamicContentBundle\Entity\DynamicContent|null
      **/
     private $translationParent;
 
