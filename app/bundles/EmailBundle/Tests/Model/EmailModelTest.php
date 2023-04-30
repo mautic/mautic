@@ -599,7 +599,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                         ['MauticEmailBundle:Email', $this->emailRepository],
                         ['MauticEmailBundle:Stat', $this->statRepository],
                         ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        ['MauticChannelBundle:MessageQueue', $this->createMock(MessageRepository::class)],
+                        [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageRepository::class)],
                     ]
                 )
             );
