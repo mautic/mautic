@@ -71625,3 +71625,6 @@ parameters:
 			message: "#^Call to an undefined method MauticPlugin\\\\MauticTagManagerBundle\\\\Security\\\\Permissions\\\\TagManagerPermissions\\:\\:expects\\(\\)\\.$#"
 			count: 1
 			path: plugins/MauticTagManagerBundle/Tests/Unit/Security/Permissions/TagManagerPermissionsTest.php
+
+		- '#\$id type mapping mismatch: database can contain string but property expects int.#'
+			
