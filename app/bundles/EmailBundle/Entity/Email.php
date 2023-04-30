@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -124,7 +123,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     /**
      * @var bool|null
      */
-    private $publicPreview = 0;
+    private $publicPreview = false;
 
     /**
      * @var int
@@ -147,12 +146,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $category;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\LeadBundle\Entity\LeadList>
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\EmailBundle\Entity\Stat>
+     * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
 
@@ -172,12 +171,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\AssetBundle\Entity\Asset>
+     * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
      */
     private $assetAttachments;
 
@@ -889,7 +888,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     public function getLists()
     {
@@ -913,7 +912,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setLists(array $lists = [])
     {
-        $this->lists = $lists;
+        $this->lists = new ArrayCollection($lists);
 
         return $this;
     }

@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 trait VariantEntityTrait
 {
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<mixed>
      **/
     private $variantChildren;
 

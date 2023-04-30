@@ -72,12 +72,12 @@ class Form extends FormEntity
     private $publishDown;
 
     /**
-     * @var ArrayCollection|\Doctrine\Common\Collections\Collection|iterable<Mautic\FormBundle\Entity\Field>
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection\Doctrine\Common\Collections\Collection|iterable<Mautic\FormBundle\Entity\Action>
+     * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     private $actions;
 
@@ -109,7 +109,7 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formType;
 
@@ -405,7 +405,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return string
+     * @return bool|null
      */
     public function getRenderStyle()
     {
@@ -528,7 +528,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Field[]
+     * @return ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     public function getFields()
     {
@@ -645,7 +645,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Action[]
+     * @return ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     public function getActions()
     {
@@ -851,10 +851,6 @@ class Form extends FormEntity
      */
     public function getProgressiveProfilingLimit()
     {
-        if (0 === $this->progressiveProfilingLimit) {
-            $this->progressiveProfilingLimit = '';
-        }
-
         return $this->progressiveProfilingLimit;
     }
 }

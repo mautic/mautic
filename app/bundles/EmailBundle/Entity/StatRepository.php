@@ -632,7 +632,9 @@ class StatRepository extends CommonRepository
     public function findContactEmailStats($leadId, $emailId)
     {
         return $this->createQueryBuilder('s')
-            ->where('IDENTITY(s.lead) = '.(int) $leadId.' AND IDENTITY(s.email) = '.(int) $emailId)
+            ->where('IDENTITY(s.lead) = :leadId AND IDENTITY(s.email) =  :emailId')
+            ->setParameter('leadId', (int) $leadId)
+            ->setParameter('emailId', (int) $emailId)
             ->getQuery()
             ->getResult();
     }

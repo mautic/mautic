@@ -16,7 +16,7 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<mixed>
      **/
     private $translationChildren;
 

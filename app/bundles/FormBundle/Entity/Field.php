@@ -83,7 +83,7 @@ class Field
     private $validation = [];
 
     /**
-     * @var array<string,mixed>
+     * @var array<string,mixed>|null
      */
     private $conditions = [];
 
@@ -118,7 +118,7 @@ class Field
     private $saveResult = true;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isAutoFill = false;
 

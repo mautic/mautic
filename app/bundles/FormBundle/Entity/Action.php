@@ -44,7 +44,7 @@ class Action
     private $properties = [];
 
     /**
-     * @var Form
+     * @var Form|null
      */
     private $form;
 

@@ -72,11 +72,11 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|\Mautic\ChannelBundle\Entity\MessageRepository
+     * @return \Mautic\ChannelBundle\Entity\MessageRepository
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticChannelBundle:Message');
+        return $this->em->getRepository(\Mautic\ChannelBundle\Entity\Message::class);
     }
 
     /**
@@ -164,8 +164,7 @@ class MessageModel extends FormModel implements AjaxLookupModelInterface
                 $entities = $this->getRepository()->getMessageList(
                     $filter,
                     $limit,
-                    $start,
-                    $this->security->isGranted($this->getPermissionBase().':viewother')
+                    $start
                 );
 
                 foreach ($entities as $entity) {
