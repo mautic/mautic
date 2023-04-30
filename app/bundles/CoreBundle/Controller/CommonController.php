@@ -439,10 +439,6 @@ class CommonController extends AbstractController implements MauticController
             $passthrough['notifications'] = $this->getNotificationContent();
         }
 
-        //render browser notifications
-        $passthrough['browserNotifications'] = $request->getSession()->get('mautic.browser.notifications', []);
-        $request->getSession()->set('mautic.browser.notifications', []);
-
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $request->get('tmpl', 'index');
         if ('index' == $tmpl) {
             $updatedContent = [];

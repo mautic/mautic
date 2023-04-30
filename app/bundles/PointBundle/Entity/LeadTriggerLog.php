@@ -23,7 +23,7 @@ class LeadTriggerLog
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateFired;
 

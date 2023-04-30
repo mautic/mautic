@@ -106,7 +106,8 @@ class LegacyEventDispatcher
             $this->contactTracker->setSystemContact($log->getLead());
 
             if (isset($settings['eventName'])) {
-                $result = $this->dispatchEventName($settings['eventName'], $settings, $log);
+                $event  = $this->dispatchEventName($settings['eventName'], $settings, $log);
+                $result = $event->getResult();
             } else {
                 if (!is_callable($settings['callback'])) {
                     // No use to keep trying for the other logs as it won't ever work
@@ -194,7 +195,7 @@ class LegacyEventDispatcher
     /**
      * @param $eventName
      *
-     * @return bool
+     * @return CampaignExecutionEvent
      */
     private function dispatchEventName($eventName, array $settings, LeadEventLog $log)
     {
@@ -219,7 +220,7 @@ class LegacyEventDispatcher
                 ->setChannelId($campaignEvent->getChannelId());
         }
 
-        return $campaignEvent->getResult();
+        return $campaignEvent;
     }
 
     /**

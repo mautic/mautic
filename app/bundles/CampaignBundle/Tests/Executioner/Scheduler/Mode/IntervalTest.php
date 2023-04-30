@@ -535,7 +535,7 @@ class IntervalTest extends \PHPUnit\Framework\TestCase
         $log->setIsScheduled(true);
 
         $interval = $this->getInterval();
-
+        /** @var \DateTime $executionDate */
         $executionDate  = $interval->validateExecutionDateTime($log, new \DateTime('2021-11-08 17:00:00'));
         $executionDate->setTimezone(new \DateTimeZone('UTC'));
 

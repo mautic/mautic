@@ -15,7 +15,7 @@ class UtmTag
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -134,7 +134,7 @@ class UtmTag
      *
      * @return UtmTag
      */
-    public function setDateAdded(\DateTime $date)
+    public function setDateAdded(\DateTimeInterface $date)
     {
         $this->dateAdded = $date;
 
@@ -144,7 +144,7 @@ class UtmTag
     /**
      * Get date added.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
