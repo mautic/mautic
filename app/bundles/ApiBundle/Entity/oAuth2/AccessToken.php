@@ -24,7 +24,7 @@ class AccessToken extends BaseAccessToken
     protected $client;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User|null
+     * @var UserInterface
      */
     protected $user;
 

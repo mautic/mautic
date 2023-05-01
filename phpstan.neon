@@ -34,3 +34,5 @@ parameters:
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
 	doctrine:
 		objectManagerLoader: object-manager.php
+	stubFiles:
+		- stubs/Token.stub		
