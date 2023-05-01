@@ -156,7 +156,7 @@ class Stat
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getId()
     {

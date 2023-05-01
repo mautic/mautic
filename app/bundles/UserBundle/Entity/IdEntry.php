@@ -94,7 +94,7 @@ class IdEntry
     }
 
     /**
-     * @param string $id
+     * @param int $id
      *
      * @return IdEntry
      */

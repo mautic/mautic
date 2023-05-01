@@ -296,7 +296,7 @@ class Hit
     /**
      * Get id.
      *
-     * @return string
+     * @return int
      */
     public function getId()
     {
