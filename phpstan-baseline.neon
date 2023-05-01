@@ -71629,6 +71629,11 @@ parameters:
 		- '#\$id type mapping mismatch: database can contain string but property expects int.#'
 
 		-
+			message: "#^Property Mautic\\\\IntegrationsBundle\\\\Entity\\\\FieldChange\\:\\:\\$objectId type mapping mismatch: database can contain string but property expects int.$#"
+			count: 1
+			path: app/bundles/IntegrationsBundle/Entity/FieldChange.php
+
+		-
 			message: "#^Property Mautic\\\\CoreBundle\\\\Entity\\\\AuditLog\\:\\:\\$objectId type mapping mismatch: database can contain string but property expects int.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/AuditLog.php
@@ -71664,6 +71669,21 @@ parameters:
 			path: app/bundles/ApiBundle/Entity/oAuth2/RefreshToken.php
 
 		-
-			message: "#^Parameter \\#1 $from of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:from\\(\\) expects literal-string, class-string\\<T of object\\> given.$#"
+			message: "#^Parameter \\#1 \\$from of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:from\\(\\) expects literal-string, class-string\\<T of object\\> given.$#"
 			count: 1
 			path: app/bundles/CoreBundle/Entity/CommonRepository.php
+
+		-
+			message: "#^Parameter \\#1 \\$from of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:from\\(\\) expects literal-string, class-string\\<Mautic\\\\LeadBundle\\\\Entity\\\\LeadField\\> given.$#"
+			count: 3
+			path: app/bundles/LeadBundle/Entity/LeadFieldRepository.php
+
+		-
+			message: "#^Parameter \\#3 \\$indexBy of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:from\\(\\) expects literal-string|null, non-falsy-string given.$#"
+			count: 1
+			path:  app/bundles/PluginBundle/Entity/PluginRepository.php
+
+		-
+			message: "#^Property Mautic\\\\UserBundle\\\\Entity\\\\IdEntry\\:\\:\\$id type mapping mismatch: property can contain int but database expects string.$#"
+			count: 1
+			path:  app/bundles/UserBundle/Entity/IdEntry.php
