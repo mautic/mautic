@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class IdEntry
 {
     /**
-     * @var string
+     * @var int
      */
     protected $id;
 

@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /**
-     * @var string
+     * @var int
      */
     private $id;
 

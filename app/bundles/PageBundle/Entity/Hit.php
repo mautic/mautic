@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class Hit
 {
     /**
-     * @var string
+     * @var int
      */
     private $id;
 
