@@ -187,7 +187,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param int $frequencyNumber
+     * @param int|null $frequencyNumber
      *
      * @return FrequencyRule
      */
@@ -209,7 +209,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param string $frequencyTime
+     * @param string|null $frequencyTime
      *
      * @return FrequencyRule
      */
