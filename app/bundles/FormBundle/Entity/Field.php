@@ -165,7 +165,6 @@ class Field
     public function __clone()
     {
         $this->id   = null;
-        $this->form = null;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)

@@ -165,7 +165,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @param \DateTime $dateAdded
+     * @param \DateTimeInterface $dateAdded
      *
      * @return FrequencyRule
      */
