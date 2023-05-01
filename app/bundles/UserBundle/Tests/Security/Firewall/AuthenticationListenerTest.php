@@ -18,6 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\AuthenticationManagerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AuthenticationListenerTest extends TestCase
 {
@@ -30,7 +31,7 @@ class AuthenticationListenerTest extends TestCase
     /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var ObjectRepository */
+    /** @var ObjectRepository<User>&MockObject */
     private $objectRepository;
 
     /** @var OAuthToken */
