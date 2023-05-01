@@ -71662,3 +71662,8 @@ parameters:
 			message: "#^Property Mautic\\\\ApiBundle\\\\Entity\\\\oAuth2\\\\RefreshToken\\:\\:\\$user type mapping mismatch: property can contain Symfony\\\\Component\\\\Security\\\\Core\\\\User\\\\UserInterface but database expects Mautic\\\\UserBundle\\\\Entity\\\\User.$#"						
 			count: 1
 			path: app/bundles/ApiBundle/Entity/oAuth2/RefreshToken.php
+
+		-
+			message: "#^Parameter \\#1 $from of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:from\\(\\) expects literal-string, class-string\\<T of object\\> given.$#"
+			count: 1
+			path: app/bundles/CoreBundle/Entity/CommonRepository.php
