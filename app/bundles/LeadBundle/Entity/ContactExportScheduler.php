@@ -18,7 +18,10 @@ class ContactExportScheduler
 
     private ?User $user = null; // Created by
 
-    private ?DateTimeImmutable $scheduledDateTime = null;
+    /**
+     * @var DateTimeImmutable
+     */
+    private DateTimeImmutable $scheduledDateTime;
 
     /** @var array<mixed> */
     private array $data = [];

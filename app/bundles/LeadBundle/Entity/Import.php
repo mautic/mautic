@@ -111,7 +111,7 @@ class Import extends FormEntity
     private $ignoredCount = 0;
 
     /**
-     * @var bool
+     * @var int
      */
     private $priority;
 

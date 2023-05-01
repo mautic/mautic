@@ -27,7 +27,7 @@ class LeadDevice
     private $clientInfo = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $device;
 
@@ -42,7 +42,7 @@ class LeadDevice
     private $deviceOsShortName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $deviceOsVersion;
 

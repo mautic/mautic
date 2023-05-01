@@ -50,7 +50,7 @@ class LeadEventLog
     protected $object;
 
     /**
-     * @var int
+     * @var int|null
      */
     protected $objectId;
 
