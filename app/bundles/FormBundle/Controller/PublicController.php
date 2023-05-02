@@ -52,12 +52,6 @@ class PublicController extends CommonFormController
 
         $translator = $this->translator;
 
-        if (!isset($post['formId']) && isset($post['formid'])) {
-            $post['formId'] = $post['formid'];
-        } elseif (isset($post['formId']) && !isset($post['formid'])) {
-            $post['formid'] = $post['formId'];
-        }
-
         //check to ensure there is a formId
         if (!isset($post['formId'])) {
             $error = $translator->trans('mautic.form.submit.error.unavailable', [], 'flashes');
@@ -256,7 +250,7 @@ class PublicController extends CommonFormController
         $msg     = (!empty($message['message'])) ? $message['message'] : '';
         $msgType = (!empty($message['type'])) ? $message['type'] : 'notice';
 
-        $analytics = $this->factory->getHelper('template.analytics')->getCode();
+        $analytics = $this->factory->getHelper('twig.analytics')->getCode();
 
         if (!empty($analytics)) {
             $this->factory->getHelper('template.assets')->addCustomDeclaration($analytics);
@@ -328,7 +322,7 @@ class PublicController extends CommonFormController
         if (!empty($template)) {
             $logicalName  = $this->factory->getHelper('theme')->checkForTwigTemplate('@themes/'.$template.'/html/form.html.twig');
             $assetsHelper = $this->factory->getHelper('template.assets');
-            $analytics    = $this->factory->getHelper('template.analytics')->getCode();
+            $analytics    = $this->factory->getHelper('twig.analytics')->getCode();
 
             if (!empty($customStylesheets)) {
                 foreach ($customStylesheets as $css) {

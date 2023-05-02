@@ -1395,8 +1395,7 @@ class LeadController extends FormController
             ? $request->get('list', 0)
             : $request->request->get(
                 'lead_quickemail[list]',
-                0,
-                true
+                0
             );
         $email = ['list' => $inList];
 
@@ -1555,7 +1554,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch', [], true);
+            $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1678,7 +1677,7 @@ class LeadController extends FormController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
 
-            $data = $request->request->get('lead_batch_dnc', [], true);
+            $data = $request->request->all()['lead_batch_dnc'] ?? [];
             $ids  = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1768,7 +1767,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_stage', [], true);
+            $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1874,7 +1873,7 @@ class LeadController extends FormController
         if ('POST' == $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_owner', [], true);
+            $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];

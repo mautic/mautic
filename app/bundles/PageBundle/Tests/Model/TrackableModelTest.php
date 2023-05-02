@@ -603,6 +603,7 @@ TEXT;
         // Has a URL so has one trackable
         reset($trackables);
         $token = key($trackables);
+        self::assertNotNull($token);
 
         $this->assertEquals(str_replace('https://plaintexttest.io', $token, $plainText), $content[1]);
     }
@@ -642,6 +643,7 @@ TEXT;
         // Has a URL so has one trackable
         reset($trackables);
         $token = key($trackables);
+        self::assertNotNull($token);
 
         $this->assertEquals(str_replace('{contactfield=website}', $token, $plainText), $content[1]);
     }

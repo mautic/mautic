@@ -92,7 +92,7 @@ class EmailApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $lists = $request->request->get('lists', null);
+        $lists = $request->request->all()['lists'] ?? [];
         $limit = $request->request->get('limit', null);
 
         list($count, $failed) = $this->model->sendEmailToLists($entity, $lists, $limit);

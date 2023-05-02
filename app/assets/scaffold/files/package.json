@@ -11,5 +11,9 @@
     "grunt-contrib-watch": "^1.1.0",
     "load-grunt-tasks": "^5.1.0",
     "time-grunt": "^2.0.0"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "mousetrap": "^1.4.6"
   }
 }

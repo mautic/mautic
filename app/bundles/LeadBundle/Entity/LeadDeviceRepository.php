@@ -109,7 +109,7 @@ class LeadDeviceRepository extends CommonRepository
         }
 
         //get totals
-        $device = $sq->execute()->fetchAll();
+        $device = $sq->execute()->fetchAllAssociative();
 
         return (!empty($device)) ? $device[0] : [];
     }
@@ -164,7 +164,7 @@ class LeadDeviceRepository extends CommonRepository
             ->setParameter('leadId', (int) $lead->getId())
             ->orderBy('date_added', 'desc')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
     }
 
     /**

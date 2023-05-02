@@ -55,6 +55,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode($defaultConfigOptions));
         EnvLoader::load();
 
+        self::ensureKernelShutdown();
         $this->client = static::createClient($this->clientOptions, $this->clientServer);
         $this->client->disableReboot();
         $this->client->followRedirects(true);
@@ -66,13 +67,13 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $scheme       = $this->router->getContext()->getScheme();
         $secure       = 0 === strcasecmp($scheme, 'https');
 
-        $this->client->setServerParameter('HTTPS', $secure);
+        $this->client->setServerParameter('HTTPS', (string) $secure);
     }
 
     /**
      * Overrides \Liip\TestFixturesBundle\Test\FixturesTrait::getContainer() method to prevent from having multiple instances of container.
      */
-    protected function getContainer(): ContainerInterface
+    protected static function getContainer(): ContainerInterface
     {
         return self::$container;
     }
@@ -164,6 +165,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
     protected function loginUser(string $username): void
     {
+        /** @var User|null $user */
         $user = $this->em->getRepository(User::class)
             ->findOneBy(['username' => $username]);
 
@@ -173,7 +175,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
 
         $firewall = 'mautic';
         $session  = self::$container->get('session');
-        $token    = new UsernamePasswordToken($user, null, $firewall, $user->getRoles());
+        $token    = new UsernamePasswordToken($user, $firewall, $user->getRoles());
         $session->set('_security_'.$firewall, serialize($token));
         $session->save();
         $cookie = new Cookie($session->getName(), $session->getId());

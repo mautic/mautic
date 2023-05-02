@@ -38,7 +38,7 @@ class TriggerRepository extends CommonRepository
 
         $q->where($this->getPublishedByDateExpression($q));
 
-        $q->orderBy('t.points', 'ASC');
+        $q->orderBy('t.points', \Doctrine\Common\Collections\Criteria::ASC);
 
         return $q->getQuery()->getArrayResult();
     }
