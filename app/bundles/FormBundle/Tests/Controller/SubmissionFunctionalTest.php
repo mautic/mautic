@@ -564,7 +564,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(1, $formCrawler->count());
         $form = $formCrawler->form();
         $form->setValues([
-            'mauticform[all]' => 'test',
+            'mauticform[f_all]' => 'test',
         ]);
         $this->client->submit($form);
 
@@ -575,7 +575,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            'all' => 'test',
+            'f_all' => 'test',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
