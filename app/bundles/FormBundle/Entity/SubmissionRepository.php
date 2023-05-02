@@ -106,7 +106,7 @@ class SubmissionRepository extends CommonRepository
             return $databasePlatform->quoteIdentifier($alias);
         }, $fieldAliases);
 
-        $fieldAliasSql = (!empty($fieldAliases)) ? 'r., '.implode(',r.', $fieldAliases) : '';
+        $fieldAliasSql = (!empty($fieldAliases)) ? ', r.'.implode(',r.', $fieldAliases) : '';
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
         $results = $dq->execute()->fetchAllAssociative();
 
