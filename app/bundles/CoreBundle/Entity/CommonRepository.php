@@ -588,7 +588,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildWhereClauseFromArray($q, $where);
 
-        $count = $q->execute()->fetchColumn();
+        $count = $q->execute()->fetchOne();
 
         if ($select) {
             foreach ($select as &$column) {
@@ -632,7 +632,7 @@ class CommonRepository extends ServiceEntityRepository
             ->where($this->getTableAlias().'.id = :id')
             ->setParameter('id', $id);
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         if (isset($result[$column])) {
             return $result[$column];
@@ -710,7 +710,7 @@ class CommonRepository extends ServiceEntityRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

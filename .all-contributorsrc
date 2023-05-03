@@ -951,7 +951,8 @@
       "profile": "http://rembo.me",
       "contributions": [
         "userTesting",
-        "code"
+        "code",
+        "review"
       ]
     },
     {
@@ -995,6 +996,24 @@
       "name": "Pedro de Jesus",
       "avatar_url": "https://avatars.githubusercontent.com/u/42081152?v=4",
       "profile": "https://www.linkedin.com/in/pedro-de-jesus-a60527167",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "JeanMarcAivie",
+      "name": "Jean-Marc ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/127292186?v=4",
+      "profile": "https://github.com/JeanMarcAivie",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "paulsanduleac",
+      "name": "Paul Sanduleac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67867?v=4",
+      "profile": "http://paulsanduleac.com",
       "contributions": [
         "code"
       ]

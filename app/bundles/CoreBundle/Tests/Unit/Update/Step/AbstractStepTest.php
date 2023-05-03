@@ -28,10 +28,15 @@ abstract class AbstractStepTest extends TestCase
 
     protected function setUp(): void
     {
+        $formatter = $this->createMock(OutputFormatterInterface::class);
+        $formatter->method('isDecorated')
+          ->willReturn(false);
+
         $this->input      = $this->createMock(InputInterface::class);
         $this->output     = $this->createMock(OutputInterface::class);
+
         $this->output->method('getFormatter')
-            ->willReturn($this->createMock(OutputFormatterInterface::class));
+            ->willReturn($formatter);
 
         $this->progressBar = new ProgressBar($this->output);
     }

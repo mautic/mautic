@@ -62,7 +62,7 @@ class SubmissionRepository extends CommonRepository
             )
             ->orderBy('f.field_order, f.id', 'ASC')
             ->setParameter('saveResult', true);
-        $results = $fq->execute()->fetchAll();
+        $results = $fq->execute()->fetchAllAssociative();
 
         $fields = [];
         foreach ($results as $r) {
@@ -81,17 +81,21 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         //get a total count
-        $result = $dq->execute()->fetchAll();
-        $total  = $result[0]['count'];
+        $result  = $dq->execute()->fetchAllAssociative();
+        $total   = $result[0]['count'];
 
         //now get the actual paginated results
         $this->buildOrderByClause($dq, $args);
         $this->buildLimiterClauses($dq, $args);
 
         $dq->resetQueryPart('select');
-        $fieldAliasSql = (!empty($fieldAliases)) ? ', '.implode(',r.', $fieldAliases) : '';
+        $fieldAliasSql = ',';
+        foreach ($fieldAliases as $fieldAlias) {
+            $fieldAliasSql .= 'r.`'.$fieldAlias.'`,';
+        }
+        $fieldAliasSql = substr($fieldAliasSql, 0, -1);
         $dq->select('r.submission_id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.referer, i.ip_address as ipAddress'.$fieldAliasSql);
-        $results = $dq->execute()->fetchAll();
+        $results = $dq->execute()->fetchAllAssociative();
 
         //loop over results to put form submission results in something that can be assigned to the entities
         $values         = [];
@@ -146,7 +150,7 @@ class SubmissionRepository extends CommonRepository
                     $q->expr()->in('s.id', ':ids')
                 )->setParameter('ids', $ids);
 
-                $q->orderBy('ORD', 'ASC');
+                $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
                 $results = $returnEntities ? $q->getQuery()->getResult() : $q->getQuery()->getArrayResult();
 
                 foreach ($results as &$r) {
@@ -186,9 +190,10 @@ class SubmissionRepository extends CommonRepository
                 ->from($this->getResultsTableName($form->getId(), $form->getAlias()), 'r')
                 ->where('r.submission_id = :id')
                 ->setParameter('id', $id);
-            $results = $q->execute()->fetchAll();
-            unset($results[0]['submission_id']);
-            if (isset($results[0])) {
+            $results = $q->execute()->fetchAllAssociative();
+
+            if (!empty($results)) {
+                unset($results[0]['submission_id']);
                 $entity->setResults($results[0]);
             }
         }
@@ -218,7 +223,8 @@ class SubmissionRepository extends CommonRepository
         $this->buildWhereClause($dq, $args);
 
         //get a total count
-        $result = $dq->execute()->fetchAll();
+        $result = $dq->execute()->fetchAllAssociative();
+
         $total  = $result[0]['count'];
 
         //now get the actual paginated results
@@ -227,7 +233,7 @@ class SubmissionRepository extends CommonRepository
 
         $dq->resetQueryPart('select');
         $dq->select('s.id, s.date_submitted as dateSubmitted, s.lead_id as leadId, s.form_id as formId, s.referer, i.ip_address as ipAddress');
-        $results = $dq->execute()->fetchAll();
+        $results = $dq->execute()->fetchAllAssociative();
 
         return [
             'count'   => $total,
@@ -320,7 +326,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -345,7 +351,7 @@ class SubmissionRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     public function getSubmissionCountsByPage($pageId, \DateTime $fromDate = null)
@@ -369,7 +375,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -404,7 +410,7 @@ class SubmissionRepository extends CommonRepository
                 ->setParameter('date', $dh->toUtcString());
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -443,7 +449,7 @@ class SubmissionRepository extends CommonRepository
             );
 
         $validIds = [];
-        $results  = $q->execute()->fetchAll();
+        $results  = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $r) {
             $validIds[] = $r['id'];
@@ -508,7 +514,7 @@ class SubmissionRepository extends CommonRepository
                 break;
         }
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         return !empty($result['id']);
     }
@@ -524,7 +530,7 @@ class SubmissionRepository extends CommonRepository
         $query->where($query->expr()->eq('fs.form_id', ':id'))
                 ->setParameter('id', $form->getId());
 
-        return $query->execute()->fetch();
+        return $query->execute()->fetchAssociative();
     }
 
     /**

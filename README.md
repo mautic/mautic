@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-105-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-107-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -34,7 +34,7 @@ Installing and using Mautic
 |3.1   | 17 Aug 2020 | 24 Aug 2020 | 23 Nov 2020 | 30 Nov 2020
 |3.2   | 23 Nov 2020 | 30 Nov 2020 | 16 Feb 2021 | 22 Feb 2021
 |3.3   | 16 Feb 2021 | 22 Feb 2021 | 17 May 2021 | 24 May 2021
-|4.x   | 17 May 2021 | 24 May 2021 | 24 May 2022 | 20 Dec 2022
+|4.x   | 17 May 2021 | 24 May 2021 | 24 May 2022 | three months after version 5 release date
 
 `*`Security support for 2.16 will only be provided for Mautic itself, not for core dependencies that are EOL, such as Symfony 2.8.
 
@@ -204,12 +204,16 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/bergwerkweb"><img src="https://avatars.githubusercontent.com/u/29873275?v=4?s=100" width="100px;" alt="bergwerkweb"/><br /><sub><b>bergwerkweb</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=bergwerkweb" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://rembo.me"><img src="https://avatars.githubusercontent.com/u/758957?v=4?s=100" width="100px;" alt="Rembrand"/><br /><sub><b>Rembrand</b></sub></a><br /><a href="#userTesting-LordRembo" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/commits?author=LordRembo" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://rembo.me"><img src="https://avatars.githubusercontent.com/u/758957?v=4?s=100" width="100px;" alt="Rembrand"/><br /><sub><b>Rembrand</b></sub></a><br /><a href="#userTesting-LordRembo" title="User Testing">📓</a> <a href="https://github.com/mautic/mautic/commits?author=LordRembo" title="Code">💻</a> <a href="https://github.com/mautic/mautic/pulls?q=is%3Apr+reviewed-by%3ALordRembo" title="Reviewed Pull Requests">👀</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/TechBill"><img src="https://avatars.githubusercontent.com/u/945103?v=4?s=100" width="100px;" alt="TechBill"/><br /><sub><b>TechBill</b></sub></a><br /><a href="#userTesting-TechBill" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://stackoverflow.com/users/902161/irfan"><img src="https://avatars.githubusercontent.com/u/4272642?v=4?s=100" width="100px;" alt="Irfan Hanfi"/><br /><sub><b>Irfan Hanfi</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=irfanhanfi" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/annamunk"><img src="https://avatars.githubusercontent.com/u/102536220?v=4?s=100" width="100px;" alt="Anna Munk"/><br /><sub><b>Anna Munk</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=annamunk" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.schriftrolle.de/?utm_source=github&utm_medium=profilLink"><img src="https://avatars.githubusercontent.com/u/765204?v=4?s=100" width="100px;" alt="Sven Döring"/><br /><sub><b>Sven Döring</b></sub></a><br /><a href="#userTesting-sdoering" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/pedro-de-jesus-a60527167"><img src="https://avatars.githubusercontent.com/u/42081152?v=4?s=100" width="100px;" alt="Pedro de Jesus"/><br /><sub><b>Pedro de Jesus</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=pedrodejesus" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/JeanMarcAivie"><img src="https://avatars.githubusercontent.com/u/127292186?v=4?s=100" width="100px;" alt="Jean-Marc "/><br /><sub><b>Jean-Marc </b></sub></a><br /><a href="#userTesting-JeanMarcAivie" title="User Testing">📓</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://paulsanduleac.com"><img src="https://avatars.githubusercontent.com/u/67867?v=4?s=100" width="100px;" alt="Paul Sanduleac"/><br /><sub><b>Paul Sanduleac</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=paulsanduleac" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

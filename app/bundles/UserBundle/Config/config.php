@@ -114,11 +114,6 @@ return [
     ],
 
     'services' => [
-        'controllers' => [
-            \Mautic\UserBundle\Controller\SecurityController::class => [
-                'class' => \Mautic\UserBundle\Controller\SecurityController::class,
-            ],
-        ],
         'other' => [
             // Authentication
             'mautic.user.manager' => [

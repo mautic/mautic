@@ -3,20 +3,19 @@
 namespace Mautic\NotificationBundle\Controller;
 
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\PageEvents;
 
 class PopupController extends CommonController
 {
-    public function indexAction()
+    public function indexAction(AssetsHelper $assetsHelper)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->container->get('templating.helper.assets');
         $assetsHelper->addStylesheet('/app/bundles/NotificationBundle/Assets/css/popup/popup.css');
 
         $response = $this->render(
-            'MauticNotificationBundle:Popup:index.html.twig',
+            '@MauticNotification/Popup/index.html.twig',
             [
                 'siteUrl' => $this->coreParametersHelper->get('site_url'),
             ]
