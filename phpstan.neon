@@ -22,6 +22,7 @@ parameters:
 		- app/bundles/CoreBundle/Controller/AbstractStandardFormController.php
 		- app/bundles/CoreBundle/Entity/TranslationEntityTrait.php
 		- app/bundles/CoreBundle/Entity/VariantEntityTrait.php
+		- app/bundles/CoreBundle/Model/VariantModelTrait.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX
