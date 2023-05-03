@@ -4,7 +4,11 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\DynamicContentBundle\Entity\DynamicContent;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\PageBundle\Entity\Page;
 
 trait VariantEntityTrait
 {
@@ -14,7 +18,7 @@ trait VariantEntityTrait
     private $variantChildren;
 
     /**
-     * @var Page
+     * @var Page|null
      **/
     private $variantParent;
 
@@ -109,9 +113,9 @@ trait VariantEntityTrait
     /**
      * Get variantParent.
      *
-     * @return $this
+     * @return Page|null
      */
-    public function getVariantParent()
+    public function getVariantParent(): Page|null
     {
         return $this->variantParent;
     }
@@ -220,7 +224,7 @@ trait VariantEntityTrait
      *
      * @return array[$parent, $children]
      */
-    public function getVariants()
+    public function getVariants(): array|Entity
     {
         $parent = $this->getVariantParent();
         if (empty($parent)) {
