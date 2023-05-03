@@ -102,14 +102,6 @@ trait MatchFilterForLeadTrait
                         $filterVal = explode('|', $filterVal);
                     }
                     break;
-                default:
-                    if (is_numeric($leadVal)) {
-                        $leadVal   = (int) $leadVal;
-                    }
-                    if (is_numeric($filterVal)) {
-                        $filterVal = (int) $filterVal;
-                    }
-                    break;
             }
 
             switch ($data['operator']) {
