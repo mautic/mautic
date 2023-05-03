@@ -41,7 +41,7 @@ class AjaxController extends CommonAjaxController
      */
     public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory)
     {
-        $data      = $request->request->get('widget');
+        $data      = $request->request->all()['widget'] ?? [];
         $dataArray = ['success' => 0];
 
         // Clear params if type is not selected

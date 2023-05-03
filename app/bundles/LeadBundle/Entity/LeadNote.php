@@ -35,7 +35,7 @@ class LeadNote extends FormEntity
     private $type = 'general';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateTime;
 

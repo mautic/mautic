@@ -51,7 +51,7 @@ class AuditLog
     protected $details = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 
@@ -251,7 +251,7 @@ class AuditLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

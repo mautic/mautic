@@ -549,8 +549,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', 'DESC')
-            ->addOrderBy('c.id', 'DESC');
+            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
 
         $entities = $q->getQuery()
             ->getResult();

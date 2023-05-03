@@ -103,7 +103,7 @@ class InstallService
         if ((empty($params)
                 || !isset($params['db_driver'])
                 || empty($params['db_driver'])) && $index > 1) {
-            return $this->configurator->getStep(self::DOCTRINE_STEP);
+            return $this->configurator->getStep(self::DOCTRINE_STEP)[0];
         }
 
         return $this->configurator->getStep($index)[0];

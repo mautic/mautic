@@ -4,6 +4,7 @@ namespace Mautic\ApiBundle\Controller;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\Exclusion\ExclusionStrategyInterface;
@@ -165,13 +166,16 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
 
     private AppVersion $appVersion;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, AppVersion $appVersion, RequestStack $requestStack)
+    protected ManagerRegistry $doctrine;
+
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine)
     {
         $this->security           = $security;
         $this->translator         = $translator;
         $this->entityResultHelper = $entityResultHelper;
         $this->appVersion         = $appVersion;
         $this->requestStack       = $requestStack;
+        $this->doctrine           = $doctrine;
     }
 
     /**
@@ -735,7 +739,7 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
     {
         unset($entities[$key]);
         if ($entity) {
-            $this->getDoctrine()->getManager()->detach($entity);
+            $this->doctrine->getManager()->detach($entity);
         }
 
         $errors[$key] = [

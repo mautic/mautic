@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\DashboardBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -88,7 +89,7 @@ class DashboardControllerTest extends \PHPUnit\Framework\TestCase
         $this->sessionMock        = $this->createMock(Session::class);
         $this->flashBagMock       = $this->createMock(FlashBag::class);
         $this->containerMock      = $this->createMock(Container::class);
-        $this->controller         = new DashboardController($this->securityMock, $this->createMock(UserHelper::class));
+        $this->controller         = new DashboardController($this->securityMock, $this->createMock(UserHelper::class), $this->createMock(ManagerRegistry::class));
         $requestStack             = new RequestStack();
         $requestStack->push($this->requestMock);
         $this->controller->setRequestStack($requestStack);
