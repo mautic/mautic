@@ -191,11 +191,16 @@ class LegacyEventDispatcherTest extends TestCase
                 [$this->isInstanceOf(ExecutedBatchEvent::class), CampaignEvents::ON_EVENT_EXECUTED_BATCH]
             )
             ->willReturnOnConsecutiveCalls(
-                $this->returnCallback(
-                    function (CampaignExecutionEvent $event, string $eventName) {
-                        $event->setResult(['foo' => 'bar']);
-                    }
-                )
+              $this->returnCallback(
+                function (CampaignExecutionEvent $event, string $eventName) {
+                    $event->setResult(['foo' => 'bar']);
+
+                    return $event;
+                }
+              ),
+              $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+              $this->returnCallback(fn (ExecutedEvent $event)          => $event),
+              $this->returnCallback(fn (ExecutedBatchEvent $event)     => $event),
             );
 
         $this->getLegacyEventDispatcher()->dispatchCustomEvent($this->config, $logs, false, $this->pendingEvent);
@@ -237,10 +242,14 @@ class LegacyEventDispatcherTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    function ($event, string $eventName) {
+                    function (CampaignExecutionEvent $event, string $eventName) {
                         $event->setResult(false);
+
+                        return $event;
                     }
-                )
+                ),
+              $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+              $this->returnCallback(fn (FailedEvent $event)            => $event),
             );
 
         $this->scheduler->expects($this->once())
@@ -287,8 +296,12 @@ class LegacyEventDispatcherTest extends TestCase
                 $this->returnCallback(
                     function (CampaignExecutionEvent $event, string $eventName) {
                         $event->setResult(['result' => false, 'foo' => 'bar']);
+
+                        return $event;
                     }
-                )
+                ),
+              $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+              $this->returnCallback(fn (FailedEvent $event)            => $event),
             );
 
         $this->scheduler->expects($this->once())
@@ -324,9 +337,14 @@ class LegacyEventDispatcherTest extends TestCase
         $this->dispatcher->method('dispatch')
             ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
-                $this->returnCallback(
-                    fn (CampaignExecutionEvent $event) => $event->setResult(['failed' => 1, 'reason' => 'because'])
-                )
+                $this->returnCallback(function (CampaignExecutionEvent $event, string $eventName): object {
+                    $event->setResult(['failed' => 1, 'reason' => 'because']);
+
+                    return $event;
+                }),
+                $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+                $this->returnCallback(fn (ExecutedEvent $event)          => $event),
+                $this->returnCallback(fn (ExecutedBatchEvent $event)     => $event),
             );
 
         $this->scheduler->expects($this->never())
@@ -363,8 +381,14 @@ class LegacyEventDispatcherTest extends TestCase
             ->withConsecutive([$this->isInstanceOf(CampaignExecutionEvent::class), 'something'])
             ->willReturnOnConsecutiveCalls(
                 $this->returnCallback(
-                    fn (CampaignExecutionEvent $event) => $event->setResult(true)
-                )
+                  function (CampaignExecutionEvent $event, $eventName) {
+                      $event->setResult(true);
+
+                      return $event;
+                  }),
+              $this->returnCallback(fn (CampaignExecutionEvent $event) => $event),
+              $this->returnCallback(fn (ExecutedEvent $event)          => $event),
+              $this->returnCallback(fn (ExecutedBatchEvent $event)     => $event),
             );
 
         $this->scheduler->expects($this->never())

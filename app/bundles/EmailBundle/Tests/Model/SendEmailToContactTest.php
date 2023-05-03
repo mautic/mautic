@@ -383,6 +383,8 @@ class SendEmailToContactTest extends \PHPUnit\Framework\TestCase
                     $tokens['{hash}'] = $event->getIdHash();
 
                     $event->addTokens($tokens);
+
+                    return $event;
                 }
             );
         $factoryMock->method('getDispatcher')

@@ -253,11 +253,11 @@ class ReportSubscriberTest extends TestCase
 
         $mockStmt = $this->getMockBuilder(PDOStatement::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['fetchAll'])
+            ->onlyMethods(['fetchAllAssociative'])
             ->getMock();
 
         $mockStmt->expects($this->exactly(2))
-            ->method('fetchAll')
+            ->method('fetchAllAssociative')
             ->willReturn(
                 [
                     [

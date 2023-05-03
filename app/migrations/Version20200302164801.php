@@ -3,7 +3,6 @@
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Mautic\CoreBundle\Doctrine\AbstractMauticMigration;
@@ -27,8 +26,8 @@ class Version20200302164801 extends AbstractMauticMigration
         ";
 
         $stmt = $this->connection->prepare($sql);
-        $stmt->execute();
-        $found = (bool) $stmt->fetch(FetchMode::ASSOCIATIVE);
+        $stmt->executeQuery();
+        $found = (bool) $stmt->fetchAssociative();
 
         if (!$found) {
             throw new SkipMigration('Schema includes this migration');

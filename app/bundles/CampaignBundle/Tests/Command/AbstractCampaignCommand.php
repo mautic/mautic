@@ -104,7 +104,7 @@ class AbstractCampaignCommand extends MauticMysqlTestCase
             ->where('log.campaign_id = 1')
             ->andWhere('log.event_id IN ('.implode(',', $ids).')')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $byEvent = [];
         foreach ($ids as $id) {
