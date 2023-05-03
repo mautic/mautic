@@ -10,13 +10,13 @@ use PHPUnit\Framework\TestCase;
 
 class MatchFilterForLeadTraitTest extends TestCase
 {
-    /** @var mixed[] $lead  */
+    /** @var mixed[] */
     private array $lead = [
         'id'     => 1,
         'custom' => 'my custom text',
     ];
 
-    /** @var mixed[] $filter  */
+    /** @var mixed[] */
     private $filter = [
         0 => [
             'display' => null,
@@ -85,7 +85,7 @@ class MatchFilterForLeadTraitTest extends TestCase
     /**
      * @dataProvider dateMatchTestProvider
      */
-    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect):void
+    public function testMatchFilterForLeadTraitForDate(?string $value, string $operator, bool $expect): void
     {
         $filters = [
             [
