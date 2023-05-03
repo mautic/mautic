@@ -2,6 +2,7 @@
 
 namespace Mautic\NotificationBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -27,11 +28,11 @@ class NotificationApiController extends CommonApiController
      */
     protected $contactTracker;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, ContactTracker $contactTracker, RequestStack $requestStack)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, ContactTracker $contactTracker, RequestStack $requestStack, ManagerRegistry $doctrine)
     {
         $this->contactTracker = $contactTracker;
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
     }
 
     public function initialize(ControllerEvent $event)
