@@ -38,9 +38,6 @@ $parameterLoader         = new \Mautic\CoreBundle\Loader\ParameterLoader();
 $configParameterBag      = $parameterLoader->getParameterBag();
 $localConfigParameterBag = $parameterLoader->getLocalParameterBag();
 
-// Set template engines
-$engines = ['php', 'twig'];
-
 // Decide on secure cookie based on site_url setting or the request if in installer
 // This cannot be set dynamically
 
@@ -62,16 +59,6 @@ $container->loadFromExtension('framework', [
     'csrf_protection' => true,
     'validation'      => [
         'enable_annotations' => false,
-    ],
-    'templating' => [
-        'engines' => $engines,
-        'form'    => [
-            'resources' => [
-                // Custom form theme has been moved into CoreBundle/Resources/views/FormTheme/mautic_form_layout.html.tiwg
-                // Once PHP engine has been removed, these no longer apply
-                //'MauticCoreBundle:FormTheme\\Custom',
-            ],
-        ],
     ],
     'default_locale' => '%mautic.locale%',
     'translator'     => [
@@ -189,10 +176,14 @@ $container->loadFromExtension('doctrine', [
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'        => '%kernel.project_dir%/app/migrations',
-    'namespace'       => 'Mautic\\Migrations',
-    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
-    'name'            => 'Mautic Migrations',
+    'migrations_paths' => [
+        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+    ],
+    'storage' => [
+        'table_storage' => [
+            'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+        ],
+    ],
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
@@ -283,6 +274,11 @@ $container->loadFromExtension('framework', [
             'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
         ],
     ],
+]);
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'exception_controller' => null,
 ]);
 
 $rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');

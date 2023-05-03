@@ -3,7 +3,7 @@
         <table class="table table-hover table-striped table-bordered tweet-list" id="tweetTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#tweetTable',
                         'langVar': 'mautic.social.tweets',
@@ -13,7 +13,7 @@
                         },
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'social.tweet',
                         'orderBy': 'e.name',
                         'text': 'mautic.core.name',
@@ -21,7 +21,7 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'social.tweet',
                         'orderBy': 'e.id',
                         'text': 'mautic.core.id',
@@ -33,7 +33,7 @@
             {% for item in items %}
                 <tr>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
                                     'edit': securityIsGranted('mauticSocial:tweet:edit'),
@@ -46,7 +46,7 @@
                     </td>
                     <td>
                         <div>
-                            {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {
+                            {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                                     'item': item,
                                     'model': 'social.tweet',
                             }) }}
@@ -67,7 +67,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
                 'totalItems': items|length,
                 'page': page,
                 'limit': limit,

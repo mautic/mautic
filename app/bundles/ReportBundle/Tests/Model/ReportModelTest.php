@@ -13,6 +13,7 @@ use Mautic\ReportBundle\Model\ExcelExporter;
 use Mautic\ReportBundle\Model\ReportModel;
 use Mautic\ReportBundle\Tests\Fixtures;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Twig\Environment;
 
 class ReportModelTest extends \PHPUnit\Framework\TestCase
@@ -30,9 +31,9 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
         $this->reportModel = new ReportModel(
             $this->createMock(CoreParametersHelper::class),
             $this->createMock(Environment::class),
-            $this->createMock(ChannelListHelper::class),
+            new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class)),
             $fieldModelMock,
-            $this->createMock(ReportHelper::class),
+            new ReportHelper(),
             $this->createMock(CsvExporter::class),
             $this->createMock(ExcelExporter::class)
         );
@@ -43,6 +44,8 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
                 function (ReportBuilderEvent $event) {
                     $reportBuilderData = Fixtures::getReportBuilderEventData();
                     $event->addTable('assets', $reportBuilderData['all']['tables']['assets']);
+
+                    return $event;
                 }
             );
         $this->reportModel->setDispatcher($mockDispatcher);

@@ -14,7 +14,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Menu\MenuHelper;
 use Mautic\CoreBundle\Service\FlashBag;
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Event\LoginEvent;
@@ -182,6 +182,7 @@ class CoreSubscriber implements EventSubscriberInterface
 
         $session = $event->getRequest()->getSession();
         if ($this->securityContext->isGranted('IS_AUTHENTICATED_FULLY') || $this->securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            /** @var User $user */
             $user = $event->getAuthenticationToken()->getUser();
 
             //set a session var for filemanager to know someone is logged in
@@ -224,17 +225,16 @@ class CoreSubscriber implements EventSubscriberInterface
     {
         $controller = $event->getController();
 
+        if ($controller instanceof \Closure) {
+            $controller = [$controller()];
+        }
+
         if (!is_array($controller)) {
             return;
         }
 
         //only affect Mautic controllers
         if ($controller[0] instanceof MauticController) {
-            $request = $event->getRequest();
-
-            //also set the request for easy access throughout controllers
-            $controller[0]->setRequest($request);
-
             // set the factory for easy use access throughout the controllers
             // @deprecated To be removed in 3.0
             $controller[0]->setFactory($this->factory);

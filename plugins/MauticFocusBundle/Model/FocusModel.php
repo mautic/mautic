@@ -18,6 +18,7 @@ use MauticPlugin\MauticFocusBundle\Event\FocusEvent;
 use MauticPlugin\MauticFocusBundle\FocusEvents;
 use MauticPlugin\MauticFocusBundle\Form\Type\FocusType;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -96,14 +97,13 @@ class FocusModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @throws NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Focus) {
             throw new MethodNotAllowedHttpException(['Focus']);

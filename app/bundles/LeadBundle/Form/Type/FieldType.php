@@ -465,7 +465,7 @@ class FieldType extends AbstractType
                     'choice_label'  => 'label',
                     'label_attr'    => ['class' => 'control-label'],
                     'attr'          => ['class' => 'form-control'],
-                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', 'ASC'),
+                    'query_builder' => fn (EntityRepository $er) => $er->createQueryBuilder('f')->orderBy('f.order', \Doctrine\Common\Collections\Criteria::ASC),
                     'required'      => false,
                 ]
             )->addModelTransformer($transformer)

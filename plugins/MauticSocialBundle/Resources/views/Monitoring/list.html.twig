@@ -1,13 +1,13 @@
 {% set isIndex = 'index' == tmpl ? true : false %}
 {% set tmpl = 'list' %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent 'monitoring' %}
 
 {% block headerTitle %}{{ 'mautic.social.monitoring'|trans }}{% endblock %}
 
 {% block actions %}
-    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'templateButtons': {
                 'new': securityIsGranted('mauticSocial:monitoring:create'),
             },
@@ -19,7 +19,7 @@
 {% block content %}
   {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
-        {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue,
                 'action': currentRoute,
         }) }}

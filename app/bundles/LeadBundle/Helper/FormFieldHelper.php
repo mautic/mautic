@@ -122,7 +122,7 @@ class FormFieldHelper extends AbstractFormFieldHelper
      * @param $type
      * @param $properties
      *
-     * @return bool
+     * @return array{0: bool, 1:string}
      */
     public static function validateProperties($type, &$properties)
     {

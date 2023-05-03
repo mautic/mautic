@@ -24,19 +24,19 @@
 </div>
 <div class="np panel-body tab-content">
     <div class="pa-20 tab-pane active" id="TwitterProfile">
-        {{ include('MauticSocialBundle:Integration:Twitter/Profile/profile.html.twig', {
+        {{ include('@MauticSocial/Integration/Twitter/Profile/profile.html.twig', {
             'lead': lead,
             'profile': details.profile,
         }) }}
     </div>
     <div class="tab-pane" id="TwitterTweets">
-        {{ include('MauticSocialBundle:Integration:Twitter/Profile/tweets.html.twig', {
+        {{ include('@MauticSocial/Integration/Twitter/Profile/tweets.html.twig', {
             'lead': lead,
             'activity': details.activity.tweets|default([]),
         }) }}
     </div>
     <div class="pa-20 tab-pane" id="TwitterPhotos">
-        {{ include('MauticSocialBundle:Integration:Twitter/Profile/photos.html.twig', {
+        {{ include('@MauticSocial/Integration/Twitter/Profile/photos.html.twig', {
             'lead': lead,
              'activity': details.activity.photos|default([]),
         }) }}

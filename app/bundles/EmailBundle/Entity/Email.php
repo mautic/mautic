@@ -112,12 +112,12 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $emailType = 'template';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 

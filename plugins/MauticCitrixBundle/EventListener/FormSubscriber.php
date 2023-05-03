@@ -506,7 +506,7 @@ class FormSubscriber implements EventSubscriberInterface
             $event->addFormField('plugin.citrix.select.'.$product, [
                 'label'    => 'plugin.citrix.'.$product.'.listfield',
                 'formType' => CitrixListType::class,
-                'template' => 'MauticCitrixBundle:Field:citrixlist.html.twig',
+                'template' => '@MauticCitrix/Field/citrixlist.html.twig',
                 'listType' => $product,
             ]);
 

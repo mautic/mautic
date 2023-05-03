@@ -25,6 +25,7 @@ use Mautic\LeadBundle\Form\Type\FieldType;
 use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Mautic\LeadBundle\LeadEvents;
 use RuntimeException;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -484,10 +485,7 @@ class FieldModel extends FormModel
         $this->leadFieldSaver             = $leadFieldSaver;
     }
 
-    /**
-     * @return LeadFieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadFieldRepository
     {
         return $this->leadFieldRepository;
     }
@@ -780,7 +778,6 @@ class FieldModel extends FormModel
      * {@inheritdoc}
      *
      * @param       $entity
-     * @param       $formFactory
      * @param null  $action
      * @param array $options
      *
@@ -788,7 +785,7 @@ class FieldModel extends FormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadField) {
             throw new MethodNotAllowedHttpException(['LeadField']);
@@ -804,7 +801,7 @@ class FieldModel extends FormModel
     /**
      * @param $properties
      *
-     * @return bool
+     * @return string|true
      */
     public function setFieldProperties(LeadField $entity, array $properties)
     {

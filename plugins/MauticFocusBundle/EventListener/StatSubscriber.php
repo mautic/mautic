@@ -61,7 +61,7 @@ class StatSubscriber implements EventSubscriberInterface
     public function onFormSubmit(SubmissionEvent $event)
     {
         // Check the request for a focus field
-        $mauticform = $this->requestStack->getCurrentRequest()->request->get('mauticform', []);
+        $mauticform = $this->requestStack->getCurrentRequest()->request->get('mauticform') ?? [];
         $id         = $mauticform['focusId'] ?? false;
 
         if (!empty($id)) {
