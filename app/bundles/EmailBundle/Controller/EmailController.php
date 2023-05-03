@@ -1543,16 +1543,25 @@ class EmailController extends FormController
         $objectId,
         $page = 1
     ) {
+        $contactFilter = null;
+        if ($this->get('mautic.security')->isGranted('lead:leads:viewown') && !$this->get('mautic.security')->isGranted('lead:leads:viewother')) 
+        {
+
+            $me = $this->get('security.token_storage')->getToken()->getUser();
+            $contactFilter = ['l.owner_id' => $me->getId()];
+        }
+
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,
             $objectId,
             $page,
-            ['email:emails:viewown', 'email:emails:viewother'],
+            ['email:emails:viewown'],
             'email',
             'email_stats',
             'email',
-            'email_id'
+            'email_id',
+            $contactFilter
         );
     }
 
