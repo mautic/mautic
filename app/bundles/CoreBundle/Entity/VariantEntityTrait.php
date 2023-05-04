@@ -13,12 +13,12 @@ use Mautic\PageBundle\Entity\Page;
 trait VariantEntityTrait
 {
     /**
-     * @var ArrayCollection<mixed>
+     * @var mixed
      **/
     private $variantChildren;
 
     /**
-     * @var Page|null
+     * @var mixed
      **/
     private $variantParent;
 
@@ -85,7 +85,7 @@ trait VariantEntityTrait
     /**
      * Get variantChildren.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return mixed
      */
     public function getVariantChildren()
     {
@@ -113,9 +113,9 @@ trait VariantEntityTrait
     /**
      * Get variantParent.
      *
-     * @return Page|null
+     * @return mixed
      */
-    public function getVariantParent(): Page|null
+    public function getVariantParent()
     {
         return $this->variantParent;
     }
@@ -222,9 +222,9 @@ trait VariantEntityTrait
      * Get the variant parent/children.
      **.
      *
-     * @return array[$parent, $children]
+     * @return array<mixed>
      */
-    public function getVariants(): array|Entity
+    public function getVariants(): array
     {
         $parent = $this->getVariantParent();
         if (empty($parent)) {

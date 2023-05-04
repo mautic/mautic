@@ -16,12 +16,12 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * \Doctrine\Common\Collections\Collection&iterable<\Mautic\EmailBundle\Entity\Email | \Mautic\PageBundle\Entity\Page>.
+     * @var mixed
      **/
     private $translationChildren;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page|\Mautic\DynamicContentBundle\Entity\DynamicContent|null
+     * @var mixed
      **/
     private $translationParent;
 
@@ -104,7 +104,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getTranslationParent()
     {
