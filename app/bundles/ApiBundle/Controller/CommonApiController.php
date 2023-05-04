@@ -2,6 +2,7 @@
 
 namespace Mautic\ApiBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\View\View;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
@@ -53,9 +54,9 @@ class CommonApiController extends FetchCommonApiController
 
     protected FormFactoryInterface $formFactory;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, ManagerRegistry $doctrine)
     {
-        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $appVersion, $requestStack, $doctrine);
 
         $this->router      = $router;
         $this->formFactory = $formFactory;
@@ -97,7 +98,7 @@ class CommonApiController extends FetchCommonApiController
             }
 
             $this->model->deleteEntity($entity);
-            $this->getDoctrine()->getManager()->detach($entity);
+            $this->doctrine->getManager()->detach($entity);
         }
 
         if (!empty($errors)) {
@@ -415,7 +416,7 @@ class CommonApiController extends FetchCommonApiController
             $errors[$key] = $formResponse;
         }
 
-        $this->getDoctrine()->getManager()->detach($entity);
+        $this->doctrine->getManager()->detach($entity);
 
         $this->inBatchMode = false;
     }
@@ -576,7 +577,7 @@ class CommonApiController extends FetchCommonApiController
     protected function setCategory($entity, $categoryId)
     {
         if (!empty($categoryId) && method_exists($entity, 'setCategory')) {
-            $category = $this->getDoctrine()->getManager()->find(Category::class, $categoryId);
+            $category = $this->doctrine->getManager()->find(Category::class, $categoryId);
 
             if (null === $category) {
                 throw new \UnexpectedValueException("Category $categoryId does not exist");

@@ -1328,16 +1328,16 @@
         },
         {
             "name": "doctrine/collections",
-            "version": "1.7.2",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/collections.git",
-                "reference": "3fe77330f5591108bbf1315da7377a7e704ed8a0"
+                "reference": "2b44dd4cbca8b5744327de78bafef5945c7e7b5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/collections/zipball/3fe77330f5591108bbf1315da7377a7e704ed8a0",
-                "reference": "3fe77330f5591108bbf1315da7377a7e704ed8a0",
+                "url": "https://api.github.com/repos/doctrine/collections/zipball/2b44dd4cbca8b5744327de78bafef5945c7e7b5e",
+                "reference": "2b44dd4cbca8b5744327de78bafef5945c7e7b5e",
                 "shasum": ""
             },
             "require": {
@@ -1392,9 +1392,9 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/collections/issues",
-                "source": "https://github.com/doctrine/collections/tree/1.7.2"
+                "source": "https://github.com/doctrine/collections/tree/1.8.0"
             },
-            "time": "2022-08-27T16:08:58+00:00"
+            "time": "2022-09-01T20:12:10+00:00"
         },
         {
             "name": "doctrine/common",
