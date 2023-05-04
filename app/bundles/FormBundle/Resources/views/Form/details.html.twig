@@ -13,14 +13,14 @@
     - formContent
     - availableActions
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}form{% endblock %}
 
 {% block headerTitle %}{{ activeForm.name }}{% endblock %}
 
 {% block actions %}
-    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'item': activeForm,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['form:forms:editown'], permissions['form:forms:editother'], activeForm.createdBy),
@@ -54,7 +54,7 @@
 {% endblock %}
 
 {% block publishStatus %}
-    {{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': activeForm}) }}
+    {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': activeForm}) }}
 {% endblock %}
 
 {% block content %}
@@ -80,7 +80,7 @@
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': activeForm}) }}
+                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': activeForm}) }}
                             <tr>
                                 <td width="20%">
                                     <span class="fw-b">{{ 'mautic.form.stats.submission_counts'|trans }}</span>
@@ -121,11 +121,11 @@
                                     </h5>
                                 </div>
                                 <div class="col-xs-6 va-m">
-                                    {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
+                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': stats['submissionsInTime'], 'chartType': 'line', 'chartHeight': 300}) }}
                             </div>
                         </div>
                     </div>
@@ -196,14 +196,14 @@
                     {% for field in activeFormFields %}
                       {% if not field.parent %}
                       <li class="list-group-item bg-auto bg-light-xs mt-10">
-                          {{ include('MauticFormBundle:Form:_details_fields_list.html.twig', {'field': field}) }}
+                          {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': field}) }}
                       </li>
                       {% endif %}
                       {# @var \Mautic\FormBundle\Entity\Field $field #}
                       {% for fieldChild in activeFormFields %}
                           {% if fieldChild.parent == field.id %}
                               <li class="list-group-item bg-auto bg-light-xs ml-20">
-                                  {{ include('MauticFormBundle:Form:_details_fields_list.html.twig', {'field': fieldChild}) }}
+                                  {{ include('@MauticForm/Form/_details_fields_list.html.twig', {'field': fieldChild}) }}
                               </li>
                           {% endif %}
                       {% endfor %}

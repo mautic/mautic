@@ -32,7 +32,7 @@ class ConfigSubscriber implements EventSubscriberInterface
             'bundle'     => 'LeadBundle',
             'formAlias'  => 'leadconfig',
             'formType'   => ConfigType::class,
-            'formTheme'  => 'MauticLeadBundle:FormTheme:Config/_config_companyconfig_widget.html.twig',
+            'formTheme'  => '@MauticLead/FormTheme/Config/_config_companyconfig_widget.html.twig',
             'parameters' => $leadParameters,
         ]);
 

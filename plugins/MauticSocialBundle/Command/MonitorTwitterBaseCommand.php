@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticSocialBundle\Command;
 
+use function assert;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
@@ -128,7 +129,7 @@ abstract class MonitorTwitterBaseCommand extends Command
     /**
      * Used in various areas to set name of the network being searched.
      *
-     * @return string twitter|facebook|linkedin etc..
+     * @return string twitter|facebook etc..
      */
     abstract public function getNetworkName();
 
@@ -146,17 +147,20 @@ abstract class MonitorTwitterBaseCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->input      = $input;
-        $this->output     = $output;
-        $this->maxRuns    = $this->input->getOption('max-runs');
-        $this->queryCount = $this->input->getOption('query-count');
-        $this->twitter    = $this->integrationHelper->getIntegrationObject('Twitter');
+        $this->input        = $input;
+        $this->output       = $output;
+        $this->maxRuns      = $this->input->getOption('max-runs');
+        $this->queryCount   = $this->input->getOption('query-count');
+        $twitterIntegration = $this->integrationHelper->getIntegrationObject('Twitter');
 
-        if (false === $this->twitter || false === $this->twitter->getIntegrationSettings()->getIsPublished()) {
+        if (false === $twitterIntegration || false === $twitterIntegration->getIntegrationSettings()->getIsPublished()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.published'));
 
             return 1;
         }
+
+        assert($twitterIntegration instanceof TwitterIntegration);
+        $this->twitter = $twitterIntegration;
 
         if (!$this->twitter->isAuthorized()) {
             $this->output->writeln($this->translator->trans('mautic.social.monitoring.twitter.not.configured'));

@@ -212,7 +212,7 @@
 {% set optionLabelAttr = optionLabelAttr|merge({
         'class': optionLabelAttr.class|default([])|merge([defaultOptionLabelClass]),
 }) %}
-{% if 'class' in field.properties.labelAttributes %}
+{% if 'class' in field.properties.labelAttributes|default('') %}
   {% set wrapDiv = false %}
 {% endif %}
 {% set firstId = 'mauticform_' ~ containerType ~ '_' ~ type ~ '_' ~ field.alias ~ '_' ~ inputAlphanum(inputTransliterate(firstListValue|default(null))) ~ '1' %}

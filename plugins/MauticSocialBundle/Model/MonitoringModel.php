@@ -31,26 +31,25 @@ class MonitoringModel extends FormModel
     ];
 
     /**
-     * @param object               $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null          $action
-     * @param mixed[]              $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param mixed[]     $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $params = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Monitoring) {
             throw new MethodNotAllowedHttpException(['Monitoring']);
         }
 
         if (!empty($action)) {
-            $params['action'] = $action;
+            $options['action'] = $action;
         }
 
-        return $formFactory->create(MonitoringType::class, $entity, $params);
+        return $formFactory->create(MonitoringType::class, $entity, $options);
     }
 
     /**

@@ -3,7 +3,7 @@
         <table class="table table-hover table-striped table-bordered monitoring-list" id="monitoringTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#monitoringTable',
                         'langVar': 'mautic.social.monitoring',
@@ -13,7 +13,7 @@
                         },
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'social.monitoring',
                         'orderBy': 'e.title',
                         'text': 'mautic.core.title',
@@ -21,7 +21,7 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'social.monitoring',
                         'orderBy': 'e.id',
                         'text': 'mautic.core.id',
@@ -33,7 +33,7 @@
                 {% for k, item in items %}
                     <tr>
                         <td>
-                            {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                            {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                     'item': item,
                                     'templateButtons': {
                                         'edit': securityIsGranted('mauticSocial:monitoring:edit'),
@@ -46,7 +46,7 @@
                         </td>
                         <td>
                             <div>
-                                {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {
+                                {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                                         'item': item,
                                         'model': 'social.monitoring',
                                 }) }}
@@ -67,7 +67,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{ include('@MauticCore/Helper/pagination.html.twig', {
                 'totalItems': items|length,
                 'page': page,
                 'limit': limit,
@@ -78,7 +78,7 @@
         }) }}
     </div>
 {% else %}
-    {{ include('MauticCoreBundle:Helper:noresults.html.twig', {'tip': 'mautic.mautic.social.monitoring.noresults.tip'}) }}
+    {{ include('@MauticCore/Helper/noresults.html.twig', {'tip': 'mautic.mautic.social.monitoring.noresults.tip'}) }}
 {% endif %}
 
 {{ include('@MauticCore/Helper/modal.html.twig', {

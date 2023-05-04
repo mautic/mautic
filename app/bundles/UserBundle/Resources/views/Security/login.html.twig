@@ -1,4 +1,4 @@
-{% extends app.request.xmlHttpRequest ? 'MauticCoreBundle:Default:content.html.twig' : '@MauticUser/Security/base.html.twig' %}
+{% extends app.request.xmlHttpRequest ? '@MauticCore/Default/content.html.twig' : '@MauticUser/Security/base.html.twig' %}
 {% block header %}{% trans %}mautic.user.auth.header{% endtrans %}{% endblock %}
 {% block headerTitle %}{% trans %}mautic.user.auth.expired.header{% endtrans %}{% endblock %}
 

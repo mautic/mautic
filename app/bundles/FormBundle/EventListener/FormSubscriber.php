@@ -113,7 +113,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'              => 'mautic.form.action.sendemail',
             'description'        => 'mautic.form.action.sendemail.descr',
             'formType'           => SubmitActionEmailType::class,
-            'formTheme'          => 'MauticFormBundle:FormTheme:FormAction/_formaction_properties_row.html.twig',
+            'formTheme'          => '@MauticForm/FormTheme/FormAction/_formaction_properties_row.html.twig',
             'formTypeCleanMasks' => [
                 'message' => 'html',
             ],

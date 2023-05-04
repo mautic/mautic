@@ -10,7 +10,7 @@
 {% set mauticTemplateVars = mauticTemplateVars|default([])|merge([{'item': item}]) %}
 <tr>
     <td>
-        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                 'item': item,
                 'templateButtons': {
                     'edit': securityHasEntityAccess(true, permissions['lead:lists:editother'], item.createdBy),

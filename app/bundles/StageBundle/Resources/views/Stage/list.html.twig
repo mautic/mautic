@@ -1,14 +1,14 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}stage{% endblock %}
 {% block headerTitle %}
 	{% trans %}mautic.stages.menu.root{% endtrans %}
 {% endblock %}
 
 {% block actions %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'templateButtons' : {
                 'new' : permissions['stage:stages:create'],
             },
@@ -19,7 +19,7 @@
 {% block content %}
 {% if isIndex %}
 <div class="panel panel-default bdr-t-wdh-0 mb-0">
-    {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig',
+    {{- include('@MauticCore/Helper/list_toolbar.html.twig',
         {
             'searchValue' : searchValue,
             'searchHelp'  : 'mautic.core.help.searchcommands',
@@ -40,7 +40,7 @@
         <table class="table table-hover table-striped table-bordered stage-list" id="stageTable">
             <thead>
             <tr>
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
+                {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'        : 'true',
                         'target'          : '#stageTable',
@@ -49,7 +49,7 @@
                             'delete' : permissions['stage:stages:delete'],
                         },
                     }) -}}
-                    {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
                         'orderBy'    : 's.name',
@@ -57,14 +57,14 @@
                         'class'      : 'col-stage-name',
                         'default'    : true,
                     }) -}}
-                    {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
                         'orderBy'    : 'c.title',
                         'text'       : 'mautic.core.category',
                         'class'      : 'visible-md visible-lg col-stage-category',
                     }) -}}
-                    {{- include('MauticCoreBundle:Helper:tableheader.html.twig',
+                    {{- include('@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'stage',
                         'orderBy'    : 's.id',
@@ -77,7 +77,7 @@
             {% for item in items %}
                 <tr>
                     <td>
-                    {{- include('MauticCoreBundle:Helper:list_actions.html.twig',
+                    {{- include('@MauticCore/Helper/list_actions.html.twig',
                             {
                                 'item'            : item,
                                 'templateButtons' : {
@@ -90,7 +90,7 @@
                     </td>
                     <td>
                         <div>
-                            {{- include('MauticCoreBundle:Helper:publishstatus_icon.html.twig',
+                            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig',
                                 {'item' : item, 'model' : 'stage'}) -}}
                             {% if permissions['stage:stages:edit'] %}
                             <a href="{{ url(
@@ -126,7 +126,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{- include('MauticCoreBundle:Helper:pagination.html.twig',
+        {{- include('@MauticCore/Helper/pagination.html.twig',
             {
                 'totalItems' : items|length,
                 'page'       : page,

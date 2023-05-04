@@ -14,7 +14,7 @@
     - inBuilder
     - mappedFields
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}form{% endblock %}
 
@@ -68,7 +68,7 @@
                           </div>
                       </div>
                       <div class="tab-pane fade bdr-w-0" id="fields-container">
-                          {{ include('MauticFormBundle:Builder:_style.html.twig') }}
+                          {{ include('@MauticForm/Builder/_style.html.twig') }}
                           <div id="mauticforms_fields">
                               <div class="row">
                                   <div class="available-fields mb-md col-sm-4">
@@ -103,9 +103,9 @@
                                               {% set params = field.customParameters %}
                                               {% set template = params.template %}
                                           {% else %}
-                                              {% set template = 'MauticFormBundle:Field:' ~ field.type ~ '.html.twig' %}
+                                              {% set template = '@MauticForm/Field/' ~ field.type ~ '.html.twig' %}
                                           {% endif %}
-                                          {{ include('MauticFormBundle:Builder:_field_wrapper.html.twig', {
+                                          {{ include('@MauticForm/Builder/_field_wrapper.html.twig', {
                                                   'template': template,
                                                   'field': field,
                                                   'viewOnlyFields': viewOnlyFields,
@@ -148,7 +148,7 @@
                                                   {% endif %}
                                                   <optgroup class="{{ class }}" label="{{ group|trans }}"></optgroup>
                                                   {% for k, e in groupActions %}
-                                                      {{ include('MauticFormBundle:Action:_option.html.twig', {
+                                                      {{ include('@MauticForm/Action/_option.html.twig', {
                                                               'action': e,
                                                               'type': k,
                                                               'isStandalone': activeForm.isStandalone,
@@ -162,7 +162,7 @@
                               <div class="drop-here">
                                 {% for action in formActions %}
                                     {% if action.id not in deletedActions %}
-                                        {% set template = actionSettings[action.type].template|default('MauticFormBundle:Action:_generic.html.twig') %}
+                                        {% set template = actionSettings[action.type].template|default('@MauticForm/Action/_generic.html.twig') %}
                                         {% set action = action|merge({
                                               'settings': actionSettings[action.type],
                                         }) %}
@@ -202,7 +202,7 @@
   {{ form_end(form) }}
 
   {% if activeForm.formType is null or (forceTypeSelection is defined and forceTypeSelection is not empty) %}
-      {{ include('MauticCoreBundle:Helper:form_selecttype.html.twig', {
+      {{ include('@MauticCore/Helper/form_selecttype.html.twig', {
               'item': activeForm,
               'mauticLang': {
                   'newStandaloneForm': 'mautic.form.type.standalone.header',

@@ -56,7 +56,7 @@ class FormSubscriber implements EventSubscriberInterface
             'label'             => 'mautic.email.form.action.sendemail.admin',
             'description'       => 'mautic.email.form.action.sendemail.admin.descr',
             'formType'          => FormSubmitActionUserEmailType::class,
-            'formTheme'         => 'MauticEmailBundle:FormTheme:FormAction/_formaction_properties_useremail_row.html.twig',
+            'formTheme'         => '@MauticEmail/FormTheme/FormAction/_formaction_properties_useremail_row.html.twig',
             'eventName'         => FormEvents::ON_EXECUTE_SUBMIT_ACTION,
             'allowCampaignForm' => true,
         ]);

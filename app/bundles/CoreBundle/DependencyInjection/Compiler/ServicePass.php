@@ -37,7 +37,7 @@ final class ServicePass implements CompilerPassInterface
                             $defaultTag = 'form.type';
                             break;
                         case 'helpers':
-                            $defaultTag = 'templating.helper';
+                            $defaultTag = 'twig.helper';
                             break;
                         case 'menus':
                             $defaultTag = 'knp_menu.menu';
@@ -261,7 +261,7 @@ final class ServicePass implements CompilerPassInterface
                 \Mautic\CoreBundle\Menu\MenuRenderer::class,
                 [
                     new Reference('knp_menu.matcher'),
-                    new Reference('mautic.helper.templating'),
+                    new Reference('twig'),
                     $options,
                 ]
             ))

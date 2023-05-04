@@ -42,7 +42,7 @@
             }]) %}
         {% endif %}
 
-        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+        {{ include('@MauticCore/Helper/list_actions.html.twig', {
             'item': item,
             'templateButtons': {
                 'edit': hasEditAccess,
@@ -54,7 +54,7 @@
         }) }}
     </td>
     {% for column, label in columns %}
-        {{ include(['MauticLeadBundle:Lead:_list_column_'~column~'.html.twig', '@MauticLead/Lead/_list_column_default.html.twig'], {
+        {{ include(['@MauticLead/Lead/_list_column_'~column~'.html.twig', '@MauticLead/Lead/_list_column_default.html.twig'], {
               'item': item,
               'fields': fields,
               'label': label,

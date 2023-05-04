@@ -2,10 +2,13 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UpdateHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Class UpdateController.
@@ -17,17 +20,14 @@ class UpdateController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction()
+    public function indexAction(UpdateHelper $updateHelper)
     {
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
         }
 
-        /** @var \Mautic\CoreBundle\Helper\UpdateHelper $updateHelper */
-        $updateHelper = $this->container->get('mautic.helper.update');
-        $updateData   = $updateHelper->fetchData();
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
+        $updateData           = $updateHelper->fetchData();
+        $coreParametersHelper = $this->coreParametersHelper;
 
         return $this->delegateView([
             'viewParameters' => [
@@ -35,7 +35,7 @@ class UpdateController extends CommonController
                 'currentVersion'    => MAUTIC_VERSION,
                 'isComposerEnabled' => $coreParametersHelper->get('composer_updates', false),
             ],
-            'contentTemplate' => 'MauticCoreBundle:Update:index.html.twig',
+            'contentTemplate' => '@MauticCore/Update/index.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'update',
                 'route'         => $this->generateUrl('mautic_core_update'),
@@ -46,7 +46,7 @@ class UpdateController extends CommonController
     /**
      * @return array|\Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function schemaAction()
+    public function schemaAction(Request $request, LoggerInterface $mauticLogger, KernelInterface $kernel)
     {
         if (!$this->user->isAdmin()) {
             return $this->accessDenied();
@@ -55,7 +55,7 @@ class UpdateController extends CommonController
         $result       = 0;
         $failed       = false;
         $noMigrations = true;
-        $iterator     = new \FilesystemIterator($this->container->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
+        $iterator     = new \FilesystemIterator($this->getParameter('kernel.project_dir').'/app/migrations', \FilesystemIterator::SKIP_DOTS);
 
         if (iterator_count($iterator)) {
             $args = ['console', 'doctrine:migrations:migrate', '--no-interaction', '--env='.MAUTIC_ENV];
@@ -65,7 +65,7 @@ class UpdateController extends CommonController
             }
 
             $input       = new ArgvInput($args);
-            $application = new Application($this->get('kernel'));
+            $application = new Application($kernel);
             $application->setAutoExit(false);
             $output = new BufferedOutput();
 
@@ -87,16 +87,12 @@ class UpdateController extends CommonController
             // Log the output
             $outputBuffer = trim(preg_replace('/\n\s*\n/s', ' \\ ', $outputBuffer));
             $outputBuffer = preg_replace('/\s\s+/', ' ', trim($outputBuffer));
-            $this->get('monolog.logger.mautic')->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
+            $mauticLogger->log('error', '[UPGRADE ERROR] Exit code '.$result.'; '.$outputBuffer);
 
             $failed = true;
-        } elseif ($this->request->get('update', 0)) {
+        } elseif ($request->get('update', 0)) {
             // This was a retry from the update so call up the finalizeAction to finish the process
-            $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
-                [
-                    'request' => $this->request,
-                ]
-            );
+            $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction');
         }
 
         return $this->delegateView([

@@ -1,11 +1,11 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block headerTitle %}{{ 'mautic.dashboard.header.index'|trans }}{% endblock %}
 
 {% block mauticContent %}dashboard{% endblock %}
 
 {% block actions %}
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
       'routeBase': 'dashboard',
       'langVar': 'dashboard',
       'customButtons': [

@@ -11,7 +11,7 @@
 {% set fieldKeys = fields|keys %}
 
 {% form_theme form with [
-    'MauticEmailBundle:FormTheme:Config/monitored_email_widget.html.twig',
+    '@MauticEmail/FormTheme/Config/monitored_email_widget.html.twig',
     '@MauticEmail/FormTheme/Config/monitored_mailboxes_widget.html.twig',
 ] %}
 
@@ -173,10 +173,6 @@
     <div class="panel-body">
         <div class="row">
             {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
-        </div>
-        <div class="row">
-            {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
-            {{ _self.row_if_exists(fields, 'resubscribe_message') }}
         </div>
         <div class="row">
             {{ _self.row_if_exists(fields, 'unsubscribe_message') }}

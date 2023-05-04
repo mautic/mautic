@@ -1,11 +1,11 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}Package{% endblock %}
 {% block headerTitle %}{{ 'marketplace.title'|trans|purify }}{% endblock %}
 {% block actions %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
     'customButtons' : {
         0: {
             'attr' : {
@@ -35,7 +35,7 @@
             </div>
         {% endif %}
         <div class="panel panel-default bdr-t-wdh-0 mb-0">
-            {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue' : searchValue,
                 'action'      : currentRoute,
             }) -}}
@@ -55,7 +55,7 @@
             <thead>
             <tr>
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'  : 'true',
                         'target'    : '#packages-table',
@@ -65,25 +65,25 @@
                 ) -}}
 
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'text'       : 'mautic.core.name',
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'text'       : 'marketplace.vendor',
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'text'       : 'marketplace.downloads',
                     }
                 ) -}}
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'text'       : 'marketplace.favers',
                     }
@@ -95,7 +95,7 @@
                 <tr>
                     <td>
                         {{- include(
-                            'MauticCoreBundle:Helper:list_actions.html.twig',
+                            '@MauticCore/Helper/list_actions.html.twig',
                             {
                                 'item'            : item,
                                 'customButtons'   : {},
@@ -131,7 +131,7 @@
     <div class="panel-footer">
 
         {{- include(
-            'MauticCoreBundle:Helper:pagination.html.twig',
+            '@MauticCore/Helper/pagination.html.twig',
             {
                 'totalItems' : count,
                 'page'       : page,

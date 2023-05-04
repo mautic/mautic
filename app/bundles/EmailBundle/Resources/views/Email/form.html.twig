@@ -1,5 +1,5 @@
-{% form_theme form 'MauticEmailBundle:FormTheme:Email/layout.html.twig' %}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% form_theme form '@MauticEmail/FormTheme/Email/layout.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent 'email' %}
 
@@ -21,7 +21,7 @@
 } %}
 {% set isCodeMode = (email.getTemplate() is same as 'mautic_code_mode') %}
 {% set previewUrl = previewUrl|default('') %}
-{% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': 'MauticEmailBundle:Email:form.html.twig', 'email': email}) %}
+{% set mauticTemplateVars = mauticTemplateVars|default({'mauticTemplate': '@MauticEmail/Email/form.html.twig', 'email': email}) %}
 
 {% block headerTitle %}
   {% if email.id is not empty %}
@@ -62,7 +62,7 @@
                             <div class="row">
                                 <div class="col-md-12">{{ form_row(form.template) }}</div>
                             </div>
-                            {{- include('MauticCoreBundle:Helper:theme_select.html.twig', {
+                            {{- include('@MauticCore/Helper/theme_select.html.twig', {
                                 'type'   : 'email',
                                 'themes' : themes,
                                 'active' : form.template.vars.value,
@@ -230,7 +230,7 @@
             </select>
         {% endfor %}
     </div>
-    {{- include('MauticCoreBundle:Helper:builder.html.twig', {
+    {{- include('@MauticCore/Helper/builder.html.twig', {
         'type'          : 'email',
         'isCodeMode'    : isCodeMode,
         'sectionForm'   : sectionForm,

@@ -1,8 +1,8 @@
 {% set item = item is defined ? item : null %}
 {% set tooltip = tooltip is defined ? tooltip : null %}
 {{ buttonReset(
-    constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::LOCATION_PAGE_ACTIONS'),
-    constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::TYPE_BUTTON_DROPDOWN'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_PAGE_ACTIONS'),
+    constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::TYPE_BUTTON_DROPDOWN'),
     item) }}
 {{- include('@MauticCore/Helper/action_button_helper.html.twig') -}}
 

@@ -16,7 +16,7 @@
         <thead>
             <tr>
                 {% if canDelete %}
-                  {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                  {{ include('@MauticCore/Helper/tableheader.html.twig', {
                       'checkall': 'true',
                       'target': '#formResultTable',
                       'routeBase': 'form_results',
@@ -25,7 +25,7 @@
                   }) }}
                 {% endif %}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'formresult.' ~ formId,
                     'orderBy': 's.id',
                     'text': 'mautic.form.report.submission.id',
@@ -33,7 +33,7 @@
                     'filterBy': 's.id',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'formresult.' ~ formId,
                     'orderBy': 's.lead_id',
                     'text': 'mautic.lead.report.contact_id',
@@ -41,7 +41,7 @@
                     'filterBy': 's.lead_id',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'formresult.' ~ formId,
                     'orderBy': 's.date_submitted',
                     'text': 'mautic.form.result.thead.date',
@@ -51,7 +51,7 @@
                     'dataToggle': 'date',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar': 'formresult.' ~ formId,
                     'orderBy': 'i.ip_address',
                     'text': 'mautic.core.ipaddress',
@@ -63,7 +63,7 @@
                 {% set fieldCount = canDelete ? 4 : 3 %}
                 {% for f in fields %}
                     {% if f.type not in viewOnlyFields and true == f.saveResult %}
-                      {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                      {{ include('@MauticCore/Helper/tableheader.html.twig', {
                           'sessionVar': 'formresult.' ~ formId,
                           'orderBy': 'r.' ~ f.alias,
                           'text': f.label,
@@ -84,7 +84,7 @@
               <tr>
                   {% if canDelete %}
                   <td>
-                      {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                      {{ include('@MauticCore/Helper/list_actions.html.twig', {
                           'item': item,
                           'templateButtons': {'delete': canDelete},
                           'route': 'mautic_form_results_action',
@@ -123,7 +123,7 @@
         {% else %}
             <tr>
                 <td colspan="{{ fieldCount }}">
-                    {{ include('MauticCoreBundle:Helper:noresults.html.twig') }}
+                    {{ include('@MauticCore/Helper/noresults.html.twig') }}
                 </td>
             </tr>
         {% endif %}

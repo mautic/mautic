@@ -1,7 +1,7 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block headerTitle %}{% trans %}mautic.tagmanager.tag.header.index{%  endtrans %}{% endblock %}
 {% block mauticContent %}tags{% endblock %}
 
@@ -14,7 +14,7 @@
 
 {% block actions %}
     {{- include(
-        'MauticCoreBundle:Helper:page_actions.html.twig',
+        '@MauticCore/Helper/page_actions.html.twig',
         {
             'templateButtons': {
             'new': security.isGranted('tagManager:tagManager:create')
@@ -28,7 +28,7 @@
 {% block content %}
     <div class="panel panel-default bdr-t-wdh-0">
         <div class="page-list">
-        {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue' : searchValue,
             'searchHelp'  : 'mautic.lead.list.help.searchcommands',
             'action'      : currentRoute,
@@ -39,7 +39,7 @@
                         <thead>
                         <tr>
                             {{ include(
-                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                '@MauticCore/Helper/tableheader.html.twig',
                                 {
                                     'checkall': 'true',
                                     'target': '#tagsTable',
@@ -50,7 +50,7 @@
                                     }
                                 }) }}
                             {{ include(
-                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                '@MauticCore/Helper/tableheader.html.twig',
                                 {
                                     'sessionVar': 'tags',
                                     'orderBy'   : 'lt.tag',
@@ -60,7 +60,7 @@
                             ) }}
 
                             {{ include(
-                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                '@MauticCore/Helper/tableheader.html.twig',
                                 {
                                     'sessionVar' : 'tags',
                                     'text'       : 'mautic.lead.list.thead.leadcount',
@@ -69,7 +69,7 @@
                             ) }}
 
                             {{ include(
-                                'MauticCoreBundle:Helper:tableheader.html.twig',
+                                '@MauticCore/Helper/tableheader.html.twig',
                                 {
                                     'sessionVar' : 'tags',
                                     'orderBy'    : 'lt.id',
@@ -83,7 +83,7 @@
                         {% for item in items %}
                             <tr>
                                 <td>
-                                    {{- include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                                    {{- include('@MauticCore/Helper/list_actions.html.twig', {
                                         item: item,
                                         templateButtons: {
                                             edit: permissions['tagManager:tagManager:edit'],
@@ -137,7 +137,7 @@
                         </tbody>
                     </table>
                     <div class="panel-footer">
-                        {{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+                        {{- include('@MauticCore/Helper/pagination.html.twig', {
                             'totalItems' : items|length,
                             'page'       : page,
                             'limit'      : limit,

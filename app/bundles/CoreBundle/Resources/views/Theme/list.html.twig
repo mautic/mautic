@@ -7,7 +7,7 @@
             <table class="table table-hover table-striped table-bordered theme-list" id="themeTable">
                 <thead>
                     <tr>   
-                        {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'checkall': 'true',
                             'target'  : '#themeTable',
                             'langVar' : 'core.theme',
@@ -17,15 +17,15 @@
                             },
                         })}}
 
-                        {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'text': 'mautic.core.title',
                         })}}
 
-                        {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'text': 'mautic.core.author',
                         })}}
 
-                        {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                        {{ include('@MauticCore/Helper/tableheader.html.twig', {
                             'text': 'mautic.core.features',
                         })}}
 
@@ -53,7 +53,7 @@
                                     } %}
                                     {% set templateButtons = (k not in defaultThemes) ? deleteButton : {} %}
 
-                                    {{ include ('MauticCoreBundle:Helper:list_actions.html.twig',
+                                    {{ include ('@MauticCore/Helper/list_actions.html.twig',
                                         {
                                             'item': item,
                                             'templateButtons': templateButtons,

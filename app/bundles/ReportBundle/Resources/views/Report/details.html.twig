@@ -1,12 +1,12 @@
 {%- set isIndex = 'index' == tmpl -%}
 {%- set tmpl = 'list' -%}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent 'report' %}
 
 {% block headerTitle 'mautic.report.report.header.view'|trans({'%name%': report.name|trans}) %}
 
-{% block publishStatus include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': report}) %}
+{% block publishStatus include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': report}) %}
 
 {% block actions %}
   {%- set buttons = [] -%}
@@ -46,7 +46,7 @@
           {% endif %}
       {% endif %}
   {% endif %}
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
           'item': report,
           'templateButtons': {
               'edit': securityHasEntityAccess(permissions['report:reports:editown'], permissions['report:reports:editother'], report.createdBy),
@@ -61,10 +61,10 @@
 
 {% block content %}
   {% if isIndex %}
-    {{ include('MauticReportBundle:Report:_details_content_header.html.twig') }}
+    {{ include('@MauticReport/Report/_details_content_header.html.twig') }}
   {% endif %}
 
-  {{ include('MauticReportBundle:Report:_details_report_content.html.twig') }}
+  {{ include('@MauticReport/Report/_details_report_content.html.twig') }}
 
   {% if isIndex %}
     {{ include('@MauticReport/Report/_details_content_footer.html.twig') }}

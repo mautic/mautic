@@ -4,7 +4,7 @@
 #}
 {% set isIndex = 'index' == tmpl ? true : false %}
 {% set tmpl = 'list' %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent %}lead{% endblock %}
 {% block headerTitle %}{{ 'mautic.lead.leads'|trans }}{% endblock %}
@@ -62,7 +62,7 @@
   </div>
   {% endset %}
 
-  {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{ include('@MauticCore/Helper/page_actions.html.twig', {
         'templateButtons': {'new': permissions['lead:leads:create']},
         'routeBase': 'contact',
         'langVar': 'lead.lead',
@@ -101,7 +101,7 @@
         }]) %}
     {% endif %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
-        {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        {{ include('@MauticCore/Helper/list_toolbar.html.twig', {
                 'searchValue': searchValue|default(''),
                 'searchHelp': 'mautic.lead.lead.help.searchcommands',
                 'action': currentRoute,

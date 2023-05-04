@@ -1,11 +1,11 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
 
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}user{% endblock %}
 {% block headerTitle %}{% trans %}mautic.user.users{% endtrans %}{% endblock %}
 {% block actions %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
         'templateButtons' : {
                 'new' : permissions['create'],
         },
@@ -16,7 +16,7 @@
 
 {% block content %}
     {% if isIndex %}
-        {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue' : searchValue,
             'searchHelp'  : 'mautic.user.user.help.searchcommands',
             'action'      : currentRoute,
@@ -34,7 +34,7 @@
     <table class="table table-hover table-striped table-bordered user-list" id="userTable">
         <thead>
         <tr>
-            {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+            {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'checkall'        : 'true',
                     'target'          : '#userTable',
                     'langVar'         : 'user.user',
@@ -45,34 +45,34 @@
             }) -}}
             
             <th class="visible-md visible-lg col-user-avatar"></th>
-            {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+            {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
                     'orderBy'    : 'u.lastName, u.firstName, u.username',
                     'text'       : 'mautic.core.name',
                     'class'      : 'col-user-name',
                     'default'    : true,
                 }) -}}
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
                     'orderBy'    : 'u.username',
                     'text'       : 'mautic.core.username',
                     'class'      : 'col-user-username',
                 }) -}}
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
                     'orderBy'    : 'u.email',
                     'text'       : 'mautic.core.type.email',
                     'class'      : 'visible-md visible-lg col-user-email',
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
                     'orderBy'    : 'r.name',
                     'text'       : 'mautic.user.role',
                     'class'      : 'visible-md visible-lg col-user-role',
                 }) -}}
 
-                {{- include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{- include('@MauticCore/Helper/tableheader.html.twig', {
                     'sessionVar' : 'user',
                     'orderBy'    : 'u.id',
                     'text'       : 'mautic.core.id',
@@ -85,7 +85,7 @@
         {% for item in items %}
             <tr>
                 <td>
-                   {{- include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                   {{- include('@MauticCore/Helper/list_actions.html.twig', {
                             'item'            : item,
                             'templateButtons' : {
                                 'edit'   : permissions['edit'],

@@ -8,9 +8,13 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\Form\Form;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 trait CustomFieldsApiControllerTrait
 {
+    private ?RequestStack $requestStack = null;
+
     /**
      * Remove IpAddress and lastActive as it'll be handled outside the form.
      *
@@ -20,7 +24,7 @@ trait CustomFieldsApiControllerTrait
      *
      * @return mixed|void
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         if ('company' === $this->entityNameOne) {
             $object = 'company';
@@ -29,7 +33,7 @@ trait CustomFieldsApiControllerTrait
             unset($parameters['lastActive'], $parameters['tags'], $parameters['ipAddress']);
         }
 
-        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
+        if (in_array($request->getMethod(), ['POST', 'PUT'])) {
             // If a new contact or PUT update (complete representation of the objectd), set empty fields to field defaults if the parameter
             // is not defined in the request
 
@@ -191,5 +195,13 @@ trait CustomFieldsApiControllerTrait
                 $this->dataInputMasks[$field['alias']]  = 'html';
             }
         }
+    }
+
+    /**
+     * @required
+     */
+    public function setRequestStack(RequestStack $requestStack): void
+    {
+        $this->requestStack = $requestStack;
     }
 }

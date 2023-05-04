@@ -8,7 +8,7 @@
     - modalView
     - template
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}leadImport{% endblock %}
 
@@ -18,7 +18,7 @@
 
 {% block actions %}
   {% if step is defined and constant('Mautic\\LeadBundle\\Controller\\ImportController::STEP_UPLOAD_CSV') == step %}
-    {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'routeBase': 'import',
             'langVar': 'lead.import',
             'templateButtons': {'close': true},
@@ -33,7 +33,7 @@
 
 {% block content %}
   {% if step is defined and constant('Mautic\\LeadBundle\\Controller\\ImportController::STEP_UPLOAD_CSV') == step %}
-    {{ include('MauticLeadBundle:Import:_upload_form.html.twig') }}
+    {{ include('@MauticLead/Import/_upload_form.html.twig') }}
   {% else %}
     {{ include('@MauticLead/Import/_mapping_form.html.twig') }}
   {% endif %}

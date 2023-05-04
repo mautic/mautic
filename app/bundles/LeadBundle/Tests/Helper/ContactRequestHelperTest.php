@@ -140,9 +140,11 @@ class ContactRequestHelperTest extends \PHPUnit\Framework\TestCase
         $contact = new Lead();
 
         $this->dispatcher->method('dispatch')
-            ->willReturnCallback(
-                fn (ContactIdentificationEvent $event) => $event->setIdentifiedContact($contact, 'email')
-            );
+            ->willReturnCallback(function (ContactIdentificationEvent $event) use ($contact) {
+                $event->setIdentifiedContact($contact, 'email');
+
+                return $event;
+            });
 
         $this->contactMerger->expects($this->never())
             ->method('merge');

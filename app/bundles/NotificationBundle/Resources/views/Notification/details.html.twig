@@ -9,14 +9,14 @@
     - contacts
     - dateRangeForm
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}notification{% endblock %}
 
 {% block headerTitle %}{{ notification.name }}{% endblock %}
 
 {% block actions %}
-    {{ include('MauticCoreBundle:Helper:page_actions.html.twig', {
+    {{ include('@MauticCore/Helper/page_actions.html.twig', {
             'item': notification,
             'templateButtons': {
                 'edit': securityHasEntityAccess(permissions['notification:notifications:editown'], permissions['notification:notifications:editother'], notification.createdBy),
@@ -28,7 +28,7 @@
 {% endblock %}
 
 {% block publishStatus %}
-  {{ include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': notification}) }}
+  {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': notification}) }}
 {% endblock %}
 
 {% block content %}
@@ -43,7 +43,7 @@
                 <div class="panel shd-none mb-0">
                   <table class="table table-bordered table-striped mb-0">
                     <tbody>
-                      {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': notification}) }}
+                      {{ include('@MauticCore/Helper/details.html.twig', {'entity': notification}) }}
                     </tbody>
                   </table>
                 </div>
@@ -75,11 +75,11 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
-                                    {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}, with_context=false) }}
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}, with_context=false) }}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}, with_context=false) }}
+                                {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}, with_context=false) }}
                             </div>
                         </div>
                     </div>
@@ -108,7 +108,7 @@
         <!-- start: tab-content -->
         <div class="tab-content pa-md">
             <div class="tab-pane active bdr-w-0" id="clicks-container">
-                {{ include('MauticPageBundle:Trackable:click_counts.html.twig', {
+                {{ include('@MauticPage/Trackable/click_counts.html.twig', {
                     'trackables': trackables,
                     'entity': notification,
                     'channel': 'notification'

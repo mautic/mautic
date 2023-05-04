@@ -56,23 +56,6 @@ return [
     ],
 
     'services' => [
-        'controllers' => [
-            'mautic.api.oauth2.authorize_controller' => [
-                'class'     => \Mautic\ApiBundle\Controller\oAuth2\AuthorizeController::class,
-                'arguments' => [
-                    'request_stack',
-                    'fos_oauth_server.authorize.form',
-                    'fos_oauth_server.authorize.form.handler.default',
-                    'fos_oauth_server.server',
-                    'templating',
-                    'security.token_storage',
-                    'router',
-                    'fos_oauth_server.client_manager.default',
-                    'event_dispatcher',
-                    'session',
-                ],
-            ],
-        ],
         'helpers' => [
             'mautic.api.helper.entity_result' => [
                 'class' => \Mautic\ApiBundle\Helper\EntityResultHelper::class,
@@ -80,7 +63,7 @@ return [
         ],
         'other' => [
             'mautic.api.oauth.event_listener' => [
-                'class'     => 'Mautic\ApiBundle\EventListener\OAuthEventListener',
+                'class'     => 'Mautic\ApiBundle\EventListener\PreAuthorizationEventListener',
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.security',

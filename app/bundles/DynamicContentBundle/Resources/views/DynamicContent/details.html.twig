@@ -1,14 +1,14 @@
 {#
 #}
-{% extends (not isEmbedded) ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends (not isEmbedded) ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 
 {% block mauticContent 'dynamicContent' %}
 
 {% block headerTitle entity.name %}
 
-{% block publishStatus include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': entity}) %}
+{% block publishStatus include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': entity}) %}
 
-{% block actions include('MauticCoreBundle:Helper:page_actions.html.twig', {
+{% block actions include('@MauticCore/Helper/page_actions.html.twig', {
     'item': entity,
     'customButtons': customButtons|default([]),
     'templateButtons': {
@@ -21,7 +21,7 @@
 })  %}
 
 {% block content %}
-  {%- set translationContent = include('MauticCoreBundle:Translation:index.html.twig', {
+  {%- set translationContent = include('@MauticCore/Translation/index.html.twig', {
           'activeEntity': entity,
           'translations': translations,
           'model': 'dynamicContent',
@@ -68,7 +68,7 @@
                       <div class="panel shd-none mb-0">
                           <table class="table table-bordered table-striped mb-0">
                               <tbody>
-                              {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': entity}) }}
+                              {{ include('@MauticCore/Helper/details.html.twig', {'entity': entity}) }}
                               <tr>
                                   <td width="20%"><span class="fw-b textTitle">{{ 'mautic.dynamicContent.slot.campaign'|trans }}</span></td>
                                   <td>{{ entity.isCampaignBased ? 'Yes' : 'No' }}</td>
@@ -111,11 +111,11 @@
                                       </h5>
                                   </div>
                                   <div class="col-md-9 va-m">
-                                      {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
+                                      {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {'dateRangeForm': dateRangeForm, 'class': 'pull-right'}) }}
                                   </div>
                               </div>
                               <div class="pt-0 pl-15 pb-10 pr-15">
-                                  {{ include('MauticCoreBundle:Helper:chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
+                                  {{ include('@MauticCore/Helper/chart.html.twig', {'chartData': entityViews, 'chartType': 'line', 'chartHeight': 300}) }}
                               </div>
                           </div>
                       </div>
@@ -145,7 +145,7 @@
           <!-- start: tab-content -->
           <div class="tab-content pa-md">
               <div class="tab-pane active active bdr-w-0" id="clicks-container">
-                  {{ include('MauticPageBundle:Trackable:click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
+                  {{ include('@MauticPage/Trackable/click_counts.html.twig', {'trackables': trackables, 'entity': entity, 'channel': 'dynamicContent'}) }}
 
               </div>
               <!-- #translation-container -->

@@ -1,8 +1,8 @@
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{ 'mautic.sms.smses'|trans }}{% endblock %}
 {% block actions %}
-{{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+{{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'templateButtons' : {
             'new' : permissions['sms:smses:create'],

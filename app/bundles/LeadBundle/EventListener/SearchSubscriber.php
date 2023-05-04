@@ -6,7 +6,6 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event as MauticEvents;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\EmailRepository;
@@ -16,6 +15,7 @@ use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class SearchSubscriber implements EventSubscriberInterface
 {
@@ -45,23 +45,23 @@ class SearchSubscriber implements EventSubscriberInterface
     private $security;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templating;
+    private $twig;
 
     public function __construct(
         LeadModel $leadModel,
         EmailRepository $emailRepository,
         TranslatorInterface $translator,
         CorePermissions $security,
-        TemplatingHelper $templating
+        Environment $twig
     ) {
         $this->leadModel       = $leadModel;
         $this->leadRepo        = $leadModel->getRepository();
         $this->emailRepository = $emailRepository;
         $this->translator      = $translator;
         $this->security        = $security;
-        $this->templating      = $templating;
+        $this->twig            = $twig;
     }
 
     /**
@@ -117,21 +117,21 @@ class SearchSubscriber implements EventSubscriberInterface
                 $leadResults = [];
 
                 foreach ($leads as $lead) {
-                    $leadResults[] = $this->templating->getTemplating()->renderResponse(
+                    $leadResults[] = $this->twig->render(
                         '@MauticLead/SubscribedEvents\Search/global.html.twig',
                         ['lead' => $lead]
-                    )->getContent();
+                    );
                 }
 
                 if ($results['count'] > 5) {
-                    $leadResults[] = $this->templating->getTemplating()->renderResponse(
+                    $leadResults[] = $this->twig->render(
                         '@MauticLead/SubscribedEvents\Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
                             'remaining'    => ($results['count'] - 5),
                         ]
-                    )->getContent();
+                    );
                 }
                 $leadResults['count'] = $results['count'];
                 $event->addResults('mautic.lead.leads', $leadResults);

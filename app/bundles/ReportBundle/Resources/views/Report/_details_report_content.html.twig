@@ -7,7 +7,7 @@
 {%- set groupBy = report.groupBy -%}
 {%- set groupByCount = report.groupBy|length -%}
 {%- set startCount = totalResults > limit ? (reportPage * limit) - limit + 1 : 1 -%}
-{%- set graphContent = include('MauticReportBundle:Report:details_data_graphs.html.twig', {'graphOrder': graphOrder, 'graphs': graphs, 'report': report}, with_context=false) -%}
+{%- set graphContent = include('@MauticReport/Report/details_data_graphs.html.twig', {'graphOrder': graphOrder, 'graphs': graphs, 'report': report}, with_context=false) -%}
 
 {% if showGraphsAboveTable %}{{ graphContent|raw }}{% endif %}
 
@@ -25,7 +25,7 @@
                                 {% if columns[key] is defined %}
                                     {# order by alias if exists, if not then by column name #}
                                     {%- set orderBy = columns[key].alias|default((key starts with 'channel.') ? key|replace({'.': '_'}) : key) -%}
-                                    {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                         'sessionVar': 'report.' ~ report.id,
                                         'orderBy': orderBy,
                                         'text': columns[key].label,
@@ -38,7 +38,7 @@
                             {% if aggregatorCount %}
                                 {% for aggregator in aggregatorOrder %}
                                     {%- set columnName = columns[aggregator.column].alias|default('') -%}
-                                    {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                                    {{ include('@MauticCore/Helper/tableheader.html.twig', {
                                         'sessionVar': 'report.' ~ report.id,
                                         'text': aggregator.function ~ ' ' ~ columnName,
                                         'orderBy': '`' ~ aggregator.function ~ ' ' ~ aggregator.column ~ '`',

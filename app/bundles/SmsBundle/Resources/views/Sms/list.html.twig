@@ -1,10 +1,10 @@
 {% set isIndex = tmpl == 'index' ? true : false %}
 {% set tmpl = 'list' %}
-{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
 {% block mauticContent %}sms{% endblock %}
 {% block headerTitle %}{{ 'mautic.sms.smses'|trans }}{% endblock %}
 {% block actions %}
-{{- include('MauticCoreBundle:Helper:page_actions.html.twig',
+{{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'templateButtons' : {
             'new' : permissions['sms:smses:create'],
@@ -16,7 +16,7 @@
 {% block content %}
     {% if isIndex %}
     <div class="panel panel-default bdr-t-wdh-0 mb-0">
-        {{- include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
             'searchValue' : searchValue,
             'searchHelp'  : 'mautic.sms.help.searchcommands',
             'searchId'    : 'sms-search',
@@ -39,7 +39,7 @@
             <thead>
             <tr>
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'checkall'        : 'true',
                         'routeBase'       : 'sms',
@@ -50,7 +50,7 @@
                 ) -}}
 
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'sms',
                         'orderBy'    : 'e.name',
@@ -61,7 +61,7 @@
                 ) -}}
 
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'sms',
                         'orderBy'    : 'c.title',
@@ -73,7 +73,7 @@
                 <th class="visible-sm visible-md visible-lg col-sms-stats">{{ 'mautic.core.stats'|trans }}</th>
 
                 {{- include(
-                    'MauticCoreBundle:Helper:tableheader.html.twig',
+                    '@MauticCore/Helper/tableheader.html.twig',
                     {
                         'sessionVar' : 'sms',
                         'orderBy'    : 'e.id',
@@ -108,7 +108,7 @@
                             }
                         ] %}
                         {{- include(
-                            'MauticCoreBundle:Helper:list_actions.html.twig',
+                            '@MauticCore/Helper/list_actions.html.twig',
                             {
                                 'item'            : item,
                                 'templateButtons' : {
@@ -127,7 +127,7 @@
                     </td>
                     <td>
                         <div>
-                            {{- include('MauticCoreBundle:Helper:publishstatus_icon.html.twig',
+                            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig',
                                 {
                                     'item'  : item,
                                     'model' : 'sms',
@@ -152,7 +152,7 @@
                             <span>{{ catName }}</span>
                         </span>
                     </td>
-                        {{- include('MauticSmsBundle:Sms:list_stats.html.twig', { 'item' : item }) -}}
+                        {{- include('@MauticSms/Sms/list_stats.html.twig', { 'item' : item }) -}}
                     <td class="visible-md visible-lg">{{ item.getId() }}</td>
                 </tr>
             {% endfor %}
@@ -160,7 +160,7 @@
         </table>
     </div>
     <div class="panel-footer">
-        {{- include('MauticCoreBundle:Helper:pagination.html.twig', {
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
             'totalItems' : totalItems,
             'page'       : page,
             'limit'      : limit,

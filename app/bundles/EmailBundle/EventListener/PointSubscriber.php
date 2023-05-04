@@ -73,7 +73,7 @@ class PointSubscriber implements EventSubscriberInterface
             'callback'        => ['\\Mautic\\EmailBundle\\Helper\\PointEventHelper', 'sendEmail'],
             'formType'        => EmailSendType::class,
             'formTypeOptions' => ['update_select' => 'pointtriggerevent_properties_email'],
-            'formTheme'       => 'MauticEmailBundle:FormTheme:EmailSendList/emailsend_list_row.html.twig',
+            'formTheme'       => '@MauticEmail/FormTheme/EmailSendList/emailsend_list_row.html.twig',
         ];
 
         $event->addEvent('email.send', $sendEvent);

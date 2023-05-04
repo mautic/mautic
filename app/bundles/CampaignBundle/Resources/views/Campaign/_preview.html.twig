@@ -25,7 +25,7 @@
               {% for form in campaign.forms.toArray %}
                 {% set names = names + [form.name] %}
               {% endfor %}
-              {{- include('MauticCampaignBundle:Source:_index.html.twig', {
+              {{- include('@MauticCampaign/Source/_index.html.twig', {
                     'sourceType': 'forms',
                     'campaignId': campaign.id,
                     'names': names|join(', '),
@@ -37,7 +37,7 @@
               {% for list in campaign.lists.toArray %}
                 {% set names = names + [list.name] %}
               {% endfor %}
-              {{- include('MauticCampaignBundle:Source:_index.html.twig', {
+              {{- include('@MauticCampaign/Source/_index.html.twig', {
                     'sourceType': 'lists',
                     'campaignId': campaign.id,
                     'names': names|join(', '),
@@ -45,13 +45,13 @@
             {% endif %}
 
             {% for event in campaignEvents %}
-              {{- include('MauticCampaignBundle:Event:_preview.html.twig', {
+              {{- include('@MauticCampaign/Event/_preview.html.twig', {
                     'event': event,
                     'campaignId': campaign.id,
               }) -}}
             {% endfor %}
 
-            {{- include('MauticCampaignBundle:Campaign/Builder:_index.html.twig', {
+            {{- include('@MauticCampaign/Campaign/Builder/_index.html.twig', {
                     'campaignSources': campaignSources,
                     'eventSettings': eventSettings,
                     'campaignId': campaign.id,

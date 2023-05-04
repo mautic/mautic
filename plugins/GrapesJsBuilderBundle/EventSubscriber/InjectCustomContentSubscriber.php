@@ -6,7 +6,6 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
@@ -14,6 +13,7 @@ use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
+use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
@@ -28,9 +28,9 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
     private $grapesJsBuilderModel;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    private $templatingHelper;
+    private $twig;
 
     /**
      * @var RequestStack
@@ -45,11 +45,11 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
     /**
      * InjectCustomContentSubscriber constructor.
      */
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, TemplatingHelper $templatingHelper, RequestStack $requestStack, RouterInterface $router)
+    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, Environment $twig, RequestStack $requestStack, RouterInterface $router)
     {
         $this->config               = $config;
         $this->grapesJsBuilderModel = $grapesJsBuilderModel;
-        $this->templatingHelper     = $templatingHelper;
+        $this->twig                 = $twig;
         $this->requestStack         = $requestStack;
         $this->router               = $router;
     }
@@ -97,8 +97,8 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                     $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
                 }
             }
-            $content = $this->templatingHelper->getTemplating()->render(
-                'GrapesJsBuilderBundle:Setting:fields.html.twig',
+            $content = $this->twig->render(
+                '@GrapesJsBuilder/Setting/fields.html.twig',
                 $passParams
             );
 
@@ -109,8 +109,8 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
             $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
             $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
 
-            $content = $this->templatingHelper->getTemplating()->render(
-                'GrapesJsBuilder/Setting/vars.html.twig',
+            $content = $this->twig->render(
+                '@GrapesJsBuilder/Setting/vars.html.twig',
                 $passParams
             );
 

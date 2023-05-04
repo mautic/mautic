@@ -3,7 +3,7 @@
     - form
     - currentRoute
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}leadfield{% endblock %}
 
@@ -54,22 +54,22 @@
                 <div class="form-group col-md-6 {% if errors > 0 %}has-error{% endif %}">
                     <div id="leadfield_properties">
                         {% if 'boolean' == type %}
-                            {{ include('MauticLeadBundle:Field:properties_boolean.html.twig', {
+                            {{ include('@MauticLead/Field/properties_boolean.html.twig', {
                                 'yes':  properties.yes|default(''),
                                 'no':  properties.no|default(''),
                             }) }}
                         {% elseif 'number' == type %}
-                            {{ include('MauticLeadBundle:Field:properties_number.html.twig', {
+                            {{ include('@MauticLead/Field/properties_number.html.twig', {
                                 'roundMode': properties.roundmode|default(''),
                                 'scale': properties.scale|default(''),
                             }) }}
                         {% elseif 'select' == type or 'multiselect' == type %}
-                            {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+                            {{ include('@MauticLead/Field/properties_select.html.twig', {
                                 'form': form.properties,
                                 'selectTemplate': selectTemplate,
                             }) }}
                         {% elseif 'lookup' == type %}
-                            {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+                            {{ include('@MauticLead/Field/properties_select.html.twig', {
                                 'form': form.properties,
                                 'selectTemplate': lookupTemplate,
                                 'type': 'lookup',
@@ -128,19 +128,19 @@
       <div class="default_template_locale">{{ defaultLocaleTemplate|raw }}</div>
       <div class="default_template_timezone">{{ defaultTimezoneTemplate|raw }}</div>
       <div class="default_template_select">{{ defaultSelectTemplate|raw }}</div>
-      {{ include('MauticLeadBundle:Field:properties_number.html.twig') }}
-      {{ include('MauticLeadBundle:Field:properties_boolean.html.twig') }}
-      {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+      {{ include('@MauticLead/Field/properties_number.html.twig') }}
+      {{ include('@MauticLead/Field/properties_boolean.html.twig') }}
+      {{ include('@MauticLead/Field/properties_select.html.twig', {
           'selectTemplate': selectTemplate,
           'type': 'select',
       }) }}
 
-      {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+      {{ include('@MauticLead/Field/properties_select.html.twig', {
           'selectTemplate': selectTemplate,
           'type': 'multiselect',
       }) }}
 
-      {{ include('MauticLeadBundle:Field:properties_select.html.twig', {
+      {{ include('@MauticLead/Field/properties_select.html.twig', {
           'selectTemplate': selectTemplate,
           'type': 'lookup',
       }) }}

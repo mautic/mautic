@@ -1,6 +1,6 @@
-{% extends 'MauticCoreBundle:FormTheme:form_simple.html.twig' %}
+{% extends '@MauticCore/FormTheme/form_simple.html.twig' %}
 {% form_theme form with [
-    'MauticSmsBundle:FormTheme:SmsSendList/smssend_list_row.html.twig'
+    '@MauticSms/FormTheme/SmsSendList/smssend_list_row.html.twig'
 ] %}
 
 {% block mauticContent %}sms{% endblock %}

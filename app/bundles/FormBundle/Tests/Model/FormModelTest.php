@@ -8,7 +8,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Doctrine\Helper\TableSchemaHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\FormBundle\Collector\MappedObjectCollectorInterface;
@@ -28,6 +27,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Twig\Environment;
 
 class FormModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,9 +37,9 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     private $requestStack;
 
     /**
-     * @var MockObject&TemplatingHelper
+     * @var MockObject&Environment
      */
-    private $templatingHelperMock;
+    private $twigMock;
 
     /**
      * @var MockObject&ThemeHelper
@@ -119,7 +119,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->requestStack          = $this->createMock(RequestStack::class);
-        $this->templatingHelperMock  = $this->createMock(TemplatingHelper::class);
+        $this->twigMock              = $this->createMock(Environment::class);
         $this->themeHelper           = $this->createMock(ThemeHelper::class);
         $this->formActionModel       = $this->createMock(ActionModel::class);
         $this->formFieldModel        = $this->createMock(FieldModel::class);
@@ -148,7 +148,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
 
         $this->formModel = new FormModel(
             $this->requestStack,
-            $this->templatingHelperMock,
+            $this->twigMock,
             $this->themeHelper,
             $this->formActionModel,
             $this->formFieldModel,

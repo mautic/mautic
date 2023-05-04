@@ -6,6 +6,8 @@ use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Model\EventLogModel;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -13,14 +15,22 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class AjaxController extends CommonAjaxController
 {
+    private DateHelper $dateHelper;
+
+    public function __construct(CorePermissions $security, DateHelper $dateHelper)
+    {
+        $this->security   = $security;
+        $this->dateHelper = $dateHelper;
+    }
+
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function updateConnectionsAction(Request $request)
+    public function updateConnectionsAction(Request $request)
     {
-        $session        = $this->get('session');
+        $session        = $request->getSession();
         $campaignId     = InputHelper::clean($request->query->get('campaignId'));
-        $canvasSettings = $request->request->get('canvasSettings', [], true);
+        $canvasSettings = $request->request->get('canvasSettings') ?? [];
         if (empty($campaignId)) {
             $dataArray = ['success' => 0];
         } else {
@@ -32,7 +42,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($dataArray);
     }
 
-    protected function updateScheduledCampaignEventAction(Request $request)
+    public function updateScheduledCampaignEventAction(Request $request)
     {
         $eventId      = (int) $request->request->get('eventId');
         $contactId    = (int) $request->request->get('contactId');
@@ -61,7 +71,7 @@ class AjaxController extends CommonAjaxController
         }
 
         // Format the date to match the view
-        $dataArray['formattedDate'] = $this->get('mautic.helper.template.date')->toFull($dataArray['date']);
+        $dataArray['formattedDate'] = $this->dateHelper->toFull($dataArray['date']);
 
         return $this->sendJsonResponse($dataArray);
     }
@@ -69,7 +79,7 @@ class AjaxController extends CommonAjaxController
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
-    protected function cancelScheduledCampaignEventAction(Request $request)
+    public function cancelScheduledCampaignEventAction(Request $request)
     {
         $dataArray = ['success' => 0];
 
@@ -106,7 +116,7 @@ class AjaxController extends CommonAjaxController
     {
         $contact = $this->getModel('lead')->getEntity($contactId);
         if ($contact) {
-            if ($this->get('mautic.security')->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
+            if ($this->security->hasEntityAccess('lead:leads:editown', 'lead:leads:editother', $contact->getPermissionUser())) {
                 /** @var EventLogModel $logModel */
                 $logModel = $this->getModel('campaign.event_log');
 

@@ -99,7 +99,7 @@
     }
 }
 
-{{ include('MauticFocusBundle:Builder:Bar/collapser.less.twig', with_context=false) }}
+{{ include('@MauticFocus/Builder/Bar/collapser.less.twig', with_context=false) }}
 
 @media only screen and (max-width: 667px) {
     & .mf-bar-collapse, & .mf-bar-collapser {
@@ -108,7 +108,7 @@
 }
 
 {% if preview is not empty %}
-{{ include('MauticFocusBundle:Builder:Bar/animations.less.twig', with_context=false) }}
+{{ include('@MauticFocus/Builder/Bar/animations.less.twig', with_context=false) }}
 {{ include('@MauticFocus/Builder/Bar/shared.less.twig', with_context=false) }}
 .mf-bar {
     &.mf-animate {

@@ -15,7 +15,7 @@
         <table class="table table-hover table-striped table-bordered pagetable-list" id="pageTable">
             <thead>
             <tr>
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'checkall': 'true',
                         'target': '#pageTable',
                         'routeBase': 'page',
@@ -24,35 +24,35 @@
                         },
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'p.title',
                         'text': 'mautic.core.title',
                         'class': 'col-page-title',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'c.title',
                         'text': 'mautic.core.category',
                         'class': 'visible-md visible-lg col-page-category',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'p.hits',
                         'text': 'mautic.page.thead.hits',
                         'class': 'col-page-hits visible-md visible-lg',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'p.dateAdded',
                         'text': 'mautic.lead.import.label.dateAdded',
                         'class': 'col-page-dateAdded visible-md visible-lg',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'p.dateModified',
                         'text': 'mautic.lead.import.label.dateModified',
@@ -60,21 +60,21 @@
                         'default': true,
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'p.createdByUser',
                         'text': 'mautic.core.createdby',
                         'class': 'col-page-createdByUser visible-md visible-lg',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'submission_count',
                         'text': 'mautic.form.form.results',
                         'class': 'visible-md visible-lg col-page-submissions',
                 }) }}
 
-                {{ include('MauticCoreBundle:Helper:tableheader.html.twig', {
+                {{ include('@MauticCore/Helper/tableheader.html.twig', {
                         'sessionVar': 'page',
                         'orderBy': 'p.id',
                         'text': 'mautic.core.id',
@@ -87,7 +87,7 @@
                 {% set item = i[0] %}
                 <tr>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:list_actions.html.twig', {
+                        {{ include('@MauticCore/Helper/list_actions.html.twig', {
                                 'item': item,
                                 'templateButtons': {
                                     'edit': securityHasEntityAccess(permissions['page:pages:editown'], permissions['page:pages:editother'], item.createdBy),
@@ -99,7 +99,7 @@
                         }) }}
                     </td>
                     <td>
-                        {{ include('MauticCoreBundle:Helper:publishstatus_icon.html.twig', {'item': item, 'model': 'page.page'}) }}
+                        {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {'item': item, 'model': 'page.page'}) }}
                         <a href="{{ path('mautic_page_action', {'objectAction': 'view', 'objectId': item.id}) }}" data-toggle="ajax">
                             {{ item.title }} ({{ item.alias }})
                             {% if item.isVariant or item.isTranslation or item.isPreferenceCenter %}
@@ -151,7 +151,7 @@
             </tbody>
         </table>
         <div class="panel-footer">
-            {{ include('MauticCoreBundle:Helper:pagination.html.twig', {
+            {{ include('@MauticCore/Helper/pagination.html.twig', {
                     'totalItems': items|length,
                     'page': page,
                     'limit': limit,

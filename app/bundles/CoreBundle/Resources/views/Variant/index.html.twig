@@ -37,7 +37,7 @@
   <ul class="list-group">
       {% if variants.parent %}
           {# totalWeight was &$totalReference #}
-          {{ include('MauticCoreBundle:Variant:row.html.twig', {
+          {{ include('@MauticCore/Variant/row.html.twig', {
                   'totalWeight': totalWeight,
                   'variant': variants.parent,
                   'variants': variants,
@@ -51,7 +51,7 @@
       {% if variants.children|length > 0 %}
           {% for id, variant in variants.children %}
               {# totalWeight was &$totalReference #}
-              {{ include('MauticCoreBundle:Variant:row.html.twig', {
+              {{ include('@MauticCore/Variant/row.html.twig', {
                       'totalWeight': totalWeight,
                       'variant': variant,
                       'variants': variants,

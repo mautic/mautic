@@ -128,7 +128,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $eventLog;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 
@@ -160,7 +160,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $newlyCreated = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateIdentified;
 

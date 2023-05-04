@@ -14,14 +14,14 @@
     - modalView
     - template
 #}
-{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+{% extends '@MauticCore/Default/content.html.twig' %}
 
 {% block mauticContent %}list{% endblock %}
 
 {% block headerTitle %}{{ list.name }}{% endblock %}
 
 {% block actions %}
-  {{- include('MauticCoreBundle:Helper:page_actions.html.twig', {
+  {{- include('@MauticCore/Helper/page_actions.html.twig', {
             'item': list,
             'customButtons': customButtons|default([]),
             'templateButtons': {
@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block publishStatus %}
-  {{- include('MauticCoreBundle:Helper:publishstatus_badge.html.twig', {'entity': list}) -}}
+  {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity': list}) -}}
 {% endblock %}
 
 {% block content %}
@@ -59,7 +59,7 @@
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
-                            {{ include('MauticCoreBundle:Helper:details.html.twig', {'entity': list}) }}
+                            {{ include('@MauticCore/Helper/details.html.twig', {'entity': list}) }}
                             <tr>
                                 <td width="20%"><span class="fw-b textTitle">{{ 'mautic.lead.leads'|trans }}</span></td>
                                 <td>{{ segmentCount }}</td>
@@ -102,14 +102,14 @@
                                     </h5>
                                 </div>
                                 <div class="col-md-9 va-m">
-                                    {{ include('MauticCoreBundle:Helper:graph_dateselect.html.twig', {
+                                    {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
                                           'dateRangeForm': dateRangeForm,
                                           'class': 'pull-right',
                                     }) }}
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
-                                {{ include('MauticCoreBundle:Helper:chart.html.twig', {
+                                {{ include('@MauticCore/Helper/chart.html.twig', {
                                       'chartData': stats,
                                       'chartType': 'line',
                                       'chartHeight': 300,
@@ -201,7 +201,7 @@
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-        {{ include('MauticCoreBundle:Helper:usage.html.twig', {
+        {{ include('@MauticCore/Helper/usage.html.twig', {
             'title': 'mautic.lead.segments.usages'|trans,
             'stats': usageStats,
         }) }}
