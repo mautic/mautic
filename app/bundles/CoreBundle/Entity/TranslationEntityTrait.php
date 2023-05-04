@@ -16,12 +16,12 @@ trait TranslationEntityTrait
     public $languageSlug;
 
     /**
-     * @var ArrayCollection
+     * @var mixed
      **/
     private $translationChildren;
 
     /**
-     * @var TranslationEntityInterface
+     * @var mixed
      **/
     private $translationParent;
 
@@ -104,7 +104,7 @@ trait TranslationEntityTrait
     /**
      * Get translation parent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getTranslationParent()
     {
