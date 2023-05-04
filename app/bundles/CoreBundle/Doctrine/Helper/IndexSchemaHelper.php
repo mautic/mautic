@@ -167,7 +167,7 @@ class IndexSchemaHelper
 
         if (count($sql)) {
             foreach ($sql as $query) {
-                $this->db->executeUpdate($query);
+                $this->db->executeStatement($query);
             }
             $this->changedIndexes = [];
             $this->dropIndexes    = [];

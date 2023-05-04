@@ -40,7 +40,7 @@ class Copy
             ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->length(32)
             ->build();
 

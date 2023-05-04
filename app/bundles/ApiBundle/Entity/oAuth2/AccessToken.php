@@ -51,7 +51,7 @@ class AccessToken extends BaseAccessToken
             ->addIndex(['token'], 'oauth2_access_token_search');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 

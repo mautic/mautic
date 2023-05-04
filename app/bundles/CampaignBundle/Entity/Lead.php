@@ -57,7 +57,7 @@ class Lead
             ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
 
         $builder->createManyToOne('campaign', 'Campaign')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->inversedBy('leads')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
             ->build();

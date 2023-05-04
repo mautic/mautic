@@ -51,7 +51,7 @@ class RefreshToken extends BaseRefreshToken
             ->addIndex(['token'], 'oauth2_refresh_token_search');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
