@@ -65,11 +65,11 @@ $container->loadFromExtension('swiftmailer', [
 ]);
 
 $connectionSettings = [
-    'host'     => getenv('DB_HOST') ?: '%mautic.db_host%',
-    'port'     => getenv('DB_PORT') ?: '%mautic.db_port%',
-    'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
-    'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
-    'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
+    'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
+    'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
+    'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
+    'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
+    'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
 ];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
