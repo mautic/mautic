@@ -225,14 +225,10 @@ class PageController extends FormController
         $abTestResults = [];
         $criteria      = $model->getBuilderComponents($activePage, 'abTestWinnerCriteria');
 
-                $event = new DetermineWinnerEvent($args);
-                $this->dispatcher->dispatch(
-                    $event,
-                    $testSettings['event']
-                );
-
-                $abTestResults = $event->getAbTestResults();
-            }
+        if (count($children) > 0) {
+            $abTestSettings      = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
+            $abTestResultService = $this->get('mautic.core.variant.abtest_result');
+            $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
         }
 
         // Init the date range filter form
