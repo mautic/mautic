@@ -5,6 +5,7 @@ namespace Mautic\ChannelBundle\Command;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,12 +22,12 @@ class SendChannelBroadcastCommand extends ModeratedCommand
     private EventDispatcherInterface $dispatcher;
     private TranslatorInterface $translator;
 
-    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper)
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
     {
         $this->dispatcher = $dispatcher;
         $this->translator = $translator;
 
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
     }
 
     protected function configure()
