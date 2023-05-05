@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Mautic\CoreBundle\Shortener;
 
@@ -53,15 +54,7 @@ class Shortener
 
     public function getEnabledServices(): array
     {
-        $enabledServices = [];
-
-        foreach ($this->services as $name => $service) {
-            if ($service->isEnabled()) {
-                $enabledServices[$name] = $service;
-            }
-        }
-
-        return $enabledServices;
+        return array_filter($this->services, fn ($service) => $service->isEnabled());
     }
 
     public function shortenUrl(string $url): string

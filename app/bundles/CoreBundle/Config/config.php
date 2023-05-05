@@ -452,14 +452,6 @@ return [
                 ],
             ],
 
-            'mautic.shortener' => [
-                'class'     => \Mautic\CoreBundle\Shortener\Shortener::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.shortener.custom.api',
-                ],
-            ],
-
             // System uses
             'mautic.di.env_processor.nullable' => [
                 'class' => \Mautic\CoreBundle\DependencyInjection\EnvProcessor\NullableProcessor::class,
