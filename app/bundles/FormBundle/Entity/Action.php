@@ -44,7 +44,7 @@ class Action
     private $properties = [];
 
     /**
-     * @var Form
+     * @var Form|null
      */
     private $form;
 
@@ -59,6 +59,7 @@ class Action
     public function __clone()
     {
         $this->id   = null;
+        $this->form = null;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
