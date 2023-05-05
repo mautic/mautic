@@ -157,7 +157,7 @@ class FrequencyRule extends CommonEntity
     }
 
     /**
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {

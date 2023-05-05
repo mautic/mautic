@@ -71687,3 +71687,13 @@ parameters:
 			message: "#^Property Mautic\\\\UserBundle\\\\Entity\\\\IdEntry\\:\\:\\$id type mapping mismatch: property can contain int but database expects string.$#"
 			count: 1
 			path:  app/bundles/UserBundle/Entity/IdEntry.php
+
+		-
+			message: "#^Property Mautic\\\\CampaignBundle\\\\Entity\\\\Campaign\\:\\:\\$allowRestart type mapping mismatch: database can contain int but property expects bool.$#"
+			count: 1
+			path:  app/bundles/CampaignBundle/Entity/Campaign.php
+
+		-
+			message: "#^Property Mautic\\\\CampaignBundle\\\\Entity\\\\Campaign\\:\\:\\$allowRestart type mapping mismatch: property can contain bool but database expects int.$#"
+			count: 1
+			path:  app/bundles/CampaignBundle/Entity/Campaign.php

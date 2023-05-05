@@ -73,9 +73,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var int
+     * @var bool
      */
-    private $allowRestart = 0;
+    private $allowRestart = false;
 
     public function __construct()
     {
@@ -581,7 +581,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function getAllowRestart()
     {
@@ -589,7 +589,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @return int
+     * @return bool
      */
     public function allowRestart()
     {
@@ -597,7 +597,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @param int $allowRestart
+     * @param bool $allowRestart
      *
      * @return Campaign
      */
