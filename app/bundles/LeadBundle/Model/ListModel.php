@@ -452,7 +452,7 @@ class ListModel extends FormModel
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
-                        new ListChangeEvent($segmentId, $leadList, true),
+                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true),
                         LeadEvents::LEAD_LIST_BATCH_CHANGE
                     );
                 }

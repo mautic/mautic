@@ -1,0 +1,76 @@
+diff --git a/node_modules/chosen-js/chosen.jquery.js b/node_modules/chosen-js/chosen.jquery.js
+index dbc3a25..3a1e473 100644
+--- a/node_modules/chosen-js/chosen.jquery.js
++++ b/node_modules/chosen-js/chosen.jquery.js
+@@ -382,15 +382,38 @@
+         }
+       }
+       this.result_clear_highlight();
+-      if (results < 1 && query.length) {
++
++      // Mautic hack to allow adding new options - start
++
++      var resultsCount = this.results_data.length,
++          selectedCount = 0;
++
++      for (_i = 0, _len = this.results_data.length; _i < _len; _i++) {
++        if (!this.results_data[_i].group && this.results_data[_i].selected) {
++          selectedCount++;
++        }
++      }
++
++      if ((results < 1 || (resultsCount > 0 && resultsCount === selectedCount && $(this.form_field).data('allow-add'))) && query.length) {
+         this.update_results_content("");
+         return this.no_results(query);
+       } else {
+         this.update_results_content(this.results_option_build());
+-        if (!(options != null ? options.skip_highlight : void 0)) {
+-          return this.winnow_results_set_highlight();
+-        }
++        return this.winnow_results_set_highlight();
+       }
++
++      // Mautic hack to allow adding new options - end
++
++      // Original:
++      // if (results < 1 && query.length) {
++      //   this.update_results_content("");
++      //   return this.no_results(query);
++      // } else {
++      //   this.update_results_content(this.results_option_build());
++      //   if (!(options != null ? options.skip_highlight : void 0)) {
++      //     return this.winnow_results_set_highlight();
++      //   }
++      // }
+     };
+ 
+     AbstractChosen.prototype.get_search_regex = function(escaped_search_string) {
+@@ -456,6 +479,23 @@
+         case 13:
+           if (this.results_showing) {
+             evt.preventDefault();
++
++            // Mautic hack to allow adding new entries if applicable - start
++            if (!$(this.form_field).data('allow-add') || !this.is_multiple || this.result_highlight) {
++              return this.result_select(evt);
++            }
++
++            var newTag = $(evt.target).val();
++
++            if ($(this.form_field).find('option').filter(function(){ return $(this).text() === newTag}).length === 0) {
++              $(this.form_field).append('<option>' + newTag + '</option>');
++              $(this.form_field).trigger('chosen:updated');
++              this.result_highlight = this.search_results.find('li.active-result').last();
++
++              return this.result_select(evt);
++            }
++            // Mautic hack to allow adding new entries if applicable - end
++
+           }
+           break;
+         case 27:
+@@ -1345,3 +1385,4 @@
+   })(AbstractChosen);
+ 
+ }).call(this);
++
