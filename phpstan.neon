@@ -34,5 +34,6 @@ parameters:
 		- vendor/twig/twig/src/Extension/EscaperExtension.php
 	doctrine:
 		objectManagerLoader: object-manager.php
+		allowNullablePropertyForRequiredField: true
 	stubFiles:
 		- stubs/Token.stub		
