@@ -325,5 +325,6 @@ return [
         'blacklisted_extensions'    => ['php', 'sh'],
         'do_not_submit_emails'      => [],
         'form_results_data_sources' => false,
+        'successful_submit_action'  => 'top',
     ],
 ];

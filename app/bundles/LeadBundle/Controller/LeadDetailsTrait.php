@@ -185,7 +185,7 @@ trait LeadDetailsTrait
         }
 
         $lineChart  = new LineChart(null, $fromDate, $toDate);
-        $chartQuery = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
@@ -325,7 +325,7 @@ trait LeadDetailsTrait
 
         /** @var LeadModel $model */
         $model       = $this->getModel('lead');
-        $chartQuery  = new ChartQuery($this->getDoctrine()->getConnection(), $fromDate, $toDate);
+        $chartQuery  = new ChartQuery($this->doctrine->getConnection(), $fromDate, $toDate);
 
         $engagements = $model->getEngagementCount($lead, $fromDate, $toDate, 'm', $chartQuery);
         $pointStats  = $chartQuery->fetchSumTimeData('lead_points_change_log', 'date_added', ['lead_id' => $lead->getId()], 'delta');
@@ -410,7 +410,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->getDoctrine()->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
 
         return $leadEventLogRepository->getUpcomingEvents(
             [
