@@ -32,7 +32,7 @@ class CheckStep implements StepInterface
     private $openSSLCipher;
 
     /**
-     * @var ParameterLoader
+     * @var ParameterLoader|null
      */
     private $parameterLoader;
 
