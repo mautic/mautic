@@ -97,8 +97,9 @@
               </div>
           {% endif %}
 
+          {%- if form.shortener_service is defined %}
           <div class="row">
-              <div class="col-md-6">
+                <div class="col-md-6">
                   {{ form_label(form.shortener_service) }}
                   {% if form.shortener_service.vars.choices|length > 0 %}
                       {{ form_widget(form.shortener_service) }}
@@ -110,10 +111,8 @@
                       </div>
                   {% endif %}
               </div>
-              {% if fields.link_shortener_url is defined %}
-                  {%- if form.link_shortener_url is defined %}<div class="col-md-6">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
-              {% endif %}
           </div>
+          {% endif %}
 
           {% if fields.max_entity_lock_time is defined %}
             <hr class="text-muted" />

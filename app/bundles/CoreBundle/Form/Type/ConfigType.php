@@ -582,21 +582,6 @@ class ConfigType extends AbstractType
         );
 
         $builder->add(
-            'link_shortener_url',
-            TextType::class,
-            [
-                'label'      => 'mautic.core.config.form.link.shortener',
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'tooltip'      => 'mautic.core.config.form.link.shortener.tooltip',
-                    'data-show-on' => !empty($choices) ? '{"config_coreconfig_shortener_service": ""}' : null,
-                ],
-                'required' => false,
-            ]
-        );
-
-        $builder->add(
             'max_entity_lock_time',
             NumberType::class,
             [

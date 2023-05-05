@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Shortener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Shortener\CustomApi\CustomApiShortener;
 
 class Shortener
 {
@@ -13,17 +12,14 @@ class Shortener
 
     private CoreParametersHelper $coreParametersHelper;
 
-    private CustomApiShortener $customApiShortener;
-
     /**
      * @var ShortenerServiceInterface[]
      */
     private array $services = [];
 
-    public function __construct(CoreParametersHelper $coreParametersHelper, CustomApiShortener $customApiShortener)
+    public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->customApiShortener   = $customApiShortener;
     }
 
     public function addService(string $id, ShortenerServiceInterface $shortener)
@@ -62,7 +58,7 @@ class Shortener
         try {
             return $this->getService()->shortenUrl($url);
         } catch (\InvalidArgumentException $exception) {
-            return $this->customApiShortener->shortenUrl($url);
+            return $url;
         }
     }
 }

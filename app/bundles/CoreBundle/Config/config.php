@@ -624,11 +624,6 @@ return [
             ],
             'mautic.helper.url' => [
                 'class'     => \Mautic\CoreBundle\Helper\UrlHelper::class,
-                'arguments' => [
-                    'mautic.http.client',
-                    '%mautic.link_shortener_url%',
-                    'monolog.logger.mautic',
-                ],
             ],
             'mautic.helper.export' => [
                 'class'     => \Mautic\CoreBundle\Helper\ExportHelper::class,
@@ -837,14 +832,6 @@ return [
                     'doctrine.orm.default_entity_manager',
                 ],
                 'tag' => 'mautic.update_check',
-            ],
-            'mautic.shortener.custom.api' => [
-                'class'     => \Mautic\CoreBundle\Shortener\CustomApi\CustomApiShortener::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.http.client',
-                    'monolog.logger.mautic',
-                ],
             ],
         ],
         'models' => [
@@ -1368,7 +1355,6 @@ return [
         ],
         'do_not_track_internal_ips' => [],
         'track_private_ip_ranges'   => false,
-        'link_shortener_url'        => null,
         'cached_data_timeout'       => 10,
         'batch_sleep_time'          => 1,
         'batch_campaign_sleep_time' => false,
