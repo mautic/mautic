@@ -37,6 +37,7 @@
         <div class="col-md-8 va-m">
             <div class="row">
                 <div class="col-xs-1">
+                    {% if variants.parent.getId() == variant.getId() %}
                     <h3>
                         {{ include('@MauticCore/Helper/publishstatus_icon.html.twig', {
                                 'item': variant,
@@ -45,6 +46,7 @@
                                 'query': 'size=',
                         }) }}
                     </h3>
+                    {% endif %}
                 </div>
                 <div class="col-xs-11">
                     {% if isWinner %}
