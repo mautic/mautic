@@ -189,6 +189,7 @@ return [
                     'mautic.ip_lookup.factory',
                     '%mautic.ip_lookup_services%',
                     'mautic.ip_lookup',
+                    'mautic.shortener',
                 ],
             ],
             'mautic.form.type.dynamic_content_filter_entry_filters' => [
@@ -448,6 +449,14 @@ return [
                 'class'     => 'Mautic\CoreBundle\Configurator\Configurator',
                 'arguments' => [
                     'mautic.helper.paths',
+                ],
+            ],
+
+            'mautic.shortener' => [
+                'class'     => \Mautic\CoreBundle\Shortener\Shortener::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.shortener.custom.api',
                 ],
             ],
 
@@ -836,6 +845,14 @@ return [
                     'doctrine.orm.default_entity_manager',
                 ],
                 'tag' => 'mautic.update_check',
+            ],
+            'mautic.shortener.custom.api' => [
+                'class'     => \Mautic\CoreBundle\Shortener\CustomApi\CustomApiShortener::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'mautic.http.client',
+                    'monolog.logger.mautic',
+                ],
             ],
         ],
         'models' => [
@@ -1465,7 +1482,8 @@ return [
                 'font' => 'メイリオ, Meiryo, ＭＳ Ｐゴシック, MS PGothic, ヒラギノ角ゴ Pro W3, Hiragino Kaku Gothic Pro,Osaka, sans-serif',
             ],
         ],
-        'composer_updates'   => false,
-        'redis_primary_only' => false,
+        'composer_updates'                                        => false,
+        'redis_primary_only'                                      => false,
+        \Mautic\CoreBundle\Shortener\Shortener::SHORTENER_SERVICE => null,
     ],
 ];

@@ -114,9 +114,9 @@ return [
                 ],
             ],
             'mautic.page.model.redirect' => [
-                'class'     => 'Mautic\PageBundle\Model\RedirectModel',
+                'class'     => \Mautic\PageBundle\Model\RedirectModel::class,
                 'arguments' => [
-                    'mautic.helper.url',
+                    'mautic.shortener',
                 ],
             ],
             'mautic.page.model.trackable' => [

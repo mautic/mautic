@@ -97,12 +97,23 @@
               </div>
           {% endif %}
 
-          {% if fields.link_shortener_url is defined %}
-            <hr class="text-muted" />
-            <div class="row">
-                {%- if form.link_shortener_url is defined %}<div class="col-md-6">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
-            </div>
-          {% endif %}
+          <div class="row">
+              <div class="col-md-6">
+                  {{ form_label(form.shortener_service) }}
+                  {% if form.shortener_service.vars.choices|length > 0 %}
+                      {{ form_widget(form.shortener_service) }}
+                  {% else %}
+                      <div class="row">
+                          <div class="col-xs-12">
+                              {{ 'mautic.core.config.form.shortener.empty'|trans }}
+                          </div>
+                      </div>
+                  {% endif %}
+              </div>
+              {% if fields.link_shortener_url is defined %}
+                  {%- if form.link_shortener_url is defined %}<div class="col-md-6">{{ form_row(form.link_shortener_url) }}</div>{% endif %}
+              {% endif %}
+          </div>
 
           {% if fields.max_entity_lock_time is defined %}
             <hr class="text-muted" />

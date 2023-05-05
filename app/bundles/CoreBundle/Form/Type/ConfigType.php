@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Form\DataTransformer\ArrayStringTransformer;
 use Mautic\CoreBundle\Helper\LanguageHelper;
 use Mautic\CoreBundle\IpLookup\AbstractLookup;
 use Mautic\CoreBundle\IpLookup\IpLookupFormInterface;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Form\Type\PageListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -27,6 +28,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
+    private Shortener $shortenerFactory;
+
     /**
      * @var TranslatorInterface
      */
@@ -62,7 +65,8 @@ class ConfigType extends AbstractType
         LanguageHelper $langHelper,
         IpLookupFactory $ipLookupFactory,
         array $ipLookupServices,
-        AbstractLookup $ipLookup = null
+        AbstractLookup $ipLookup = null,
+        Shortener $shortenerFactory
     ) {
         $this->translator          = $translator;
         $this->langHelper          = $langHelper;
@@ -70,6 +74,7 @@ class ConfigType extends AbstractType
         $this->ipLookup            = $ipLookup;
         $this->supportedLanguages  = $langHelper->getSupportedLanguages();
         $this->ipLookupServices    = $ipLookupServices;
+        $this->shortenerFactory    = $shortenerFactory;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -560,6 +565,22 @@ class ConfigType extends AbstractType
             ]
         );
 
+        $enabledServices = $this->shortenerFactory->getEnabledServices();
+        $choices         = array_combine(array_keys($enabledServices), array_keys($enabledServices));
+        $builder->add(
+            Shortener::SHORTENER_SERVICE,
+            ChoiceType::class,
+            [
+                'choices'           => $choices,
+                'label'             => 'mautic.core.config.form.shortener',
+                'required'          => false,
+                'attr'              => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.core.config.form.shortener.tooltip',
+                ],
+            ]
+        );
+
         $builder->add(
             'link_shortener_url',
             TextType::class,
@@ -567,8 +588,9 @@ class ConfigType extends AbstractType
                 'label'      => 'mautic.core.config.form.link.shortener',
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'mautic.core.config.form.link.shortener.tooltip',
+                    'class'        => 'form-control',
+                    'tooltip'      => 'mautic.core.config.form.link.shortener.tooltip',
+                    'data-show-on' => !empty($choices) ? '{"config_coreconfig_shortener_service": ""}' : null,
                 ],
                 'required' => false,
             ]

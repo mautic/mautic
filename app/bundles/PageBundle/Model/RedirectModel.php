@@ -4,6 +4,7 @@ namespace Mautic\PageBundle\Model;
 
 use Mautic\CoreBundle\Helper\UrlHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\RedirectRepository;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
@@ -14,17 +15,11 @@ use Mautic\PageBundle\PageEvents;
  */
 class RedirectModel extends FormModel
 {
-    /**
-     * @var UrlHelper
-     */
-    protected $urlHelper;
+    private Shortener $shortener;
 
-    /**
-     * RedirectModel constructor.
-     */
-    public function __construct(UrlHelper $urlHelper)
+    public function __construct(Shortener $shortener)
     {
-        $this->urlHelper = $urlHelper;
+        $this->shortener = $shortener;
     }
 
     public function getRepository(): RedirectRepository
@@ -77,7 +72,7 @@ class RedirectModel extends FormModel
         }
 
         if ($shortenUrl) {
-            $url = $this->urlHelper->buildShortUrl($url);
+            $url = $this->shortener->shortenUrl($url);
         }
 
         return $url;
