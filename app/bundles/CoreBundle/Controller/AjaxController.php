@@ -318,11 +318,11 @@ class AjaxController extends CommonController
                         $dataArray['statusHtml'] = $html;
                     }
                 } catch (RecordCanNotUnpublishException $e) {
-                    $this->addFlash($e->getMessage());
+                    $this->addFlashMessage($e->getMessage());
                     $status = Response::HTTP_UNPROCESSABLE_ENTITY;
                 }
             } else {
-                $this->addFlash('mautic.core.error.access.denied');
+                $this->addFlashMessage('mautic.core.error.access.denied');
                 $status = Response::HTTP_FORBIDDEN;
             }
         }

@@ -173,7 +173,7 @@ class SchemaHelper
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->db->query($q);
+                    $this->db->executeQuery($q);
                 } catch (\Exception $exception) {
                     $this->db->close();
 

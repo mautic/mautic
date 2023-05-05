@@ -22,12 +22,12 @@ class Lead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLastExited;
 
@@ -57,7 +57,7 @@ class Lead
             ->addIndex(['campaign_id', 'manually_removed', 'lead_id', 'rotation'], 'campaign_leads');
 
         $builder->createManyToOne('campaign', 'Campaign')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->inversedBy('leads')
             ->addJoinColumn('campaign_id', 'id', false, false, 'CASCADE')
             ->build();
@@ -106,7 +106,7 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -227,7 +227,7 @@ class Lead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateLastExited()
     {

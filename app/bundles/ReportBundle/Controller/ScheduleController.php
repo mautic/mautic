@@ -46,19 +46,19 @@ class ScheduleController extends CommonAjaxController
         $security = $this->security;
 
         if (empty($report)) {
-            $this->addFlash('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
+            $this->addFlashMessage('mautic.report.notfound', ['%id%' => $reportId], FlashBag::LEVEL_ERROR, 'messages');
 
             return $this->flushFlash();
         }
 
         if (!$security->hasEntityAccess('report:reports:viewown', 'report:reports:viewother', $report->getCreatedBy())) {
-            $this->addFlash('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.core.error.accessdenied', [], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash();
         }
 
         if ($report->isScheduled()) {
-            $this->addFlash('mautic.report.scheduled.already', ['%id%' => $reportId], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.report.scheduled.already', ['%id%' => $reportId], FlashBag::LEVEL_ERROR);
 
             return $this->flushFlash();
         }
@@ -66,7 +66,7 @@ class ScheduleController extends CommonAjaxController
         $report->setAsScheduledNow($this->user->getEmail());
         $model->saveEntity($report);
 
-        $this->addFlash(
+        $this->addFlashMessage(
             'mautic.report.scheduled.to.now',
             ['%id%' => $reportId, '%email%' => $this->user->getEmail()]
         );

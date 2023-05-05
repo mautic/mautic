@@ -18,7 +18,7 @@ class CompanyLead
     private $lead;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -35,7 +35,7 @@ class CompanyLead
             ->setCustomRepositoryClass(CompanyLeadRepository::class);
 
         $builder->createManyToOne('company', 'Company')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->build();
 
@@ -50,7 +50,7 @@ class CompanyLead
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

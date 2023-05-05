@@ -123,7 +123,7 @@ class ConfigController extends FormController
                             $configurator->write();
                             $dispatcher->dispatch($configEvent, ConfigEvents::CONFIG_POST_SAVE);
 
-                            $this->addFlash('mautic.config.config.notice.updated');
+                            $this->addFlashMessage('mautic.config.config.notice.updated');
 
                             $cacheHelper->refreshConfig();
 
@@ -131,7 +131,7 @@ class ConfigController extends FormController
                                 $openTab = $formData['coreconfig']['last_shown_tab'];
                             }
                         } catch (\RuntimeException $exception) {
-                            $this->addFlash('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
+                            $this->addFlashMessage('mautic.config.config.error.not.updated', ['%exception%' => $exception->getMessage()], 'error');
                         }
 
                         $this->setLocale($request, $tokenStorage, $params);
@@ -269,6 +269,7 @@ class ConfigController extends FormController
 
         // Import the current local configuration, $parameters is defined in this file
 
+        $parameters = [];
         /** @var array $parameters */
         include $localConfigFile;
 

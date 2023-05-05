@@ -79,8 +79,8 @@ class CategoryControllerFunctionalTest extends MauticMysqlTestCase
         $form       = $saveButton->form();
         $form['category_form[bundle]']->setValue('category');
         $form['category_form[title]']->setValue('Test');
-        $form['category_form[isPublished]']->setValue(1);
-        $form['category_form[inForm]']->setValue(1);
+        $form['category_form[isPublished]']->setValue('1');
+        $form['category_form[inForm]']->setValue('1');
 
         $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk());

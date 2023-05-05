@@ -47,7 +47,7 @@ class PublicController extends FormController
         }
 
         /** @var array $result */
-        $result           = $request->request->get('body', []);
+        $result           = $request->request->get('body') ?? [];
         $oid              = $request->request->get('id');
         $validatedRequest = $lookupHelper->validateRequest($oid, $request->request->get('type'));
 
@@ -168,7 +168,7 @@ class PublicController extends FormController
             } else {
                 /******************  COMPANY STUFF  *********************/
 
-                if ('company' === $request->request->get('type', [], true)) {
+                if ('company' === $request->request->get('type')) {
                     /** @var \Mautic\LeadBundle\Model\CompanyModel $model */
                     $model = $this->getModel('lead.company');
                     /** @var Company $company */

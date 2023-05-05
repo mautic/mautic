@@ -120,7 +120,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.openrate',
-                    'supportTemplate' => '@MauticPage/SubscribedEvents\AbTest/bargraph.html.twig',
+                    'supportTemplate' => '@MauticPage/SubscribedEvents/AbTest/bargraph.html.twig',
                 ]);
 
                 return;
@@ -221,7 +221,7 @@ class DetermineWinnerSubscriber implements EventSubscriberInterface
                     'winners'         => $winners,
                     'support'         => $support,
                     'basedOn'         => 'email.clickthrough',
-                    'supportTemplate' => '@MauticPage/SubscribedEvents\AbTest/bargraph.html.twig',
+                    'supportTemplate' => '@MauticPage/SubscribedEvents/AbTest/bargraph.html.twig',
                 ]);
 
                 return;

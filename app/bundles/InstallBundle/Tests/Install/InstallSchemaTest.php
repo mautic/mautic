@@ -5,6 +5,7 @@ namespace Mautic\InstallBundle\Tests\Install;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Table;
+use Mautic\CoreBundle\Test\EnvLoader;
 use Mautic\InstallBundle\Helper\SchemaHelper;
 use PHPUnit\Framework\Assert;
 
@@ -22,14 +23,15 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         parent::setUp();
+        EnvLoader::load();
 
         $this->dbParams = [
-            'driver'        => getenv('DB_DRIVER') ?: 'pdo_mysql',
-            'host'          => getenv('DB_HOST'),
-            'port'          => getenv('DB_PORT'),
-            'dbname'        => getenv('DB_NAME'), // Doctrine needs 'dbname', not 'name'
-            'user'          => getenv('DB_USER'),
-            'password'      => getenv('DB_PASSWD'),
+            'driver'        => $_ENV['DB_DRIVER'] ?? 'pdo_mysql',
+            'host'          => $_ENV['DB_HOST'],
+            'port'          => $_ENV['DB_PORT'],
+            'dbname'        => $_ENV['DB_NAME'], // Doctrine needs 'dbname', not 'name'
+            'user'          => $_ENV['DB_USER'],
+            'password'      => $_ENV['DB_PASSWD'],
             'table_prefix'  => MAUTIC_TABLE_PREFIX,
             'backup_prefix' => 'bak_',
         ];
@@ -86,7 +88,7 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->connection->query($q);
+                    $this->connection->executeQuery($q);
                 } catch (\Exception $exception) {
                     $exceptions[] = $exception->getMessage();
                 }

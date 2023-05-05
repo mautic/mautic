@@ -172,7 +172,7 @@ class TagController extends FormController
                     $found = $model->getRepository()->countOccurrences($tag->getTag());
                     if (0 !== $found) {
                         $valid = false;
-                        $this->addFlash('mautic.core.notice.updated', [
+                        $this->addFlashMessage('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -183,7 +183,7 @@ class TagController extends FormController
                     } else {
                         $model->saveEntity($tag);
 
-                        $this->addFlash('mautic.core.notice.created', [
+                        $this->addFlashMessage('mautic.core.notice.created', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -294,7 +294,7 @@ class TagController extends FormController
                     }
 
                     if (!$valid) {
-                        $this->addFlash('mautic.core.notice.updated', [
+                        $this->addFlashMessage('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [
@@ -306,7 +306,7 @@ class TagController extends FormController
                         //form is valid so process the data
                         $tagModel->saveEntity($tag, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                        $this->addFlash('mautic.core.notice.updated', [
+                        $this->addFlashMessage('mautic.core.notice.updated', [
                             '%name%'      => $tag->getTag(),
                             '%menu_link%' => 'mautic_tagmanager_index',
                             '%url%'       => $this->generateUrl('mautic_tagmanager_action', [

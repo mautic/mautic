@@ -3,6 +3,7 @@
 namespace Mautic\LeadBundle\Controller;
 
 use function assert;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\CsvHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -59,11 +60,11 @@ class ImportController extends FormController
      */
     private $importModel;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine)
     {
         $this->logger = $mauticLogger;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     public function initialize(ControllerEvent $event)
@@ -227,7 +228,7 @@ class ImportController extends FormController
         if (!file_exists($fullPath) && self::STEP_UPLOAD_CSV !== $step) {
             // Force step one if the file doesn't exist
             $this->logger->log(LogLevel::WARNING, "File {$fullPath} does not exist anymore. Reseting import to step STEP_UPLOAD_CSV.");
-            $this->addFlash('mautic.import.file.missing', ['%file%' => $this->getImportFileName($object)], FlashBag::LEVEL_ERROR);
+            $this->addFlashMessage('mautic.import.file.missing', ['%file%' => $this->getImportFileName($object)], FlashBag::LEVEL_ERROR);
             $step = self::STEP_UPLOAD_CSV;
             $this->session->set('mautic.'.$object.'.import.step', self::STEP_UPLOAD_CSV);
         }
@@ -455,7 +456,7 @@ class ImportController extends FormController
 
                     // In case the user decided to queue the import
                     if ($this->importInCli($form, $object)) {
-                        $this->addFlash('mautic.'.$object.'.batch.import.created');
+                        $this->addFlashMessage('mautic.'.$object.'.batch.import.created');
                         $this->resetImport($object);
 
                         return $this->indexAction($request);

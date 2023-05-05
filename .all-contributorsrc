@@ -1008,6 +1008,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "paulsanduleac",
+      "name": "Paul Sanduleac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67867?v=4",
+      "profile": "http://paulsanduleac.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

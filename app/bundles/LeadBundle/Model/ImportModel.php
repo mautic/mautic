@@ -520,12 +520,14 @@ class ImportModel extends FormModel
      *
      * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
 
         // Clear the times for display by minutes
+        /** @var \DateTime $dateFrom */
+        /** @var \DateTime $dateTo */
         $dateFrom->modify('-1 minute');
         $dateFrom->setTime($dateFrom->format('H'), $dateFrom->format('i'), 0);
         $dateTo->modify('+1 minute');

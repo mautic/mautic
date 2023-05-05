@@ -131,7 +131,7 @@ class UserController extends FormController
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user', []);
+                $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -161,11 +161,11 @@ class UserController extends FormController
                                 $messageVars = $fetchLanguage['vars'];
                             }
 
-                            $this->addFlash($message, $messageVars);
+                            $this->addFlashMessage($message, $messageVars);
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
@@ -261,7 +261,7 @@ class UserController extends FormController
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 //check to see if the password needs to be rehashed
-                $formUser          = $request->request->get('user', []);
+                $formUser          = $request->request->get('user') ?? [];
                 $submittedPassword = $formUser['plainPassword']['password'] ?? null;
                 $password          = $model->checkNewPassword($user, $encoder, $submittedPassword);
 
@@ -291,11 +291,11 @@ class UserController extends FormController
                                 $messageVars = $fetchLanguage['vars'];
                             }
 
-                            $this->addFlash($message, $messageVars);
+                            $this->addFlashMessage($message, $messageVars);
                         }
                     }
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $user->getName(),
                         '%menu_link%' => 'mautic_user_index',
                         '%url%'       => $this->generateUrl('mautic_user_action', [
@@ -432,7 +432,7 @@ class UserController extends FormController
         $currentUser = $this->user;
 
         if ('POST' === $request->getMethod()) {
-            $contact   = $request->request->get('contact', []);
+            $contact   = $request->request->get('contact') ?? [];
             $formUrl   = $contact['returnUrl'] ?? '';
             $returnUrl = $formUrl ? urldecode($formUrl) : $this->generateUrl('mautic_dashboard_index');
             $valid     = false;
@@ -479,7 +479,7 @@ class UserController extends FormController
                     \assert($auditLogModel instanceof AuditLogModel);
                     $auditLogModel->writeToLog($log);
 
-                    $this->addFlash('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
+                    $this->addFlashMessage('mautic.user.user.notice.messagesent', ['%name%' => $user->getName()]);
                 }
             }
             if ($cancelled || $valid) {

@@ -183,9 +183,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->method('write');
 
         $this->configurator->expects($this->once())
-            ->method('mergeParameters')
-            ->with($params)
-            ->willReturn($messages);
+            ->method('mergeParameters');
 
         $this->assertEquals($messages, $this->installer->saveConfiguration($params, $step, $clearCache));
     }
@@ -204,9 +202,7 @@ class InstallServiceTest extends \PHPUnit\Framework\TestCase
             ->willReturn($params);
 
         $this->configurator->expects($this->once())
-            ->method('mergeParameters')
-            ->with($params)
-            ->willReturn($messages);
+            ->method('mergeParameters');
 
         $this->configurator->expects($this->once())
             ->method('write');

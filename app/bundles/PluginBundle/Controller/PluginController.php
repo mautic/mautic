@@ -147,7 +147,7 @@ class PluginController extends FormController
 
         $session   = $request->getSession();
 
-        $integrationDetailsPost = $request->request->get('integration_details', [], true);
+        $integrationDetailsPost = $request->request->get('integration_details') ?? [];
         $authorize              = empty($integrationDetailsPost['in_auth']) ? false : true;
 
         /** @var \Mautic\PluginBundle\Helper\IntegrationHelper $integrationHelper */
@@ -418,7 +418,7 @@ class PluginController extends FormController
             return $this->accessDenied();
         }
 
-        $this->addFlash(
+        $this->addFlashMessage(
             $reloadFacade->reloadPlugins()
         );
 

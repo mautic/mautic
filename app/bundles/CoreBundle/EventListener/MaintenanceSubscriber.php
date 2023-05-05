@@ -70,7 +70,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                     $qb->expr()->lte('log.date_added', ':date')
                 )
                 ->execute()
-                ->fetchColumn();
+                ->fetchOne();
         } else {
             $qb->select('log.id')
               ->from(MAUTIC_TABLE_PREFIX.$table, 'log')
@@ -83,7 +83,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
-                $ids = array_column($qb->execute()->fetchAll(), 'id');
+                $ids = array_column($qb->execute()->fetchAllAssociative(), 'id');
 
                 if (0 === sizeof($ids)) {
                     break;

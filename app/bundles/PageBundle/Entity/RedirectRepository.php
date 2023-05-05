@@ -170,6 +170,6 @@ class RedirectRepository extends CommonRepository
 
         $q->orderBy('hits', 'DESC');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 }

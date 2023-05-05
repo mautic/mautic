@@ -2,14 +2,14 @@
   Variables
     - form
     - fields
+    - first
 #}
 {% block _leadlist_filters_entry_widget %}
-  {% set first = true %}
   {% set isPrototype = ('__name__' == form.vars.name) %}
   {% set filterType = form.field.vars.value %}
   {% set inGroup = form.vars.data is defined and form.vars.data.glue is defined and 'and' == form.vars.data.glue %}
   {% set isBehavior = fields.behaviors[filterType].label is defined %}
-  {% set class = (form.vars.data.object is defined and form.vars.object is defined and 'company' == form.vars.object) ? 'fa-building' : 'fa-user' %}
+  {% set class = form.vars.data.object is defined and 'company' == form.vars.data.object ? 'fa-building' : 'fa-user' %}
 
   {% if isBehavior %}
       {% set object = 'behaviors' %}

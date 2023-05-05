@@ -106,7 +106,7 @@ $container->loadFromExtension('framework', [
 $container->setParameter('mautic.famework.csrf_protection', true);
 
 //Doctrine Configuration
-$dbalSettings = [
+$connectionSettings = [
     'driver'                => '%mautic.db_driver%',
     'host'                  => '%mautic.db_host%',
     'port'                  => '%mautic.db_port%',
@@ -118,11 +118,6 @@ $dbalSettings = [
         'charset'    => 'utf8mb4',
         'collate'    => 'utf8mb4_unicode_ci',
         'row_format' => 'DYNAMIC',
-    ],
-    'types'    => [
-        'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
-        'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
-        'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
     ],
     // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
     'mapping_types' => [
@@ -151,7 +146,22 @@ if (!empty($localConfigParameterBag->get('db_host_ro'))) {
 }
 
 $container->loadFromExtension('doctrine', [
-    'dbal' => $dbalSettings,
+    'dbal' => [
+        'default_connection' => 'default',
+        'connections'        => [
+            'default'    => $connectionSettings,
+            'unbuffered' => array_merge($connectionSettings, [
+                'options' => [
+                    PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => false,
+                ],
+            ]),
+        ],
+        'types'    => [
+            'array'     => \Mautic\CoreBundle\Doctrine\Type\ArrayType::class,
+            'datetime'  => \Mautic\CoreBundle\Doctrine\Type\UTCDateTimeType::class,
+            'generated' => \Mautic\CoreBundle\Doctrine\Type\GeneratedType::class,
+        ],
+    ],
     'orm'  => [
         'auto_generate_proxy_classes' => '%kernel.debug%',
         'auto_mapping'                => true,
@@ -166,10 +176,14 @@ $container->loadFromExtension('doctrine', [
 
 //MigrationsBundle Configuration
 $container->loadFromExtension('doctrine_migrations', [
-    'dir_name'        => '%kernel.project_dir%/app/migrations',
-    'namespace'       => 'Mautic\\Migrations',
-    'table_name'      => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
-    'name'            => 'Mautic Migrations',
+    'migrations_paths' => [
+        'Mautic\\Migrations' => '%kernel.project_dir%/app/migrations',
+    ],
+    'storage' => [
+        'table_storage' => [
+            'table_name' => '%env(MAUTIC_MIGRATIONS_TABLE_NAME)%',
+        ],
+    ],
     'custom_template' => '%kernel.project_dir%/app/migrations/Migration.template',
 ]);
 
@@ -260,6 +274,11 @@ $container->loadFromExtension('framework', [
             'api_rate_limiter_cache' => $configParameterBag->get('api_rate_limiter_cache'),
         ],
     ],
+]);
+
+//Twig Configuration
+$container->loadFromExtension('twig', [
+    'exception_controller' => null,
 ]);
 
 $rateLimit = (int) $configParameterBag->get('api_rate_limiter_limit');

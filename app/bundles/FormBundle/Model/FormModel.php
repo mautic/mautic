@@ -541,19 +541,20 @@ class FormModel extends CommonFormModel
         $html               = $this->twig->render(
             $formToRender,
             [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $viewOnlyFields,
-                'fields'         => $fields,
-                'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
-                'form'           => $entity,
-                'theme'          => '@themes/'.$entity->getTemplate().'/Field/',
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
-                'displayManager' => $displayManager,
+                'fieldSettings'          => $this->getCustomComponents()['fields'],
+                'viewOnlyFields'         => $viewOnlyFields,
+                'fields'                 => $fields,
+                'mappedFields'           => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                'form'                   => $entity,
+                'theme'                  => '@themes/'.$entity->getTemplate().'/Field/',
+                'submissions'            => $submissions,
+                'lead'                   => $lead,
+                'formPages'              => $pages,
+                'lastFormPage'           => $lastPage,
+                'style'                  => $style,
+                'inBuilder'              => false,
+                'displayManager'         => $displayManager,
+                'successfulSubmitAction' => $this->coreParametersHelper->get('successful_submit_action'),
             ]
         );
 
@@ -969,7 +970,7 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

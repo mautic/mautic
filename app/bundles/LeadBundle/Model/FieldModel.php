@@ -485,10 +485,7 @@ class FieldModel extends FormModel
         $this->leadFieldSaver             = $leadFieldSaver;
     }
 
-    /**
-     * @return LeadFieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadFieldRepository
     {
         return $this->leadFieldRepository;
     }

@@ -60,15 +60,15 @@
     }
 }
 
-{{ include('MauticFocusBundle:Builder:Bar/style.less.twig', {
+{{ include('@MauticFocus/Builder/Bar/style.less.twig', {
         'preview': preview,
 }, with_context=false) }}
 
-{{ include('MauticFocusBundle:Builder:Modal/style.less.twig', {
+{{ include('@MauticFocus/Builder/Modal/style.less.twig', {
         'preview': preview,
 }, with_context=false) }}
 
-{{ include('MauticFocusBundle:Builder:Notification/style.less.twig', {
+{{ include('@MauticFocus/Builder/Notification/style.less.twig', {
         'preview': preview,
 }, with_context=false) }}
 

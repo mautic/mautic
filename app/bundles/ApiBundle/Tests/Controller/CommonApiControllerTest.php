@@ -2,6 +2,7 @@
 
 namespace Mautic\ApiBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Tests\CampaignTestAbstract;
@@ -97,7 +98,8 @@ class CommonApiControllerTest extends CampaignTestAbstract
             $this->createMock(Router::class),
             $this->createMock(FormFactoryInterface::class),
             $this->createMock(AppVersion::class),
-            $this->createMock(RequestStack::class)
+            $this->createMock(RequestStack::class),
+            $this->createMock(ManagerRegistry::class)
         );
 
         $controllerReflection = new \ReflectionClass(CommonApiController::class);
@@ -109,7 +111,7 @@ class CommonApiControllerTest extends CampaignTestAbstract
 
     public function testGetBatchEntities(): void
     {
-        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), ) extends CommonApiController {
+        $controller = new class($this->createMock(CorePermissions::class), $this->createMock(Translator::class), new EntityResultHelper(), $this->createMock(Router::class), $this->createMock(FormFactoryInterface::class), $this->createMock(AppVersion::class), $this->createMock(RequestStack::class), $this->createMock(ManagerRegistry::class)) extends CommonApiController {
             /**
              * @param mixed[]                   $parameters
              * @param mixed[]                   $errors
