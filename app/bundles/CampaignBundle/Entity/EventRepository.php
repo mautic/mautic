@@ -244,7 +244,6 @@ class EventRepository extends CommonRepository
         return $this->getStandardSearchCommands();
     }
 
-    //Rewrite function
     /**
      * @param        $channel
      * @param null   $campaignId
@@ -252,8 +251,6 @@ class EventRepository extends CommonRepository
      */
     public function getEventsByChannel($channel, $campaignId = null, $eventType = 'action')
     {
-        //Write a better query
-
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')

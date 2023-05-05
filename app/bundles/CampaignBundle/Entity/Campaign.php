@@ -73,9 +73,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var bool
+     * @var int
      */
-    private $allowRestart = false;
+    private $allowRestart = 0;
 
     public function __construct()
     {
@@ -141,7 +141,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->nullable()
             ->build();
 
-        $builder->addNamedField('allowRestart', 'boolean', 'allow_restart');
+        $builder->addNamedField('allowRestart', 'integer', 'allow_restart');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -581,7 +581,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @return bool
+     * @return int
      */
     public function getAllowRestart()
     {
@@ -589,7 +589,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @return bool
+     * @return int
      */
     public function allowRestart()
     {
@@ -597,7 +597,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     }
 
     /**
-     * @param bool $allowRestart
+     * @param int $allowRestart
      *
      * @return Campaign
      */
