@@ -1210,7 +1210,7 @@ class EmailController extends FormController
                 'objectAction' => 'view',
                 'objectId'     => $entity->getId(),
             ];
-            $template       = 'MauticEmailBundle:Email:view';
+            $template       = 'Mautic\EmailBundle\Controller\EmailController::viewAction';
             $passthrough    = [
                 'activeLink'    => 'mautic_email_index',
                 'mauticContent' => 'email',
