@@ -43,7 +43,7 @@ class Summary
     private $failedCount = 0;
 
     /**
-     * @var Event
+     * @var Event|null
      */
     private $event;
 
