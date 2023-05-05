@@ -90,7 +90,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                     'decision' => $decisions,
                 ],
             ],
-            'timelineTemplate'       => '@MauticChannel/SubscribedEvents\Timeline/index.html.twig',
+            'timelineTemplate'       => '@MauticChannel/SubscribedEvents/Timeline/index.html.twig',
             'timelineTemplateVars'   => [
                 'messageSettings' => $channels,
             ],
