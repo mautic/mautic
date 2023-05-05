@@ -5,6 +5,7 @@ namespace Mautic\EmailBundle\Command;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Exception\RecordNotFoundException;
 use Mautic\CoreBundle\Helper\ExitCode;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\EmailBundle\Model\AbTest\SendWinnerService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,9 +20,9 @@ class SendWinnerEmailCommand extends ModeratedCommand
 
     private $sendWinnerService;
 
-    public function __construct(SendWinnerService $sendWinnerService)
+    public function __construct(SendWinnerService $sendWinnerService, PathsHelper $pathsHelper)
     {
-        parent::__construct();
+        parent::__construct($pathsHelper);
 
         $this->sendWinnerService = $sendWinnerService;
     }

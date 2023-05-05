@@ -553,6 +553,8 @@ return [
                     'mautic.email.helper.stats_collection',
                     'mautic.security',
                     'doctrine.dbal.default_connection',
+                    'mautic.core.variant.abtest_settings',
+                    'mautic.email.variant.converter',
                 ],
             ],
             'mautic.email.model.send_email_to_user' => [
