@@ -243,7 +243,7 @@ class AppKernel extends Kernel
             // Firstly look into environment variables.
             $prefix = $_SERVER['MAUTIC_TABLE_PREFIX'];
             // Secondly look into the local.php file.
-            if (false === $prefix) {
+            if (empty($prefix)) {
                 $prefix = $parameterLoader->getLocalParameterBag()->get('db_table_prefix', '');
             }
 
