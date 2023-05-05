@@ -289,33 +289,26 @@ class CheckStep implements StepInterface
         return $parameters;
     }
 
-    /**
-     * @return ParameterLoader
-     */
     private function getParameterLoader(): ParameterLoader
     {
-        if ($this->parameterLoader) {
-            return $this->parameterLoader;
+        if (!$this->parameterLoader) {
+            $this->parameterLoader = new ParameterLoader();
         }
 
-        return $this->parameterLoader = new ParameterLoader();
+        return $this->parameterLoader;
     }
 
-    /**
-     * @return string
-     */
     private function getCacheDir(): string
     {
         $cachePath = $this->getParameterLoader()->getLocalParameterBag()->get('cache_path') ?? $this->cache_path;
+
         return str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $cachePath);
     }
 
-    /**
-     * @return string
-     */
     private function getLogDir(): string
     {
         $logPath = $this->getParameterLoader()->getLocalParameterBag()->get('log_path') ?? $this->log_path;
+
         return str_replace('%kernel.project_dir%', $this->kernelRoot.'/..', $logPath);
     }
 }
