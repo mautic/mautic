@@ -3,7 +3,7 @@
 {% set header = 'mautic.email.send.list'|trans({'%name%': email.getName()}) %}
 
 {% block headerTitle %}
-    {{ 'mautic.email.send.list'|trans({'%name%': email.getName()}) }}
+    {{ 'mautic.email.send.list'|trans({'%name%': email.getName()})|raw }}
     <i title="{{ 'mautic.email.icon_tooltip.abtest.part'|trans }}" class="fa fa-fw fa-sitemap"></i>
 {% endblock %}
 
@@ -26,7 +26,7 @@
                                     {{- include('@MauticCore/Helper/confirm.html.twig', {
                                         'message'         : 'mautic.email.form.confirmsend'|trans({'%name%' : email.getName()}),
                                         'confirmText'     : 'mautic.email.send'|trans,
-                                        'confirmCallback' : 'submitSendForm',
+                                        'confirmCallback' : 'submitAbSendForm',
                                         'iconClass'       : 'fa fa-send-o',
                                         'btnText'         : 'mautic.email.send'|trans,
                                         'btnClass'        : 'btn btn-primary btn-send' ~ ((pending) ? '' : ' disabled')
@@ -34,7 +34,7 @@
                                 </span>
                             </div>
                             <div class="text-center">
-                                <span class="label label-primary mt-lg">{{ 'mautic.email.send.pending'|trans({'%pending%': pending}) }}</span>
+                                <span class="label label-primary mt-lg">{{ 'mautic.email.send.pending'|trans({'%count%': pending}) }}</span>
                                 <div class="mt-sm">
                                     <a class="text-danger mt-md" href="{{ path('mautic_email_action', {'objectAction': 'view', 'objectId': email.getId()}) }}" data-toggle="ajax">{{ 'mautic.core.form.cancel'|trans }}</a>
                                 </div>
