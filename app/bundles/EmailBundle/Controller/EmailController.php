@@ -20,6 +20,8 @@ use Mautic\CoreBundle\Form\Type\BuilderSectionType;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Model\AbTest\AbTestResultService;
+use Mautic\CoreBundle\Model\AbTest\AbTestSettingsService;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
@@ -266,7 +268,7 @@ class EmailController extends FormController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(AbTestSettingsService $abTestSettingsService, AbTestResultService $abTestResultService, Request $request, $objectId)
     {
         /** @var \Mautic\EmailBundle\Model\EmailModel $model */
         $model    = $this->getModel('email');
@@ -320,8 +322,7 @@ class EmailController extends FormController
         $criteria      = $model->getBuilderComponents($email, 'abTestWinnerCriteria');
 
         if (count($children) > 0) {
-            $abTestSettings      = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($parent);
-            $abTestResultService = $this->get('mautic.core.variant.abtest_result');
+            $abTestSettings      = $abTestSettingsService->getAbTestSettings($parent);
             $abTestResults       = $abTestResultService->getAbTestResult($parent, $criteria['criteria'][$abTestSettings['winnerCriteria']]);
         }
 
@@ -581,6 +582,7 @@ class EmailController extends FormController
             Request $request,
             AssetsHelper $assetsHelper,
             Translator $translator,
+            AbTestSettingsService $abTestSettingsService,
             $objectId,
             $ignorePost = false,
             $forceTypeSelection = false
@@ -648,7 +650,7 @@ class EmailController extends FormController
 
         // Variant settings for an email with variants, helpful for BC
         if ($entity->isVariant()) {
-            $abTestSettings                    = $this->get('mautic.core.variant.abtest_settings')->getAbTestSettings($entity);
+            $abTestSettings                    = $abTestSettingsService->getAbTestSettings($entity);
             $variantSettings                   = $entity->getVariantSettings();
             $variantSettings['enableAbTest']   = true;
             $variantSettings['winnerCriteria'] = $abTestSettings['winnerCriteria'];
@@ -1227,8 +1229,7 @@ class EmailController extends FormController
             );
         }
 
-        //process and send
-        $contentTemplate = 'MauticEmailBundle:Send:abform.html.php';
+        $contentTemplate = '@MauticEmail/Send/abform.html.twig';
         $viewParameters  = [
             'form'    => $form->createView(),
             'email'   => $entity,

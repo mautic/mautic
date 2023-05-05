@@ -1,7 +1,5 @@
 {% extends isEmbedded ? '@MauticCore/Default/raw_output.html.twig' : '@MauticCore/Default/content.html.twig' %}
 
-{% block headerTitle email.name %}
-
 {% block mauticContent 'email' %}
 
 {% set variantContent = include('@MauticCore/Variant/index.html.twig', {
@@ -13,6 +11,16 @@
 }) %}
 
 {% set showVariants = variantContent is defined and variantContent|trim is not empty %}
+
+
+{% block headerTitle %}
+    {{ email.getName() }}
+    {% if not isEmbedded %}
+        {% if showVariants %}
+            <i title="{{ 'mautic.email.icon_tooltip.abtest.part'|trans }}" class="fa fa-fw fa-sitemap"></i>
+        {% endif %}
+    {% endif %}
+{% endblock %}
 
 {% set translationContent = include('@MauticCore/Translation/index.html.twig',
     {
@@ -66,7 +74,7 @@
 
 
 {# Only show A/B test button if not already a translation of an a/b test #}
-{% set allowAbTest = email.isTranslation(true) and translations['parent'].isVariant(true) ? false : true %}
+{% set allowAbTest = email.isEnableAbTest() %}
 
 {% block publishStatus %}
   {% if not isEmbedded %}
@@ -85,7 +93,7 @@
                     email.getCreatedBy(),
                 ),
                 'clone'  : permissions['email:emails:create'],
-                'abtest' : (allowAbTest and permissions['email:emails:create']),
+                'abtest': ('list' == email.getEmailType() and allowAbTest and permissions['email:emails:create']),
                 'delete' : securityHasEntityAccess(
                     permissions['email:emails:deleteown'],
                     permissions['email:emails:deleteother'],

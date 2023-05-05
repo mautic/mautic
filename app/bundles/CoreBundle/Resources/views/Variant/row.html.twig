@@ -21,13 +21,9 @@
     }) %}
 {% endif %}
 
-{% if variants.properties[id] is not empty %}
-    {% set thisCriteria = variants.properties[id].winnerCriteria %}
-    {% set weight = variants.properties[id].weight %}
-    {% set criteriaLabel = thisCriteria ? variants.criteria[thisCriteria].label|trans : '' %}
-{% else %}
-    {% set thisCriteria, criteriaLabel, weight = '', '', 0 %}
-{% endif %}
+{% set thisCriteria = variants['winnerCriteria'] %}
+{% set weight = variants['properties'][id]['weight']|int %}
+{% set criteriaLabel = (thisCriteria) ? variants['criteria'][thisCriteria]['label']|trans : '' %}
 
 {% set isPublished = variant.isPublished %}
 {% set totalWeight = totalWeight + (isPublished ? weight : 0) %}
@@ -88,20 +84,20 @@
         </div>
         <div class="col-md-4 va-t text-right">
             <em class="text-white dark-sm">
-                {% if isPublished and (totalWeight > 100 or (thisCriteria and firstCriteria != thisCriteria)) %}
+                {% if true == variants['configurationError'] %}
                     <div class="text-danger" data-toggle="label label-danger" title="{{ 'mautic.core.variant.misconfiguration'|trans }}">
                         <div><span class="badge">{{ weight }}%</span></div>
                         <div><i class="fa fa-fw fa-exclamation-triangle"></i>{{ criteriaLabel }}</div>
                     </div>
-                {% elseif isPublished and criteriaLabel %}
+                {% elseif isPublished %}
                     <div class="text-success">
-                        <div><span class="label label-success">{{ weight }}%</span></div>
+                        <span class="label label-{{ variant == variants['parent'] ? 'default' : 'success' }}">{{ weight }}%</span>
                         <div><i class="fa fa-fw fa-check"></i>{{ criteriaLabel }}</div>
                     </div>
                 {% else %}
                     <div class="text-muted">
                         <div><span class="label label-default">{{ weight }}%</span></div>
-                        <div>{{ criteriaLabel }}</div>
+                        <div><i class="fa fa-fw fa-check"></i>{{ criteriaLabel }}</div>
                     </div>
                 {% endif %}
             </em>
