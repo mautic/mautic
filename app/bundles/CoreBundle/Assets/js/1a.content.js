@@ -246,10 +246,6 @@ Mautic.processPageContent = function (response) {
             Mautic.setNotifications(response.notifications);
         }
 
-        if (response.browserNotifications) {
-            Mautic.setBrowserNotifications(response.browserNotifications);
-        }
-
         if (response.route) {
             //update URL in address bar
             MauticVars.manualStateChange = false;

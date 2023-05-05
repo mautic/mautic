@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -77,6 +78,13 @@ class CommonController extends AbstractController implements MauticController
      * @var FlashBag
      */
     private $flashBag;
+
+    protected ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
 
     public function setFactory(MauticFactory $factory)
     {
@@ -438,10 +446,6 @@ class CommonController extends AbstractController implements MauticController
             // Prevent error in case installer is loaded via index_dev.php
             $passthrough['notifications'] = $this->getNotificationContent();
         }
-
-        //render browser notifications
-        $passthrough['browserNotifications'] = $request->getSession()->get('mautic.browser.notifications', []);
-        $request->getSession()->set('mautic.browser.notifications', []);
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $request->get('tmpl', 'index');
         if ('index' == $tmpl) {

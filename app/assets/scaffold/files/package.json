@@ -10,6 +10,7 @@
     "grunt-contrib-less": "^3.0.0",
     "grunt-contrib-watch": "^1.1.0",
     "load-grunt-tasks": "^5.1.0",
+    "patch-package": "^7.0.0",
     "time-grunt": "^2.0.0"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "codemirror": "^5.15.2",
     "dropzone": "^4.0.1",
     "history.js": "^1.8.0",
+    "chosen-js": "^1.8.7",
     "jquery": "^3.3.1",
     "jquery-color": "^2.2.0",
     "jquery-datetimepicker": "^2.5.20",

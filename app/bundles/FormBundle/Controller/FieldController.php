@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController as CommonFormController;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -34,7 +35,7 @@ class FieldController extends CommonFormController
      */
     private $alreadyMappedFieldCollector;
 
-    public function __construct(FormModel $formModel, FieldModel $formFieldModel, FormFieldHelper $fieldHelper, CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, MappedObjectCollectorInterface $mappedObjectCollector, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector)
+    public function __construct(FormModel $formModel, FieldModel $formFieldModel, FormFieldHelper $fieldHelper, CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, MappedObjectCollectorInterface $mappedObjectCollector, AlreadyMappedFieldCollectorInterface $alreadyMappedFieldCollector, ManagerRegistry $doctrine)
     {
         $this->formModel                   = $formModel;
         $this->formFieldModel              = $formFieldModel;
@@ -44,7 +45,7 @@ class FieldController extends CommonFormController
         $this->mappedObjectCollector       = $mappedObjectCollector;
         $this->alreadyMappedFieldCollector = $alreadyMappedFieldCollector;
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**
