@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
@@ -375,10 +374,20 @@ class ImportModel extends FormModel
 
             // Release entities in Doctrine's memory to prevent memory leak
             $this->em->detach($eventLog);
+            if (null !== $leadEntity = $eventLog->getLead()) {
+                $this->em->detach($leadEntity);
+
+                $company        = $leadEntity->getCompany();
+                $primaryCompany = $leadEntity->getPrimaryCompany();
+                if ($company instanceof Company) {
+                    $this->em->detach($company);
+                }
+                if ($primaryCompany instanceof Company) {
+                    $this->em->detach($primaryCompany);
+                }
+            }
             $eventLog = null;
             $data     = null;
-            $this->em->clear(Lead::class);
-            $this->em->clear(Company::class);
 
             // Save Import entity once per batch so the user could see the progress
             if (0 === $batchSize && $import->isBackgroundProcess()) {
