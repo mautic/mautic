@@ -35,7 +35,7 @@ class StagesChangeLogRepository extends CommonRepository
             ));
         }
 
-        return $this->getTimelineResults($query, $options, 'ls.event_name', 'ls.date_added', [], ['dateAdded']);
+        return $this->getTimelineResults($query, $options, 'ls.event_name', 'ls.date_added', [], ['dateAdded'], null, 'ls.id');
     }
 
     /**

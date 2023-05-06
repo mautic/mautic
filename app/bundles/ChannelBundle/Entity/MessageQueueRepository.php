@@ -116,6 +116,6 @@ class MessageQueueRepository extends CommonRepository
             ));
         }
 
-        return $this->getTimelineResults($query, $options, 'mq.channel', 'mq.date_published', [], ['dateAdded']);
+        return $this->getTimelineResults($query, $options, 'mq.channel', 'mq.date_published', [], ['dateAdded'], null, 'mq.id');
     }
 }
