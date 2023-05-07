@@ -7,6 +7,7 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
 use Mautic\MarketplaceBundle\Service\Config;
@@ -47,11 +48,17 @@ class DetailController extends CommonController
 
         $isInstalled = $this->composer->isInstalled("{$vendor}/{$package}");
 
+        try {
+            $packageDetail = $this->packageModel->getPackageDetail("{$vendor}/{$package}");
+        } catch (RecordNotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'packageDetail'     => $this->packageModel->getPackageDetail("{$vendor}/{$package}"),
+                    'packageDetail'     => $packageDetail,
                     'isInstalled'       => $isInstalled,
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
                 ],

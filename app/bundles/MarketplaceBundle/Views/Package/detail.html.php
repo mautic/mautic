@@ -23,27 +23,43 @@ $buttons = [
         ],
         'btnText'   => $view['translator']->trans('mautic.core.form.close'),
         'iconClass' => 'fa fa-remove',
+        'primary'   => true,
     ],
 ];
 
 // @todo make the stability configurable
 // @todo make the version configurable
-try {
+$latestVersion = $packageDetail->versions->findLatestStableVersionPackage();
+
+if (!$latestVersion) {
     $latestVersion = $packageDetail->versions->findLatestVersionPackage();
-} catch (\Throwable $e) {
-    $latestVersionException = $e;
 }
 
-if (isset($latestVersion) && $latestVersion->issues) {
+if ($latestVersion && $latestVersion->issues) {
     $buttons[] = [
         'attr' => [
-            'href'   => $latestVersion->issues,
-            'target' => '_blank',
-            'rel'    => 'noopener noreferrer',
+            'href'        => $latestVersion->issues,
+            'target'      => '_blank',
+            'rel'         => 'noopener noreferrer',
+            'data-toggle' => '',
         ],
         'btnText'   => $view['translator']->trans('marketplace.package.issue.tracker'),
         'iconClass' => 'fa fa-question',
-        'primary'   => true,
+        'primary'   => false,
+    ];
+}
+
+if ($latestVersion && $latestVersion->wiki) {
+    $buttons[] = [
+        'attr' => [
+            'href'        => $latestVersion->wiki,
+            'target'      => '_blank',
+            'rel'         => 'noopener noreferrer',
+            'data-toggle' => '',
+        ],
+        'btnText'   => $view['translator']->trans('marketplace.package.wiki'),
+        'iconClass' => 'fa fa-book',
+        'primary'   => false,
     ];
 }
 
@@ -111,12 +127,12 @@ $view['slots']->set(
         <tr>
             <th><?php echo $view['translator']->trans('marketplace.package.version'); ?></th>
             <td>
-                <?php if (!empty($latestVersionException)) : ?>
+                <?php if (!$latestVersion) : ?>
                     <div class="text-danger">
-                        <?php echo $view->escape($latestVersionException->getMessage()); ?>
+                        <?php echo $view['translator']->trans('marketplace.latest.version.missing'); ?>
                     </div>
                 <?php else : ?>
-                    <a href="<?php echo $view->escape($packageDetail->packageBase->repository); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" target="_blank" rel="noopener noreferrer" >
+                    <a href="<?php echo $view->escape($packageDetail->packageBase->repository); ?>/releases/tag/<?php echo $view->escape($latestVersion->version); ?>" id="latest-version" target="_blank" rel="noopener noreferrer">
                         <strong><?php echo $view->escape($latestVersion->version); ?></strong>
                     </a>
                 <?php endif; ?>
@@ -162,12 +178,20 @@ $view['slots']->set(
         <?php foreach ($packageDetail->versions->sortByLatest() as $version) : ?>
         <tr>
             <td>
-                <a href="<?php echo $view->escape($packageDetail->packageBase->repository); ?>/releases/tag/<?php echo $view->escape($version->version); ?>" target="_blank" rel="noopener noreferrer" >
-                    <?php echo $view->escape($version->version); ?>
-                </a>
+                <?php if ($version->isStable() || $version->isPreRelease()) : ?>
+                    <a href="<?php echo $view->escape($packageDetail->packageBase->repository); ?>/releases/tag/<?php echo $view->escape($version->version); ?>" target="_blank" rel="noopener noreferrer" >
+                    <?php if ($version->isStable()) : ?>
+                        <b><?php echo $view->escape($version->version); ?></b>
+                    <?php else : ?>
+                        <?php echo $view->escape($version->version); ?>
+                    <?php endif; ?>
+                    </a>
+                <?php else : ?>
+                    <i><?php echo $view->escape($version->version); ?></i>
+                <?php endif; ?>
             </td>
             <td title="<?php echo $view['date']->toText($version->time); ?>">
-                <?php echo $view['date']->toDate($version->time); ?>
+                <?php echo $view['date']->toFullConcat($version->time); ?>
             </td>
         </tr>
         <?php endforeach; ?>
@@ -260,14 +284,14 @@ $view['slots']->set(
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
     'id'            => 'InstallationInProgressModal',
-    'header'        => 'Installing '.$packageDetail->packageBase->getHumanPackageName(),
+    'header'        => 'Installing '.$view->escape($packageDetail->packageBase->getHumanPackageName()),
     'size'          => 'md',
     'footerButtons' => false,
 ]); ?>
 
 <?php echo $view->render('MauticCoreBundle:Helper:modal.html.php', [
     'id'            => 'RemovalInProgressModal',
-    'header'        => 'Removing '.$packageDetail->packageBase->getHumanPackageName(),
+    'header'        => 'Removing '.$view->escape($packageDetail->packageBase->getHumanPackageName()),
     'size'          => 'md',
     'footerButtons' => false,
 ]); ?>

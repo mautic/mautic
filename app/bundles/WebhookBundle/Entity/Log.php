@@ -136,7 +136,7 @@ class Log
     }
 
     /**
-     * Strips tags and keeps first 254 characters so it would fit in the varchar 191 limit.
+     * Strips tags and keeps first 191 characters so it would fit in the varchar 191 limit.
      *
      * @param string $note
      *

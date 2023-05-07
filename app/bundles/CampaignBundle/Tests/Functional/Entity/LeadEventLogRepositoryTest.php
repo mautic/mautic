@@ -10,7 +10,7 @@ use PHPUnit\Framework\Assert;
 
 class LeadEventLogRepositoryTest extends MauticMysqlTestCase
 {
-    public function testThatRemoveEventLogsMethodRemovesLogs()
+    public function testThatRemoveEventLogsMethodRemovesLogs(): void
     {
         $eventId    = random_int(200, 2000);
         $connection = $this->em->getConnection();
@@ -18,7 +18,7 @@ class LeadEventLogRepositoryTest extends MauticMysqlTestCase
         /** @var LeadEventLogRepository $leadEventLogRepository */
         $leadEventLogRepository = $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
 
-        $insertStatement = $connection->prepare('INSERT INTO `campaign_lead_event_log` (`event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?);');
+        $insertStatement = $connection->prepare('INSERT INTO `'.MAUTIC_TABLE_PREFIX.'campaign_lead_event_log` (`event_id`, `lead_id`, `rotation`, `is_scheduled`, `system_triggered`) VALUES (?, ?, ?, ?, ?);');
 
         $connection->query('SET FOREIGN_KEY_CHECKS=0;');
         foreach ($this->getLeadCampaignEventData($eventId) as $row) {

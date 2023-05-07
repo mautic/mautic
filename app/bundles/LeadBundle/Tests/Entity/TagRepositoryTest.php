@@ -55,7 +55,7 @@ class TagRepositoryTest extends \PHPUnit\Framework\TestCase
 
         $mockRepository->expects($this->once())
             ->method('findOneBy')
-            ->with(['tag' => 'hello&#34; world'])
+            ->with(['tag' => 'hello" world'])
             ->willReturn($fetchedEntity);
 
         $this->assertSame($fetchedEntity, $mockRepository->getTagByNameOrCreateNewOne('hello" world'));

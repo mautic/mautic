@@ -36,8 +36,6 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->report               = $this->createMock(Report::class);
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->channelListHelper    = $this->createMock(ChannelListHelper::class);

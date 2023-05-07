@@ -186,10 +186,10 @@ $now         = (new DateTimeHelper())->getUtcDateTime();
                         <?php endif; ?>
                     </td>
                     <td class="visible-md visible-lg">
-                        <a class="label label-primary" href="<?php echo $view['router']->path(
+                        <a class="label label-primary col-count" data-id="<?php echo $item->getId(); ?>" href="<?php echo $view['router']->path(
                             'mautic_contact_index',
                             ['search' => $view['translator']->trans('mautic.lead.lead.searchcommand.list').':'.$item->getAlias()]
-                        ); ?>" data-toggle="ajax"<?php echo (0 == $leadCounts[$item->getId()]) ? 'disabled=disabled' : ''; ?>>
+                        ); ?>" data-toggle="ajax">
                             <?php echo $view['translator']->trans(
                                 'mautic.lead.list.viewleads_count',
                                 ['%count%' => $leadCounts[$item->getId()]]

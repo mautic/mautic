@@ -105,6 +105,7 @@ class TokenSubscriber implements EventSubscriberInterface
             foreach ($data['filters'] as $filter) {
                 if ($this->matchFilterForLead($filter['filters'], $lead)) {
                     $filterContent = $filter['content'];
+                    break;
                 }
             }
 

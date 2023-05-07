@@ -164,6 +164,16 @@ class Fixtures
         return 'string';
     }
 
+    public static function getIntegerType(): string
+    {
+        return 'int';
+    }
+
+    public static function getBooleanType(): string
+    {
+        return 'bool';
+    }
+
     /**
      * @return string
      */
@@ -234,5 +244,72 @@ class Fixtures
         ];
 
         return $list;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function getValidReportResultWithAggregatedColumns(): array
+    {
+        return [
+            'totalResults' => '2',
+            'data'         => self::getValidReportDataAggregatedColumns(),
+            'dataColumns'  => [
+                'e_id'           => 'e.id',
+                'e_name'         => 'e.name',
+                'SUM es.is_read' => 'es.is_read',
+                'COUNT l.id'     => 'l.id',
+            ],
+            'columns' => [
+                'e.id' => [
+                    'label' => 'ID',
+                    'type'  => self::getIntegerType(),
+                    'link'  => 'mautic_email_action',
+                    'alias' => 'e_id',
+                ],
+                'e.name' => [
+                    'label' => 'Name',
+                    'type'  => self::getStringType(),
+                    'alias' => 'e_name',
+                ],
+                'es.is_read' => [
+                    'label' => 'Read',
+                    'type'  => self::getBooleanType(),
+                    'alias' => 'is_read',
+                ],
+                'l.id' => [
+                    'label' => 'Contact ID',
+                    'type'  => self::getIntegerType(),
+                    'link'  => 'mautic_email_action',
+                    'alias' => 'contactId',
+                ],
+            ],
+            'aggregatorColumns' => [
+                'SUM es.is_read' => 'es.is_read',
+                'COUNT l.id'     => 'l.id',
+            ],
+            'limit' => 0,
+        ];
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public static function getValidReportDataAggregatedColumns(): array
+    {
+        return [
+            [
+                'e_id'           => '1',
+                'e_name'         => 'Email 1',
+                'SUM es.is_read' => '50',
+                'COUNT l.id'     => '100',
+            ],
+            [
+                'e_id'           => '2',
+                'e_name'         => 'Email 2',
+                'SUM es.is_read' => '10',
+                'COUNT l.id'     => '60',
+            ],
+        ];
     }
 }

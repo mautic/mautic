@@ -73,18 +73,16 @@ class RouteLoader extends Loader
         $collection->addCollection($this->import('@FMElfinderBundle/Resources/config/routing.yaml'));
 
         //API
-        if ($this->coreParameters->get('api_enabled')) {
-            $event = new RouteEvent($this, 'api');
-            $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
-            $apiCollection = $event->getCollection();
-            $apiCollection->addPrefix('/api');
+        $event = new RouteEvent($this, 'api');
+        $this->dispatcher->dispatch(CoreEvents::BUILD_ROUTE, $event);
+        $apiCollection = $event->getCollection();
+        $apiCollection->addPrefix('/api');
 
-            if ($forceSSL) {
-                $apiCollection->setSchemes('https');
-            }
-
-            $collection->addCollection($apiCollection);
+        if ($forceSSL) {
+            $apiCollection->setSchemes('https');
         }
+
+        $collection->addCollection($apiCollection);
 
         $secureCollection->addPrefix('/s');
         if ($forceSSL) {

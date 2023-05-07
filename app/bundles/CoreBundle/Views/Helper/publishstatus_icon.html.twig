@@ -1,0 +1,18 @@
+{% set disableToggle = disableToggle is defined ? disableToggle : false %}
+{% set icon = publishStatusIcon(
+    query is defined ? query : '',
+    item,
+    size|default('fa-lg'),
+    model,
+    backdrop is defined ? 'true' : 'false',
+    onclick is defined ? onclick : null,
+    transKeys is defined ? transKeys : [],
+    attributes is defined ? attributes : [],
+    aditionalLabel is defined ? aditionalLabel : null,
+    disableToggle
+) %}
+<i
+    class="fa fa-fw {{ icon.size }} {{ icon.icon }}{{ icon.clickAction }} {{ icon.idClass }} toggle-publish-status" 
+    title="{{ icon.text }}" {{ icon.dataAttributes|raw }}
+    {% if disableToggle is empty %}onclick="{{ icon.onclick }}"{% endif %}
+></i>
