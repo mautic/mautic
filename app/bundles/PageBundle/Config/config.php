@@ -100,7 +100,7 @@ return [
                     'mautic.lead.model.field',
                     'mautic.page.model.redirect',
                     'mautic.page.model.trackable',
-                    'mautic.queue.service',
+                    'messenger.bus.default',
                     'mautic.lead.model.company',
                     'mautic.tracker.device',
                     'mautic.tracker.contact',

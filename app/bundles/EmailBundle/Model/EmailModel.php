@@ -4,6 +4,7 @@ namespace Mautic\EmailBundle\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\OptimisticLockException;
 use Mautic\ChannelBundle\Entity\MessageQueue;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -475,14 +476,21 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param      $stat
-     * @param      $request
-     * @param bool $viaBrowser
+     * @param ?Stat|string $stat
+     * @param Request      $request
+     * @param bool         $throwDoctrineExceptions in asynchronous processing; we do not wish to ignore the error, rather let the messenger do the handling
      *
-     * @throws \Exception
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
-    public function hitEmail($stat, $request, $viaBrowser = false, $activeRequest = true)
-    {
+    public function hitEmail(
+        $stat,
+        $request,
+        $viaBrowser = false,
+        $activeRequest = true,
+        ?DateTime $hitDateTime = null,
+        bool $throwDoctrineExceptions = false
+    ) {
         if (!$stat instanceof Stat) {
             $stat = $this->getEmailStatus($stat);
         }
@@ -500,7 +508,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
         }
 
-        $readDateTime = new DateTimeHelper();
+        $readDateTime = new DateTimeHelper($hitDateTime ?? '');
         $stat->setLastOpened($readDateTime->getDateTime());
 
         $lead = $stat->getLead();
@@ -526,6 +534,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 } catch (\Exception $exception) {
                     error_log($exception);
                 }
+            }
+
+            if ($lead instanceof Lead && ($hitDateTime > $lead->getLastActive())) {
+                $updateLastActive = true;
             }
         }
 
@@ -557,10 +569,24 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->em->persist($stat);
 
         // Flush the email stat entity in different transactions than the device stat entity to avoid deadlocks.
-        $this->flushAndCatch();
+        if ($throwDoctrineExceptions) {
+            $this->em->flush();
+        } else {
+            $this->flushAndCatch();
+        }
 
         if ($lead) {
-            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent($lead, $request->server->get('HTTP_USER_AGENT'));
+            $trackedDevice = $this->deviceTracker->createDeviceFromUserAgent(
+                $lead,
+                $request->server->get('HTTP_USER_AGENT'),
+                true
+            );
+
+            //  There is a cascade missing but it relays on it
+            if (!$this->em->contains($trackedDevice)) {
+                $this->em->persist($trackedDevice);
+            }
+
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
             $emailOpenStat->setDevice($trackedDevice);
@@ -568,7 +594,15 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $emailOpenStat->setStat($stat);
 
             $this->em->persist($emailOpenStat);
-            $this->flushAndCatch();
+            if ($throwDoctrineExceptions) {
+                $this->em->flush();
+            } else {
+                $this->flushAndCatch();
+            }
+
+            if ($updateLastActive ?? false) { // We need to perform the update after all is saved
+                $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDateTime);
+            }
         }
     }
 

@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\LeadBundle\Tracker\DeviceTracker;
+use Mautic\MessengerBundle\Message\PageHitNotification;
 use Mautic\PageBundle\Entity\Hit;
 use Mautic\PageBundle\Entity\Page;
 use Mautic\PageBundle\Entity\Redirect;
@@ -34,12 +35,12 @@ use Mautic\PageBundle\Event\PageEvent;
 use Mautic\PageBundle\Event\PageHitEvent;
 use Mautic\PageBundle\Form\Type\PageType;
 use Mautic\PageBundle\PageEvents;
-use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @extends FormModel<Page>
@@ -114,6 +115,7 @@ class PageModel extends FormModel
      * @var ContactTracker
      */
     private $contactTracker;
+    private MessageBusInterface $messageBus;
 
     private ContactRequestHelper $contactRequestHelper;
 
@@ -124,7 +126,7 @@ class PageModel extends FormModel
         FieldModel $leadFieldModel,
         RedirectModel $pageRedirectModel,
         TrackableModel $pageTrackableModel,
-        QueueService $queueService,
+        MessageBusInterface $messageBus,
         CompanyModel $companyModel,
         DeviceTracker $deviceTracker,
         ContactTracker $contactTracker,
@@ -138,12 +140,12 @@ class PageModel extends FormModel
         $this->pageRedirectModel    = $pageRedirectModel;
         $this->pageTrackableModel   = $pageTrackableModel;
         $this->dateTimeHelper       = new DateTimeHelper();
-        $this->queueService         = $queueService;
         $this->companyModel         = $companyModel;
         $this->deviceTracker        = $deviceTracker;
         $this->contactTracker       = $contactTracker;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->contactRequestHelper = $contactRequestHelper;
+        $this->messageBus           = $messageBus;
     }
 
     /**
@@ -463,9 +465,8 @@ class PageModel extends FormModel
             $query = $this->getHitQuery($request, $page);
         }
 
-        // Get lead if required
-        if (null == $lead) {
-            $lead = $this->contactRequestHelper->getContactFromQuery($query);
+        if (null === $lead) {
+            $lead = $this->leadModel->getContactFromRequest($query);
 
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
@@ -514,24 +515,27 @@ class PageModel extends FormModel
                     ['exception' => $exception]
                 );
             }
+
+            return;
         }
 
-        //save hit to the cookie to use to update the exit time
-        if ($hit) {
-            $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
-        }
+        // save hit to the cookie to use to update the exit time
+        $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
 
-        if ($this->queueService->isQueueEnabled()) {
-            $msg = [
-                'hitId'         => $hit->getId(),
-                'pageId'        => $page ? $page->getId() : null,
-                'request'       => $request,
-                'leadId'        => $lead ? $lead->getId() : null,
-                'isNew'         => $this->deviceTracker->wasDeviceChanged(),
-                'isRedirect'    => ($page instanceof Redirect),
-            ];
-            $this->queueService->publishToQueue(QueueName::PAGE_HIT, $msg);
-        } else {
+        $message = new PageHitNotification(
+            $hit->getId(),
+            $page?->getId(),
+            $request,
+            $lead->getId(),
+            $this->deviceTracker->wasDeviceChanged(),
+            $page instanceof Redirect
+        );
+
+        try {
+            $this->messageBus->dispatch($message);
+        } catch (\Exception $exception) {
+            $this->logger->error('Failed to dispatch a message to messenger. '.$exception->getMessage());
+            // Fallback measure
             $this->processPageHit($hit, $page, $request, $lead, $this->deviceTracker->wasDeviceChanged());
         }
     }
@@ -540,13 +544,26 @@ class PageModel extends FormModel
      * Process page hit.
      *
      * @param Page|Redirect $page
-     * @param bool          $trackingNewlyGenerated
-     * @param bool          $activeRequest
      *
      * @throws \Exception
      */
-    public function processPageHit(Hit $hit, $page, Request $request, Lead $lead, $trackingNewlyGenerated, $activeRequest = true)
-    {
+    public function processPageHit(
+        Hit $hit,
+        $page,
+        Request $request,
+        Lead $lead,
+        bool $trackingNewlyGenerated,
+        bool $activeRequest = true,
+        ?\DateTime $hitDate = null
+    ) {
+        //  There is somewhere sometimes, modified the last_active; as a temporary fix we will prevent it by tracking it
+        /** @var ?DateTimeInterface $leadLastActive */
+        $leadLastActive = $lead->getLastActive();
+
+        if (MAUTIC_ENV === 'dev') {
+            dump('processing : '.$lead->getId(), 'last active: ', $lead->getLastActive(), 'event:', $hitDate);
+        }
+
         // Store Page/Redirect association
         if ($page) {
             if ($page instanceof Page) {
@@ -558,7 +575,8 @@ class PageModel extends FormModel
 
         // Check for any clickthrough info
         $clickthrough = $this->generateClickThrough($hit);
-        if (!empty($clickthrough)) {
+
+        if ([] !== $clickthrough) {
             if (!empty($clickthrough['channel'])) {
                 if (1 === count($clickthrough['channel'])) {
                     $channelId = reset($clickthrough['channel']);
@@ -582,7 +600,7 @@ class PageModel extends FormModel
             }
         }
 
-        $query = $hit->getQuery() ? $hit->getQuery() : [];
+        $query = $hit->getQuery() ?: [];
 
         if (isset($query['timezone_offset']) && !$lead->getTimezone()) {
             // timezone_offset holds timezone offset in minutes. Multiply by 60 to get seconds.
@@ -620,9 +638,11 @@ class PageModel extends FormModel
         $hit->setLead($lead);
 
         if (!$activeRequest) {
-            // Queue is consuming this hit outside of the lead's active request so this must be set in order for listeners to know who the request belongs to
+            // Queue is consuming this hit outside the lead's active request so this must be set in order for listeners
+            // to know who the request belongs to
             $this->contactTracker->setSystemContact($lead);
         }
+
         $trackingId = $hit->getTrackingId();
         if (!$trackingNewlyGenerated) {
             $lastHit = $request->cookies->get('mautic_referer_id');
@@ -725,6 +745,53 @@ class PageModel extends FormModel
             $event = new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique);
             $this->dispatcher->dispatch($event, PageEvents::PAGE_ON_HIT);
         }
+
+        if ($lead->getLastActive() != $leadLastActive) {
+            $this->logger->addError(
+                'HIT: Listener updated last active to event time',
+                ['context' => json_encode(new PageHitEvent($hit, $request, $hit->getCode(), $clickthrough, $isUnique))]
+            );
+        } else {
+            $this->logger->addInfo(
+                'HIT: Listener made NO updates to lead #'.$lead->getId()
+            );
+        }
+
+        if (null !== $hitDate) {
+            if (null === $leadLastActive || $leadLastActive < $hitDate) {
+                $data = [
+                    'unique'             => ($isUnique ? 'true' : 'false'),
+                    'lead'               => $lead->getId(),
+                    'page'               => null === $page ? null : $page->getId(),
+                    'hit'                => $hit->getId(),
+                    'lastActiveOriginal' => $leadLastActive,
+                    'newLastActive'      => $hitDate,
+                ];
+
+                $this->logger->warn(
+                    'HIT: Updating last active to event time',
+                    ['context' => $data]
+                );
+
+                try {
+                    $this->leadModel->getRepository()->updateLastActive($lead->getId(), $hitDate);
+
+                    $this->logger->addWarning(
+                        'HIT: Last active updated to event time',
+                        ['context' => $data]
+                    );
+                } catch (\Exception $e) {
+                    $this->logger->addError(
+                        'HIT: Failed to update event time due to '.$e->getMessage(),
+                        ['context' => $data]
+                    );
+                }
+            } else {
+                $this->logger->info(
+                    'HIT: No update will be performed to lead #'.$lead->getId()
+                );
+            }
+        }
     }
 
     /**
@@ -774,8 +841,6 @@ class PageModel extends FormModel
 
     /**
      * Get number of page bounces.
-     *
-     * @param \DateTime $fromDate
      *
      * @return int
      */
@@ -914,9 +979,6 @@ class PageModel extends FormModel
     /**
      * Get bar chart data of hits.
      *
-     * @param DateTime $dateFrom
-     * @param DateTime $dateTo
-     *
      * @return array
      */
     public function getDeviceGranularityData(\DateTime $dateFrom, \DateTime $dateTo, $filters = [], $canViewOthers = true)
@@ -956,11 +1018,9 @@ class PageModel extends FormModel
     /**
      * Get a list of popular (by hits) pages.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */
@@ -989,11 +1049,9 @@ class PageModel extends FormModel
     /**
      * Get a list of pages created in a date range.
      *
-     * @param int       $limit
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param array     $filters
-     * @param bool      $canViewOthers
+     * @param int   $limit
+     * @param array $filters
+     * @param bool  $canViewOthers
      *
      * @return array
      */
