@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -35,6 +39,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class ConfigController extends AbstractFormController
 {
+    private FormExtension $formHelper;
+
     /**
      * @var BasicIntegration|ConfigFormInterface
      */
@@ -44,6 +50,12 @@ class ConfigController extends AbstractFormController
      * @var Integration
      */
     private $integrationConfiguration;
+
+    public function __construct(CorePermissions $security, UserHelper $userHelper, ManagerRegistry $managerRegistry, FormExtension $formHelper)
+    {
+        parent::__construct($security, $userHelper, $managerRegistry);
+        $this->formHelper = $formHelper;
+    }
 
     /**
      * @return array|JsonResponse|RedirectResponse|Response
@@ -182,7 +194,7 @@ class ConfigController extends AbstractFormController
     {
         $integrationObject = $this->integrationObject;
         $formView          = $form->createView();
-        $formHelper        = $this->get('twig.helper.form');
+        $formHelper        = $this->formHelper;
 
         $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface ||
             $integrationObject instanceof ConfigFormSyncInterface ||
