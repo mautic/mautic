@@ -22,7 +22,8 @@
     },
   "require": {
     "composer/installers": "^1.11",
-    "mautic/core-lib": "^4.0"
+    "mautic/core-lib": "^4.0",
+    "sentry/sentry-symfony": "^4.8"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0",
@@ -34,7 +35,6 @@
     "phpstan/phpstan": "^1.8.2",
     "phpunit/phpunit": "^9.5",
     "rector/rector": "^0.14",
-    "sentry/sentry-symfony": "^4.8",
     "symfony/browser-kit": "~5.4.0",
     "symfony/dom-crawler": "~5.4.0",
     "symfony/maker-bundle": "^1.38",

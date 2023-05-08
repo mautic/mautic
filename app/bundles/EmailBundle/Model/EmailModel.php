@@ -584,11 +584,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                 $request->server->get('HTTP_USER_AGENT'),
                 true
             );
-
-            //  There is a cascade missing but it relays on it
-            if (!$this->em->contains($trackedDevice)) {
-                $this->em->persist($trackedDevice);
-            }
+            $this->em->persist($trackedDevice);
 
             $emailOpenStat = new StatDevice();
             $emailOpenStat->setIpAddress($ipAddress);
