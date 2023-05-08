@@ -25,12 +25,10 @@ use Mautic\PageBundle\Event\PageDisplayEvent;
 use Mautic\PageBundle\EventListener\BuilderSubscriber;
 use Mautic\PageBundle\PageEvents;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use Mautic\QueueBundle\Queue\QueueName;
-use Mautic\QueueBundle\Queue\QueueService;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class PublicController extends CommonFormController
@@ -39,14 +37,6 @@ class PublicController extends CommonFormController
 
     private MessageBusInterface $messageBus;
     private LoggerInterface $logger;
-
-    public function __construct(
-        MessageBusInterface $messageBus,
-        LoggerInterface $logger
-    ) {
-        $this->messageBus = $messageBus;
-        $this->logger     = $logger;
-    }
 
     /**
      * @param $idHash

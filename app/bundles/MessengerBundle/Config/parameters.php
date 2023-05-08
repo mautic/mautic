@@ -1,6 +1,5 @@
 <?php
 
-/** @var ContainerBuilder $container */
 use Mautic\MessengerBundle\MauticMessengerRoutes;
 /** @var ContainerBuilder $container */
 use Mautic\MessengerBundle\Message\EmailHitNotification;
