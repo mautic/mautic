@@ -13,32 +13,21 @@ class PageHitNotification
     use MessageRequestTrait;
 
     private array $request;
-    private int $hitId;
-    private ?int $pageId;
-    private ?int $leadId;
-    private bool $isNew;
-    private bool $isRedirect;
 
     /**
      * @param array|Request $request
      */
     public function __construct(
-        int $hitId,
-        ?int $pageId,
+        private int $hitId,
+        private ?int $pageId,
         $request,
-        ?int $leadId,
-        bool $isNew,
-        bool $isRedirect,
+        private ?int $leadId,
+        private bool $isNew,
+        private bool $isRedirect,
         ?DateTime $eventTime = null
     ) {
         $this->setRequest($request);
         $this->setEventTime($eventTime);
-
-        $this->hitId      = $hitId;
-        $this->pageId     = $pageId;
-        $this->leadId     = $leadId;
-        $this->isNew      = $isNew;
-        $this->isRedirect = $isRedirect;
     }
 
     public function getHitId(): int

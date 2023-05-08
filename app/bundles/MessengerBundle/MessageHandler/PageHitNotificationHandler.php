@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\MessengerBundle\MessageHandler;
 
+use Mautic\PageBundle\Entity\Hit;
 use DateTime;
 use Exception;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -23,27 +24,8 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class PageHitNotificationHandler implements MessageSubscriberInterface
 {
-    private PageRepository $pageRepository;
-    private HitRepository $hitRepository;
-    private LeadRepository $leadRepository;
-    private LoggerInterface $logger;
-    private RedirectRepository $redirectRepository;
-    private PageModel $pageModel;
-
-    public function __construct(
-        PageRepository $pageRepository,
-        HitRepository $hitRepository,
-        LeadRepository $leadRepository,
-        LoggerInterface $logger,
-        RedirectRepository $redirectRepository,
-        PageModel $pageModel
-    ) {
-        $this->pageRepository     = $pageRepository;
-        $this->hitRepository      = $hitRepository;
-        $this->leadRepository     = $leadRepository;
-        $this->logger             = $logger;
-        $this->redirectRepository = $redirectRepository;
-        $this->pageModel          = $pageModel;
+    public function __construct(private PageRepository $pageRepository, private HitRepository $hitRepository, private LeadRepository $leadRepository, private LoggerInterface $logger, private RedirectRepository $redirectRepository, private PageModel $pageModel)
+    {
     }
 
     /** @throws MauticMessengerException */
@@ -93,7 +75,7 @@ class PageHitNotificationHandler implements MessageSubscriberInterface
             }
         }
 
-        if (null === $hit && $message->getHitId() > 0) {
+        if (!$hit instanceof Hit && $message->getHitId() > 0) {
             $this->logger->warning('Invalid hit id #'.$message->getHitId(), ['message' => $message]);
 
             throw new InvalidPayloadException('Invalid hit id #'.$message->getHitId(), (array) $message);

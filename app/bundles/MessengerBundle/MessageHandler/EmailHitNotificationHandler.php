@@ -19,15 +19,8 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class EmailHitNotificationHandler implements MessageSubscriberInterface
 {
-    private EmailModel $emailModel;
-    private LoggerInterface $logger;
-
-    public function __construct(
-        EmailModel $emailModel,
-        LoggerInterface $logger
-    ) {
-        $this->emailModel = $emailModel;
-        $this->logger     = $logger;
+    public function __construct(private EmailModel $emailModel, private LoggerInterface $logger)
+    {
     }
 
     /** @throws MauticMessengerException */

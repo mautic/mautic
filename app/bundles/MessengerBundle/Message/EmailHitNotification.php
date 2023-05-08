@@ -12,16 +12,13 @@ class EmailHitNotification
 {
     use MessageRequestTrait;
 
-    private string $statId;
-
     public function __construct(
-        string $statId,
+        private string $statId,
         Request $request,
         ?DateTime $eventTime = null
     ) {
         $this->setEventTime($eventTime ?? new DateTime());
         $this->setRequest($request);
-        $this->statId = $statId;
     }
 
     public function getStatId(): string

@@ -22,11 +22,9 @@ trait MessageRequestTrait
     }
 
     /**
-     * @param string|DateTimeInterface $eventTime
-     *
      * @return MessageRequestTrait|EmailHitNotification
      */
-    public function setEventTime($eventTime): self
+    public function setEventTime(string|\DateTimeInterface $eventTime): self
     {
         $eventTime ??= (new DateTime())->format('c');
 
@@ -48,10 +46,7 @@ trait MessageRequestTrait
         return MessengerRequestFactory::fromArray($this->request);
     }
 
-    /**
-     * @param array|Request $request
-     */
-    public function setRequest($request): self
+    public function setRequest(array|Request $request): self
     {
         $this->request = $request instanceof Request ? MessengerRequestFactory::toArray($request) : $request;
 
