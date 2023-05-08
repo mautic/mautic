@@ -22,7 +22,7 @@ class Shortener
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
-    public function addService(string $id, ShortenerServiceInterface $shortener)
+    public function addService(string $id, ShortenerServiceInterface $shortener): void
     {
         $this->services[$id] = $shortener;
     }
@@ -48,6 +48,9 @@ class Shortener
         return $this->services;
     }
 
+    /**
+     * @return ShortenerServiceInterface[]
+     */
     public function getEnabledServices(): array
     {
         return array_filter($this->services, fn ($service) => $service->isEnabled());
