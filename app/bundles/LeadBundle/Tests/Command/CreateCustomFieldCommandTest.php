@@ -42,7 +42,7 @@ class CreateCustomFieldCommandTest extends TestCase
                 $this->translatorMock,
                 $this->leadFieldRepositoryMock,
                 $this->pathsHelperMock,
-                $this->coreParametersHelper
+                $this->coreParametersHelper,
             ])
             ->onlyMethods(['completeRun', 'checkRunStatus'])
             ->getMock();
