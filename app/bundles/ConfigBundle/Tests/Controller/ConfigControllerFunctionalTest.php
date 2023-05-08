@@ -47,7 +47,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $form->setValues(
             [
                 'config[coreconfig][site_url]'           => 'https://mautic-community.local', // required
-                'config[coreconfig][link_shortener_url]' => $url,
                 'config[coreconfig][do_not_track_ips]'   => $trackIps,
                 'config[pageconfig][google_analytics]'   => $googleAnalytics,
                 'config[leadconfig][contact_columns]'    => ['name', 'email', 'id'],
@@ -68,8 +67,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         // Check values are escaped properly in the config file
         $configParameters = $this->getConfigParameters();
-        Assert::assertArrayHasKey('link_shortener_url', $configParameters, 'Assert "link_shortener_url" in: '.implode(',', array_keys($configParameters)));
-        Assert::assertSame($this->escape($url), $configParameters['link_shortener_url']);
         Assert::assertArrayHasKey('do_not_track_ips', $configParameters);
         Assert::assertSame(
             [
@@ -87,7 +84,6 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
         $buttonCrawler = $crawler->selectButton('config[buttons][save]');
         $form          = $buttonCrawler->form();
-        Assert::assertEquals($url, $form['config[coreconfig][link_shortener_url]']->getValue());
         Assert::assertEquals($trackIps, $form['config[coreconfig][do_not_track_ips]']->getValue());
         Assert::assertEquals($googleAnalytics, $form['config[pageconfig][google_analytics]']->getValue());
     }

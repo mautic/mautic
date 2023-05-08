@@ -2,7 +2,7 @@
 
 namespace Mautic\PageBundle\Tests\Model;
 
-use Mautic\CoreBundle\Helper\UrlHelper;
+use Mautic\CoreBundle\Shortener\Shortener;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Event\RedirectGenerationEvent;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -35,12 +35,12 @@ class RedirectModelTest extends PageTestAbstract
 
     public function testRedirectGenerationEvent()
     {
-        $urlHelper = $this
-            ->getMockBuilder(UrlHelper::class)
+        $shortener = $this
+            ->getMockBuilder(Shortener::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $model = new RedirectModel($urlHelper);
+        $model = new RedirectModel($shortener);
 
         $dispatcher = new EventDispatcher();
         $model->setDispatcher($dispatcher);
