@@ -117,7 +117,7 @@ class PublicController extends CommonFormController
         $idHash
     ) {
         try {
-            $messageBus->dispatch(new EmailHitNotification($idHash, $this->request));
+            $messageBus->dispatch(new EmailHitNotification($idHash, $request));
         } catch (\Exception $exception) {
             $logger->error($exception->getMessage(), ['idHash' => $idHash]);
             $this->getModel('email')->hitEmail($idHash, $request);

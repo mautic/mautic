@@ -95,13 +95,6 @@ return [
     ],
     'services' => [
         'other' => [
-            'mautic.email.controller.public' => [
-                'class'     => \Mautic\EmailBundle\Controller\PublicController::class,
-                'arguments' => [
-                    'messenger.bus.default',
-                    'logger',
-                ],
-            ],
             'mautic.spool.delegator' => [
                 'class'     => \Mautic\EmailBundle\Swiftmailer\Spool\DelegatingSpool::class,
                 'arguments' => [

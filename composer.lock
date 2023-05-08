@@ -5684,7 +5684,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "0be0ed0967c65a9ad595a35b47f8264bbff4641c"
+                "reference": "daf6a22269fc840a8b3acfc0cee3f66d125f9eaf"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5735,6 +5735,7 @@
                 "simshaun/recurr": "^3.0",
                 "sparkpost/sparkpost": "^2.3",
                 "stack/builder": "^1.0",
+                "symfony/amqp-messenger": "^5.4",
                 "symfony/asset": "~5.4.0",
                 "symfony/cache": "~5.4.0",
                 "symfony/config": "~5.4.0",

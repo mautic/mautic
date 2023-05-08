@@ -27,6 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class PublicController extends CommonFormController
@@ -436,11 +437,9 @@ class PublicController extends CommonFormController
         ContactRequestHelper $contactRequestHelper,
         PrimaryCompanyHelper $primaryCompanyHelper,
         IpLookupHelper $ipLookupHelper,
-        LoggerInterface $mauticLogger,
+        LoggerInterface $logger,
         $redirectId
     ) {
-        $logger = $mauticLogger;
-
         $logger->debug('Attempting to load redirect with tracking_id of: '.$redirectId);
 
         /** @var \Mautic\PageBundle\Model\RedirectModel $redirectModel */
@@ -484,6 +483,7 @@ class PublicController extends CommonFormController
 
                 try {
                     $lead = $contactRequestHelper->getContactFromQuery(['ct' => $ct]);
+
                     $pageModel->hitPage($redirect, $request, 200, $lead);
                 } catch (InvalidDecodedStringException $e) {
                     // Invalid ct value so we must unset it

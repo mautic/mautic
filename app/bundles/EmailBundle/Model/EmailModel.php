@@ -51,6 +51,7 @@ use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -485,10 +486,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      */
     public function hitEmail(
         $stat,
-        $request,
+        ?Request $request,
         $viaBrowser = false,
         $activeRequest = true,
-        ?DateTime $hitDateTime = null,
+        ?\DateTime $hitDateTime = null,
         bool $throwDoctrineExceptions = false
     ) {
         if (!$stat instanceof Stat) {
@@ -553,8 +554,10 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             ]
         );
 
-        //check for existing IP
-        $ipAddress = $this->ipLookupHelper->getIpAddress();
+        // check for existing IP, we need to use current request
+        $ipAddress = $this->ipLookupHelper->getIpAddress(
+            $this->ipLookupHelper->getIpAddressFromRequest($request)
+        );
         $stat->setIpAddress($ipAddress);
 
         if ($this->dispatcher->hasListeners(EmailEvents::EMAIL_ON_OPEN)) {
