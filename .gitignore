@@ -91,6 +91,7 @@
 
 /plugins/*
 !/plugins/GrapesJsBuilderBundle
+!/plugins/MauticBitlyBundle
 !/plugins/MauticCitrixBundle
 !/plugins/MauticClearbitBundle
 !/plugins/MauticCloudStorageBundle
