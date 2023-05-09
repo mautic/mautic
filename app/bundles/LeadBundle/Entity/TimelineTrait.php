@@ -98,7 +98,7 @@ trait TimelineTrait
 
                 foreach ($dateTimeColumns as $col) {
                     if (isset($result[$col]) && !empty($result[$col])) {
-                        $dt           = new DateTimeHelper($result[$col], 'Y-m-d H:i:s', 'UTC');
+                        $dt           = new DateTimeHelper($result[$col], 'Y-m-d H:i:s.u', 'UTC');
                         $result[$col] = $dt->getLocalDateTime();
                         unset($dt);
                     }

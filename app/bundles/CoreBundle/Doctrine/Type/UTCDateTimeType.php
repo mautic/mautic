@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Doctrine\Type;
 
+use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
@@ -18,9 +19,23 @@ class UTCDateTimeType extends DateTimeType
     private static $utc;
 
     /**
-     * @param \DateTime $value
-     *
-     * @return string|null
+     * {@inheritdoc}
+     */
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
+    {
+        if (isset($column['version']) && true === $column['version']) {
+            return 'TIMESTAMP';
+        }
+
+        if (isset($column['length']) && $column['length'] > 0) {
+            return 'DATETIME('.(int) $column['length'].')';
+        }
+
+        return 'DATETIME';
+    }
+
+    /**
+     * @param mixed $value
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
@@ -40,6 +55,12 @@ class UTCDateTimeType extends DateTimeType
         }
 
         $value->setTimezone(self::$utc);
+
+        if ($value instanceof DateTimeInterface) {
+            $dateTimeFormat = $platform->getDateTimeFormatString();
+
+            return $value->format("{$dateTimeFormat}.u");
+        }
 
         return parent::convertToDatabaseValue($value, $platform);
     }

@@ -132,6 +132,7 @@ class LeadEventLog implements ChannelInterface
 
         $builder->createField('dateTriggered', 'datetime')
             ->columnName('date_triggered')
+            ->length(3)
             ->nullable()
             ->build();
 

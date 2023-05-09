@@ -78,7 +78,7 @@ class UtmTag
         $builder->setTable('lead_utmtags');
         $builder->setCustomRepositoryClass(UtmTagRepository::class);
         $builder->addId();
-        $builder->addDateAdded();
+        $builder->addDateAdded(false, 3);
         $builder->addLead(false, 'CASCADE', false, 'utmtags');
         $builder->addNullableField('query', Type::TARRAY);
         $builder->addNullableField('referer', Type::TEXT);

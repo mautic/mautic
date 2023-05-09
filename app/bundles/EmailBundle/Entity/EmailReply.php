@@ -47,6 +47,7 @@ class EmailReply
 
         $builder->createField('dateReplied', 'datetime')
             ->columnName('date_replied')
+            ->length(3)
             ->build();
 
         $builder->createField('messageId', 'string')

@@ -241,13 +241,18 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
      * Added dateAdded column.
      *
      * @param bool|false $nullable
+     * @param int|null   $length
      *
      * @return $this
      */
-    public function addDateAdded($nullable = false)
+    public function addDateAdded($nullable = false, $length = null)
     {
         $dateAdded = $this->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added');
+
+        if (isset($length)) {
+            $dateAdded->length($length);
+        }
 
         if ($nullable) {
             $dateAdded->nullable();
@@ -367,17 +372,22 @@ class ClassMetadataBuilder extends OrmClassMetadataBuilder
     /**
      * Add a field with a custom column name.
      *
-     * @param      $name
-     * @param      $type
-     * @param      $columnName
-     * @param bool $nullable
+     * @param          $name
+     * @param          $type
+     * @param          $columnName
+     * @param bool     $nullable
+     * @param int|null $length
      *
      * @return $this
      */
-    public function addNamedField($name, $type, $columnName, $nullable = false)
+    public function addNamedField($name, $type, $columnName, $nullable = false, $length = null)
     {
         $field = $this->createField($name, $type)
             ->columnName($columnName);
+
+        if (isset($length)) {
+            $field->length($length);
+        }
 
         if ($nullable) {
             $field->nullable();

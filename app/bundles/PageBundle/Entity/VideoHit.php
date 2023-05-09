@@ -137,10 +137,12 @@ class VideoHit
 
         $builder->createField('dateHit', 'datetime')
             ->columnName('date_hit')
+            ->length(3)
             ->build();
 
         $builder->createField('dateLeft', 'datetime')
             ->columnName('date_left')
+            ->length(3)
             ->nullable()
             ->build();
 
