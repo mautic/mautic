@@ -314,7 +314,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     ->join('log', MAUTIC_TABLE_PREFIX.'campaign_events', 'e', 'log.event_id = e.id')
                     ->join('log', MAUTIC_TABLE_PREFIX.'campaigns', 'c', 'log.campaign_id = c.id')
                     ->andWhere(
-                        $qb->expr()->andX(
+                        $qb->expr()->and(
                             $qb->expr()->eq('e.event_type', $qb->expr()->literal('decision')),
                             $qb->expr()->eq('log.is_scheduled', 0),
                             $qb->expr()->isNotNull('l.attribution'),
@@ -344,7 +344,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
                 $alias = str_replace('contact.attribution.', '', $context);
 
-                $expr = $subQ->expr()->andX(
+                $expr = $subQ->expr()->and(
                     $subQ->expr()->eq("{$alias}e.event_type", $subQ->expr()->literal('decision')),
                     $subQ->expr()->eq("{$alias}log.lead_id", 'log.lead_id')
                 );
@@ -362,7 +362,7 @@ class ReportSubscriber implements EventSubscriberInterface
                                 $x = $alias.$filter['column'];
                             }
 
-                            $expr->add(
+                            $expr->with(
                                 $expr->{$filter['operator']}($x, ":$filterParam")
                             );
                             $qb->setParameter($filterParam, $filter['value']);

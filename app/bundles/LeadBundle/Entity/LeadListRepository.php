@@ -365,10 +365,10 @@ class LeadListRepository extends CommonRepository
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subExpr = $subQb->expr()->andX();
+        $subExpr = $subQb->expr()->and();
 
         if ('leads' !== $table) {
-            $subExpr->add(
+            $subExpr->with(
                 $subQb->expr()->eq($alias.'.lead_id', 'l.id')
             );
         }
@@ -376,13 +376,13 @@ class LeadListRepository extends CommonRepository
         // Specific lead
         if (!empty($leadId)) {
             $columnName = ('leads' === $table) ? 'id' : 'lead_id';
-            $subExpr->add(
+            $subExpr->with(
                 $subQb->expr()->eq($alias.'.'.$columnName, $leadId)
             );
         }
 
         foreach ($subQueryFilters as $subColumn => $subParameter) {
-            $subExpr->add(
+            $subExpr->with(
                 $subQb->expr()->eq($subColumn, ":$subParameter")
             );
         }
@@ -392,7 +392,7 @@ class LeadListRepository extends CommonRepository
             $subFunc           = 'eq';
             if (is_array($value)) {
                 $subFunc = 'in';
-                $subExpr->add(
+                $subExpr->with(
                     $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter")
                 );
                 $parameters[$subFilterParamter] = ['value' => $value, 'type' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY];
@@ -400,7 +400,7 @@ class LeadListRepository extends CommonRepository
                 $parameters[$subFilterParamter] = $value;
             }
 
-            $subExpr->add(
+            $subExpr->with(
                 $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter")
             );
         }

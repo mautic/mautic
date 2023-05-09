@@ -374,11 +374,11 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
-            $groupExpr->add(
+            $groupExpr->with(
                 $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
             );
         } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
-            $groupExpr->add(
+            $groupExpr->with(
                 $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
             );
         }

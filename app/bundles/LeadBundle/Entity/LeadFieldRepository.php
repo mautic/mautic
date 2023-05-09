@@ -217,7 +217,7 @@ class LeadFieldRepository extends CommonRepository
             $q->join('l', MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x', 'l.id = x.lead_id')
                 ->join('x', MAUTIC_TABLE_PREFIX.'lead_tags', 't', 'x.tag_id = t.id')
                 ->where(
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
                         $q->expr()->eq('t.tag', ':value')
                     )
@@ -239,17 +239,17 @@ class LeadFieldRepository extends CommonRepository
             if ('empty' === $operatorExpr || 'notEmpty' === $operatorExpr) {
                 $doesSupportEmptyValue            = !in_array($fieldType, ['date', 'datetime'], true);
                 $compositeExpression              = ('empty' === $operatorExpr) ?
-                    $q->expr()->orX(
+                    $q->expr()->or(
                          $q->expr()->isNull($property),
                         $doesSupportEmptyValue ? $q->expr()->eq($property, $q->expr()->literal('')) : null
                     )
                     :
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->isNotNull($property),
                         $doesSupportEmptyValue ? $q->expr()->neq($property, $q->expr()->literal('')) : null
                     );
                 $q->where(
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
                         $compositeExpression
                     )
@@ -263,9 +263,9 @@ class LeadFieldRepository extends CommonRepository
                 }
 
                 $q->where(
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
-                        $q->expr()->andX($where)
+                        $q->expr()->and($where)
                     )
                 )
                   ->setParameter('lead', (int) $lead)
@@ -279,28 +279,28 @@ class LeadFieldRepository extends CommonRepository
                     // multiselect field values are separated by `|` and must be queried using regexp
                     $operator = str_starts_with($operatorExpr, 'not') ? 'NOT REGEXP' : 'REGEXP';
 
-                    $expr = $q->expr()->andX(
+                    $expr = $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead')
                     );
 
                     // require all multiselect values in condition
-                    $andExpr = $q->expr()->andX();
+                    $andExpr = $q->expr()->and();
                     foreach ($value as $v) {
                         $v = $q->expr()->literal(
                             InputHelper::clean($v)
                         );
 
                         $v = trim($v, "'");
-                        $andExpr->add(
+                        $andExpr->with(
                             $property." $operator '\\\\|?$v\\\\|?'"
                         );
                     }
-                    $expr->add($andExpr);
+                    $expr->with($andExpr);
 
                     $q->where($expr)
                         ->setParameter('lead', (int) $lead);
                 } else {
-                    $expr = $q->expr()->andX(
+                    $expr = $q->expr()->and(
                         $q->expr()->eq('l.id', ':lead'),
                         ('in' === $operatorExpr ? $q->expr()->in($property, ':values') : $q->expr()->notIn($property, ':values'))
                     );
@@ -310,14 +310,14 @@ class LeadFieldRepository extends CommonRepository
                         ->setParameter('values', $values, Connection::PARAM_STR_ARRAY);
                 }
             } else {
-                $expr = $q->expr()->andX(
+                $expr = $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead')
                 );
 
                 if ('neq' == $operatorExpr) {
                     // include null
-                    $expr->add(
-                        $q->expr()->orX(
+                    $expr->with(
+                        $q->expr()->or(
                             $q->expr()->$operatorExpr($property, ':value'),
                             $q->expr()->isNull($property)
                         )
@@ -338,7 +338,7 @@ class LeadFieldRepository extends CommonRepository
                             break;
                     }
 
-                    $expr->add(
+                    $expr->with(
                         $q->expr()->$operatorExpr($property, ':value')
                     );
                 }
@@ -403,7 +403,7 @@ class LeadFieldRepository extends CommonRepository
         $q->select('l.id')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('l.id', ':lead'),
                     $q->expr()->eq("MONTH(l. $field)", ':month'),
                     $q->expr()->eq("DAY(l. $field)", ':day')

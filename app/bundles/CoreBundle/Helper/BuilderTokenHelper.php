@@ -103,17 +103,17 @@ class BuilderTokenHelper
 
         $exprBuilder = $this->connection->getExpressionBuilder();
         if (null == $expr) {
-            $expr = $exprBuilder->andX();
+            $expr = $exprBuilder->and();
         }
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
-            $expr->add(
+            $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
         }
 
         if (!empty($filter)) {
-            $expr->add(
+            $expr->with(
                 $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
             );
 

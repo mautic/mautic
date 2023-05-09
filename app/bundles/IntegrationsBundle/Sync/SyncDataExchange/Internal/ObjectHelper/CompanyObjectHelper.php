@@ -149,12 +149,12 @@ class CompanyObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->where(
-                $qb->expr()->orX(
-                    $qb->expr()->andX(
+                $qb->expr()->or(
+                    $qb->expr()->and(
                         $qb->expr()->isNotNull('c.date_modified'),
                         $qb->expr()->comparison('c.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
                     ),
-                    $qb->expr()->andX(
+                    $qb->expr()->and(
                         $qb->expr()->isNull('c.date_modified'),
                         $qb->expr()->comparison('c.date_added', 'BETWEEN', ':dateFrom and :dateTo')
                     )

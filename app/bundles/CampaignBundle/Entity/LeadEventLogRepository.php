@@ -100,9 +100,9 @@ class LeadEventLogRepository extends CommonRepository
             if ($options['scheduledState']) {
                 // Include cancelled as well
                 $query->andWhere(
-                    $query->expr()->orX(
+                    $query->expr()->or(
                         $query->expr()->eq('ll.is_scheduled', ':scheduled'),
-                        $query->expr()->andX(
+                        $query->expr()->and(
                             $query->expr()->eq('ll.is_scheduled', 0),
                             $query->expr()->isNull('ll.date_triggered', 0)
                         )
@@ -118,7 +118,7 @@ class LeadEventLogRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->orX(
+                $query->expr()->or(
                     $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%')),
                     $query->expr()->like('e.description', $query->expr()->literal('%'.$options['search'].'%')),
                     $query->expr()->like('c.name', $query->expr()->literal('%'.$options['search'].'%')),
@@ -228,12 +228,12 @@ class LeadEventLogRepository extends CommonRepository
             'l.campaign_id = '.(int) $campaignId.' and l.manually_removed = 0 and o.lead_id = l.lead_id and l.rotation = o.rotation'
         );
 
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->eq('o.campaign_id', (int) $campaignId)
         );
 
         if ($eventId) {
-            $expr->add(
+            $expr->with(
                 $q->expr()->eq('o.event_id', $eventId)
             );
         }
@@ -241,8 +241,8 @@ class LeadEventLogRepository extends CommonRepository
         $groupBy = 'o.event_id';
         if ($excludeNegative) {
             $q->select('o.event_id, count(o.lead_id) as lead_count');
-            $expr->add(
-                $q->expr()->orX(
+            $expr->with(
+                $q->expr()->or(
                     $q->expr()->isNull('o.non_action_path_taken'),
                     $q->expr()->eq('o.non_action_path_taken', ':false')
                 )
@@ -253,7 +253,7 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if ($excludeScheduled) {
-            $expr->add(
+            $expr->with(
                 $q->expr()->eq('o.is_scheduled', ':false')
             );
         }
@@ -270,7 +270,7 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
-        $expr->add(
+        $expr->with(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
 
@@ -526,7 +526,7 @@ class LeadEventLogRepository extends CommonRepository
         $qb->select('log.lead_id, log.date_triggered, log.is_scheduled')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('log.event_id', $eventId),
                     $qb->expr()->in('log.lead_id', $contactIds)
                 )
@@ -571,7 +571,7 @@ class LeadEventLogRepository extends CommonRepository
         $qb->select('log.rotation')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'log')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('log.lead_id', ':contactId'),
                     $qb->expr()->eq('log.campaign_id', ':campaignId'),
                     $qb->expr()->in('log.rotation', ':rotation')
@@ -590,7 +590,7 @@ class LeadEventLogRepository extends CommonRepository
     /**
      * @param string $message
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function unscheduleEvents(Lead $campaignMember, $message)
     {
@@ -620,7 +620,7 @@ SQL;
         $qb->update(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log')
             ->set('is_scheduled', 0)
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('is_scheduled', 1),
                     $qb->expr()->eq('lead_id', ':contactId'),
                     $qb->expr()->eq('campaign_id', ':campaignId'),

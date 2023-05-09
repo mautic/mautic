@@ -257,11 +257,11 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
         } else {
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $expr->andX();
+            $composite = $expr->and();
 
             $limit = 100;
             if ($data) {
-                $composite->add(
+                $composite->with(
                     $expr->in($alias.'.id', $data)
                 );
                 if (count($data) > $limit) {

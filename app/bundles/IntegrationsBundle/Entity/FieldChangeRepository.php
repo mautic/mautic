@@ -23,7 +23,7 @@ class FieldChangeRepository extends CommonRepository
         $qb
             ->delete(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('object_type', ':objectType'),
                     $qb->expr()->eq('object_id', ':objectId'),
                     $qb->expr()->in('column_name', ':columnNames')
@@ -42,15 +42,15 @@ class FieldChangeRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $expr = $qb->expr()->andX();
+        $expr = $qb->expr()->and();
         if ($integration) {
-            $expr->add(
+            $expr->with(
                 $qb->expr()->eq('integration', ':integration')
             );
             $qb->setParameter('integration', $integration);
         }
 
-        $expr->addMultiple([
+        $expr->with([
             $qb->expr()->eq('object_type', ':objectType'),
             $qb->expr()->eq('object_id', ':objectId'),
         ]);
@@ -77,7 +77,7 @@ class FieldChangeRepository extends CommonRepository
             ->select('f.object_id')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->lte('f.modified_at', ':toDateTime')
@@ -113,7 +113,7 @@ class FieldChangeRepository extends CommonRepository
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->in('f.object_id', $objectIds)
@@ -139,7 +139,7 @@ class FieldChangeRepository extends CommonRepository
             ->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_field_change_report', 'f')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('f.integration', ':integration'),
                     $qb->expr()->eq('f.object_type', ':objectType'),
                     $qb->expr()->eq('f.object_id', ':objectId')

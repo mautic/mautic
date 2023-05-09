@@ -361,14 +361,14 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $alias = $event->getAlias();
         $q     = $event->getQueryBuilder();
-        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
+        $expr  = $q->expr()->and(sprintf('%s = :%s', $config['column'], $alias));
 
-        $expr->add(sprintf('%s = %s',
+        $expr->with(sprintf('%s = %s',
             'mq.channel',
             $q->createNamedParameter('email')
         ));
 
-        $expr->add(sprintf('%s IN (%s, %s)',
+        $expr->with(sprintf('%s IN (%s, %s)',
             'mq.status',
             $q->createNamedParameter(MessageQueue::STATUS_PENDING),
             $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)
@@ -485,13 +485,13 @@ class SearchSubscriber implements EventSubscriberInterface
 
         $alias = $event->getAlias();
         $q     = $event->getQueryBuilder();
-        $expr  = $q->expr()->andX(sprintf('%s = :%s', $config['column'], $alias));
+        $expr  = $q->expr()->and(sprintf('%s = :%s', $config['column'], $alias));
 
         if (isset($config['params'])) {
             $params = (array) $config['params'];
             foreach ($params as $name => $value) {
                 $param = $q->createNamedParameter($value);
-                $expr->add(sprintf('%s = %s', $name, $param));
+                $expr->with(sprintf('%s = %s', $name, $param));
             }
         }
 
