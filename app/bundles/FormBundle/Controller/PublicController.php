@@ -196,7 +196,7 @@ class PublicController extends CommonFormController
             } else {
                 $response = json_encode($data);
 
-                return $this->render('@MauticForm//messenger.html.twig', ['response' => $response]);
+                return $this->render('@MauticForm/messenger.html.twig', ['response' => $response]);
             }
         } else {
             if (!empty($error)) {
@@ -342,7 +342,7 @@ class PublicController extends CommonFormController
             return $this->render($logicalName, $viewParams);
         }
 
-        return $this->render('@MauticForm//form.html.twig', $viewParams);
+        return $this->render('@MauticForm/form.html.twig', $viewParams);
     }
 
     /**
