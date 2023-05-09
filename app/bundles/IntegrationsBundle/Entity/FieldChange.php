@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -65,33 +64,33 @@ class FieldChange
         $builder->addId();
 
         $builder
-            ->createField('integration', Type::STRING)
+            ->createField('integration', Types::STRING)
             ->build();
 
         $builder->addBigIntIdField('objectId', 'object_id', false);
 
         $builder
-            ->createField('objectType', Type::STRING)
+            ->createField('objectType', Types::STRING)
             ->columnName('object_type')
             ->build();
 
         $builder
-            ->createField('modifiedAt', Type::DATETIME)
+            ->createField('modifiedAt', Types::DATETIME)
             ->columnName('modified_at')
             ->build();
 
         $builder
-            ->createField('columnName', Type::STRING)
+            ->createField('columnName', Types::STRING)
             ->columnName('column_name')
             ->build();
 
         $builder
-            ->createField('columnType', Type::STRING)
+            ->createField('columnType', Types::STRING)
             ->columnName('column_type')
             ->build();
 
         $builder
-            ->createField('columnValue', Types::TEXT)
+            ->createField('columnValue', Typess::TEXT)
             ->columnName('column_value')
             ->build();
     }
