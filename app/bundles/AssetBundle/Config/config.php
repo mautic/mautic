@@ -31,6 +31,9 @@ return [
                 'defaults'   => [
                     'slug' => '',
                 ],
+                'requirements' => [
+                    'slug' => '.*[^\d+\s*:?].*',
+                ],
             ],
         ],
     ],
