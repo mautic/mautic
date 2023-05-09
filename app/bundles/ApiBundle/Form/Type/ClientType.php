@@ -15,11 +15,11 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ClientType extends AbstractType
 {
@@ -44,7 +44,7 @@ class ClientType extends AbstractType
     private $requestStack;
 
     /**
-     * @var Session
+     * @var SessionInterface
      */
     private $session;
 
@@ -52,7 +52,7 @@ class ClientType extends AbstractType
         RequestStack $requestStack,
         TranslatorInterface $translator,
         ValidatorInterface $validator,
-        Session $session,
+        SessionInterface $session,
         RouterInterface $router
     ) {
         $this->translator   = $translator;
@@ -202,13 +202,5 @@ class ClientType extends AbstractType
                 'data_class' => $dataClass,
             ]
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'client';
     }
 }

@@ -3,22 +3,21 @@
 namespace Mautic\CoreBundle\Controller;
 
 use Mautic\ApiBundle\Helper\RequestHelper;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Mautic\CoreBundle\Helper\ThemeHelper;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 
-/**
- * Class ExceptionController.
- */
 class ExceptionController extends CommonController
 {
     /**
      * {@inheritdoc}
      */
-    public function showAction(Request $request, FlattenException $exception, DebugLoggerInterface $logger = null)
+    public function showAction(Request $request, \Throwable $exception, ThemeHelper $themeHelper, DebugLoggerInterface $logger = null)
     {
+        $exception      = FlattenException::createFromThrowable($exception, $exception->getCode(), $request->headers->all());
         $class          = $exception->getClass();
         $currentContent = $this->getAndCleanOutputBuffering($request->headers->get('X-Php-Ob-Level', -1));
         $layout         = 'prod' == MAUTIC_ENV ? 'Error' : 'Exception';
@@ -43,7 +42,7 @@ class ExceptionController extends CommonController
 
             $message   = $allowRealMessage
                 ? $exception->getMessage()
-                : $this->get('translator')->trans(
+                : $this->translator->trans(
                     'mautic.core.error.generic',
                     ['%code%' => $code]
                 );
@@ -70,18 +69,17 @@ class ExceptionController extends CommonController
             $layout = 'Error';
         }
 
-        $anonymous    = $this->get('mautic.security')->isAnonymous();
-        $baseTemplate = 'MauticCoreBundle:Default:slim.html.php';
+        $anonymous    = $this->security->isAnonymous();
+        $baseTemplate = '@MauticCore/Default/slim.html.twig';
         if ($anonymous) {
-            if ($templatePage = $this->get('mautic.helper.theme')->getTheme()->getErrorPageTemplate($code)) {
+            if ($templatePage = $themeHelper->getTheme()->getErrorPageTemplate((string) $code)) {
                 $baseTemplate = $templatePage;
             }
         }
 
-        $template   = "MauticCoreBundle:{$layout}:{$code}.html.php";
-        $templating = $this->get('mautic.helper.templating')->getTemplating();
-        if (!$templating->exists($template)) {
-            $template = "MauticCoreBundle:{$layout}:base.html.php";
+        $template   = "@MauticCore/{$layout}/{$code}.html.twig";
+        if (!$this->get('twig')->getLoader()->exists($template)) {
+            $template = "@MauticCore/{$layout}/base.html.twig";
         }
 
         $statusText = isset(Response::$statusTexts[$code]) ? Response::$statusTexts[$code] : '';

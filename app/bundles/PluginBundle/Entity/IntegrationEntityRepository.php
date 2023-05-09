@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * IntegrationRepository.
+ * @extends CommonRepository<IntegrationEntity>
  */
 class IntegrationEntityRepository extends CommonRepository
 {
@@ -103,7 +103,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -138,7 +138,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setMaxResults(1);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -295,7 +295,9 @@ class IntegrationEntityRepository extends CommonRepository
         if ($limit) {
             $q->setMaxResults($limit);
         }
-        $results = $q->execute()->fetchAll();
+
+        $results = $q->execute()->fetchAllAssociative();
+
         $leads   = [];
 
         if ($integrationEntity) {
@@ -412,7 +414,8 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('dateTo', $toDate);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         if (false === $limit) {
             return (int) $results[0]['total'];
         }
@@ -467,7 +470,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
-            $rows    = $pq->execute()->fetchAll();
+            $rows    = $pq->execute()->fetchAllAssociative();
             $plugins = array_map(function ($i) {
                 return "'${i['name']}'";
             }, $rows);
@@ -500,7 +503,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setParameter('integrationEntity', $integrationEntity);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if (false === $limit && count($results) > 0) {
             return (int) $results[0]['total'];

@@ -20,12 +20,12 @@ class Hit
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateHit;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLeft;
 
@@ -109,7 +109,7 @@ class Hit
     private $pageLanguage;
 
     /**
-     * @var string
+     * @var array<string>
      */
     private $browserLanguages = [];
 
@@ -319,7 +319,7 @@ class Hit
     /**
      * Get dateHit.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateHit()
     {
@@ -327,7 +327,7 @@ class Hit
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLeft()
     {
@@ -704,7 +704,7 @@ class Hit
     /**
      * Set browserLanguages.
      *
-     * @param string $browserLanguages
+     * @param array<string> $browserLanguages
      *
      * @return Hit
      */
@@ -718,7 +718,7 @@ class Hit
     /**
      * Get browserLanguages.
      *
-     * @return string
+     * @return array<string>
      */
     public function getBrowserLanguages()
     {

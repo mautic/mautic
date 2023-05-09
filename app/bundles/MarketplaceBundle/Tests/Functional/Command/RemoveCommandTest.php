@@ -7,14 +7,15 @@ namespace Mautic\MarketplaceBundle\Tests\Functional\Command;
 use Mautic\CoreBundle\Helper\ComposerHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\MarketplaceBundle\Command\RemoveCommand;
-use Mautic\MarketplaceBundle\Model\ConsoleOutputModel;
+use Mautic\MarketplaceBundle\DTO\ConsoleOutput;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 final class RemoveCommandTest extends AbstractMauticTestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject&LoggerInterface
+     * @var MockObject&LoggerInterface
      */
     private $logger;
     private string $packageName;
@@ -31,7 +32,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer    = $this->createMock(ComposerHelper::class);
         $composer->method('remove')
             ->with($this->packageName)
-            ->willReturn(new ConsoleOutputModel(0, 'OK'));
+            ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn(['koco/mautic-recaptcha-bundle']);
         $command = new RemoveCommand($composer, $this->logger);
@@ -50,7 +51,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer    = $this->createMock(ComposerHelper::class);
         $composer->method('remove')
             ->with($this->packageName)
-            ->willReturn(new ConsoleOutputModel(0, 'OK'));
+            ->willReturn(new ConsoleOutput(0, 'OK'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
         $command = new RemoveCommand($composer, $this->logger);
@@ -69,7 +70,7 @@ final class RemoveCommandTest extends AbstractMauticTestCase
         $composer    = $this->createMock(ComposerHelper::class);
         $composer->method('remove')
             ->with($this->packageName)
-            ->willReturn(new ConsoleOutputModel(1, 'Error while removing package'));
+            ->willReturn(new ConsoleOutput(1, 'Error while removing package'));
         $composer->method('getMauticPluginPackages')
             ->willReturn([]);
         $command = new RemoveCommand($composer, $this->logger);

@@ -2,6 +2,12 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\FormFactoryInterface;
+
 /**
  * Class FormController.
  *
@@ -121,14 +127,6 @@ class FormController extends AbstractStandardFormController
     /**
      * @return mixed
      */
-    protected function getControllerBase()
-    {
-        return $this->deprecatedTemplateBase;
-    }
-
-    /**
-     * @return mixed
-     */
     protected function getTranslationBase()
     {
         return $this->deprecatedTranslationBase;
@@ -140,5 +138,10 @@ class FormController extends AbstractStandardFormController
     protected function getPermissionBase()
     {
         return $this->deprecatedPermissionBase;
+    }
+
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $managerRegistry)
+    {
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $managerRegistry);
     }
 }

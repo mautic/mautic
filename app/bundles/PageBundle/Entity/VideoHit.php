@@ -20,12 +20,12 @@ class VideoHit
     private $guid;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateHit;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateLeft;
 
@@ -104,7 +104,7 @@ class VideoHit
     private $pageLanguage;
 
     /**
-     * @var string
+     * @var array<string>
      */
     private $browserLanguages = [];
 
@@ -287,7 +287,7 @@ class VideoHit
     /**
      * Get dateHit.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateHit()
     {
@@ -295,7 +295,7 @@ class VideoHit
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateLeft()
     {
@@ -603,7 +603,7 @@ class VideoHit
     /**
      * Set browserLanguages.
      *
-     * @param string $browserLanguages
+     * @param array<string> $browserLanguages
      *
      * @return VideoHit
      */
@@ -617,7 +617,7 @@ class VideoHit
     /**
      * Get browserLanguages.
      *
-     * @return string
+     * @return array<string>
      */
     public function getBrowserLanguages()
     {

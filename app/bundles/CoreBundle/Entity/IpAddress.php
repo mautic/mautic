@@ -29,7 +29,7 @@ class IpAddress
     private $ipAddress;
 
     /**
-     * @var array
+     * @var array<string,string>
      */
     private $ipDetails;
 
@@ -125,7 +125,7 @@ class IpAddress
     /**
      * Set ipDetails.
      *
-     * @param string $ipDetails
+     * @param array<string,string> $ipDetails
      *
      * @return IpAddress
      */
@@ -139,7 +139,7 @@ class IpAddress
     /**
      * Get ipDetails.
      *
-     * @return string
+     * @return array<string,string>
      */
     public function getIpDetails()
     {

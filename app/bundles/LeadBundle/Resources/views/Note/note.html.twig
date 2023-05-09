@@ -1,0 +1,45 @@
+{#
+  Variables:
+    - note
+    - lead
+    - permissions
+#}
+{% set icon = 'fa-file-text' %}
+{% if 'email' == note.type %}
+    {% set icon = 'fa-send' %}
+{% elseif 'call' == note.type %}
+    {% set icon = 'fa-phone' %}
+{% elseif 'meeting' == note.type %}
+    {% set icon = 'fa-group' %}
+{% endif %}
+<li id="LeadNote{{ note.id }}">
+    <div class="panel ">
+        <div class="panel-body np box-layout">
+            <div class="height-auto icon bdr-r bg-dark-xs col-xs-1 text-center">
+                <h3><i class="fa fa-lg fa-fw {{ icon }}"></i></h3>
+            </div>
+            <div class="media-body col-xs-11 pa-10">
+                <div class="pull-right btn-group">
+                    {% if permissions['edit'] %}
+                        <a class="btn btn-default btn-xs" href="{{ url('mautic_contactnote_action', {'leadId': lead.id, 'objectAction': 'edit', 'objectId': note.id}) }}" data-toggle="ajaxmodal" data-target="#MauticSharedModal" data-header="{{ 'mautic.lead.note.header.edit'|trans }}"><i class="fa fa-pencil"></i></a>
+                    {% endif %}
+                    {% if permissions['delete'] %}
+                        <a class="btn btn-default btn-xs" data-toggle="confirmation"
+                           href="{{ path('mautic_contactnote_action', {'objectAction': 'delete', 'objectId': note.id, 'leadId': lead.id}) }}"
+                           data-message="{{ 'mautic.lead.note.confirmdelete'|trans|e }}"
+                           data-confirm-text="{{ 'mautic.core.form.delete'|trans|e }}"
+                           data-confirm-callback="executeAction"
+                           data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
+                            <i class="fa fa-trash text-danger"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                {{ note.text|purify }}
+                <div class="mt-15 text-muted">
+                  <i class="fa fa-clock-o fa-fw"></i> <span class="small">{{ dateToFullConcat(note.dateTime) }}</span>
+                  <i class="fa fa-user fa-fw"></i> <span class="small">{{ note.createdByUser }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</li>

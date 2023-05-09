@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 class Stat
 {
     /** @var int Limit number of stored 'openDetails' */
-    const MAX_OPEN_DETAILS = 1000;
+    public const MAX_OPEN_DETAILS = 1000;
 
     /**
      * @var int|null
@@ -46,7 +46,7 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -66,7 +66,7 @@ class Stat
     private $viewedInBrowser = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateRead;
 
@@ -106,7 +106,7 @@ class Stat
     private $openCount = 0;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastOpened;
 
@@ -250,7 +250,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateRead()
     {
@@ -266,7 +266,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateSent()
     {
@@ -558,7 +558,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getLastOpened()
     {

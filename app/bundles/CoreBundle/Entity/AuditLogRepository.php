@@ -7,7 +7,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * AuditLogRepository.
+ * @extends CommonRepository<AuditLog>
  */
 class AuditLogRepository extends CommonRepository
 {
@@ -41,7 +41,7 @@ class AuditLogRepository extends CommonRepository
             $query->andWhere('al.action not in ('.$excludeList.')');
         }
 
-        return $query->execute()->fetchColumn();
+        return $query->execute()->fetchOne();
     }
 
     /**
@@ -154,11 +154,11 @@ class AuditLogRepository extends CommonRepository
     /**
      * Get array of objects which belongs to the object.
      *
-     * @param null $object
-     * @param null $id
-     * @param int  $limit
-     * @param null $afterDate
-     * @param null $bundle
+     * @param string|null $object
+     * @param string|null $id
+     * @param int         $limit
+     * @param null        $afterDate
+     * @param null        $bundle
      *
      * @return array
      */
@@ -190,7 +190,7 @@ class AuditLogRepository extends CommonRepository
                 ->setParameter('date', $afterDate);
         }
 
-        $query->orderBy('al.dateAdded', 'DESC')
+        $query->orderBy('al.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
             ->setMaxResults($limit);
 
         return $query->getQuery()->getArrayResult();

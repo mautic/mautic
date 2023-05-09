@@ -2,7 +2,9 @@
 
 namespace Mautic\CoreBundle\Controller;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
 trait BuilderControllerTrait
@@ -10,20 +12,17 @@ trait BuilderControllerTrait
     /**
      * Get assets for builder.
      */
-    protected function getAssetsForBuilder()
+    protected function getAssetsForBuilder(AssetsHelper $assetsHelper, Translator $translatorHelper, Request $request)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
-        $assetsHelper = $this->get('templating.helper.assets');
         /** @var RouterInterface $routerHelper */
         $routerHelper = $this->get('router');
-        $translator   = $this->get('templating.helper.translator');
         $assetsHelper
             ->setContext(AssetsHelper::CONTEXT_BUILDER)
-            ->addScriptDeclaration("var mauticBasePath    = '".$this->request->getBasePath()."';")
+            ->addScriptDeclaration("var mauticBasePath    = '".$request->getBasePath()."';")
             ->addScriptDeclaration("var mauticAjaxUrl     = '".$routerHelper->generate('mautic_core_ajax')."';")
             ->addScriptDeclaration("var mauticBaseUrl     = '".$routerHelper->generate('mautic_base_index')."';")
             ->addScriptDeclaration("var mauticAssetPrefix = '".$assetsHelper->getAssetPrefix(true)."';")
-            ->addScriptDeclaration('var mauticLang        = '.$translator->getJsLang().';')
+            ->addScriptDeclaration('var mauticLang        = '.$translatorHelper->getJsLang().';')
             ->addCustomDeclaration($assetsHelper->getSystemScripts(true, true))
             ->addStylesheet('app/bundles/CoreBundle/Assets/css/libraries/builder.css');
 
@@ -44,7 +43,7 @@ trait BuilderControllerTrait
     {
         foreach ($slotTypes as $key => $slotType) {
             if (!empty($slotType['form'])) {
-                $slotForm                = $this->get('form.factory')->create($slotType['form']);
+                $slotForm                = $this->formFactory->create($slotType['form']);
                 $slotTypes[$key]['form'] = $slotForm->createView();
             }
         }

@@ -1,0 +1,29 @@
+<div class="panel-toolbar np">
+    <ul class="nav nav-tabs pr-md pl-md">
+        <li class="active">
+            <a href="#FoursquareProfile" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.profile'|trans }}
+            </a>
+        </li>
+        <li>
+            <a href="#FoursquareTips" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.lead.social.foursquare.tips'|trans }}
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="np panel-body tab-content">
+    <div class="pa-20 tab-pane active" id="FoursquareProfile">
+        {{ include('@MauticSocial/Integration/Foursquare/Profile/profile.html.twig', {
+            'lead': lead,
+            'profile': details.profile,
+        }) }}
+    </div>
+    <div class="tab-pane" id="FoursquareTips">
+        {{ include('@MauticSocial/Integration/Foursquare/Profile/tips.html.twig', {
+            'lead': lead,
+            'activity': details.activity.tips|default([]),
+        }) }}
+    </div>
+</div>

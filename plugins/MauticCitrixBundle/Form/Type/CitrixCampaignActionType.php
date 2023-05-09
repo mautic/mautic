@@ -8,7 +8,7 @@ use MauticPlugin\MauticCitrixBundle\Helper\CitrixProducts;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class CitrixCampaignActionType.
@@ -108,13 +108,5 @@ class CitrixCampaignActionType extends AbstractType
 
             $builder->add('template', EmailListType::class, $defaultOptions);
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'citrix_campaign_action';
     }
 }

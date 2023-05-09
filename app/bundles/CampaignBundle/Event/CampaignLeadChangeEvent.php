@@ -4,7 +4,7 @@ namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class CampaignLeadChangeEvent.

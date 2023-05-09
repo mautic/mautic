@@ -15,7 +15,7 @@ class GeneratedType extends Type
     /**
      * @var string
      */
-    const GENERATED = 'generated';
+    public const GENERATED = 'generated';
 
     /**
      * @return string

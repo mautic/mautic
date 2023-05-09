@@ -1,36 +1,6 @@
 # Mautic Integrations
 
-> Integrations solutions structured to mirror current Integrations and created as transition to final product.
-
-## Install integrations bundle
-
-Bundle is to be installed as any other common plugin even it is to be a part of Mautic in the future.
-
-Create app/bundles/PluginBundle/Integration/UnifiedIntegrationInterface.php
-
-```php
-<?php
-
-/*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
-namespace Mautic\PluginBundle\Integration;
-
-/**
- * Interface UnifiedIntegrationInterface is used for type hinting.
- */
-interface UnifiedIntegrationInterface
-{
-}
-```
-
-### Composer requirements and dependencies
+This bundle allows you to create integrations with CRM systems with support for 2-way sync between Mautic and the CRM.
 
 ### Sync command
 
@@ -70,27 +40,3 @@ $inputOptions = new Mautic\IntegrationsBundle\Sync\DAO\Sync\InputOptionsDAO(
 /** @var \Mautic\IntegrationsBundle\Sync\SyncService\SyncServiceInterface $syncService **/
 $syncService->processIntegrationSync($inputOptions);
 ```
-
-## Tests
-
-This plugin is covered with some unit tests, functional tests, static analysis and code style check that run also in CI on every push.
-
-### Useful commands
-
-Always run following commands from the `plugins/IntegrationsBundle` directory.
-
-#### `$ composer test`
-
-With this command you can run all the tests for this plugin. Functional tests included.
-
-#### `$ composer quicktest`
-
-With this command you can run all the tests for this plugin except functional tests which makes it fast.
-
-#### `$ composer phpunit -- --filter x`
-
-With this command you can filter which tests you want to run. Replace `x` with whatever test class name or method you focus on.
-
-#### `$ composer fixcs`
-
-If you wan to automatically fix code styles then run this.

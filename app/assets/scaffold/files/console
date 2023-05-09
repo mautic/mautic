@@ -18,26 +18,25 @@ defined('IN_MAUTIC_CONSOLE') or define('IN_MAUTIC_CONSOLE', 1);
 
 define('MAUTIC_ROOT_DIR', realpath(__DIR__.'/..'));
 
-require_once __DIR__.'/../app/autoload.php';
-require_once __DIR__.'/../app/AppKernel.php';
+require_once __DIR__.'/../autoload.php';
 
 use Mautic\CoreBundle\Console\Output\ConsoleDatetimeOutput;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Debug\Debug;
+use Symfony\Component\ErrorHandler\Debug;
 
 $input = new ArgvInput();
 $env   = $input->getParameterOption(['--env', '-e'], getenv('SYMFONY_ENV') ?: 'prod');
-$debug = getenv('SYMFONY_DEBUG') !== '0' && !$input->hasParameterOption(['--no-debug', '']) && $env !== 'prod';
+$debug = '0' !== getenv('SYMFONY_DEBUG') && !$input->hasParameterOption(['--no-debug', '']) && 'prod' !== $env;
 
 if ($debug) {
     Debug::enable();
 }
 
-$output = ($input->getParameterOption(['--no-interaction', '-n']) !== false) ? new ConsoleDatetimeOutput() : null;
+$output = (false !== $input->getParameterOption(['--no-interaction', '-n'])) ? new ConsoleDatetimeOutput() : null;
 
 $kernel      = new AppKernel($env, $debug);
 $application = new Application($kernel);
 $application->setName('Mautic');
-$application->setVersion($kernel->getVersion().' - '.$kernel->getName().'/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
+$application->setVersion($kernel->getVersion().' - app/'.$kernel->getEnvironment().($kernel->isDebug() ? '/debug' : ''));
 $application->run($input, $output);

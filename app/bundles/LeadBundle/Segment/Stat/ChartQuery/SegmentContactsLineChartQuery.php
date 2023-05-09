@@ -68,7 +68,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
         parent::__construct($connection, $dateFrom, $dateTo, $unit);
     }
 
-    public function setDateRange(\DateTime $dateFrom, \DateTime $dateTo)
+    public function setDateRange(\DateTimeInterface $dateFrom, \DateTimeInterface $dateTo)
     {
         parent::setDateRange($dateFrom, $dateTo);
         $this->init();
@@ -156,7 +156,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
     {
         $subQuery = $this->connection->createQueryBuilder();
         $subQuery->select('el.date_added - INTERVAL 10 SECOND')
-            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log', 'el')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_event_log el FORCE INDEX ('.MAUTIC_TABLE_PREFIX.'IDX_SEARCH)')
             ->where(
                 $subQuery->expr()->andX(
                     $subQuery->expr()->eq('el.object', $subQuery->expr()->literal('segment')),
@@ -168,7 +168,7 @@ class SegmentContactsLineChartQuery extends ChartQuery
             ->setFirstResult(0)
             ->setMaxResults(1);
 
-        return $subQuery->execute()->fetchColumn();
+        return $subQuery->execute()->fetchOne();
     }
 
     /**

@@ -11,7 +11,7 @@ class BatchLookupType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('ids', 'hidden');
+        $builder->add('ids', \Symfony\Component\Form\Extension\Core\Type\HiddenType::class);
 
         $builder->add(
             'buttons',

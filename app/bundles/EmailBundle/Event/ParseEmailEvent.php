@@ -2,7 +2,7 @@
 
 namespace Mautic\EmailBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ParseEmailEvent extends Event
 {

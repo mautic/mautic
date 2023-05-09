@@ -2,27 +2,64 @@
 
 namespace Mautic\CampaignBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
+use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
+use Mautic\CampaignBundle\Model\CampaignModel;
+use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Controller\LeadAccessTrait;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+use Symfony\Component\Routing\RouterInterface;
 
+/**
+ * @extends CommonApiController<Campaign>
+ */
 class CampaignApiController extends CommonApiController
 {
     use LeadAccessTrait;
 
-    /**
-     * @var MembershipManager
-     */
-    private $membershipManager;
+    private MembershipManager $membershipManager;
 
-    public function initialize(FilterControllerEvent $event)
+    /**
+     * @var CampaignModel|null
+     */
+    protected $model = null;
+
+    private RequestStack $requestStack;
+
+    public function __construct(
+        CorePermissions $security,
+        Translator $translator,
+        EntityResultHelper $entityResultHelper,
+        RouterInterface $router,
+        FormFactoryInterface $formFactory,
+        AppVersion $appVersion,
+        RequestStack $requestStack,
+        MembershipManager $membershipManager,
+        ManagerRegistry $doctrine
+    ) {
+        $this->requestStack      = $requestStack;
+        $this->membershipManager = $membershipManager;
+
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
+    }
+
+    public function initialize(ControllerEvent $event)
     {
-        $this->model             = $this->getModel('campaign');
-        $this->membershipManager = $this->get('mautic.campaign.membership.manager');
+        $campaignModel = $this->getModel('campaign');
+        \assert($campaignModel instanceof CampaignModel);
+
+        $this->model             = $campaignModel;
         $this->entityClass       = Campaign::class;
         $this->entityNameOne     = 'campaign';
         $this->entityNameMulti   = 'campaigns';
@@ -97,22 +134,22 @@ class CampaignApiController extends CommonApiController
     /**
      * {@inheritdoc}
      *
-     * @param \Mautic\LeadBundle\Entity\Lead &$entity
-     * @param                                $parameters
-     * @param                                $form
-     * @param string                         $action
+     * @param Campaign &$entity
+     * @param $parameters
+     * @param $form
+     * @param string $action
      */
     protected function preSaveEntity(&$entity, $form, $parameters, $action = 'edit')
     {
-        $method = $this->request->getMethod();
+        $method = $this->requestStack->getCurrentRequest()->getMethod();
 
         if ('POST' === $method || 'PUT' === $method) {
             if (empty($parameters['events'])) {
-                $msg = $this->get('translator')->trans('mautic.campaign.form.events.notempty', [], 'validators');
+                $msg = $this->translator->trans('mautic.campaign.form.events.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             } elseif (empty($parameters['lists']) && empty($parameters['forms'])) {
-                $msg = $this->get('translator')->trans('mautic.campaign.form.sources.notempty', [], 'validators');
+                $msg = $this->translator->trans('mautic.campaign.form.sources.notempty', [], 'validators');
 
                 return $this->returnError($msg, Response::HTTP_BAD_REQUEST);
             }
@@ -191,8 +228,10 @@ class CampaignApiController extends CommonApiController
             $this->model->setCanvasSettings($entity, $parameters['canvasSettings']);
         }
 
-        if ('PUT' === $method && !empty($deletedEvents)) {
-            $this->getModel('campaign.event')->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
+        if (Request::METHOD_PUT === $method && !empty($deletedEvents)) {
+            $campaignEventModel = $this->getModel('campaign.event');
+            \assert($campaignEventModel instanceof EventModel);
+            $campaignEventModel->deleteEvents($entity->getEvents()->toArray(), $deletedEvents);
         }
     }
 
@@ -225,7 +264,7 @@ class CampaignApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function getContactsAction($id)
+    public function getContactsAction(Request $request, $id)
     {
         $entity = $this->model->getEntity($id);
 
@@ -237,10 +276,10 @@ class CampaignApiController extends CommonApiController
             return $this->accessDenied();
         }
 
-        $where = InputHelper::clean($this->request->query->get('where', []));
-        $order = InputHelper::clean($this->request->query->get('order', []));
-        $start = (int) $this->request->query->get('start', 0);
-        $limit = (int) $this->request->query->get('limit', 100);
+        $where = InputHelper::clean($request->query->get('where') ?? []);
+        $order = InputHelper::clean($request->query->get('order') ?? []);
+        $start = (int) $request->query->get('start', 0);
+        $limit = (int) $request->query->get('limit', 100);
 
         $where[] = [
             'col'  => 'campaign_id',
@@ -255,7 +294,7 @@ class CampaignApiController extends CommonApiController
         ];
 
         return $this->forward(
-            'MauticCoreBundle:Api\StatsApi:list',
+            'Mautic\CoreBundle\Controller\Api\StatsApiController::listAction',
             [
                 'table'     => 'campaign_leads',
                 'itemsName' => 'contacts',

@@ -4,13 +4,20 @@ namespace Mautic\LeadBundle\Controller\Api;
 
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\LeadBundle\Entity\Tag;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Mautic\LeadBundle\Model\TagModel;
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
+/**
+ * @extends CommonApiController<Tag>
+ */
 class TagApiController extends CommonApiController
 {
-    public function initialize(FilterControllerEvent $event)
+    public function initialize(ControllerEvent $event)
     {
-        $this->model           = $this->getModel('lead.tag');
+        $leadTagModel = $this->getModel('lead.tag');
+        \assert($leadTagModel instanceof TagModel);
+
+        $this->model           = $leadTagModel;
         $this->entityClass     = Tag::class;
         $this->entityNameOne   = 'tag';
         $this->entityNameMulti = 'tags';
@@ -28,9 +35,12 @@ class TagApiController extends CommonApiController
     public function getNewEntity(array $params)
     {
         if (empty($params[$this->entityNameOne])) {
-            throw new \InvalidArgumentException($this->get('translator')->trans('mautic.lead.api.tag.required', [], 'validators'));
+            throw new \InvalidArgumentException($this->translator->trans('mautic.lead.api.tag.required', [], 'validators'));
         }
 
-        return $this->model->getRepository()->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
+        $tagModel = $this->model;
+        \assert($tagModel instanceof TagModel);
+
+        return $tagModel->getRepository()->getTagByNameOrCreateNewOne($params[$this->entityNameOne]);
     }
 }

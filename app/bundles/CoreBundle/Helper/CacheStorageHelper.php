@@ -3,8 +3,8 @@
 namespace Mautic\CoreBundle\Helper;
 
 use Doctrine\DBAL\Connection;
+use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
-use Symfony\Component\Cache\Adapter\PdoAdapter;
 
 /**
  * Class CacheStorageHelper.
@@ -13,9 +13,9 @@ use Symfony\Component\Cache\Adapter\PdoAdapter;
  */
 class CacheStorageHelper
 {
-    const ADAPTOR_DATABASE = 'db';
+    public const ADAPTOR_DATABASE = 'db';
 
-    const ADAPTOR_FILESYSTEM = 'fs';
+    public const ADAPTOR_FILESYSTEM = 'fs';
 
     /**
      * @var array
@@ -23,7 +23,7 @@ class CacheStorageHelper
     protected $cache = [];
 
     /**
-     * @var PdoAdapter|FilesystemAdapter
+     * @var DoctrineDbalAdapter|FilesystemAdapter
      */
     protected $cacheAdaptor;
 
@@ -203,7 +203,8 @@ class CacheStorageHelper
         switch ($this->adaptor) {
             case self::ADAPTOR_DATABASE:
                 $namespace          = ($this->namespace) ? InputHelper::alphanum($this->namespace, false, '-', ['-', '+', '.']) : '';
-                $this->cacheAdaptor = new PdoAdapter(
+
+                $this->cacheAdaptor = new DoctrineDbalAdapter(
                     $this->connection, $namespace, $this->defaultExpiration, ['db_table' => MAUTIC_TABLE_PREFIX.'cache_items']
                 );
                 break;

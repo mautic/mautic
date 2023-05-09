@@ -59,7 +59,20 @@ class PageModelTest extends PageTestAbstract
         $page = new Page();
         $page->setAlias('this-is-a-test');
         $pageModel = $this->getPageModel();
-        $url       = $pageModel->generateUrl($page);
+
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->willReturnCallback(
+                function (string $route, array $routeParams, int $referenceType) {
+                    $this->assertSame('mautic_page_public', $route);
+                    $this->assertSame(['slug' => 'this-is-a-test'], $routeParams);
+                    $this->assertSame(0, $referenceType);
+
+                    return '/'.$routeParams['slug'];
+                }
+            );
+
+        $url = $pageModel->generateUrl($page);
         $this->assertStringContainsString('/this-is-a-test', $url);
     }
 

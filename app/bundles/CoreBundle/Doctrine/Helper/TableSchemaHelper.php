@@ -203,7 +203,7 @@ class TableSchemaHelper
 
         if (!empty($sql)) {
             foreach ($sql as $s) {
-                $this->db->executeUpdate($s);
+                $this->db->executeStatement($s);
             }
         }
 

@@ -24,7 +24,7 @@ trait VariantEntityTrait
     private $variantSettings = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface|null
      */
     private $variantStartDate;
 
@@ -245,7 +245,7 @@ trait VariantEntityTrait
      *
      * @param bool $publishedOnly
      *
-     * @return array
+     * @return array<int,int|string>
      */
     public function getRelatedEntityIds($publishedOnly = false)
     {

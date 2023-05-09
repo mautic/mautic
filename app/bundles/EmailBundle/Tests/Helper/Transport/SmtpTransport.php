@@ -6,8 +6,11 @@ use Swift_Mime_SimpleMessage;
 
 class SmtpTransport implements \Swift_Transport
 {
+    public Swift_Mime_SimpleMessage $sentMessage;
+
     public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
+        $this->sentMessage = clone $message;
     }
 
     /**

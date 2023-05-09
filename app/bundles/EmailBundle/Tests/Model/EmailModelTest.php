@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\Doctrine\DBALMocker;
@@ -52,9 +52,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class EmailModelTest extends \PHPUnit\Framework\TestCase
 {
-    const SEGMENT_A = 'segment A';
+    public const SEGMENT_A = 'segment A';
 
-    const SEGMENT_B = 'segment B';
+    public const SEGMENT_B = 'segment B';
+
+    /**
+     * @var Connection|MockObject
+     */
+    private $connection;
 
     /**
      * @var MockObject|IpLookupHelper
@@ -62,7 +67,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
     private $ipLookupHelper;
 
     /**
-     * @var MockObject|ThemeHelper
+     * @var MockObject|ThemeHelperInterface
      */
     private $themeHelper;
 
@@ -201,7 +206,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->ipLookupHelper           = $this->createMock(IpLookupHelper::class);
-        $this->themeHelper              = $this->createMock(ThemeHelper::class);
+        $this->themeHelper              = $this->createMock(ThemeHelperInterface::class);
         $this->mailboxHelper            = $this->createMock(Mailbox::class);
         $this->mailHelper               = $this->createMock(MailHelper::class);
         $this->leadModel                = $this->createMock(LeadModel::class);
@@ -227,6 +232,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
         $this->doNotContact             = $this->createMock(DoNotContact::class);
         $this->statsCollectionHelper    = $this->createMock(StatsCollectionHelper::class);
         $this->corePermissions          = $this->createMock(CorePermissions::class);
+        $this->connection               = $this->createMock(Connection::class);
 
         $this->emailModel = new EmailModel(
             $this->ipLookupHelper,
@@ -245,7 +251,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection
         );
 
         $this->emailModel->setTranslator($this->translator);
@@ -629,7 +636,8 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
             $this->contactTracker,
             $this->doNotContact,
             $this->statsCollectionHelper,
-            $this->corePermissions
+            $this->corePermissions,
+            $this->connection
         );
 
         $emailModel->setTranslator($this->translator);

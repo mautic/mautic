@@ -55,7 +55,7 @@ class AuthCode extends BaseAuthCode
         $builder->setTable('oauth2_authcodes');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 

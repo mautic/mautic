@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\FormBundle\Tests\Controller;
 
+use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Lead;
+use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\FormBundle\Entity\Submission;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -44,10 +47,11 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
 
         $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
         $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-        $formId         = $response['form']['id'];
 
         $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $response = json_decode($clientResponse->getContent(), true);
+        $formId   = $response['form']['id'];
 
         // Add conditional state field dependent on the country field:
         $patchPayload = [
@@ -102,8 +106,8 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            'country' => 'Australia',
-            'state'   => 'Victoria',
+            '`country`' => 'Australia',
+            '`state`'   => 'Victoria',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -196,7 +200,7 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         /** @var Submission $submission */
         $submission = $submissions[0];
         Assert::assertSame([
-            'country' => '',
+            '`country`' => '',
         ], $submission->getResults());
 
         // A contact should be created by the submission.
@@ -300,11 +304,125 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 
-    protected function tearDown(): void
+    public function testProgressiveFormsWithMaximumFieldsDisplayedAtTime(): void
+    {
+        // Create the test form via API.
+        $payload = [
+            'name'                      => 'Submission test form',
+            'description'               => 'Form created via submission test',
+            'formType'                  => 'standalone',
+            'isPublished'               => true,
+            'progressiveProfilingLimit' => 2,
+            'fields'                    => [
+                [
+                    'label'                  => 'Email',
+                    'type'                   => 'email',
+                    'alias'                  => 'email',
+                    'leadField'              => 'email',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Firstname',
+                    'type'                   => 'text',
+                    'alias'                  => 'firstname',
+                    'leadField'              => 'firstname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label'                  => 'Lastname',
+                    'type'                   => 'text',
+                    'alias'                  => 'lastname',
+                    'leadField'              => 'lastname',
+                    'is_auto_fill'           => 1,
+                    'show_when_value_exists' => 0,
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        // show just one text field
+        $this->assertSame(1, $formCrawler->filter('.mauticform-text')->count());
+    }
+
+    public function testAddContactToCampaignByForm(): void
+    {
+        // Create the test form via API.
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'campaign',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'     => 'Email',
+                    'type'      => 'email',
+                    'alias'     => 'email',
+                    'leadField' => 'email',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        $campaignSources = ['forms' => [$formId => $formId]];
+
+        /** @var CampaignModel $campaignModel */
+        $campaignModel = $this->getContainer()->get('mautic.campaign.model.campaign');
+
+        $publishedCampaign = new Campaign();
+        $publishedCampaign->setName('Published');
+        $publishedCampaign->setIsPublished(true);
+        $campaignModel->setLeadSources($publishedCampaign, $campaignSources, []);
+
+        $unpublishedCampaign =  new Campaign();
+        $unpublishedCampaign->setName('Unpublished');
+        $unpublishedCampaign->setIsPublished(false);
+        $campaignModel->setLeadSources($unpublishedCampaign, $campaignSources, []);
+
+        $this->em->persist($publishedCampaign);
+        $this->em->persist($unpublishedCampaign);
+        $this->em->flush();
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[email]' => 'xx@xx.com',
+        ]);
+        $this->client->submit($form);
+
+        $submissions = $this->em->getRepository(Lead::class)->findAll();
+        Assert::assertCount(1, $submissions);
+    }
+
+    protected function beforeTearDown(): void
     {
         $tablePrefix = self::$container->getParameter('mautic.db_table_prefix');
-
-        parent::tearDown();
 
         if ($this->connection->getSchemaManager()->tablesExist("{$tablePrefix}form_results_1_submission")) {
             $this->connection->executeQuery("DROP TABLE {$tablePrefix}form_results_1_submission");
@@ -414,5 +532,75 @@ final class SubmissionFunctionalTest extends MauticMysqlTestCase
     private function getUserPlainPassword(): string
     {
         return 'test-pass';
+    }
+
+    public function testSendSubmissionWhenFieldHaveMysqlReservedWords(): void
+    {
+        // Create the test form.
+        $payload = [
+            'name'        => 'Submission test form',
+            'description' => 'Form created via submission test',
+            'formType'    => 'standalone',
+            'isPublished' => true,
+            'fields'      => [
+                [
+                    'label'     => 'All',
+                    'type'      => 'text',
+                    'alias'     => 'all',
+                    'leadField' => 'firstname',
+                ],
+                [
+                    'label' => 'Submit',
+                    'type'  => 'button',
+                ],
+            ],
+        ];
+
+        $this->client->request(Request::METHOD_POST, '/api/forms/new', $payload);
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+        $formId         = $response['form']['id'];
+
+        $this->assertSame(Response::HTTP_CREATED, $clientResponse->getStatusCode(), $clientResponse->getContent());
+
+        // Submit the form:
+        $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
+        $formCrawler = $crawler->filter('form[id=mauticform_submissiontestform]');
+        $this->assertSame(1, $formCrawler->count());
+        $form = $formCrawler->form();
+        $form->setValues([
+            'mauticform[all]' => 'test',
+        ]);
+        $this->client->submit($form);
+
+        // Ensure the submission was created properly.
+        $submissions = $this->em->getRepository(Submission::class)->findAll();
+        Assert::assertCount(1, $submissions);
+
+        /** @var Submission $submission */
+        $submission = $submissions[0];
+        Assert::assertSame([
+            '`all`' => 'test',
+        ], $submission->getResults());
+
+        // A contact should be created by the submission.
+        $contact = $submission->getLead();
+
+        Assert::assertSame('test', $contact->getFirstname());
+
+        // The previous request changes user to anonymous. We have to configure API again.
+        $this->setUpSymfony($this->configParams);
+
+        $this->client->request(Request::METHOD_GET, "/s/forms/results/{$formId}");
+        $clientResponse = $this->client->getResponse();
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertStringContainsString('Results for Submission test form', $clientResponse->getContent());
+
+        // Cleanup:
+        $this->client->request(Request::METHOD_DELETE, "/api/forms/{$formId}/delete");
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode(), $clientResponse->getContent());
     }
 }

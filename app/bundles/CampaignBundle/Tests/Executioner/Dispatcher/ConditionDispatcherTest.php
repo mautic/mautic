@@ -40,8 +40,8 @@ class ConditionDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->dispatcher->expects($this->exactly(2))
             ->method('dispatch')
             ->withConsecutive(
-                ['something', $this->isInstanceOf(ConditionEvent::class)],
-                [CampaignEvents::ON_EVENT_CONDITION_EVALUATION, $this->isInstanceOf(ConditionEvent::class)]
+                [$this->isInstanceOf(ConditionEvent::class), 'something'],
+                [$this->isInstanceOf(ConditionEvent::class), CampaignEvents::ON_EVENT_CONDITION_EVALUATION]
             );
 
         (new ConditionDispatcher($this->dispatcher))->dispatchEvent($this->config, new LeadEventLog());

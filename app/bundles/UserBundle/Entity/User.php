@@ -80,12 +80,12 @@ class User extends FormEntity implements UserInterface, \Serializable, Equatable
     private $locale = '';
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastLogin;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 

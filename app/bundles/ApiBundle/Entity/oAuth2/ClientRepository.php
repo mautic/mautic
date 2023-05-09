@@ -7,7 +7,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\UserBundle\Entity\User;
 
 /**
- * ClientRepository.
+ * @extends CommonRepository<Client>
  */
 class ClientRepository extends CommonRepository
 {

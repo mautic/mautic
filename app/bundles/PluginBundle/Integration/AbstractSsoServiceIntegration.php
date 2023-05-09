@@ -61,7 +61,7 @@ abstract class AbstractSsoServiceIntegration extends AbstractIntegration
     {
         return $this->router->generate('mautic_sso_login_check',
             ['integration' => $this->getName()],
-            true //absolute
+            \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL //absolute
         );
     }
 

@@ -2,13 +2,30 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use RuntimeException;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 abstract class AbstractFormController extends CommonController
 {
-    use FormThemeTrait;
-
     protected $permissionBase;
+
+    protected ?CorePermissions $security;
+
+    protected UserHelper $userHelper;
+
+    public function __construct(CorePermissions $security, UserHelper $userHelper, ManagerRegistry $managerRegistry)
+    {
+        $this->security   = $security;
+        $this->userHelper = $userHelper;
+
+        parent::__construct($managerRegistry);
+    }
 
     /**
      * @param $id
@@ -16,7 +33,7 @@ abstract class AbstractFormController extends CommonController
      *
      * @return mixed
      */
-    public function unlockAction($id, $modelName)
+    public function unlockAction(Request $request, $id, $modelName)
     {
         $model                = $this->getModel($modelName);
         $entity               = $model->getEntity($id);
@@ -26,15 +43,15 @@ abstract class AbstractFormController extends CommonController
             if (null !== $entity && null !== $entity->getCheckedOutBy()) {
                 $model->unlockEntity($entity);
             }
-            $returnUrl = urldecode($this->request->get('returnUrl'));
+            $returnUrl = urldecode($request->get('returnUrl'));
             if (empty($returnUrl)) {
                 $returnUrl = $this->generateUrl('mautic_dashboard_index');
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.core.action.entity.unlocked',
                 [
-                    '%name%' => urldecode($this->request->get('name')),
+                    '%name%' => urldecode($request->get('name')),
                 ]
             );
 
@@ -66,7 +83,7 @@ abstract class AbstractFormController extends CommonController
         $this->permissionBase   = $modelClass->getPermissionBase();
 
         if ($this->canEdit($entity)) {
-            $override = $this->get('translator')->trans(
+            $override = $this->translator->trans(
                 'mautic.core.override.lock',
                 [
                     '%url%' => $this->generateUrl(
@@ -126,9 +143,14 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormCancelled(Form $form)
+    protected function isFormCancelled(FormInterface $form)
     {
-        $formData = $this->request->request->get($form->getName());
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new RuntimeException('Request is required.');
+        }
+
+        $formData = $request->request->get($form->getName());
 
         return is_array($formData) && array_key_exists('buttons', $formData) && array_key_exists('cancel', $formData['buttons']);
     }
@@ -138,9 +160,14 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormApplied(Form $form)
+    protected function isFormApplied(FormInterface $form)
     {
-        $formData = $this->request->request->get($form->getName());
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new RuntimeException('Request is required.');
+        }
+
+        $formData = $request->request->get($form->getName());
 
         return array_key_exists('buttons', $formData) && array_key_exists('apply', $formData['buttons']);
     }
@@ -152,10 +179,15 @@ abstract class AbstractFormController extends CommonController
      *
      * @return bool
      */
-    protected function isFormValid(Form $form, array $data = null)
+    protected function isFormValid(FormInterface $form)
     {
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new RuntimeException('Request is required.');
+        }
+
         //bind request to the form
-        $form->handleRequest($this->request);
+        $form->handleRequest($request);
 
         return $form->isSubmitted() && $form->isValid();
     }
@@ -170,8 +202,6 @@ abstract class AbstractFormController extends CommonController
      */
     protected function canEdit($entity = null)
     {
-        $security = $this->get('mautic.security');
-
         if ($this->permissionBase) {
             $permissionBase = $this->permissionBase;
         } else {
@@ -179,20 +209,20 @@ abstract class AbstractFormController extends CommonController
         }
 
         if ($permissionBase) {
-            if ($entity && $security->checkPermissionExists($permissionBase.':editown')) {
-                return $security->hasEntityAccess(
+            if ($entity && $this->security->checkPermissionExists($permissionBase.':editown')) {
+                return $this->security->hasEntityAccess(
                     $permissionBase.':editown',
                     $permissionBase.':editother',
                     $entity->getCreatedBy()
                 );
-            } elseif ($security->checkPermissionExists($permissionBase.':edit')) {
-                return $security->isGranted(
+            } elseif ($this->security->checkPermissionExists($permissionBase.':edit')) {
+                return $this->security->isGranted(
                     $permissionBase.':edit'
                 );
             }
         }
 
-        return $this->get('mautic.helper.user')->getUser()->isAdmin();
+        return $this->userHelper->getUser()->isAdmin();
     }
 
     protected function copyErrorsRecursively(Form $copyFrom, Form $copyTo)
@@ -217,11 +247,16 @@ abstract class AbstractFormController extends CommonController
      */
     protected function refererPostActionVars($vars)
     {
-        if (empty($this->request->server->get('HTTP_REFERER'))) {
+        $request = $this->getCurrentRequest();
+        if (null === $request) {
+            throw new RuntimeException('Request is required.');
+        }
+
+        if (empty($request->server->get('HTTP_REFERER'))) {
             return $vars;
         }
 
-        $returnUrl         = !empty($this->request->server->get('HTTP_REFERER')) ? $this->request->server->get('HTTP_REFERER') : '';
+        $returnUrl         = !empty($request->server->get('HTTP_REFERER')) ? $request->server->get('HTTP_REFERER') : '';
         $vars['returnUrl'] = $returnUrl;
 
         $urlMatcher  = explode('/s/', $returnUrl);
@@ -239,5 +274,16 @@ abstract class AbstractFormController extends CommonController
         }
 
         return $vars;
+    }
+
+    protected function getFormButton(FormInterface $form, array $elements): ClickableInterface
+    {
+        foreach ($elements as $element) {
+            $form = $form->get($element);
+        }
+
+        \assert($form instanceof ClickableInterface);
+
+        return $form;
     }
 }

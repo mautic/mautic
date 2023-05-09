@@ -205,10 +205,6 @@ Mautic.processModalContent = function (response, target) {
             Mautic.setNotifications(response.notifications);
         }
 
-        if (response.browserNotifications) {
-            Mautic.setBrowserNotifications(response.browserNotifications);
-        }
-
         if (response.callback) {
             window["Mautic"][response.callback].apply('window', [response]);
             return;

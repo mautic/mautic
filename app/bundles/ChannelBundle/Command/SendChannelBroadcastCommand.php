@@ -5,19 +5,31 @@ namespace Mautic\ChannelBundle\Command;
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Event\ChannelBroadcastEvent;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * CLI Command to send a scheduled broadcast.
  */
 class SendChannelBroadcastCommand extends ModeratedCommand
 {
-    /**
-     * {@inheritdoc}
-     */
+    private EventDispatcherInterface $dispatcher;
+    private TranslatorInterface $translator;
+
+    public function __construct(TranslatorInterface $translator, EventDispatcherInterface $dispatcher, PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->dispatcher = $dispatcher;
+        $this->translator = $translator;
+
+        parent::__construct($pathsHelper, $coreParametersHelper);
+    }
+
     protected function configure()
     {
         $this->setName('mautic:broadcasts:send')
@@ -56,40 +68,55 @@ EOT
                         'Limit how many messages to send at once.'
                     ),
                 ]
+            )->addOption(
+                '--thread-id',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The number of this current process if running multiple in parallel.'
+            )
+            ->addOption(
+                '--max-threads',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The maximum number of processes you intend to run in parallel.'
             );
 
         parent::configure();
     }
 
-    /**
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $channel      = $input->getOption('channel');
-        $channelId    = $input->getOption('id');
-        $limit        = $input->getOption('limit');
-        $batch        = $input->getOption('batch');
-        $minContactId = $input->getOption('min-contact-id');
-        $maxContactId = $input->getOption('max-contact-id');
-        $key          = $channel.$channelId;
+        $channel       = $input->getOption('channel');
+        $channelId     = $input->getOption('id');
+        $limit         = $input->getOption('limit');
+        $batch         = $input->getOption('batch');
+        $minContactId  = $input->getOption('min-contact-id');
+        $maxContactId  = $input->getOption('max-contact-id');
+        $threadId      = $input->getOption('thread-id');
+        $maxThreads    = $input->getOption('max-threads');
+        $key           = sprintf('%s-%s-%s-%s', $channel, $channelId, $threadId, $maxThreads);
 
-        if (!$this->checkRunStatus($input, $output, (empty($key)) ? 'all' : $key)) {
-            return 0;
+        if ($threadId && $maxThreads) {
+            if ((int) $threadId > (int) $maxThreads) {
+                $output->writeln('--thread-id cannot be larger than --max-thread');
+
+                return 1;
+            }
         }
 
-        $translator = $this->getContainer()->get('translator');
-        $translator->setLocale($this->getContainer()->get('mautic.helper.core_parameters')->get('locale'));
-
-        $dispatcher = $this->getContainer()->get('event_dispatcher');
+        if (!$this->checkRunStatus($input, $output, $key)) {
+            return 0;
+        }
 
         $event = new ChannelBroadcastEvent($channel, $channelId, $output);
         $event->setLimit($limit);
         $event->setBatch($batch);
         $event->setMinContactIdFilter($minContactId);
         $event->setMaxContactIdFilter($maxContactId);
+        $event->setThreadId($threadId);
+        $event->setMaxThreads($maxThreads);
 
-        $dispatcher->dispatch(ChannelEvents::CHANNEL_BROADCAST, $event);
+        $this->dispatcher->dispatch($event, ChannelEvents::CHANNEL_BROADCAST);
 
         $results = $event->getResults();
 
@@ -104,7 +131,7 @@ EOT
 
         $table = new Table($output);
         $table
-            ->setHeaders([$translator->trans('mautic.core.channel'), $translator->trans('mautic.core.channel.broadcast_success_count'), $translator->trans('mautic.core.channel.broadcast_failed_count')])
+            ->setHeaders([$this->translator->trans('mautic.core.channel'), $this->translator->trans('mautic.core.channel.broadcast_success_count'), $this->translator->trans('mautic.core.channel.broadcast_failed_count')])
             ->setRows($rows);
         $table->render();
 

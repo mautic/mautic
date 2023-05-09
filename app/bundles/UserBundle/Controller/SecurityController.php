@@ -2,33 +2,38 @@
 
 namespace Mautic\UserBundle\Controller;
 
+use function assert;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\PluginBundle\Helper\IntegrationHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception as Exception;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-/**
- * Class DefaultController.
- */
-class SecurityController extends CommonController
+class SecurityController extends CommonController implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function initialize(FilterControllerEvent $event)
+    public function onRequest(RequestEvent $event): void
     {
-        /** @var \Symfony\Component\Security\Core\Authorization\AuthorizationChecker $authChecker */
+        $controller = $event->getRequest()->attributes->get('_controller');
+        assert(is_string($controller));
+
+        if (false === strpos($controller, self::class)) {
+            return;
+        }
+
         $authChecker = $this->get('security.authorization_checker');
+        assert($authChecker instanceof AuthorizationCheckerInterface);
 
         //redirect user if they are already authenticated
         if ($authChecker->isGranted('IS_AUTHENTICATED_FULLY') ||
             $authChecker->isGranted('IS_AUTHENTICATED_REMEMBERED')
         ) {
             $redirectUrl = $this->generateUrl('mautic_dashboard_index');
-            $event->setController(function () use ($redirectUrl) {
-                return new RedirectResponse($redirectUrl);
-            });
+            $event->setResponse(new RedirectResponse($redirectUrl));
         }
     }
 
@@ -37,26 +42,26 @@ class SecurityController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function loginAction()
+    public function loginAction(Request $request, AuthenticationUtils $authenticationUtils, IntegrationHelper $integrationHelper)
     {
         // A way to keep the upgrade from failing if the session is lost after
         // the cache is cleared by upgrade.php
-        if ($this->request->cookies->has('mautic_update')) {
-            $step = $this->request->cookies->get('mautic_update');
-            if ('clearCache' == $step) {
+        if ($request->cookies->has('mautic_update')) {
+            $step = $request->cookies->get('mautic_update');
+            if ('clearCache' === $step) {
                 // Run migrations
-                $this->request->query->set('finalize', 1);
+                $request->query->set('finalize', 1);
 
-                return $this->forward('MauticCoreBundle:Ajax:updateDatabaseMigration',
+                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateDatabaseMigrationAction',
                     [
-                        'request' => $this->request,
+                        'request' => $request,
                     ]
                 );
-            } elseif ('schemaMigration' == $step) {
+            } elseif ('schemaMigration' === $step) {
                 // Done so finalize
-                return $this->forward('MauticCoreBundle:Ajax:updateFinalization',
+                return $this->forward('Mautic\CoreBundle\Controller\AjaxController::updateFinalizationAction',
                     [
-                        'request' => $this->request,
+                        'request' => $request,
                     ]
                 );
             }
@@ -66,41 +71,30 @@ class SecurityController extends CommonController
             $cookieHelper->deleteCookie('mautic_update');
         }
 
-        $session = $this->request->getSession();
+        $error = $authenticationUtils->getLastAuthenticationError();
 
-        // get the login error if there is one
-        if ($this->request->attributes->has(Security::AUTHENTICATION_ERROR)) {
-            $error = $this->request->attributes->get(Security::AUTHENTICATION_ERROR);
-        } else {
-            $error = $session->get(Security::AUTHENTICATION_ERROR);
-            $session->remove(Security::AUTHENTICATION_ERROR);
-        }
-
-        if (!empty($error)) {
+        if (null !== $error) {
             if (($error instanceof Exception\BadCredentialsException)) {
                 $msg = 'mautic.user.auth.error.invalidlogin';
             } elseif ($error instanceof Exception\DisabledException) {
                 $msg = 'mautic.user.auth.error.disabledaccount';
-            } elseif ($error instanceof \Exception) {
-                $msg = $error->getMessage();
             } else {
-                $msg = $error;
+                $msg = $error->getMessage();
             }
 
-            $this->addFlash($msg, [], 'error', null, false);
+            $this->addFlashMessage($msg, [], 'error', null, false);
         }
-        $this->request->query->set('tmpl', 'login');
+        $request->query->set('tmpl', 'login');
 
         // Get a list of SSO integrations
-        $integrationHelper = $this->get('mautic.helper.integration');
-        $integrations      = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
+        $integrations = $integrationHelper->getIntegrationObjects(null, ['sso_service'], true, null, true);
 
         return $this->delegateView([
             'viewParameters' => [
-                'last_username' => $session->get(Security::LAST_USERNAME),
+                'last_username' => $authenticationUtils->getLastUsername(),
                 'integrations'  => $integrations,
             ],
-            'contentTemplate' => 'MauticUserBundle:Security:login.html.php',
+            'contentTemplate' => '@MauticUser/Security/login.html.twig',
             'passthroughVars' => [
                 'route'          => $this->generateUrl('login'),
                 'mauticContent'  => 'user',
@@ -140,5 +134,15 @@ class SecurityController extends CommonController
         // The plugin should be handling this in it's listener
 
         return new RedirectResponse($this->generateUrl('login'));
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            KernelEvents::REQUEST => 'onRequest',
+        ];
     }
 }

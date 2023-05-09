@@ -2,8 +2,8 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Symfony\Component\EventDispatcher\Event;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class CustomAssetsEvent.
@@ -61,7 +61,7 @@ class CustomAssetsEvent extends Event
     public function addScriptDeclaration($script, $location = 'head', $context = AssetsHelper::CONTEXT_APP)
     {
         $this->assetsHelper->setContext($context)
-            ->addScriptDeclaration($script, $location, $context)
+            ->addScriptDeclaration($script, $location)
             ->setContext(AssetsHelper::CONTEXT_APP);
 
         return $this;

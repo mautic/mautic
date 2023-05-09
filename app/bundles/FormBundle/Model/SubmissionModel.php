@@ -3,6 +3,7 @@
 namespace Mautic\FormBundle\Model;
 
 use Doctrine\ORM\ORMException;
+use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Membership\MembershipManager;
 use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Exception\FileUploadException;
@@ -11,9 +12,8 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -32,6 +32,8 @@ use Mautic\FormBundle\Helper\FormUploader;
 use Mautic\FormBundle\ProgressiveProfiling\DisplayManager;
 use Mautic\FormBundle\Validator\UploadFieldValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
+use Mautic\LeadBundle\Deduplicate\ContactMerger;
+use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\Lead;
@@ -48,7 +50,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Twig\Environment;
 
+/**
+ * @extends CommonFormModel<Submission>
+ */
 class SubmissionModel extends CommonFormModel
 {
     /**
@@ -57,9 +63,9 @@ class SubmissionModel extends CommonFormModel
     protected $ipLookupHelper;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var FormModel
@@ -131,9 +137,11 @@ class SubmissionModel extends CommonFormModel
      */
     private $contactTracker;
 
+    private ContactMerger $contactMerger;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         FormModel $formModel,
         PageModel $pageModel,
         LeadModel $leadModel,
@@ -147,10 +155,11 @@ class SubmissionModel extends CommonFormModel
         DeviceTrackingServiceInterface $deviceTrackingService,
         FieldValueTransformer $fieldValueTransformer,
         DateHelper $dateHelper,
-        ContactTracker $contactTracker
+        ContactTracker $contactTracker,
+        ContactMerger $contactMerger
     ) {
         $this->ipLookupHelper         = $ipLookupHelper;
-        $this->templatingHelper       = $templatingHelper;
+        $this->twig                   = $twig;
         $this->formModel              = $formModel;
         $this->pageModel              = $pageModel;
         $this->leadModel              = $leadModel;
@@ -165,16 +174,15 @@ class SubmissionModel extends CommonFormModel
         $this->fieldValueTransformer  = $fieldValueTransformer;
         $this->dateHelper             = $dateHelper;
         $this->contactTracker         = $contactTracker;
+        $this->contactMerger          = $contactMerger;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @return SubmissionRepository
-     */
-    public function getRepository()
+    public function getRepository(): SubmissionRepository
     {
-        return $this->em->getRepository('MauticFormBundle:Submission');
+        $result = $this->em->getRepository(Submission::class);
+        \assert($result instanceof SubmissionRepository);
+
+        return $result;
     }
 
     /**
@@ -332,11 +340,11 @@ class SubmissionModel extends CommonFormModel
                 $validationErrors[$alias] = $isValid;
             }
 
-            $leadField = $f->getLeadField();
-            if (!empty($leadField)) {
+            $mappedField = $f->getMappedField();
+            if (!empty($mappedField) && in_array($f->getMappedObject(), ['company', 'contact'])) {
                 $leadValue = $value;
 
-                $leadFieldMatches[$leadField] = $leadValue;
+                $leadFieldMatches[$mappedField] = $leadValue;
             }
 
             $tokens["{formfield={$alias}}"] = $this->normalizeValue($value, $f);
@@ -348,7 +356,7 @@ class SubmissionModel extends CommonFormModel
 
             //save the result
             if (false !== $f->getSaveResult()) {
-                $results[$alias] = $value;
+                $results['`'.$alias.'`'] = $value;
             }
         }
 
@@ -440,8 +448,11 @@ class SubmissionModel extends CommonFormModel
             // Find and add the lead to the associated campaigns
             $campaigns = $this->campaignModel->getCampaignsByForm($form);
             if (!empty($campaigns)) {
+                /** @var Campaign $campaign */
                 foreach ($campaigns as $campaign) {
-                    $this->membershipManager->addContact($lead, $campaign);
+                    if ($campaign->isPublished()) {
+                        $this->membershipManager->addContact($lead, $campaign);
+                    }
                 }
             }
         }
@@ -451,7 +462,7 @@ class SubmissionModel extends CommonFormModel
             $submissionEvent->setAction(null);
 
             // Dispatch to on submit listeners
-            $this->dispatcher->dispatch(FormEvents::FORM_ON_SUBMIT, $submissionEvent);
+            $this->dispatcher->dispatch($submissionEvent, FormEvents::FORM_ON_SUBMIT);
         }
 
         //get callback commands from the submit action
@@ -568,21 +579,21 @@ class SubmissionModel extends CommonFormModel
                 $response->headers->set('Content-Type', 'application/force-download');
                 $response->headers->set('Content-Type', 'application/octet-stream');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
+                $response->headers->set('Expires', '0');
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
 
                 return $response;
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticFormBundle:Result:export.html.php',
+                $content = $this->twig->render(
+                    '@MauticForm/Result/export.html.twig',
                     [
                         'form'           => $form,
                         'results'        => $results,
                         'pageTitle'      => $name,
                         'viewOnlyFields' => $viewOnlyFields,
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
             case 'xlsx':
@@ -650,7 +661,7 @@ class SubmissionModel extends CommonFormModel
                     $response->headers->set('Content-Type', 'application/force-download');
                     $response->headers->set('Content-Type', 'application/octet-stream');
                     $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                    $response->headers->set('Expires', 0);
+                    $response->headers->set('Expires', '0');
                     $response->headers->set('Cache-Control', 'must-revalidate');
                     $response->headers->set('Pragma', 'public');
 
@@ -722,20 +733,20 @@ class SubmissionModel extends CommonFormModel
 
                 $response->headers->set('Content-Type', 'text/csv; charset=UTF-8');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.csv"');
-                $response->headers->set('Expires', 0);
+                $response->headers->set('Expires', '0');
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
 
                 return $response;
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticPageBundle:Result:export.html.php',
+                $content = $this->twig->render(
+                    '@MauticPage/Result/export.html.twig',
                     [
                         'page'      => $page,
                         'results'   => $results,
                         'pageTitle' => $name,
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
             case 'xlsx':
@@ -786,7 +797,7 @@ class SubmissionModel extends CommonFormModel
                 );
                 $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                 $response->headers->set('Content-Disposition', 'attachment; filename="'.$name.'.xlsx"');
-                $response->headers->set('Expires', 0);
+                $response->headers->set('Expires', '0');
                 $response->headers->set('Cache-Control', 'must-revalidate');
                 $response->headers->set('Pragma', 'public');
 
@@ -799,15 +810,15 @@ class SubmissionModel extends CommonFormModel
     /**
      * Get line chart data of submissions.
      *
-     * @param string $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param string $dateFormat
-     * @param array  $filter
-     * @param bool   $canViewOthers
+     * @param string|null $unit          {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param string      $dateFormat
+     * @param array       $filter
+     * @param bool        $canViewOthers
      *
      * @return array
      */
     public function getSubmissionsLineChartData(
-        $unit,
+        ?string $unit,
         \DateTime $dateFrom,
         \DateTime $dateTo,
         $dateFormat = null,
@@ -860,7 +871,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -894,7 +905,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -912,7 +923,7 @@ class SubmissionModel extends CommonFormModel
             return array_key_exists($action->getType(), $availableActions);
         })->map(function (Action $action) use ($event, $availableActions) {
             $event->setAction($action);
-            $this->dispatcher->dispatch($availableActions[$action->getType()]['eventName'], $event);
+            $this->dispatcher->dispatch($event, $availableActions[$action->getType()]['eventName']);
         });
     }
 
@@ -1046,7 +1057,10 @@ class SubmissionModel extends CommonFormModel
                 $this->logger->debug('FORM: Merging contacts '.$lead->getId().' and '.$foundLead->getId());
 
                 // Merge the found lead with currently tracked lead
-                $lead = $this->leadModel->mergeLeads($lead, $foundLead);
+                try {
+                    $lead = $this->contactMerger->merge($lead, $foundLead);
+                } catch (SameContactException $exception) {
+                }
             }
 
             // Update unique fields data for comparison with submitted data
@@ -1163,7 +1177,7 @@ class SubmissionModel extends CommonFormModel
                     if (!is_array($validator)) {
                         $validator = ['eventName' => $validator];
                     }
-                    $event = $this->dispatcher->dispatch($validator['eventName'], new ValidationEvent($field, $value));
+                    $event = $this->dispatcher->dispatch(new ValidationEvent($field, $value), $validator['eventName']);
                     if (!$event->isValid()) {
                         return $event->getInvalidReason();
                     }

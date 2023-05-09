@@ -5,12 +5,15 @@ namespace Mautic\CampaignBundle\Entity;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Mautic\CampaignBundle\Executioner\ContactFinder\Limiter\ContactLimiter;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
+/**
+ * @extends CommonRepository<LeadEventLog>
+ */
 class LeadEventLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -194,7 +197,7 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('userId', $this->currentUser->getId());
         }
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -287,9 +290,9 @@ class LeadEventLogRepository extends CommonRepository
                 $q->getParameters(),
                 $q->getParameterTypes(),
                 new QueryCacheProfile(600, __METHOD__)
-            )->fetchAll();
+            )->fetchAllAssociative();
         } else {
-            $results = $q->execute()->fetchAll();
+            $results = $q->execute()->fetchAllAssociative();
         }
 
         $return = [];
@@ -328,7 +331,7 @@ class LeadEventLogRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'cl')
             ->where('cl.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
         $exists = [];
         foreach ($results as $r) {
             $exists[] = $r['event_id'];
@@ -429,7 +432,7 @@ class LeadEventLogRepository extends CommonRepository
             )
             ->setParameter('eventId', (int) $eventId)
             ->setParameter('now', $now)
-            ->setParameter('true', true, Type::BOOLEAN);
+            ->setParameter('true', true, Types::BOOLEAN);
 
         $this->updateOrmQueryFromContactLimiter('o', $q, $limiter);
 
@@ -483,7 +486,7 @@ class LeadEventLogRepository extends CommonRepository
 
         $q = $this->getSlaveConnection($limiter)->createQueryBuilder();
 
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->eq('l.campaign_id', ':campaignId'),
             $q->expr()->eq('l.is_scheduled', ':true'),
             $q->expr()->lte('l.trigger_date', ':now'),
@@ -501,7 +504,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('true', true, \PDO::PARAM_BOOL)
             ->groupBy('l.event_id')
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $events = [];
 
@@ -529,7 +532,7 @@ class LeadEventLogRepository extends CommonRepository
                 )
             );
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         $dates = [];
         foreach ($results as $result) {
@@ -550,7 +553,7 @@ class LeadEventLogRepository extends CommonRepository
             ->orderBy('log.date_triggered', 'ASC')
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         return isset($results[0]['date_triggered']) ? new \DateTime($results[0]['date_triggered']) : null;
     }
@@ -579,7 +582,7 @@ class LeadEventLogRepository extends CommonRepository
             ->setParameter('rotation', (int) $rotation)
             ->setMaxResults(1);
 
-        $results = $qb->execute()->fetchAll();
+        $results = $qb->execute()->fetchAllAssociative();
 
         return !empty($results);
     }
@@ -610,7 +613,7 @@ SQL;
         $stmt->bindParam('contactId', $contactId, \PDO::PARAM_INT);
         $stmt->bindParam('campaignId', $campaignId, \PDO::PARAM_INT);
         $stmt->bindParam('rotation', $rotation, \PDO::PARAM_INT);
-        $stmt->execute();
+        $stmt->executeStatement();
 
         // Now unschedule them
         $qb = $connection->createQueryBuilder();

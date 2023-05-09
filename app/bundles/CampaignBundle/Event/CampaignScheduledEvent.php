@@ -3,7 +3,7 @@
 namespace Mautic\CampaignBundle\Event;
 
 use Mautic\CampaignBundle\Entity\LeadEventLog;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class CampaignScheduledEvent.
@@ -35,7 +35,7 @@ class CampaignScheduledEvent extends Event
     protected $systemTriggered;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateScheduled;
 
@@ -107,7 +107,7 @@ class CampaignScheduledEvent extends Event
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateScheduled()
     {

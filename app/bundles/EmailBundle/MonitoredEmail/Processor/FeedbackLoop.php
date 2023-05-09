@@ -9,7 +9,7 @@ use Mautic\EmailBundle\MonitoredEmail\Search\ContactFinder;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Model\DoNotContact as DoNotContactModel;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FeedbackLoop implements ProcessorInterface
 {

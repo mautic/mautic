@@ -4,9 +4,14 @@ namespace Mautic\CoreBundle\Model;
 
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\UserBundle\Entity\User;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @template T of object
+ * @extends AbstractCommonModel<T>
+ */
 class FormModel extends AbstractCommonModel
 {
     /**
@@ -90,6 +95,8 @@ class FormModel extends AbstractCommonModel
      *
      * @param object $entity
      * @param bool   $unlock
+     *
+     * @phpstan-param T $entity
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -119,8 +126,8 @@ class FormModel extends AbstractCommonModel
     /**
      * Save an array of entities.
      *
-     * @param array $entities
-     * @param bool  $unlock
+     * @param iterable<T> $entities
+     * @param bool        $unlock
      *
      * @return array
      */
@@ -241,6 +248,9 @@ class FormModel extends AbstractCommonModel
                     if (empty($changes)) {
                         $setDateModified = false;
                     }
+                    if (is_array($changes) && 1 === count($changes) && isset($changes['dateLastActive'])) {
+                        $setDateModified = false;
+                    }
                 }
                 if ($setDateModified) {
                     $dateModified = (defined('MAUTIC_DATE_MODIFIED_OVERRIDE')) ? \DateTime::createFromFormat('U', MAUTIC_DATE_MODIFIED_OVERRIDE)
@@ -316,16 +326,15 @@ class FormModel extends AbstractCommonModel
     /**
      * Creates the appropriate form per the model.
      *
-     * @param object                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param object      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         throw new NotFoundHttpException('Object does not support edits.');
     }
@@ -442,7 +451,7 @@ class FormModel extends AbstractCommonModel
                 throw $ex;
             }
 
-            $this->logger->addError(
+            $this->logger->error(
                 $ex->getMessage(),
                 ['exception' => $ex]
             );

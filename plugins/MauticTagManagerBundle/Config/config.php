@@ -9,11 +9,11 @@ return [
         'main' => [
             'mautic_tagmanager_index' => [
                 'path'       => '/tags/{page}',
-                'controller' => 'MauticTagManagerBundle:Tag:index',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::indexAction',
             ],
             'mautic_tagmanager_action' => [
                 'path'       => '/tags/{objectAction}/{objectId}',
-                'controller' => 'MauticTagManagerBundle:Tag:execute',
+                'controller' => 'MauticPlugin\MauticTagManagerBundle\Controller\TagController::executeAction',
             ],
         ],
     ],

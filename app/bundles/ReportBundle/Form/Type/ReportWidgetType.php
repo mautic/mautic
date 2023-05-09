@@ -58,12 +58,4 @@ class ReportWidgetType extends AbstractType
             $builder->setAction($options['action']);
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
-    {
-        return 'report_widget';
-    }
 }

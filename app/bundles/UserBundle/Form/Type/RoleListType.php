@@ -38,14 +38,6 @@ class RoleListType extends AbstractType
     /**
      * @return string
      */
-    public function getBlockPrefix()
-    {
-        return 'role_list';
-    }
-
-    /**
-     * @return string
-     */
     public function getParent()
     {
         return ChoiceType::class;

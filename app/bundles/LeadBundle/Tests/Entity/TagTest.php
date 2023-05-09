@@ -21,15 +21,15 @@ class TagTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('tagA', $entity->getTag());
     }
 
-    public function testTagValidation()
+    public function testTagValidation(): void
     {
         $sampleTags = [
-            'hello world'                                         => 'hello world',
-            'hello&#34; world'                                    => 'hello" world',
-            'trim whitespace'                                     => ' trim whitespace ',
-            'trim tab'                                            => "\ttrim tab\t",
-            '&#60;script&#62;console.log(hello)&#60;/script&#62;' => '<script>console.log(hello)</script>',
-            'oěř§ůú.'                                             => 'oěř§ůú.',
+            'hello world'        => 'hello world',
+            'hello" world'       => 'hello" world',
+            'trim whitespace'    => ' trim whitespace ',
+            'trim tab'           => "\ttrim tab\t",
+            'console.log(hello)' => '<script>console.log(hello)</script>',
+            'oěř§ůú.'            => 'oěř§ůú.',
         ];
 
         foreach ($sampleTags as $expected => $tag) {

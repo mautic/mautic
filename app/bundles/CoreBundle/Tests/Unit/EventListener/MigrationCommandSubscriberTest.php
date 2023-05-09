@@ -14,6 +14,7 @@ use Mautic\CoreBundle\EventListener\MigrationCommandSubscriber;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -54,7 +55,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     private $output;
 
     /**
-     * @var GeneratedColumns
+     * @var GeneratedColumns<GeneratedColumn>
      */
     private $generatedColumns;
 
@@ -67,12 +68,9 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->versionProvider          = $this->createMock(VersionProviderInterface::class);
         $this->generatedColumnsProvider = $this->createMock(GeneratedColumnsProviderInterface::class);
         $this->connection               = $this->createMock(Connection::class);
-        $this->event                    = $this->createMock(ConsoleCommandEvent::class);
         $this->command                  = $this->createMock(Command::class);
         $this->output                   = $this->createMock(OutputInterface::class);
         $this->schemaManager            = $this->createMock(MySqlSchemaManager::class);
@@ -83,13 +81,15 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->connection
         );
 
-        $this->event->method('getCommand')->willReturn($this->command);
-        $this->event->method('getOutput')->willReturn($this->output);
+        $input = $this->createMock(InputInterface::class);
+
+        $this->event = new ConsoleCommandEvent($this->command, $input, $this->output);
+
         $this->connection->method('getSchemaManager')->willReturn($this->schemaManager);
         $this->generatedColumns->add(new GeneratedColumn('page_hits', 'generated_hit_date', 'DATE', 'not important'));
     }
 
-    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand()
+    public function testAddGeneratedColumnsWillRunOnlyForMigrationCommand(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -101,7 +101,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenNotSupported()
+    public function testAddGeneratedColumnsWhenNotSupported(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -117,7 +117,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenExistsAlready()
+    public function testAddGeneratedColumnsWhenExistsAlready(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -136,12 +136,12 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['generated_hit_date' => new \StdClass()]);
 
         $this->connection->expects($this->never())
-            ->method('query');
+            ->method('executeQuery');
 
         $this->subscriber->addGeneratedColumns($this->event);
     }
 
-    public function testAddGeneratedColumnsWhenDoesNotExist()
+    public function testAddGeneratedColumnsWhenDoesNotExist(): void
     {
         $this->command->expects($this->once())
             ->method('getName')
@@ -160,7 +160,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['id' => new \StdClass()]);
 
         $this->connection->expects($this->once())
-            ->method('query');
+            ->method('executeQuery');
 
         $this->subscriber->addGeneratedColumns($this->event);
     }

@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Form\Type;
 
-use Mautic\CoreBundle\Helper\ThemeHelper;
+use Mautic\CoreBundle\Helper\ThemeHelperInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
@@ -14,14 +14,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ThemeListType extends AbstractType
 {
     /**
-     * @var ThemeHelper
+     * @var ThemeHelperInterface
      */
     private $themeHelper;
 
     /**
      * ThemeListType constructor.
      */
-    public function __construct(ThemeHelper $helper)
+    public function __construct(ThemeHelperInterface $helper)
     {
         $this->themeHelper = $helper;
     }
@@ -48,14 +48,6 @@ class ThemeListType extends AbstractType
                 'feature'           => 'all',
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'theme_list';
     }
 
     public function getParent()

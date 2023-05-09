@@ -149,9 +149,4 @@ class WebhookType extends AbstractType
 
         $resolver->setDefined(['events']);
     }
-
-    public function getBlockPrefix()
-    {
-        return 'webhook';
-    }
 }

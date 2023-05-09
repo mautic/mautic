@@ -1,0 +1,15 @@
+<ul class="list-group">
+     {% for item in activity %}
+        <li class="bdr-w-0 list-group-item">
+            <h4 class="mt-10 mb-10 pb-10"><i class="fa fa-check-circle-o"></i> {{ item.tipText }}</h4>
+            <p class="alert alert-warning">
+                {{ item.venueName }}<br />
+                {% for l in item.venueLocation %}
+                  {{ l }}<br />
+                {% endfor %}
+            </p>
+            <p class="text-muted"><i class="fa fa-clock-o"></i> {{ dateToFull(item.createdAt, 'UTC', 'U') }}</p>
+            {% if not loop.first %}<hr />{% endif %}
+        </li>
+    {% endfor %}
+</ul>

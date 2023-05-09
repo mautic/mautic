@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentLogReportSubscriber implements EventSubscriberInterface
 {
-    const SEGMENT_LOG = 'segment.log';
+    public const SEGMENT_LOG = 'segment.log';
 
     /**
      * @var FieldsBuilder

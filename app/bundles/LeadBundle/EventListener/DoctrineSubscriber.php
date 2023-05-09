@@ -59,7 +59,8 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                     ->from(MAUTIC_TABLE_PREFIX.'lead_fields', 'f')
                     ->where("f.object = '$object'")
                     ->orderBy('f.field_order', 'ASC')
-                    ->execute()->fetchAll();
+                    ->execute()
+                    ->fetchAllAssociative();
 
                 // Compile which ones are unique identifiers
                 // Email will always be included first
@@ -113,7 +114,7 @@ class DoctrineSubscriber implements \Doctrine\Common\EventSubscriber
                 return;
             }
             //table doesn't exist or something bad happened so oh well
-            $this->logger->addError('SCHEMA ERROR: '.$e->getMessage());
+            $this->logger->error('SCHEMA ERROR: '.$e->getMessage());
         }
     }
 }

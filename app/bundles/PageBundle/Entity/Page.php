@@ -53,12 +53,12 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     private $content = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -385,7 +385,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Set content.
      *
-     * @param string $content
+     * @param array<string> $content
      *
      * @return Page
      */
@@ -400,7 +400,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get content.
      *
-     * @return string
+     * @return array<string>
      */
     public function getContent()
     {
@@ -425,7 +425,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -450,7 +450,7 @@ class Page extends FormEntity implements TranslationEntityInterface, VariantEnti
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

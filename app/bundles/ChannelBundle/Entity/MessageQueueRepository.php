@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
 /**
- * MessageQueueRepository.
+ * @extends CommonRepository<MessageQueue>
  */
 class MessageQueueRepository extends CommonRepository
 {
@@ -52,7 +52,7 @@ class MessageQueueRepository extends CommonRepository
             ->setParameter('processStarted', $processStarted)
             ->indexBy('mq', 'mq.id');
 
-        $q->orderBy('mq.priority, mq.scheduledDate', 'ASC');
+        $q->orderBy('mq.priority, mq.scheduledDate', \Doctrine\Common\Collections\Criteria::ASC);
 
         if ($limit) {
             $q->setMaxResults((int) $limit);
@@ -100,7 +100,7 @@ class MessageQueueRepository extends CommonRepository
                 ]
             )
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 
     /**

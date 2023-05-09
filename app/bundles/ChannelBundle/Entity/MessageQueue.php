@@ -12,13 +12,13 @@ use Mautic\LeadBundle\Entity\Lead;
  */
 class MessageQueue
 {
-    const STATUS_RESCHEDULED = 'rescheduled';
-    const STATUS_PENDING     = 'pending';
-    const STATUS_SENT        = 'sent';
-    const STATUS_CANCELLED   = 'cancelled';
+    public const STATUS_RESCHEDULED = 'rescheduled';
+    public const STATUS_PENDING     = 'pending';
+    public const STATUS_SENT        = 'sent';
+    public const STATUS_CANCELLED   = 'cancelled';
 
-    const PRIORITY_NORMAL = 2;
-    const PRIORITY_HIGH   = 1;
+    public const PRIORITY_NORMAL = 2;
+    public const PRIORITY_HIGH   = 1;
 
     /**
      * @var int
@@ -68,22 +68,22 @@ class MessageQueue
     private $status = self::STATUS_PENDING;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      **/
     private $datePublished;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $scheduledDate;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $lastAttempt;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateSent;
 
@@ -272,7 +272,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDatePublished()
     {
@@ -288,7 +288,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSent()
     {
@@ -304,7 +304,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastAttempt()
     {
@@ -365,7 +365,7 @@ class MessageQueue
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getScheduledDate()
     {

@@ -4,6 +4,9 @@ namespace Mautic\LeadBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<LeadList>
+ */
 class ListLeadRepository extends CommonRepository
 {
     /**
@@ -20,7 +23,8 @@ class ListLeadRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'l')
             ->where('l.lead_id = '.$toLeadId)
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
+
         $lists = [];
         foreach ($results as $r) {
             $lists[] = $r['leadlist_id'];
