@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 class EmailRepository extends CommonRepository
 {
     /**
-     * Get an array of do not email emails.
+     * Get an array of do not email.
      *
      * @param array $leadIds
      *
@@ -50,7 +50,7 @@ class EmailRepository extends CommonRepository
     /**
      * Check to see if an email is set as do not contact.
      *
-     * @param $email
+     * @param string $email
      *
      * @return bool
      */
@@ -161,7 +161,9 @@ class EmailRepository extends CommonRepository
         $minContactId = null,
         $maxContactId = null,
         $countWithMaxMin = false,
-        $maxDate = null
+        $maxDate = null,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -266,6 +268,14 @@ class EmailRepository extends CommonRepository
             )
         );
 
+        if ($threadId && $maxThreads) {
+            if ($threadId <= $maxThreads) {
+                $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
+                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+            }
+        }
+
         if (!empty($limit)) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
@@ -294,7 +304,9 @@ class EmailRepository extends CommonRepository
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false
+        $countWithMaxMin = false,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -304,7 +316,10 @@ class EmailRepository extends CommonRepository
             $limit,
             $minContactId,
             $maxContactId,
-            $countWithMaxMin
+            $countWithMaxMin,
+            null,
+            $maxThreads,
+            $threadId
         );
 
         if (!($q instanceof QueryBuilder)) {
@@ -329,13 +344,13 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param string      $search
-     * @param int         $limit
-     * @param int         $start
-     * @param bool        $viewOther
-     * @param bool        $topLevel
-     * @param string|null $emailType
-     * @param int|null    $variantParentId
+     * @param string|array<int|string> $search
+     * @param int                      $limit
+     * @param int                      $start
+     * @param bool                     $viewOther
+     * @param bool                     $topLevel
+     * @param string|null              $emailType
+     * @param int|null                 $variantParentId
      *
      * @return array
      */

@@ -1017,6 +1017,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "lenonleite",
+      "name": "Lenon Leite",
+      "avatar_url": "https://avatars.githubusercontent.com/u/218436?v=4",
+      "profile": "http://lenonleite.com.br",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
