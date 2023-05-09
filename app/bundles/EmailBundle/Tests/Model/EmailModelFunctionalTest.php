@@ -26,9 +26,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 1);
         $this->assertEquals($sentCount, 8);
         [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 2);
-        $this->assertEquals($sentCount, 8);
-        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
         $this->assertEquals($sentCount, 7);
+        [$sentCount, ,] = $emailModel->sendEmailToLists($email, [$segment], null, false, null, null, null, 3, 3);
+        $this->assertEquals($sentCount, 8);
     }
 
     /**
