@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\AssetBundle\Entity\Asset;
@@ -24,11 +25,11 @@ class AssetApiController extends CommonApiController
 {
     private CoreParametersHelper $parametersHelper;
 
-    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, CoreParametersHelper $parametersHelper)
+    public function __construct(CorePermissions $security, Translator $translator, EntityResultHelper $entityResultHelper, RouterInterface $router, FormFactoryInterface $formFactory, AppVersion $appVersion, RequestStack $requestStack, CoreParametersHelper $parametersHelper, ManagerRegistry $doctrine)
     {
         $this->parametersHelper = $parametersHelper;
 
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
     }
 
     /**

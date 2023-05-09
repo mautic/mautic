@@ -33,12 +33,12 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $description;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishUp;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $publishDown;
 
@@ -118,7 +118,6 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
             ->build();
 
         $builder->createOneToMany('leads', Lead::class)
-            ->setIndexBy('lead_id')
             ->mappedBy('campaign')
             ->fetchExtraLazy()
             ->build();
@@ -419,7 +418,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishUp.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -429,7 +428,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Set publishDown.
      *
-     * @param \DateTime $publishDown
+     * @param \DateTimeInterface $publishDown
      *
      * @return Campaign
      */
@@ -444,7 +443,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     /**
      * Get publishDown.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {

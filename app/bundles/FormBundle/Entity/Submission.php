@@ -40,7 +40,7 @@ class Submission
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSubmitted;
 
@@ -160,7 +160,7 @@ class Submission
     /**
      * Get dateSubmitted.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateSubmitted()
     {

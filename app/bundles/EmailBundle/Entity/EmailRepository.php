@@ -16,7 +16,7 @@ use Mautic\LeadBundle\Entity\DoNotContact;
 class EmailRepository extends CommonRepository
 {
     /**
-     * Get an array of do not email emails.
+     * Get an array of do not email.
      *
      * @param array $leadIds
      *
@@ -37,7 +37,7 @@ class EmailRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $dnc = [];
         foreach ($results as $r) {
@@ -50,7 +50,7 @@ class EmailRepository extends CommonRepository
     /**
      * Check to see if an email is set as do not contact.
      *
-     * @param $email
+     * @param string $email
      *
      * @return bool
      */
@@ -64,7 +64,8 @@ class EmailRepository extends CommonRepository
             ->andWhere('l.email = :email')
             ->setParameter('email', $email);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         $dnc     = count($results) ? $results[0] : null;
 
         if (null === $dnc) {
@@ -160,7 +161,9 @@ class EmailRepository extends CommonRepository
         $minContactId = null,
         $maxContactId = null,
         $countWithMaxMin = false,
-        $maxDate = null
+        $maxDate = null,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         // Do not include leads in the do not contact table
         $dncQb = $this->getEntityManager()->getConnection()->createQueryBuilder();
@@ -205,7 +208,7 @@ class EmailRepository extends CommonRepository
                 ->from(MAUTIC_TABLE_PREFIX.'email_list_xref', 'el')
                 ->where('el.email_id = '.(int) $emailId)
                 ->execute()
-                ->fetchAll();
+                ->fetchAllAssociative();
 
             $listIds = array_column($lists, 'leadlist_id');
 
@@ -265,6 +268,14 @@ class EmailRepository extends CommonRepository
             )
         );
 
+        if ($threadId && $maxThreads) {
+            if ($threadId <= $maxThreads) {
+                $q->andWhere('MOD((l.id + :threadShift), :maxThreads) = 0')
+                        ->setParameter('threadShift', $threadId - 1, \Doctrine\DBAL\ParameterType::INTEGER)
+                        ->setParameter('maxThreads', $maxThreads, \Doctrine\DBAL\ParameterType::INTEGER);
+            }
+        }
+
         if (!empty($limit)) {
             $q->setFirstResult(0)
                 ->setMaxResults($limit);
@@ -293,7 +304,9 @@ class EmailRepository extends CommonRepository
         $limit = null,
         $minContactId = null,
         $maxContactId = null,
-        $countWithMaxMin = false
+        $countWithMaxMin = false,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         $q = $this->getEmailPendingQuery(
             $emailId,
@@ -303,14 +316,17 @@ class EmailRepository extends CommonRepository
             $limit,
             $minContactId,
             $maxContactId,
-            $countWithMaxMin
+            $countWithMaxMin,
+            null,
+            $maxThreads,
+            $threadId
         );
 
         if (!($q instanceof QueryBuilder)) {
             return $q;
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ($countOnly && $countWithMaxMin) {
             // returns array in format ['count' => #, ['min_id' => #, 'max_id' => #]]
@@ -328,13 +344,13 @@ class EmailRepository extends CommonRepository
     }
 
     /**
-     * @param string      $search
-     * @param int         $limit
-     * @param int         $start
-     * @param bool        $viewOther
-     * @param bool        $topLevel
-     * @param string|null $emailType
-     * @param int|null    $variantParentId
+     * @param string|array<int|string> $search
+     * @param int                      $limit
+     * @param int                      $start
+     * @param bool                     $viewOther
+     * @param bool                     $topLevel
+     * @param string|null              $emailType
+     * @param int|null                 $variantParentId
      *
      * @return array
      */

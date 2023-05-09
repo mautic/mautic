@@ -289,7 +289,6 @@ class ContactMerger
             ->setMergedId($loser->getId());
 
         $this->repo->saveEntity($mergeRecord);
-        $this->repo->clear();
 
         return $this;
     }

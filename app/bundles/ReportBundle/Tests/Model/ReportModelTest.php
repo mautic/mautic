@@ -44,6 +44,8 @@ class ReportModelTest extends \PHPUnit\Framework\TestCase
                 function (ReportBuilderEvent $event) {
                     $reportBuilderData = Fixtures::getReportBuilderEventData();
                     $event->addTable('assets', $reportBuilderData['all']['tables']['assets']);
+
+                    return $event;
                 }
             );
         $this->reportModel->setDispatcher($mockDispatcher);

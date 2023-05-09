@@ -21,37 +21,37 @@ trait FakeContainerTrait
                 $this->container = $container;
             }
 
-            public function set($id, $service)
+            public function set(string $id, ?object $service)
             {
                 $this->container->set($id, $service);
             }
 
-            public function get($id, $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
+            public function get(string $id, int $invalidBehavior = self::EXCEPTION_ON_INVALID_REFERENCE)
             {
                 return $this->container->get($id, $invalidBehavior);
             }
 
-            public function has($id)
+            public function has(string $id)
             {
                 return $this->container->has($id);
             }
 
-            public function initialized($id)
+            public function initialized(string $id)
             {
                 return $this->container->initialized($id);
             }
 
-            public function getParameter($name)
+            public function getParameter(string $name)
             {
                 return $this->container->getParameter($name);
             }
 
-            public function hasParameter($name)
+            public function hasParameter(string $name)
             {
                 return $this->container->hasParameter($name);
             }
 
-            public function setParameter($name, $value)
+            public function setParameter(string $name, $value)
             {
                 $this->container->setParameter($name, $value);
             }

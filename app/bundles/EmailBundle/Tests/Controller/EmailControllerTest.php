@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -117,7 +118,8 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             $this->corePermissionsMock,
             $this->helperUserMock,
             $this->formFactoryMock,
-            $this->createMock(FormFieldHelper::class)
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
         );
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);

@@ -60,7 +60,7 @@ class HitRepository extends CommonRepository
         $q->select('u.is_unique')
             ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u');
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -157,7 +157,7 @@ class HitRepository extends CommonRepository
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $hits = [];
         foreach ($results as $r) {
@@ -262,7 +262,7 @@ class HitRepository extends CommonRepository
         } else {
             $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
-        $result = $sq->execute()->fetch();
+        $result = $sq->execute()->fetchAssociative();
 
         return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
@@ -286,7 +286,7 @@ class HitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $return = [];
         foreach ($pages as $p) {
@@ -320,7 +320,7 @@ class HitRepository extends CommonRepository
             ->where($expr)
             ->groupBy('h.page_id');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $p) {
             $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
@@ -391,7 +391,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         //loop to structure
         $times  = [];
@@ -439,7 +439,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $times = [];
 
@@ -506,7 +506,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -535,7 +535,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

@@ -4,29 +4,21 @@ namespace Mautic\CoreBundle\Helper;
 
 use Symfony\Component\Finder\Finder;
 
-/**
- * Class AssetGenerationHelper.
- */
 class AssetGenerationHelper
 {
-    /**
-     * @var BundleHelper
-     */
-    private $bundleHelper;
+    // Temporary array of libraries to load from node_modules before we switch
+    // to Symfony Encore. This is the first step to load libraries from NPM.
+    private const NODE_MODULES = [
+        'mousetrap/mousetrap.js',
+        'jquery/dist/jquery.js',
+        'chosen-js/chosen.jquery.js',
+        // TODO: Add the rest of the libraries here.
+    ];
 
-    /**
-     * @var PathsHelper
-     */
-    private $pathsHelper;
+    private BundleHelper $bundleHelper;
+    private PathsHelper $pathsHelper;
+    private string $version;
 
-    /**
-     * @var string
-     */
-    private $version;
-
-    /**
-     * AssetGenerationHelper constructor.
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper, BundleHelper $bundleHelper, PathsHelper $pathsHelper, AppVersion $version)
     {
         $this->bundleHelper = $bundleHelper;
@@ -83,6 +75,22 @@ class AssetGenerationHelper
                         }
                     }
                     file_put_contents($inProgressFile, date('r'));
+                }
+
+                foreach (self::NODE_MODULES as $path) {
+                    $relPath  = "node_modules/{$path}";
+                    $fullPath = "{$this->pathsHelper->getRootPath()}/{$relPath}";
+                    $ext      = pathinfo($relPath, PATHINFO_EXTENSION);
+                    $details  = [
+                        'fullPath' => $fullPath,
+                        'relPath'  => $relPath,
+                    ];
+
+                    if ('prod' == $env) {
+                        $assets[$ext]['libraries'][$relPath] = $details;
+                    } else {
+                        $assets[$ext][$relPath] = $details;
+                    }
                 }
 
                 $modifiedLast = [];

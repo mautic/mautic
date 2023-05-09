@@ -5,21 +5,22 @@ namespace Mautic\CoreBundle\Tests\Unit\Doctrine;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Type;
-use Mautic\CoreBundle\Doctrine\Type\ArrayType;
 
 class ExampleClassWithPrivateProperty
 {
-    /** @noinspection PhpUnusedPrivateFieldInspection */
+    /** @phpstan-ignore-next-line */
     private $test = 'value';
 }
 
 class ExampleClassWithProtectedProperty
 {
+    /** @phpstan-ignore-next-line */
     protected $test = 'value';
 }
 
 class ExampleClassWithPublicProperty
 {
+    /** @phpstan-ignore-next-line */
     public $test = 'value';
 }
 
@@ -27,7 +28,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
 {
     public const MAUTIC_ARRAY_TYPE_NAME = 'mautic-array-type';
 
-    /** @var ArrayType */
+    /** @var Type */
     private $arrayType;
 
     /** @var AbstractPlatform */
@@ -46,35 +47,35 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         $this->platform = new MySqlPlatform();
     }
 
-    public function testGivenSimpleArrayWhenConvertsToDatabaseValueThenGetEncodedData()
+    public function testGivenSimpleArrayWhenConvertsToDatabaseValueThenGetEncodedData(): void
     {
         $stringWithUtf8Characters = '--ěš--';
         $result                   = $this->arrayType->convertToDatabaseValue([$stringWithUtf8Characters], $this->platform);
         $this->assertEquals('a:1:{i:0;s:8:"--ěš--";}', $result);
     }
 
-    public function testGivenNullPoisonedStringWhenConvertsToDatabaseValueThenError()
+    public function testGivenNullPoisonedStringWhenConvertsToDatabaseValueThenError(): void
     {
         $this->expectException('Doctrine\DBAL\Types\ConversionException');
 
         $this->arrayType->convertToDatabaseValue(["abcd\0efgh"], $this->platform);
     }
 
-    public function testGivenObjectWithPrivatePropertyWhenConvertsToDatabaseValueThenError()
+    public function testGivenObjectWithPrivatePropertyWhenConvertsToDatabaseValueThenError(): void
     {
         $this->expectException('Doctrine\DBAL\Types\ConversionException');
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithPrivateProperty()], $this->platform);
     }
 
-    public function testGivenObjectWithProtectedPropertyWhenConvertsToDatabaseValueThenError()
+    public function testGivenObjectWithProtectedPropertyWhenConvertsToDatabaseValueThenError(): void
     {
         $this->expectException('Doctrine\DBAL\Types\ConversionException');
 
         $this->arrayType->convertToDatabaseValue([new ExampleClassWithProtectedProperty()], $this->platform);
     }
 
-    public function testGivenObjectWithPublicPropertyWhenConvertsToDatabaseValueThenGetEncodedData()
+    public function testGivenObjectWithPublicPropertyWhenConvertsToDatabaseValueThenGetEncodedData(): void
     {
         $result = $this->arrayType->convertToDatabaseValue([new ExampleClassWithPublicProperty()], $this->platform);
         $this->assertEquals(
@@ -83,7 +84,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGivenStdClassWhenConvertsToDatabaseValueThenGetEncodedData()
+    public function testGivenStdClassWhenConvertsToDatabaseValueThenGetEncodedData(): void
     {
         $object       = new \stdClass();
         $object->test = 'value';
@@ -95,7 +96,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGivenObjectWithPrivatePropertyWhenConvertsToPHPValueThenGetsArrayWithoutObject()
+    public function testGivenObjectWithPrivatePropertyWhenConvertsToPHPValueThenGetsArrayWithoutObject(): void
     {
         $array = [
             0,
@@ -111,7 +112,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGivenObjectWithProtectedPropertyWhenConvertsToPHPValueThenGetsArrayWithoutObject()
+    public function testGivenObjectWithProtectedPropertyWhenConvertsToPHPValueThenGetsArrayWithoutObject(): void
     {
         $array = [
             0,
@@ -127,7 +128,7 @@ class ArrayTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGivenObjectWithPublicPropertyWhenConvertsToPHPValueThenGetsArrayWithObject()
+    public function testGivenObjectWithPublicPropertyWhenConvertsToPHPValueThenGetsArrayWithObject(): void
     {
         $array = [
             0,

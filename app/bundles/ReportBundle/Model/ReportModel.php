@@ -639,7 +639,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAll();
+            $data      = $query->execute()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -748,7 +748,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->fetchOne();
     }
 
     /**
