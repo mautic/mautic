@@ -381,7 +381,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
-        $this->assertNotEmpty($response['form']['cachedHtml']);
+        $this->assertEmpty($response['form']['cachedHtml']);
 
         // Submit the form:
         $crawler     = $this->client->request(Request::METHOD_GET, "/form/{$formId}");
@@ -449,7 +449,7 @@ final class FormApiControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertEquals($payload['description'], $response['form']['description']);
         $this->assertCount($fieldCount, $response['form']['fields']);
         $this->assertEquals($payload['formType'], $response['form']['formType']);
-        $this->assertNotEmpty($response['form']['cachedHtml']);
+        $this->assertEmpty($response['form']['cachedHtml']);
 
         // Get (ensure that the form is gone):
         $this->client->request(Request::METHOD_GET, "/api/forms/{$formId}");

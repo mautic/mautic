@@ -352,6 +352,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formField->setMappedField('contactbool');
         $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
+        $formField->setForm($formEntity);
 
         $fields->add($formField);
 
@@ -432,6 +433,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formField->setMappedField('contactfieldalias');
         $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
+        $formField->setForm($formEntity);
 
         $contactField = new LeadField();
         $contactField->setType($type);
@@ -474,6 +476,7 @@ class FormModelTest extends \PHPUnit\Framework\TestCase
         $formField->setMappedField('contactfield');
         $formField->setMappedObject('contact');
         $formField->setProperties(['syncList' => true]);
+        $formField->setForm($formEntity);
 
         $fields->add($formField);
 

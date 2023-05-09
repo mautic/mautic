@@ -993,6 +993,7 @@ class FormModel extends CommonFormModel implements GlobalSearchInterface
                 $formFieldProps['optionlist'] = ['list' => $list];
             }
             $formField->setProperties($formFieldProps);
+            $formField->getForm()->setCachedHtml('');
         }
     }
 
