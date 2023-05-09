@@ -75,7 +75,7 @@ class FieldChange
             ->build();
 
         $builder
-            ->createField('modifiedAt', Types::DATETIME)
+            ->createField('modifiedAt', Types::DATETIME_MUTABLE)
             ->columnName('modified_at')
             ->build();
 
@@ -90,7 +90,7 @@ class FieldChange
             ->build();
 
         $builder
-            ->createField('columnValue', Typess::TEXT)
+            ->createField('columnValue', Types::TEXT)
             ->columnName('column_value')
             ->build();
     }
