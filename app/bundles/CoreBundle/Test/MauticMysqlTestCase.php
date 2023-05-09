@@ -326,7 +326,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
-                $this->connection->exec(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
+                $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
             } catch (Exception $e) {
             }
         }
@@ -366,7 +366,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $this->connection->exec("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
+        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
     }
 
     private function wasRollbackSuccessful(): bool

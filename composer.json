@@ -31,9 +31,9 @@
     "liip/test-fixtures-bundle": "^2.0",
     "mautic/transifex": "^5.0",
     "php-http/mock-client": "^1.4",
-    "phpstan/phpstan": "^1.8.2",
+    "phpstan/phpstan": "^1.10",
     "phpunit/phpunit": "^9.5",
-    "rector/rector": "^0.14",
+    "rector/rector": "^0.16.0",
     "symfony/browser-kit": "~5.4.0",
     "symfony/dom-crawler": "~5.4.0",
     "symfony/maker-bundle": "^1.38",
@@ -118,12 +118,14 @@
       "@auto-scripts",
       "@remove-git-submodules",
       "@npm-ci",
+      "@npx-patch-package",
       "@generate-assets"
     ],
     "post-update-cmd": [
       "@auto-scripts",
       "@remove-git-submodules",
       "@npm-ci",
+      "@npx-patch-package",
       "@generate-assets"
     ],
     "test": "bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist",
@@ -133,6 +135,7 @@
     "rector": "bin/rector process",
     "remove-git-submodules": "find . -mindepth 2 -type d -name .git | xargs rm -rf",
     "npm-ci": "npm ci",
+    "npx-patch-package": "npx patch-package",
     "generate-assets": "bin/console mautic:assets:generate"
   },
   "config": {
