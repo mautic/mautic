@@ -131,10 +131,11 @@
   "extra": {
     "mautic-scaffold": {
       "file-mapping": {
-        "[project-root]/.env.dist": "assets/scaffold/files/.env.dist",
+        "[project-root]/.env": "assets/scaffold/files/.env",
         "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
         "[project-root]/package.json": "assets/scaffold/files/package.json",
         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
+        "[project-root]/app/config/bootstrap.php": "assets/scaffold/files/bootstrap.php",
         "[project-root]/bin/console": "assets/scaffold/files/console",
         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
@@ -142,7 +143,6 @@
         "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
         "[web-root]/index.php": "assets/scaffold/files/index.php",
-        "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
         "[web-root]/upgrade.php": "assets/scaffold/files/upgrade.php",
         "[web-root]/translations/.htaccess": "assets/scaffold/files/translations.htaccess",
