@@ -374,13 +374,25 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
-            $groupExpr->with(
-                $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
-            );
+            if (null === $groupExpr) {
+                $groupExpr->and(
+                    $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
+                );
+            } else {
+                $groupExpr = $groupExpr->with(
+                    $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
+                );
+            }
         } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
-            $groupExpr->with(
-                $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
-            );
+            if (null === $groupExpr) {
+                $groupExpr->and(
+                    $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
+                );
+            } else {
+                $groupExpr = $groupExpr->with(
+                    $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
+                );
+            }
         }
     }
 

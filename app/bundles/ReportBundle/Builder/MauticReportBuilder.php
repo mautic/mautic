@@ -392,11 +392,11 @@ final class MauticReportBuilder implements ReportBuilderInterface
 
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $groupExpr->with(
+                        $groupExpr = $groupExpr->with(
                             $expr->isNotNull($filter['column'])
                         );
                         if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
-                            $groupExpr->with(
+                            $groupExpr = $groupExpr->with(
                                 $expr->neq($filter['column'], $expr->literal(''))
                             );
                         }
@@ -406,12 +406,12 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $queryBuilder->expr()->isNull($filter['column'])
                         );
                         if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
-                            $expression->with(
+                            $expression = $expression->with(
                                 $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
                             );
                         }
 
-                        $groupExpr->with(
+                        $groupExpr = $groupExpr->with(
                             $expression
                         );
                         break;
@@ -422,7 +422,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
-                        $groupExpr->with(
+                        $groupExpr = $groupExpr->with(
                             $expression
                         );
                         break;
@@ -482,7 +482,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-                        $groupExpr->with(
+                        $groupExpr = $groupExpr->with(
                             $expr->{$exprFunction}($filter['column'], $columnValue)
                         );
                 }
@@ -501,7 +501,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             // Sets of expressions grouped by OR
             $orX = $queryBuilder->expr()->or('');
             foreach ($groups as $group) {
-                $orX->with($group);
+                $orX = $orX->with($group);
             }
 
             // Wrap in a andX for other functions to append
