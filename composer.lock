@@ -5793,7 +5793,6 @@
                         "[project-root]/autoload.php": "assets/scaffold/files/autoload.php",
                         "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/index.php": "assets/scaffold/files/index.php",
-                        "[web-root]/index_dev.php": "assets/scaffold/files/index_dev.php",
                         "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
                         "[web-root]/upgrade.php": "assets/scaffold/files/upgrade.php",
                         "[web-root]/translations/.htaccess": "assets/scaffold/files/translations.htaccess",

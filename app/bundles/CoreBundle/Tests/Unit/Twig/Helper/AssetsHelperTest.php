@@ -107,7 +107,7 @@ class AssetsHelperTest extends TestCase
              ->getMock();
 
         $pathsHelper->method('getSystemPath')
-            ->willReturn('http://some.mautic/index_dev.php/');
+            ->willReturn('http://some.mautic/');
 
         $assetHelper = new AssetsHelper($this->createPackagesMock());
         $assetHelper->setPathsHelper($pathsHelper);
@@ -150,9 +150,14 @@ class AssetsHelperTest extends TestCase
         $method           = $reflectionObject->getMethod('getCKEditorScripts');
         $method->setAccessible(true);
         $ckEditorScripts = $method->invokeArgs($assetHelper, []);
-        Assert::assertEquals(["app/bundles/CoreBundle/Assets/js/libraries/ckeditor/ckeditor.js?v$version",
-            "app/bundles/CoreBundle/Assets/js/libraries/ckeditor/adapters/jquery.js?v$version",
-        ], $ckEditorScripts);
+        Assert::assertEquals(
+            [
+                "node_modules/ckeditor4/ckeditor.js?v{$version}",
+                "node_modules/ckeditor4/adapters/jquery.js?v{$version}",
+                "app/bundles/CoreBundle/Assets/js/libraries/ckeditor/mautic-token.js?v{$version}",
+            ],
+            $ckEditorScripts
+        );
     }
 
     /**
