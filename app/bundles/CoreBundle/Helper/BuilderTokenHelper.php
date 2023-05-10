@@ -102,9 +102,6 @@ class BuilderTokenHelper
         }
 
         $exprBuilder = $this->connection->getExpressionBuilder();
-        if (null == $expr) {
-            $expr = $exprBuilder->and();
-        }
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
             $expr = $expr->with(
