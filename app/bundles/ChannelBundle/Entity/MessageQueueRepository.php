@@ -85,7 +85,7 @@ class MessageQueueRepository extends CommonRepository
         );
 
         if (!empty($ids)) {
-            $expr->with(
+            $expr = $expr->with(
                 $q->expr()->in($this->getTableAlias().'.channel_id', $ids)
             );
         }

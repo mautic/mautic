@@ -233,7 +233,7 @@ class LeadEventLogRepository extends CommonRepository
         );
 
         if ($eventId) {
-            $expr->with(
+            $expr = $expr->with(
                 $q->expr()->eq('o.event_id', $eventId)
             );
         }
@@ -241,7 +241,7 @@ class LeadEventLogRepository extends CommonRepository
         $groupBy = 'o.event_id';
         if ($excludeNegative) {
             $q->select('o.event_id, count(o.lead_id) as lead_count');
-            $expr->with(
+            $expr = $expr->with(
                 $q->expr()->or(
                     $q->expr()->isNull('o.non_action_path_taken'),
                     $q->expr()->eq('o.non_action_path_taken', ':false')
@@ -253,7 +253,7 @@ class LeadEventLogRepository extends CommonRepository
         }
 
         if ($excludeScheduled) {
-            $expr->with(
+            $expr = $expr->with(
                 $q->expr()->eq('o.is_scheduled', ':false')
             );
         }
@@ -270,7 +270,7 @@ class LeadEventLogRepository extends CommonRepository
                 ->setParameter('dateFrom', $dateFrom->getTimestamp(), \PDO::PARAM_INT)
                 ->setParameter('dateTo', $dateTo->getTimestamp(), \PDO::PARAM_INT);
         }
-        $expr->with(
+        $expr = $expr->with(
             sprintf('NOT EXISTS (%s)', $failedSq->getSQL())
         );
 

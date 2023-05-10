@@ -363,12 +363,12 @@ class SearchSubscriber implements EventSubscriberInterface
         $q     = $event->getQueryBuilder();
         $expr  = $q->expr()->and(sprintf('%s = :%s', $config['column'], $alias));
 
-        $expr->with(sprintf('%s = %s',
+        $expr = $expr->with(sprintf('%s = %s',
             'mq.channel',
             $q->createNamedParameter('email')
         ));
 
-        $expr->with(sprintf('%s IN (%s, %s)',
+        $expr = $expr->with(sprintf('%s IN (%s, %s)',
             'mq.status',
             $q->createNamedParameter(MessageQueue::STATUS_PENDING),
             $q->createNamedParameter(MessageQueue::STATUS_RESCHEDULED)
@@ -491,7 +491,7 @@ class SearchSubscriber implements EventSubscriberInterface
             $params = (array) $config['params'];
             foreach ($params as $name => $value) {
                 $param = $q->createNamedParameter($value);
-                $expr->with(sprintf('%s = %s', $name, $param));
+                $expr  = $expr->with(sprintf('%s = %s', $name, $param));
             }
         }
 

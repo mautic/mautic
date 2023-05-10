@@ -362,7 +362,7 @@ class ReportSubscriber implements EventSubscriberInterface
                                 $x = $alias.$filter['column'];
                             }
 
-                            $expr->with(
+                            $expr = $expr->with(
                                 $expr->{$filter['operator']}($x, ":$filterParam")
                             );
                             $qb->setParameter($filterParam, $filter['value']);

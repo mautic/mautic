@@ -45,7 +45,7 @@ class FieldChangeRepository extends CommonRepository
 
         $expr = CompositeExpression::and($qb->expr()->eq('object_type', ':objectType'), $qb->expr()->eq('object_id', ':objectId'));
         if ($integration) {
-            $expr->with(
+            $expr = $expr->with(
                 $qb->expr()->eq('integration', ':integration')
             );
             $qb->setParameter('integration', $integration);

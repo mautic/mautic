@@ -43,11 +43,11 @@ class HitRepository extends CommonRepository
         }
 
         if ($page instanceof Page) {
-            $expr->with(
+            $expr = $expr->with(
                 $q2->expr()->eq('h.page_id', $page->getId())
             );
         } elseif ($page instanceof Redirect) {
-            $expr->with(
+            $expr = $expr->with(
                 $q2->expr()->eq('h.redirect_id', $page->getId())
             );
         }
@@ -306,8 +306,8 @@ class HitRepository extends CommonRepository
 
         if (null !== $fromDate) {
             //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
-            $expr->with(
+            $dt   = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
+            $expr = $expr->with(
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }

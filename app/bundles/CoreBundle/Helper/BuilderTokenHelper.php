@@ -107,13 +107,13 @@ class BuilderTokenHelper
         }
 
         if (isset($permissions[$this->viewPermissionBase.':viewother']) && !$permissions[$this->viewPermissionBase.':viewother']) {
-            $expr->with(
+            $expr = $expr->with(
                 $exprBuilder->eq($prefix.'created_by', $this->userHelper->getUser()->getId())
             );
         }
 
         if (!empty($filter)) {
-            $expr->with(
+            $expr = $expr->with(
                 $exprBuilder->like('LOWER('.$labelColumn.')', ':label')
             );
 

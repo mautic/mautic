@@ -660,7 +660,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                         $qb->andWhere($expr);
                         continue;
                     }
-                    $expr->with(
+                    $expr = $expr->with(
                         $qb->expr()->eq($column, $qb->createNamedParameter($value))
                     );
                     $qb->andWhere($expr);

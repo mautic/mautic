@@ -303,7 +303,7 @@ class LeadFieldRepository extends CommonRepository
                             $property." $operator '\\\\|?$v\\\\|?'"
                         );
                     }
-                    $expr->with($andExpr);
+                    $expr = $expr->with($andExpr);
 
                     $q->where($expr)
                         ->setParameter('lead', (int) $lead);
@@ -324,7 +324,7 @@ class LeadFieldRepository extends CommonRepository
 
                 if ('neq' == $operatorExpr) {
                     // include null
-                    $expr->with(
+                    $expr = $expr->with(
                         $q->expr()->or(
                             $q->expr()->$operatorExpr($property, ':value'),
                             $q->expr()->isNull($property)
@@ -346,7 +346,7 @@ class LeadFieldRepository extends CommonRepository
                             break;
                     }
 
-                    $expr->with(
+                    $expr = $expr->with(
                         $q->expr()->$operatorExpr($property, ':value')
                     );
                 }
