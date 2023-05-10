@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Tests\Unit\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -29,7 +30,8 @@ class AbstractFormControllerTest extends \PHPUnit\Framework\TestCase
     {
         $security                              = $this->createMock(CorePermissions::class);
         $userHelper                            = $this->createMock(UserHelper::class);
-        $this->classFromAbstractFormController = new class($security, $userHelper) extends AbstractFormController {
+        $doctrine                              = $this->createMock(ManagerRegistry::class);
+        $this->classFromAbstractFormController = new class($security, $userHelper, $doctrine) extends AbstractFormController {
             public function returnIsFormCancelled(Form $form): bool
             {
                 return $this->isFormCancelled($form);

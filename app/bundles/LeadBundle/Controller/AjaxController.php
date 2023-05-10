@@ -526,7 +526,7 @@ class AjaxController extends CommonAjaxController
             $doNotContact = $this->getModel('lead.dnc');
 
             /** @var DoNotContactModel $dnc */
-            $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
+            $dnc = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->findOneBy(
                 [
                     'id' => $dncId,
                 ]

@@ -89,6 +89,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
                     'translator',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.sms.broadcast.query' => [
