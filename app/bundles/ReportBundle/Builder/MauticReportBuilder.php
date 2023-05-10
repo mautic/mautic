@@ -499,10 +499,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
-            $orX = $queryBuilder->expr()->or('');
-            foreach ($groups as $group) {
-                $orX = $orX->with($group);
-            }
+            $orX = $queryBuilder->expr()->or(...$groups);
 
             // Wrap in a andX for other functions to append
             $filterExpr = $queryBuilder->expr()->and($orX);
