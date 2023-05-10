@@ -12,10 +12,11 @@
 !.gitpod.yml
 !.ddev/commands/web/dd
 .php_cs.cache
-/.env
+/.env.local
+/.env.local.php
+/.env.*.local
 /composer.phar
 /coverage.xml
-
 /app/bootstrap*
 /app/console
 /app/tests.bootstrap*

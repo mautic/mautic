@@ -124,11 +124,6 @@ final class AssetsHelper
             $url = $this->getBaseUrl().'/'.$path;
         }
 
-        // Remove the dev index so the assets work in the dev mode
-        if (strpos($url, '/index_dev.php/')) {
-            $url = str_replace('index_dev.php/', '', $url);
-        }
-
         return $url;
     }
 

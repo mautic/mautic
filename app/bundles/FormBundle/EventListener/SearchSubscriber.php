@@ -83,13 +83,13 @@ class SearchSubscriber implements EventSubscriberInterface
                 $formResults = [];
                 foreach ($forms as $form) {
                     $formResults[] = $this->twig->render(
-                        '@MauticForm/SubscribedEvents\Search/global.html.twig',
+                        '@MauticForm/SubscribedEvents/Search/global.html.twig',
                         ['form' => $form[0]]
                     );
                 }
                 if (count($forms) > 5) {
                     $formResults[] = $this->twig->render(
-                        '@MauticForm/SubscribedEvents\Search/global.html.twig',
+                        '@MauticForm/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
