@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d92504fb20c8a9c365912609fc286698",
+    "content-hash": "891518c8945180f50cc178a11d8485fe",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -3853,17 +3853,11 @@
         },
         {
             "name": "helios-ag/fm-elfinder-bundle",
-            "version": "12.2.3",
+            "version": "dev-vendor-above-project-dir",
             "source": {
                 "type": "git",
-                "url": "https://github.com/helios-ag/FMElfinderBundle.git",
-                "reference": "68a3b900a49894feaf5bf500c92376e5d1bc9925"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/helios-ag/FMElfinderBundle/zipball/68a3b900a49894feaf5bf500c92376e5d1bc9925",
-                "reference": "68a3b900a49894feaf5bf500c92376e5d1bc9925",
-                "shasum": ""
+                "url": "https://github.com/mollux/FMElfinderBundle.git",
+                "reference": "75cb6dc3234ec0b9542a9245254a3a58af0697ed"
             },
             "require": {
                 "ext-json": "*",
@@ -3899,7 +3893,17 @@
                     "FM\\ElfinderBundle\\": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "FM\\ElfinderBundle\\Tests\\": "tests/"
+                }
+            },
+            "archive": {
+                "exclude": [
+                    "/tests",
+                    "./github"
+                ]
+            },
             "license": [
                 "MIT"
             ],
@@ -3920,17 +3924,7 @@
                 "file manager",
                 "wysiwyg"
             ],
-            "support": {
-                "issues": "https://github.com/helios-ag/FMElfinderBundle/issues",
-                "source": "https://github.com/helios-ag/FMElfinderBundle/tree/12.2.3"
-            },
-            "funding": [
-                {
-                    "url": "https://paypal.me/heliosag",
-                    "type": "custom"
-                }
-            ],
-            "time": "2023-02-13T14:27:16+00:00"
+            "time": "2023-04-30T18:42:48+00:00"
         },
         {
             "name": "intervention/image",
@@ -5642,7 +5636,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "0a096711208dc04c4d645777c38bb5d4144bb0a8"
+                "reference": "2fb16cd22d9bc1da4c929dedd16523f538fc05fd"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5669,7 +5663,7 @@
                 "giggsey/libphonenumber-for-php": "^8.12",
                 "guzzlehttp/guzzle": "^7.2",
                 "guzzlehttp/oauth-subscriber": "^0.6.0",
-                "helios-ag/fm-elfinder-bundle": "^12.2.3",
+                "helios-ag/fm-elfinder-bundle": "dev-vendor-above-project-dir",
                 "ip2location/ip2location-php": "^7.2",
                 "jbroadway/urlify": "^1.0",
                 "jms/serializer-bundle": "^4.0",
@@ -17777,7 +17771,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "helios-ag/fm-elfinder-bundle": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": [],
