@@ -647,7 +647,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($filters) {
-            $expr = $qb->expr()->and();
+            $expr = $qb->expr()->and('');
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);

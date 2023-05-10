@@ -371,7 +371,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $expr      = $queryBuilder->expr();
         $groups    = [];
-        $groupExpr = $queryBuilder->expr()->and();
+        $groupExpr = $queryBuilder->expr()->and('');
 
         if (count($filters)) {
             foreach ($filters as $i => $filter) {
@@ -381,7 +381,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
                     if ($groupExpr->count()) {
                         $groups[]  = $groupExpr;
-                        $groupExpr = $queryBuilder->expr()->and();
+                        $groupExpr = $queryBuilder->expr()->and('');
                     }
                 }
 
@@ -499,8 +499,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
-            $orX = $queryBuilder->expr()->or();
-            $orX->with($groups);
+            $orX = $queryBuilder->expr()->or('');
+            foreach ($groups as $group) {
+                $orX->with($group);
+            }
 
             // Wrap in a andX for other functions to append
             $filterExpr = $queryBuilder->expr()->and($orX);

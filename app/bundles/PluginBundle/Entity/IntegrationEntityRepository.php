@@ -216,7 +216,7 @@ class IntegrationEntityRepository extends CommonRepository
             if (!is_array($integrationEntity)) {
                 $integrationEntity = [$integrationEntity];
             }
-            $sub = $q->expr()->or();
+            $sub = $q->expr()->or('');
             foreach ($integrationEntity as $key => $entity) {
                 $sub->with($q->expr()->eq('i.integration_entity', ':entity'.$key));
                 $q->setParameter(':entity'.$key, $entity);

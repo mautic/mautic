@@ -576,7 +576,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 }
 
                 $expr      = new ExpressionBuilder($this->em->getConnection());
-                $composite = $expr->and();
+                $composite = $expr->and('');
                 $composite->with(
                     $expr->like("comp.$column", ':filterVar')
                 );

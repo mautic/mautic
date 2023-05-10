@@ -365,7 +365,7 @@ class LeadListRepository extends CommonRepository
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subExpr = $subQb->expr()->and();
+        $subExpr = $subQb->expr()->and('');
 
         if ('leads' !== $table) {
             $subExpr->with(

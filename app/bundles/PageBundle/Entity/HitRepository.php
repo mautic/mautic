@@ -31,7 +31,7 @@ class HitRepository extends CommonRepository
         $q2->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        $expr = $q2->expr()->and();
+        $expr = $q2->expr()->and('');
 
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {

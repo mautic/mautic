@@ -42,7 +42,7 @@ class FieldChangeRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $expr = $qb->expr()->and();
+        $expr = $qb->expr()->and('');
         if ($integration) {
             $expr->with(
                 $qb->expr()->eq('integration', ':integration')
@@ -50,10 +50,13 @@ class FieldChangeRepository extends CommonRepository
             $qb->setParameter('integration', $integration);
         }
 
-        $expr->with([
+        $expr->with(
             $qb->expr()->eq('object_type', ':objectType'),
+        );
+        $expr->with(
             $qb->expr()->eq('object_id', ':objectId'),
-        ]);
+        );
+
         $qb->setParameter('objectType', $objectType)
             ->setParameter('objectId', (int) $objectId);
 
