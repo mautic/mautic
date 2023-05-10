@@ -850,18 +850,18 @@ class DynamicsIntegration extends CrmAbstractIntegration
                 foreach ($lead as $dk => $dv) {
                     if ($v === $dk) {
                         if (isset($dv)) {
-                          if (isset($availableFields[$object][$k])) {
-                            if ($availableFields[$object][$k]['type'] === 'boolean') {
-                              // Map boolean values correctly
-                              if ($dv === '1') {
-                                $mappedData[$availableFields[$object][$k]['dv']] = true;
-                              } else {
-                                $mappedData[$availableFields[$object][$k]['dv']] = false;
-                              }
-                            } else {
-                              $mappedData[$availableFields[$object][$k]['dv']] = $dv;
+                            if (isset($availableFields[$object][$k])) {
+                                if ('boolean' === $availableFields[$object][$k]['type']) {
+                                    // Map boolean values correctly
+                                    if ('1' === $dv) {
+                                        $mappedData[$availableFields[$object][$k]['dv']] = true;
+                                    } else {
+                                        $mappedData[$availableFields[$object][$k]['dv']] = false;
+                                    }
+                                } else {
+                                    $mappedData[$availableFields[$object][$k]['dv']] = $dv;
+                                }
                             }
-                          }
                         }
                     }
                 }
@@ -892,16 +892,16 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     if ($v === $dk) {
                         if (isset($dv)) {
                             if (isset($availableFields[$object][$k])) {
-                              if ($availableFields[$object][$k]['type'] === 'boolean') {
-                                // Map boolean values correctly
-                                if ($dv === '1') {
-                                  $mappedData[$availableFields[$object][$k]['dv']] = true;
+                                if ('boolean' === $availableFields[$object][$k]['type']) {
+                                    // Map boolean values correctly
+                                    if ('1' === $dv) {
+                                        $mappedData[$availableFields[$object][$k]['dv']] = true;
+                                    } else {
+                                        $mappedData[$availableFields[$object][$k]['dv']] = false;
+                                    }
                                 } else {
-                                  $mappedData[$availableFields[$object][$k]['dv']] = false;
+                                    $mappedData[$availableFields[$object][$k]['dv']] = $dv;
                                 }
-                              } else {
-                                $mappedData[$availableFields[$object][$k]['dv']] = $dv;
-                              }
                             }
                         }
                     }
