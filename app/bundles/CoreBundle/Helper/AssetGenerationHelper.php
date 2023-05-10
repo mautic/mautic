@@ -12,6 +12,7 @@ class AssetGenerationHelper
         'mousetrap/mousetrap.js',
         'jquery/dist/jquery.js',
         'chosen-js/chosen.jquery.js',
+        'at.js/dist/js/jquery.atwho.js',
         // TODO: Add the rest of the libraries here.
     ];
 
