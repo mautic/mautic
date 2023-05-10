@@ -14,8 +14,28 @@
     "time-grunt": "^2.0.0"
   },
   "dependencies": {
+    "@claviska/jquery-minicolors": "^2.2.4",
+    "bootstrap": "^3.3.7",
+    "chart.js": "^2.3.0",
+    "ckeditor4": "^4.16.0",
+    "codemirror": "^5.15.2",
+    "dropzone": "^4.0.1",
+    "history.js": "^1.8.0",
     "chosen-js": "^1.8.7",
     "jquery": "^3.3.1",
-    "mousetrap": "^1.4.6"
+    "jquery-color": "^2.2.0",
+    "jquery-datetimepicker": "^2.5.20",
+    "jquery-form": "^4.2.2",
+    "jquery-ui-touch-punch": "^0.2.3",
+    "jquery.caret": "^0.3.1",
+    "jquery.cookie": "^1.4.1",
+    "js-cookie": "^2.0.2",
+    "jsplumb": "^2.12.8",
+    "moment": "^2.8.1",
+    "mousetrap": "^1.4.6",
+    "multiselect": "^0.9.12",
+    "shufflejs": "^5.2.2",
+    "typeahead.js": "^0.10.2",
+    "vimeo-froogaloop2": "^0.1.1"
   }
 }

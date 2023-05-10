@@ -215,13 +215,13 @@ JS;
         $mauticBaseUrl   = $this->router->generate('mautic_base_index', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $mediaElementCss = $this->assetsHelper->getUrl('media/css/mediaelementplayer.min.css', null, null, true);
         $jQueryUrl       = $this->assetsHelper->getUrl(
-            'app/bundles/CoreBundle/Assets/js/libraries/2.jquery.js',
+            'node_modules/jquery/dist/jquery.js',
             null,
             null,
             true
         );
         $froogaloop2       = $this->assetsHelper->getUrl(
-            'app/bundles/CoreBundle/Assets/js/libraries/froogaloop2.min.js',
+            'node_modules/vimeo-froogaloop2/javascript/froogaloop.min.js',
             null,
             null,
             true
