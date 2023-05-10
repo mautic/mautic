@@ -252,6 +252,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockDoNotContact   = $this->createMock(DoNotContact::class);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -265,7 +266,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $mockDoNotContact,
         );
 
         $lead = new Lead();
@@ -317,6 +319,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockDoNotContact   = $this->createMock(DoNotContact::class);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -330,7 +333,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $mockDoNotContact,
         );
 
         $lead = new Lead();
@@ -383,6 +387,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockDoNotContact   = $this->createMock(DoNotContact::class);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -396,7 +401,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $mockDoNotContact,
         );
 
         $lead = new Lead();

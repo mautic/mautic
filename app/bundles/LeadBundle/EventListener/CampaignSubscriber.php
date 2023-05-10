@@ -83,6 +83,8 @@ class CampaignSubscriber implements EventSubscriberInterface
      */
     private $fields;
 
+    private DoNotContact $doNotContact;
+
     public function __construct(
         IpLookupHelper $ipLookupHelper,
         LeadModel $leadModel,
