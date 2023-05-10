@@ -361,9 +361,10 @@ class ReportGeneratorEvent extends AbstractReportEvent
     }
 
     /**
-     * @param array<string, mixed> $filter
+     * @param CompositeExpression|null $groupExpr
+     * @param array<string, mixed>     $filter
      */
-    public function applyTagFilter(CompositeExpression $groupExpr, array $filter): CompositeExpression
+    public function applyTagFilter($groupExpr, array $filter): CompositeExpression
     {
         $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
         $tagSubQuery->select('DISTINCT lead_id')

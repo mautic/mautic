@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -371,7 +372,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $expr      = $queryBuilder->expr();
         $groups    = [];
-        $groupExpr = $queryBuilder->expr()->and('');
+        $groupExpr = CompositeExpression::and('');
 
         if (count($filters)) {
             foreach ($filters as $i => $filter) {
@@ -381,7 +382,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
                     if ($groupExpr->count()) {
                         $groups[]  = $groupExpr;
-                        $groupExpr = $queryBuilder->expr()->and('');
+                        $groupExpr = CompositeExpression::and('');
                     }
                 }
 
@@ -499,7 +500,10 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
-            $orX = $queryBuilder->expr()->or(...$groups);
+            $orX = $queryBuilder->expr()->or('');
+            foreach ($groups as $group) {
+                $orX = $orX->with($group);
+            }
 
             // Wrap in a andX for other functions to append
             $filterExpr = $queryBuilder->expr()->and($orX);
