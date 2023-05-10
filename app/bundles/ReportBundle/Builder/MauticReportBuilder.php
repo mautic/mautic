@@ -386,7 +386,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 }
 
                 if ('tag' === $filter['column']) {
-                    $event->applyTagFilter($groupExpr, $filter);
+                    $groupExpr = $event->applyTagFilter($groupExpr, $filter);
                     continue;
                 }
 

@@ -363,7 +363,7 @@ class ReportGeneratorEvent extends AbstractReportEvent
     /**
      * @param array<string, mixed> $filter
      */
-    public function applyTagFilter(CompositeExpression $groupExpr, array $filter): void
+    public function applyTagFilter(CompositeExpression $groupExpr, array $filter): CompositeExpression
     {
         $tagSubQuery = $this->queryBuilder->getConnection()->createQueryBuilder();
         $tagSubQuery->select('DISTINCT lead_id')
@@ -374,26 +374,16 @@ class ReportGeneratorEvent extends AbstractReportEvent
         }
 
         if (in_array($filter['condition'], ['in', 'notEmpty'])) {
-            if (null === $groupExpr) {
-                $groupExpr->and(
-                    $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
-                );
-            } else {
-                $groupExpr = $groupExpr->with(
-                    $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
-                );
-            }
+            $groupExpr = $groupExpr->with(
+                $tagSubQuery->expr()->in('l.id', $tagSubQuery->getSQL())
+            );
         } elseif (in_array($filter['condition'], ['notIn', 'empty'])) {
-            if (null === $groupExpr) {
-                $groupExpr->and(
-                    $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
-                );
-            } else {
-                $groupExpr = $groupExpr->with(
-                    $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
-                );
-            }
+            $groupExpr = $groupExpr->with(
+                $tagSubQuery->expr()->notIn('l.id', $tagSubQuery->getSQL())
+            );
         }
+
+        return $groupExpr;
     }
 
     public function hasColumnWithPrefix(string $prefix): bool
