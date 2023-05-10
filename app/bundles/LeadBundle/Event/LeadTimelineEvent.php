@@ -71,12 +71,12 @@ class LeadTimelineEvent extends Event
     protected $countOnly = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateFrom;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateTo;
 

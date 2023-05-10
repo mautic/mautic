@@ -27,9 +27,7 @@ bin/security-checker
 bin/simple-phpunit
 build/*
 deleted_files.txt
-index_dev.php
 modified_files.txt
-node_modules/*
 package-lock.json
 package.json
 phpstan*.neon

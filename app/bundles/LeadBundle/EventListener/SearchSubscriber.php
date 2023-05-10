@@ -118,14 +118,14 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($leads as $lead) {
                     $leadResults[] = $this->twig->render(
-                        '@MauticLead/SubscribedEvents\Search/global.html.twig',
+                        '@MauticLead/SubscribedEvents/Search/global.html.twig',
                         ['lead' => $lead]
                     );
                 }
 
                 if ($results['count'] > 5) {
                     $leadResults[] = $this->twig->render(
-                        '@MauticLead/SubscribedEvents\Search/global.html.twig',
+                        '@MauticLead/SubscribedEvents/Search/global.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,

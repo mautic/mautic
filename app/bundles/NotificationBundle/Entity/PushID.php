@@ -41,7 +41,7 @@ class PushID
             ->setCustomRepositoryClass('Mautic\NotificationBundle\Entity\PushIDRepository');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
