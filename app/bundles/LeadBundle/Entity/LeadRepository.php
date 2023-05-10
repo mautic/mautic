@@ -647,7 +647,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($filters) {
-            $expr = $qb->expr()->and('');
+            $expr = null;
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
@@ -655,7 +655,11 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (false === strpos($column, '.')) {
                         $column = "entity.$column";
                     }
-
+                    if (null === $expr) {
+                        $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
+                        $qb->andWhere($expr);
+                        continue;
+                    }
                     $expr->with(
                         $qb->expr()->eq($column, $qb->createNamedParameter($value))
                     );

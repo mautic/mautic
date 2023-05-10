@@ -284,13 +284,21 @@ class LeadFieldRepository extends CommonRepository
                     );
 
                     // require all multiselect values in condition
-                    $andExpr = $q->expr()->and('');
+                    $andExpr = null;
                     foreach ($value as $v) {
                         $v = $q->expr()->literal(
                             InputHelper::clean($v)
                         );
 
                         $v = trim($v, "'");
+
+                        if (null === $andExpr) {
+                            $andExpr = $q->expr()->and(
+                                $property." $operator '\\\\|?$v\\\\|?'"
+                            );
+                            continue;
+                        }
+
                         $andExpr->with(
                             $property." $operator '\\\\|?$v\\\\|?'"
                         );

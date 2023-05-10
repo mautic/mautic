@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,17 +32,13 @@ class HitRepository extends CommonRepository
         $q2->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        $expr = $q2->expr()->and('');
+        $expr = null;
 
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {
-            $expr->with(
-                $q2->expr()->eq('h.lead_id', $lead->getId())
-            );
+            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
         } else {
-            $expr->with(
-                $q2->expr()->eq('h.tracking_id', ':id')
-            );
+            $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));
             $q->setParameter('id', $trackingId);
         }
 

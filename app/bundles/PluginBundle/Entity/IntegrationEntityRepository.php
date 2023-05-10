@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -216,8 +217,14 @@ class IntegrationEntityRepository extends CommonRepository
             if (!is_array($integrationEntity)) {
                 $integrationEntity = [$integrationEntity];
             }
-            $sub = $q->expr()->or('');
+            $sub = null;
             foreach ($integrationEntity as $key => $entity) {
+                if (null === $sub) {
+                    $sub = CompositeExpression::or($q->expr()->eq('i.integration_entity', ':entity'.$key));
+                    $q->setParameter(':entity'.$key, $entity);
+                    continue;
+                }
+
                 $sub->with($q->expr()->eq('i.integration_entity', ':entity'.$key));
                 $q->setParameter(':entity'.$key, $entity);
             }

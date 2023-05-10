@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -42,20 +43,13 @@ class FieldChangeRepository extends CommonRepository
     {
         $qb = $this->getEntityManager()->getConnection()->createQueryBuilder();
 
-        $expr = $qb->expr()->and('');
+        $expr = CompositeExpression::and($qb->expr()->eq('object_type', ':objectType'), $qb->expr()->eq('object_id', ':objectId'));
         if ($integration) {
             $expr->with(
                 $qb->expr()->eq('integration', ':integration')
             );
             $qb->setParameter('integration', $integration);
         }
-
-        $expr->with(
-            $qb->expr()->eq('object_type', ':objectType'),
-        );
-        $expr->with(
-            $qb->expr()->eq('object_id', ':objectId'),
-        );
 
         $qb->setParameter('objectType', $objectType)
             ->setParameter('objectId', (int) $objectId);

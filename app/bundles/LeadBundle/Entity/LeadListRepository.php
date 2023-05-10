@@ -365,26 +365,38 @@ class LeadListRepository extends CommonRepository
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subExpr = $subQb->expr()->and('');
+        $subExpr = null;
+
+        foreach ($subQueryFilters as $subColumn => $subParameter) {
+            if (null === $subExpr) {
+                $subExpr = $subQb->expr()->and($subQb->expr()->eq($subColumn, ":$subParameter"));
+                continue;
+            }
+            $subExpr->with(
+                $subQb->expr()->eq($subColumn, ":$subParameter")
+            );
+        }
 
         if ('leads' !== $table) {
-            $subExpr->with(
-                $subQb->expr()->eq($alias.'.lead_id', 'l.id')
-            );
+            if (null === $subExpr) {
+                $subExpr = $subQb->expr()->and($subQb->expr()->eq($alias.'.lead_id', 'l.id'));
+            } else {
+                $subExpr->with(
+                    $subQb->expr()->eq($alias.'.lead_id', 'l.id')
+                );
+            }
         }
 
         // Specific lead
         if (!empty($leadId)) {
             $columnName = ('leads' === $table) ? 'id' : 'lead_id';
-            $subExpr->with(
+            if (null === $subExpr) {
+                $subExpr = $subQb->expr()->and($subQb->expr()->eq($alias.'.'.$columnName, $leadId));
+            } else {
+                $subExpr->with(
                 $subQb->expr()->eq($alias.'.'.$columnName, $leadId)
             );
-        }
-
-        foreach ($subQueryFilters as $subColumn => $subParameter) {
-            $subExpr->with(
-                $subQb->expr()->eq($subColumn, ":$subParameter")
-            );
+            }
         }
 
         if (null !== $value && !empty($column)) {

@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Form\ChoiceLoader;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\AjaxLookupModelInterface;
@@ -258,13 +259,12 @@ class EntityLookupChoiceLoader implements ChoiceLoaderInterface
             //rewrite query to use expression builder
             $alias     = $model->getRepository()->getTableAlias();
             $expr      = new ExpressionBuilder($this->connection);
-            $composite = $expr->and('');
+            $composite = null;
 
             $limit = 100;
             if ($data) {
-                $composite->with(
-                    $expr->in($alias.'.id', $data)
-                );
+                $composite = CompositeExpression::and($expr->in($alias.'.id', $data));
+
                 if (count($data) > $limit) {
                     $limit = $data;
                 }
