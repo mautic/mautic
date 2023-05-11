@@ -349,6 +349,7 @@ $container->loadFromExtension('fm_elfinder', [
     'instances'   => [
         'default' => [
             'locale'          => '%mautic.locale%',
+            'cors_support'    => true,
             'editor'          => 'custom',
             'editor_template' => '@bundles/CoreBundle/Assets/js/libraries/filemanager/index.html.twig',
             'fullscreen'      => true,
