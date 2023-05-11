@@ -87,7 +87,7 @@
     "noxlogic/ratelimit-bundle": "^1.11",
     "knplabs/knp-menu-bundle": "^3.0",
     "guzzlehttp/oauth-subscriber": "^0.6.0",
-    "helios-ag/fm-elfinder-bundle": "dev-vendor-above-project-dir",
+    "helios-ag/fm-elfinder-bundle": "^12.3",
     "leezy/pheanstalk-bundle": "dev-master",
     "tightenco/collect": "^8.16.0",
     "kamermans/guzzle-oauth2-subscriber": "^1.0",
@@ -120,11 +120,6 @@
     {
       "type": "git",
       "url": "https://github.com/mautic/SymfonyBridgeBundle.git"
-    },
-    {
-      "type": "git",
-      "url": "https://github.com/mollux/FMElfinderBundle.git",
-      "only": ["helios-ag/fm-elfinder-bundle"]
     }
   ],
   "minimum-stability": "dev",
