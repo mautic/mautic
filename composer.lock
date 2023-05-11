@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8416d525d6a7da04ce4140b1d0dcf906",
+    "content-hash": "3a5e8d67de488fe580e792a9bae74879",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -5684,7 +5684,7 @@
             "dist": {
                 "type": "path",
                 "url": "app",
-                "reference": "0be0ed0967c65a9ad595a35b47f8264bbff4641c"
+                "reference": "355929898459fe8b67e727cf45bf041b465c87f0"
             },
             "require": {
                 "aws/aws-sdk-php": "~3.0",
@@ -5782,10 +5782,11 @@
             "extra": {
                 "mautic-scaffold": {
                     "file-mapping": {
-                        "[project-root]/.env.dist": "assets/scaffold/files/.env.dist",
+                        "[project-root]/.env": "assets/scaffold/files/.env",
                         "[project-root]/Gruntfile.js": "assets/scaffold/files/Gruntfile.js",
                         "[project-root]/package.json": "assets/scaffold/files/package.json",
                         "[project-root]/package-lock.json": "assets/scaffold/files/package-lock.json",
+                        "[project-root]/app/config/bootstrap.php": "assets/scaffold/files/bootstrap.php",
                         "[project-root]/bin/console": "assets/scaffold/files/console",
                         "[project-root]/bin/.htaccess": "assets/scaffold/files/deny.htaccess",
                         "[project-root]/.gitignore": "assets/scaffold/files/example.gitignore",
