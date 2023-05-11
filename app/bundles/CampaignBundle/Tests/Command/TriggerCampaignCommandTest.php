@@ -543,7 +543,9 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $property = ['addTo' => [$campaign2->getId()], 'removeFrom' => ['this']];
         $this->createEvent('Event', $campaign1, 'campaign.addremovelead', 'action', $property);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($campaign1);
+        $this->em->detach($campaign2);
+        $this->em->detach($lead);
 
         $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
@@ -592,7 +594,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $john);
         $this->createCampaignLead($campaign, $jane, true); // Manually removed.
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($campaign);
+        $this->em->detach($campaignRepo);
 
         $tStart = microtime(true);
 
