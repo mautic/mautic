@@ -7,7 +7,6 @@ namespace Mautic\LeadBundle\Tests\Command;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
-use Mautic\LeadBundle\Deduplicate\ContactDeduper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
 use Mautic\LeadBundle\Entity\LeadFieldRepository;
@@ -30,10 +29,8 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     public function testDeduplicateCommandWithUniqueEmail(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
 
         $contactDeduper = self::$container->get('mautic.lead.deduper');
-        \assert($contactDeduper instanceof ContactDeduper);
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
@@ -63,10 +60,8 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     public function testDeduplicateCommandWithAnotherUniqueFieldAndAnd(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
-        \assert($fieldRepository instanceof LeadFieldRepository);
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 

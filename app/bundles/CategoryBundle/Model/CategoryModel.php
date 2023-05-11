@@ -34,7 +34,6 @@ class CategoryModel extends FormModel
     public function getRepository(): CategoryRepository
     {
         $result = $this->em->getRepository(Category::class);
-        \assert($result instanceof CategoryRepository);
 
         return $result;
     }

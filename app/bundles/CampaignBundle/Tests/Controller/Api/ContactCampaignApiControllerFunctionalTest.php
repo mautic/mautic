@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\CampaginBundle\Tests\Controller\Api;
 
 use Mautic\CampaignBundle\Entity\Lead as CampaignMember;
-use Mautic\CampaignBundle\Entity\LeadRepository;
 use Mautic\CampaignBundle\Tests\Campaign\AbstractCampaignTest;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
@@ -23,7 +22,6 @@ class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTest
         $this->em->flush();
 
         $campaignMemberRepository = $this->em->getRepository(CampaignMember::class);
-        \assert($campaignMemberRepository instanceof LeadRepository);
 
         // Add the contact to the campaign.
         $this->client->request(Request::METHOD_POST, "/api/campaigns/{$campaign->getId()}/contact/{$contact->getId()}/add");
