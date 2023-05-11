@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -162,19 +162,19 @@ class Import extends FormEntity
             ->addIndex(['status'], 'import_status')
             ->addIndex(['priority'], 'import_priority')
             ->addId()
-            ->addField('dir', Type::STRING)
-            ->addField('file', Type::STRING)
-            ->addNullableField('originalFile', Type::STRING, 'original_file')
-            ->addNamedField('lineCount', Type::INTEGER, 'line_count')
-            ->addNamedField('insertedCount', Type::INTEGER, 'inserted_count')
-            ->addNamedField('updatedCount', Type::INTEGER, 'updated_count')
-            ->addNamedField('ignoredCount', Type::INTEGER, 'ignored_count')
-            ->addField('priority', Type::INTEGER)
-            ->addField('status', Type::INTEGER)
-            ->addNullableField('dateStarted', Type::DATETIME, 'date_started')
-            ->addNullableField('dateEnded', Type::DATETIME, 'date_ended')
-            ->addField('object', Type::STRING)
-            ->addNullableField('properties', Type::JSON_ARRAY);
+            ->addField('dir', Types::STRING)
+            ->addField('file', Types::STRING)
+            ->addNullableField('originalFile', Types::STRING, 'original_file')
+            ->addNamedField('lineCount', Types::INTEGER, 'line_count')
+            ->addNamedField('insertedCount', Types::INTEGER, 'inserted_count')
+            ->addNamedField('updatedCount', Types::INTEGER, 'updated_count')
+            ->addNamedField('ignoredCount', Types::INTEGER, 'ignored_count')
+            ->addField('priority', Types::INTEGER)
+            ->addField('status', Types::INTEGER)
+            ->addNullableField('dateStarted', Types::DATETIME_MUTABLE, 'date_started')
+            ->addNullableField('dateEnded', Types::DATETIME_MUTABLE, 'date_ended')
+            ->addField('object', Types::STRING)
+            ->addNullableField('properties', Types::JSON);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)

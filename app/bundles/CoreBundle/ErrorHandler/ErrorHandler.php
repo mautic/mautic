@@ -494,7 +494,7 @@ namespace Mautic\CoreBundle\ErrorHandler {
 
             try {
                 // Get the URLs base path
-                $base  = str_replace(['index.php', 'index_dev.php'], '', $_SERVER['SCRIPT_NAME']);
+                $base  = str_replace(['index.php'], '', $_SERVER['SCRIPT_NAME']);
 
                 // Determine if there is an asset prefix
                 $root = self::$root;
