@@ -37,6 +37,7 @@ use Mautic\PageBundle\PageEvents;
 use Mautic\QueueBundle\Queue\QueueName;
 use Mautic\QueueBundle\Queue\QueueService;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -518,7 +519,11 @@ class PageModel extends FormModel
 
         //save hit to the cookie to use to update the exit time
         if ($hit) {
-            $this->cookieHelper->setCookie('mautic_referer_id', $hit->getId() ?: null);
+            $this->cookieHelper->setCookie(
+                name: 'mautic_referer_id',
+                value: $hit->getId() ?: null,
+                sameSite: Cookie::SAMESITE_NONE
+            );
         }
 
         if ($this->queueService->isQueueEnabled()) {
