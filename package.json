@@ -17,6 +17,7 @@
     "@claviska/jquery-minicolors": "^2.2.4",
     "bootstrap": "^3.3.7",
     "chart.js": "^2.3.0",
+    "at.js": "^1.5.4",
     "chosen-js": "^1.8.7",
     "ckeditor4": "^4.16.0",
     "codemirror": "^5.15.2",
