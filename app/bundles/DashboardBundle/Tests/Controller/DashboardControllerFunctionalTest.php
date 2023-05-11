@@ -32,7 +32,7 @@ class DashboardControllerFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($widget);
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($widget);
 
         $this->client->request('GET', sprintf('/s/dashboard/widget/%s', $widget->getId()), [], [], [
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
