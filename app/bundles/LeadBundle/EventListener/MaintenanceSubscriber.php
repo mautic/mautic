@@ -50,7 +50,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
-                  $qb->expr()->andX(
+                  $qb->expr()->and(
                     $qb->expr()->lte('l.date_added', ':date2'),
                     $qb->expr()->isNull('l.last_active')
                   ));
@@ -65,7 +65,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
-                  $qb->expr()->andX(
+                  $qb->expr()->and(
                     $qb->expr()->lte('l.date_added', ':date2'),
                     $qb->expr()->isNull('l.last_active')
                   ));
