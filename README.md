@@ -1,6 +1,6 @@
 [![codecov](https://codecov.io/gh/mautic/mautic/branch/features/graph/badge.svg)](https://codecov.io/gh/mautic/mautic)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-108-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-109-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 About Mautic
@@ -215,6 +215,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/JeanMarcAivie"><img src="https://avatars.githubusercontent.com/u/127292186?v=4?s=100" width="100px;" alt="Jean-Marc "/><br /><sub><b>Jean-Marc </b></sub></a><br /><a href="#userTesting-JeanMarcAivie" title="User Testing">📓</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://paulsanduleac.com"><img src="https://avatars.githubusercontent.com/u/67867?v=4?s=100" width="100px;" alt="Paul Sanduleac"/><br /><sub><b>Paul Sanduleac</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=paulsanduleac" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://lenonleite.com.br"><img src="https://avatars.githubusercontent.com/u/218436?v=4?s=100" width="100px;" alt="Lenon Leite"/><br /><sub><b>Lenon Leite</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=lenonleite" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/thanks"><img src="https://avatars.githubusercontent.com/u/1121545?v=4?s=100" width="100px;" alt="Thanks"/><br /><sub><b>Thanks</b></sub></a><br /><a href="https://github.com/mautic/mautic/commits?author=Thanks" title="Tests">⚠️</a></td>
     </tr>
   </tbody>
 </table>
