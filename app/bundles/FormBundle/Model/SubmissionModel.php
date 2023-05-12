@@ -1147,7 +1147,8 @@ class SubmissionModel extends CommonFormModel
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
             }
-            $this->em->clear(CompanyChangeLog::class);
+            $companyChangeLog = $lead->getCompanyChangeLog();
+            $this->em->detach($companyChangeLog);
         }
 
         return $lead;
