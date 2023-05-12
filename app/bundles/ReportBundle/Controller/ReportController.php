@@ -341,6 +341,9 @@ class ReportController extends FormController
                 // Columns have to be reset in order for Symfony to honor the new submitted order
                 $oldColumns = $entity->getColumns();
                 $entity->setColumns([]);
+                $oldSchedule = $entity->isScheduled() ?? $this->getSchedule($entity);
+
+                //check if schedule has changes, if yes, set unique check to true (how?)
 
                 $oldGraphs = $entity->getGraphs();
                 $entity->setGraphs([]);
@@ -885,5 +888,20 @@ class ReportController extends FormController
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, "report-{$report->getId()}.zip");
 
         return $response;
+    }
+
+    /**
+     * @param Report|null $entity
+     *
+     * @return array
+     */
+    private function getSchedule(Report $entity): array
+    {
+        $schedule = [];
+        $schedule['schedule_unit'] = $entity->getScheduleUnit();
+        $schedule['schedule_day'] = $entity->getScheduleDay();
+        $schedule['schedule_month_frequency'] = $entity->getScheduleMonthFrequency();
+
+        return $schedule;
     }
 }
