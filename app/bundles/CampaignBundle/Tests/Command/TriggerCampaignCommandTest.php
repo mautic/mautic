@@ -545,7 +545,6 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->em->flush();
         $this->em->clear();
 
-
         $this->runCommand('mautic:campaigns:trigger', ['--campaign-id' => $campaign1->getId(), '--contact-id' => $lead->getId(), '--kickoff-only' => true]);
 
         $campaignLeads = $this->em->getRepository(Lead::class)->findBy(['lead' => $lead], ['campaign' => 'ASC']);
