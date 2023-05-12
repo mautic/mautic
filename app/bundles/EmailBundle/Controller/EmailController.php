@@ -489,7 +489,7 @@ class EmailController extends FormController
 
             if (!$cancelled = $this->isFormCancelled($form)) {
                 $formData = $request->request->all()['emailform'] ?? [];
-                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
+                if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
 
                     $entity->setCustomHtml($content);
@@ -691,8 +691,7 @@ class EmailController extends FormController
         if (!$ignorePost && 'POST' === $method) {
             $valid = false;
             if (!$cancelled = $this->isFormCancelled($form)) {
-                $formData = $request->request->all()['emailform'] ?? [];
-                if ($valid = $this->isFormValid($form) && $this->isFormValidForWebinar($formData, $form, $entity)) {
+                if ($valid = $this->isFormValid($form)) {
                     $content = $entity->getCustomHtml();
                     $entity->setCustomHtml($content);
 
@@ -1474,49 +1473,6 @@ class EmailController extends FormController
         <input type="hidden" id="builder_entity_id" value="<?php echo $entity->getSessionId(); ?>"/>
         <?php
         $slotsHelper->stop();
-    }
-
-    /**
-     * Checks the form data for webinar tokens and validates that the segment has webinar filters.
-     *
-     * @return int
-     */
-    protected function isFormValidForWebinar(array $data, Form &$form, Email $email)
-    {
-        // search for webinar filters in the email segments
-        if (!array_key_exists('lists', $data) || 0 === count($data['lists'])) {
-            return true;
-        }
-
-        // search for token in content
-        $html         = $email->getCustomHtml();
-        $isTokenFound = preg_match('/\{webinar_button\}/', $html);
-        if (!$isTokenFound) {
-            return true;
-        }
-
-        $isWebinarFilterPresent = false;
-        $webinarFiltersCount    = 0;
-        $lists                  = $data['lists'];
-        /** @var ListModel $model */
-        $model = $this->getModel('lead.list');
-        foreach ($lists as $listId) {
-            $list    = $model->getEntity($listId);
-            $filters = $list->getFilters();
-            foreach ($filters as $filter) {
-                if ('webinar-registration' == $filter['field'] && 'in' == $filter['operator']) {
-                    $isWebinarFilterPresent = true;
-                    ++$webinarFiltersCount;
-                }
-            }
-        }
-        // make sure that each list has a webinar-registration filter
-        if (count($lists) !== $webinarFiltersCount) {
-            $isWebinarFilterPresent = false;
-        }
-
-        // everything is ok
-        return true;
     }
 
     /**
