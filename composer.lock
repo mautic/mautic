@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d92504fb20c8a9c365912609fc286698",
+    "content-hash": "7b5dab6b01b7bc1aa3752f84d94367db",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -7076,6 +7076,7 @@
                 "issues": "https://github.com/php-http/message-factory/issues",
                 "source": "https://github.com/php-http/message-factory/tree/master"
             },
+            "abandoned": "psr/http-factory",
             "time": "2015-12-19T14:08:53+00:00"
         },
         {

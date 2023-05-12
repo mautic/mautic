@@ -31,7 +31,6 @@ use Mautic\EmailBundle\Form\Type\ExampleSendType;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Controller\EntityContactsTrait;
 use Mautic\LeadBundle\Model\ListModel;
-use MauticPlugin\MauticCitrixBundle\Helper\CitrixHelper;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -1485,10 +1484,6 @@ class EmailController extends FormController
      */
     protected function isFormValidForWebinar(array $data, Form &$form, Email $email)
     {
-        if (!CitrixHelper::isAuthorized('Gotowebinar')) {
-            return true;
-        }
-
         // search for webinar filters in the email segments
         if (!array_key_exists('lists', $data) || 0 === count($data['lists'])) {
             return true;
@@ -1519,12 +1514,6 @@ class EmailController extends FormController
         // make sure that each list has a webinar-registration filter
         if (count($lists) !== $webinarFiltersCount) {
             $isWebinarFilterPresent = false;
-        }
-        if (!$isWebinarFilterPresent) {
-            $error = $this->translator->trans('plugin.citrix.webinar.token_error');
-            $form->addError(new FormError($error));
-
-            return false;
         }
 
         // everything is ok
