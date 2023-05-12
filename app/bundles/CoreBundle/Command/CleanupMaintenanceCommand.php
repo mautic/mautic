@@ -40,8 +40,7 @@ class CleanupMaintenanceCommand extends ModeratedCommand
                         'days-old',
                         'd',
                         InputOption::VALUE_OPTIONAL,
-                        'Purge records older than this number of days. Defaults to 365.',
-                        365
+                        'Purge records older than this number of days. Defaults to 365.'
                     ),
                     new InputOption('dry-run', 'r', InputOption::VALUE_NONE, 'Do a dry run without actually deleting anything.'),
                     new InputOption('gdpr', 'g', InputOption::VALUE_NONE, 'Delete data to fullfil GDPR requirement.'),
@@ -75,14 +74,12 @@ EOT
         $dryRun        = $input->getOption('dry-run');
         $noInteraction = $input->getOption('no-interaction');
         $gdpr          = $input->getOption('gdpr');
-        if (empty($daysOld) && empty($gdpr)) {
-            // Safety catch; bail
-            return 1;
-        }
 
-        if (!empty($gdpr)) {
-            // to fullfil GDPR, you must delete inactive user data older than 3years
-            $daysOld = 365 * 3;
+        if (empty($gdpr)) {
+            empty($daysOld) && $daysOld = 365;
+        } else {
+            // to fulfill GDPR, you must delete inactive user data older than 3 years or custom
+            empty($daysOld) && $daysOld = 365 * 3;
         }
 
         if (empty($dryRun) && empty($noInteraction)) {
