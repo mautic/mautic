@@ -51,7 +51,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper          = new ReloadHelper($this->eventDispatcher, $this->factoryMock);
 
         $this->sampleMetaData = [
-            'MauticPlugin\MauticZapierBundle' => [$this->createMock(ClassMetadata::class)]
+            'MauticPlugin\MauticZapierBundle' => [$this->createMock(ClassMetadata::class)],
         ];
 
         $sampleSchema = $this->createMock(Schema::class);
@@ -59,7 +59,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                 ->willReturn([]);
 
         $this->sampleSchemas = [
-            'MauticPlugin\MauticZapierBundle' => $sampleSchema
+            'MauticPlugin\MauticZapierBundle' => $sampleSchema,
         ];
 
         $this->sampleAllPlugins = [
@@ -79,7 +79,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
                     'version'     => '1.0',
                     'author'      => 'Mautic',
                 ],
-            ]
+            ],
         ];
     }
 
@@ -102,7 +102,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
         $zapierPlugin = $this->createSampleZapierPlugin();
         $zapierPlugin->setIsMissing(true);
         $sampleInstalledPlugins = [
-            'MauticZapierBundle' => $zapierPlugin            
+            'MauticZapierBundle' => $zapierPlugin,
         ];
 
         $enabledPlugins = $this->helper->enableFoundPlugins($this->sampleAllPlugins, $sampleInstalledPlugins);
@@ -136,7 +136,7 @@ class ReloadHelperTest extends \PHPUnit\Framework\TestCase
     public function testInstallPlugins()
     {
         $sampleInstalledPlugins = [
-            'MauticHappierBundle' => $this->createSampleHappierPlugin()
+            'MauticHappierBundle' => $this->createSampleHappierPlugin(),
         ];
         $event = new PluginInstallEvent($this->createSampleZapierPlugin());
         $this->eventDispatcher->expects($this->once())->method('dispatch')->with($event, PluginEvents::ON_PLUGIN_INSTALL);
