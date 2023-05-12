@@ -46,7 +46,6 @@ class UserModel extends FormModel
     public function getRepository(): UserRepository
     {
         $result = $this->em->getRepository(User::class);
-        \assert($result instanceof UserRepository);
 
         return $result;
     }

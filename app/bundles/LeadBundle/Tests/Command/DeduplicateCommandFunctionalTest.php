@@ -9,8 +9,6 @@ use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Command\DeduplicateCommand;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use PHPUnit\Framework\Assert;
 
 final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
@@ -92,10 +90,8 @@ final class DeduplicateCommandFunctionalTest extends MauticMysqlTestCase
     public function testDeduplicateCommandWithAnotherUniqueFieldAndOr(): void
     {
         $contactRepository = $this->em->getRepository(Lead::class);
-        \assert($contactRepository instanceof LeadRepository);
 
         $fieldRepository = $this->em->getRepository(LeadField::class);
-        \assert($fieldRepository instanceof LeadFieldRepository);
 
         Assert::assertSame(0, $contactRepository->count([]), 'Some contacts were forgotten to remove from other tests');
 
