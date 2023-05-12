@@ -13,7 +13,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Model\FormModel as CommonFormModel;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Crate\UploadFileCrate;
 use Mautic\FormBundle\Entity\Action;
 use Mautic\FormBundle\Entity\Field;
@@ -356,7 +356,7 @@ class SubmissionModel extends CommonFormModel
 
             //save the result
             if (false !== $f->getSaveResult()) {
-                $results[$alias] = $value;
+                $results['`'.$alias.'`'] = $value;
             }
         }
 
@@ -871,7 +871,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -905,7 +905,7 @@ class SubmissionModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_submitted');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

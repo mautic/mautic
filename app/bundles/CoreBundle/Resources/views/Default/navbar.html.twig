@@ -13,8 +13,8 @@
                 <i class="fa fa-navicon fs-16"></i>
             </a>
         </li>
-        {{ render(controller('MauticCoreBundle:Default:notifications')) }}
-        {{ render(controller('MauticCoreBundle:Default:globalSearch')) }}
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::notificationsAction')) }}
+        {{ render(controller('Mautic\\CoreBundle\\Controller\\DefaultController::globalSearchAction')) }}
     </ul>
     <!--/ end: left nav -->
 
@@ -28,7 +28,7 @@
         </li>
     </ul>
     <div class="navbar-toolbar pull-right mt-15 mr-10">
-    {{ buttonReset(constant('Mautic\\CoreBundle\\Templating\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
+    {{ buttonReset(constant('Mautic\\CoreBundle\\Twig\\Helper\\ButtonHelper::LOCATION_NAVBAR')) }}
     {{ buttonsRender() }}
     </div>
 

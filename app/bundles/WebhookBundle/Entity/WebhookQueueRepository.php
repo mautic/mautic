@@ -50,6 +50,6 @@ class WebhookQueueRepository extends CommonRepository
             ->where($this->getTableAlias().'.webhook_id = :id')
             ->setParameter('id', $id)
             ->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

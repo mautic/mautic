@@ -3,7 +3,17 @@
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
 *   Configuration
     * Replace all occurances of `%kernel.root_dir%` to `%kernel.project_dir%/app` as the "root_dir" was deprecated in Symfony 4 and removed in Symfony 5. The "project_dir" variable is path to the Mautic root directory. The "root_dir" variable was path to the app directory.
-*   Commands
+    * The index_dev.php was removed. Use env variables to set the environment.
+    * We are following symfony env naming convention. [synfomy 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
+      * `.env`                contains default values for the environment variables needed by the app
+      * `.env.local`          uncommitted file with local overrides
+      * `.env.$APP_ENV`       committed environment-specific defaults
+      * `.env.$APP_ENV.local` uncommitted environment-specific overrides
+    * The system run similar index_dev.php if you use `APP_ENV=dev` and `APP_DEBUG=1` in your .env.local file.
+* Installation
+    * The email step was removed from both GUI and CLI installers.
+    * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
+* Commands
     * The command `bin/console mautic:segments:update` will no longer update the campaign members but only the segment members. Use also command `bin/console mautic:campaigns:update` to update the campaign members if you haven't already. Both commands are recommended from Mautic 1.
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:
         * `Mautic\LeadBundle\Model\ListModel::getVersionNew()`
@@ -32,6 +42,8 @@
     * Transactional emails in campaigns ignore the DNC setting.
     * There are no unsubscribe headers in transactional emails.
     * The SortablePanels templates, JS and CSS was removed as unused.
+    * Country name of Swaziland was update to Eswatini based on Standard: ISO 3166.
+    * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
 
 # Dependency injection improvements
 

@@ -53,7 +53,7 @@ class Trackable
 
         $builder->createField('channelId', 'integer')
             ->columnName('channel_id')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->build();
 
         $builder->addField('channel', 'string');

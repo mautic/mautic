@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Tests\EventListener;
 
-use Doctrine\DBAL\Driver\PDOStatement;
+use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\CampaignRepository;
 use Mautic\CampaignBundle\EventCollector\EventCollector;
@@ -19,7 +20,6 @@ use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
@@ -28,6 +28,7 @@ use Mautic\ReportBundle\Event\ReportGraphEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\StageBundle\Model\StageModel;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -179,8 +180,8 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translatorMock                   = $this->createMock(Translator::class);
         $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
-        $this->channelListHelperMock            = $this->createMock(ChannelListHelper::class);
-        $this->reportHelperMock                 = $this->createMock(ReportHelper::class);
+        $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->reportHelperMock                 = new ReportHelper();
         $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
@@ -897,9 +898,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRepository')
             ->willReturn($this->companyRepositoryMock);
 
-        $mockStmt = $this->getMockBuilder(PDOStatement::class)
+        $mockStmt = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['fetchAll'])
+            ->onlyMethods(['fetchAllAssociative'])
             ->getMock();
 
         $this->reportGraphEventMock->expects($this->once())

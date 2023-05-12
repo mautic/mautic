@@ -42,6 +42,11 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     // Define what rule sets will be applied
     $rectorConfig->sets([
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
+        \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
@@ -57,4 +62,5 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadContinueRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
+    $rectorConfig->rule(\Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
 };

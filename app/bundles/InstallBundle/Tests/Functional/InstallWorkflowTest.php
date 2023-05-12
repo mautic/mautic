@@ -72,11 +72,11 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $submitButton = $crawler->selectButton('install_doctrine_step[buttons][next]');
         $form         = $submitButton->form();
 
-        $form['install_doctrine_step[host]']->setValue(getenv('DB_HOST'));
-        $form['install_doctrine_step[port]']->setValue(getenv('DB_PORT'));
-        $form['install_doctrine_step[name]']->setValue(getenv('DB_NAME'));
-        $form['install_doctrine_step[user]']->setValue(getenv('DB_USER'));
-        $form['install_doctrine_step[password]']->setValue(getenv('DB_PASSWD'));
+        $form['install_doctrine_step[host]']->setValue($this->connection->getHost());
+        $form['install_doctrine_step[port]']->setValue($this->connection->getPort());
+        $form['install_doctrine_step[name]']->setValue($this->connection->getDatabase());
+        $form['install_doctrine_step[user]']->setValue($this->connection->getUsername());
+        $form['install_doctrine_step[password]']->setValue($this->connection->getPassword());
         $form['install_doctrine_step[backup_tables]']->setValue('0');
 
         $crawler = $this->client->submit($form);
@@ -91,17 +91,6 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $form['install_user_step[firstname]']->setValue('admin');
         $form['install_user_step[lastname]']->setValue('mautic');
         $form['install_user_step[email]']->setValue('mautic@example.com');
-
-        $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-
-        $submitButton = $crawler->selectButton('install_email_step[buttons][next]');
-        $form         = $submitButton->form();
-
-        $form['install_email_step[mailer_from_name]']->setValue('admin');
-        $form['install_email_step[mailer_from_email]']->setValue('mautic@example.com');
-        $form['install_email_step[mailer_spool_type]']->setValue('memory');
-        $form['install_email_step[mailer_transport]']->setValue('smtp');
 
         $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());

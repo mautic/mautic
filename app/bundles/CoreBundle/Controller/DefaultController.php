@@ -42,14 +42,14 @@ class DefaultController extends CommonController
     /**
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function globalSearchAction()
+    public function globalSearchAction(Request $request)
     {
-        $searchStr = $this->request->get('global_search', $this->get('session')->get('mautic.global_search', ''));
-        $this->get('session')->set('mautic.global_search', $searchStr);
+        $searchStr = $request->get('global_search', $request->getSession()->get('mautic.global_search', ''));
+        $request->getSession()->set('mautic.global_search', $searchStr);
 
         if (!empty($searchStr)) {
-            $event = new GlobalSearchEvent($searchStr, $this->get('translator'));
-            $this->get('event_dispatcher')->dispatch($event, CoreEvents::GLOBAL_SEARCH);
+            $event = new GlobalSearchEvent($searchStr, $this->translator);
+            $this->dispatcher->dispatch($event, CoreEvents::GLOBAL_SEARCH);
             $results = $event->getResults();
         } else {
             $results = [];

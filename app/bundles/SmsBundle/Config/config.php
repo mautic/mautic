@@ -89,6 +89,7 @@ return [
                     'mautic.sms.model.sms',
                     'mautic.sms.broadcast.query',
                     'translator',
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'mautic.sms.broadcast.query' => [
@@ -140,20 +141,6 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \Mautic\SmsBundle\Entity\Stat::class,
-                ],
-            ],
-        ],
-        'controllers' => [
-            'mautic.sms.controller.reply' => [
-                'class'     => \Mautic\SmsBundle\Controller\ReplyController::class,
-                'arguments' => [
-                    'mautic.sms.callback_handler_container',
-                    'mautic.sms.helper.reply',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
                 ],
             ],
         ],

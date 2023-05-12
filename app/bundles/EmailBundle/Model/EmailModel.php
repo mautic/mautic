@@ -49,6 +49,7 @@ use Mautic\PageBundle\Model\TrackableModel;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
 
@@ -358,7 +359,6 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      * {@inheritdoc}
      *
      * @param             $entity
-     * @param             $formFactory
      * @param string|null $action
      * @param array       $options
      *
@@ -366,7 +366,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Email) {
             throw new MethodNotAllowedHttpException(['Email']);
@@ -1010,7 +1010,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $minContactId = null,
         $maxContactId = null,
         $countWithMaxMin = false,
-        $storeToCache = true
+        $storeToCache = true,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         $variantIds = ($includeVariants) ? $email->getRelatedEntityIds() : null;
         $total      = $this->getRepository()->getEmailPendingLeads(
@@ -1021,7 +1023,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $limit,
             $minContactId,
             $maxContactId,
-            $countWithMaxMin
+            $countWithMaxMin,
+            $maxThreads,
+            $threadId
         );
 
         if ($storeToCache) {
@@ -1076,7 +1080,9 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $batch = false,
         OutputInterface $output = null,
         $minContactId = null,
-        $maxContactId = null
+        $maxContactId = null,
+        int $maxThreads = null,
+        int $threadId = null
     ) {
         //get the leads
         if (empty($lists)) {
@@ -1110,7 +1116,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $progress = false;
         if ($batch && $output) {
             $progressCounter = 0;
-            $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false);
+            $totalLeadCount  = $this->getPendingLeads($email, null, true, null, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             if (!$totalLeadCount) {
                 return [0, 0, []];
             }
@@ -1127,7 +1133,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             }
 
             $options['listId'] = $list->getId();
-            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false);
+            $leads             = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
             $leadCount         = count($leads);
 
             while ($leadCount) {
@@ -1156,7 +1162,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
                     }
 
                     // Get the next batch of leads
-                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false);
+                    $leads     = $this->getPendingLeads($email, $list->getId(), false, $limit, true, $minContactId, $maxContactId, false, false, $maxThreads, $threadId);
                     $leadCount = count($leads);
                 } else {
                     $leadCount = 0;
@@ -1885,7 +1891,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $this->addCampaignFilter($q, $campaignId);
         $this->addSegmentFilter($q, $segmentId);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $chart  = new BarChart(array_column($result, 'hour'));
         $counts = array_column($result, 'count');
@@ -2105,7 +2111,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
             $chartQuery->applyDateFilters($q, 'date_read');
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2136,7 +2142,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

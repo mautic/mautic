@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\Test;
 
 use AppKernel;
 use Doctrine\DBAL\DBALException;
-use Doctrine\DBAL\FetchMode;
 use Exception;
 use LogicException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
@@ -14,6 +13,7 @@ use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Psr\Cache\CacheItemPoolInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Client;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Process\Process;
 
 abstract class MauticMysqlTestCase extends AbstractMauticTestCase
@@ -119,6 +119,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
             throw new LogicException('You cannot re-create the client when a transaction rollback for cleanup is enabled. Turn it off using $useCleanupRollback property or avoid re-creating a client.');
         }
 
+        self::ensureKernelShutdown();
         parent::setUpSymfony($defaultConfigOptions);
     }
 
@@ -135,11 +136,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connection = $this->connection;
 
         foreach ($tables as $table) {
-            $connection->query(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
+            $connection->executeQuery(sprintf('ALTER TABLE `%s%s` AUTO_INCREMENT=1', $prefix, $table));
         }
     }
 
-    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): Client
+    protected function createAnotherClient(string $username = 'admin', string $password = 'mautic'): KernelBrowser
     {
         // turn off rollback cleanup as this client creates a separate DB connection
         $this->useCleanupRollback = false;
@@ -164,7 +165,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $prefix = MAUTIC_TABLE_PREFIX;
 
         foreach ($tables as $table) {
-            $this->connection->query("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
+            $this->connection->executeQuery("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE `{$prefix}{$table}`; SET FOREIGN_KEY_CHECKS = 1;");
         }
     }
 
@@ -254,7 +255,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $content .= 'SET FOREIGN_KEY_CHECKS=0;'.PHP_EOL;
 
         $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getDatabase()])
-            ->fetchAll(FetchMode::COLUMN);
+            ->fetchFirstColumn();
 
         foreach ($tables as $table) {
             $content .= sprintf('DELETE FROM %s;'.PHP_EOL, $table);
@@ -320,12 +321,12 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
     private function resetCustomFields(): bool
     {
         $prefix = $this->getTablePrefix();
-        $result = $this->connection->fetchAll(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
+        $result = $this->connection->fetchAllAssociative(sprintf('SELECT alias, object FROM %slead_fields WHERE date_added IS NOT NULL', $prefix));
 
         foreach ($result as $data) {
             $table = 'company' === $data['object'] ? 'companies' : 'leads';
             try {
-                $this->connection->exec(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
+                $this->connection->executeStatement(sprintf('ALTER TABLE %s%s DROP COLUMN %s', $prefix, $table, $data['alias']));
             } catch (Exception $e) {
             }
         }
@@ -365,17 +366,17 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function insertRollbackCheckData(): void
     {
-        $this->connection->exec("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
+        $this->connection->executeStatement("INSERT INTO {$this->getTablePrefix()}ip_addresses (ip_address) VALUES ('127.0.0.1')");
     }
 
     private function wasRollbackSuccessful(): bool
     {
-        return false === $this->connection->fetchColumn("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
+        return false === $this->connection->fetchOne("SELECT 1 FROM {$this->getTablePrefix()}ip_addresses LIMIT 1");
     }
 
     private function getTablePrefix(): string
     {
-        return self::$container->getParameter('mautic.db_table_prefix');
+        return (string) self::$container->getParameter('mautic.db_table_prefix');
     }
 
     private function isDatabasePrepared(): bool
@@ -393,5 +394,21 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $cacheProvider = self::$container->get('mautic.cache.provider');
         \assert($cacheProvider instanceof CacheItemPoolInterface);
         $cacheProvider->clear();
+    }
+
+    /**
+     * Helper method to ensure booleans are strings in HTTP payloads.
+     *
+     * this ensures the payload is compatible with a change in Symfony 5.2
+     *
+     * @see https://github.com/symfony/browser-kit/commit/1d033e7dccc9978dd7a2bde778d06ebbbf196392
+     */
+    protected function generateTypeSafePayload(mixed $payload): mixed
+    {
+        array_walk_recursive($payload, function (&$value) {
+            $value = is_bool($value) ? ($value ? '1' : '0') : $value;
+        });
+
+        return $payload;
     }
 }

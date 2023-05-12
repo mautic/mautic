@@ -112,7 +112,7 @@ class LeadSubscriber implements EventSubscriberInterface
         if (!$event->isEngagementCount()) {
             foreach ($logs['results'] as $log) {
                 $template = (!empty($eventSettings['action'][$log['type']]['timelineTemplate']))
-                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents\Timeline/index.html.twig';
+                    ? $eventSettings['action'][$log['type']]['timelineTemplate'] : '@MauticCampaign/SubscribedEvents/Timeline/index.html.twig';
 
                 $label = $log['event_name'].' / '.$log['campaign_name'];
 

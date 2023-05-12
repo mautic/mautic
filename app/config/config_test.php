@@ -64,25 +64,18 @@ $container->loadFromExtension('swiftmailer', [
     'disable_delivery' => true,
 ]);
 
+$connectionSettings = [
+    'host'     => '%env(DB_HOST)%' ?: '%mautic.db_host%',
+    'port'     => '%env(DB_PORT)%' ?: '%mautic.db_port%',
+    'dbname'   => '%env(DB_NAME)%' ?: '%mautic.db_name%',
+    'user'     => '%env(DB_USER)%' ?: '%mautic.db_user%',
+    'password' => '%env(DB_PASSWD)%' ?: '%mautic.db_password%',
+];
 $container->loadFromExtension('doctrine', [
     'dbal' => [
-        'default_connection' => 'default',
-        'connections'        => [
-            'default' => [
-                'driver'   => 'pdo_mysql',
-                'host'     => getenv('DB_HOST') ?: '%mautic.db_host%',
-                'port'     => getenv('DB_PORT') ?: '%mautic.db_port%',
-                'dbname'   => getenv('DB_NAME') ?: '%mautic.db_name%',
-                'user'     => getenv('DB_USER') ?: '%mautic.db_user%',
-                'password' => getenv('DB_PASSWD') ?: '%mautic.db_password%',
-                'charset'  => 'utf8mb4',
-                // Prevent Doctrine from crapping out with "unsupported type" errors due to it examining all tables in the database and not just Mautic's
-                'mapping_types' => [
-                    'enum'  => 'string',
-                    'point' => 'string',
-                    'bit'   => 'string',
-                ],
-            ],
+        'connections' => [
+            'default'    => $connectionSettings,
+            'unbuffered' => $connectionSettings,
         ],
     ],
 ]);

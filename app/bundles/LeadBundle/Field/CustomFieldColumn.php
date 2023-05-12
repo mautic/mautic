@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Exception\SchemaException;
@@ -73,7 +72,7 @@ class CustomFieldColumn
     /**
      * @throws AbortColumnCreateException
      * @throws CustomFieldLimitException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -135,7 +134,7 @@ class CustomFieldColumn
         try {
             $leadsSchema->executeChanges();
         } catch (DriverException $e) {
-            $this->logger->addWarning($e->getMessage());
+            $this->logger->warning($e->getMessage());
 
             if (1118 === $e->getErrorCode() /* ER_TOO_BIG_ROWSIZE */) {
                 throw new CustomFieldLimitException('mautic.lead.field.max_column_error');

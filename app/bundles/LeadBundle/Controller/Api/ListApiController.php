@@ -7,6 +7,7 @@ use Mautic\LeadBundle\Controller\LeadAccessTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -43,7 +44,7 @@ class ListApiController extends CommonApiController
      * Those fields were moved to 'properties' subarray. We have to ensure BC and remove them
      * from filter root array so Symfony forms would not fail with unknown field error.
      */
-    protected function prepareParametersForBinding($parameters, $entity, $action)
+    protected function prepareParametersForBinding(Request $request, $parameters, $entity, $action)
     {
         if (empty($parameters['filters']) || !is_array($parameters['filters'])) {
             return $parameters;
@@ -128,9 +129,9 @@ class ListApiController extends CommonApiController
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function addLeadsAction($id)
+    public function addLeadsAction(Request $request, $id)
     {
-        $contactIds = $this->request->request->get('ids');
+        $contactIds = $request->request->all()['ids'] ?? null;
         if (null === $contactIds) {
             return $this->returnError('mautic.core.error.badrequest', Response::HTTP_BAD_REQUEST);
         }

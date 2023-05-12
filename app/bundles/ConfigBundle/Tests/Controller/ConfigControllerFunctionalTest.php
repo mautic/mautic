@@ -99,9 +99,9 @@ class ConfigControllerFunctionalTest extends MauticMysqlTestCase
 
     private function getConfigParameters(): array
     {
+        $parameters = [];
         include $this->getConfigPath();
 
-        /* @var array $parameters */
         return $parameters;
     }
 

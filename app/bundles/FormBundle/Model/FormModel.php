@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\FormFieldHelper as ContactFieldHelper;
 use Mautic\LeadBundle\Model\FieldModel as LeadFieldModel;
 use Mautic\LeadBundle\Tracker\ContactTracker;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -151,7 +152,7 @@ class FormModel extends CommonFormModel
     /**
      * {@inheritdoc}
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Form) {
             throw new MethodNotAllowedHttpException(['Form']);
@@ -540,19 +541,20 @@ class FormModel extends CommonFormModel
         $html               = $this->twig->render(
             $formToRender,
             [
-                'fieldSettings'  => $this->getCustomComponents()['fields'],
-                'viewOnlyFields' => $viewOnlyFields,
-                'fields'         => $fields,
-                'mappedFields'   => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
-                'form'           => $entity,
-                'theme'          => '@themes/'.$entity->getTemplate().'/Field/',
-                'submissions'    => $submissions,
-                'lead'           => $lead,
-                'formPages'      => $pages,
-                'lastFormPage'   => $lastPage,
-                'style'          => $style,
-                'inBuilder'      => false,
-                'displayManager' => $displayManager,
+                'fieldSettings'          => $this->getCustomComponents()['fields'],
+                'viewOnlyFields'         => $viewOnlyFields,
+                'fields'                 => $fields,
+                'mappedFields'           => $this->mappedObjectCollector->buildCollection(...$entity->getMappedFieldObjects()),
+                'form'                   => $entity,
+                'theme'                  => '@themes/'.$entity->getTemplate().'/Field/',
+                'submissions'            => $submissions,
+                'lead'                   => $lead,
+                'formPages'              => $pages,
+                'lastFormPage'           => $lastPage,
+                'style'                  => $style,
+                'inBuilder'              => false,
+                'displayManager'         => $displayManager,
+                'successfulSubmitAction' => $this->coreParametersHelper->get('successful_submit_action'),
             ]
         );
 
@@ -968,7 +970,7 @@ class FormModel extends CommonFormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

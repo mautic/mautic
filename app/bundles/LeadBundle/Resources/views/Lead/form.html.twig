@@ -187,7 +187,7 @@
                                   <div class="form-group mb-0">
                                       <div class="row">
                                           {% for alias, field in groupFields %}
-                                              {% if 'company' != alias or form[alias] is defined or not form[alias].isRendered %}
+                                              {% if 'company' != alias and form[alias] is defined and not form[alias].isRendered %}
                                                   <div class="col-sm-8">
                                                       {{ form_row(form[alias]) }}
                                                   </div>

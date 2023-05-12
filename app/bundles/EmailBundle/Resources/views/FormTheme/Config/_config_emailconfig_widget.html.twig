@@ -162,6 +162,7 @@
             {{ _self.row_if_exists(fields, 'mailer_append_tracking_pixel') }}
             {{ _self.row_if_exists(fields, 'mailer_convert_embed_images') }}
             {{ _self.row_if_exists(fields, 'disable_trackable_urls') }}
+            {{ _self.row_if_exists(fields, 'minify_email_html') }}
         </div>
     </div>
 </div>
@@ -173,10 +174,6 @@
     <div class="panel-body">
         <div class="row">
             {{ _self.row_if_exists(fields, 'unsubscribe_text') }}
-        </div>
-        <div class="row">
-            {{ _self.row_if_exists(fields, 'unsubscribe_message') }}
-            {{ _self.row_if_exists(fields, 'resubscribe_message') }}
         </div>
         <div class="row">
             {{ _self.row_if_exists(fields, 'unsubscribe_message') }}

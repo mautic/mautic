@@ -14,6 +14,7 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\Form\Type\WidgetType;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -261,16 +262,15 @@ class DashboardModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Widget                              $entity
-     * @param \Symfony\Component\Form\FormFactory $formFactory
-     * @param string|null                         $action
-     * @param array                               $options
+     * @param Widget      $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Widget) {
             throw new MethodNotAllowedHttpException(['Widget'], 'Entity must be of class Widget()');

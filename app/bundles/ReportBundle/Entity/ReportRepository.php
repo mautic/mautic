@@ -122,7 +122,7 @@ class ReportRepository extends CommonRepository
         $qb->select('r.id, r.name, r.graphs')
             ->from(MAUTIC_TABLE_PREFIX.'reports', 'r')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->isNotNull('r.graphs'),
                     $qb->expr()->neq('r.graphs', $qb->expr()->literal('a:0:{}')),
                     $qb->expr()->eq('r.is_published', ':true')
@@ -138,6 +138,6 @@ class ReportRepository extends CommonRepository
 
         $qb->orderBy('r.name');
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

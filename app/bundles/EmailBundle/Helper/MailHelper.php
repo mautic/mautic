@@ -6,11 +6,13 @@ use Doctrine\ORM\ORMException;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\EmojiHelper;
+use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Exception\PartialEmailSendFailure;
+use Mautic\EmailBundle\Form\Type\ConfigType;
 use Mautic\EmailBundle\Swiftmailer\Exception\BatchQueueMaxException;
 use Mautic\EmailBundle\Swiftmailer\Message\MauticMessage;
 use Mautic\EmailBundle\Swiftmailer\Transport\SpoolTransport;
@@ -42,7 +44,7 @@ class MailHelper
     /**
      * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var null
@@ -885,11 +887,11 @@ class MailHelper
      */
     public function setTemplate($template, $vars = [], $returnContent = false, $charset = null)
     {
-        if (null == $this->templating) {
-            $this->templating = $this->factory->getTemplating();
+        if (null == $this->twig) {
+            $this->twig = $this->factory->getTwig();
         }
 
-        $content = $this->templating->render($template, $vars);
+        $content = $this->twig->render($template, $vars);
 
         unset($vars);
 
@@ -1083,8 +1085,8 @@ class MailHelper
     /**
      * Add to address.
      *
-     * @param string $address
-     * @param null   $name
+     * @param string      $address
+     * @param string|null $name
      *
      * @return bool
      */
@@ -1375,6 +1377,10 @@ class MailHelper
      */
     public function setEmail(Email $email, $allowBcc = true, $slots = [], $assetAttachments = [], $ignoreTrackingPixel = false)
     {
+        if ($this->factory->getParameter(ConfigType::MINIFY_EMAIL_HTML)) {
+            $email->setCustomHtml(InputHelper::minifyHTML($email->getCustomHtml()));
+        }
+
         $this->email = $email;
 
         $subject = $email->getSubject();
@@ -2044,7 +2050,7 @@ class MailHelper
      */
     public function processSlots($slots, $entity)
     {
-        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        /** @var \Mautic\CoreBundle\Twig\Helper\SlotsHelper $slotsHelper */
         $slotsHelper = $this->factory->getHelper('template.slots');
 
         $content = $entity->getContent();

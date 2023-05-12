@@ -37,10 +37,10 @@ class UrlHelper
             if (200 === $response->getStatusCode()) {
                 return rtrim($response->getBody());
             } else {
-                $this->logger->addWarning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
+                $this->logger->warning("Url shortner failed with code {$response->getStatusCode()}: {$response->getBody()}");
             }
         } catch (\Exception $exception) {
-            $this->logger->addError(
+            $this->logger->error(
                 $exception->getMessage(),
                 ['exception' => $exception]
             );
@@ -99,7 +99,6 @@ class UrlHelper
         $host   = isset($host) ? $host : $_SERVER['SERVER_NAME'].$port;
         $base   = "$scheme://$host".$_SERVER['REQUEST_URI'];
 
-        $base = str_replace('/index_dev.php', '', $base);
         $base = str_replace('/index.php', '', $base);
 
         /* return if already absolute URL */
