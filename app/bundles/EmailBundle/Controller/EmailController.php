@@ -757,7 +757,7 @@ class EmailController extends FormController
                         ]
                     )
                 );
-            } elseif ($valid && $form->get('buttons')->get('apply')->isClicked()) {
+            } elseif ($valid && $this->getFormButton($form, ['buttons', 'apply'])->isClicked()) {
                 // Rebuild the form in the case apply is clicked so that DEC content is properly populated if all were removed
                 $form = $model->createForm($entity, $this->formFactory, $action, ['update_select' => $updateSelect]);
             }
