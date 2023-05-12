@@ -1,6 +1,6 @@
 // import ContentService from '../../../../../../../grapesjs-preset-mautic/src/content.service';
-import MjmlService from 'grapesjs-preset-mautic/dist/mjml/mjml.service';
-import ContentService from 'grapesjs-preset-mautic/dist/content.service';
+import MjmlService from "grapesjs-preset-mautic/dist/mjml/mjml.service";
+import ContentService from "grapesjs-preset-mautic/dist/content.service";
 
 class CodeEditor {
   editor;
@@ -21,12 +21,12 @@ class CodeEditor {
 
   // Build codeEditor (CodeMirror instance)
   buildCodeEditor() {
-    const codeEditor = this.editor.CodeManager.getViewer('CodeMirror').clone();
+    const codeEditor = this.editor.CodeManager.getViewer("CodeMirror").clone();
 
     codeEditor.set({
-      codeName: 'htmlmixed',
+      codeName: "htmlmixed",
       readOnly: false,
-      theme: 'hopscotch',
+      theme: "hopscotch",
       autoBeautify: true,
       autoCloseTags: true,
       autoCloseBrackets: true,
@@ -43,16 +43,18 @@ class CodeEditor {
   buildCodePopup() {
     const cfg = this.editor.getConfig();
 
-    const codePopup = document.createElement('div');
-    const btnEdit = document.createElement('button');
-    const btnCancel = document.createElement('button');
-    const textarea = document.createElement('textarea');
+    const codePopup = document.createElement("div");
+    const btnEdit = document.createElement("button");
+    const btnCancel = document.createElement("button");
+    const textarea = document.createElement("textarea");
 
-    btnEdit.innerHTML = Mautic.translate('grapesjsbuilder.sourceEditBtnLabel');
+    btnEdit.innerHTML = Mautic.translate("grapesjsbuilder.sourceEditBtnLabel");
     btnEdit.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-code-edit`;
     btnEdit.onclick = this.updateCode.bind(this);
 
-    btnCancel.innerHTML = Mautic.translate('grapesjsbuilder.sourceCancelBtnLabel');
+    btnCancel.innerHTML = Mautic.translate(
+      "grapesjsbuilder.sourceCancelBtnLabel"
+    );
     btnCancel.className = `${cfg.stylePrefix}btn-prim ${cfg.stylePrefix}btn-code-cancel`;
     btnCancel.onclick = this.cancelCode.bind(this);
 
@@ -71,10 +73,12 @@ class CodeEditor {
     // this.codeEditor.editor.refresh();
     // editor.Modal.setContent('');
     editor.Modal.setContent(this.codePopup);
-    editor.Modal.setTitle(Mautic.translate('grapesjsbuilder.sourceEditModalTitle'));
+    editor.Modal.setTitle(
+      Mautic.translate("grapesjsbuilder.sourceEditModalTitle")
+    );
     editor.Modal.open();
 
-    editor.Modal.onceClose(() => editor.stopCommand('preset-mautic:code-edit'));
+    editor.Modal.onceClose(() => editor.stopCommand("preset-mautic:code-edit"));
   }
 
   /**
@@ -91,11 +95,15 @@ class CodeEditor {
 
     try {
       // delete canvas and set new content
-      this.editor.DomComponents.getWrapper().set('content', '');
+      this.editor.DomComponents.getWrapper().set("content", "");
       this.editor.setComponents(code.trim());
       this.editor.Modal.close();
     } catch (e) {
-      window.alert(`${Mautic.translate('grapesjsbuilder.sourceSyntaxError')} \n${e.message}`);
+      window.alert(
+        `${Mautic.translate("grapesjsbuilder.sourceSyntaxError")} \n${
+          e.message
+        }`
+      );
     }
   }
 

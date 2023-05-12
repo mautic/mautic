@@ -8,18 +8,19 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\EmojiHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
-use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
-use Mautic\CoreBundle\Twig\Helper\SlotsHelper;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Response;
 
 class GrapesJsController extends CommonController
 {
-    public const OBJECT_TYPE = ['email', 'page'];
+    const OBJECT_TYPE = ['email', 'page'];
+
+    /**
+     * @var Logger
+     */
+    private $logger;
 
     /**
      * Activate the custom builder.
@@ -29,19 +30,12 @@ class GrapesJsController extends CommonController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function builderAction(
-            Request $request,
-            LoggerInterface $mauticLogger,
-            ThemeHelper $themeHelper,
-            SlotsHelper $slotsHelper,
-            AssetsHelper $assetsHelper,
-            FormFactoryInterface $formFactory,
-            $objectType,
-            $objectId
-    ) {
+    public function builderAction($objectType, $objectId)
+    {
         if (!in_array($objectType, self::OBJECT_TYPE)) {
             throw new \Exception('Object not authorized to load custom builder', Response::HTTP_CONFLICT);
         }
+        $this->logger     = $this->get('monolog.logger.mautic');
 
         /** @var \Mautic\EmailBundle\Model\EmailModel|\Mautic\PageBundle\Model\PageModel $model */
         $model      = $this->getModel($objectType);
@@ -55,7 +49,7 @@ class GrapesJsController extends CommonController
         if (false !== strpos($objectId, 'new')) {
             $isNew = true;
 
-            if (!$this->security->isGranted($aclToCheck.'create')) {
+            if (!$this->get('mautic.security')->isGranted($aclToCheck.'create')) {
                 return $this->accessDenied();
             }
 
@@ -68,7 +62,7 @@ class GrapesJsController extends CommonController
             $isNew  = false;
 
             if (null == $entity
-                || !$this->security->hasEntityAccess(
+                || !$this->get('mautic.security')->hasEntityAccess(
                     $aclToCheck.'viewown',
                     $aclToCheck.'viewother',
                     $entity->getCreatedBy()
@@ -80,14 +74,16 @@ class GrapesJsController extends CommonController
 
         $slots        = [];
         $type         = 'html';
-        $template     = InputHelper::clean($request->query->get('template'));
+        $template     = InputHelper::clean($this->request->query->get('template'));
         if (!$template) {
-            $mauticLogger->warning('Grapesjs: no template in query');
+            $this->logger->warn('Grapesjs: no template in query');
 
             return $this->json(false);
         }
-        $templateName = '@themes/'.$template.'/html/'.$objectType;
+        $templateName = ':'.$template.':'.$objectType;
         $content      = $entity->getContent();
+        /** @var ThemeHelper $themeHelper */
+        $themeHelper  = $this->get('mautic.helper.theme');
 
         // Check for MJML template
         // @deprecated - use mjml directly in email.html.twig
@@ -98,7 +94,7 @@ class GrapesJsController extends CommonController
             $slots       = $themeHelper->getTheme($template)->getSlots($objectType);
 
             //merge any existing changes
-            $newContent = $request->getSession()->get('mautic.'.$objectType.'builder.'.$objectId.'.content', []);
+            $newContent = $this->get('session')->get('mautic.'.$objectType.'builder.'.$objectId.'.content', []);
 
             if (is_array($newContent)) {
                 $content = array_merge($content, $newContent);
@@ -107,9 +103,9 @@ class GrapesJsController extends CommonController
             }
 
             if ('page' === $objectType) {
-                $this->processPageSlots($assetsHelper, $slotsHelper, $formFactory, $slots, $entity);
+                $this->processPageSlots($slots, $entity);
             } else {
-                $this->processEmailSlots($slotsHelper, $slots, $entity);
+                $this->processEmailSlots($slots, $entity);
             }
         }
 
@@ -124,7 +120,7 @@ class GrapesJsController extends CommonController
                 'content'   => $content,
                 $objectType => $entity,
                 'template'  => $template,
-                'basePath'  => $request->getBasePath(),
+                'basePath'  => $this->request->getBasePath(),
             ]
         );
 
@@ -136,7 +132,7 @@ class GrapesJsController extends CommonController
         $renderedTemplateMjml = ('mjml' === $type) ? $renderedTemplate : '';
 
         return $this->render(
-            '@GrapesJsBuilder/Builder/template.html.twig',
+            'GrapesJsBuilderBundle:Builder:template.html.php',
             [
                 'templateHtml' => $renderedTemplateHtml,
                 'templateMjml' => $renderedTemplateMjml,
@@ -150,9 +146,11 @@ class GrapesJsController extends CommonController
      * @param array $slots
      * @param Email $entity
      */
-    private function processEmailSlots(SlotsHelper $slotsHelper, $slots, $entity)
+    private function processEmailSlots($slots, $entity)
     {
-        $content = $entity->getContent();
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('templating.helper.slots');
+        $content     = $entity->getContent();
 
         //Set the slots
         foreach ($slots as $slot => $slotConfig) {
@@ -179,8 +177,14 @@ class GrapesJsController extends CommonController
      * @param array $slots
      * @param Page  $entity
      */
-    private function processPageSlots(AssetsHelper $assetsHelper, SlotsHelper $slotsHelper, FormFactoryInterface $formFactory, $slots, $entity)
+    private function processPageSlots($slots, $entity)
     {
+        /** @var \Mautic\CoreBundle\Templating\Helper\AssetsHelper $assetsHelper */
+        $assetsHelper = $this->get('templating.helper.assets');
+        /** @var \Mautic\CoreBundle\Templating\Helper\SlotsHelper $slotsHelper */
+        $slotsHelper = $this->get('templating.helper.slots');
+        $formFactory = $this->get('form.factory');
+
         $slotsHelper->inBuilder(true);
 
         $content = $entity->getContent();
@@ -249,7 +253,7 @@ class GrapesJsController extends CommonController
 
                 // create config form
                 $options['configForm'] = $formFactory->createNamedBuilder(
-                    '',
+                    null,
                     'slideshow_config',
                     [],
                     ['data' => $options]
@@ -260,12 +264,19 @@ class GrapesJsController extends CommonController
                     $slide['key']  = $key;
                     $slide['slot'] = $slot;
                     $slide['form'] = $formFactory->createNamedBuilder(
-                        '',
+                        null,
                         'slideshow_slide_config',
                         [],
                         ['data' => $slide]
                     )->getForm()->createView();
                 }
+
+                $renderingEngine = $this->get('templating');
+
+                if (method_exists($renderingEngine, 'getEngine')) {
+                    $renderingEngine->getEngine('MauticPageBundle:Page:Slots/slideshow.html.php');
+                }
+                $slotsHelper->set($slot, $renderingEngine->render('MauticPageBundle:Page:Slots/slideshow.html.php', $options));
             } else {
                 $slotsHelper->set($slot, "<div data-slot=\"text\" id=\"slot-{$slot}\">{$value}</div>");
             }
@@ -277,15 +288,19 @@ class GrapesJsController extends CommonController
         $slotsHelper->stop();
     }
 
-    /**
-     * @deprecated deprecated since version 5.0 - use mjml directly in email.html.twig
-     */
     private function checkForMjmlTemplate($template)
     {
-        $twig = $this->get('twig');
+        $templatingHelper = $this->get('mautic.helper.templating');
 
-        if ($twig->getLoader()->exists($template)) {
-            return $template;
+        $parser     = $templatingHelper->getTemplateNameParser();
+        $templating = $templatingHelper->getTemplating();
+        $template   = $parser->parse($template);
+
+        $twigTemplate = clone $template;
+        $twigTemplate->set('engine', 'twig');
+
+        if ($templating->exists($twigTemplate)) {
+            return $twigTemplate->getLogicalName();
         }
 
         return null;

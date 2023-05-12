@@ -207,11 +207,11 @@ html {
 }
 
 .gjs-f-button::before {
-  content: 'B';
+  content: "B";
 }
 
 .gjs-f-divider::before {
-  content: 'D';
+  content: "D";
 }
 
 .gjs-mdl-dialog-sm {

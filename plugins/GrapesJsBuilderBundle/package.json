@@ -51,5 +51,8 @@
     "parcel-bundler": "^1.12.4",
     "prettier": "^2.5.1",
     "sass": "^1.48.0"
+  },
+  "overrides": {
+    "ckeditor": "npm:ckeditor4@^4.20.2"
   }
 }

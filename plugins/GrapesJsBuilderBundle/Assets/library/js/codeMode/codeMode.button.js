@@ -1,4 +1,4 @@
-import CodeModeCommand from './codeMode.command';
+import CodeModeCommand from "./codeMode.command";
 
 export default class CodeModeButton {
   editor;
@@ -8,18 +8,18 @@ export default class CodeModeButton {
    */
   constructor(editor) {
     if (!editor) {
-      throw new Error('no editor');
+      throw new Error("no editor");
     }
     this.editor = editor;
   }
 
   addButton() {
-    this.editor.Panels.addButton('options', [
+    this.editor.Panels.addButton("options", [
       {
-        id: 'code-edit',
-        className: 'fa fa-edit',
+        id: "code-edit",
+        className: "fa fa-edit",
         attributes: {
-          title: Mautic.translate('grapesjsbuilder.sourceEditModalTitle'),
+          title: Mautic.translate("grapesjsbuilder.sourceEditModalTitle"),
         },
         command: CodeModeCommand.name,
       },

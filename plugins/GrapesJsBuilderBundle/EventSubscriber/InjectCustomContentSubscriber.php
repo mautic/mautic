@@ -6,14 +6,16 @@ namespace MauticPlugin\GrapesJsBuilderBundle\EventSubscriber;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
+use Mautic\CoreBundle\Helper\TemplatingHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\EmailBundle\Entity\Email;
 use MauticPlugin\GrapesJsBuilderBundle\Entity\GrapesJsBuilder;
+use MauticPlugin\GrapesJsBuilderBundle\Helper\FileManager;
 use MauticPlugin\GrapesJsBuilderBundle\Integration\Config;
 use MauticPlugin\GrapesJsBuilderBundle\Model\GrapesJsBuilderModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
-use Twig\Environment;
 
 class InjectCustomContentSubscriber implements EventSubscriberInterface
 {
@@ -28,9 +30,14 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
     private $grapesJsBuilderModel;
 
     /**
-     * @var Environment
+     * @var FileManager
      */
-    private $twig;
+    private $fileManager;
+
+    /**
+     * @var TemplatingHelper
+     */
+    private $templatingHelper;
 
     /**
      * @var RequestStack
@@ -42,16 +49,21 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
      */
     private $router;
 
+    /** @var CorePermissions */
+    private $permissions;
+
     /**
      * InjectCustomContentSubscriber constructor.
      */
-    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, Environment $twig, RequestStack $requestStack, RouterInterface $router)
+    public function __construct(Config $config, GrapesJsBuilderModel $grapesJsBuilderModel, FileManager $fileManager, TemplatingHelper $templatingHelper, RequestStack $requestStack, RouterInterface $router, CorePermissions $permissions)
     {
         $this->config               = $config;
         $this->grapesJsBuilderModel = $grapesJsBuilderModel;
-        $this->twig                 = $twig;
+        $this->fileManager          = $fileManager;
+        $this->templatingHelper     = $templatingHelper;
         $this->requestStack         = $requestStack;
         $this->router               = $router;
+        $this->permissions          = $permissions;
     }
 
     public static function getSubscribedEvents()
@@ -69,6 +81,21 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
 
         $passParams = [];
         $parameters = $customContentEvent->getVars();
+
+        $shouldSendGrapeJSFiles = false;
+        $allowedGrapeJSPaths    = [
+            '/s/emails/edit',
+            '/s/emails/new',
+            '/s/pages/edit',
+            '/s/pages/new',
+        ];
+
+        foreach ($allowedGrapeJSPaths as $path) {
+            if (false !== strpos($this->requestStack->getCurrentRequest()->getRequestUri(), $path)) {
+                $shouldSendGrapeJSFiles = true;
+                break;
+            }
+        }
 
         if ('email.settings.advanced' === $customContentEvent->getContext()) {
             // Inject MJML form within mail page
@@ -97,20 +124,22 @@ class InjectCustomContentSubscriber implements EventSubscriberInterface
                     $passParams['customMjml'] = $grapesJsBuilder->getCustomMjml();
                 }
             }
-            $content = $this->twig->render(
-                '@GrapesJsBuilder/Setting/fields.html.twig',
+            $content = $this->templatingHelper->getTemplating()->render(
+                'GrapesJsBuilderBundle:Setting:fields.html.php',
                 $passParams
             );
 
             $customContentEvent->addContent($content);
-        } elseif ('page.header.left' === $customContentEvent->getContext()) {
-            // Inject fileManager URL
-            $passParams['dataAssets'] = $this->router->generate('grapesjsbuilder_assets', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-            $passParams['dataUpload'] = $this->router->generate('grapesjsbuilder_upload', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
-            $passParams['dataDelete'] = $this->router->generate('grapesjsbuilder_delete', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL);
+        } elseif ('page.header.left' === $customContentEvent->getContext() && $shouldSendGrapeJSFiles) {
+            // Inject fileManager URLs
+            $passParams['dataAssets']       = $this->router->generate('grapesjsbuilder_assets', [], true);
+            $passParams['dataUpload']       = $this->router->generate('grapesjsbuilder_upload', [], true);
+            $passParams['dataDelete']       = $this->router->generate('grapesjsbuilder_delete', [], true);
+            $passParams['newDirectory']     = $this->router->generate('grapesjsbuilder_newDirectory', [], true);
+            $passParams['canManageFolders'] = $this->permissions->isGranted('asset:folders:manage');
 
-            $content = $this->twig->render(
-                '@GrapesJsBuilder/Setting/vars.html.twig',
+            $content = $this->templatingHelper->getTemplating()->render(
+                'GrapesJsBuilderBundle:Setting:vars.html.php',
                 $passParams
             );
 

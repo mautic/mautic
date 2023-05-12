@@ -9,21 +9,25 @@ return [
     'author'      => 'Mautic Community',
     'routes'      => [
         'main'   => [
+            'grapesjsbuilder_assets' => [
+                'path'       => '/grapesjsbuilder/assets',
+                'controller' => 'GrapesJsBuilderBundle:FileManager:assets',
+            ],
             'grapesjsbuilder_upload' => [
                 'path'       => '/grapesjsbuilder/upload',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::uploadAction',
+                'controller' => 'GrapesJsBuilderBundle:FileManager:upload',
             ],
             'grapesjsbuilder_delete' => [
                 'path'       => '/grapesjsbuilder/delete',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::deleteAction',
+                'controller' => 'GrapesJsBuilderBundle:FileManager:delete',
             ],
-            'grapesjsbuilder_assets' => [
-                'path'       => '/grapesjsbuilder/assets',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\FileManagerController::assetsAction',
+            'grapesjsbuilder_newDirectory' => [
+                'path'       => '/grapesjsbuilder/newDirectory',
+                'controller' => 'GrapesJsBuilderBundle:FileManager:newDirectory',
             ],
             'grapesjsbuilder_builder' => [
                 'path'       => '/grapesjsbuilder/{objectType}/{objectId}',
-                'controller' => 'MauticPlugin\GrapesJsBuilderBundle\Controller\GrapesJsController::builderAction',
+                'controller' => 'GrapesJsBuilderBundle:GrapesJs:builder',
             ],
         ],
         'public' => [],
@@ -81,6 +85,34 @@ return [
                     'mautic.helper.file_uploader',
                     'mautic.helper.core_parameters',
                     'mautic.helper.paths',
+                ],
+            ],
+        ],
+        'events'  => [
+            'grapesjsbuilder.event.assets.subscriber' => [
+                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\AssetsSubscriber::class,
+                'arguments' => [
+                    'grapesjsbuilder.config',
+                    'mautic.install.service',
+                ],
+            ],
+            'grapesjsbuilder.event.email.subscriber' => [
+                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\EmailSubscriber::class,
+                'arguments' => [
+                    'grapesjsbuilder.config',
+                    'grapesjsbuilder.model',
+                ],
+            ],
+            'grapesjsbuilder.event.content.subscriber' => [
+                'class'     => \MauticPlugin\GrapesJsBuilderBundle\EventSubscriber\InjectCustomContentSubscriber::class,
+                'arguments' => [
+                    'grapesjsbuilder.config',
+                    'grapesjsbuilder.model',
+                    'grapesjsbuilder.helper.filemanager',
+                    'mautic.helper.templating',
+                    'request_stack',
+                    'router',
+                    'mautic.security',
                 ],
             ],
         ],
