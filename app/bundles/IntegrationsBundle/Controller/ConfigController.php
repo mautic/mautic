@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\IntegrationsBundle\Controller;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Twig\Extension\FormExtension;
 use Mautic\IntegrationsBundle\Event\ConfigSaveEvent;
 use Mautic\IntegrationsBundle\Event\FormLoadEvent;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
@@ -54,6 +55,7 @@ class ConfigController extends AbstractFormController
         EventDispatcherInterface $dispatcher,
         FieldValidationHelper $fieldValidator,
         FormFactoryInterface $formFactory,
+        FormExtension $formExtension,
         string $integration
     ) {
         // Check ACL
@@ -75,7 +77,7 @@ class ConfigController extends AbstractFormController
         $form = $this->getForm($formFactory);
 
         if (Request::METHOD_POST === $request->getMethod()) {
-            return $this->submitForm($request, $integrationsHelper, $fieldValidator, $dispatcher, $formFactory, $form);
+            return $this->submitForm($request, $integrationsHelper, $fieldValidator, $dispatcher, $formFactory, $formExtension, $form);
         }
 
         // Clear the session of previously stored fields in case it got stuck
@@ -83,7 +85,7 @@ class ConfigController extends AbstractFormController
         $session = $request->getSession();
         $session->remove("$integration-fields");
 
-        return $this->showForm($request, $form);
+        return $this->showForm($request, $form, $formExtension);
     }
 
     /**
@@ -97,6 +99,7 @@ class ConfigController extends AbstractFormController
         FieldValidationHelper $fieldValidator,
         EventDispatcherInterface $eventDispatcher,
         FormFactoryInterface $formFactory,
+        FormExtension $formExtension,
         FormInterface $form
     ) {
         if ($this->isFormCancelled($form)) {
@@ -136,7 +139,7 @@ class ConfigController extends AbstractFormController
         $integrationDetailsPost = $request->request->get('integration_details') ?? [];
         $authorize              = !empty($integrationDetailsPost['in_auth']);
         if ($form->isSubmitted() && !$form->isValid() && ($this->integrationConfiguration->getIsPublished() || $authorize)) {
-            return $this->showForm($request, $form);
+            return $this->showForm($request, $form, $formExtension);
         }
 
         // Save the integration configuration
@@ -151,7 +154,7 @@ class ConfigController extends AbstractFormController
             $this->resetFieldsInSession($request);
             $form = $this->getForm($formFactory);
 
-            return $this->showForm($request, $form);
+            return $this->showForm($request, $form, $formExtension);
         }
 
         // Otherwise close the modal
@@ -178,11 +181,10 @@ class ConfigController extends AbstractFormController
      *
      * @return JsonResponse|Response
      */
-    private function showForm(Request $request, FormInterface $form)
+    private function showForm(Request $request, FormInterface $form, FormExtension $formExtension)
     {
         $integrationObject = $this->integrationObject;
         $formView          = $form->createView();
-        $formHelper        = $this->get('twig.helper.form');
 
         $showFeaturesTab = $integrationObject instanceof ConfigFormFeaturesInterface ||
             $integrationObject instanceof ConfigFormSyncInterface ||
@@ -190,13 +192,13 @@ class ConfigController extends AbstractFormController
 
         $hasFeatureErrors = (
                 $integrationObject instanceof ConfigFormFeatureSettingsInterface &&
-                $formHelper->containsErrors($formView['featureSettings']['integration'])
+                $formExtension->containsErrors($formView['featureSettings']['integration'])
             ) || (
                 isset($formView['featureSettings']['sync']['integration']) &&
-                $formHelper->containsErrors($formView['featureSettings']['sync']['integration'])
+                $formExtension->containsErrors($formView['featureSettings']['sync']['integration'])
             );
 
-        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formHelper->containsErrors($formView['apiKeys']);
+        $hasAuthErrors = $integrationObject instanceof ConfigFormAuthInterface && $formExtension->containsErrors($formView['apiKeys']);
 
         $useSyncFeatures = $integrationObject instanceof ConfigFormSyncInterface;
 

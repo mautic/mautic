@@ -75,7 +75,7 @@ class SegmentLogReportSubscriberTest extends TestCase
         $mockQueryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['from', 'andWhere', 'leftJoin', 'expr', 'setParameter', 'groupBy'])
-            ->addMethods(['orX', 'isNotNull'])
+            ->addMethods(['or', 'isNotNull'])
             ->getMock();
 
         $mockQueryBuilder->expects($this->once())
@@ -99,7 +99,7 @@ class SegmentLogReportSubscriberTest extends TestCase
             ->willReturn($mockQueryBuilder);
 
         $mockQueryBuilder->expects($this->exactly(1))
-            ->method('orX')
+            ->method('or')
             ->willReturn($mockQueryBuilder);
 
         $mockQueryBuilder->expects($this->exactly(2))

@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Exception;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -148,7 +147,7 @@ class ListModel extends FormModel
      *
      * @return mixed|void
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function saveEntity($entity, $unlock = true)
     {

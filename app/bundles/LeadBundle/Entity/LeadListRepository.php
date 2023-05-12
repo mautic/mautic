@@ -365,45 +365,37 @@ class LeadListRepository extends CommonRepository
     protected function createFilterExpressionSubQuery($table, $alias, $column, $value, array &$parameters, $leadId = null, array $subQueryFilters = [])
     {
         $subQb   = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $subExpr = $subQb->expr()->andX();
+        $subExpr = [];
+
+        foreach ($subQueryFilters as $subColumn => $subParameter) {
+            $subExpr[] = $subQb->expr()->eq($subColumn, ":$subParameter");
+        }
 
         if ('leads' !== $table) {
-            $subExpr->add(
-                $subQb->expr()->eq($alias.'.lead_id', 'l.id')
-            );
+            $subExpr[] = $subQb->expr()->eq($alias.'.lead_id', 'l.id');
         }
 
         // Specific lead
         if (!empty($leadId)) {
             $columnName = ('leads' === $table) ? 'id' : 'lead_id';
-            $subExpr->add(
-                $subQb->expr()->eq($alias.'.'.$columnName, $leadId)
-            );
-        }
-
-        foreach ($subQueryFilters as $subColumn => $subParameter) {
-            $subExpr->add(
-                $subQb->expr()->eq($subColumn, ":$subParameter")
-            );
+            $subExpr[]  = $subQb->expr()->eq($alias.'.'.$columnName, $leadId);
         }
 
         if (null !== $value && !empty($column)) {
             $subFilterParamter = $this->generateRandomParameterName();
             $subFunc           = 'eq';
             if (is_array($value)) {
-                $subFunc = 'in';
-                $subExpr->add(
-                    $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter")
-                );
+                $subFunc                        = 'in';
+                $subExpr[]                      = $subQb->expr()->in(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
                 $parameters[$subFilterParamter] = ['value' => $value, 'type' => \Doctrine\DBAL\Connection::PARAM_STR_ARRAY];
             } else {
                 $parameters[$subFilterParamter] = $value;
             }
 
-            $subExpr->add(
-                $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter")
-            );
+            $subExpr = $subQb->expr()->$subFunc(sprintf('%s.%s', $alias, $column), ":$subFilterParamter");
         }
+
+        $subQb->expr()->and(...$subExpr);
 
         $subQb->select('null')
             ->from(MAUTIC_TABLE_PREFIX.$table, $alias)

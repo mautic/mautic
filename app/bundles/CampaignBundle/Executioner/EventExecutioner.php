@@ -511,7 +511,7 @@ class EventExecutioner
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws \Doctrine\ORM\OptimisticLockException
      */
     public function persistSummaries(): void

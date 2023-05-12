@@ -45,6 +45,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE

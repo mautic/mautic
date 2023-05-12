@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -152,7 +151,7 @@ class FieldController extends FormController
                         try {
                             //form is valid so process the data
                             $model->saveEntity($field);
-                        } catch (DBALException $ee) {
+                        } catch (\Doctrine\DBAL\Exception $ee) {
                             $flashMessage = $ee->getMessage();
                         } catch (AbortColumnCreateException $e) {
                             $flashMessage = $this->translator->trans('mautic.lead.field.pushed_to_background');

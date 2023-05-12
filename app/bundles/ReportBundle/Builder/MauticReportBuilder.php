@@ -3,6 +3,7 @@
 namespace Mautic\ReportBundle\Builder;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -371,7 +372,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
     {
         $expr      = $queryBuilder->expr();
         $groups    = [];
-        $groupExpr = $queryBuilder->expr()->andX();
+        $groupExpr = CompositeExpression::and('');
 
         if (count($filters)) {
             foreach ($filters as $i => $filter) {
@@ -381,48 +382,48 @@ final class MauticReportBuilder implements ReportBuilderInterface
                 if (array_key_exists('glue', $filter) && 'or' === $filter['glue']) {
                     if ($groupExpr->count()) {
                         $groups[]  = $groupExpr;
-                        $groupExpr = $queryBuilder->expr()->andX();
+                        $groupExpr = CompositeExpression::and('');
                     }
                 }
 
                 if ('tag' === $filter['column']) {
-                    $event->applyTagFilter($groupExpr, $filter);
+                    $groupExpr = $event->applyTagFilter($groupExpr, $filter);
                     continue;
                 }
 
                 switch ($exprFunction) {
                     case 'notEmpty':
-                        $groupExpr->add(
+                        $groupExpr = $groupExpr->with(
                             $expr->isNotNull($filter['column'])
                         );
                         if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
-                            $groupExpr->add(
+                            $groupExpr = $groupExpr->with(
                                 $expr->neq($filter['column'], $expr->literal(''))
                             );
                         }
                         break;
                     case 'empty':
-                        $expression = $queryBuilder->expr()->orX(
+                        $expression = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column'])
                         );
                         if ($this->doesColumnSupportEmptyValue($filter, $filterDefinitions)) {
-                            $expression->add(
+                            $expression = $expression->with(
                                 $queryBuilder->expr()->eq($filter['column'], $expr->literal(''))
                             );
                         }
 
-                        $groupExpr->add(
+                        $groupExpr = $groupExpr->with(
                             $expression
                         );
                         break;
                     case 'neq':
                         $columnValue = ":$paramName";
-                        $expression  = $queryBuilder->expr()->orX(
+                        $expression  = $queryBuilder->expr()->or(
                             $queryBuilder->expr()->isNull($filter['column']),
                             $queryBuilder->expr()->$exprFunction($filter['column'], $columnValue)
                         );
                         $queryBuilder->setParameter($paramName, $filter['value']);
-                        $groupExpr->add(
+                        $groupExpr = $groupExpr->with(
                             $expression
                         );
                         break;
@@ -482,7 +483,7 @@ final class MauticReportBuilder implements ReportBuilderInterface
                             default:
                                 $queryBuilder->setParameter($paramName, $filter['value']);
                         }
-                        $groupExpr->add(
+                        $groupExpr = $groupExpr->with(
                             $expr->{$exprFunction}($filter['column'], $columnValue)
                         );
                 }
@@ -499,11 +500,13 @@ final class MauticReportBuilder implements ReportBuilderInterface
             $filterExpr = $groups[0];
         } elseif (count($groups) > 1) {
             // Sets of expressions grouped by OR
-            $orX = $queryBuilder->expr()->orX();
-            $orX->addMultiple($groups);
+            $orX = $queryBuilder->expr()->or('');
+            foreach ($groups as $group) {
+                $orX = $orX->with($group);
+            }
 
             // Wrap in a andX for other functions to append
-            $filterExpr = $queryBuilder->expr()->andX($orX);
+            $filterExpr = $queryBuilder->expr()->and($orX);
         } else {
             $filterExpr = $groupExpr;
         }
