@@ -1,7 +1,28 @@
-@import "../../libraries/bootstrap/less/variables";
+@import "../../../../../../../node_modules/bootstrap/less/variables";
 
 @media (min-width: @screen-md-min) {
   .modal-xl { width: 1140px; }
+}
+
+.label-as-badge {
+  border-radius: @badge-border-radius !important;
+}
+
+.media-list {
+  .media-body {
+    width: auto;
+  }
+  .media-object{
+    padding-right: 0;
+    margin-right: 10px;
+  }
+}
+
+// Contact image
+form[name="lead"] {
+  .media-body {
+    width: 100%;
+  }
 }
 
 // vertical tabs

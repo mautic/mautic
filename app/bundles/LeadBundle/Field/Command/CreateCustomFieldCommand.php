@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Command;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\CoreBundle\Command\ModeratedCommand;
@@ -108,7 +107,7 @@ EOT
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return 1;
-        } catch (DBALException $e) {
+        } catch (\Doctrine\DBAL\Exception $e) {
             $output->writeln('<error>'.$this->translator->trans($e->getMessage()).'</error>');
 
             return 1;

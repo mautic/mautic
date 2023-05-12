@@ -29,7 +29,7 @@ class StagesChangeLogRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('ls.event_name', $query->expr()->literal('%'.$options['search'].'%')),
                 $query->expr()->like('ls.action_name', $query->expr()->literal('%'.$options['search'].'%'))
             ));

@@ -228,7 +228,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
      *
      * @return string the SQL query string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getSQL()
     {
@@ -1134,7 +1134,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     private function getSQLForSelect()
     {
@@ -1248,7 +1248,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function __toString()
     {
@@ -1586,7 +1586,7 @@ class QueryBuilder extends \Doctrine\DBAL\Query\QueryBuilder
     /**
      * @return mixed|string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function getDebugOutput()
     {

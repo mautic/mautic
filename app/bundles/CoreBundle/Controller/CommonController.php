@@ -443,7 +443,7 @@ class CommonController extends AbstractController implements MauticController
         $passthrough['flashes'] = $this->getFlashContent();
 
         if (!defined('MAUTIC_INSTALLER')) {
-            // Prevent error in case installer is loaded via index_dev.php
+            // Prevent error in case installer is loaded via dev environment
             $passthrough['notifications'] = $this->getNotificationContent();
         }
 

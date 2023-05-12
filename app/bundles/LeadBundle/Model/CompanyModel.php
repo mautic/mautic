@@ -576,16 +576,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 }
 
                 $expr      = new ExpressionBuilder($this->em->getConnection());
-                $composite = $expr->andX();
-                $composite->add(
-                    $expr->like("comp.$column", ':filterVar')
-                );
+                $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
-                    $composite->add(
-                        $expr->orX(
-                            $expr->andX(
+                    $composite->with(
+                        $expr->or(
+                            $expr->and(
                                 $expr->isNull('comp.owner_id'),
                                 $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
                             ),

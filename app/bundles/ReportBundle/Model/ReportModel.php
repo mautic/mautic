@@ -2,7 +2,6 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -787,7 +786,7 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+        if ($this->em->getConnection() instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $this->em->getConnection()->connect('slave');
         }
 

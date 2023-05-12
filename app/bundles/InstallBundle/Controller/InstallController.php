@@ -2,7 +2,6 @@
 
 namespace Mautic\InstallBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -33,7 +32,7 @@ class InstallController extends CommonController
      *
      * @return JsonResponse|Response
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
     {
