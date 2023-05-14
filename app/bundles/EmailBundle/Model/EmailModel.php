@@ -2347,4 +2347,36 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
     {
         return $this->updatingTranslationChildren;
     }
+
+    /**
+     * @param string                                   $route
+     * @param array<string, string>|array<string, int> $routeParams
+     * @param bool                                     $absolute
+     * @param array<array<string>>                     $clickthrough
+     * @param array<string>                            $utmTags
+     *
+     * @return string
+     */
+    public function buildUrl($route, $routeParams = [], $absolute = true, $clickthrough = [], $utmTags = [])
+    {
+        $parts = parse_url($this->coreParametersHelper->get('site_url') ?: '');
+
+        $context         = $this->router->getContext();
+        $original_host   = $context->getHost();
+        $original_scheme = $context->getScheme();
+
+        if (!empty($parts['host'])) {
+            $this->router->getContext()->setHost($parts['host']);
+        }
+        if (!empty($parts['scheme'])) {
+            $this->router->getContext()->setScheme($parts['scheme']);
+        }
+
+        $url = parent::buildUrl($route, $routeParams, $absolute, $clickthrough, $utmTags);
+
+        $context->setHost($original_host);
+        $context->setScheme($original_scheme);
+
+        return $url;
+    }
 }

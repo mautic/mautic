@@ -116,7 +116,8 @@ class AjaxController extends CommonAjaxController
                                     [
                                         'lead'  => $contactId,
                                         'event' => $eventId,
-                                    ]
+                                    ],
+                                    ['dateTriggered' => 'desc']
                                 );
 
                 if ($log && ($log->getTriggerDate() > new \DateTime())) {

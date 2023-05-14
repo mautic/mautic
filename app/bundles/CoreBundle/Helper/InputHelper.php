@@ -458,16 +458,13 @@ class InputHelper
             // detect if there is any unicode character in the passed string
             $hasUnicode = strlen($value) != strlen(utf8_decode($value));
 
-            // Encode the incoming value before cleaning, it convert unicode to encoded strings
-            $value = $hasUnicode ? rawurlencode($value) : $value;
-
-            $value = self::getFilter(true)->clean($value, 'html');
+            $value = self::getFilter(true)->clean($value, $hasUnicode ? 'raw' : 'html');
 
             // After cleaning encode the value
             $value = $hasUnicode ? rawurldecode($value) : $value;
 
             // Was a doctype found?
-            if ($doctypeFound) {
+            if ($doctypeFound && false === $hasUnicode) {
                 $value = "$doctype[0]$value";
             }
 

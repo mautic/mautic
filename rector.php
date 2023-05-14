@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use Rector\Caching\ValueObject\Storage\FileCacheStorage;
+use Rector\Core\Configuration\Option;
+
 return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->paths([__DIR__.'/app/bundles', __DIR__.'/plugins']);
     $rectorConfig->skip(
@@ -16,6 +19,10 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
             __DIR__.'/*.js.php',
         ]
     );
+
+    $rectorConfig->parallel();
+    $rectorConfig->parameters()->set(Option::CACHE_CLASS, FileCacheStorage::class);
+    $rectorConfig->parameters()->set(Option::CACHE_DIR, __DIR__.'/var/cache/rector');
 
     // Define what rule sets will be applied
     // $rectorConfig->sets([\Rector\Set\ValueObject\SetList::DEAD_CODE]); // @todo implement the whole set. Start rule by rule bellow.
