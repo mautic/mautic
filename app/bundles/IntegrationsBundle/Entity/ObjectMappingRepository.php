@@ -51,7 +51,7 @@ class ObjectMappingRepository extends CommonRepository
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('i.integration', ':integration'),
                     $qb->expr()->eq('i.internal_object_name', ':internalObjectName'),
                     $qb->expr()->eq('i.internal_object_id', ':internalObjectId'),
@@ -85,7 +85,7 @@ class ObjectMappingRepository extends CommonRepository
             ->set('integration_object_name', ':newObjectName')
             ->set('integration_object_id', ':newObjectId')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('i.integration', ':integration'),
                     $qb->expr()->eq('i.integration_object_name', ':oldObjectName'),
                     $qb->expr()->eq('i.integration_object_id', ':oldObjectId')
@@ -160,7 +160,7 @@ class ObjectMappingRepository extends CommonRepository
         $qb->update(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'm')
             ->set('is_deleted', 1)
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('m.integration', ':integration'),
                     $qb->expr()->eq('m.integration_object_name', ':objectName')
                 )
@@ -224,7 +224,7 @@ class ObjectMappingRepository extends CommonRepository
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'sync_object_mapping', 'i')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('i.integration', ':integration'),
                     $qb->expr()->eq('i.integration_object_name', ':integrationObjectName'),
                     $qb->expr()->eq('i.integration_object_id', ':integrationObjectId'),

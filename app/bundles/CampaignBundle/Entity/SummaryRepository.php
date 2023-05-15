@@ -6,7 +6,6 @@ namespace Mautic\CampaignBundle\Entity;
 
 use DateTime;
 use DateTimeInterface;
-use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 use PDO;
@@ -87,7 +86,7 @@ class SummaryRepository extends CommonRepository
     /**
      * Regenerate summary entries for a given time frame.
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function summarize(
         DateTimeInterface $dateFrom,

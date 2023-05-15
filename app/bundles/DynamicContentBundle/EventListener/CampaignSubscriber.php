@@ -60,7 +60,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'formType'               => DynamicContentSendType::class,
                 'formTypeOptions'        => ['update_select' => 'campaignevent_properties_dynamicContent'],
                 'formTheme'              => '@MauticDynamicContent/FormTheme/DynamicContentPushList/_dynamiccontentpush_list_row.html.twig',
-                'timelineTemplate'       => '@MauticDynamicContent/SubscribedEvents\Timeline/index.html.twig',
+                'timelineTemplate'       => '@MauticDynamicContent/SubscribedEvents/Timeline/index.html.twig',
                 'hideTriggerMode'        => true,
                 'connectionRestrictions' => [
                     'anchor' => [

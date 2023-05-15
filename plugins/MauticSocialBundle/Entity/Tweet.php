@@ -3,7 +3,7 @@
 namespace MauticPlugin\MauticSocialBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
@@ -128,13 +128,13 @@ class Tweet extends FormEntity
 
         $builder->addIdColumns();
         $builder->addCategory();
-        $builder->addNullableField('mediaId', Type::STRING, 'media_id');
-        $builder->addNullableField('mediaPath', Type::STRING, 'media_path');
-        $builder->addField('text', Type::STRING, ['length' => 280]);
-        $builder->addNullableField('sentCount', Type::INTEGER, 'sent_count');
-        $builder->addNullableField('favoriteCount', Type::INTEGER, 'favorite_count');
-        $builder->addNullableField('retweetCount', Type::INTEGER, 'retweet_count');
-        $builder->addNullableField('language', Type::STRING, 'lang');
+        $builder->addNullableField('mediaId', Types::STRING, 'media_id');
+        $builder->addNullableField('mediaPath', Types::STRING, 'media_path');
+        $builder->addField('text', Types::STRING, ['length' => 280]);
+        $builder->addNullableField('sentCount', Types::INTEGER, 'sent_count');
+        $builder->addNullableField('favoriteCount', Types::INTEGER, 'favorite_count');
+        $builder->addNullableField('retweetCount', Types::INTEGER, 'retweet_count');
+        $builder->addNullableField('language', Types::STRING, 'lang');
 
         $builder->createManyToOne('page', Page::class)
             ->addJoinColumn('page_id', 'id', true, false, 'SET NULL')

@@ -343,7 +343,7 @@ class CampaignRepository extends CommonRepository
         $q->select('min(cl.lead_id) as min_id, max(cl.lead_id) as max_id, count(cl.lead_id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('cl.campaign_id', (int) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
@@ -357,7 +357,7 @@ class CampaignRepository extends CommonRepository
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
                 ->where(
-                    $sq->expr()->andX(
+                    $sq->expr()->and(
                         $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
                         $sq->expr()->eq('e.rotation', 'cl.rotation'),
                         $sq->expr()->in('e.event_id', $pendingEvents)
@@ -392,7 +392,7 @@ class CampaignRepository extends CommonRepository
         $q->select('cl.lead_id')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('cl.campaign_id', (int) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
@@ -407,7 +407,7 @@ class CampaignRepository extends CommonRepository
         $sq->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
             ->where(
-                $sq->expr()->andX(
+                $sq->expr()->and(
                     $sq->expr()->eq('e.lead_id', 'cl.lead_id'),
                     $sq->expr()->eq('e.campaign_id', (int) $campaignId),
                     $sq->expr()->eq('e.rotation', 'cl.rotation')
@@ -455,7 +455,7 @@ class CampaignRepository extends CommonRepository
         $q->select('count(cl.lead_id) as lead_count')
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('cl.campaign_id', (int) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )
@@ -479,7 +479,7 @@ class CampaignRepository extends CommonRepository
             $sq->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'campaign_lead_event_log', 'e')
                 ->where(
-                    $sq->expr()->andX(
+                    $sq->expr()->and(
                         $sq->expr()->eq('cl.lead_id', 'e.lead_id'),
                         $sq->expr()->in('e.event_id', $pendingEvents)
                     )
@@ -527,7 +527,7 @@ class CampaignRepository extends CommonRepository
         $q->select($select)
             ->from(MAUTIC_TABLE_PREFIX.'campaign_leads', 'cl')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('cl.campaign_id', (int) $campaignId),
                     $q->expr()->eq('cl.manually_removed', ':false')
                 )

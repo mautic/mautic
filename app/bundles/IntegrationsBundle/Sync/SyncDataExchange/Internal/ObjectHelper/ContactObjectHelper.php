@@ -198,15 +198,15 @@ class ContactObjectHelper implements ObjectHelperInterface
         $qb->select('*')
             ->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->isNotNull('l.date_identified'),
-                    $qb->expr()->orX(
-                        $qb->expr()->andX(
+                    $qb->expr()->or(
+                        $qb->expr()->and(
                             $qb->expr()->isNotNull('l.date_modified'),
                             $qb->expr()->gte('l.date_modified', ':dateFrom'),
                             $qb->expr()->lt('l.date_modified', ':dateTo')
                         ),
-                        $qb->expr()->andX(
+                        $qb->expr()->and(
                             $qb->expr()->isNull('l.date_modified'),
                             $qb->expr()->gte('l.date_added', ':dateFrom'),
                             $qb->expr()->lt('l.date_added', ':dateTo')
@@ -260,7 +260,7 @@ class ContactObjectHelper implements ObjectHelperInterface
         $q->select('dnc.reason')
             ->from(MAUTIC_TABLE_PREFIX.'lead_donotcontact', 'dnc')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('dnc.lead_id', ':contactId'),
                     $q->expr()->eq('dnc.channel', ':channel')
                 )
