@@ -69,7 +69,7 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
 
         $this->em->persist($asset);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($asset);
 
         return $asset;
     }
