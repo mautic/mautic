@@ -343,7 +343,13 @@ class ReportController extends FormController
                 $entity->setColumns([]);
                 $oldSchedule = $entity->isScheduled() ? $this->getSchedule($entity) : null;
 
-                //check if schedule has changes, if yes, set unique check to true (how?)
+                $newSchedule['schedule_unit']            = $this->request->request->all()['report']['scheduleUnit'];
+                $newSchedule['schedule_day']             = $this->request->request->all()['report']['scheduleDay'];
+                $newSchedule['schedule_month_frequency'] = $this->request->request->all()['report']['scheduleMonthFrequency'];
+
+                if ($oldSchedule != $newSchedule) {
+                    $entity->setHasScheduleChanged(true);
+                }//check if schedule has changes, if yes, set unique check to true (how?)
 
                 //$this->request->request->all()['report']['scheduleDay'] etc. fetches the data
 
@@ -894,14 +900,12 @@ class ReportController extends FormController
 
     /**
      * @param Report|null $entity
-     *
-     * @return array
      */
     private function getSchedule(Report $entity): array
     {
-        $schedule = [];
-        $schedule['schedule_unit'] = $entity->getScheduleUnit();
-        $schedule['schedule_day'] = $entity->getScheduleDay();
+        $schedule                             = [];
+        $schedule['schedule_unit']            = $entity->getScheduleUnit();
+        $schedule['schedule_day']             = $entity->getScheduleDay();
         $schedule['schedule_month_frequency'] = $entity->getScheduleMonthFrequency();
 
         return $schedule;
