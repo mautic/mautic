@@ -341,9 +341,11 @@ class ReportController extends FormController
                 // Columns have to be reset in order for Symfony to honor the new submitted order
                 $oldColumns = $entity->getColumns();
                 $entity->setColumns([]);
-                $oldSchedule = $entity->isScheduled() ?? $this->getSchedule($entity);
+                $oldSchedule = $entity->isScheduled() ? $this->getSchedule($entity) : null;
 
                 //check if schedule has changes, if yes, set unique check to true (how?)
+
+                //$this->request->request->all()['report']['scheduleDay'] etc. fetches the data
 
                 $oldGraphs = $entity->getGraphs();
                 $entity->setGraphs([]);

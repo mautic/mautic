@@ -101,6 +101,7 @@ class Report extends FormEntity implements SchedulerInterface
      * @var string|null
      */
     private $scheduleMonthFrequency;
+    private $hasScheduleChanged = false;
 
     public function __clone()
     {
@@ -678,5 +679,10 @@ class Report extends FormEntity implements SchedulerInterface
     public function isScheduledWeekDays()
     {
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
+    }
+
+    public function getHasScheduleChanged()
+    {
+        return $this->hasScheduleChanged;
     }
 }
