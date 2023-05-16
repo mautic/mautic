@@ -897,8 +897,6 @@ class ReportController extends FormController
     }
 
     /**
-     * @param Report|null $entity
-     *
      * @return array<string>
      */
     public static function getSchedule(?Report $entity): array
