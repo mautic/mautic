@@ -91,7 +91,7 @@
                             {% endfor %}
                         </div>
                     </div>
-                    {% if embedded is defined %}
+                    {% if embedded is defined and not form['owner'].isRendered %}
                         <hr class="mnr-md mnl-md">
                         <div>{{ form_row(form.owner) }}</div>
                     {% endif %}

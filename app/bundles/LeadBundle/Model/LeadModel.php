@@ -550,14 +550,6 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Clear all Lead entities.
-     */
-    public function clearEntities()
-    {
-        $this->getRepository()->clear();
-    }
-
-    /**
      * Populates custom field values for updating the lead. Also retrieves social media data.
      *
      * @param bool|false $overwriteWithBlank
