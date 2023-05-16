@@ -690,4 +690,17 @@ class Report extends FormEntity implements SchedulerInterface
     {
         $this->hasScheduleChanged = $hasScheduleChanged;
     }
+
+    /**
+     * @return array<string>
+     */
+    public function getSchedule(): array
+    {
+        $schedule                             = [];
+        $schedule['schedule_unit']            = $this->getScheduleUnit();
+        $schedule['schedule_day']             = $this->getScheduleDay();
+        $schedule['schedule_month_frequency'] = $this->getScheduleMonthFrequency();
+
+        return $schedule;
+    }
 }
