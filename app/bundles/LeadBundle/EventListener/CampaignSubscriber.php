@@ -436,8 +436,9 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         if (isset($config['companyname']) && $primaryCompany->getName() != $config['companyname']) {
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($config, $lead, $this->companyModel);
+            $companyChangeLog                      = null;
             if ($leadAdded) {
-                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
                 $this->companyModel->setFieldValues($companyEntity, $config);
                 $this->companyModel->saveEntity($companyEntity);
@@ -447,6 +448,10 @@ class CampaignSubscriber implements EventSubscriberInterface
                 // Save after the lead in for new leads created
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
+
+            if (null !== $companyChangeLog) {
+                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
             }
         } else {
             $this->companyModel->setFieldValues($primaryCompany, $config, false);
