@@ -681,12 +681,20 @@ class Report extends FormEntity implements SchedulerInterface
         return SchedulerEnum::DAY_WEEK_DAYS === $this->getScheduleDay();
     }
 
+    /**
+     * @return bool
+     */
     public function getHasScheduleChanged(): bool
     {
         return $this->hasScheduleChanged;
     }
 
-    public function setHasScheduleChanged($hasScheduleChanged)
+    /**
+     * @param bool $hasScheduleChanged
+     *
+     * @return void
+     */
+    public function setHasScheduleChanged(bool $hasScheduleChanged): void
     {
         $this->hasScheduleChanged = $hasScheduleChanged;
     }

@@ -351,8 +351,6 @@ class ReportController extends FormController
                     $entity->setHasScheduleChanged(true);
                 }//check if schedule has changes, if yes, set unique check to true (how?)
 
-                //$this->request->request->all()['report']['scheduleDay'] etc. fetches the data
-
                 $oldGraphs = $entity->getGraphs();
                 $entity->setGraphs([]);
                 if ($valid = $this->isFormValid($form)) {
@@ -900,8 +898,10 @@ class ReportController extends FormController
 
     /**
      * @param Report|null $entity
+     *
+     * @return array<string>
      */
-    private function getSchedule(Report $entity): array
+    public static function getSchedule(?Report $entity): array
     {
         $schedule                             = [];
         $schedule['schedule_unit']            = $entity->getScheduleUnit();
