@@ -2,6 +2,7 @@
 
 namespace MauticPlugin\MauticFocusBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CacheBundle\Cache\CacheProvider;
 use Mautic\CoreBundle\Controller\AjaxController as CommonAjaxController;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -9,15 +10,16 @@ use MauticPlugin\MauticFocusBundle\Helper\IframeAvailabilityChecker;
 use MauticPlugin\MauticFocusBundle\Model\FocusModel;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class AjaxController extends CommonAjaxController
 {
     private CacheProvider $cacheProvider;
 
-    public function initialize(ControllerEvent $event)
+    public function __construct(ManagerRegistry $doctrine, CacheProvider $cacheProvider)
     {
-        $this->cacheProvider = $this->container->get('mautic.cache.provider');
+        $this->cacheProvider = $cacheProvider;
+
+        parent::__construct($doctrine);
     }
 
     /**
@@ -50,7 +52,7 @@ class AjaxController extends CommonAjaxController
         return $this->sendJsonResponse($responseContent);
     }
 
-    protected function getViewsCountAction(Request $request): JsonResponse
+    public function getViewsCountAction(Request $request): JsonResponse
     {
         $focusId = (int) InputHelper::clean($request->query->get('focusId'));
 
