@@ -1,7 +1,7 @@
 {%- set props = focus.properties -%}
 {%- set style = focus.style -%}
 {%- set placement = props[style].placement is defined ? props[style].placement|replace({'_': '-'}) : false -%}
-{%- set animate = preview is not defined and props.animate is defined and props.animate is not empty -%}
+{%- set animate = not preview and props.animate is defined and props.animate == 1 -%}
 <style scoped>
     .mf-{{ style }} {
         border-color: #{{ props.colors.primary }};
