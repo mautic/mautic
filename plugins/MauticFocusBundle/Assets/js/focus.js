@@ -432,12 +432,12 @@ Mautic.focusLoadConversionRateTable = function() {
         $conversionRateCells.each(function(i, el) {
             var $cell = mQuery(el);
             var uniqueHits = $cell.data('unique-hits');
-            var conversionRate = Math.round(uniqueHits / views * 10000) / 100;
+            var conversionRate = views > 0 ? Math.round(uniqueHits / views * 10000) / 100 : 0;
             $cell.html(conversionRate + '%');
             totalUniqueHits += uniqueHits;
         })
 
-        var totalConversionRate = Math.round(totalUniqueHits / views * 10000) / 100;
+        var totalConversionRate = views > 0 ? Math.round(totalUniqueHits / views * 10000) / 100 : 0;
         $conversionRateTotalCell.html(totalConversionRate + '%');
         $focusTotalViewsCell.html(views);
     }, false, true, "GET");
