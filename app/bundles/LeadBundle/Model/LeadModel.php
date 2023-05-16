@@ -23,7 +23,6 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -503,12 +502,13 @@ class LeadModel extends FormModel
             }
         }
 
-        $updatedFields = $entity->getUpdatedFields();
+        $updatedFields   = $entity->getUpdatedFields();
+        $changeLogEntity = null;
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company']            = $updatedFields['company'];
             [$company, $leadAdded, $companyEntity]     = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
-                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                $changeLogEntity = $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
         }
 
@@ -528,7 +528,9 @@ class LeadModel extends FormModel
             $this->companyModel->getCompanyLeadRepository()->removeContactPrimaryCompany($entity->getId());
         }
 
-        $this->em->clear(CompanyChangeLog::class);
+        if (null !== $changeLogEntity) {
+            $this->em->detach($changeLogEntity);
+        }
     }
 
     /**
@@ -2260,7 +2262,7 @@ class LeadModel extends FormModel
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
+        $this->companyModel->getCompanyLeadRepository()->detachEntities($companyLeads);
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }
