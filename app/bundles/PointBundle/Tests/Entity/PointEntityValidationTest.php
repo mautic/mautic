@@ -111,8 +111,6 @@ class PointEntityValidationTest extends MauticMysqlTestCase
         $this->client->submit($form);
         self::assertTrue($this->client->getResponse()->isOk());
 
-        $this->em->clear();
-
         $response = $this->client->getResponse()->getContent();
         self::assertStringContainsString($errorMessage, (string) $response);
 
