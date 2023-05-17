@@ -330,6 +330,7 @@ class ReportBuilderEvent extends AbstractReportEvent
                 if (isset($item['type'])) {
                     $item['type'] =  $this->reportHelper->getReportBuilderFieldType($item['type']);
                 }
+
                 return $item;
             },
             $this->reportHelper->getMappedObjectsColumns($object, $properties)

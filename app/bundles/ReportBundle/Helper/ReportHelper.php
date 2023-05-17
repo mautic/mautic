@@ -14,6 +14,7 @@ final class ReportHelper
     {
         $this->dispatcher = $dispatcher;
     }
+
     /**
      * @return string
      */
@@ -136,6 +137,7 @@ final class ReportHelper
     {
         $event = new ColumnCollectEvent($object, $properties);
         $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_COLUMN_COLLECT);
+
         return $event->getColumns();
     }
 }
