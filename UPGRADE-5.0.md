@@ -21,6 +21,11 @@
 *   Services
     * Repository service `mautic.user.token.repository` for `Mautic\UserBundle\Entity\UserTokenRepository` was removed as it was duplicated. Use `mautic.user.repository.user_token` instead.
     * In tests replace `self::$container->get('mautic.http.client.mock_handler')` with `self::$container->get(\GuzzleHttp\Handler\MockHandler::class)` to get HTTP client mock handler.
+* JS Dependencies
+    * Most of the JS libraries were moved from hard-coded location in the CoreBundle to package.json so we can manage them with NPM
+    * This means that when you run `composer install` then it will also run `npm install` to download JS dependencies and `bin/console mautic:assets:generate` to build the production assets.
+    * Libraries `jquery-color`, `jquery-play-sound` and `html5notifications` were removed as unused.
+    * Library `jvectormap` was replaced with its accessor `jvectormap-next` as it was unmaintaned.
 *   Other
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
