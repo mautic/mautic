@@ -24,7 +24,6 @@
     "dropzone": "^4.0.1",
     "historyjs": "^1.8.0-b2",
     "jquery": "^3.3.1",
-    "jquery-color": "^2.2.0",
     "jquery-datetimepicker": "^2.5.20",
     "jquery-form": "^4.2.2",
     "jquery-ui-touch-punch": "^0.2.3",
