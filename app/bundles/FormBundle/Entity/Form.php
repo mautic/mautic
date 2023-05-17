@@ -554,7 +554,7 @@ class Form extends FormEntity
     /**
      * Loops through the form fields and returns an array of fields with mapped data.
      *
-     * @return array<string, string>
+     * @return array<int, array<string, int|string>>
      */
     public function getMappedFieldObjectData(): array
     {

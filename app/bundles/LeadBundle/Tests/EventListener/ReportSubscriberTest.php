@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Entity\PointsChangeLogRepository;
 use Mautic\LeadBundle\EventListener\ReportSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
@@ -36,6 +37,11 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      * @var MockObject|LeadModel
      */
     private $leadModelMock;
+
+    /**
+     * @var MockObject|FieldModel
+     */
+    private $fieldModelMock;
 
     /**
      * @var MockObject|StageModel
@@ -171,6 +177,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->leadModelMock                    = $this->createMock(LeadModel::class);
+        $this->leadFieldModelMock               = $this->createMock(FieldModel::class);
         $this->stageModelMock                   = $this->createMock(StageModel::class);
         $this->campaignModelMock                = $this->createMock(CampaignModel::class);
         $this->eventCollectorMock               = $this->createMock(EventCollector::class);
@@ -181,7 +188,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportGeneratorEventMock         = $this->createMock(ReportGeneratorEvent::class);
         $this->reportDataEventMock              = $this->createMock(ReportDataEvent::class);
         $this->channelListHelperMock            = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
-        $this->reportHelperMock                 = new ReportHelper();
+        $this->reportHelperMock                 = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->campaignRepositoryMock           = $this->createMock(CampaignRepository::class);
         $this->reportBuilderEventMock           = $this->createMock(ReportBuilderEvent::class);
         $this->queryBuilderMock                 = $this->createMock(QueryBuilder::class);
@@ -192,6 +199,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportMock                       = $this->createMock(Report::class);
         $this->reportSubscriber                 = new ReportSubscriber(
             $this->leadModelMock,
+            $this->leadFieldModelMock,
             $this->stageModelMock,
             $this->campaignModelMock,
             $this->eventCollectorMock,

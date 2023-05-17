@@ -44,7 +44,7 @@ final class ColumnCollectEvent extends Event
     }
 
     /**
-     * @param array<string, string|int> $column
+     * @param array<string, array<string, mixed>> $column
      */
     public function addColumns(array $column): void
     {

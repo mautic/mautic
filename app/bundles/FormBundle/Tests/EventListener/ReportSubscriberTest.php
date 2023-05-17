@@ -11,6 +11,7 @@ use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
 use Mautic\FormBundle\EventListener\ReportSubscriber;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -31,9 +32,9 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     private $submissionRepository;
 
     /**
-     * @var FormRepository|MockObject
+     * @var FormModel|MockObject
      */
-    private $formRepository;
+    private $formModel;
 
     /**
      * @var CoreParametersHelper|MockObject
@@ -58,13 +59,13 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
-        $this->formRepository       = $this->createMock(FormRepository::class);
+        $this->formRepository       = $this->createMock(FormModel::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
-            $this->formRepository,
+            $this->formModel,
             $this->coreParametersHelper,
             $this->translator
         );
