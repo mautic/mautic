@@ -2,12 +2,7 @@
 
 namespace Mautic\ReportBundle\Helper;
 
-use Mautic\ReportBundle\Event\ColumnCollectEvent;
-use Mautic\ReportBundle\ReportEvents;
-use Symfony\Component\Templating\Helper\Helper;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-
-class ReportHelper extends Helper
+final class ReportHelper
 {
     private EventDispatcherInterface $dispatcher;
 

@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Event\LeadChangeCompanyEvent;
 use Mautic\LeadBundle\Exception\UniqueFieldNotFoundException;
 use Mautic\LeadBundle\Form\Type\CompanyType;
 use Mautic\LeadBundle\LeadEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -167,7 +168,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Company) {
             throw new MethodNotAllowedHttpException(['Company']);
@@ -426,7 +427,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
+        $this->getCompanyLeadRepository()->detachEntities($persistCompany);
 
         return $contactAdded;
     }
@@ -487,8 +488,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $companies = [$companies];
         }
 
-        $deleteCompany  = [];
-        $dispatchEvents = [];
+        $deleteCompany     = [];
+        $dispatchEvents    = [];
+        $deleteCompanyLead = [];
 
         $primaryRemoved = false;
         foreach ($companies as $companyId) {
@@ -532,7 +534,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
+        $this->getCompanyLeadRepository()->detachEntities($deleteCompanyLead);
 
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
@@ -575,16 +577,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
                 }
 
                 $expr      = new ExpressionBuilder($this->em->getConnection());
-                $composite = $expr->andX();
-                $composite->add(
-                    $expr->like("comp.$column", ':filterVar')
-                );
+                $composite = $expr->and($expr->like("comp.$column", ':filterVar'));
 
                 // Validate owner permissions
                 if (!$this->security->isGranted('lead:leads:viewother')) {
-                    $composite->add(
-                        $expr->orX(
-                            $expr->andX(
+                    $composite->with(
+                        $expr->or(
+                            $expr->and(
                                 $expr->isNull('comp.owner_id'),
                                 $expr->eq('comp.created_by', (int) $this->userHelper->getUser()->getId())
                             ),
@@ -931,6 +930,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private function updateContactAfterPrimaryCompanyWasRemoved(Lead $lead): void
     {
         $primaryCompanyName = '';
+        $companyLead        = null;
+        $newPrimaryCompany  = null;
 
         // Find another company to make primary if applicable
         $leadCompanies = $this->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
@@ -955,5 +956,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $lead->addUpdatedField('company', $primaryCompanyName)
             ->setDateModified(new \DateTime());
         $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+
+        if (null !== $newPrimaryCompany) {
+            $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);
+        }
+
+        if (null !== $companyLead) {
+            $this->getCompanyLeadRepository()->detachEntity($companyLead);
+        }
     }
 }

@@ -49,10 +49,11 @@ return [
                 'arguments' => [
                     'mautic.form.model.form',
                     'mautic.page.model.trackable',
-                    'mautic.helper.templating',
+                    'twig',
                     'event_dispatcher',
                     'mautic.lead.model.field',
                     'mautic.tracker.contact',
+                    'twig',
                 ],
             ],
         ],
@@ -72,6 +73,18 @@ return [
                 ],
             ],
         ],
+//        'repositories' => [
+//            'mautic.focus.repository' => [
+//                'class'     => \Doctrine\ORM\EntityRepository::class,
+//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\FocusRepository::class,
+//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+//            ],
+//            'mautic.focus.stat.repository' => [
+//                'class'     => \Doctrine\ORM\EntityRepository::class,
+//                'arguments' => \MauticPlugin\MauticFocusBundle\Entity\StatRepository::class,
+//                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+//            ],
+//        ]
     ],
 
     'menu' => [

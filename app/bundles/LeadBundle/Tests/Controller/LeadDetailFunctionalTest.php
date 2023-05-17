@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Mautic\LeadBundle\Tests\Controller;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\FetchMode;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -76,7 +75,7 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
                 Connection::PARAM_STR_ARRAY
             )
             ->execute()
-            ->fetchAll(FetchMode::COLUMN);
+            ->fetchFirstColumn();
 
         $expectedLabels = array_merge(['Created on', 'ID'], $expectedLabels);
 

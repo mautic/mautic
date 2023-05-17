@@ -9,6 +9,7 @@ use Mautic\FormBundle\Model\ActionModel;
 use Mautic\FormBundle\Model\FieldModel;
 use Mautic\FormBundle\Model\FormModel;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -46,7 +47,7 @@ class FormApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteFieldsAction($formId)
+    public function deleteFieldsAction(Request $request, $formId)
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -58,7 +59,7 @@ class FormApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $fieldsToDelete = $this->request->get('fields');
+        $fieldsToDelete = $request->get('fields');
 
         if (!is_array($fieldsToDelete)) {
             return $this->badRequest('The fields attribute must be array.');
@@ -76,7 +77,7 @@ class FormApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function deleteActionsAction($formId)
+    public function deleteActionsAction(Request $request, $formId)
     {
         if (!$this->security->isGranted(['form:forms:editown', 'form:forms:editother'], 'MATCH_ONE')) {
             return $this->accessDenied();
@@ -88,7 +89,7 @@ class FormApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $actionsToDelete = $this->request->get('actions');
+        $actionsToDelete = $request->get('actions');
 
         if (!is_array($actionsToDelete)) {
             return $this->badRequest('The actions attribute must be array.');
@@ -110,7 +111,7 @@ class FormApiController extends CommonApiController
         \assert($fieldModel instanceof FieldModel);
         $actionModel = $this->getModel('form.action');
         \assert($actionModel instanceof ActionModel);
-        $method = $this->request->getMethod();
+        $method = $this->getCurrentRequest()->getMethod();
         $isNew  = false;
         $alias  = $entity->getAlias();
 
@@ -276,7 +277,7 @@ class FormApiController extends CommonApiController
 
         return $formActionModel->createForm(
             $entity,
-            $this->get('form.factory'),
+            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,
@@ -300,7 +301,7 @@ class FormApiController extends CommonApiController
 
         return $formFieldModel->createForm(
             $entity,
-            $this->get('form.factory'),
+            $this->formFactory,
             null,
             [
                 'csrf_protection'    => false,

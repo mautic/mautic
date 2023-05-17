@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var ChannelListHelper
      */
     private $channelListHelper;
 
@@ -40,12 +40,16 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $queryBuilder;
 
+    /**
+     * @var ReportHelper
+     */
+    private $reportHelper;
+
     public function setUp(): void
     {
         $this->queryBuilder       = $this->createMock(QueryBuilder::class);
-        $eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
-        $this->channelListHelper  = new ChannelListHelper($eventDispatcher, $this->createMock(Translator::class));
-        $this->reportHelper       = new ReportHelper($eventDispatcher);
+        $this->channelListHelper  = new ChannelListHelper($this->createMock(EventDispatcherInterface::class), $this->createMock(Translator::class));
+        $this->reportHelper       = new ReportHelper();
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
     }
@@ -100,19 +104,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
             }
         };
 
-        $channelListHelper = new class() extends ChannelListHelper {
-            public function __construct()
-            {
-            }
-        };
-
-        $reportHelper = new class() extends ReportHelper {
-            public function __construct()
-            {
-            }
-        };
-
-        $event = new ReportBuilderEvent($this->createTranslatorMock(), $channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $reportHelper);
+        $event = new ReportBuilderEvent($this->createTranslatorMock(), $this->channelListHelper, ReportSubscriber::CONTEXT_ASSET_DOWNLOAD, [], $this->reportHelper);
 
         $reportSubscriber = new ReportSubscriber($companyReportData, $downloadRepository);
 

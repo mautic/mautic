@@ -288,18 +288,23 @@ class ReportSubscriber implements EventSubscriberInterface
                 'formula' => 'IF(es.date_read IS NOT NULL, TIMEDIFF(es.date_read, es.date_sent), \'-\')',
             ];
 
-            $filters = $this->fieldsBuilder->getLeadFilter('l.', 's.');
+            $columns = array_merge(
+                $columns,
+                self::EMAIL_STATS_COLUMNS,
+                $event->getCampaignByChannelColumns(),
+                $event->getLeadColumns(),
+                $event->getIpColumn(),
+                $this->companyReportData->getCompanyData()
+            );
+
+            $filters = array_merge(
+                $columns,
+                $this->fieldsBuilder->getLeadFilter('l.', 's.')
+            );
 
             $data = [
                 'display_name' => 'mautic.email.stats.report.table',
-                'columns'      => array_merge(
-                    $columns,
-                    self::EMAIL_STATS_COLUMNS,
-                    $event->getCampaignByChannelColumns(),
-                    $event->getLeadColumns(),
-                    $event->getIpColumn(),
-                    $this->companyReportData->getCompanyData()
-                ),
+                'columns'      => $columns,
                 'filters'      => $filters,
             ];
             $event->addTable(self::CONTEXT_EMAIL_STATS, $data, self::CONTEXT_EMAILS);
@@ -520,7 +525,7 @@ class ReportSubscriber implements EventSubscriberInterface
                     );
                     $this->addDNCTableForEmails($queryBuilder);
                     $queryBuilder->resetQueryPart('groupBy');
-                    $counts = $queryBuilder->execute()->fetch();
+                    $counts = $queryBuilder->execute()->fetchAssociative();
                     $chart  = new PieChart();
                     $chart->setDataset(
                         $options['translator']->trans('mautic.email.stat.read'),

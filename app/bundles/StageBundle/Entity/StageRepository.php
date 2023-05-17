@@ -67,12 +67,12 @@ class StageRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->eq('x.lead_id', (int) $leadId)
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 

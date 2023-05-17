@@ -3,7 +3,6 @@
 namespace Mautic\InstallBundle\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
@@ -38,7 +37,7 @@ class SchemaHelper
     protected $dbParams = [];
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function __construct(array $dbParams)
     {
@@ -90,7 +89,7 @@ class SchemaHelper
     /**
      * @return bool
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function createDatabase()
     {
@@ -125,7 +124,7 @@ class SchemaHelper
      *
      * @return array|bool Array containing the flash message data on a failure, boolean true on success
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws ORMException
      */
     public function installSchema()
@@ -173,7 +172,7 @@ class SchemaHelper
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->db->query($q);
+                    $this->db->executeQuery($q);
                 } catch (\Exception $exception) {
                     $this->db->close();
 
@@ -219,7 +218,7 @@ class SchemaHelper
      *
      * @return array
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function backupExistingSchema($tables, $mauticTables, $backupPrefix)
     {

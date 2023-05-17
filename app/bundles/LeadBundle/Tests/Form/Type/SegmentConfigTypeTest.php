@@ -34,9 +34,9 @@ final class SegmentConfigTypeTest extends TestCase
         $this->assertTrue(is_string($blockPrefix));
     }
 
-    public function testThatBuildFormMethodAddsSegmentRebuildTimeWarningOption(): void
+    public function testThatBuildFormMethodAddsSegmentBuildAndRebuildTimeWarningOption(): void
     {
-        $parameters = [
+        $rebuildParameters = [
             'label'      => 'mautic.lead.list.form.config.segment_rebuild_time_warning',
             'label_attr' => [
                     'class' => 'control-label',
@@ -48,12 +48,27 @@ final class SegmentConfigTypeTest extends TestCase
             'required' => false,
         ];
 
-        $this->formBuilderInterface->expects($this->once())
+        $buildParameters = [
+            'label'      => 'mautic.lead.list.form.config.segment_build_time_warning',
+            'label_attr' => [
+                'class' => 'control-label',
+            ],
+            'attr' => [
+                'class'   => 'form-control',
+                'tooltip' => 'mautic.lead.list.form.config.segment_build_time_warning.tooltip',
+            ],
+            'required' => false,
+        ];
+
+        $this->formBuilderInterface->expects($this->exactly(2))
             ->method('add')
-            ->with(
-                'segment_rebuild_time_warning',
-                NumberType::class,
-                $parameters
+            ->withConsecutive(
+                ['segment_rebuild_time_warning',
+                    NumberType::class,
+                    $rebuildParameters, ],
+                ['segment_build_time_warning',
+                    NumberType::class,
+                    $buildParameters, ],
             );
 
         $this->segmentConfigType->buildForm($this->formBuilderInterface, []);

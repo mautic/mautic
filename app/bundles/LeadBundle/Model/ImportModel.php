@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
@@ -375,10 +374,20 @@ class ImportModel extends FormModel
 
             // Release entities in Doctrine's memory to prevent memory leak
             $this->em->detach($eventLog);
+            if (null !== $leadEntity = $eventLog->getLead()) {
+                $this->em->detach($leadEntity);
+
+                $company        = $leadEntity->getCompany();
+                $primaryCompany = $leadEntity->getPrimaryCompany();
+                if ($company instanceof Company) {
+                    $this->em->detach($company);
+                }
+                if ($primaryCompany instanceof Company) {
+                    $this->em->detach($primaryCompany);
+                }
+            }
             $eventLog = null;
             $data     = null;
-            $this->em->clear(Lead::class);
-            $this->em->clear(Company::class);
 
             // Save Import entity once per batch so the user could see the progress
             if (0 === $batchSize && $import->isBackgroundProcess()) {
@@ -520,12 +529,14 @@ class ImportModel extends FormModel
      *
      * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
 
         // Clear the times for display by minutes
+        /** @var \DateTime $dateFrom */
+        /** @var \DateTime $dateTo */
         $dateFrom->modify('-1 minute');
         $dateFrom->setTime($dateFrom->format('H'), $dateFrom->format('i'), 0);
         $dateTo->modify('+1 minute');

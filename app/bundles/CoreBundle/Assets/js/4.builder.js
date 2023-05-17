@@ -219,7 +219,7 @@ Mautic.formatCode = function() {
  */
 Mautic.openMediaManager = function() {
     Mautic.openServerBrowser(
-        mauticBasePath + (typeof mauticEnv !== 'undefined' &&  mauticEnv === 'dev' ? '/index_dev.php' : '') + '/elfinder',
+        mauticBasePath + '/elfinder',
         screen.width * 0.7,
         screen.height * 0.7
     );
@@ -2126,8 +2126,12 @@ Mautic.getDynamicContentDataForToken = function(token) {
     if (dynConContainer.html()) {
         var dynConContent = dynConContainer.find(dynConTarget+'_content');
 
-        if (dynConContent.hasClass('editor') && Mautic.getActiveBuilderName() === 'legacy') {
-            dynConContent = dynConContent.froalaEditor('html.get');
+        if (Mautic.getActiveBuilderName() === 'legacy') {
+            if (dynConContent.data('froala.editor')) {
+                dynConContent = dynConContent.froalaEditor('html.get');
+            } else {
+                dynConContent = dynConContent.text();
+            }
         } else {
             dynConContent = dynConContent.html();
         }

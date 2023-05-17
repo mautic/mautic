@@ -341,7 +341,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
@@ -393,7 +393,7 @@ class PipedriveIntegration extends CrmAbstractIntegration
 
         return $qb->delete(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->eq('integration', ':integration')
                 )
             )

@@ -23,7 +23,6 @@ use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Company;
-use Mautic\LeadBundle\Entity\CompanyChangeLog;
 use Mautic\LeadBundle\Entity\CompanyLead;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\FrequencyRule;
@@ -364,16 +363,15 @@ class LeadModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param Lead                 $entity
-     * @param FormFactoryInterface $formFactory
-     * @param string|null          $action
-     * @param array                $options
+     * @param Lead        $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return \Symfony\Component\Form\Form
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Lead) {
             throw new MethodNotAllowedHttpException(['Lead'], 'Entity must be of class Lead()');
@@ -504,12 +502,13 @@ class LeadModel extends FormModel
             }
         }
 
-        $updatedFields = $entity->getUpdatedFields();
+        $updatedFields   = $entity->getUpdatedFields();
+        $changeLogEntity = null;
         if (isset($updatedFields['company'])) {
             $companyFieldMatches['company']            = $updatedFields['company'];
             [$company, $leadAdded, $companyEntity]     = IdentifyCompanyHelper::identifyLeadsCompany($companyFieldMatches, $entity, $this->companyModel);
             if ($leadAdded) {
-                $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                $changeLogEntity = $entity->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             }
         }
 
@@ -529,7 +528,9 @@ class LeadModel extends FormModel
             $this->companyModel->getCompanyLeadRepository()->removeContactPrimaryCompany($entity->getId());
         }
 
-        $this->em->clear(CompanyChangeLog::class);
+        if (null !== $changeLogEntity) {
+            $this->em->detach($changeLogEntity);
+        }
     }
 
     /**
@@ -1991,7 +1992,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2019,7 +2020,7 @@ class LeadModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -2051,7 +2052,8 @@ class LeadModel extends FormModel
         if (empty($options['includeAnonymous'])) {
             $q->andWhere($q->expr()->isNotNull('t.date_identified'));
         }
-        $results = $q->execute()->fetchAll();
+
+        $results = $q->execute()->fetchAllAssociative();
 
         if ($results) {
             foreach ($results as &$result) {
@@ -2072,16 +2074,9 @@ class LeadModel extends FormModel
     }
 
     /**
-     * Get timeline/engagement data.
-     *
-     * @param null $filters
-     * @param int  $page
-     * @param int  $limit
-     * @param bool $forTimeline
-     *
-     * @return array
+     * @param array<mixed, mixed>|null $filters
      */
-    public function getEngagements(Lead $lead = null, $filters = null, array $orderBy = null, $page = 1, $limit = 25, $forTimeline = true)
+    public function getEngagements(?Lead $lead = null, ?array $filters = null, ?array $orderBy = null, int $page = 1, int $limit = 25, bool $forTimeline = true): array
     {
         $event = $this->dispatcher->dispatch(
             new LeadTimelineEvent($lead, $filters, $orderBy, $page, $limit, $forTimeline, $this->coreParametersHelper->get('site_url')),
@@ -2267,7 +2262,7 @@ class LeadModel extends FormModel
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
+        $this->companyModel->getCompanyLeadRepository()->detachEntities($companyLeads);
 
         return ['oldPrimary' => $oldPrimaryCompany, 'newPrimary' => $companyId];
     }

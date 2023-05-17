@@ -72,8 +72,8 @@ trait CitrixStartTrait
                                 'productText' => sprintf($this->translator->trans('plugin.citrix.start.producttext'), ucfirst($product)),
                             ];
 
-                            $button = $this->templating->render(
-                                'MauticCitrixBundle:SubscribedEvents\EmailToken:token.html.php',
+                            $button = $this->twig->render(
+                                '@MauticCitrix/SubscribedEvents/EmailToken/token.html.twig',
                                 $params
                             );
                             $content = str_replace('{'.$product.'_button}', $button, $content);

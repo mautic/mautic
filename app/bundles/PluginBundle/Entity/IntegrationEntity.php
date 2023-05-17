@@ -33,12 +33,12 @@ class IntegrationEntity extends CommonEntity
     private $integrationEntityId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastSyncDate;
 
@@ -177,7 +177,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
@@ -197,7 +197,7 @@ class IntegrationEntity extends CommonEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getLastSyncDate()
     {

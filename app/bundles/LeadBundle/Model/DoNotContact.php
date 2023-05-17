@@ -2,11 +2,12 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
-class DoNotContact
+class DoNotContact implements MauticModelInterface
 {
     /**
      * @var LeadModel

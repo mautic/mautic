@@ -2,6 +2,7 @@
 
 namespace Mautic\AssetBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\EmailBundle\Entity\Email;
@@ -17,7 +18,7 @@ class Download
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateDownload;
 
@@ -66,6 +67,16 @@ class Download
      */
     private $email;
 
+    private ?string $utmCampaign;
+
+    private ?string $utmContent;
+
+    private ?string $utmMedium;
+
+    private ?string $utmSource;
+
+    private ?string $utmTerm;
+
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -112,6 +123,31 @@ class Download
         $builder->createManyToOne('email', 'Mautic\EmailBundle\Entity\Email')
             ->addJoinColumn('email_id', 'id', true, false, 'SET NULL')
             ->build();
+
+        $builder->createField('utmCampaign', Types::STRING)
+            ->columnName('utm_campaign')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmContent', Types::STRING)
+            ->columnName('utm_content')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmMedium', Types::STRING)
+            ->columnName('utm_medium')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmSource', Types::STRING)
+            ->columnName('utm_source')
+            ->nullable()
+            ->build();
+
+        $builder->createField('utmTerm', Types::STRING)
+            ->columnName('utm_term')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -141,7 +177,7 @@ class Download
     /**
      * Get dateDownload.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateDownload()
     {
@@ -328,5 +364,65 @@ class Download
     public function setEmail(Email $email)
     {
         $this->email = $email;
+    }
+
+    public function getUtmCampaign(): ?string
+    {
+        return $this->utmCampaign;
+    }
+
+    public function setUtmCampaign(?string $utmCampaign): static
+    {
+        $this->utmCampaign = $utmCampaign;
+
+        return $this;
+    }
+
+    public function getUtmContent(): ?string
+    {
+        return $this->utmContent;
+    }
+
+    public function setUtmContent(?string $utmContent): static
+    {
+        $this->utmContent = $utmContent;
+
+        return $this;
+    }
+
+    public function getUtmMedium(): ?string
+    {
+        return $this->utmMedium;
+    }
+
+    public function setUtmMedium(?string $utmMedium): static
+    {
+        $this->utmMedium = $utmMedium;
+
+        return $this;
+    }
+
+    public function getUtmSource(): ?string
+    {
+        return $this->utmSource;
+    }
+
+    public function setUtmSource(?string $utmSource): static
+    {
+        $this->utmSource = $utmSource;
+
+        return $this;
+    }
+
+    public function getUtmTerm(): ?string
+    {
+        return $this->utmTerm;
+    }
+
+    public function setUtmTerm(?string $utmTerm): static
+    {
+        $this->utmTerm = $utmTerm;
+
+        return $this;
     }
 }

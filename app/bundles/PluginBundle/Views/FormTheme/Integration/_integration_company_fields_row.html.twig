@@ -1,7 +1,0 @@
-{% block _integration_company_fields_row %}
-  {{ include('MauticPluginBundle:FormTheme:Integration/_fields_row.html.twig', {
-        'containerId': 'companyFieldsContainer',
-        'numberOfFields': (form.offsetExists('update_mautic_company1')) ? 5 : 4,
-        'object': 'company',
-  }) }}
-{% endblock %}

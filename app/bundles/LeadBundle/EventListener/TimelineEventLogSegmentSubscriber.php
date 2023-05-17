@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Translation\Translator;
@@ -64,7 +65,8 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             [$contact],
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
@@ -89,14 +91,15 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             $contacts,
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
     /**
      * @param $action
      */
-    private function writeEntries(array $contacts, LeadList $segment, $action)
+    private function writeEntries(array $contacts, LeadList $segment, $action, DateTime $date = null)
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];
@@ -123,6 +126,10 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
                         'object_description' => $segment->getName(),
                     ]
                 );
+
+            if ($date) {
+                $log->setDateAdded($date);
+            }
 
             $logs[] = $log;
         }
