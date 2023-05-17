@@ -37,6 +37,11 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     private $formModel;
 
     /**
+     * @var FormRepository|MockObject
+     */
+    private $formRepository;
+
+    /**
      * @var CoreParametersHelper|MockObject
      */
     private $coreParametersHelper;
@@ -59,7 +64,8 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $this->companyReportData    = $this->createMock(CompanyReportData::class);
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
-        $this->formRepository       = $this->createMock(FormModel::class);
+        $this->formModel            = $this->createMock(FormModel::class);
+        $this->formRepository       = $this->createMock(FormRepository::class);
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new ReportSubscriber(
@@ -140,6 +146,10 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $form->expects($this->once())
             ->method('getFields')
             ->willReturn([]);
+
+        $this->formModel->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->formRepository);
 
         $this->formRepository->expects($this->once())
             ->method('getEntities')

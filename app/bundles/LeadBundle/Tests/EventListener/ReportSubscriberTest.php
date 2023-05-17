@@ -41,7 +41,7 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var MockObject|FieldModel
      */
-    private $fieldModelMock;
+    private $leadFieldModelMock;
 
     /**
      * @var MockObject|StageModel
