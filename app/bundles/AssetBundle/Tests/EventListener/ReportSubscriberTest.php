@@ -7,6 +7,7 @@ namespace Mautic\AssetBundle\Tests\EventListener;
 use Mautic\AssetBundle\Entity\DownloadRepository;
 use Mautic\AssetBundle\EventListener\ReportSubscriber;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\ReportBundle\Entity\Report;
@@ -14,6 +15,7 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\Assert;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -41,7 +43,9 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         $this->queryBuilder       = $this->createMock(QueryBuilder::class);
-        $this->channelListHelper  = $this->createMock(ChannelListHelper::class);
+        $eventDispatcher          = $this->createMock(EventDispatcherInterface::class);
+        $this->channelListHelper  = new ChannelListHelper($eventDispatcher, $this->createMock(Translator::class));
+        $this->reportHelper       = new ReportHelper($eventDispatcher);
         $this->companyReportData  = $this->createMock(CompanyReportData::class);
         $this->downloadRepository = $this->createMock(DownloadRepository::class);
     }
