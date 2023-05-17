@@ -108,5 +108,5 @@ final class ReportEvents
      *
      * @var string
      */
-    public const ON_COLUMN_COLLECT = 'mautic.report_on_column_collect';
+    public const REPORT_ON_COLUMN_COLLECT = 'mautic.report_on_column_collect';
 }

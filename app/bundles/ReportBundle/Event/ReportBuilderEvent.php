@@ -323,13 +323,17 @@ class ReportBuilderEvent extends AbstractReportEvent
      *
      * @return array<string, string|int>
      */
-    public function getObjectColumns(string $object, array $properties = []): array
+    public function getMappedObjectColumns(string $object, array $properties = []): array
     {
-        if ('contact' === $object || 'company' === $object) {
-            return [];
-        }
-
-        return $this->reportHelper->getObjectColumns($object, $properties);
+        return array_map(
+            function ($item) {
+                if (isset($item['type'])) {
+                    $item['type'] =  $this->reportHelper->getReportBuilderFieldType($item['type']);
+                }
+                return $item;
+            },
+            $this->reportHelper->getMappedObjectsColumns($object, $properties)
+        );
     }
 
     /**

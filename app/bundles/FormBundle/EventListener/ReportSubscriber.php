@@ -159,26 +159,20 @@ class ReportSubscriber implements EventSubscriberInterface
                 $formEntity         = $form[0];
 
                 $formResultsColumns = $this->getFormResultsColumns($formEntity);
-                $leadColumns        = $event->getLeadColumns();
-                $companyColumns     = $this->companyReportData->getCompanyData();
-                unset($companyColumns['companies_lead.is_primary'], $companyColumns['companies_lead.date_added']);
-
-                $mappedObjectData    = $formEntity->getMappedFieldObjectData();
-
-                $columnsMapped = [];
+                $mappedObjectData   = $formEntity->getMappedFieldObjectData();
+                $columnsMapped      = [];
                 foreach ($mappedObjectData as $item) {
-                    $columns       = $event->getObjectColumns($item['mappedObject'], $item);
-                    $columnsMapped = array_merge($columnsMapped, $columns);
+                    $columns        = $event->getMappedObjectColumns($item['mappedObject'], $item);
+                    $columnsMapped  = array_merge($columnsMapped, $columns);
                 }
 
-                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns, $columnsMapped);
-
-                $data = [
+                $formResultsColumns = array_merge($formResultsColumns, $columnsMapped);
+                $data               = [
                     'display_name' => $formEntity->getId().' '.$formEntity->getName(),
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName   = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }

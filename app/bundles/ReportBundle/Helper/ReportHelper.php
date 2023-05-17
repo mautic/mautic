@@ -132,10 +132,10 @@ final class ReportHelper
      *
      * @return array<string, string|int>
      */
-    public function getObjectColumns(string $object, array $properties = []): array
+    public function getMappedObjectsColumns(string $object, array $properties = []): array
     {
         $event = new ColumnCollectEvent($object, $properties);
-        $this->dispatcher->dispatch($event, ReportEvents::ON_COLUMN_COLLECT);
+        $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_COLUMN_COLLECT);
         return $event->getColumns();
     }
 }
