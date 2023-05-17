@@ -5,8 +5,8 @@ namespace Mautic\FormBundle\EventListener;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
+use Mautic\FormBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -25,7 +25,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private SubmissionRepository $submissionRepository;
 
-    private FormRepository $formRepository;
+    private FormModel $formModel;
 
     private CoreParametersHelper $coreParametersHelper;
 
@@ -34,13 +34,13 @@ class ReportSubscriber implements EventSubscriberInterface
     public function __construct(
         CompanyReportData $companyReportData,
         SubmissionRepository $submissionRepository,
-        FormRepository $formRepository,
+        FormModel $formModel,
         CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator
     ) {
         $this->companyReportData    = $companyReportData;
         $this->submissionRepository = $submissionRepository;
-        $this->formRepository       = $formRepository;
+        $this->formModel            = $formModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
     }
@@ -135,11 +135,12 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         if ($event->checkContext(self::CONTEXT_FORM_RESULT)) {
+            $formRepository = $this->formModel->getRepository();
             // select only the table for an existing report, if the setting is disabled
             if (false === $this->coreParametersHelper->get('form_results_data_sources')) {
                 $reportSource = empty($event->getContext()) ? ($event->getReportSource() ?? '') : $event->getContext();
 
-                $id   = $this->formRepository->getFormTableIdViaResults($reportSource);
+                $id   = $formRepository->getFormTableIdViaResults($reportSource);
                 $args = [
                     'filter' => [
                         'force' => [
@@ -153,29 +154,31 @@ class ReportSubscriber implements EventSubscriberInterface
                 ];
             }
 
-            $forms = $this->formRepository->getEntities($args ?? []);
+            $forms = $formRepository->getEntities($args ?? []);
             foreach ($forms as $form) {
-                $formEntity          = $form[0];
+                $formEntity         = $form[0];
 
                 $formResultsColumns = $this->getFormResultsColumns($formEntity);
                 $leadColumns        = $event->getLeadColumns();
                 $companyColumns     = $this->companyReportData->getCompanyData();
+                unset($companyColumns['companies_lead.is_primary'], $companyColumns['companies_lead.date_added']);
 
                 $mappedObjectData    = $formEntity->getMappedFieldObjectData();
 
+                $columnsMapped = [];
                 foreach ($mappedObjectData as $item) {
-                    $columns       = $event->getObjectColumns($item['mappedObject'], ['fieldAlias' => $item['fieldAlias']]);
-                    $columnsMapped = array_merge($columnsMapped ?? [], $columns, $columnsMapped ?? []);
+                    $columns       = $event->getObjectColumns($item['mappedObject'], $item);
+                    $columnsMapped = array_merge($columnsMapped, $columns);
                 }
 
-                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns, $columnsMapped ?? []);
+                $formResultsColumns = array_merge($formResultsColumns, $leadColumns, $companyColumns, $columnsMapped);
 
                 $data = [
                     'display_name' => $formEntity->getId().' '.$formEntity->getName(),
                     'columns'      => $formResultsColumns,
                 ];
 
-                $resultsTableName = $this->formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
+                $resultsTableName = $formRepository->getResultsTableName($formEntity->getId(), $formEntity->getAlias());
                 $event->addTable(self::CONTEXT_FORM_RESULT.'.'.$resultsTableName, $data, self::CONTEXT_FORM_RESULT);
             }
         }
@@ -296,11 +299,12 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private function getFormResultsColumns(Form $form): array
     {
-        $prefix = 'fr.';
-        $fields = $form->getFields();
+        $prefix         = 'fr.';
+        $fields         = $form->getFields();
+        $viewOnlyFields = $this->formModel->getCustomComponents()['viewOnlyFields'];
 
         foreach ($fields as $field) {
-            if ('button' !== $field->getType()) {
+            if (!in_array($field->getType(), $viewOnlyFields)) {
                 $index                      = $prefix.$field->getAlias();
                 $formResultsColumns[$index] = [
                     'label' => $this->translator->trans('mautic.form.report.form_results.label', ['%field%' => $field->getLabel()]),

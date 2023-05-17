@@ -558,20 +558,19 @@ class Form extends FormEntity
      */
     public function getMappedFieldObjectData(): array
     {
-        $fields = array_filter(
-            $this->getFields()->map(
+        return array_filter(
+            array_map(
                 function (Field $field) {
                     return [
+                        'idFormField'  => $field->getId(),
                         'mappedObject' => $field->getMappedObject(),
                         'mappedField'  => $field->getMappedField(),
-                        'fieldAlias'   => $field->getAlias(),
                     ];
-                }
-            )->toArray(),
-            fn ($elem) => isset($elem['mappedObject'])
+                },
+                $this->getFields()->getValues()
+            ),
+            fn ($elem) => isset($elem['mappedObject']) && isset($elem['mappedField'])
         );
-
-        return array_map('unserialize', array_unique(array_map('serialize', $fields)));
     }
 
     /**

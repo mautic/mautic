@@ -9,7 +9,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 final class ColumnCollectEvent extends Event
 {
     private string $object;
+
+    /**
+     * @var array<string, mixed>
+     */
     private array $properties;
+
     /**
      * @var array<string, mixed>
      */
