@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\AbstractMauticTestCase;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\FormRepository;
 use Mautic\FormBundle\Entity\SubmissionRepository;
@@ -116,12 +117,12 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $mockEvent->expects($this->exactly(3))
             ->method('checkContext')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(true, true, false);
 
         $setTables = [];
         $setGraphs = [];
 
-        $mockEvent->expects($this->exactly(3))
+        $mockEvent->expects($this->exactly(2))
             ->method('addTable')
             ->willReturnCallback(function () use (&$setTables) {
                 $args = func_get_args();
@@ -137,33 +138,6 @@ class ReportSubscriberTest extends AbstractMauticTestCase
                 $setGraphs[] = $args;
             });
 
-        $form = $this->getMockBuilder(Form::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([
-                'getFields',
-            ])
-            ->getMock();
-
-        $form->expects($this->exactly(2))
-            ->method('getFields')
-            ->willReturn(new ArrayCollection([]));
-
-//        $form->expects($this->once())
-//            ->method('getValues')
-//            ->willReturn([]);
-
-        $this->formModel->expects($this->once())
-            ->method('getRepository')
-            ->willReturn($this->formRepository);
-
-        $this->formModel->expects($this->once())
-            ->method('getCustomComponents')
-            ->willReturn(['viewOnlyFields' => ["button", "captcha", "freetext", "freehtml", "pagebreak", 'plugin.loginSocial']]);
-
-        $this->formRepository->expects($this->once())
-            ->method('getEntities')
-            ->willReturn([[$form, 1]]);
-
         $this->companyReportData->expects($this->once())
             ->method('getCompanyData')
             ->with()
@@ -171,8 +145,101 @@ class ReportSubscriberTest extends AbstractMauticTestCase
 
         $this->subscriber->onReportBuilder($mockEvent);
 
-        $this->assertCount(3, $setTables);
+        $this->assertCount(2, $setTables);
         $this->assertCount(3, $setGraphs);
+    }
+
+    public function testOnReportBuilderAddsFormAndFormResultReports(): void
+    {
+        $mockEvent = $this->getMockBuilder(ReportBuilderEvent::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'checkContext',
+                'getStandardColumns',
+                'getCategoryColumns',
+                'addTable',
+                'getMappedObjectColumns',
+            ])
+            ->getMock();
+
+        $mockEvent->expects($this->once())
+            ->method('getStandardColumns')
+            ->willReturn([]);
+
+        $mockEvent->expects($this->once())
+            ->method('getCategoryColumns')
+            ->willReturn([]);
+
+        $mockEvent->expects($this->exactly(3))
+            ->method('checkContext')
+            ->willReturnOnConsecutiveCalls(true, false, true);
+
+        $form = $this->getMockBuilder(Form::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods([
+                'getFields',
+                'getMappedFieldValues',
+            ])
+            ->getMock();
+
+        $field = $this->createMock(Field::class);
+        $field->expects($this->exactly(2))
+            ->method('getAlias')
+            ->willReturn('email');
+        $field->expects($this->once())
+            ->method('getLabel')
+            ->willReturn('Email');
+        $field->expects($this->exactly(2))
+            ->method('getType')
+            ->willReturn('string');
+
+        $form->expects($this->once())
+            ->method('getFields')
+            ->willReturn(new ArrayCollection([$field]));
+
+        $form->expects($this->once())
+            ->method('getMappedFieldValues')
+            ->willReturn([
+                [
+                    'idFormFields' => 1,
+                    'mappedObject' => 'contact',
+                    'mappedField'  => 'email',
+                ],
+            ]);
+
+        $mockEvent->expects($this->once())
+            ->method('getMappedObjectColumns')
+            ->willReturnOnConsecutiveCalls([]);
+
+        $this->formModel->expects($this->once())
+            ->method('getRepository')
+            ->willReturn($this->formRepository);
+
+        $this->formModel->expects($this->once())
+            ->method('getCustomComponents')
+            ->willReturn(['viewOnlyFields' => ['button', 'captcha', 'freetext', 'freehtml', 'pagebreak', 'plugin.loginSocial']]);
+
+        $this->formRepository->expects($this->once())
+            ->method('getEntities')
+            ->willReturn([[$form, 1]]);
+
+        $this->formRepository->expects($this->once())
+            ->method('getResultsTableName')
+            ->willReturn('test');
+
+        $setTables = [];
+
+        $mockEvent->expects($this->exactly(2))
+            ->method('addTable')
+            ->willReturnCallback(function () use (&$setTables) {
+                $args = func_get_args();
+
+                $setTables[] = $args;
+            });
+
+        $this->subscriber->onReportBuilder($mockEvent);
+
+        $this->assertCount(2, $setTables);
     }
 
     public function testOnReportGenerateFormsContext(): void
