@@ -152,28 +152,37 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
+        // id is hinted as an int but actually returns a string causing really weird issues with assertEquals
+        // if expected id is casted to a string or not casted (still a string), the actual value is an int and fails
+        // if expected id is casted to an int, all the expected int values are converted to strings and it fails
+        // casting exptected id to an int and testing each individual value as an int works
+        $membersForCampaign = $this->getMembersForCampaign($campaign->getId());
         $this->assertSame(
             [
-                [
-                    'lead_id'          => (string) $contactA->getId(),
-                    'manually_added'   => '1',
-                    'manually_removed' => '0',
-                    'date_last_exited' => null,
-                ],
-                [
-                    'lead_id'          => (string) $contactB->getId(),
-                    'manually_added'   => '1',
-                    'manually_removed' => '0',
-                    'date_last_exited' => null,
-                ],
-                [
-                    'lead_id'          => (string) $contactC->getId(),
-                    'manually_added'   => '1',
-                    'manually_removed' => '0',
-                    'date_last_exited' => null,
-                ],
+                'lead_id'          => (int) $contactA->getId(),
+                'manually_added'   => 1,
+                'manually_removed' => 0,
+                'date_last_exited' => null,
             ],
-            $this->getMembersForCampaign($campaign->getId())
+            $membersForCampaign[0]
+        );
+        $this->assertSame(
+            [
+                'lead_id'          => (int) $contactB->getId(),
+                'manually_added'   => 1,
+                'manually_removed' => 0,
+                'date_last_exited' => null,
+            ],
+            $membersForCampaign[1]
+        );
+        $this->assertSame(
+            [
+                'lead_id'          => (int) $contactC->getId(),
+                'manually_added'   => 1,
+                'manually_removed' => 0,
+                'date_last_exited' => null,
+            ],
+            $membersForCampaign[2]
         );
 
         $response = json_decode($clientResponse->getContent(), true);
@@ -193,28 +202,39 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
+
+
+        // id is hinted as an int but actually returns a string causing really weird issues with assertEquals
+        // if expected id is casted to a string or not casted (still a string), the actual value is an int and fails
+        // if expected id is casted to an int, all the expected int values are converted to strings and it fails
+        // casting exptected id to an int and testing each individual value as an int works
+        $membersForCampaign = $this->getMembersForCampaign($campaign->getId());
         $this->assertSame(
             [
-                [
-                    'lead_id'          => (string) $contactA->getId(),
-                    'manually_added'   => '0',
-                    'manually_removed' => '1',
-                    'date_last_exited' => null,
-                ],
-                [
-                    'lead_id'          => (string) $contactB->getId(),
-                    'manually_added'   => '0',
-                    'manually_removed' => '1',
-                    'date_last_exited' => null,
-                ],
-                [
-                    'lead_id'          => (string) $contactC->getId(),
-                    'manually_added'   => '0',
-                    'manually_removed' => '1',
-                    'date_last_exited' => null,
-                ],
+                'lead_id'          => (int) $contactA->getId(),
+                'manually_added'   => 0,
+                'manually_removed' => 1,
+                'date_last_exited' => null,
             ],
-            $this->getMembersForCampaign($campaign->getId())
+            $membersForCampaign[0]
+        );
+        $this->assertSame(
+            [
+                'lead_id'          => (int) $contactB->getId(),
+                'manually_added'   => 0,
+                'manually_removed' => 1,
+                'date_last_exited' => null,
+            ],
+            $membersForCampaign[1]
+        );
+        $this->assertSame(
+            [
+                'lead_id'          => (int) $contactC->getId(),
+                'manually_added'   => 0,
+                'manually_removed' => 1,
+                'date_last_exited' => null,
+            ],
+            $membersForCampaign[2]
         );
 
         $response = json_decode($clientResponse->getContent(), true);
