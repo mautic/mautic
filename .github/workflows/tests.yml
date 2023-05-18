@@ -218,9 +218,30 @@ jobs:
           cd test_composer
           cp ../.github/ci-files/composer.json ./
           composer install
-          
+
+          # install NPM packages
+          npm install
+
           # test if console works by generating assets for next step
           php ./bin/console mautic:assets:generate
+
+          # test that production assets were generated
+          generated_prod_files=(
+            "docroot/media/css/app.css"
+            "docroot/media/css/libraries.css"
+            "docroot/media/js/app.js"
+            "docroot/media/js/libraries.js"
+            "docroot/media/js/mautic-form.js"
+          )
+          
+          for file in "${generated_prod_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Error: File '$file' was not generated during production asset build!"
+              exit 1
+            fi
+          done
+
+          echo "All production assets were generated sucessfully."
           
           # test if media/css and media/js folder contain the same files as the tarball releases
           test -z "$(comm -23 <(ls ../media/js  | sort) <(ls docroot/media/js  | sort))"
