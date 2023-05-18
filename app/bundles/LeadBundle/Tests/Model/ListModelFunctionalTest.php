@@ -95,7 +95,7 @@ class ListModelFunctionalTest extends MauticMysqlTestCase
         );
 
         Assert::assertSame(4, end($data['datasets'][0]['data'])); // Added for today.
-        Assert::assertSame('2', end($data['datasets'][1]['data'])); // Removed for today.
+        Assert::assertSame(2, end($data['datasets'][1]['data'])); // Removed for today.
         Assert::assertSame(2, end($data['datasets'][2]['data'])); // Total for today.
     }
 }

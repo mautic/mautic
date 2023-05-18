@@ -42,16 +42,16 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
 
         $objectMapping = $this->createObjectMapping();
         $expectedData  = [
-            'id'                       => (string) $objectMapping->getId(),
+            'id'                       => $objectMapping->getId(),
             'date_created'             => $objectMapping->getDateCreated()->format(DateTimeHelper::FORMAT_DB),
             'integration'              => $objectMapping->getIntegration(),
             'internal_object_name'     => $objectMapping->getInternalObjectName(),
-            'internal_object_id'       => (string) $objectMapping->getInternalObjectId(),
+            'internal_object_id'       => $objectMapping->getInternalObjectId(),
             'integration_object_name'  => $objectMapping->getIntegrationObjectName(),
             'integration_object_id'    => $objectMapping->getIntegrationObjectId(),
             'last_sync_date'           => $objectMapping->getLastSyncDate()->format(DateTimeHelper::FORMAT_DB),
             'internal_storage'         => json_encode($objectMapping->getInternalStorage()),
-            'is_deleted'               => (string) (int) $objectMapping->isDeleted(),
+            'is_deleted'               => (int) $objectMapping->isDeleted(),
             'integration_reference_id' => $objectMapping->getIntegrationReferenceId(),
         ];
         Assert::assertSame($expectedData, $this->repository->getInternalObject(...$arguments));
@@ -65,7 +65,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
 
         $this->repository->updateInternalObjectId($newInternalObjectId, $objectMapping->getId());
 
-        Assert::assertSame((string) $newInternalObjectId, $this->repository->getValue($objectMapping->getId(), 'internal_object_id'));
+        Assert::assertSame($newInternalObjectId, $this->repository->getValue($objectMapping->getId(), 'internal_object_id'));
     }
 
     public function testInsert(): void

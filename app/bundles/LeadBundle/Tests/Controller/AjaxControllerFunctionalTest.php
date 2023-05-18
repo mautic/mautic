@@ -44,7 +44,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
 
         // Ensure the contact 1 is a campaign 1 member now.
-        $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '1', 'manually_removed' => '0']], $this->getMembersForCampaign($campaign->getId()));
+        $membersForCampaign = $this->getMembersForCampaign($campaign->getId());
+        $this->assertSame($contact->getId(), (string) $membersForCampaign[0]['lead_id']);
+        $this->assertSame(1, $membersForCampaign[0]['manually_added']);
+        $this->assertSame(0, $membersForCampaign[0]['manually_removed']);
 
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
         $this->assertSame(1, $response['success']);
@@ -62,7 +65,10 @@ class AjaxControllerFunctionalTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         // Ensure the contact 1 was removed as a member of campaign 1 member now.
-        $this->assertSame([['lead_id' => (string) $contact->getId(), 'manually_added' => '0', 'manually_removed' => '1']], $this->getMembersForCampaign($campaign->getId()));
+        $membersForCampaign = $this->getMembersForCampaign($campaign->getId());
+        $this->assertSame($contact->getId(), (string) $membersForCampaign[0]['lead_id']);
+        $this->assertSame(0, $membersForCampaign[0]['manually_added']);
+        $this->assertSame(1, $membersForCampaign[0]['manually_removed']);
 
         $this->assertTrue($clientResponse->isOk(), $clientResponse->getContent());
         $this->assertTrue(isset($response['success']), 'The response does not contain the `success` param.');
