@@ -13,7 +13,7 @@ class FormEntity extends CommonEntity
     /**
      * @var bool
      */
-    private $isPublished = true;
+    protected $isPublished = true;
 
     /**
      * @var \DateTimeInterface|null
