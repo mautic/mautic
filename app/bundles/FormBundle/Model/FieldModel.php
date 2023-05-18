@@ -145,11 +145,11 @@ class FieldModel extends CommonFormModel
         return $testAlias;
     }
 
-    public function hasChoices(Field $entity): bool
+    public function hasChoices(Field $field): bool
     {
-        $properties = $entity->getProperties();
+        $properties = $field->getProperties();
 
-        return 'checkboxgrp' === $entity->getType() ||
+        return 'checkboxgrp' === $field->getType() ||
             (key_exists('multiple', $properties) && 1 === $properties['multiple']);
     }
 
