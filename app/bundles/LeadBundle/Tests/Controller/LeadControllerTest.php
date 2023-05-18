@@ -202,8 +202,6 @@ class LeadControllerTest extends MauticMysqlTestCase
         $clientResponse = $this->client->getResponse();
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
 
-
-
         // id is hinted as an int but actually returns a string causing really weird issues with assertEquals
         // if expected id is casted to a string or not casted (still a string), the actual value is an int and fails
         // if expected id is casted to an int, all the expected int values are converted to strings and it fails
