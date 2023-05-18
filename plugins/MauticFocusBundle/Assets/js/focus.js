@@ -424,21 +424,33 @@ Mautic.focusLoadConversionRateTable = function() {
     var $conversionRateTotalCell = mQuery('[data-conversion-rate-total-cell]', $conversionRateTable);
     var $focusTotalViewsCell = mQuery('[data-focus-total-views-cell]');
     var focusId = $conversionRateTable.data('entity-id');
+    var views = null;
+    var clickThrough = null;
+
+    var updateTotalClickThroughRate = function() {
+        if (views === null || clickThrough === null) return;
+
+        var totalConversionRate = views > 0 ? Math.round(clickThrough / views * 10000) / 100 : 0;
+        $conversionRateTotalCell.children('.spinner').remove();
+        $conversionRateTotalCell.prepend(totalConversionRate + '%')
+    };
 
     Mautic.ajaxActionRequest('plugin:focus:getViewsCount', {focusId: focusId}, function(response){
-        var views = response.views;
-        var totalUniqueHits = 0;
+        views = response.views;
 
         $conversionRateCells.each(function(i, el) {
             var $cell = mQuery(el);
             var uniqueHits = $cell.data('unique-hits');
             var conversionRate = views > 0 ? Math.round(uniqueHits / views * 10000) / 100 : 0;
             $cell.html(conversionRate + '%');
-            totalUniqueHits += uniqueHits;
         })
 
-        var totalConversionRate = views > 0 ? Math.round(totalUniqueHits / views * 10000) / 100 : 0;
-        $conversionRateTotalCell.html(totalConversionRate + '%');
         $focusTotalViewsCell.html(views);
+        updateTotalClickThroughRate();
+    }, false, true, "GET");
+
+    Mautic.ajaxActionRequest('plugin:focus:getClickThroughCount', {focusId: focusId}, function(response){
+        clickThrough = response.clickThrough;
+        updateTotalClickThroughRate();
     }, false, true, "GET");
 }

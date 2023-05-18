@@ -44,7 +44,7 @@ class StatRepository extends CommonRepository
     {
         $q = $this->_em->getConnection()->createQueryBuilder();
 
-        $q->select('count(s.id) as views_count')
+        $q->select('COUNT(s.id) as views_count')
             ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
 
         $expr = $q->expr()->and(
@@ -55,6 +55,25 @@ class StatRepository extends CommonRepository
         $q->where($expr)
             ->setParameter('id', $id)
             ->setParameter('type', Stat::TYPE_NOTIFICATION);
+
+        return (int) $q->execute()->fetchOne();
+    }
+
+    public function getClickThroughCount(int $id): int
+    {
+        $q = $this->_em->getConnection()->createQueryBuilder();
+
+        $q->select('COUNT(DISTINCT s.lead_id) as click_through_count')
+            ->from(MAUTIC_TABLE_PREFIX.'focus_stats', 's');
+
+        $expr = $q->expr()->and(
+            $q->expr()->eq('s.focus_id', ':id'),
+            $q->expr()->eq('s.type', ':type')
+        );
+
+        $q->where($expr)
+            ->setParameter('id', $id)
+            ->setParameter('type', Stat::TYPE_CLICK);
 
         return (int) $q->execute()->fetchOne();
     }

@@ -90,4 +90,43 @@ class AjaxController extends CommonAjaxController
             'views'   => $viewsCount,
         ]);
     }
+
+    public function getClickThroughCountAction(Request $request): JsonResponse
+    {
+        $focusId = (int) InputHelper::clean($request->query->get('focusId'));
+
+        if (0 === $focusId) {
+            return $this->sendJsonResponse([
+                'success' => 0,
+                'message' => $this->translator->trans('mautic.core.error.badrequest'),
+            ], 400);
+        }
+
+        $cacheTimeout = (int) $this->coreParametersHelper->get('cached_data_timeout');
+        $cacheItem    = $this->cacheProvider->getItem('focus.clickThroughCount.'.$focusId);
+
+        if ($cacheItem->isHit()) {
+            $clickThroughCount = $cacheItem->get();
+        } else {
+            /** @var FocusModel $model */
+            $model   = $this->getModel('focus');
+
+            $focus = $model->getEntity($focusId);
+            if (null === $focus) {
+                return $this->sendJsonResponse([
+                    'success' => 0,
+                    'message' => $this->translator->trans('mautic.api.call.notfound'),
+                ], 404);
+            }
+            $clickThroughCount = $model->getClickThroughCount($focus);
+            $cacheItem->set($clickThroughCount);
+            $cacheItem->expiresAfter($cacheTimeout * 60);
+            $this->cacheProvider->save($cacheItem);
+        }
+
+        return $this->sendJsonResponse([
+            'success'        => 1,
+            'clickThrough'   => $clickThroughCount,
+        ]);
+    }
 }

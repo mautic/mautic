@@ -476,4 +476,9 @@ class FocusModel extends FormModel
     {
         return $this->getStatRepository()->getViewsCount($focus->getId());
     }
+
+    public function getClickThroughCount(Focus $focus): int
+    {
+        return $this->getStatRepository()->getClickThroughCount($focus->getId());
+    }
 }
