@@ -556,7 +556,7 @@ class Form extends FormEntity
      *
      * @return array<int, array<string, int|string>>
      */
-    public function getMappedFieldObjectData(): array
+    public function getMappedFieldValues(): array
     {
         return array_filter(
             array_map(
