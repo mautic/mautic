@@ -120,10 +120,9 @@ final class ContentDTO implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return array|mixed
-     */
-    public function jsonSerialize()
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'subject' => $this->subject,

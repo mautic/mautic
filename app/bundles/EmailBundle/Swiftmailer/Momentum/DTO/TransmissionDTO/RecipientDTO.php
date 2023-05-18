@@ -98,10 +98,9 @@ final class RecipientDTO implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'address' => $this->address,

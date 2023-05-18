@@ -71,10 +71,9 @@ class TransmissionDTO implements \JsonSerializable
         $this->campaignId = $campaignId;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'return_path' => $this->returnPath,

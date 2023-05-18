@@ -38,10 +38,9 @@ final class AddressDTO implements \JsonSerializable
         }
     }
 
-    /**
-     * @return array
-     */
-    public function jsonSerialize()
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'email' => $this->email,

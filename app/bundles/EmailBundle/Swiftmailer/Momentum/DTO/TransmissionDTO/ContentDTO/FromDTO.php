@@ -39,10 +39,9 @@ final class FromDTO implements \JsonSerializable
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'email' => $this->email,

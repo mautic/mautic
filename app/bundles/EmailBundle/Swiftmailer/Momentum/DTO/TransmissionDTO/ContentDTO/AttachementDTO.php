@@ -36,10 +36,9 @@ final class AttachementDTO implements \JsonSerializable
         $this->content = $content;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         return [
             'type' => $this->type,
