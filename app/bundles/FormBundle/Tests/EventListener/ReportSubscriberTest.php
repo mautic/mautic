@@ -2,6 +2,7 @@
 
 namespace Mautic\FormBundle\Tests\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -105,7 +106,7 @@ class ReportSubscriberTest extends AbstractMauticTestCase
             ->method('getCampaignByChannelColumns')
             ->willReturn([]);
 
-        $mockEvent->expects($this->exactly(2))
+        $mockEvent->expects($this->once())
             ->method('getLeadColumns')
             ->willReturn([]);
 
@@ -143,19 +144,27 @@ class ReportSubscriberTest extends AbstractMauticTestCase
             ])
             ->getMock();
 
-        $form->expects($this->once())
+        $form->expects($this->exactly(2))
             ->method('getFields')
-            ->willReturn([]);
+            ->willReturn(new ArrayCollection([]));
+
+//        $form->expects($this->once())
+//            ->method('getValues')
+//            ->willReturn([]);
 
         $this->formModel->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->formRepository);
 
+        $this->formModel->expects($this->once())
+            ->method('getCustomComponents')
+            ->willReturn(['viewOnlyFields' => ["button", "captcha", "freetext", "freehtml", "pagebreak", 'plugin.loginSocial']]);
+
         $this->formRepository->expects($this->once())
             ->method('getEntities')
             ->willReturn([[$form, 1]]);
 
-        $this->companyReportData->expects($this->exactly(2))
+        $this->companyReportData->expects($this->once())
             ->method('getCompanyData')
             ->with()
             ->willReturn([]);
