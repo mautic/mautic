@@ -82,7 +82,7 @@ class FieldModelTest extends TestCase
     }
 
     /**
-     * @return iterable<array<int, array<string, array<string, int>, bool>>>
+     * @return array<int, mixed>
      */
     public function dataProvider(): iterable
     {

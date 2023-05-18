@@ -22,6 +22,7 @@ use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Entity\Report;
+use Mautic\ReportBundle\Event\ColumnCollectEvent;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportDataEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -1022,4 +1023,106 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEventMock);
         $this->reportSubscriber->onReportDisplay($this->reportDataEventMock);
     }
+
+    public function testOnReportColumnCollectForCompany(): void
+    {
+        $companyFields  = [
+            'comp.id'   => [
+                'alias' => 'comp_id',
+                'label' => 'mautic.lead.report.company.company_id',
+                'type'  => 'int',
+                'link'  => 'mautic_company_action',
+            ],
+            'companies_lead.is_primary' => [
+                'label' => 'mautic.lead.report.company.is_primary',
+                'type'  => 'bool',
+            ],
+            'companies_lead.date_added' => [
+                'label' => 'mautic.lead.report.company.date_added',
+                'type'  => 'datetime',
+            ],
+        ];
+
+        $fields         = [
+            'comp.id'   => [
+                'alias' => 'comp_id',
+                'label' => 'mautic.lead.report.company.company_id',
+                'type'  => 'int',
+                'link'  => 'mautic_company_action',
+            ],
+        ];
+
+        $columnCollectEventMock = $this->createMock(ColumnCollectEvent::class);
+
+        $columnCollectEventMock->expects($this->once())
+            ->method('getObject')
+            ->willReturn('company');
+
+        $this->companyReportDataMock->expects($this->once())
+            ->method('getCompanyData')
+            ->willReturn($companyFields);
+
+        $columnCollectEventMock->expects($this->once())
+            ->method('addColumns')
+            ->with($fields);
+
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEventMock);
+    }
+
+    public function testOnReportColumnCollectForContact(): void
+    {
+
+        $publishedFields = [
+            [
+                'label'  => 'Email',
+                'type'   => 'string',
+                'alias'  => 'email',
+            ],
+            [
+                'label'  => 'Firstname',
+                'type'   => 'string',
+                'alias'  => 'firstname',
+            ],
+        ];
+
+        $fields           = [
+            'l.email'     => [
+                'label'   => '',
+                'type'    => 'string',
+                'alias'   => 'email',
+            ],
+            'l.firstname' => [
+                'label'   => '',
+                'type'    => 'string',
+                'alias'   => 'firstname',
+            ],
+            'l.id'        => [
+                'label'   => 'mautic.lead.report.contact_id',
+                'type'    => 'int',
+                'link'    => 'mautic_contact_action',
+                'alias'   => 'contactId',
+            ],
+        ];
+
+        $columnCollectEventMock = $this->createMock(ColumnCollectEvent::class);
+
+        $columnCollectEventMock->expects($this->once())
+            ->method('getObject')
+            ->willReturn('contact');
+
+        $columnCollectEventMock->expects($this->once())
+            ->method('getProperties')
+            ->willReturn([]);
+
+        $this->leadFieldModelMock->expects($this->once())
+            ->method('getPublishedFieldArrays')
+            ->willReturn($publishedFields);
+
+        $columnCollectEventMock->expects($this->once())
+            ->method('addColumns')
+            ->with($fields);
+
+        $this->reportSubscriber->onReportColumnCollect($columnCollectEventMock);
+    }
+
 }

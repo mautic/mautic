@@ -6,7 +6,7 @@ namespace Mautic\ReportBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
-final class ColumnCollectEvent extends Event
+class ColumnCollectEvent extends Event
 {
     private string $object;
 
