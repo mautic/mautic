@@ -1071,7 +1071,6 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnReportColumnCollectForContact(): void
     {
-
         $publishedFields = [
             [
                 'label'  => 'Email',
@@ -1124,5 +1123,4 @@ class ReportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->reportSubscriber->onReportColumnCollect($columnCollectEventMock);
     }
-
 }
