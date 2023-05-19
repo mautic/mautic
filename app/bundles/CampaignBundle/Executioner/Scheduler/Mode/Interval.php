@@ -229,6 +229,7 @@ class Interval implements ScheduleModeInterface
         /** @var \DateTime $groupHour */
         $groupHour = clone $hour;
 
+        /** @var \DateTime $groupExecutionDate */
         $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
         $groupExecutionDate->setTime($groupHour->format('H'), $groupHour->format('i'));
 
@@ -267,14 +268,13 @@ class Interval implements ScheduleModeInterface
             unset($tempStartTime);
         }
 
+        /** @var \DateTime $groupExecutionDate */
         $groupExecutionDate = $this->getGroupExecutionDateWithTimeZone($contact, $eventId, $compareFromDateTime);
 
         // Is the time between the start and end hours?
-        /* @var \DateTime $testStartDateTime */
         $testStartDateTime = clone $groupExecutionDate;
         $testStartDateTime->setTime($startTime->format('H'), $startTime->format('i'));
 
-        /* @var \DateTime $testStopDateTime */
         $testStopDateTime = clone $groupExecutionDate;
         $testStopDateTime->setTime($endTime->format('H'), $endTime->format('i'));
 
@@ -307,8 +307,9 @@ class Interval implements ScheduleModeInterface
         return $this->defaultTimezone;
     }
 
-    private function getGroupExecutionDateWithTimeZone(Lead $contact, int $eventId, \DateTime $compareFromDateTime): \DateTime
+    private function getGroupExecutionDateWithTimeZone(Lead $contact, int $eventId, \DateTimeInterface $compareFromDateTime): \DateTimeInterface
     {
+        /** @var \DateTime $groupExecutionDate */
         $groupExecutionDate = clone $compareFromDateTime;
         $contactTimezone    = $this->getDefaultTimezone();
         // Set execution to UTC
