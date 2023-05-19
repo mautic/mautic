@@ -141,7 +141,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $contact2 = $this->createContact('paul@example.com');
 
         $this->em->flush();
-        $email   = $this->createEmail(
+        $email   = $this->createEmailWithParams(
             'Email A',
             'Email A Subject',
             'list',
@@ -173,7 +173,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $contactPl2 = $this->createContact('jadwiga@example.com');
         $this->em->flush();
 
-        $emailEn   = $this->createEmail(
+        $emailEn   = $this->createEmailWithParams(
             'Email EN',
             'Email EN Subject',
             'list',
@@ -183,7 +183,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $emailEn->setLanguage('en');
         $this->em->flush();
 
-        $emailPl   = $this->createEmail(
+        $emailPl   = $this->createEmailWithParams(
             'Email PL',
             'Email PL Subject',
             'list',
@@ -223,7 +223,7 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    private function createEmail(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
+    private function createEmailWithParams(string $name, string $subject, string $emailType, string $template, string $customHtml, array $segments = []): Email
     {
         $email = new Email();
         $email->setName($name);
