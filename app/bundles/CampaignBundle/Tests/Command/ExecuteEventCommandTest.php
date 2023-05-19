@@ -6,7 +6,6 @@ use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use DateTime;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
-use Mautic\CampaignBundle\Executioner\Scheduler\Mode\Interval;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
@@ -197,11 +196,7 @@ class ExecuteEventCommandTest extends AbstractCampaignCommand
 
         Assert::assertTrue($log->getIsScheduled());
 
-        [$tube, $task] = explode('.', EventTube::ACTION);
-        $job           = $this->em->getRepository(Job::class)->findOneBy(['tube' => $tube, 'task' => $task, 'primaryEntityId' => $log->getEvent()->getId()]);
-        \assert($job instanceof Job);
-
-        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId(), '--execution-time' => $job->getDelay()->format(Interval::LOG_DATE_FORMAT)]);
+        $output = $this->runCommand('mautic:campaigns:execute', ['--scheduled-log-ids' => $log->getId()]);
 
         Assert::assertStringContainsString('1 total events(s) to be processed', $output);
         Assert::assertStringContainsString('1 total event was executed', $output);
