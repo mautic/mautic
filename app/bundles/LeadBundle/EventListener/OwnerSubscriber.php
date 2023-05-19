@@ -126,7 +126,7 @@ class OwnerSubscriber implements EventSubscriberInterface
         foreach (self::onwerColumns as $ownerColumn) {
             $token = $this->buildToken($ownerColumn);
             if (false !== strpos($combinedContent, $token)) {
-                $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
+                $ownerColumnNormalized = $this->getOwnerColumnNormalized($ownerColumn);
                 $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
             }
         }
@@ -224,13 +224,13 @@ class OwnerSubscriber implements EventSubscriberInterface
             return $this->getEmptyTokens();
         }
 
-        return [
-            $this->buildToken('email')     => ArrayHelper::getValue('email', $owner),
-            $this->buildToken('firstname') => ArrayHelper::getValue('first_name', $owner),
-            $this->buildToken('lastname')  => ArrayHelper::getValue('last_name', $owner),
-            $this->buildToken('position')  => ArrayHelper::getValue('position', $owner),
-            $this->buildToken('signature') => nl2br(ArrayHelper::getValue('signature', $owner)),
-        ];
+        $tokens = [];
+        foreach (self::onwerColumns as $ownerColumn) {
+            $ownerColumnNormalized                   = $this->getOwnerColumnNormalized($ownerColumn);
+            $tokens[$this->buildToken($ownerColumn)] = $owner[$ownerColumnNormalized] ?? null;
+        }
+
+        return $tokens;
     }
 
     /**
@@ -238,12 +238,19 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getTokens(): array
     {
-        return [
-            $this->buildToken('email')     => $this->buildLabel('email'),
-            $this->buildToken('firstname') => $this->buildLabel('firstname'),
-            $this->buildToken('lastname')  => $this->buildLabel('lastname'),
-            $this->buildToken('position')  => $this->buildLabel('position'),
-            $this->buildToken('signature') => $this->buildLabel('signature'),
-        ];
+        $tokens = [];
+        foreach (self::onwerColumns as $ownerColumn) {
+            $tokens[$this->buildToken($ownerColumn)] = $this->buildLabel($ownerColumn);
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * @return array|string|string[]
+     */
+    protected function getOwnerColumnNormalized(string $ownerColumn): string|array
+    {
+        return str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
     }
 }
