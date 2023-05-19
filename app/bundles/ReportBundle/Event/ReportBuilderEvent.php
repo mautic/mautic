@@ -122,7 +122,7 @@ class ReportBuilderEvent extends AbstractReportEvent
             uasort(
                 $data['filters'],
                 function ($a, $b) {
-                    return strnatcmp($a['label'], $b['label']);
+                    return strnatcmp((string) $a['label'], (string) $b['label']);
                 }
             );
         }
