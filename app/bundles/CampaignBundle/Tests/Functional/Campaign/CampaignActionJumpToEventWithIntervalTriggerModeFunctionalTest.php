@@ -108,7 +108,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
      */
     public function dataForCampaignWithJumpToEventWithIntervalTriggerMode(): iterable
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime();
 
         $event = new Event();
         $event->setName('Adjust points');
@@ -153,8 +153,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
 
         $adjustPointEvent = clone $event;
         $adjustPointEvent->setTriggerDate($now);
-        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+2 hour')->format('H:i'));
-        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+3 hour')->format('H:i'));
+        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+2 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+3 hour'));
 
         yield 'Points at a relative time: Between future start and stop time on same day' => [
             $adjustPointEvent,
@@ -163,8 +163,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('-2 hour')->format('H:i'));
-        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('-1 hour')->format('H:i'));
+        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('-2 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('-1 hour'));
 
         yield 'Points at a relative time: Between passed time' => [
             $adjustPointEvent,
@@ -173,8 +173,8 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+3 hour')->format('H:i'));
-        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+4 hour')->format('H:i'));
+        $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+3 hour'));
+        $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+4 hour'));
 
         yield 'Points at a relative time: Between future time' => [
             $adjustPointEvent,

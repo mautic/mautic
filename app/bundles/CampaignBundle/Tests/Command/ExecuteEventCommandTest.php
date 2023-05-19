@@ -2,10 +2,10 @@
 
 namespace Mautic\CampaignBundle\Tests\Command;
 
-use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use DateTime;
 use Mautic\CampaignBundle\Entity\LeadEventLog;
 use Mautic\CampaignBundle\Entity\LeadEventLogRepository;
+use Mautic\CampaignBundle\Executioner\ScheduledExecutioner;
 use Mautic\CampaignBundle\Tests\Functional\Fixtures\FixtureHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use PHPUnit\Framework\Assert;
