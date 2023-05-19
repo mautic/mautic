@@ -145,14 +145,6 @@ class FieldModel extends CommonFormModel
         return $testAlias;
     }
 
-    public function hasChoices(Field $field): bool
-    {
-        $properties = $field->getProperties();
-
-        return 'checkboxgrp' === $field->getType() ||
-            (key_exists('multiple', $properties) && 1 === $properties['multiple']);
-    }
-
     /**
      * @return FormFieldEvent|Event|void|null
      *

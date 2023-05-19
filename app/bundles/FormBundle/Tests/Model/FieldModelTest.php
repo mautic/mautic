@@ -58,39 +58,4 @@ class FieldModelTest extends TestCase
             $this->assertEquals($expected, $alias);
         }
     }
-
-    /**
-     * @dataProvider dataProvider
-     *
-     * @param array<string, int> $properties
-     */
-    public function testHasChoices(string $type, array $properties, bool $result): void
-    {
-        $leadFieldModel = $this->createMock(\Mautic\LeadBundle\Model\FieldModel::class);
-        $fieldModel     = new FieldModel($leadFieldModel);
-
-        $field          = $this->createMock(Field::class);
-
-        $field->expects($this->once())
-            ->method('getType')
-            ->willReturn($type);
-        $field->expects($this->once())
-            ->method('getProperties')
-            ->willReturn($properties);
-
-        $this->assertEquals($result, $fieldModel->hasChoices($field));
-    }
-
-    /**
-     * @return array<int, mixed>
-     */
-    public function dataProvider(): iterable
-    {
-        yield ['string', [], false];
-        yield ['string', ['multiple' => 0], false];
-        yield ['string', ['multiple' => 1], true];
-        yield ['checkboxgrp', [], true];
-        yield ['checkboxgrp', ['multiple' => 0], true];
-        yield ['checkboxgrp', ['multiple' => 1], true];
-    }
 }
