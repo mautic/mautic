@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -27,6 +28,8 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private FormModel $formModel;
 
+    private ReportHelper $reportHelper;
+
     private CoreParametersHelper $coreParametersHelper;
 
     private TranslatorInterface $translator;
@@ -35,12 +38,14 @@ class ReportSubscriber implements EventSubscriberInterface
         CompanyReportData $companyReportData,
         SubmissionRepository $submissionRepository,
         FormModel $formModel,
+        ReportHelper $reportHelper,
         CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator
     ) {
         $this->companyReportData    = $companyReportData;
         $this->submissionRepository = $submissionRepository;
         $this->formModel            = $formModel;
+        $this->reportHelper         = $reportHelper;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->translator           = $translator;
     }
@@ -162,7 +167,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $mappedFieldValues  = $formEntity->getMappedFieldValues();
                 $columnsMapped      = [];
                 foreach ($mappedFieldValues as $item) {
-                    $columns        = $event->getMappedObjectColumns($item['mappedObject'], $item);
+                    $columns        = $this->reportHelper->getMappedObjectColumns($item['mappedObject'], $item);
                     $columnsMapped  = array_merge($columnsMapped, $columns);
                 }
 

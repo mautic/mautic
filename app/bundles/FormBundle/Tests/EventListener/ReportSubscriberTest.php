@@ -18,7 +18,9 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportGraphEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends AbstractMauticTestCase
@@ -42,6 +44,16 @@ class ReportSubscriberTest extends AbstractMauticTestCase
      * @var FormRepository|MockObject
      */
     private $formRepository;
+
+    /**
+     * @var EventDispatcher|MockObject
+     */
+    public $eventDispatcher;
+
+    /**
+     * @var ReportHelper|MockObject
+     */
+    private $reportHelper;
 
     /**
      * @var CoreParametersHelper|MockObject
@@ -68,12 +80,24 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
+        $this->eventDispatcher      = $this->createMock(EventDispatcher::class);
+
+        $createReportHelper         = \Closure::bind(
+            function () {
+                return new ReportHelper($this->eventDispatcher);
+            },
+            $this,
+            ReportHelper::class
+        );
+        $this->reportHelper         = $createReportHelper();
+
         $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
         $this->subscriber           = new ReportSubscriber(
             $this->companyReportData,
             $this->submissionRepository,
             $this->formModel,
+            $this->reportHelper,
             $this->coreParametersHelper,
             $this->translator
         );
@@ -158,7 +182,6 @@ class ReportSubscriberTest extends AbstractMauticTestCase
                 'getStandardColumns',
                 'getCategoryColumns',
                 'addTable',
-                'getMappedObjectColumns',
             ])
             ->getMock();
 
@@ -206,10 +229,6 @@ class ReportSubscriberTest extends AbstractMauticTestCase
                     'mappedField'  => 'email',
                 ],
             ]);
-
-        $mockEvent->expects($this->once())
-            ->method('getMappedObjectColumns')
-            ->willReturnOnConsecutiveCalls([]);
 
         $this->formModel->expects($this->once())
             ->method('getRepository')
