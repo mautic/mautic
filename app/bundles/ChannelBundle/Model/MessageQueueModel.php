@@ -175,7 +175,9 @@ class MessageQueueModel extends FormModel
 
         if ($messageQueues) {
             $this->saveEntities($messageQueues);
-            $this->em->clear(MessageQueue::class);
+            foreach ($messageQueues as $messageQueue) {
+                $this->em->detach($messageQueue);
+            }
         }
 
         return true;
@@ -240,7 +242,9 @@ class MessageQueueModel extends FormModel
 
         if ($messageQueues) {
             $this->saveEntities($messageQueues);
-            $this->em->clear(MessageQueue::class);
+            foreach ($messageQueues as $messageQueue) {
+                $this->em->detach($messageQueue);
+            }
         }
 
         return true;
@@ -260,11 +264,22 @@ class MessageQueueModel extends FormModel
         $counter        = 0;
         while ($queue = $this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId)) {
             $counter += $this->processMessageQueue($queue);
+            $channel = $queue->getChannel();
+            $event   = $queue->getEvent();
+            $lead    = $queue->getEvent()->getCampaignLead()->getLeaad();
 
             // Remove the entities from memory
-            $this->em->clear(MessageQueue::class);
-            $this->em->clear(Lead::class);
-            $this->em->clear(\Mautic\CampaignBundle\Entity\Event::class);
+            if (!empty($channel)) {
+                $this->em->detach($channel);
+            }
+
+            if (!empty($event)) {
+                $this->em->detach($event);
+            }
+
+            if (!empty($lead)) {
+                $this->em->detach($lead);
+            }
         }
 
         return $counter;

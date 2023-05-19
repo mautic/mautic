@@ -687,7 +687,7 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getRepository()->detachEntities($persistLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -813,7 +813,8 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getListLeadRepository()->detachEntities($persistLists);
+        $this->getListLeadRepository()->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory

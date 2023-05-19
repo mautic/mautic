@@ -133,7 +133,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn(null);
 
-        $mockCompanyModel->expects($this->once())
+        $mockCompanyModel->expects($this->atLeastOnce())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 

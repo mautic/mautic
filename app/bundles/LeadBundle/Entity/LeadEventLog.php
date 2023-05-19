@@ -25,7 +25,7 @@ class LeadEventLog
     protected $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     protected $lead;
 
@@ -151,7 +151,7 @@ class LeadEventLog
     /**
      * Get lead.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
