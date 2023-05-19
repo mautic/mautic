@@ -3,7 +3,14 @@
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
 *   Configuration
     * Replace all occurances of `%kernel.root_dir%` to `%kernel.project_dir%/app` as the "root_dir" was deprecated in Symfony 4 and removed in Symfony 5. The "project_dir" variable is path to the Mautic root directory. The "root_dir" variable was path to the app directory.
-*   Installation
+    * The index_dev.php was removed. Use env variables to set the environment.
+    * We are following symfony env naming convention. [synfomy 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
+      * `.env`                contains default values for the environment variables needed by the app
+      * `.env.local`          uncommitted file with local overrides
+      * `.env.$APP_ENV`       committed environment-specific defaults
+      * `.env.$APP_ENV.local` uncommitted environment-specific overrides
+    * The system run similar index_dev.php if you use `APP_ENV=dev` and `APP_DEBUG=1` in your .env.local file.
+* Installation
     * The email step was removed from both GUI and CLI installers.
     * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
 * Commands

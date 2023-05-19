@@ -469,8 +469,9 @@ class PageModel extends FormModel
 
             // company
             [$company, $leadAdded, $companyEntity] = IdentifyCompanyHelper::identifyLeadsCompany($query, $lead, $this->companyModel);
+            $companyChangeLog                      = null;
             if ($leadAdded) {
-                $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
+                $companyChangeLog = $lead->addCompanyChangeLogEntry('form', 'Identify Company', 'Lead added to the company, '.$company['companyname'], $company['id']);
             } elseif ($companyEntity instanceof Company) {
                 $this->companyModel->setFieldValues($companyEntity, $query);
                 $this->companyModel->saveEntity($companyEntity);
@@ -480,6 +481,10 @@ class PageModel extends FormModel
                 // Save after the lead in for new leads created through the API and maybe other places
                 $this->companyModel->addLeadToCompany($companyEntity, $lead);
                 $this->leadModel->setPrimaryCompany($companyEntity->getId(), $lead->getId());
+            }
+
+            if (null !== $companyChangeLog) {
+                $this->companyModel->getCompanyLeadRepository()->detachEntity($companyChangeLog);
             }
         }
 

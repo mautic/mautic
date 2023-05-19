@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\EventListener\CampaignSubscriber;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
@@ -30,6 +31,51 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         'companyname' => 'Mautic2',
         'companemail' => 'mautic@mauticsecond.com',
     ];
+
+    /**
+     * @return array<int, array<string, array<int, string>|bool|int|null>>
+     */
+    public function provideFormDNC(): array
+    {
+        return [
+            [
+                'reason'   => 1,
+                'channels' => ['email'],
+                'expected' => true,
+                'dncLead'  => 1,
+            ],
+            [
+                'reason'   => 2,
+                'channels' => ['email'],
+                'expected' => false,
+                'dncLead'  => 1,
+            ],
+            [
+                'reason'   => 3,
+                'channels' => ['email'],
+                'expected' => false,
+                'dncLead'  => 1,
+            ],
+            [
+                'reason'   => 2,
+                'channels' => ['email'],
+                'expected' => true,
+                'dncLead'  => 2,
+            ],
+            [
+                'reason'   => null,
+                'channels' => ['email'],
+                'expected' => true,
+                'dncLead'  => 2,
+            ],
+            [
+                'reason'   => null,
+                'channels' => ['email'],
+                'expected' => false,
+                'dncLead'  => 0,
+            ],
+        ];
+    }
 
     /** @var array<string, string> */
     private $configPageHit = [
@@ -67,6 +113,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
         $companyEntityFrom  = $this->createMock(Company::class);
+        $doNotContact       = $this->createMock(DoNotContact::class);
 
         $companyEntityFrom->method('getId')
             ->willReturn($this->configFrom['id']);
@@ -86,7 +133,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockCompanyLeadRepo  = $this->createMock(CompanyLeadRepository::class);
         $mockCompanyLeadRepo->expects($this->once())->method('getCompaniesByLeadId')->willReturn(null);
 
-        $mockCompanyModel->expects($this->once())
+        $mockCompanyModel->expects($this->atLeastOnce())
             ->method('getCompanyLeadRepository')
             ->willReturn($mockCompanyLeadRepo);
 
@@ -110,10 +157,10 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $doNotContact
         );
 
-        /** @var LeadModel $leadModel */
         $lead = new Lead();
         $lead->setId(99);
         $lead->setPrimaryCompany($this->configFrom);
@@ -143,6 +190,60 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($this->configTo['companyname'], $primaryCompany['companyname']);
     }
 
+    /**
+     * @dataProvider provideFormDNC
+     *
+     * @param array<string> $channels
+     */
+    public function testOnCampaignTriggerConditionDNCFlag(?int $reason, array $channels, bool $expected, int $dncLead): void
+    {
+        $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
+        $mockLeadModel      = $this->createMock(LeadModel::class);
+        $mockLeadFieldModel = $this->createMock(FieldModel::class);
+        $mockListModel      = $this->createMock(ListModel::class);
+        $mockCompanyModel   = $this->createMock(CompanyModel::class);
+        $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $doNotContact       = $this->createMock(DoNotContact::class);
+
+        $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $mockCoreParametersHelper->method('get')
+            ->with('default_timezone')
+            ->willReturn('UTC');
+
+        $doNotContact->expects($this->once())->method('isContactable')->willReturn($dncLead);
+
+        $subscriber = new CampaignSubscriber(
+            $mockIpLookupHelper,
+            $mockLeadModel,
+            $mockLeadFieldModel,
+            $mockListModel,
+            $mockCompanyModel,
+            $mockCampaignModel,
+            $mockCoreParametersHelper,
+            $doNotContact
+        );
+
+        $lead = new Lead();
+        $lead->setId(99);
+        $args = [
+            'lead'  => $lead,
+            'event' => [
+                'type'       => 'lead.dnc',
+                'properties' => [
+                    'reason'   => $reason,
+                    'channels' => $channels,
+                ],
+            ],
+            'eventDetails'    => [],
+            'systemTriggered' => true,
+            'eventSettings'   => [],
+        ];
+
+        $event = new CampaignExecutionEvent($args, true);
+        $subscriber->onCampaignTriggerCondition($event);
+        $this->assertSame($expected, $event->getResult());
+    }
+
     public function testOnCampaignTriggerConditionLeadLandingPageHit(): void
     {
         $mockIpLookupHelper = $this->createMock(IpLookupHelper::class);
@@ -151,6 +252,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockDoNotContact   = $this->createMock(DoNotContact::class);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -164,7 +266,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $mockDoNotContact,
         );
 
         $lead = new Lead();
@@ -216,6 +319,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockDoNotContact   = $this->createMock(DoNotContact::class);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -229,7 +333,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $mockDoNotContact,
         );
 
         $lead = new Lead();
@@ -282,6 +387,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $mockListModel      = $this->createMock(ListModel::class);
         $mockCompanyModel   = $this->createMock(CompanyModel::class);
         $mockCampaignModel  = $this->createMock(CampaignModel::class);
+        $mockDoNotContact   = $this->createMock(DoNotContact::class);
 
         $mockCoreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $mockCoreParametersHelper->method('get')
@@ -295,7 +401,8 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $mockListModel,
             $mockCompanyModel,
             $mockCampaignModel,
-            $mockCoreParametersHelper
+            $mockCoreParametersHelper,
+            $mockDoNotContact,
         );
 
         $lead = new Lead();

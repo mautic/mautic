@@ -120,7 +120,9 @@ class EmailModelFunctionalTest extends MauticMysqlTestCase
         $childrenEmail->setTranslationParent($parentEmail);
         $this->em->persist($parentEmail);
 
-        $this->em->clear();
+        $this->em->detach($segment);
+        $this->em->detach($parentEmail);
+        $this->em->detach($childrenEmail);
 
         /** @var EmailModel $emailModel */
         $emailModel = self::$container->get('mautic.email.model.email');
