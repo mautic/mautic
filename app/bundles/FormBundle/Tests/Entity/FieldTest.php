@@ -302,7 +302,6 @@ final class FieldTest extends \PHPUnit\Framework\TestCase
         Assert::assertTrue($field->showForContact(null, $contact, $form));
     }
 
-
     /**
      * @dataProvider dataProvider
      *
