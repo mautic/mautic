@@ -75,7 +75,6 @@ class ReportDataResultTest extends \PHPUnit\Framework\TestCase
         $reportEmptyDataResult = new ReportDataResult($fixture);
 
         $this->assertSame($expectedDataCount, $actualDataCount);
-        $this->assertTrue(is_int($actualDataCount));
         $this->assertSame(0, $reportEmptyDataResult->getDataCount());
     }
 
