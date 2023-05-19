@@ -4,7 +4,6 @@ namespace Mautic\FormBundle\Tests\Model;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
 

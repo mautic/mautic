@@ -46,11 +46,6 @@ class ReportSubscriberTest extends AbstractMauticTestCase
     private $formRepository;
 
     /**
-     * @var EventDispatcher|MockObject
-     */
-    public $eventDispatcher;
-
-    /**
      * @var ReportHelper|MockObject
      */
     private $reportHelper;
@@ -80,11 +75,10 @@ class ReportSubscriberTest extends AbstractMauticTestCase
         $this->submissionRepository = $this->createMock(SubmissionRepository::class);
         $this->formModel            = $this->createMock(FormModel::class);
         $this->formRepository       = $this->createMock(FormRepository::class);
-        $this->eventDispatcher      = $this->createMock(EventDispatcher::class);
 
         $createReportHelper         = \Closure::bind(
             function () {
-                return new ReportHelper($this->eventDispatcher);
+                return new ReportHelper(new EventDispatcher());
             },
             $this,
             ReportHelper::class

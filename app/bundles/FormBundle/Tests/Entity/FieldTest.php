@@ -7,7 +7,6 @@ namespace Mautic\FormBundle\Tests\Entity;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
-use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Assert;
 
