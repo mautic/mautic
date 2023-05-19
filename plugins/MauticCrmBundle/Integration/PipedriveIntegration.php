@@ -18,7 +18,6 @@ use MauticPlugin\MauticCrmBundle\Services\Transport;
 use Monolog\Logger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -294,14 +293,6 @@ class PipedriveIntegration extends CrmAbstractIntegration
      */
     public function appendToForm(&$builder, $data, $formArea)
     {
-        $builder->add(
-            'deprecationWarning',
-            HiddenType::class,
-            [
-                'label'             => 'Deprecated!',
-                'label_attr'        => ['class' => ''],
-            ]
-        );
         if ('features' == $formArea) {
             $builder->add(
                 'objects',
