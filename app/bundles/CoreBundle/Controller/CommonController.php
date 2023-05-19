@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -77,6 +78,13 @@ class CommonController extends AbstractController implements MauticController
      * @var FlashBag
      */
     private $flashBag;
+
+    protected ManagerRegistry $doctrine;
+
+    public function __construct(ManagerRegistry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
 
     public function setFactory(MauticFactory $factory)
     {
@@ -320,7 +328,7 @@ class CommonController extends AbstractController implements MauticController
         //set flashes
         if (!empty($flashes)) {
             foreach ($flashes as $flash) {
-                $this->addFlash(
+                $this->addFlashMessage(
                     $flash['msg'],
                     !empty($flash['msgVars']) ? $flash['msgVars'] : [],
                     !empty($flash['type']) ? $flash['type'] : 'notice',
@@ -435,13 +443,9 @@ class CommonController extends AbstractController implements MauticController
         $passthrough['flashes'] = $this->getFlashContent();
 
         if (!defined('MAUTIC_INSTALLER')) {
-            // Prevent error in case installer is loaded via index_dev.php
+            // Prevent error in case installer is loaded via dev environment
             $passthrough['notifications'] = $this->getNotificationContent();
         }
-
-        //render browser notifications
-        $passthrough['browserNotifications'] = $request->getSession()->get('mautic.browser.notifications', []);
-        $request->getSession()->set('mautic.browser.notifications', []);
 
         $tmpl = (isset($parameters['tmpl'])) ? $parameters['tmpl'] : $request->get('tmpl', 'index');
         if ('index' == $tmpl) {
@@ -711,13 +715,13 @@ class CommonController extends AbstractController implements MauticController
     }
 
     /**
-     * @param string      $message
-     * @param array|null  $messageVars
-     * @param string|null $level
-     * @param string|null $domain
-     * @param bool|null   $addNotification
+     * @param string       $message
+     * @param array<mixed> $messageVars
+     * @param string|null  $level
+     * @param string|null  $domain
+     * @param bool|null    $addNotification
      */
-    public function addFlash($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false)
+    public function addFlashMessage($message, $messageVars = [], $level = FlashBag::LEVEL_NOTICE, $domain = 'flashes', $addNotification = false): void
     {
         $this->flashBag->add($message, $messageVars, $level, $domain, $addNotification);
     }

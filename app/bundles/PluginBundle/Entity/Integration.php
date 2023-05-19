@@ -54,7 +54,7 @@ class Integration extends CommonEntity
             ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationRepository');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 

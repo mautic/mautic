@@ -305,12 +305,9 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        // When we change company data these changes get cached
-        // so we need to clear the entity manager
-        $model->getRepository()->clear();
-
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
+        $model->getRepository()->refetchEntity($lead);
 
         //set some permissions
         $permissions = $this->security->isGranted(
@@ -387,11 +384,11 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
 
-        $integrationRepo = $this->getDoctrine()->getRepository(IntegrationEntity::class);
+        $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
         assert($integrationRepo instanceof IntegrationEntityRepository);
 
         $model = $this->getModel('lead.list');
@@ -400,7 +397,7 @@ class LeadController extends FormController
         $leadNoteModel = $this->getModel('lead.note');
         assert($leadNoteModel instanceof NoteModel);
 
-        $leadDeviceRepository = $this->getDoctrine()->getRepository(LeadDevice::class);
+        $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
         assert($leadDeviceRepository instanceof LeadDeviceRepository);
 
         return $this->delegateView(
@@ -503,7 +500,7 @@ class LeadController extends FormController
                     ));
 
                     /** @var LeadRepository $contactRepository */
-                    $contactRepository = $this->getDoctrine()->getManager()->getRepository(Lead::class);
+                    $contactRepository = $this->doctrine->getManager()->getRepository(Lead::class);
 
                     // Save here as we need the entity with an ID for the company code bellow.
                     $contactRepository->saveEntity($lead);
@@ -526,7 +523,7 @@ class LeadController extends FormController
 
                     $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $identifier,
@@ -563,7 +560,7 @@ class LeadController extends FormController
                     }
 
                     $formErrors = $this->getFormErrorMessages($form);
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $this->getFormErrorMessage($formErrors),
                         [],
                         'error'
@@ -726,7 +723,7 @@ class LeadController extends FormController
 
                     $identifier = $this->translator->trans($lead->getPrimaryIdentifier());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $identifier,
@@ -742,7 +739,7 @@ class LeadController extends FormController
                     );
                 } else {
                     $formErrors = $this->getFormErrorMessages($form);
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         $this->getFormErrorMessage($formErrors),
                         [],
                         'error'
@@ -1395,8 +1392,7 @@ class LeadController extends FormController
             ? $request->get('list', 0)
             : $request->request->get(
                 'lead_quickemail[list]',
-                0,
-                true
+                0
             );
         $email = ['list' => $inList];
 
@@ -1414,7 +1410,7 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doctrine->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
 
@@ -1453,7 +1449,7 @@ class LeadController extends FormController
                         $subject = EmojiHelper::toHtml($email['subject']);
                         if ($mailer->send(true, false)) {
                             $mailer->createEmailStat();
-                            $this->addFlash(
+                            $this->addFlashMessage(
                                 'mautic.lead.email.notice.sent',
                                 [
                                     '%subject%' => $subject,
@@ -1555,7 +1551,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch', [], true);
+            $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1614,7 +1610,7 @@ class LeadController extends FormController
                 }
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -1678,7 +1674,7 @@ class LeadController extends FormController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
 
-            $data = $request->request->get('lead_batch_dnc', [], true);
+            $data = $request->request->all()['lead_batch_dnc'] ?? [];
             $ids  = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1713,7 +1709,7 @@ class LeadController extends FormController
                 $model->saveEntities($persistEntities);
             }
 
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -1768,7 +1764,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_stage', [], true);
+            $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1809,7 +1805,7 @@ class LeadController extends FormController
             }
             // Save entities
             $model->saveEntities($entities);
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -1874,7 +1870,7 @@ class LeadController extends FormController
         if ('POST' == $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_owner', [], true);
+            $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1908,7 +1904,7 @@ class LeadController extends FormController
             }
             // Save entities
             $model->saveEntities($entities);
-            $this->addFlash(
+            $this->addFlashMessage(
                 'mautic.lead.batch_leads_affected',
                 [
                     '%count%'     => $count,
@@ -2116,7 +2112,7 @@ class LeadController extends FormController
             LeadEvents::POST_CONTACT_EXPORT_SCHEDULED
         );
 
-        $this->addFlash('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
+        $this->addFlashMessage('mautic.lead.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
         $response['message'] = 'Contact export scheduled for CSV file type.';
         $response['flashes'] = $this->getFlashContent();
 

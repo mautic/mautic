@@ -1,7 +1,7 @@
 #!/bin/bash
 
 setup_mautic() {
-    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}/index_dev.php"
+    [ -z "${MAUTIC_URL}" ] && MAUTIC_URL="https://${DDEV_HOSTNAME}"
     [ -z "${PHPMYADMIN_URL}" ] && PHPMYADMIN_URL="https://${DDEV_HOSTNAME}:8037"
     [ -z "${MAILHOG_URL}" ] && MAILHOG_URL="https://${DDEV_HOSTNAME}:8026"
 
@@ -9,12 +9,10 @@ setup_mautic() {
     composer install
 
     cp ./.ddev/local.config.php.dist ./app/config/local.php
-    cp ./.env.dist ./.env
+    cp ./.ddev/.env.test.local ./.env.test.local
 
     printf "Installing Mautic...\n"
-    php bin/console mautic:install "${MAUTIC_URL}" \
-        --mailer_from_name="DDEV" --mailer_from_email="mautic@ddev.local" \
-        --mailer_transport="smtp" --mailer_host="localhost" --mailer_port="1025" --messenger_type="sync"
+    php bin/console mautic:install "${MAUTIC_URL}"
     php bin/console cache:warmup --no-interaction --env=dev
 
     printf "Enabling plugins...\n"

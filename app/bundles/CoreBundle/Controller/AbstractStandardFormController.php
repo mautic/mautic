@@ -2,6 +2,7 @@
 
 namespace Mautic\CoreBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
@@ -21,12 +22,12 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
     protected FormFieldHelper $fieldHelper;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $managerRegistry)
     {
         $this->formFactory = $formFactory;
         $this->fieldHelper = $fieldHelper;
 
-        parent::__construct($security, $userHelper);
+        parent::__construct($security, $userHelper, $managerRegistry);
     }
 
     /**
@@ -426,7 +427,7 @@ abstract class AbstractStandardFormController extends AbstractFormController
 
                         $this->afterEntitySave($entity, $form, 'edit', $valid);
 
-                        $this->addFlash(
+                        $this->addFlashMessage(
                             'mautic.core.notice.updated',
                             [
                                 '%name%'      => $entity->getName(),

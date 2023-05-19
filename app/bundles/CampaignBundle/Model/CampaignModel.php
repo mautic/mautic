@@ -737,7 +737,7 @@ class CampaignModel extends CommonFormModel
 
                     if ($this->coreParametersHelper->get('campaign_use_summary')) {
                         $q       = $query->prepareTimeDataQuery('campaign_summary', 'date_triggered', $filter, 'triggered_count + non_action_path_taken_count', 'sum');
-                        $rawData = $q->execute()->fetchAll();
+                        $rawData = $q->execute()->fetchAllAssociative();
                     } else {
                         // Exclude failed events
                         $failedSq = $this->em->getConnection()->createQueryBuilder();
@@ -751,7 +751,7 @@ class CampaignModel extends CommonFormModel
                         ];
 
                         $q       = $query->prepareTimeDataQuery('campaign_lead_event_log', 'date_triggered', $filter);
-                        $rawData = $q->execute()->fetchAll();
+                        $rawData = $q->execute()->fetchAllAssociative();
                     }
 
                     if (!empty($rawData)) {

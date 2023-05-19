@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
@@ -221,6 +222,22 @@ class CommonRepository extends ServiceEntityRepository
     public function detachEntity($entity)
     {
         $this->getEntityManager()->detach($entity);
+    }
+
+    public function refetchEntity(object &$entity): void
+    {
+        if ($this->getEntityManager()->contains($entity)) {
+            $this->getEntityManager()->detach($entity);
+
+            $metadata = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
+            $this->getEntityManager()->clear($metadata->name);
+            $identifierValues = $metadata->getIdentifierValues($entity);
+            if (count($identifierValues) > 1) {
+                throw new \RuntimeException('Multiple identifiers are not supported.');
+            }
+
+            $entity = $this->getEntity(array_pop($identifierValues));
+        }
     }
 
     /**
@@ -588,7 +605,7 @@ class CommonRepository extends ServiceEntityRepository
 
         $this->buildWhereClauseFromArray($q, $where);
 
-        $count = $q->execute()->fetchColumn();
+        $count = $q->execute()->fetchOne();
 
         if ($select) {
             foreach ($select as &$column) {
@@ -632,7 +649,7 @@ class CommonRepository extends ServiceEntityRepository
             ->where($this->getTableAlias().'.id = :id')
             ->setParameter('id', $id);
 
-        $result = $q->execute()->fetch();
+        $result = $q->execute()->fetchAssociative();
 
         if (isset($result[$column])) {
             return $result[$column];
@@ -710,7 +727,7 @@ class CommonRepository extends ServiceEntityRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**

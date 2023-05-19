@@ -2,7 +2,6 @@
 
 namespace Mautic\InstallBundle\Controller;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Configurator\Configurator;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -33,7 +32,7 @@ class InstallController extends CommonController
      *
      * @return JsonResponse|Response
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function stepAction(Request $request, EntityManagerInterface $entityManager, PathsHelper $pathsHelper, float $index = 0)
     {
@@ -116,18 +115,6 @@ class InstallController extends CommonController
                         // Store the data to repopulate the form
                         unset($formData->password);
                         $session->set('mautic.installer.user', $formData);
-
-                        $complete = true;
-                        break;
-
-                    case InstallService::EMAIL_STEP:
-                        $emailParam = (array) $formData;
-                        $messages   = $this->installer->setupEmailStep($step, $emailParam);
-
-                        if (!empty($messages)) {
-                            $this->handleInstallerErrors($form, $messages);
-                            break;
-                        }
 
                         $complete = true;
                         break;
@@ -289,7 +276,7 @@ class InstallController extends CommonController
                 case 'warning':
                 case 'error':
                 case 'notice':
-                    $this->addFlash($message, [], $type);
+                    $this->addFlashMessage($message, [], $type);
                     break;
                 default:
                     // If type not a flash type, assume form field error

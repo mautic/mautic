@@ -276,7 +276,7 @@ class NotificationController extends AbstractFormController
         //set the page we came from
         $page         = $session->get('mautic.notification.page', 1);
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'new']);
-        $notification = $request->request->get('notification', []);
+        $notification = $request->request->get('notification') ?? [];
         $updateSelect = ('POST' == $method)
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -296,7 +296,7 @@ class NotificationController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -443,7 +443,7 @@ class NotificationController extends AbstractFormController
 
         //Create the form
         $action       = $this->generateUrl('mautic_notification_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
-        $notification = $request->request->get('notification', []);
+        $notification = $request->request->get('notification') ?? [];
         $updateSelect = 'POST' === $method
             ? ($notification['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -459,7 +459,7 @@ class NotificationController extends AbstractFormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),

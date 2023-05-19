@@ -209,14 +209,6 @@ class DoNotContact implements MauticModelInterface
     }
 
     /**
-     * Clear DoNotContact entities from Doctrine UnitOfWork.
-     */
-    public function clearEntities()
-    {
-        $this->dncRepo->clear();
-    }
-
-    /**
      * @return DoNotContactRepository
      */
     public function getDncRepo()

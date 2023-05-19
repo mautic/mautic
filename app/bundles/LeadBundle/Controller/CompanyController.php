@@ -203,7 +203,7 @@ class CompanyController extends FormController
         $page         = $request->getSession()->get('mautic.company.page', 1);
         $method       = $request->getMethod();
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'new']);
-        $company      = $request->request->get('company', []);
+        $company      = $request->request->get('company') ?? [];
         $updateSelect = InputHelper::clean(
             'POST' === $method
                 ? ($company['updateSelect'] ?? false)
@@ -235,7 +235,7 @@ class CompanyController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity);
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.created',
                         [
                             '%name%'      => $entity->getName(),
@@ -381,7 +381,7 @@ class CompanyController extends FormController
 
         $action       = $this->generateUrl('mautic_company_action', ['objectAction' => 'edit', 'objectId' => $objectId]);
         $method       = $request->getMethod();
-        $company      = $request->request->get('company', []);
+        $company      = $request->request->get('company') ?? [];
         $updateSelect = 'POST' === $method
             ? ($company['updateSelect'] ?? false)
             : $request->get('updateSelect', false);
@@ -413,7 +413,7 @@ class CompanyController extends FormController
                     //form is valid so process the data
                     $model->saveEntity($entity, $this->getFormButton($form, ['buttons', 'save'])->isClicked());
 
-                    $this->addFlash(
+                    $this->addFlashMessage(
                         'mautic.core.notice.updated',
                         [
                             '%name%'      => $entity->getName(),
@@ -521,12 +521,9 @@ class CompanyController extends FormController
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
-        // When we change company data these changes get cached
-        // so we need to clear the entity manager
-        $model->getRepository()->clear();
-
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company = $model->getEntity($objectId);
+        $model->getRepository()->refetchEntity($company);
 
         //set some permissions
         $permissions = $this->security->isGranted(
@@ -797,7 +794,7 @@ class CompanyController extends FormController
             if (!empty($deleteIds)) {
                 $entities = $model->deleteEntities($deleteIds);
                 $deleted  = count($entities);
-                $this->addFlash(
+                $this->addFlashMessage(
                     'mautic.company.notice.batch_deleted',
                     [
                         '%count%'     => $deleted,

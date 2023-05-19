@@ -1823,7 +1823,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 ));
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
+                $this->logger->warning($exception->getMessage());
 
                 return;
             }
@@ -2066,7 +2066,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+        $logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**
@@ -2308,7 +2308,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (!empty($leadsToSync)) {
             // Let's only sync thos that have actual changes to prevent a loop
             $integrationEntityRepo->saveEntities($leadsToSync);
-            $this->em->clear(Lead::class);
+            $integrationEntityRepo->deleteEntity($leadsToSync);
             $leadsToSync = [];
         }
 
@@ -2323,8 +2323,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
             $this->deleteIntegrationEntities = [];
         }
-
-        $this->em->clear(IntegrationEntity::class);
+        $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
 
         if ($error) {
             if ($error instanceof \Exception) {
@@ -2382,7 +2381,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         $integrationEntityRepo->saveEntities($integrationEntities);
-        $this->em->clear(IntegrationEntity::class);
+        $integrationEntityRepo->detachEntities($integrationEntities);
     }
 
     /**

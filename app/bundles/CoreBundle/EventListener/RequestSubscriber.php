@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
@@ -85,8 +86,7 @@ class RequestSubscriber implements EventSubscriberInterface
     private function isCsrfTokenFromRequestHeaderValid(Request $request)
     {
         $csrfRequestToken = $request->headers->get('X-CSRF-Token');
-        $csrfSessionToken = $this->tokenManager->getToken('mautic_ajax_post')->getValue();
 
-        return $csrfSessionToken === $csrfRequestToken;
+        return $this->tokenManager->isTokenValid(new CsrfToken('mautic_ajax_post', $csrfRequestToken));
     }
 }

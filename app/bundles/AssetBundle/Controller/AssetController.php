@@ -307,7 +307,7 @@ class AssetController extends FormController
         ], 'validators');
 
         // Create temporary asset ID
-        $asset  = $request->request->get('asset', []);
+        $asset  = $request->request->get('asset') ?? [];
         $tempId = 'POST' === $method ? ($asset['tempId'] ?? '') : uniqid('tmp_');
         $entity->setTempId($tempId);
 
@@ -335,7 +335,7 @@ class AssetController extends FormController
                     //remove the asset from request
                     $request->files->remove('asset');
 
-                    $this->addFlash('mautic.core.notice.created', [
+                    $this->addFlashMessage('mautic.core.notice.created', [
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_asset_index',
                         '%url%'       => $this->generateUrl('mautic_asset_action', [
@@ -475,7 +475,7 @@ class AssetController extends FormController
         }
 
         // Create temporary asset ID
-        $asset  = $request->request->get('asset', []);
+        $asset  = $request->request->get('asset') ?? [];
         $tempId = 'POST' === $method ? ($asset['tempId'] ?? '') : uniqid('tmp_');
         $entity->setTempId($tempId);
 
@@ -498,7 +498,7 @@ class AssetController extends FormController
                     //remove the asset from request
                     $request->files->remove('asset');
 
-                    $this->addFlash('mautic.core.notice.updated', [
+                    $this->addFlashMessage('mautic.core.notice.updated', [
                         '%name%'      => $entity->getTitle(),
                         '%menu_link%' => 'mautic_asset_index',
                         '%url%'       => $this->generateUrl('mautic_asset_action', [

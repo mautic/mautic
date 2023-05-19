@@ -41,7 +41,7 @@ class CompanyChangeLog
     private $company;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -199,7 +199,7 @@ class CompanyChangeLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {
