@@ -222,6 +222,9 @@ class InputHelper
      */
     public static function alphanum($value, $urldecode = false, $convertSpacesTo = false, $allowedCharacters = [])
     {
+        // force string if null for php >= 8.1
+        $value = $value ?? '';
+
         if ($urldecode) {
             $value = urldecode($value);
         }
