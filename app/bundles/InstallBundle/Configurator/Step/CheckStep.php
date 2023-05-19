@@ -51,7 +51,7 @@ class CheckStep implements StepInterface
      *
      * @var string
      */
-    public $site_url;
+    public $site_url = '';
 
     /**
      * Recommended minimum memory limit for Mautic.
