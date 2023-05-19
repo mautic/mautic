@@ -38,6 +38,7 @@ class AssetGenerationHelper
         'jquery/dist/jquery.js',
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
+        'jvectormap-next/jquery-jvectormap.js',
         // TODO: Add the rest of the libraries here.
     ];
 
