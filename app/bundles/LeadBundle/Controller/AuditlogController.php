@@ -136,7 +136,7 @@ class AuditlogController extends CommonController
 
             $items = $this->getAuditlogs($lead, $filters, $order, $loop + 1, 200);
 
-            $this->getDoctrine()->getManager()->clear();
+            $this->doctrine->getManager()->clear();
 
             ++$loop;
         }

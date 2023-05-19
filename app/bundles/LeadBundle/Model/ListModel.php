@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Exception;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -148,7 +147,7 @@ class ListModel extends FormModel
      *
      * @return mixed|void
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -452,7 +451,7 @@ class ListModel extends FormModel
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
-                        new ListChangeEvent($segmentId, $leadList, true),
+                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true),
                         LeadEvents::LEAD_LIST_BATCH_CHANGE
                     );
                 }
@@ -688,7 +687,7 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getRepository()->detachEntities($persistLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -814,7 +813,8 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getListLeadRepository()->detachEntities($persistLists);
+        $this->getListLeadRepository()->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory

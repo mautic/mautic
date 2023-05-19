@@ -69,7 +69,7 @@ class DynamicContentControllerFunctionalTest extends MauticMysqlTestCase
         $user = $this->createUser($role);
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($role);
 
         $this->loginUser($user->getUsername());
         $this->client->setServerParameter('PHP_AUTH_USER', $user->getUsername());

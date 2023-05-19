@@ -521,12 +521,9 @@ class CompanyController extends FormController
         /** @var CompanyModel $model */
         $model  = $this->getModel('lead.company');
 
-        // When we change company data these changes get cached
-        // so we need to clear the entity manager
-        $model->getRepository()->clear();
-
         /** @var \Mautic\LeadBundle\Entity\Company $company */
         $company = $model->getEntity($objectId);
+        $model->getRepository()->refetchEntity($company);
 
         //set some permissions
         $permissions = $this->security->isGranted(

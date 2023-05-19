@@ -163,7 +163,7 @@ class SubmissionRepository extends CommonRepository
                     $q->expr()->in('s.id', ':ids')
                 )->setParameter('ids', $ids);
 
-                $q->orderBy('ORD', 'ASC');
+                $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
                 $results = $returnEntities ? $q->getQuery()->getResult() : $q->getQuery()->getArrayResult();
 
                 foreach ($results as &$r) {
@@ -455,7 +455,7 @@ class SubmissionRepository extends CommonRepository
         $q->select('s.id')
             ->from(MAUTIC_TABLE_PREFIX.'form_submissions', 's')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('s.form_id', (int) $formId),
                     $q->expr()->in('s.id', $ids)
                 )
@@ -508,7 +508,7 @@ class SubmissionRepository extends CommonRepository
             ->from($this->getResultsTableName($form, $formAlias), 'r')
             ->leftJoin('r', MAUTIC_TABLE_PREFIX.'form_submissions', 's', 's.id = r.submission_id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('s.lead_id', ':lead'),
                     $q->expr()->eq('s.form_id', ':form')
                 )

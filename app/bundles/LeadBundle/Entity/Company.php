@@ -91,7 +91,7 @@ class Company extends FormEntity implements CustomFieldEntityInterface, Identifi
             ->setCustomRepositoryClass(CompanyRepository::class);
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 

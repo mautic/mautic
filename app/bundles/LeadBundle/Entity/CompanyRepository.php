@@ -362,7 +362,7 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             ->from(MAUTIC_TABLE_PREFIX.'companies', 'c')
             ->join('c', MAUTIC_TABLE_PREFIX.'companies_leads', 'l', 'l.company_id = c.id')
             ->where(
-                $qb->expr()->andX(
+                $qb->expr()->and(
                     $qb->expr()->in('l.lead_id', $contacts)
                 )
             )
@@ -549,8 +549,8 @@ class CompanyRepository extends CommonRepository implements CustomFieldRepositor
             $q->expr()->in('c.id', ':ids')
         )
             ->setParameter('ids', array_keys($companies))
-            ->orderBy('c.dateAdded', 'DESC')
-            ->addOrderBy('c.id', 'DESC');
+            ->orderBy('c.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('c.id', \Doctrine\Common\Collections\Criteria::DESC);
 
         $entities = $q->getQuery()
             ->getResult();

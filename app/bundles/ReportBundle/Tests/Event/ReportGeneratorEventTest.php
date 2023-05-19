@@ -319,8 +319,8 @@ class ReportGeneratorEventTest extends \PHPUnit\Framework\TestCase
             ],
         ];
 
-        $this->reportGeneratorEvent->applyTagFilter($groupExpr, $filters[0]);
-        $this->reportGeneratorEvent->applyTagFilter($groupExpr, $filters[1]);
+        $groupExpr = $this->reportGeneratorEvent->applyTagFilter($groupExpr, $filters[0]);
+        $groupExpr = $this->reportGeneratorEvent->applyTagFilter($groupExpr, $filters[1]);
         Assert::assertSame('(l.id IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (1, 2))) AND (l.id NOT IN (SELECT DISTINCT lead_id FROM '.MAUTIC_TABLE_PREFIX.'lead_tags_xref ltx WHERE ltx.tag_id IN (3)))', $groupExpr->__toString());
     }
 }

@@ -236,8 +236,8 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $q->expr()->in('l.id', ':ids')
         )
             ->setParameter('ids', array_keys($leads))
-            ->orderBy('l.dateAdded', 'DESC')
-            ->addOrderBy('l.id', 'DESC');
+            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC)
+            ->addOrderBy('l.id', \Doctrine\Common\Collections\Criteria::DESC);
         $entities = $q->getQuery()
             ->getResult();
 
@@ -337,7 +337,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $col = ($byId) ? 'i.id' : 'i.ipAddress';
         $q->where($col.' = :ip')
             ->setParameter('ip', $ip)
-            ->orderBy('l.dateAdded', 'DESC');
+            ->orderBy('l.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
         $results = $q->getQuery()->getResult();
 
         /** @var Lead $lead */
@@ -571,7 +571,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         $alias           = $this->getTableAlias();
         $select          = [$alias, 'u', $order];
         $q               = $this->getEntityManager()->createQueryBuilder();
-        $joinIpAddresses = !isset($args['joinIpAddresses']) || true === $args['joinIpAddresses'];
+        $joinIpAddresses = $args['joinIpAddresses'] ?? true;
 
         if ($joinIpAddresses) {
             $select[] = 'i';
@@ -616,12 +616,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             $contactColumnName = 'lead_id';
         }
 
-        $joinCondition = $qb->expr()->andX(
+        $joinCondition = $qb->expr()->and(
             $qb->expr()->eq($this->getTableAlias().'.id', 'entity.'.$contactColumnName)
         );
 
         if ($entityId && $entityColumnName) {
-            $joinCondition->add(
+            $joinCondition->with(
                 $qb->expr()->eq("entity.{$entityColumnName}", (int) $entityId)
             );
         }
@@ -647,7 +647,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         if ($filters) {
-            $expr = $qb->expr()->andX();
+            $expr = null;
             foreach ($filters as $column => $value) {
                 if (is_array($value)) {
                     $this->buildWhereClauseFromArray($qb, [$value]);
@@ -655,8 +655,12 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
                     if (false === strpos($column, '.')) {
                         $column = "entity.$column";
                     }
-
-                    $expr->add(
+                    if (null === $expr) {
+                        $expr = CompositeExpression::and($qb->expr()->eq($column, $qb->createNamedParameter($value)));
+                        $qb->andWhere($expr);
+                        continue;
+                    }
+                    $expr = $expr->with(
                         $qb->expr()->eq($column, $qb->createNamedParameter($value))
                     );
                     $qb->andWhere($expr);
@@ -1113,7 +1117,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'stages', 's');
         $q->join('s', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.stage_id = s.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('s.id', ':stageIds'),
                     $q->expr()->eq('l.id', ':leadId')
                 )
@@ -1142,7 +1146,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from(MAUTIC_TABLE_PREFIX.'users', 'u')
             ->join('u', MAUTIC_TABLE_PREFIX.'leads', 'l', 'l.owner_id = u.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('u.id', ':ownerIds'),
                     $q->expr()->eq('l.id', ':leadId')
                 )
@@ -1272,7 +1276,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
             ->from($this->getTableName(), $this->getTableAlias());
 
         $qb->where(
-            $qb->expr()->andX(
+            $qb->expr()->and(
                 $qb->expr()->gt("$alias.id", (int) $lastId),
                 $qb->expr()->isNotNull("$alias.date_identified")
             )

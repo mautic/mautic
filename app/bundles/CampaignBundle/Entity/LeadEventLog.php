@@ -36,7 +36,7 @@ class LeadEventLog implements ChannelInterface
     private $ipAddress;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      **/
     private $dateTriggered;
 
@@ -46,7 +46,7 @@ class LeadEventLog implements ChannelInterface
     private $isScheduled = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerDate;
 
@@ -217,7 +217,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateTriggered()
     {
@@ -227,7 +227,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setDateTriggered(\DateTime $dateTriggered = null)
+    public function setDateTriggered(\DateTimeInterface $dateTriggered = null)
     {
         $this->dateTriggered = $dateTriggered;
         if (null !== $dateTriggered) {
@@ -332,7 +332,7 @@ class LeadEventLog implements ChannelInterface
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getTriggerDate()
     {
@@ -342,7 +342,7 @@ class LeadEventLog implements ChannelInterface
     /**
      * @return $this
      */
-    public function setTriggerDate(\DateTime $triggerDate = null)
+    public function setTriggerDate(\DateTimeInterface $triggerDate = null)
     {
         $this->triggerDate = $triggerDate;
         $this->setIsScheduled(true);

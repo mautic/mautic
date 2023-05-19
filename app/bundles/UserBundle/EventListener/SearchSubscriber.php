@@ -74,7 +74,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 $canEdit     = $this->security->isGranted('user:users:edit');
                 foreach ($users as $user) {
                     $userResults[] = $this->twig->render(
-                        '@MauticUser/SubscribedEvents\Search/global_user.html.twig',
+                        '@MauticUser/SubscribedEvents/Search/global_user.html.twig',
                         [
                             'user'    => $user,
                             'canEdit' => $canEdit,
@@ -83,7 +83,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($users) > 5) {
                     $userResults[] = $this->twig->render(
-                        'MauticUser/SubscribedEvents\Search/global_user.html.twig',
+                        'MauticUser/SubscribedEvents/Search/global_user.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
@@ -108,7 +108,7 @@ class SearchSubscriber implements EventSubscriberInterface
 
                 foreach ($roles as $role) {
                     $roleResults[] = $this->twig->render(
-                        '@MauticUser/SubscribedEvents\Search/global_role.html.twig',
+                        '@MauticUser/SubscribedEvents/Search/global_role.html.twig',
                         [
                             'role'    => $role,
                             'canEdit' => $canEdit,
@@ -117,7 +117,7 @@ class SearchSubscriber implements EventSubscriberInterface
                 }
                 if (count($roles) > 5) {
                     $roleResults[] = $this->twig->render(
-                        '@MauticUser/SubscribedEvents\Search/global_role.html.twig',
+                        '@MauticUser/SubscribedEvents/Search/global_role.html.twig',
                         [
                             'showMore'     => true,
                             'searchString' => $str,
