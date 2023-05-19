@@ -8,7 +8,7 @@ class RequestHelper
 {
     public static function hasBasicAuth(Request $request): bool
     {
-        return 0 === strpos(strtolower($request->headers->get('Authorization')), 'basic');
+        return str_starts_with(strtolower($request->headers->get('Authorization')), 'basic');
     }
 
     public static function isApiRequest(Request $request): bool
