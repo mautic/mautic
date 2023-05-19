@@ -8,11 +8,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 final class ReportHelper
 {
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(private EventDispatcherInterface $dispatcher)
     {
-        $this->dispatcher = $dispatcher;
     }
 
     /**
