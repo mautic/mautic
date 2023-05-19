@@ -1115,11 +1115,10 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
 
     /**
      * Check all links in content and decode ampersands.
-     *
-     * @param $content
      */
     private function decodeAmpersands(&$content)
     {
+        $content = $content ?? '';
         if (preg_match_all('/((https?|ftps?):\/\/)([a-zA-Z0-9-\.{}]*[a-zA-Z0-9=}]*)(\??)([^\s\"\]]+)?/i', $content, $matches)) {
             foreach ($matches[0] as $url) {
                 $content = str_replace($url, UrlHelper::decodeAmpersands($url), $content);
