@@ -26,7 +26,7 @@ class AssetControllerFunctionalTest extends AbstractAssetTest
 
         $this->em->persist($asset);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($asset);
 
         $urlAlias   = 'assets';
         $routeAlias = 'asset';

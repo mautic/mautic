@@ -73,7 +73,7 @@ class NotificationRepository extends CommonRepository
 
             if ($limit) {
                 // Doctrine API doesn't support updates with limits
-                $this->getEntityManager()->getConnection()->executeUpdate(
+                $this->getEntityManager()->getConnection()->executeStatement(
                     $qb->getSQL()." LIMIT $limit"
                 );
             } else {
@@ -138,7 +138,7 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.dateAdded', 'DESC');
+            ->orderBy('n.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
 
         if ($limit) {
             $qb->setMaxResults($limit);
@@ -164,6 +164,6 @@ class NotificationRepository extends CommonRepository
             ->setMaxResults(1);
 
         return (bool) $qb->execute()
-            ->fetchColumn();
+            ->fetchOne();
     }
 }

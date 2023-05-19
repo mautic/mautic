@@ -95,17 +95,6 @@ class InstallWorkflowTest extends MauticMysqlTestCase
         $crawler = $this->client->submit($form);
         Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
 
-        $submitButton = $crawler->selectButton('install_email_step[buttons][next]');
-        $form         = $submitButton->form();
-
-        $form['install_email_step[mailer_from_name]']->setValue('admin');
-        $form['install_email_step[mailer_from_email]']->setValue('mautic@example.com');
-        $form['install_email_step[mailer_spool_type]']->setValue('memory');
-        $form['install_email_step[mailer_transport]']->setValue('smtp');
-
-        $crawler = $this->client->submit($form);
-        Assert::assertTrue($this->client->getResponse()->isOk(), $this->client->getResponse()->getContent());
-
         $successText = $crawler->filter('.panel-body.text-center h5')->text();
         Assert::assertStringContainsString('Mautic is installed', $successText);
 

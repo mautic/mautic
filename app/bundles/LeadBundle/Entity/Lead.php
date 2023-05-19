@@ -128,7 +128,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $eventLog;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastActive;
 
@@ -160,7 +160,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $newlyCreated = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateIdentified;
 
@@ -980,11 +980,11 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      * @param      $action
      * @param null $company
      */
-    public function addCompanyChangeLogEntry($type, $name, $action, $company = null)
+    public function addCompanyChangeLogEntry($type, $name, $action, $company = null): ?CompanyChangeLog
     {
         if (!$company) {
             // No need to record a null delta
-            return;
+            return null;
         }
 
         // Create a new company change event
@@ -996,6 +996,8 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
         $event->setCompany($company);
         $event->setLead($this);
         $this->addCompanyChangeLog($event);
+
+        return $event;
     }
 
     /**

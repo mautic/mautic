@@ -41,7 +41,7 @@ class AjaxController extends CommonAjaxController
      */
     public function updateWidgetFormAction(Request $request, FormFactoryInterface $formFactory)
     {
-        $data      = $request->request->get('widget');
+        $data      = $request->request->all()['widget'] ?? [];
         $dataArray = ['success' => 0];
 
         // Clear params if type is not selected
@@ -51,7 +51,7 @@ class AjaxController extends CommonAjaxController
 
         $widget   = new Widget();
         $form     = $formFactory->create(WidgetType::class, $widget);
-        $formHtml = $this->render('@MauticDashboard//Widget\\form.html.twig',
+        $formHtml = $this->render('@MauticDashboard/Widget/form.html.twig',
             ['form' => $form->submit($data)->createView()]
         )->getContent();
 
@@ -68,7 +68,7 @@ class AjaxController extends CommonAjaxController
      */
     public function updateWidgetOrderingAction(Request $request)
     {
-        $data           = $request->request->get('ordering');
+        $data           = $request->request->all()['ordering'] ?? [];
         $dashboardModel = $this->getModel('dashboard');
         \assert($dashboardModel instanceof DashboardModel);
         $repo = $dashboardModel->getRepository();

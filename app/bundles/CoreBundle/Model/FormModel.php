@@ -403,7 +403,7 @@ class FormModel extends AbstractCommonModel
      *
      * @return string
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function cleanAlias($alias, $prefix = '', $maxLength = false, $spaceCharacter = '_')
     {

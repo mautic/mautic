@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\EmailBundle\Controller\AjaxController;
 use Mautic\EmailBundle\Entity\Email;
@@ -46,6 +47,11 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
      */
     private $controller;
 
+    /**
+     * @var MockObject&ManagerRegistry
+     */
+    private $managerRegistry;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -55,7 +61,8 @@ class AjaxControllerTest extends \PHPUnit\Framework\TestCase
         $this->containerMock    = $this->createMock(Container::class);
         $this->modelMock        = $this->createMock(EmailModel::class);
         $this->emailMock        = $this->createMock(Email::class);
-        $this->controller       = new AjaxController();
+        $this->managerRegistry  = $this->createMock(ManagerRegistry::class);
+        $this->controller       = new AjaxController($this->managerRegistry);
         $this->controller->setModelFactory($this->modelFactoryMock);
         $this->controller->setContainer($this->containerMock);
 

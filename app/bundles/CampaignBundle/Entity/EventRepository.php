@@ -144,7 +144,7 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.order', 'ASC');
+            ->orderBy('e.order', \Doctrine\Common\Collections\Criteria::ASC);
 
         $results = $q->getQuery()->getArrayResult();
 

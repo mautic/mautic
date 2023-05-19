@@ -49,7 +49,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($installQueries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();
@@ -96,7 +96,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($queries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();
@@ -131,7 +131,7 @@ abstract class PluginBundleBase extends Bundle
         $db->beginTransaction();
         try {
             foreach ($dropQueries as $q) {
-                $db->query($q);
+                $db->executeQuery($q);
             }
 
             $db->commit();

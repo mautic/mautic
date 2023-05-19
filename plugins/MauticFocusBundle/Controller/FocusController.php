@@ -167,7 +167,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getPostActionRedirectArguments(array $args, $action)
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus', []);
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);
@@ -198,7 +198,7 @@ class FocusController extends AbstractStandardFormController
      */
     protected function getEntityFormOptions()
     {
-        $focus        = $this->getCurrentRequest()->request->get('focus', []);
+        $focus        = $this->getCurrentRequest()->request->get('focus') ?? [];
         $updateSelect = 'POST' === $this->getCurrentRequest()->getMethod()
             ? ($focus['updateSelect'] ?? false)
             : $this->getCurrentRequest()->get('updateSelect', false);

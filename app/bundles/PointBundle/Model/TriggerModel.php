@@ -421,7 +421,7 @@ class TriggerModel extends CommonFormModel
                 if ($this->triggerEvent($event, $lead, true)) {
                     $log = new LeadTriggerLog();
                     $log->setIpAddress($ipAddress);
-                    $log->setEvent($this->em->getReference('MauticPointBundle:TriggerEvent', $event['id']));
+                    $log->setEvent($triggerEvent = $this->getEventRepository()->find($event['id']));
                     $log->setLead($lead);
                     $log->setDateFired(new \DateTime());
                     $persist[] = $log;
@@ -430,9 +430,10 @@ class TriggerModel extends CommonFormModel
 
             if (!empty($persist)) {
                 $this->getEventRepository()->saveEntities($persist);
-
-                $this->em->clear('Mautic\PointBundle\Entity\LeadTriggerLog');
-                $this->em->clear('Mautic\PointBundle\Entity\TriggerEvent');
+                $this->getEventRepository()->detachEntities($persist);
+                if (isset($triggerEvent)) {
+                    $this->getEventRepository()->deleteEntity($triggerEvent);
+                }
             }
         }
     }

@@ -162,7 +162,13 @@ final class JumpToActionTest extends MauticMysqlTestCase
         }
 
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($eventLog);
+        $this->em->detach($jumpTo);
+        $this->em->detach($eventLog);
+        $this->em->detach($decision);
+        $this->em->detach($addTag);
+        $this->em->detach($campaignMember);
+        $this->em->detach($tag);
 
         // Executing the command for the second time should not schedule any new events:
         $this->testSymfonyCommand('mautic:campaigns:trigger', ['-i' => $campaign->getId()]);

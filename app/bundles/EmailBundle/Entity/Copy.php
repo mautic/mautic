@@ -16,7 +16,7 @@ class Copy
     private $id;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateCreated;
 
@@ -40,7 +40,7 @@ class Copy
             ->setCustomRepositoryClass(CopyRepository::class);
 
         $builder->createField('id', 'string')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->length(32)
             ->build();
 
@@ -75,7 +75,7 @@ class Copy
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateCreated()
     {

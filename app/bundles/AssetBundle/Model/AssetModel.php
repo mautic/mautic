@@ -163,6 +163,11 @@ class AssetModel extends FormModel
 
         $download = new Download();
         $download->setDateDownload(new \Datetime());
+        $download->setUtmCampaign($request->get('utm_campaign'));
+        $download->setUtmContent($request->get('utm_content'));
+        $download->setUtmMedium($request->get('utm_medium'));
+        $download->setUtmSource($request->get('utm_source'));
+        $download->setUtmTerm($request->get('utm_term'));
 
         // Download triggered by lead
         if (empty($systemEntry)) {
@@ -653,7 +658,7 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_download');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -683,6 +688,6 @@ class AssetModel extends FormModel
         $chartQuery->applyFilters($q, $filters);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 }

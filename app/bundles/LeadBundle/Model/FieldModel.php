@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -485,10 +484,7 @@ class FieldModel extends FormModel
         $this->leadFieldSaver             = $leadFieldSaver;
     }
 
-    /**
-     * @return LeadFieldRepository
-     */
-    public function getRepository()
+    public function getRepository(): LeadFieldRepository
     {
         return $this->leadFieldRepository;
     }
@@ -572,7 +568,7 @@ class FieldModel extends FormModel
      * @param bool      $unlock
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException
@@ -599,7 +595,7 @@ class FieldModel extends FormModel
             $this->customFieldColumn->createLeadColumn($entity);
         } catch (CustomFieldLimitException $e) {
             // Convert to original Exception not to cause BC
-            throw new DBALException($this->translator->trans($e->getMessage()));
+            throw new \Doctrine\DBAL\Exception($this->translator->trans($e->getMessage()));
         }
 
         // Update order of the other fields.
@@ -615,7 +611,7 @@ class FieldModel extends FormModel
      * @return array|void
      *
      * @throws AbortColumnCreateException
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      * @throws DriverException
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws \Mautic\CoreBundle\Exception\SchemaException

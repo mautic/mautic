@@ -1008,6 +1008,33 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "paulsanduleac",
+      "name": "Paul Sanduleac",
+      "avatar_url": "https://avatars.githubusercontent.com/u/67867?v=4",
+      "profile": "http://paulsanduleac.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "lenonleite",
+      "name": "Lenon Leite",
+      "avatar_url": "https://avatars.githubusercontent.com/u/218436?v=4",
+      "profile": "http://lenonleite.com.br",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Syrgak-Alan",
+      "name": "Alan Syrgak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/96595532?v=4",
+      "profile": "https://github.com/Syrgak-Alan",
+      "contributions": [
+        "userTesting"
+      ]
     }
   ],
   "contributorsPerLine": 7,
