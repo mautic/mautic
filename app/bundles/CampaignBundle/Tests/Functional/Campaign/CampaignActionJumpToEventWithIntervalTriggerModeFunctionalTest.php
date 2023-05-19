@@ -140,7 +140,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerDate();
+        $adjustPointEvent->setTriggerDate($now);
         $adjustPointEvent->setTriggerInterval(1);
         $adjustPointEvent->setTriggerIntervalUnit('H');
         $adjustPointEvent->setTriggerHour($now->modify('-1 hour')->format('H:i'));
@@ -152,7 +152,7 @@ class CampaignActionJumpToEventWithIntervalTriggerModeFunctionalTest extends Mau
         ];
 
         $adjustPointEvent = clone $event;
-        $adjustPointEvent->setTriggerDate();
+        $adjustPointEvent->setTriggerDate($now);
         $adjustPointEvent->setTriggerRestrictedStartHour($now->modify('+2 hour')->format('H:i'));
         $adjustPointEvent->setTriggerRestrictedStopHour($now->modify('+3 hour')->format('H:i'));
 

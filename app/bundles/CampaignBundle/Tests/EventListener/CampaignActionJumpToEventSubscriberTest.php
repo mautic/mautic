@@ -253,12 +253,12 @@ final class CampaignActionJumpToEventSubscriberTest extends TestCase
             /**
              * @return \DateTime
              */
-            public function getExecutionDateTime(Event $event, \DateTime $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
+            public function getExecutionDateTime(Event $event, \DateTimeInterface $compareFromDateTime = null, \DateTime $comparedToDateTime = null)
             {
                 return new \DateTime();
             }
 
-            public function shouldScheduleEvent(Event $event, \DateTime $executionDate, \DateTime $now): bool
+            public function shouldScheduleEvent(Event $event, \DateTimeInterface $executionDate, \DateTimeInterface $now): bool
             {
                 return false;
             }
