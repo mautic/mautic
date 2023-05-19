@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * @deprecated will be removed in Mautic 5. See DEPRECATION_MESSAGE bellow.
+ * @deprecated will be removed in Mautic 5. See DEPRECATION_MESSAGE below.
  */
 class PipedriveIntegration extends CrmAbstractIntegration
 {
