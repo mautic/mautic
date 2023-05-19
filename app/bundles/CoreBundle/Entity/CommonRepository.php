@@ -229,8 +229,7 @@ class CommonRepository extends ServiceEntityRepository
         if ($this->getEntityManager()->contains($entity)) {
             $this->getEntityManager()->detach($entity);
 
-            $metadata = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
-            $this->getEntityManager()->clear($metadata->name);
+            $metadata         = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
             $identifierValues = $metadata->getIdentifierValues($entity);
             if (count($identifierValues) > 1) {
                 throw new \RuntimeException('Multiple identifiers are not supported.');

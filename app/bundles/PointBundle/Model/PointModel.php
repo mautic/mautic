@@ -316,7 +316,7 @@ class PointModel extends CommonFormModel
             $this->getRepository()->detachEntities($persist);
         }
 
-        if (!empty($lead->getpointchanges())) {
+        if (!empty($lead->getPointChanges())) {
             $this->leadModel->saveEntity($lead);
         }
     }
