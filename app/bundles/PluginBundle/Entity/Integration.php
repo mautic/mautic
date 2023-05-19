@@ -17,7 +17,7 @@ class Integration extends CommonEntity
     private $id;
 
     /**
-     * @var Plugin
+     * @var Plugin|null
      */
     private $plugin;
 
@@ -54,7 +54,7 @@ class Integration extends CommonEntity
             ->setCustomRepositoryClass('Mautic\PluginBundle\Entity\IntegrationRepository');
 
         $builder->createField('id', 'integer')
-            ->isPrimaryKey()
+            ->makePrimaryKey()
             ->generatedValue()
             ->build();
 
@@ -93,7 +93,7 @@ class Integration extends CommonEntity
     }
 
     /**
-     * @return Plugin
+     * @return Plugin|null
      */
     public function getPlugin()
     {
@@ -154,6 +154,11 @@ class Integration extends CommonEntity
         $this->isPublished = $isPublished;
 
         return $this;
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->isPublished;
     }
 
     /**

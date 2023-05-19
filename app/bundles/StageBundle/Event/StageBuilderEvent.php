@@ -34,7 +34,7 @@ class StageBuilderEvent extends Event
      *                       'label'           => (required) what to display in the list
      *                       'description'     => (optional) short description of event
      *                       'template'        => (optional) template to use for the action's HTML in the stage builder
-     *                       i.e AcmeMyBundle:StageAction:theaction.html.php
+     *                       i.e AcmeMyBundle:StageAction:theaction.html.twig
      *                       'formType'        => (optional) name of the form type SERVICE for the action; will use a default form with stage change only
      *                       'formTypeOptions' => (optional) array of options to pass to formType
      *                       'callback'        => (optional) callback function that will be passed when the action is triggered; return true to

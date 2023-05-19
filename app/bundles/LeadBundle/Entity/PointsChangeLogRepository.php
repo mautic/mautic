@@ -30,7 +30,7 @@ class PointsChangeLogRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('lp.event_name', $query->expr()->literal('%'.$options['search'].'%')),
                 $query->expr()->like('lp.action_name', $query->expr()->literal('%'.$options['search'].'%'))
             ));
@@ -52,7 +52,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -68,7 +68,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

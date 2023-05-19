@@ -14,7 +14,7 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -63,8 +63,6 @@ class UserProvider implements UserProviderInterface
      * @param string $username
      *
      * @return User
-     *
-     * @throws \Doctrine\ORM\NonUniqueResultException
      */
     public function loadUserByUsername($username)
     {
@@ -84,7 +82,7 @@ class UserProvider implements UserProviderInterface
                 'Unable to find an active admin MauticUserBundle:User object identified by "%s".',
                 $username
             );
-            throw new UsernameNotFoundException($message, 0);
+            throw new UserNotFoundException($message, 0);
         }
 
         //load permissions
@@ -112,7 +110,7 @@ class UserProvider implements UserProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function supportsClass($class)
+    public function supportsClass(string $class)
     {
         return User::class === $class || is_subclass_of($class, User::class);
     }
@@ -193,11 +191,11 @@ class UserProvider implements UserProviderInterface
             $user = $this->loadUserByUsername($user->getUsername());
 
             return $user;
-        } catch (UsernameNotFoundException $exception) {
+        } catch (UserNotFoundException $exception) {
             // Try by email
             try {
                 return $this->loadUserByUsername($user->getEmail());
-            } catch (UsernameNotFoundException $exception) {
+            } catch (UserNotFoundException $exception) {
             }
         }
 

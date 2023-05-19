@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\EventListener\LeadSubscriber;
 use Mautic\LeadBundle\Helper\LeadChangeEventDispatcher;
 use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Templating\Helper\DncReasonHelper;
+use Mautic\LeadBundle\Twig\Helper\DncReasonHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RouterInterface;
@@ -42,7 +42,7 @@ class LeadSubscriberTest extends CommonMocks
     private $leadEventDispatcher;
 
     /**
-     * @var DncReasonHelper|MockObject
+     * @var DncReasonHelper
      */
     private $dncReasonHelper;
 
@@ -71,7 +71,7 @@ class LeadSubscriberTest extends CommonMocks
         $this->ipLookupHelper      = $this->createMock(IpLookupHelper::class);
         $this->auditLogModel       = $this->createMock(AuditLogModel::class);
         $this->leadEventDispatcher = $this->createMock(LeadChangeEventDispatcher::class);
-        $this->dncReasonHelper     = $this->createMock(DncReasonHelper::class);
+        $this->dncReasonHelper     = new DncReasonHelper($this->createMock(TranslatorInterface::class));
         $this->entityManager       = $this->createMock(EntityManager::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->router              = $this->createMock(RouterInterface::class);

@@ -2,17 +2,23 @@
 
 namespace Mautic\ConfigBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ConfigBundle\Model\SysinfoModel;
 use Mautic\CoreBundle\Controller\FormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\FormBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SysinfoController extends FormController
 {
     private SysinfoModel $sysinfoModel;
 
-    public function __construct(SysinfoModel $sysinfoModel)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, SysinfoModel $sysinfoModel, ManagerRegistry $doctrine)
     {
         $this->sysinfoModel = $sysinfoModel;
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**
@@ -33,7 +39,7 @@ class SysinfoController extends FormController
                 'log'             => $this->sysinfoModel->getLogTail(200),
                 'dbInfo'          => $this->sysinfoModel->getDbInfo(),
             ],
-            'contentTemplate' => 'MauticConfigBundle:Sysinfo:index.html.php',
+            'contentTemplate' => '@MauticConfig/Sysinfo/index.html.twig',
             'passthroughVars' => [
                 'activeLink'    => '#mautic_sysinfo_index',
                 'mauticContent' => 'sysinfo',

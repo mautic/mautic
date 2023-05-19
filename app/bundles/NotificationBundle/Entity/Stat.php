@@ -39,12 +39,12 @@ class Stat
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateRead;
 
@@ -54,7 +54,7 @@ class Stat
     private $isClicked = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateClicked;
 
@@ -94,7 +94,7 @@ class Stat
     private $clickDetails = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastClicked;
 
@@ -487,7 +487,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateRead()
     {

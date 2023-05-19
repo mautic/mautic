@@ -4,28 +4,31 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Tests\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Controller\EmailController;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\FormBundle\Helper\FormFieldHelper;
 use Mautic\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Router;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 class EmailControllerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translatorMock;
 
@@ -90,15 +93,15 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
     private $formMock;
 
     /**
-     * @var MockObject|DelegatingEngine
+     * @var MockObject|Environment
      */
-    private $templatingMock;
+    private $twigMock;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translatorMock       = $this->createMock(TranslatorInterface::class);
+        $this->translatorMock       = $this->createMock(Translator::class);
         $this->sessionMock          = $this->createMock(Session::class);
         $this->modelFactoryMock     = $this->createMock(ModelFactory::class);
         $this->containerMock        = $this->createMock(Container::class);
@@ -110,21 +113,27 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->helperUserMock       = $this->createMock(UserHelper::class);
         $this->formFactoryMock      = $this->createMock(FormFactory::class);
         $this->formMock             = $this->createMock(Form::class);
-        $this->templatingMock       = $this->createMock(DelegatingEngine::class);
-        $this->controller           = new EmailController();
+        $this->twigMock             = $this->createMock(Environment::class);
+        $this->controller           = new EmailController(
+            $this->corePermissionsMock,
+            $this->helperUserMock,
+            $this->formFactoryMock,
+            $this->createMock(FormFieldHelper::class),
+            $this->createMock(ManagerRegistry::class)
+        );
         $this->controller->setContainer($this->containerMock);
         $this->controller->setTranslator($this->translatorMock);
         $this->controller->setFlashBag($this->flashBagMock);
+        $this->controller->setModelFactory($this->modelFactoryMock);
         $this->sessionMock->method('getFlashBag')->willReturn($this->flashBagMock);
-        $this->controller->setRequest(new Request());
     }
 
     public function testSendActionWhenNoEntityFound(): void
     {
-        $this->containerMock->expects($this->exactly(3))
+        $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(['mautic.model.factory'], ['session'], ['router'])
-            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock, $this->routerMock);
+            ->withConsecutive(['router'])
+            ->willReturnOnConsecutiveCalls($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -143,16 +152,25 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->emailMock->expects($this->never())
             ->method('isPublished');
 
-        $response = $this->controller->sendAction(5);
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
+            ->method('getSession')
+            ->willReturn($this->sessionMock);
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->expects(self::any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+        $this->controller->setRequestStack($requestStack);
+        $response = $this->controller->sendAction($request, 5);
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function testSendActionWhenEnityFoundButNotPublished(): void
+    public function testSendActionWhenEntityFoundButNotPublished(): void
     {
-        $this->containerMock->expects($this->exactly(3))
+        $this->containerMock->expects($this->once())
             ->method('get')
-            ->withConsecutive(['mautic.model.factory'], ['session'], ['router'])
-            ->willReturnOnConsecutiveCalls($this->modelFactoryMock, $this->sessionMock, $this->routerMock);
+            ->withConsecutive(['router'])
+            ->willReturnOnConsecutiveCalls($this->routerMock);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -175,7 +193,16 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
         $this->emailMock->expects($this->never())
             ->method('getEmailType');
 
-        $response = $this->controller->sendAction(5);
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
+            ->method('getSession')
+            ->willReturn($this->sessionMock);
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->expects(self::any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+        $this->controller->setRequestStack($requestStack);
+        $response = $this->controller->sendAction($request, 5);
         $this->assertEquals(302, $response->getStatusCode());
     }
 
@@ -185,29 +212,16 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             ->method('setSubject')
             ->with($this->stringStartsWith(EmailController::EXAMPLE_EMAIL_SUBJECT_PREFIX));
 
-        $this->containerMock->expects($this->exactly(7))
-            ->method('get')
-            ->withConsecutive(
-                ['mautic.model.factory'],
-                ['mautic.security'],
-                ['router'],
-                ['mautic.helper.user'],
-                ['form.factory'],
-                ['templating'],
-                ['templating']
-            )
-            ->willReturnOnConsecutiveCalls(
-                $this->modelFactoryMock,
-                $this->corePermissionsMock,
-                $this->routerMock,
-                $this->helperUserMock,
-                $this->formFactoryMock,
-                $this->templatingMock,
-                $this->templatingMock
-            );
+        $services = [
+            ['router', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->routerMock],
+            ['form.factory', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->formFactoryMock],
+            ['twig', Container::EXCEPTION_ON_INVALID_REFERENCE, $this->twigMock],
+        ];
 
-        $this->templatingMock->method('supports')
-            ->willReturn(true);
+        $serviceExists = fn ($key) => count(array_filter($services, fn ($service) => $service[0] === $key));
+
+        $this->containerMock->method('has')->willReturnCallback($serviceExists);
+        $this->containerMock->method('get')->willReturnMap($services);
 
         $this->modelFactoryMock->expects($this->once())
             ->method('getModel')
@@ -252,15 +266,16 @@ class EmailControllerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->formMock);
 
-        $this->containerMock->expects($this->once())
-            ->method('has')
-            ->with('templating')
-            ->willReturn(true);
-
-        $this->templatingMock->expects($this->once())
+        $this->twigMock->expects($this->once())
             ->method('render')
             ->willReturn('');
 
-        $this->controller->sendExampleAction(1);
+        $request      = new Request();
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->expects(self::any())
+            ->method('getCurrentRequest')
+            ->willReturn($request);
+        $this->controller->setRequestStack($requestStack);
+        $this->controller->sendExampleAction($request, 1);
     }
 }

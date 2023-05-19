@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Mautic\CampaignBundle\Command;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\Model\SummaryModel;
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,9 +25,10 @@ class SummarizeCommand extends ModeratedCommand
     public function __construct(
         TranslatorInterface $translator,
         SummaryModel $summaryModel,
-        PathsHelper $pathsHelper
+        PathsHelper $pathsHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
-        parent::__construct($pathsHelper);
+        parent::__construct($pathsHelper, $coreParametersHelper);
 
         $this->translator   = $translator;
         $this->summaryModel = $summaryModel;
@@ -61,7 +62,7 @@ class SummarizeCommand extends ModeratedCommand
     }
 
     /**
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

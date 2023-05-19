@@ -37,6 +37,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -275,7 +276,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      * Example:
      *  'cloud_storage' => 'mautic.integration.form.features.cloud_storage.tooltip'
      *
-     * @return array
+     * @return array<string, string>
      */
     public function getSupportedFeatureTooltips()
     {
@@ -299,7 +300,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getFormTemplate()
     {
-        return 'MauticPluginBundle:Integration:form.html.php';
+        return '@MauticPlugin/Integration/form.html.twig';
     }
 
     /**
@@ -309,7 +310,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      */
     public function getFormTheme()
     {
-        return 'MauticPluginBundle:FormTheme\Integration';
+        return '@MauticPlugin/FormTheme/Integration/layout.html.twig';
     }
 
     /**
@@ -1822,7 +1823,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
                 ));
                 $leadModel->saveEntity($lead, false);
             } catch (\Exception $exception) {
-                $this->logger->addWarning($exception->getMessage());
+                $this->logger->warning($exception->getMessage());
 
                 return;
             }
@@ -2065,7 +2066,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             }
         }
 
-        $logger->addError('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
+        $logger->error('INTEGRATION ERROR: '.$this->getName().' - '.(('dev' == MAUTIC_ENV) ? (string) $e : $e->getMessage()));
     }
 
     /**
@@ -2091,7 +2092,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
      *
      * @param $section
      *
-     * @return string
+     * @return array<mixed>
      */
     public function getFormNotes($section)
     {
@@ -2118,8 +2119,8 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
     }
 
     /**
-     * @param FormBuilder $builder
-     * @param array       $options
+     * @param FormBuilderInterface $builder
+     * @param array<mixed>         $options
      */
     public function modifyForm($builder, $options)
     {
@@ -2307,7 +2308,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         if (!empty($leadsToSync)) {
             // Let's only sync thos that have actual changes to prevent a loop
             $integrationEntityRepo->saveEntities($leadsToSync);
-            $this->em->clear(Lead::class);
+            $integrationEntityRepo->deleteEntity($leadsToSync);
             $leadsToSync = [];
         }
 
@@ -2322,8 +2323,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
             $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
             $this->deleteIntegrationEntities = [];
         }
-
-        $this->em->clear(IntegrationEntity::class);
+        $integrationEntityRepo->deleteEntities($this->deleteIntegrationEntities);
 
         if ($error) {
             if ($error instanceof \Exception) {
@@ -2381,7 +2381,7 @@ abstract class AbstractIntegration implements UnifiedIntegrationInterface
         }
 
         $integrationEntityRepo->saveEntities($integrationEntities);
-        $this->em->clear(IntegrationEntity::class);
+        $integrationEntityRepo->detachEntities($integrationEntities);
     }
 
     /**

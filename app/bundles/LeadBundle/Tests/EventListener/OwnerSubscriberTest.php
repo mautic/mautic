@@ -88,16 +88,15 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
 
-        $this->assertArrayHasKey('{ownerfield=email}', $tokens);
+        $this->assertArrayNotHasKey('{ownerfield=email}', $tokens);
         $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
 
-        $this->assertEquals('owner3@owner.com', $tokens['{ownerfield=email}']);
         $this->assertEquals('John', $tokens['{ownerfield=firstname}']);
         $this->assertEquals('S&#39;mith', $tokens['{ownerfield=lastname}']);
     }
@@ -111,7 +110,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
@@ -129,7 +128,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailGenerate($event);
 
         $tokens = $event->getTokens();
@@ -151,11 +150,11 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[0]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
-        $this->assertArrayHasKey('{ownerfield=email}', $tokens);
+        $this->assertArrayNotHasKey('{ownerfield=email}', $tokens);
         $this->assertArrayHasKey('{ownerfield=firstname}', $tokens);
         $this->assertArrayHasKey('{ownerfield=lastname}', $tokens);
     }
@@ -169,7 +168,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[1]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
@@ -187,7 +186,7 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
         $subscriber = new OwnerSubscriber($leadModel, $this->getMockTranslator());
 
         $mailer = $this->getMockMailer($this->contacts[4]);
-        $event  = new EmailSendEvent($mailer);
+        $event  = $this->getEmailSendEvent($mailer);
         $subscriber->onEmailDisplay($event);
 
         $tokens = $event->getTokens();
@@ -388,5 +387,13 @@ class OwnerSubscriberTest extends \PHPUnit\Framework\TestCase
             $validOwner,
             $noOwner,
         ];
+    }
+
+    protected function getEmailSendEvent(MailHelper $mailer): EmailSendEvent
+    {
+        $event = new EmailSendEvent($mailer);
+        $event->setContent('<html><body>{ownerfield=firstname} {ownerfield=lastname}</body></html>');
+
+        return $event;
     }
 }

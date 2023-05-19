@@ -8,11 +8,8 @@ use Mautic\CoreBundle\Exception\FileNotFoundException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\Filesystem;
 use Mautic\CoreBundle\Helper\PathsHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Helper\ThemeHelper;
 use Mautic\CoreBundle\Helper\ThemeHelperInterface;
-use Mautic\CoreBundle\Templating\TemplateNameParser;
-use Mautic\CoreBundle\Templating\TemplateReference;
 use Mautic\IntegrationsBundle\Exception\IntegrationNotFoundException;
 use Mautic\IntegrationsBundle\Helper\BuilderIntegrationsHelper;
 use Mautic\IntegrationsBundle\Integration\Interfaces\BuilderInterface;
@@ -21,9 +18,10 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Templating\DelegatingEngine;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 class ThemeHelperTest extends TestCase
 {
@@ -33,9 +31,14 @@ class ThemeHelperTest extends TestCase
     private $pathsHelper;
 
     /**
-     * @var TemplatingHelper|MockObject
+     * @var Environment|MockObject
      */
-    private $templatingHelper;
+    private $twig;
+
+    /**
+     * @var FilesystemLoader|MockObject
+     */
+    private $loader;
 
     /**
      * @var TranslatorInterface|MockObject
@@ -61,7 +64,8 @@ class ThemeHelperTest extends TestCase
     {
         parent::setUp();
         $this->pathsHelper         = $this->createMock(PathsHelper::class);
-        $this->templatingHelper    = $this->createMock(TemplatingHelper::class);
+        $this->twig                = $this->createMock(Environment::class);
+        $this->loader              = $this->createMock(FilesystemLoader::class);
         $this->translator          = $this->createMock(TranslatorInterface::class);
         $this->coreParameterHelper = $this->createMock(CoreParametersHelper::class);
         $this->coreParameterHelper->method('get')
@@ -72,7 +76,7 @@ class ThemeHelperTest extends TestCase
 
         $this->themeHelper = new ThemeHelper(
             $this->pathsHelper,
-            $this->templatingHelper,
+            $this->twig,
             $this->translator,
             $this->coreParameterHelper,
             new Filesystem(),
@@ -159,29 +163,16 @@ class ThemeHelperTest extends TestCase
 
     public function testThemeFallbackToDefaultIfTemplateIsMissing(): void
     {
-        $templateNameParser = $this->createMock(TemplateNameParser::class);
-        $this->templatingHelper->expects($this->once())
-            ->method('getTemplateNameParser')
-            ->willReturn($templateNameParser);
-        $templateNameParser->expects($this->once())
-            ->method('parse')
-            ->willReturn(
-                new TemplateReference('', 'goldstar', 'page', 'html')
-            );
+        $this->twig->expects($this->exactly(2))
+            ->method('getLoader')
+            ->willReturn($this->loader);
 
-        $templating = $this->createMock(DelegatingEngine::class);
-
-        $templating->expects($this->exactly(3))
+        $this->loader->expects($this->exactly(2))
             ->method('exists')
             ->willReturnOnConsecutiveCalls(
                 false, // twig does not exist
-                false, // php does not exist
-                true // default themes twig exists
+                true, // default themes twig exists
             );
-
-        $this->templatingHelper->expects($this->once())
-            ->method('getTemplating')
-            ->willReturn($templating);
 
         $this->pathsHelper->method('getSystemPath')
             ->willReturnCallback(
@@ -197,30 +188,20 @@ class ThemeHelperTest extends TestCase
 
         $this->themeHelper->setDefaultTheme('nature');
 
-        $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
-        $this->assertEquals(':nature:page.html.twig', $template);
+        $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/html/page.html.twig');
+        $this->assertEquals('@themes/nature/html/page.html.twig', $template);
     }
 
     public function testThemeFallbackToNextBestIfTemplateIsMissingForBothRequestedAndDefaultThemes(): void
     {
-        $templateNameParser = $this->createMock(TemplateNameParser::class);
-        $this->templatingHelper->expects($this->once())
-            ->method('getTemplateNameParser')
-            ->willReturn($templateNameParser);
-        $templateNameParser->expects($this->once())
-            ->method('parse')
-            ->willReturn(
-                new TemplateReference('', 'goldstar', 'page', 'html')
-            );
+        $this->twig->expects($this->exactly(3))
+            ->method('getLoader')
+            ->willReturn($this->loader);
 
-        $templating = $this->createMock(DelegatingEngine::class);
-
-        $templating->expects($this->exactly(4))
+        $this->loader->expects($this->exactly(3))
             ->method('exists')
             ->willReturnOnConsecutiveCalls(
                 // twig does not exist
-                false,
-                // php does not exist
                 false,
                 // default theme twig does not exist
                 false,
@@ -228,10 +209,6 @@ class ThemeHelperTest extends TestCase
                 true
             );
 
-        $this->templatingHelper->expects($this->once())
-            ->method('getTemplating')
-            ->willReturn($templating);
-
         $this->pathsHelper->method('getSystemPath')
             ->willReturnCallback(
                 function ($path, $absolute) {
@@ -246,10 +223,10 @@ class ThemeHelperTest extends TestCase
 
         $this->themeHelper->setDefaultTheme('nature');
 
-        $template = $this->themeHelper->checkForTwigTemplate(':goldstar:page.html.twig');
-        $this->assertNotEquals(':nature:page.html.twig', $template);
-        $this->assertNotEquals(':goldstar:page.html.twig', $template);
-        $this->assertStringContainsString(':page.html.twig', $template);
+        $template = $this->themeHelper->checkForTwigTemplate('@themes/goldstar/page.html.twig');
+        $this->assertNotEquals('@themes/nature/page.html.twig', $template);
+        $this->assertNotEquals('@themes/goldstar/page.html.twig', $template);
+        $this->assertStringContainsString('/page.html.twig', $template);
     }
 
     public function testCopyWithNoNewDirName(): void
@@ -267,11 +244,7 @@ class ThemeHelperTest extends TestCase
                     return '/path/to/themes';
                 }
             },
-            new class() extends TemplatingHelper {
-                public function __construct()
-                {
-                }
-            },
+            new Environment(new FilesystemLoader()),
             new class() extends Translator {
                 public function __construct()
                 {
@@ -300,12 +273,10 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @param string               $originDir
-                 * @param string               $targetDir
                  * @param ?\Traversable<mixed> $iterator
                  * @param mixed[]              $options
                  */
-                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = []): void
+                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/new-theme-name', $targetDir);
@@ -318,7 +289,7 @@ class ThemeHelperTest extends TestCase
                     return '{"name":"Origin Theme"}';
                 }
 
-                public function dumpFile($filename, $content): void
+                public function dumpFile(string $filename, $content): void
                 {
                     Assert::assertSame('/path/to/themes/new-theme-name/config.json', $filename);
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
@@ -342,7 +313,7 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @return \ArrayIterator<int,\SplFileInfo>
+                 * {@inheritDoc}
                  */
                 public function getIterator()
                 {
@@ -370,11 +341,7 @@ class ThemeHelperTest extends TestCase
                     return '/path/to/themes';
                 }
             },
-            new class() extends TemplatingHelper {
-                public function __construct()
-                {
-                }
-            },
+            new Environment(new FilesystemLoader()),
             new class() extends Translator {
                 public function __construct()
                 {
@@ -405,10 +372,8 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @param ?\Traversable<mixed> $iterator
                  * @param array<mixed>         $options
-                 *
-                 * @return void
                  */
-                public function mirror($originDir, $targetDir, ?\Traversable $iterator = null, $options = [])
+                public function mirror(string $originDir, string $targetDir, \Traversable $iterator = null, array $options = []): void
                 {
                     Assert::assertSame('/path/to/themes/origin-template-dir', $originDir);
                     Assert::assertSame('/path/to/themes/requested-theme-dir', $targetDir);
@@ -424,7 +389,7 @@ class ThemeHelperTest extends TestCase
                 /**
                  * @return void
                  */
-                public function dumpFile($filename, $content)
+                public function dumpFile(string $filename, $content)
                 {
                     Assert::assertSame('/path/to/themes/requested-theme-dir/config.json', $filename);
                     Assert::assertSame('{"name":"New Theme Name"}', $content);
@@ -450,9 +415,9 @@ class ThemeHelperTest extends TestCase
                 }
 
                 /**
-                 * @return \ArrayIterator<int,\SplFileInfo>
+                 * {@inheritDoc}
                  */
-                public function getIterator(): \ArrayIterator
+                public function getIterator()
                 {
                     return new \ArrayIterator($this->dirs);
                 }
@@ -588,11 +553,7 @@ class ThemeHelperTest extends TestCase
                 {
                 }
             },
-            new class() extends TemplatingHelper {
-                public function __construct()
-                {
-                }
-            },
+            new Environment(new FilesystemLoader()),
             new class() extends Translator {
                 public function __construct()
                 {

@@ -1,0 +1,82 @@
+{% set overflow = overflow is defined ? 'nav-overflow-tabs' : '' %}
+{% if verticalTabColWidth is not defined %}
+    {% set verticalTabColWidth = 3 %}
+{% endif %}
+{% set verticalContentColWidth = 12 - verticalTabColWidth %}
+{% set vertical, button = vertical is defined ? vertical : '', button is defined ? button : [] %}
+{% if vertical is not empty %}
+<div class="box-layout">
+{% endif %}
+<div class="tab-container {{ overflow }}{{ vertical is not empty ? ' bg-auto height-auto col-xs-' ~ verticalTabColWidth ~ ' pr-0 bdr-r' : '' }}">
+    {% if button is not empty %}
+    <div class="tab-button{{ (vertical is not empty) ? ' tab-button-' ~ vertical : '' }}">
+        <a href="javascript:void(0);"
+           role="tab"
+           class="btn btn-primary btn-lg btn-block btn-nospin"
+           id="{{ button.id }}"
+           style="border-radius: 0;"
+            {% if button.attr is not empty %}{{ button.attr }}{% endif %}
+        >
+            <i class="fa fa-fw {{ button.icon }}"></i>{{ button.text }}
+        </a>
+    {% if button.extra is not empty %}{{ button.extra }}{% endif %}
+    </div>
+    {% endif %}
+    <ul{{ (deletable is defined and deletable is string) ? ' data-delete-action="' ~ deletable ~ '" ' : '' }}
+        {{ (sortable is defined and sortable is string) ? ' data-sort-action="' ~ sortable ~ '" ' : '' }}
+            class="{{ (deletable is defined and deletable is not empty) ? 'nav-deletable ' : '' }}nav nav-tabs {{ (vertical is not empty) ? 'tabs-' ~ vertical ~ ' pt-0 bdr-b-wdh-0  bdr-r-wdh-0' : 'tabs-horizontal bg-auto' }}{{ sortable is defined and sortable is not empty ? ' sortable' : '' }}">
+        {% for tabKey, tab in tabs %}
+            {% set class = (tab.class is defined and tab.class is not empty) ? ' ' ~ tab.class : '' %}
+            {% if tab.attr is defined and tab.attr is iterable %}
+                {% set attr = [] %}
+                {% for key, val in tab.attr %}
+                    {% set attr = aatr|merge({0: key ~"=\"" ~ val ~ "\""}) %}
+                {% endfor %}
+                {% set tab = tab|merge({'attr': attr|join(' ')}) %}
+            {% endif %}
+            {% set attr = (tab.attr is defined and tab.attr is not empty) ? ' ' ~ tab['attr'] : '' %}
+            {% if tab['icon'] is not defined %}
+                {% if tab.published is defined and tab['published'] is not empty %}
+                    {% set tab = tab|merge({'icon': 'fa-check-circle text-success'}) %}
+                {% else %}
+                    {% set tab = tab|merge({'icon': 'fa-check-circle text-muted'}) %}
+                {% endif %}
+            {% endif %}
+            <li data-tab-id="{{ tab['id'] }}" class="{% if tab['active'] is not empty %}active{% endif %}{{ class }}"{{ attr }}>
+                <a href="#{{ tab['id'] }}" role="tab" data-toggle="tab" class="{{ class }}">
+                    <span>{{ tab['name'] }}</span>
+                    {% if tab.icon is not empty %}
+                        <i class="fa fa-fw {{ tab['icon'] }}"></i>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+<div class="tab-content{{ vertical is not empty ? ' col-xs-' ~ verticalContentColWidth ~' pl-0 pt-0 height-auto' : ' pa-md' }}">
+    {% for tab in tabs %}
+        {% set containerClass = (tab.containerClass is defined and tab['containerClass'] is not empty) ? ' ' ~ tab['containerClass'] : '' %}
+        {% if tab['containerAttr'] is defined and tab['containerAttr'] is iterable %}
+            {% set attr = [] %}
+            {% for key, val in tab['containerAttr'] %}
+                {% set attr = attr|merge([key ~ "=\"" ~ val ~ "\""]) %}
+            {% endfor %}
+            {% set tab = tab|merge({'containerAttr': attr|join(' ')}) %}
+        {% endif %}
+        {% set containerAttr = (tab['containerAttr'] is not empty) ? ' ' ~ tab['containerAttr'] : '' %}
+        <div class="tab-pane fade {{ (tab['active'] is not empty) ? 'in active' : '' }} bdr-w-0{{ containerClass }}" id="{{ tab['id'] }}"{{ containerAttr|purify }}>
+            {{ tab['content']|raw }}
+        </div>
+    {% endfor %}
+
+    {% if noContentKey is defined and noContentKey is not empty %}
+    <div class="placeholder{{ tabs is empty ? '' : ' hide' }}">
+        <div class="alert alert-warning">
+            {{ noContentKey|trans }}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% if vertical is not empty %}
+</div>
+{% endif %}

@@ -35,7 +35,7 @@ class TagApiController extends CommonApiController
     public function getNewEntity(array $params)
     {
         if (empty($params[$this->entityNameOne])) {
-            throw new \InvalidArgumentException($this->get('translator')->trans('mautic.lead.api.tag.required', [], 'validators'));
+            throw new \InvalidArgumentException($this->translator->trans('mautic.lead.api.tag.required', [], 'validators'));
         }
 
         $tagModel = $this->model;

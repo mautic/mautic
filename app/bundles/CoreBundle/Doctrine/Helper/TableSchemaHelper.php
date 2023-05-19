@@ -241,7 +241,7 @@ class TableSchemaHelper
             return $this->schema;
         }
 
-        if ($this->db instanceof \Doctrine\DBAL\Connections\MasterSlaveConnection) {
+        if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
             $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);

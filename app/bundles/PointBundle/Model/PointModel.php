@@ -18,6 +18,7 @@ use Mautic\PointBundle\Event\PointBuilderEvent;
 use Mautic\PointBundle\Event\PointEvent;
 use Mautic\PointBundle\Form\Type\PointType;
 use Mautic\PointBundle\PointEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
@@ -91,7 +92,7 @@ class PointModel extends CommonFormModel
      *
      * @throws MethodNotAllowedHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Point) {
             throw new MethodNotAllowedHttpException(['Point']);
@@ -312,8 +313,7 @@ class PointModel extends CommonFormModel
 
         if (!empty($persist)) {
             $this->getRepository()->saveEntities($persist);
-            // Detach logs to reserve memory
-            $this->em->clear('Mautic\PointBundle\Entity\LeadPointLog');
+            $this->getRepository()->detachEntities($persist);
         }
 
         if (!empty($lead->getpointchanges())) {

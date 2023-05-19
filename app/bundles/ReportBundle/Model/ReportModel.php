@@ -2,14 +2,12 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
@@ -30,6 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
  * @extends FormModel<Report>
@@ -49,9 +48,9 @@ class ReportModel extends FormModel
     protected $defaultPageLimit;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var ChannelListHelper
@@ -85,7 +84,7 @@ class ReportModel extends FormModel
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         ChannelListHelper $channelListHelper,
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
@@ -93,7 +92,7 @@ class ReportModel extends FormModel
         ExcelExporter $excelExporter
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
-        $this->templatingHelper  = $templatingHelper;
+        $this->twig              = $twig;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
         $this->reportHelper      = $reportHelper;
@@ -129,7 +128,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -448,19 +447,20 @@ class ReportModel extends FormModel
                 return $response;
 
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.php',
+                $content = $this->twig->render(
+                    '@MauticReport/Report/export.html.twig',
                     [
-                        'reportData' => $reportData,
-                        'data'       => $reportData['data'],
-                        'columns'    => $reportData['columns'],
-                        'pageTitle'  => $name,
-                        'graphs'     => $reportData['graphs'],
-                        'report'     => $report,
-                        'dateFrom'   => $reportData['dateFrom'],
-                        'dateTo'     => $reportData['dateTo'],
+                        'reportData'       => $reportData,
+                        'data'             => $reportData['data'],
+                        'columns'          => $reportData['columns'],
+                        'pageTitle'        => $name,
+                        'graphs'           => $reportData['graphs'],
+                        'report'           => $report,
+                        'dateFrom'         => $reportData['dateFrom'],
+                        'dateTo'           => $reportData['dateTo'],
+                        'reportDataResult' => new ReportDataResult($reportData),
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
 
@@ -638,7 +638,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAll();
+            $data      = $query->execute()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -747,7 +747,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->fetchOne();
     }
 
     /**
@@ -786,7 +786,7 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+        if ($this->em->getConnection() instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $this->em->getConnection()->connect('slave');
         }
 

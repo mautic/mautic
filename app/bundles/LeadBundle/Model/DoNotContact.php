@@ -2,11 +2,12 @@
 
 namespace Mautic\LeadBundle\Model;
 
+use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\LeadBundle\Entity\DoNotContact as DNC;
 use Mautic\LeadBundle\Entity\DoNotContactRepository;
 use Mautic\LeadBundle\Entity\Lead;
 
-class DoNotContact
+class DoNotContact implements MauticModelInterface
 {
     /**
      * @var LeadModel
@@ -205,14 +206,6 @@ class DoNotContact
 
         // Re-add the entry to the lead
         $contact->addDoNotContactEntry($dnc);
-    }
-
-    /**
-     * Clear DoNotContact entities from Doctrine UnitOfWork.
-     */
-    public function clearEntities()
-    {
-        $this->dncRepo->clear();
     }
 
     /**

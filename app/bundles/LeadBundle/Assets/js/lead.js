@@ -453,7 +453,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 var fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
-        } 
+        }
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -521,7 +521,7 @@ Mautic.reorderSegmentFilters = function() {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
-    
+
     // Extract the filter number
     var regExp = /_filters_(\d+)_operator/;
     var matches = regExp.exec(operatorSelect.attr('id'));
@@ -1480,8 +1480,13 @@ Mautic.updateFilterPositioning = function (el) {
     var $el       = mQuery(el);
     var $parentEl = $el.closest('.panel');
     var list      = $parentEl.parent().children('.panel');
+    const isFirst = list.index($parentEl) === 0;
 
-    if ($el.val() == 'and' && list.index($parentEl) !== 0) {
+    if (isFirst) {
+        $el.val('and');
+    }
+
+    if ($el.val() === 'and' && !isFirst) {
         $parentEl.addClass('in-group');
     } else {
         $parentEl.removeClass('in-group');

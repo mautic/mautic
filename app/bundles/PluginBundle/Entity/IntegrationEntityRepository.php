@@ -3,6 +3,7 @@
 namespace Mautic\PluginBundle\Entity;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
@@ -51,12 +52,12 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         if ('lead' === $internalEntity) {
-            $joinCondition = $q->expr()->andX(
+            $joinCondition = $q->expr()->and(
                 $q->expr()->eq('l.id', 'i.internal_entity_id')
             );
 
             if ($push) {
-                $joinCondition->add(
+                $joinCondition->with(
                     $q->expr()->gte('l.last_active', ':startDate')
                 );
                 $q->setParameter('startDate', $startDate);
@@ -103,7 +104,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setMaxResults((int) $limit);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -126,7 +127,7 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->eq('i.integration', ':integration'),
                 $q->expr()->eq('i.internal_entity', ':internalEntity'),
                 $q->expr()->eq('i.integration_entity', ':integrationEntity'),
@@ -138,7 +139,7 @@ class IntegrationEntityRepository extends CommonRepository
             ->setParameter('integrationEntity', $integrationEntity)
             ->setMaxResults(1);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         return ($results) ? $results[0] : null;
     }
@@ -216,9 +217,15 @@ class IntegrationEntityRepository extends CommonRepository
             if (!is_array($integrationEntity)) {
                 $integrationEntity = [$integrationEntity];
             }
-            $sub = $q->expr()->orX();
+            $sub = null;
             foreach ($integrationEntity as $key => $entity) {
-                $sub->add($q->expr()->eq('i.integration_entity', ':entity'.$key));
+                if (null === $sub) {
+                    $sub = CompositeExpression::or($q->expr()->eq('i.integration_entity', ':entity'.$key));
+                    $q->setParameter(':entity'.$key, $entity);
+                    continue;
+                }
+
+                $sub->with($q->expr()->eq('i.integration_entity', ':entity'.$key));
                 $q->setParameter(':entity'.$key, $entity);
             }
             $q->andWhere($sub);
@@ -243,14 +250,14 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         $q->andWhere(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->isNotNull('i.integration_entity_id'),
-                    $q->expr()->orX(
-                        $q->expr()->andX(
+                    $q->expr()->or(
+                        $q->expr()->and(
                             $q->expr()->isNotNull('i.last_sync_date'),
                             $q->expr()->gt('l.date_modified', 'i.last_sync_date')
                         ),
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->isNull('i.last_sync_date'),
                             $q->expr()->isNotNull('l.date_modified'),
                             $q->expr()->gt('l.date_modified', 'l.date_added')
@@ -261,10 +268,10 @@ class IntegrationEntityRepository extends CommonRepository
 
         if ('lead' == $internalEntity) {
             $q->andWhere(
-                $q->expr()->andX($q->expr()->isNotNull('l.email')));
+                $q->expr()->and($q->expr()->isNotNull('l.email')));
         } else {
             $q->andWhere(
-                $q->expr()->andX($q->expr()->isNotNull('l.companyname')));
+                $q->expr()->and($q->expr()->isNotNull('l.companyname')));
         }
 
         if ($fromDate) {
@@ -295,7 +302,9 @@ class IntegrationEntityRepository extends CommonRepository
         if ($limit) {
             $q->setMaxResults($limit);
         }
-        $results = $q->execute()->fetchAll();
+
+        $results = $q->execute()->fetchAllAssociative();
+
         $leads   = [];
 
         if ($integrationEntity) {
@@ -368,12 +377,12 @@ class IntegrationEntityRepository extends CommonRepository
         if ($fromDate) {
             if ($toDate) {
                 $q->andWhere(
-                    $q->expr()->orX(
-                        $q->expr()->andX(
+                    $q->expr()->or(
+                        $q->expr()->and(
                             $q->expr()->isNotNull('l.date_modified'),
                             $q->expr()->comparison('l.date_modified', 'BETWEEN', ':dateFrom and :dateTo')
                         ),
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->isNull('l.date_modified'),
                             $q->expr()->comparison('l.date_added', 'BETWEEN', ':dateFrom and :dateTo')
                         )
@@ -383,12 +392,12 @@ class IntegrationEntityRepository extends CommonRepository
                     ->setParameter('dateTo', $toDate);
             } else {
                 $q->andWhere(
-                    $q->expr()->orX(
-                        $q->expr()->andX(
+                    $q->expr()->or(
+                        $q->expr()->and(
                             $q->expr()->isNotNull('l.date_modified'),
                             $q->expr()->gte('l.date_modified', ':dateFrom')
                         ),
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->isNull('l.date_modified'),
                             $q->expr()->gte('l.date_added', ':dateFrom')
                         )
@@ -398,12 +407,12 @@ class IntegrationEntityRepository extends CommonRepository
             }
         } elseif ($toDate) {
             $q->andWhere(
-                $q->expr()->orX(
-                    $q->expr()->andX(
+                $q->expr()->or(
+                    $q->expr()->and(
                         $q->expr()->isNotNull('l.date_modified'),
                         $q->expr()->lte('l.date_modified', ':dateTo')
                     ),
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->isNull('l.date_modified'),
                         $q->expr()->lte('l.date_added', ':dateTo')
                     )
@@ -412,7 +421,8 @@ class IntegrationEntityRepository extends CommonRepository
                 ->setParameter('dateTo', $toDate);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
+
         if (false === $limit) {
             return (int) $results[0]['total'];
         }
@@ -467,7 +477,7 @@ class IntegrationEntityRepository extends CommonRepository
                 ->select('p.name')
                 ->from(MAUTIC_TABLE_PREFIX.'plugin_integration_settings', 'p')
                 ->where('p.is_published = 1');
-            $rows    = $pq->execute()->fetchAll();
+            $rows    = $pq->execute()->fetchAllAssociative();
             $plugins = array_map(function ($i) {
                 return "'${i['name']}'";
             }, $rows);
@@ -482,7 +492,7 @@ class IntegrationEntityRepository extends CommonRepository
         }
 
         $q->andWhere(
-            $q->expr()->andX(
+            $q->expr()->and(
                 "i.internal_entity='lead'",
                 $q->expr()->eq('i.internal_entity_id', ':internalEntityId')
             )
@@ -500,7 +510,7 @@ class IntegrationEntityRepository extends CommonRepository
             $q->setParameter('integrationEntity', $integrationEntity);
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if (false === $limit && count($results) > 0) {
             return (int) $results[0]['total'];
@@ -519,7 +529,7 @@ class IntegrationEntityRepository extends CommonRepository
         $q->update(MAUTIC_TABLE_PREFIX.'integration_entity')
             ->set('internal_entity', ':entity')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('integration', ':integration'),
                     $q->expr()->in('integration_entity_id', array_map([$q->expr(), 'literal'], $integrationIds))
                 )

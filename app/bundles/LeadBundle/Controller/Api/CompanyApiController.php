@@ -8,6 +8,7 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
 use Mautic\LeadBundle\Model\CompanyModel;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
@@ -43,10 +44,10 @@ class CompanyApiController extends CommonApiController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function newEntityAction()
+    public function newEntityAction(Request $request)
     {
         // Check for an email to see if the lead already exists
-        $parameters = $this->request->request->all();
+        $parameters = $request->request->all();
 
         if (empty($parameters['force'])) {
             $leadCompanyModel = $this->getModel('lead.company');
@@ -54,11 +55,11 @@ class CompanyApiController extends CommonApiController
             list($company, $companyEntities) = IdentifyCompanyHelper::findCompany($parameters, $leadCompanyModel);
 
             if (count($companyEntities)) {
-                return $this->editEntityAction($company['id']);
+                return $this->editEntityAction($request, $company['id']);
             }
         }
 
-        return parent::newEntityAction();
+        return parent::newEntityAction($request);
     }
 
     /**

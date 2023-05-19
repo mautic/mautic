@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\EventListener;
 
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
-use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
@@ -35,6 +34,8 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private $owners;
 
+    public const onwerColumns = ['email', 'firstname', 'lastname', 'position', 'signature'];
+
     /**
      * OwnerSubscriber constructor.
      */
@@ -60,7 +61,9 @@ class OwnerSubscriber implements EventSubscriberInterface
 
     public function onEmailBuild(EmailBuilderEvent $event)
     {
-        $event->addTokens($this->getTokens());
+        foreach (self::onwerColumns as $ownerAlias) {
+            $event->addToken($this->buildToken($ownerAlias), $this->buildLabel($ownerAlias));
+        }
     }
 
     public function onEmailDisplay(EmailSendEvent $event)
@@ -102,13 +105,33 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getGeneratedTokens(EmailSendEvent $event)
     {
+        $contact = $event->getLead();
+
         if ($event->isInternalSend()) {
             return $this->getFakeTokens();
         }
 
-        $contact = $event->getLead();
+        if (empty($contact['owner_id'])) {
+            return $this->getEmptyTokens();
+        }
 
-        return $this->getOwnerTokens($contact);
+        $owner = $this->getOwner($contact['owner_id']);
+
+        if (!$owner) {
+            return $this->getEmptyTokens();
+        }
+
+        $tokens          = [];
+        $combinedContent = $event->getCombinedContent();
+        foreach (self::onwerColumns as $ownerColumn) {
+            $token = $this->buildToken($ownerColumn);
+            if (false !== strpos($combinedContent, $token)) {
+                $ownerColumnNormalized = str_replace(['firstname', 'lastname'], ['first_name', 'last_name'], $ownerColumn);
+                $tokens[$token]        = $owner[$ownerColumnNormalized] ?? null;
+            }
+        }
+
+        return $tokens;
     }
 
     /**
@@ -118,13 +141,13 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getEmptyTokens()
     {
-        return [
-            $this->buildToken('email')       => '',
-            $this->buildToken('firstname')   => '',
-            $this->buildToken('lastname')    => '',
-            $this->buildToken('position')    => '',
-            $this->buildToken('signature')   => '',
-        ];
+        $tokens = [];
+
+        foreach (self::onwerColumns as $ownerColumn) {
+            $tokens[$this->buildToken($ownerColumn)] = '';
+        }
+
+        return $tokens;
     }
 
     /**
@@ -134,13 +157,13 @@ class OwnerSubscriber implements EventSubscriberInterface
      */
     private function getFakeTokens()
     {
-        return [
-            $this->buildToken('email')       => '['.$this->buildLabel('email').']',
-            $this->buildToken('firstname')   => '['.$this->buildLabel('firstname').']',
-            $this->buildToken('lastname')    => '['.$this->buildLabel('lastname').']',
-            $this->buildToken('position')    => '['.$this->buildLabel('position').']',
-            $this->buildToken('signature')   => '['.$this->buildLabel('signature').']',
-        ];
+        $tokens = [];
+
+        foreach (self::onwerColumns as $ownerColumn) {
+            $tokens[$this->buildToken($ownerColumn)] = '['.$this->buildLabel($ownerColumn).']';
+        }
+
+        return $tokens;
     }
 
     /**

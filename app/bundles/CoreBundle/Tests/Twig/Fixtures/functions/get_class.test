@@ -1,0 +1,8 @@
+--TEST--
+get_class function
+--TEMPLATE--
+{{ get_class('Mautic\\CoreBundle\\Form\\Type\\TelType') }}
+--DATA--
+return []
+--EXPECT--
+TelType

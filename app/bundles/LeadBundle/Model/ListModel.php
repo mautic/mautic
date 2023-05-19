@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Exception;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -33,9 +32,10 @@ use Mautic\LeadBundle\Segment\Exception\SegmentNotFoundException;
 use Mautic\LeadBundle\Segment\Stat\ChartQuery\SegmentContactsLineChartQuery;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -147,7 +147,7 @@ class ListModel extends FormModel
      *
      * @return mixed|void
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -193,16 +193,15 @@ class ListModel extends FormModel
     /**
      * {@inheritdoc}
      *
-     * @param       $entity
-     * @param       $formFactory
-     * @param null  $action
-     * @param array $options
+     * @param             $entity
+     * @param string|null $action
+     * @param array       $options
      *
      * @return mixed
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof LeadList) {
             throw new MethodNotAllowedHttpException(['LeadList'], 'Entity must be of class LeadList()');
@@ -357,8 +356,8 @@ class ListModel extends FormModel
     }
 
     /**
-     * @param int  $limit
-     * @param bool $maxLeads
+     * @param int      $limit
+     * @param bool|int $maxLeads
      *
      * @return int
      *
@@ -452,7 +451,7 @@ class ListModel extends FormModel
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
-                        new ListChangeEvent($segmentId, $leadList, true),
+                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true),
                         LeadEvents::LEAD_LIST_BATCH_CHANGE
                     );
                 }
@@ -688,7 +687,7 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getRepository()->detachEntities($persistLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -814,7 +813,8 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getListLeadRepository()->detachEntities($persistLists);
+        $this->getListLeadRepository()->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -882,7 +882,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -926,7 +926,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if (in_array(0, $segments)) {
             $qAll = $this->em->getConnection()->createQueryBuilder();
@@ -943,7 +943,7 @@ class ListModel extends FormModel
             if (!empty($dateTo)) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
-            $resultsAll = $qAll->execute()->fetchAll();
+            $resultsAll = $qAll->execute()->fetchAllAssociative();
             $results    = array_merge($results, $resultsAll);
         }
 
@@ -1028,7 +1028,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr($result['stage'], 0, 12);
@@ -1094,7 +1094,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);
@@ -1193,7 +1193,7 @@ class ListModel extends FormModel
             ]
         );
         $dependents = [];
-        $accessor   = new PropertyAccessor();
+        $accessor   = PropertyAccess::createPropertyAccessor();
         foreach ($entities as $entity) {
             $retrFilters = $entity->getFilters();
             foreach ($retrFilters as $eachFilter) {
