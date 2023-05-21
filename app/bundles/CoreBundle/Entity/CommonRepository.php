@@ -5,6 +5,7 @@ namespace Mautic\CoreBundle\Entity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\ExpressionBuilder;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
@@ -221,6 +222,21 @@ class CommonRepository extends ServiceEntityRepository
     public function detachEntity($entity)
     {
         $this->getEntityManager()->detach($entity);
+    }
+
+    public function refetchEntity(object &$entity): void
+    {
+        if ($this->getEntityManager()->contains($entity)) {
+            $this->getEntityManager()->detach($entity);
+
+            $metadata         = $this->getEntityManager()->getClassMetadata(ClassUtils::getClass($entity));
+            $identifierValues = $metadata->getIdentifierValues($entity);
+            if (count($identifierValues) > 1) {
+                throw new \RuntimeException('Multiple identifiers are not supported.');
+            }
+
+            $entity = $this->getEntity(array_pop($identifierValues));
+        }
     }
 
     /**

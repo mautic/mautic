@@ -151,7 +151,7 @@ class LeadEventLog
     /**
      * Get lead.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {

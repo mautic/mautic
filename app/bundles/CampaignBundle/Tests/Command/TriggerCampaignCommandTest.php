@@ -586,7 +586,8 @@ class TriggerCampaignCommandTest extends AbstractCampaignCommand
         $this->createCampaignLead($campaign, $john);
         $this->createCampaignLead($campaign, $jane, true); // Manually removed.
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($campaign);
+        $this->em->detach($campaignRepo);
 
         $tStart = microtime(true);
 

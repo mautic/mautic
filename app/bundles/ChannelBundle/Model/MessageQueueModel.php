@@ -4,6 +4,7 @@ namespace Mautic\ChannelBundle\Model;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
@@ -175,72 +176,9 @@ class MessageQueueModel extends FormModel
 
         if ($messageQueues) {
             $this->saveEntities($messageQueues);
-            $this->em->clear(MessageQueue::class);
-        }
-
-        return true;
-    }
-
-    /**
-     * @deprecated to be removed in 3.0; use queue method instead
-     *
-     * @param       $leads
-     * @param       $channel
-     * @param       $channelId
-     * @param null  $scheduledInterval
-     * @param int   $maxAttempts
-     * @param int   $priority
-     * @param null  $campaignEventId
-     * @param array $options
-     *
-     * @return bool
-     */
-    public function addToQueue(
-        $leads,
-        $channel,
-        $channelId,
-        $scheduledInterval = null,
-        $maxAttempts = 1,
-        $priority = 1,
-        $campaignEventId = null,
-        $options = []
-    ) {
-        $messageQueues = [];
-
-        if (!$scheduledInterval) {
-            $scheduledDate = new \DateTime();
-        } elseif (!$scheduledInterval instanceof \DateTime) {
-            $scheduledInterval = (('H' === $scheduledInterval) ? 'PT' : 'P').$scheduledInterval;
-            $scheduledDate     = (new \DateTime())->add(new \DateInterval($scheduledInterval));
-        }
-
-        foreach ($leads as $lead) {
-            $leadId = (is_array($lead)) ? $lead['id'] : $lead->getId();
-            if (!empty($this->getRepository()->findMessage($channel, $channelId, $leadId))) {
-                continue;
-            }
-
-            $messageQueue = new MessageQueue();
-            if ($campaignEventId) {
-                $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
-            }
-            $messageQueue->setChannel($channel);
-            $messageQueue->setChannelId($channelId);
-            $messageQueue->setDatePublished(new \DateTime());
-            $messageQueue->setMaxAttempts($maxAttempts);
-            $messageQueue->setLead(
-                ($lead instanceof Lead) ? $lead : $this->em->getReference('MauticLeadBundle:Lead', $leadId)
-            );
-            $messageQueue->setPriority($priority);
-            $messageQueue->setScheduledDate($scheduledDate);
-            $messageQueue->setOptions($options);
-
-            $messageQueues[] = $messageQueue;
-        }
-
-        if ($messageQueues) {
-            $this->saveEntities($messageQueues);
-            $this->em->clear(MessageQueue::class);
+            $messageQueueRepository = $this->getRepository();
+            assert($messageQueueRepository instanceof MessageQueueRepository);
+            $messageQueueRepository->detachEntities($messageQueues);
         }
 
         return true;
@@ -260,11 +198,22 @@ class MessageQueueModel extends FormModel
         $counter        = 0;
         while ($queue = $this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId)) {
             $counter += $this->processMessageQueue($queue);
+            $channel = $queue->getChannel();
+            $event   = $queue->getEvent();
+            $lead    = $queue->getEvent()->getCampaignLead()->getLeaad();
 
             // Remove the entities from memory
-            $this->em->clear(MessageQueue::class);
-            $this->em->clear(Lead::class);
-            $this->em->clear(\Mautic\CampaignBundle\Entity\Event::class);
+            if (!empty($channel)) {
+                $this->em->detach($channel);
+            }
+
+            if (!empty($event)) {
+                $this->em->detach($event);
+            }
+
+            if (!empty($lead)) {
+                $this->em->detach($lead);
+            }
         }
 
         return $counter;

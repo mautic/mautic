@@ -11,7 +11,7 @@ class AssetGenerationHelper
     private const NODE_MODULES = [
         'mousetrap/mousetrap.js', // Needed for keyboard shortcuts
         'jquery/dist/jquery.js', // Needed for everything. It's the underlying framework.
-        'history.js/scripts/bundled-uncompressed/html4+html5/jquery.history.js', // Needed for ajaxyfying the UI.
+        'historyjs/scripts/bundled-uncompressed/html4+html5/jquery.history.js', // Needed for ajaxyfying the UI.
         'js-cookie/src/js.cookie.js', // Needed for cookies.
         'bootstrap/dist/js/bootstrap.js', // Needed for the UI components like bodal boxes.
         'jquery-form/src/jquery.form.js', // Needed for ajax forms with file attachments.
@@ -38,6 +38,7 @@ class AssetGenerationHelper
         'jquery/dist/jquery.js',
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
+        'jvectormap-next/jquery-jvectormap.js',
         // TODO: Add the rest of the libraries here.
     ];
 

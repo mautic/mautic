@@ -426,7 +426,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
+        $this->getCompanyLeadRepository()->detachEntities($persistCompany);
 
         return $contactAdded;
     }
@@ -487,8 +487,9 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
             $companies = [$companies];
         }
 
-        $deleteCompany  = [];
-        $dispatchEvents = [];
+        $deleteCompany     = [];
+        $dispatchEvents    = [];
+        $deleteCompanyLead = [];
 
         $primaryRemoved = false;
         foreach ($companies as $companyId) {
@@ -532,7 +533,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         }
 
         // Clear CompanyLead entities from Doctrine memory
-        $this->em->clear(CompanyLead::class);
+        $this->getCompanyLeadRepository()->detachEntities($deleteCompanyLead);
 
         if (!empty($dispatchEvents) && ($this->dispatcher->hasListeners(LeadEvents::LEAD_COMPANY_CHANGE))) {
             foreach ($dispatchEvents as $companyId) {
@@ -928,6 +929,8 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     private function updateContactAfterPrimaryCompanyWasRemoved(Lead $lead): void
     {
         $primaryCompanyName = '';
+        $companyLead        = null;
+        $newPrimaryCompany  = null;
 
         // Find another company to make primary if applicable
         $leadCompanies = $this->getCompanyLeadRepository()->getCompaniesByLeadId($lead->getId());
@@ -952,5 +955,13 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         $lead->addUpdatedField('company', $primaryCompanyName)
             ->setDateModified(new \DateTime());
         $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+
+        if (null !== $newPrimaryCompany) {
+            $this->getCompanyLeadRepository()->detachEntity($newPrimaryCompany);
+        }
+
+        if (null !== $companyLead) {
+            $this->getCompanyLeadRepository()->detachEntity($companyLead);
+        }
     }
 }
