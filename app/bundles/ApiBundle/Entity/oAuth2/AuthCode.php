@@ -6,13 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AuthCode as BaseAuthCode;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-
 /**
  * Class AuthCode.
  */
 class AuthCode extends BaseAuthCode
 {
-
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -49,5 +47,4 @@ class AuthCode extends BaseAuthCode
             ->columnName('redirect_uri')
             ->build();
     }
-
 }

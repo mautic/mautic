@@ -86,21 +86,21 @@ class IdEntry
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getId()
     {
-        return (int) $this->id;
+        return $this->id;
     }
 
     /**
-     * @param int $id
+     * @param string $id
      *
      * @return IdEntry
      */
     public function setId($id)
     {
-        $this->id = (string) $id;
+        $this->id =  $id;
 
         return $this;
     }

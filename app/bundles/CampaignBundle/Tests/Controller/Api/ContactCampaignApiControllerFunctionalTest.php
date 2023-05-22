@@ -54,7 +54,7 @@ class ContactCampaignApiControllerFunctionalTest extends AbstractCampaignTest
         Assert::assertTrue($clientResponse->isOk(), $clientResponse->getContent());
         $body = json_decode($clientResponse->getContent(), true);
         Assert::assertSame(3, (int) $body['total']);
-        Assert::assertSame($contact->getId(), (int)$body['contacts'][2]['lead_id']);
+        Assert::assertSame($contact->getId(), (int) $body['contacts'][2]['lead_id']);
 
         // Remove the contact from the campaign.
         $this->client->request(Request::METHOD_POST, "/api/campaigns/{$campaign->getId()}/contact/{$contact->getId()}/remove");

@@ -11,7 +11,6 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class AccessToken extends BaseAccessToken
 {
-
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -45,6 +44,4 @@ class AccessToken extends BaseAccessToken
             ->nullable()
             ->build();
     }
-
-
 }
