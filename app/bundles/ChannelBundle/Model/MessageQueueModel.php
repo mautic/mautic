@@ -4,7 +4,6 @@ namespace Mautic\ChannelBundle\Model;
 
 use Mautic\ChannelBundle\ChannelEvents;
 use Mautic\ChannelBundle\Entity\MessageQueue;
-use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Event\MessageQueueBatchProcessEvent;
 use Mautic\ChannelBundle\Event\MessageQueueEvent;
 use Mautic\ChannelBundle\Event\MessageQueueProcessEvent;
@@ -177,7 +176,6 @@ class MessageQueueModel extends FormModel
         if ($messageQueues) {
             $this->saveEntities($messageQueues);
             $messageQueueRepository = $this->getRepository();
-            assert($messageQueueRepository instanceof MessageQueueRepository);
             $messageQueueRepository->detachEntities($messageQueues);
         }
 
@@ -196,20 +194,19 @@ class MessageQueueModel extends FormModel
         $processStarted = new \DateTime();
         $limit          = 50;
         $counter        = 0;
-        while ($queue = $this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId)) {
+
+        foreach ($this->getRepository()->getQueuedMessages($limit, $processStarted, $channel, $channelId) as $queue) {
             $counter += $this->processMessageQueue($queue);
             $channel = $queue->getChannel();
             $event   = $queue->getEvent();
-            $lead    = $queue->getEvent()->getCampaignLead()->getLeaad();
+            $lead    = $queue->getEvent()->getCampaignLead()->getLead();
 
             // Remove the entities from memory
             if (!empty($channel)) {
                 $this->em->detach($channel);
             }
 
-            if (!empty($event)) {
-                $this->em->detach($event);
-            }
+            $this->em->detach($event);
 
             if (!empty($lead)) {
                 $this->em->detach($lead);
