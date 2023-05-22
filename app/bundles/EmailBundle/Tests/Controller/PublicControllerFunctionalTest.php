@@ -93,11 +93,10 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocal(): void
     {
-        $form = $this->getForm('blank');
         $lead = $this->createLead();
         $page = $this->createPage();
 
-        $stat = $this->getStat($form, $lead, $page);
+        $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
@@ -107,11 +106,10 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
 
     public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocal(): void
     {
-        $form = $this->getForm('blank');
         $lead = $this->createLead('de');
         $page = $this->createPage();
 
-        $stat = $this->getStat($form, $lead, $page);
+        $stat = $this->getStat(null, $lead, $page);
         $this->em->flush();
 
         $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
