@@ -91,11 +91,11 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
-    public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocal()
+    public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocal(): void
     {
         $form = $this->getForm('blank');
-        $lead = $this->getLead();
-        $page = $this->getPage();
+        $lead = $this->createLead();
+        $page = $this->createPage();
 
         $stat = $this->getStat($form, $lead, $page);
         $this->em->flush();
@@ -105,11 +105,11 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertStringContainsString('Save preferences', $crawler->html());
     }
 
-    public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocal()
+    public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocal(): void
     {
         $form = $this->getForm('blank');
-        $lead = $this->getLead('de');
-        $page = $this->getPage();
+        $lead = $this->createLead('de');
+        $page = $this->createPage();
 
         $stat = $this->getStat($form, $lead, $page);
         $this->em->flush();
@@ -173,7 +173,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $lead;
     }
 
-    protected function getPage(): Page
+    protected function createPage(): Page
     {
         $page = new Page();
         $page->setTitle('Page:Page:LandingPagePrefCenter');
