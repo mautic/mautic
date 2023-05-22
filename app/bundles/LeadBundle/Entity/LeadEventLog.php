@@ -20,7 +20,7 @@ class LeadEventLog
     public const INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -133,7 +133,7 @@ class LeadEventLog
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

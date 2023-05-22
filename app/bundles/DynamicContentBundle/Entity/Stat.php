@@ -13,7 +13,7 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -155,7 +155,7 @@ class Stat
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -163,7 +163,7 @@ class Stat
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
     }
 
     /**

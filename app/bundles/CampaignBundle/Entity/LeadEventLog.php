@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Entity\Lead as LeadEntity;
 class LeadEventLog implements ChannelInterface
 {
     /**
-     * @var int|null
+     * @var string|null
      */
     private $id;
 
@@ -213,7 +213,7 @@ class LeadEventLog implements ChannelInterface
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

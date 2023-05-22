@@ -24,7 +24,7 @@ class AuthCode extends BaseAuthCode
     protected $client;
 
     /**
-     * @var \Mautic\UserBundle\Entity\User
+     * @var \Mautic\UserBundle\Entity\User|null
      */
     protected $user;
 
@@ -34,7 +34,7 @@ class AuthCode extends BaseAuthCode
     protected $token;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     protected $expiresAt;
 
@@ -120,7 +120,7 @@ class AuthCode extends BaseAuthCode
     /**
      * Set user.
      *
-     * @param UserInterface $user
+     * @param \Mautic\UserBundle\Entity\User|null $user
      *
      * @return RefreshToken
      */
@@ -134,7 +134,7 @@ class AuthCode extends BaseAuthCode
     /**
      * Get user.
      *
-     * @return UserInterface
+     * @return \Mautic\UserBundle\Entity\User|null
      */
     public function getUser()
     {

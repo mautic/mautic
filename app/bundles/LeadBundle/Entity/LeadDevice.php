@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class LeadDevice
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -162,11 +162,11 @@ class LeadDevice
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

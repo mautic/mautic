@@ -35,7 +35,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
     private $availableSocialFields = [];
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -564,7 +564,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
 
         return $this;
     }
@@ -576,7 +576,7 @@ class Lead extends FormEntity implements CustomFieldEntityInterface, IdentifierF
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

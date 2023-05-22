@@ -14,7 +14,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class StatDevice
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -83,11 +83,11 @@ class StatDevice
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

@@ -24,7 +24,7 @@ class RefreshToken extends BaseRefreshToken
     protected $client;
 
     /**
-     * @var UserInterface
+     * @var \Mautic\UserBundle\Entity\User
      */
     protected $user;
 
@@ -34,7 +34,7 @@ class RefreshToken extends BaseRefreshToken
     protected $token;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     protected $expiresAt;
 

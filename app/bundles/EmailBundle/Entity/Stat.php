@@ -16,7 +16,7 @@ class Stat
     public const MAX_OPEN_DETAILS = 1000;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     private $id;
 
@@ -295,11 +295,11 @@ class Stat
     }
 
     /**
-     * @return id|null
+     * @return int|null
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

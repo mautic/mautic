@@ -21,7 +21,7 @@ class MessageQueue
     public const PRIORITY_HIGH   = 1;
 
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -182,7 +182,7 @@ class MessageQueue
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

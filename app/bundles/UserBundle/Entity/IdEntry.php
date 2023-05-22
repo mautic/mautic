@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class IdEntry
 {
     /**
-     * @var int
+     * @var string
      */
     protected $id;
 
@@ -86,11 +86,11 @@ class IdEntry
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -100,7 +100,7 @@ class IdEntry
      */
     public function setId($id)
     {
-        $this->id = $id;
+        $this->id = (string) $id;
 
         return $this;
     }

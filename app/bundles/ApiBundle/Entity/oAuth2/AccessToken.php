@@ -24,7 +24,7 @@ class AccessToken extends BaseAccessToken
     protected $client;
 
     /**
-     * @var UserInterface
+     * @var \Mautic\UserBundle\Entity\User|null
      */
     protected $user;
 
@@ -34,7 +34,7 @@ class AccessToken extends BaseAccessToken
     protected $token;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     protected $expiresAt;
 
@@ -112,7 +112,7 @@ class AccessToken extends BaseAccessToken
     /**
      * Set user.
      *
-     * @param UserInterface $user
+     * @param \Mautic\UserBundle\Entity\User|null $user
      *
      * @return AccessToken
      */
@@ -126,7 +126,7 @@ class AccessToken extends BaseAccessToken
     /**
      * Get user.
      *
-     * @return UserInterface
+     * @return \Mautic\UserBundle\Entity\User|null
      */
     public function getUser()
     {

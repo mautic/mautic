@@ -7,7 +7,7 @@ namespace FOS\OAuthServerBundle\Model;
 class Token
 {
     /**
-     * @var int|null
+     * @var string|null
      */
     protected $expiresAt;
 
@@ -15,4 +15,9 @@ class Token
      * @var string|null
      */
     protected $scope;
+
+    /**
+     * @var \Mautic\UserBundle\Entity\User|null
+     */
+    protected $user;
 }

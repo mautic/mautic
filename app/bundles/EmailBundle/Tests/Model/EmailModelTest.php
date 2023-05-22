@@ -7,7 +7,7 @@ namespace Mautic\EmailBundle\Tests\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\ChannelBundle\Entity\MessageRepository;
+use Mautic\ChannelBundle\Entity\MessageQueueRepository;
 use Mautic\ChannelBundle\Model\MessageQueueModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\CacheStorageHelper;
@@ -599,7 +599,7 @@ class EmailModelTest extends \PHPUnit\Framework\TestCase
                         ['MauticEmailBundle:Email', $this->emailRepository],
                         ['MauticEmailBundle:Stat', $this->statRepository],
                         ['MauticLeadBundle:FrequencyRule', $this->frequencyRepository],
-                        [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageRepository::class)],
+                        [\Mautic\ChannelBundle\Entity\MessageQueue::class, $this->createMock(MessageQueueRepository::class)],
                     ]
                 )
             );

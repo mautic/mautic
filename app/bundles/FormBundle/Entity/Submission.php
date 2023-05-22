@@ -15,7 +15,7 @@ use Mautic\PageBundle\Entity\Page;
 class Submission
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -140,7 +140,7 @@ class Submission
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

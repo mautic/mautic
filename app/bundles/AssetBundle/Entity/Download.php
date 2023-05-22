@@ -13,7 +13,7 @@ use Mautic\EmailBundle\Entity\Email;
 class Download
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -157,7 +157,7 @@ class Download
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

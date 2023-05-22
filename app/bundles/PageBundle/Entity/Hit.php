@@ -15,7 +15,7 @@ use Mautic\LeadBundle\Entity\LeadDevice;
 class Hit
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -300,7 +300,7 @@ class Hit
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

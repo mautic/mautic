@@ -73,9 +73,9 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     private $canvasSettings = [];
 
     /**
-     * @var bool
+     * @var int
      */
-    private $allowRestart = false;
+    private $allowRestart = 0;
 
     public function __construct()
     {
@@ -585,7 +585,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
      */
     public function getAllowRestart()
     {
-        return $this->allowRestart;
+        return (bool) $this->allowRestart;
     }
 
     /**
@@ -605,7 +605,7 @@ class Campaign extends FormEntity implements PublishStatusIconAttributesInterfac
     {
         $this->isChanged('allowRestart', $allowRestart);
 
-        $this->allowRestart = $allowRestart;
+        $this->allowRestart = (int) $allowRestart;
 
         return $this;
     }
