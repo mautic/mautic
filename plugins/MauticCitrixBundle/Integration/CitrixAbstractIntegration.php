@@ -172,7 +172,7 @@ abstract class CitrixAbstractIntegration extends AbstractIntegration
     /**
      * {@inheritdoc}
      *
-     * @param $section
+     * @param string $section
      *
      * @return string
      */
