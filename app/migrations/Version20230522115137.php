@@ -34,7 +34,7 @@ final class Version20230522115137 extends AbstractMauticMigration
     public function up(Schema $schema): void
     {
         $table   = "{$this->prefix}notifications";
-        $header  = 'The Pipedrive plugin will be removed in Mautic 5.0.0';
+        $header  = 'The Citrix plugin will be removed in Mautic 5.0.0';
         $message = CitrixAbstractIntegration::DEPRECATION_MESSAGE;
         $sql     = "INSERT INTO {$table} (user_id, type, header, message, date_added, icon_class, is_read) SELECT u.id ,'warning', '{$header}', '{$message}', NOW(), 'fa-warning', 0 FROM {$this->prefix}users u";
         $this->addSql($sql);
