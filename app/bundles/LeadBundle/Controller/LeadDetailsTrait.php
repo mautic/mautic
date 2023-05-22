@@ -349,15 +349,13 @@ trait LeadDetailsTrait
         $points      = [0, 0, 0, 0, 0, 0];
         foreach ($contacts as $contact) {
             $model = $this->getModel('lead.lead');
-            // When we change lead data these changes get cached
-            // so we need to clear the entity manager
-            $model->getRepository()->clear();
 
             /** @var \Mautic\LeadBundle\Entity\Lead $lead */
             if (!isset($contact['lead_id'])) {
                 continue;
             }
-            $lead            = $model->getEntity($contact['lead_id']);
+            $lead = $model->getEntity($contact['lead_id']);
+            $model->getRepository()->refetchEntity($lead);
             if (!$lead instanceof Lead) {
                 continue;
             }

@@ -725,7 +725,6 @@ class DynamicsIntegration extends CrmAbstractIntegration
             }
 
             $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
             $this->em->clear();
 
             unset($integrationEntityRepo, $integrationEntities);
@@ -827,7 +826,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
         if (count($integrationEntities)) {
             // Persist updated entities if applicable
             $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear(IntegrationEntity::class);
+            $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
         }
 
         // update contacts

@@ -184,7 +184,6 @@ class ZohoIntegration extends CrmAbstractIntegration
             $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
             $objects               = $data['data'];
             /** @var array $rows */
-            // foreach ($rows as $row) {
             $integrationEntities = [];
             /** @var array $objects */
             foreach ($objects as $recordId => $entityData) {
@@ -442,8 +441,7 @@ class ZohoIntegration extends CrmAbstractIntegration
             }
 
             $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-            $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
-            //}
+            $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
             unset($integrationEntities);
         }
 
@@ -993,7 +991,7 @@ class ZohoIntegration extends CrmAbstractIntegration
         if (count($integrationEntities)) {
             // Persist updated entities if applicable
             $integrationEntityRepo->saveEntities($integrationEntities);
-            $this->em->clear(IntegrationEntity::class);
+            $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
         }
 
         // update leads and contacts

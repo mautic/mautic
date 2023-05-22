@@ -38,7 +38,7 @@ class MessageQueueRepository extends CommonRepository
      * @param null $channel
      * @param null $channelId
      *
-     * @return mixed
+     * @return array<int, MessageQueue>
      */
     public function getQueuedMessages($limit, $processStarted, $channel = null, $channelId = null)
     {

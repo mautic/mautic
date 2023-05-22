@@ -193,12 +193,13 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
     }
 
     /**
-     * @param       $sendTo
-     * @param array $options
+     * @param                  $sendTo
+     * @param array            $options
+     * @param array<int, Lead> $leads
      *
      * @return array
      */
-    public function sendSms(Sms $sms, $sendTo, $options = [])
+    public function sendSms(Sms $sms, $sendTo, $options = [], array &$leads = [])
     {
         $channel = (isset($options['channel'])) ? $options['channel'] : null;
         $listId  = (isset($options['listId'])) ? $options['listId'] : null;
@@ -219,6 +220,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 $fetchContacts[] = $lead;
             } else {
                 $contacts[$lead->getId()] = $lead;
+                $leads[$lead->getId()]    = $lead;
             }
         }
 
@@ -231,6 +233,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
 
             foreach ($foundContacts as $contact) {
                 $contacts[$contact->getId()] = $contact;
+                $leads[$contact->getId()]    = $contact;
             }
         }
 
@@ -367,9 +370,10 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
                 if (!$stat->isFailed()) {
                     $results[$stat->getLead()->getId()]['statId'] = $stat->getId();
                 }
-            }
 
-            $this->em->clear(Stat::class);
+                $this->getRepository()->detachEntity($stat);
+                $this->getRepository()->detachEntity($stat->getLead());
+            }
         }
 
         return $results;

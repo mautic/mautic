@@ -7,7 +7,6 @@ use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Helper\IdentifyCompanyHelper;
-use Mautic\PluginBundle\Entity\IntegrationEntity;
 use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Exception\ApiErrorException;
 use MauticPlugin\MauticCrmBundle\Api\SalesforceApi;
@@ -435,7 +434,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 }
 
                 if ($dataObject) {
-                    $entity = false;
+                    $entity = null;
                     switch ($object) {
                         case 'Contact':
                             if (isset($dataObject['Email__Contact'])) {
@@ -516,7 +515,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         // Persist integration entities
                         $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
                         $counter = 0;
-                        $this->em->clear($detachClass);
+                        $this->em->detach($entity);
                         $integrationMapping = [];
                     }
                 }
@@ -525,7 +524,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             if (count($integrationMapping)) {
                 // Persist integration entities
                 $this->buildIntegrationEntities($integrationMapping, $object, $mauticObjectReference, $params);
-                $this->em->clear($detachClass);
+                $this->em->detach($entity);
             }
 
             unset($data['records']);
@@ -1431,7 +1430,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     if (20 === $counter) {
                         // Batch to control RAM use
                         $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
-                        $this->em->clear(IntegrationEntity::class);
+                        $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                         $persistEntities = [];
                         $counter         = 0;
                     }
@@ -1440,7 +1439,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 // Catch left overs
                 if ($persistEntities) {
                     $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
-                    $this->em->clear(IntegrationEntity::class);
+                    $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 }
 
                 unset($unknownMembers, $fetcher, $organizer, $persistEntities);
