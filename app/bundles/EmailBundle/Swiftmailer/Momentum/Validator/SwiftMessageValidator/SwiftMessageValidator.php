@@ -3,7 +3,7 @@
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\Validator\SwiftMessageValidator;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\Exception\Validator\SwiftMessageValidator\SwiftMessageValidationException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class SwiftMessageValidator.

@@ -279,7 +279,7 @@ class ContactSegmentFilterDictionary
     {
         if ($this->dispatcher->hasListeners(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE)) {
             $event = new SegmentDictionaryGenerationEvent($this->filters);
-            $this->dispatcher->dispatch(LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE);
             $this->filters = $event->getTranslations();
         }
     }

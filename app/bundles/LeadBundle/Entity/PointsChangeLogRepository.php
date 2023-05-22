@@ -5,6 +5,9 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<PointsChangeLog>
+ */
 class PointsChangeLogRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -27,7 +30,7 @@ class PointsChangeLogRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('lp.event_name', $query->expr()->literal('%'.$options['search'].'%')),
                 $query->expr()->like('lp.action_name', $query->expr()->literal('%'.$options['search'].'%'))
             ));
@@ -49,7 +52,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -65,7 +68,7 @@ class PointsChangeLogRepository extends CommonRepository
         $query->setMaxResults($limit)
                 ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

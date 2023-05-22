@@ -2,7 +2,7 @@
 
 namespace Mautic\CoreBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class MaintenanceEvent.
@@ -15,7 +15,7 @@ class MaintenanceEvent extends Event
     protected $daysOld;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $date;
 
@@ -66,7 +66,7 @@ class MaintenanceEvent extends Event
     /**
      * Returns a DateTime in UTC for the date to delete records older than the given date.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDate()
     {

@@ -2,8 +2,10 @@
 
 namespace Mautic\LeadBundle\EventListener;
 
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
@@ -12,7 +14,6 @@ use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\Event\ListChangeEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
 {
@@ -34,7 +35,7 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
     public function __construct(
         LeadEventLogRepository $eventLogRepository,
         UserHelper $userHelper,
-        TranslatorInterface $translator,
+        Translator $translator,
         EntityManagerInterface $em
     ) {
         $this->eventLogRepository = $eventLogRepository;
@@ -64,7 +65,8 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             [$contact],
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
@@ -89,14 +91,15 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
         $this->writeEntries(
             $contacts,
             $event->getList(),
-            $event->wasAdded() ? 'added' : 'removed'
+            $event->wasAdded() ? 'added' : 'removed',
+            $event->getDate()
         );
     }
 
     /**
      * @param $action
      */
-    private function writeEntries(array $contacts, LeadList $segment, $action)
+    private function writeEntries(array $contacts, LeadList $segment, $action, DateTime $date = null)
     {
         $user                    = $this->userHelper->getUser();
         $logs                    = [];
@@ -124,11 +127,15 @@ class TimelineEventLogSegmentSubscriber implements EventSubscriberInterface
                     ]
                 );
 
+            if ($date) {
+                $log->setDateAdded($date);
+            }
+
             $logs[] = $log;
         }
 
         $this->eventLogRepository->saveEntities($logs);
-        $this->eventLogRepository->clear();
+        $this->eventLogRepository->detachEntities($logs);
 
         if ($detachContactReferences) {
             foreach ($contacts as $contact) {

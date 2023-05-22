@@ -7,6 +7,7 @@ use Mautic\ReportBundle\Adapter\ReportDataAdapter;
 use Mautic\ReportBundle\Crate\ReportDataResult;
 use Mautic\ReportBundle\Entity\Report;
 use Mautic\ReportBundle\Entity\Scheduler;
+use Mautic\ReportBundle\Event\ReportScheduleSendEvent;
 use Mautic\ReportBundle\Model\ReportExporter;
 use Mautic\ReportBundle\Model\ReportExportOptions;
 use Mautic\ReportBundle\Model\ReportFileWriter;
@@ -93,7 +94,11 @@ class ReportExporterTest extends \PHPUnit\Framework\TestCase
 
         $eventDispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with(ReportEvents::REPORT_SCHEDULE_SEND);
+            ->withConsecutive(
+                [new ReportScheduleSendEvent($scheduler1, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND],
+                [new ReportScheduleSendEvent($scheduler2, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND],
+                [new ReportScheduleSendEvent($schedulerNow, 'my-path'), ReportEvents::REPORT_SCHEDULE_SEND]
+            );
 
         $schedulerModel->expects($this->exactly(4))
             ->method('reportWasScheduled');

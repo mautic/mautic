@@ -108,7 +108,7 @@ class MenuBuilder
 
             //dispatch the MENU_BUILD event to retrieve bundle menu items
             $event = new MenuEvent($this->menuHelper, $name);
-            $this->dispatcher->dispatch(CoreEvents::BUILD_MENU, $event);
+            $this->dispatcher->dispatch($event, CoreEvents::BUILD_MENU);
 
             $menuItems    = $event->getMenuItems();
 

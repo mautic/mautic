@@ -6,7 +6,7 @@ use Doctrine\ORM\Query;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * PermissionRepository.
+ * @extends CommonRepository<Permission>
  */
 class PermissionRepository extends CommonRepository
 {

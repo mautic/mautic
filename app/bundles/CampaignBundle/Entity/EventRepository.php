@@ -4,6 +4,9 @@ namespace Mautic\CampaignBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Event>
+ */
 class EventRepository extends CommonRepository
 {
     /**
@@ -141,7 +144,7 @@ class EventRepository extends CommonRepository
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
-            ->orderBy('e.order', 'ASC');
+            ->orderBy('e.order', \Doctrine\Common\Collections\Criteria::ASC);
 
         $results = $q->getQuery()->getArrayResult();
 

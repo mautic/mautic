@@ -4,7 +4,6 @@ namespace Mautic\CoreBundle\EventListener;
 
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -36,7 +35,7 @@ class EnvironmentSubscriber implements EventSubscriberInterface
     /**
      * Set timezone.
      */
-    public function onKernelRequestSetTimezone(GetResponseEvent $event)
+    public function onKernelRequestSetTimezone(RequestEvent $event)
     {
         $request = $event->getRequest();
         if (!$request->hasPreviousSession()) {

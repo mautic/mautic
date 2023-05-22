@@ -79,7 +79,7 @@ class ClearbitIntegration extends AbstractIntegration
     {
         if ('custom' === $section) {
             return [
-                'template'   => 'MauticClearbitBundle:Integration:form.html.php',
+                'template'   => '@MauticClearbit/Integration/form.html.twig',
                 'parameters' => [
                     'mauticUrl' => $this->router->generate(
                         'mautic_plugin_clearbit_index', [], UrlGeneratorInterface::ABSOLUTE_URL

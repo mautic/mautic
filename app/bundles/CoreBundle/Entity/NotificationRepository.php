@@ -2,8 +2,10 @@
 
 namespace Mautic\CoreBundle\Entity;
 
+use DateTime;
+
 /**
- * NotificationRepository.
+ * @extends CommonRepository<Notification>
  */
 class NotificationRepository extends CommonRepository
 {
@@ -71,7 +73,7 @@ class NotificationRepository extends CommonRepository
 
             if ($limit) {
                 // Doctrine API doesn't support updates with limits
-                $this->getEntityManager()->getConnection()->executeUpdate(
+                $this->getEntityManager()->getConnection()->executeStatement(
                     $qb->getSQL()." LIMIT $limit"
                 );
             } else {
@@ -136,12 +138,32 @@ class NotificationRepository extends CommonRepository
         }
 
         $qb->where($expr)
-            ->orderBy('n.dateAdded', 'DESC');
+            ->orderBy('n.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
 
         if ($limit) {
             $qb->setMaxResults($limit);
         }
 
         return $qb->getQuery()->getArrayResult();
+    }
+
+    public function isDuplicate(int $userId, string $deduplicate, DateTime $from): bool
+    {
+        $qb = $this->getEntityManager()
+            ->getConnection()
+            ->createQueryBuilder();
+
+        $qb->select('1')
+            ->from(MAUTIC_TABLE_PREFIX.'notifications')
+            ->where('user_id = :userId')
+            ->andWhere('deduplicate = :deduplicate')
+            ->andWhere('date_added >= :from')
+            ->setParameter(':userId', $userId)
+            ->setParameter(':deduplicate', $deduplicate)
+            ->setParameter(':from', $from->format('Y-m-d H:i:s'))
+            ->setMaxResults(1);
+
+        return (bool) $qb->execute()
+            ->fetchOne();
     }
 }

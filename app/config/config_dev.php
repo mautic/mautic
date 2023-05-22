@@ -14,7 +14,9 @@ $container->loadFromExtension('twig', [
     'debug'            => '%kernel.debug%',
     'strict_variables' => true,
     'paths'            => [
-        '%kernel.root_dir%/bundles' => 'bundles',
+        '%kernel.project_dir%/app/bundles'                  => 'bundles',
+        '%kernel.project_dir%/app/bundles/CoreBundle'       => 'MauticCore',
+        '%kernel.project_dir%/themes'                       => 'themes',
     ],
     'form_themes' => [
         // Can be found at bundles/CoreBundle/Resources/views/mautic_form_layout.html.twig
@@ -24,7 +26,7 @@ $container->loadFromExtension('twig', [
 
 $container->loadFromExtension('framework', [
     'router' => [
-        'resource'            => '%kernel.root_dir%/config/routing_dev.php',
+        'resource'            => '%kernel.project_dir%/app/config/routing_dev.php',
         'strict_requirements' => true,
     ],
     'profiler' => [

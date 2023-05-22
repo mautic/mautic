@@ -13,8 +13,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CONTEXT_ASSET          = 'assets';
-    const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
+    public const CONTEXT_ASSET          = 'assets';
+    public const CONTEXT_ASSET_DOWNLOAD = 'asset.downloads';
 
     /**
      * @var CompanyReportData
@@ -122,6 +122,26 @@ class ReportSubscriber implements EventSubscriberInterface
                 $downloadPrefix.'source_id' => [
                     'label' => 'mautic.report.field.source_id',
                     'type'  => 'int',
+                ],
+                $downloadPrefix.'utm_campaign' => [
+                    'label' => 'mautic.report.field.utm_campaign',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_content' => [
+                    'label' => 'mautic.report.field.utm_content',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_medium' => [
+                    'label' => 'mautic.report.field.utm_medium',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_source' => [
+                    'label' => 'mautic.report.field.utm_source',
+                    'type'  => 'string',
+                ],
+                $downloadPrefix.'utm_term' => [
+                    'label' => 'mautic.report.field.utm_term',
+                    'type'  => 'string',
                 ],
             ];
 

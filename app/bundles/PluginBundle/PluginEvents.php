@@ -16,7 +16,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_CONFIG_SAVE = 'mautic.plugin_on_integration_config_save';
+    public const PLUGIN_ON_INTEGRATION_CONFIG_SAVE = 'mautic.plugin_on_integration_config_save';
 
     /**
      * The mautic.plugin_on_integration_keys_encrypt event is dispatched prior to encrypting keys to be stored into the database.
@@ -25,7 +25,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT = 'mautic.plugin_on_integration_keys_encrypt';
+    public const PLUGIN_ON_INTEGRATION_KEYS_ENCRYPT = 'mautic.plugin_on_integration_keys_encrypt';
 
     /**
      * The mautic.plugin_on_integration_keys_decrypt event is dispatched after fetching and decrypting keys from the database.
@@ -34,7 +34,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_KEYS_DECRYPT = 'mautic.plugin_on_integration_keys_decrypt';
+    public const PLUGIN_ON_INTEGRATION_KEYS_DECRYPT = 'mautic.plugin_on_integration_keys_decrypt';
 
     /**
      * The mautic.plugin_on_integration_keys_merge event is dispatched after new keys are merged into existing ones.
@@ -43,7 +43,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_KEYS_MERGE = 'mautic.plugin_on_integration_keys_merge';
+    public const PLUGIN_ON_INTEGRATION_KEYS_MERGE = 'mautic.plugin_on_integration_keys_merge';
 
     /**
      * The mautic.plugin_on_integration_request event is dispatched before a request is made.
@@ -52,7 +52,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_REQUEST = 'mautic.plugin_on_integration_request';
+    public const PLUGIN_ON_INTEGRATION_REQUEST = 'mautic.plugin_on_integration_request';
 
     /**
      * The mautic.plugin_on_integration_response event is dispatched after a request is made.
@@ -61,7 +61,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_RESPONSE = 'mautic.plugin_on_integration_response';
+    public const PLUGIN_ON_INTEGRATION_RESPONSE = 'mautic.plugin_on_integration_response';
 
     /**
      * The mautic.plugin_on_integration_auth_redirect event is dispatched when an authorization URL is generated and before the user is redirected to it.
@@ -70,7 +70,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_AUTH_REDIRECT = 'mautic.plugin_on_integration_auth_redirect';
+    public const PLUGIN_ON_INTEGRATION_AUTH_REDIRECT = 'mautic.plugin_on_integration_auth_redirect';
 
     /**
      * The mautic.plugin.on_campaign_trigger_action event is fired when the campaign action triggers.
@@ -80,7 +80,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.plugin.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'mautic.plugin.on_campaign_trigger_action';
 
     /**
      * The mautic.plugin_on_integration_get_auth_callback_url event is dispatched when generating the redirect/callback URL.
@@ -89,7 +89,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL = 'mautic.plugin_on_integration_get_auth_callback_url';
+    public const PLUGIN_ON_INTEGRATION_GET_AUTH_CALLBACK_URL = 'mautic.plugin_on_integration_get_auth_callback_url';
 
     /**
      * The mautic.plugin_on_integration_form_display event is dispatched when fetching display settings for the integration's config form.
@@ -98,7 +98,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_FORM_DISPLAY = 'mautic.plugin_on_integration_form_display';
+    public const PLUGIN_ON_INTEGRATION_FORM_DISPLAY = 'mautic.plugin_on_integration_form_display';
 
     /**
      * The mautic.plugin_on_integration_form_build event is dispatched when building an integration's config form.
@@ -107,7 +107,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const PLUGIN_ON_INTEGRATION_FORM_BUILD = 'mautic.plugin_on_integration_form_build';
+    public const PLUGIN_ON_INTEGRATION_FORM_BUILD = 'mautic.plugin_on_integration_form_build';
 
     /**
      * The mautic.plugin.on_form_submit_action_triggered event is dispatched when a plugin related submit action is executed.
@@ -116,7 +116,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const ON_FORM_SUBMIT_ACTION_TRIGGERED = 'mautic.plugin.on_form_submit_action_triggered';
+    public const ON_FORM_SUBMIT_ACTION_TRIGGERED = 'mautic.plugin.on_form_submit_action_triggered';
 
     /**
      * The mautic.plugin.on_plugin_update event is dispatched when a plugin is updated.
@@ -125,7 +125,7 @@ final class PluginEvents
      *
      * @var string
      */
-    const ON_PLUGIN_UPDATE = 'mautic.plugin.on_plugin_update';
+    public const ON_PLUGIN_UPDATE = 'mautic.plugin.on_plugin_update';
 
     /**
      * The mautic.plugin.on_plugin_install event is dispatched when a plugin is installed.
@@ -134,5 +134,5 @@ final class PluginEvents
      *
      * @var string
      */
-    const ON_PLUGIN_INSTALL = 'mautic.plugin.on_plugin_install';
+    public const ON_PLUGIN_INSTALL = 'mautic.plugin.on_plugin_install';
 }

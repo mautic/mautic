@@ -6,7 +6,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 /**
- * Class StatDeviceRepository.
+ * @extends CommonRepository<StatDevice>
  */
 class StatDeviceRepository extends CommonRepository
 {
@@ -50,6 +50,6 @@ class StatDeviceRepository extends CommonRepository
             );
         }
 
-        return $qb->execute()->fetchAll();
+        return $qb->execute()->fetchAllAssociative();
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -17,7 +17,7 @@ class LeadEventLog
     /**
      * @var string
      */
-    const INDEX_SEARCH = 'IDX_SEARCH';
+    public const INDEX_SEARCH = 'IDX_SEARCH';
 
     /**
      * @var int
@@ -25,7 +25,7 @@ class LeadEventLog
     protected $id;
 
     /**
-     * @var Lead
+     * @var Lead|null
      */
     protected $lead;
 
@@ -60,7 +60,7 @@ class LeadEventLog
     protected $action;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     protected $dateAdded;
 
@@ -86,14 +86,14 @@ class LeadEventLog
             ->addIndex(['action'], 'lead_timeline_action_index')
             ->addIndex(['date_added'], 'lead_date_added_index')
             ->addBigIntIdField()
-            ->addNullableField('userId', Type::INTEGER, 'user_id')
-            ->addNullableField('userName', Type::STRING, 'user_name')
-            ->addNullableField('bundle', Type::STRING)
-            ->addNullableField('object', Type::STRING)
-            ->addNullableField('action', Type::STRING)
-            ->addNullableField('objectId', Type::INTEGER, 'object_id')
-            ->addNamedField('dateAdded', Type::DATETIME, 'date_added')
-            ->addNullableField('properties', Type::JSON_ARRAY);
+            ->addNullableField('userId', Types::INTEGER, 'user_id')
+            ->addNullableField('userName', Types::STRING, 'user_name')
+            ->addNullableField('bundle', Types::STRING)
+            ->addNullableField('object', Types::STRING)
+            ->addNullableField('action', Types::STRING)
+            ->addNullableField('objectId', Types::INTEGER, 'object_id')
+            ->addNamedField('dateAdded', Types::DATETIME_MUTABLE, 'date_added')
+            ->addNullableField('properties', Types::JSON);
 
         $builder->createManyToOne('lead', Lead::class)
             ->addJoinColumn('lead_id', 'id', true, false, 'CASCADE')
@@ -151,7 +151,7 @@ class LeadEventLog
     /**
      * Get lead.
      *
-     * @return Lead
+     * @return Lead|null
      */
     public function getLead()
     {
@@ -308,7 +308,7 @@ class LeadEventLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

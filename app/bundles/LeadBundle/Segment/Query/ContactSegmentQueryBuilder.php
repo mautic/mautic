@@ -3,7 +3,6 @@
 namespace Mautic\LeadBundle\Segment\Query;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -55,7 +54,7 @@ class ContactSegmentQueryBuilder
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
+        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             // Prefer a slave connection if available.
             $connection->connect('slave');
         }
@@ -101,13 +100,13 @@ class ContactSegmentQueryBuilder
     /**
      * @return QueryBuilder
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function wrapInCount(QueryBuilder $qb)
     {
         /** @var Connection $connection */
         $connection = $this->entityManager->getConnection();
-        if ($connection instanceof MasterSlaveConnection) {
+        if ($connection instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             // Prefer a slave connection if available.
             $connection->connect('slave');
         }
@@ -221,7 +220,7 @@ class ContactSegmentQueryBuilder
         }
 
         $event = new LeadListQueryBuilderGeneratedEvent($segment, $queryBuilder);
-        $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED, $event);
+        $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_QUERYBUILDER_GENERATED);
     }
 
     /**
@@ -245,7 +244,7 @@ class ContactSegmentQueryBuilder
 
             $alias = $this->generateRandomParameterName();
             $event = new LeadListFilteringEvent($filterCrate, null, $alias, $filterCrate['operator'], $queryBuilder, $this->entityManager);
-            $this->dispatcher->dispatch(LeadEvents::LIST_FILTERS_ON_FILTERING, $event);
+            $this->dispatcher->dispatch($event, LeadEvents::LIST_FILTERS_ON_FILTERING);
             if ($event->isFilteringDone()) {
                 $queryBuilder->addLogic($event->getSubQuery(), $filter->getGlue());
 

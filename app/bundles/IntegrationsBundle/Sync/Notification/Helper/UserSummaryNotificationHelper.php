@@ -6,7 +6,7 @@ namespace Mautic\IntegrationsBundle\Sync\Notification\Helper;
 
 use Mautic\IntegrationsBundle\Sync\Exception\ObjectNotSupportedException;
 use Mautic\IntegrationsBundle\Sync\Notification\Writer;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserSummaryNotificationHelper
 {

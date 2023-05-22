@@ -6,13 +6,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\SmsBundle\Callback\CallbackInterface;
-use Mautic\SmsBundle\Callback\ResponseInterface;
 use Mautic\SmsBundle\Exception\NumberNotFoundException;
 use Mautic\SmsBundle\Helper\ReplyHelper;
 use Psr\Log\NullLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ReplyHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -52,38 +50,6 @@ class ReplyHelperTest extends \PHPUnit\Framework\TestCase
             ->method('dispatch');
 
         $this->getHelper()->handleRequest($handler, new Request());
-    }
-
-    public function testHandlerResponseIsReturnedIfResponseInterface()
-    {
-        $handler = new class() implements CallbackInterface, ResponseInterface {
-            public function getResponse()
-            {
-                return new Response('hi');
-            }
-
-            /**
-             * @return ArrayCollection<int,Lead>
-             */
-            public function getContacts(Request $request)
-            {
-                return new ArrayCollection([new Lead()]);
-            }
-
-            public function getMessage(Request $request)
-            {
-                return '';
-            }
-
-            public function getTransportName()
-            {
-                return '';
-            }
-        };
-
-        $response = $this->getHelper()->handleRequest($handler, new Request());
-
-        $this->assertEquals(new Response('hi'), $response);
     }
 
     public function testContactsNotFoundDoesNotDispatchEvent()

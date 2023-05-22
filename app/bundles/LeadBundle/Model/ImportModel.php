@@ -14,7 +14,6 @@ use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\ImportRepository;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\ImportEvent;
@@ -23,11 +22,11 @@ use Mautic\LeadBundle\Exception\ImportDelayedException;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Helper\Progress;
 use Mautic\LeadBundle\LeadEvents;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Class ImportModel.
+ * @extends FormModel<Import>
  */
 class ImportModel extends FormModel
 {
@@ -343,7 +342,7 @@ class ImportModel extends FormModel
                 try {
                     $event = new ImportProcessEvent($import, $eventLog, $data);
 
-                    $this->dispatcher->dispatch(LeadEvents::IMPORT_ON_PROCESS, $event);
+                    $this->dispatcher->dispatch($event, LeadEvents::IMPORT_ON_PROCESS);
 
                     if ($event->wasMerged()) {
                         $this->logDebug('Entity on line '.$lineNumber.' has been updated', $import);
@@ -375,10 +374,20 @@ class ImportModel extends FormModel
 
             // Release entities in Doctrine's memory to prevent memory leak
             $this->em->detach($eventLog);
+            if (null !== $leadEntity = $eventLog->getLead()) {
+                $this->em->detach($leadEntity);
+
+                $company        = $leadEntity->getCompany();
+                $primaryCompany = $leadEntity->getPrimaryCompany();
+                if ($company instanceof Company) {
+                    $this->em->detach($company);
+                }
+                if ($primaryCompany instanceof Company) {
+                    $this->em->detach($primaryCompany);
+                }
+            }
             $eventLog = null;
             $data     = null;
-            $this->em->clear(Lead::class);
-            $this->em->clear(Company::class);
 
             // Save Import entity once per batch so the user could see the progress
             if (0 === $batchSize && $import->isBackgroundProcess()) {
@@ -520,12 +529,14 @@ class ImportModel extends FormModel
      *
      * @return array
      */
-    public function getImportedRowsLineChartData($unit, \DateTime $dateFrom, \DateTime $dateTo, $dateFormat = null, $filter = [])
+    public function getImportedRowsLineChartData($unit, \DateTimeInterface $dateFrom, \DateTimeInterface $dateTo, $dateFormat = null, $filter = [])
     {
         $filter['object'] = 'import';
         $filter['bundle'] = 'lead';
 
         // Clear the times for display by minutes
+        /** @var \DateTime $dateFrom */
+        /** @var \DateTime $dateTo */
         $dateFrom->modify('-1 minute');
         $dateFrom->setTime($dateFrom->format('H'), $dateFrom->format('i'), 0);
         $dateTo->modify('+1 minute');
@@ -663,7 +674,7 @@ class ImportModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {

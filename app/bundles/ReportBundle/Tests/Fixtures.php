@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\ReportBundle\Tests;
 
 class Fixtures
 {
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getValidReportResult()
+    public static function getValidReportResult(): array
     {
         return [
             'totalResults' => '11',
@@ -52,9 +54,9 @@ class Fixtures
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getValidReportData()
+    public static function getValidReportData(): array
     {
         return [
             [
@@ -137,7 +139,10 @@ class Fixtures
         ];
     }
 
-    public static function getValidReportHeaders()
+    /**
+     * @return array<int, string>
+     */
+    public static function getValidReportHeaders(): array
     {
         return [
             'City',
@@ -148,18 +153,12 @@ class Fixtures
         ];
     }
 
-    /**
-     * @return int
-     */
-    public static function getValidReportTotalResult()
+    public static function getValidReportTotalResult(): int
     {
         return 11;
     }
 
-    /**
-     * @return string
-     */
-    public static function getStringType()
+    public static function getStringType(): string
     {
         return 'string';
     }
@@ -174,23 +173,25 @@ class Fixtures
         return 'bool';
     }
 
-    /**
-     * @return string
-     */
-    public static function getDateType()
+    public static function getFloatType(): string
+    {
+        return 'float';
+    }
+
+    public static function getDateType(): string
     {
         return 'datetime';
     }
 
-    /**
-     * @return string
-     */
-    public static function getEmailType()
+    public static function getEmailType(): string
     {
         return 'email';
     }
 
-    public static function getReportBuilderEventData()
+    /**
+     * @return mixed[]
+     */
+    public static function getReportBuilderEventData(): array
     {
         return [
             'all' => [
@@ -222,7 +223,7 @@ class Fixtures
         ];
     }
 
-    public static function getGoodColumnList()
+    public static function getGoodColumnList(): \stdClass
     {
         $list          = new \stdClass();
         $list->choices = [
@@ -258,6 +259,7 @@ class Fixtures
                 'e_id'           => 'e.id',
                 'e_name'         => 'e.name',
                 'SUM es.is_read' => 'es.is_read',
+                'AVG es.is_read' => 'es.is_read',
                 'COUNT l.id'     => 'l.id',
             ],
             'columns' => [
@@ -286,6 +288,7 @@ class Fixtures
             ],
             'aggregatorColumns' => [
                 'SUM es.is_read' => 'es.is_read',
+                'AVG es.is_read' => 'es.is_read',
                 'COUNT l.id'     => 'l.id',
             ],
             'limit' => 0,
@@ -302,14 +305,35 @@ class Fixtures
                 'e_id'           => '1',
                 'e_name'         => 'Email 1',
                 'SUM es.is_read' => '50',
+                'AVG es.is_read' => '0.5000',
                 'COUNT l.id'     => '100',
             ],
             [
                 'e_id'           => '2',
                 'e_name'         => 'Email 2',
                 'SUM es.is_read' => '10',
+                'AVG es.is_read' => '0.1666',
                 'COUNT l.id'     => '60',
             ],
         ];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function getValidReportWithAggregatedColumnsHeaders(): array
+    {
+        return [
+            'ID',
+            'Name',
+            'SUM Read',
+            'AVG Read',
+            'COUNT Contact ID',
+        ];
+    }
+
+    public static function getValidReportWithAggregatedColumnsTotalResult(): int
+    {
+        return 2;
     }
 }

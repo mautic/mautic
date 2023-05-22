@@ -10,6 +10,9 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
 
+/**
+ * @extends FormModel<Event>
+ */
 class EventModel extends FormModel
 {
     /**

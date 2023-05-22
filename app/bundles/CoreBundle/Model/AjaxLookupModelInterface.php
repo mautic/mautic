@@ -8,6 +8,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
  * Interface AjaxLookupModelInterface.
  *
  * Defines methods required by AjaxLookupControllerTrait to find matching records
+ *
+ * @template T of object
  */
 interface AjaxLookupModelInterface
 {
@@ -22,7 +24,7 @@ interface AjaxLookupModelInterface
     public function getLookupResults($type, $filter = '', $limit = 10, $start = 0);
 
     /**
-     * @return CommonRepository
+     * @return CommonRepository<T>
      */
     public function getRepository();
 }

@@ -46,7 +46,7 @@ class PointsChangeLog
     private $delta;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -204,7 +204,7 @@ class PointsChangeLog
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

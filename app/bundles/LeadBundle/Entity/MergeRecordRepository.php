@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
 /**
- * Class MergeRecordRepository.
+ * @extends CommonRepository<MergeRecord>
  */
 class MergeRecordRepository extends CommonRepository
 {
@@ -21,7 +21,7 @@ class MergeRecordRepository extends CommonRepository
             $contact = $record->getContact();
 
             // Clear these records from the EM so that subsequent fetches don't return deleted entities
-            $this->getEntityManager()->clear(MergeRecord::class);
+            $this->getEntityManager()->detach($record);
 
             return $contact;
         }

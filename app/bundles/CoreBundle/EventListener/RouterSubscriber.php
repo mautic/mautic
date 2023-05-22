@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -71,7 +71,7 @@ class RouterSubscriber implements EventSubscriberInterface
      * in order to prevent mismatches between cached URLs generated during web requests and URLs generated
      * via CLI/cron jobs.
      */
-    public function setRouterRequestContext(GetResponseEvent $event)
+    public function setRouterRequestContext(RequestEvent $event)
     {
         if (empty($this->host)) {
             return;
@@ -83,8 +83,8 @@ class RouterSubscriber implements EventSubscriberInterface
 
         $originalContext = $this->router->getContext();
 
-        // Remove index_dev.php, index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
-        $originalBaseUrl = str_replace(['index_dev.php', 'index.php'], '', $originalContext->getBaseUrl());
+        // Remove index.php, and ending forward slash from the URL to match what is configured in SiteUrlEnvVars
+        $originalBaseUrl = str_replace(['index.php'], '', $originalContext->getBaseUrl());
         if ('/' == substr($originalBaseUrl, -1)) {
             $originalBaseUrl = substr($originalBaseUrl, 0, -1);
         }
@@ -92,11 +92,6 @@ class RouterSubscriber implements EventSubscriberInterface
         if ($originalBaseUrl && !$this->baseUrl) {
             // Likely in installation where the request parameters passed into this listener are not set yet so just use the original context
             return;
-        }
-
-        // Append index_dev.php for installations at the root level
-        if ('dev' === MAUTIC_ENV && false === strpos($this->baseUrl, 'index_dev.php')) {
-            $this->baseUrl = $this->baseUrl.'/index_dev.php';
         }
 
         $context = $this->router->getContext();

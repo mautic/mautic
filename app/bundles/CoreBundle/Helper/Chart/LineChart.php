@@ -37,12 +37,12 @@ class LineChart extends AbstractChart implements ChartInterface
     /**
      * Defines the basic chart values, generates the time axe labels from it.
      *
-     * @param string    $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
-     * @param \DateTime $dateFrom
-     * @param \DateTime $dateTo
-     * @param string    $dateFormat
+     * @param string|null $unit       {@link php.net/manual/en/function.date.php#refsect1-function.date-parameters}
+     * @param \DateTime   $dateFrom
+     * @param \DateTime   $dateTo
+     * @param string      $dateFormat
      */
-    public function __construct($unit = null, $dateFrom = null, $dateTo = null, $dateFormat = null)
+    public function __construct(?string $unit = null, $dateFrom = null, $dateTo = null, $dateFormat = null)
     {
         $this->unit       = (null === $unit) ? $this->getTimeUnitFromDateRange($dateFrom, $dateTo) : $unit;
         $this->isTimeUnit = (in_array($this->unit, ['H', 'i', 's']));
@@ -97,6 +97,7 @@ class LineChart extends AbstractChart implements ChartInterface
             throw new \UnexpectedValueException('Date/Time unit "'.$this->unit.'" is not available for a label.');
         }
 
+        /** @var \DateTime $date */
         $date    = clone $this->dateFrom;
         $oneUnit = $this->getUnitInterval();
         $format  = !empty($this->dateFormat) ? $this->dateFormat : $this->labelFormats[$this->unit];

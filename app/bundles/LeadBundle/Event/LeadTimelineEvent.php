@@ -5,7 +5,7 @@ namespace Mautic\LeadBundle\Event;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class LeadTimelineEvent extends Event
 {
@@ -71,12 +71,12 @@ class LeadTimelineEvent extends Event
     protected $countOnly = false;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateFrom;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateTo;
 

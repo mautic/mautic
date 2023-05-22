@@ -281,7 +281,8 @@ Mautic.leadlistOnLoad = function(container, response) {
                     elem.html(response.html);
                 },
                 false,
-                true
+                true,
+                "GET"
             );
         });
     }
@@ -452,7 +453,7 @@ Mautic.attachJsUiOnFilterForms = function() {
                 var fieldOptions = displayFieldEl.attr('data-field-list');
                 Mautic[fieldCallback](selector.replace('#', '') + '_properties_display', fieldAlias, fieldOptions);
             }
-        } 
+        }
     });
 
     // Trigger event so plugins could attach other JS magic to the form.
@@ -520,7 +521,7 @@ Mautic.reorderSegmentFilters = function() {
 
 Mautic.convertLeadFilterInput = function(el) {
     var operatorSelect = mQuery(el);
-    
+
     // Extract the filter number
     var regExp = /_filters_(\d+)_operator/;
     var matches = regExp.exec(operatorSelect.attr('id'));
@@ -1121,7 +1122,7 @@ Mautic.reloadLeadImportProgress = function() {
                     mQuery('.progress-bar-import span.sr-only').html(response.percent + '%');
                 }
             }
-        });
+        }, false, false, "GET");
 
         // Initiate import
         mQuery.ajax({
@@ -1139,10 +1140,10 @@ Mautic.reloadLeadImportProgress = function() {
     }
 };
 
-Mautic.removeBounceStatus = function (el, dncId) {
+Mautic.removeBounceStatus = function (el, dncId, channel) {
     mQuery(el).removeClass('fa-times').addClass('fa-spinner fa-spin');
 
-    Mautic.ajaxActionRequest('lead:removeBounceStatus', 'id=' + dncId, function() {
+    Mautic.ajaxActionRequest('lead:removeBounceStatus', {'id': dncId, 'channel': channel}, function() {
         mQuery('#bounceLabel' + dncId).tooltip('destroy');
         mQuery('#bounceLabel' + dncId).fadeOut(300, function() { mQuery(this).remove(); });
     });
@@ -1273,7 +1274,7 @@ Mautic.getLeadEmailContent = function (el) {
         mQuery('#'+idPrefix+'subject').val(response.subject);
 
         Mautic.removeLabelLoadingIndicator();
-    });
+    }, false, false, "GET");
 };
 
 Mautic.updateLeadTags = function () {
@@ -1470,7 +1471,7 @@ Mautic.initUniqueIdentifierFields = function() {
                 } else {
                     input.parent().find('div.exists-warning').remove();
                 }
-            });
+            }, false, false, "GET");
         });
     }
 };
@@ -1479,8 +1480,13 @@ Mautic.updateFilterPositioning = function (el) {
     var $el       = mQuery(el);
     var $parentEl = $el.closest('.panel');
     var list      = $parentEl.parent().children('.panel');
+    const isFirst = list.index($parentEl) === 0;
 
-    if ($el.val() == 'and' && list.index($parentEl) !== 0) {
+    if (isFirst) {
+        $el.val('and');
+    }
+
+    if ($el.val() === 'and' && !isFirst) {
         $parentEl.addClass('in-group');
     } else {
         $parentEl.removeClass('in-group');

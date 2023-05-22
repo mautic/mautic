@@ -39,7 +39,7 @@ class TokenSubscriber implements EventSubscriberInterface
         return [
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 254],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 254],
-            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 254],
+            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', -254],
         ];
     }
 
@@ -73,9 +73,10 @@ class TokenSubscriber implements EventSubscriberInterface
                     'dynamicContent' => $dynamicContentAsArray,
                     'idHash'         => $event->getIdHash(),
                 ],
-                $email
+                $email,
+                $event->isInternalSend()
             );
-            $this->dispatcher->dispatch(EmailEvents::TOKEN_REPLACEMENT, $tokenEvent);
+            $this->dispatcher->dispatch($tokenEvent, EmailEvents::TOKEN_REPLACEMENT);
             $event->addTokens($tokenEvent->getTokens());
         }
     }
@@ -122,8 +123,9 @@ class TokenSubscriber implements EventSubscriberInterface
                 true
             );
 
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
-            $untokenizedContent = $emailSendEvent->getContent(true);
+            $this->dispatcher->dispatch($emailSendEvent, EmailEvents::EMAIL_ON_DISPLAY);
+
+            $untokenizedContent = $emailSendEvent->getContent(!$event->isInternalSend());
 
             $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
         }

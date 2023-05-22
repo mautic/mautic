@@ -260,9 +260,13 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
                 // Lots of entities will be loaded into memory while compiling these events so let's prevent memory overload by clearing the EM
                 $entityToNotDetach = ['Mautic\PluginBundle\Entity\Integration', 'Mautic\PluginBundle\Entity\Plugin'];
                 $loadedEntities    = $this->em->getUnitOfWork()->getIdentityMap();
-                foreach ($loadedEntities as $name => $loadedEntity) {
-                    if (!in_array($name, $entityToNotDetach)) {
-                        $this->em->clear($name);
+                foreach ($loadedEntities as $name => $loadedEntitySet) {
+                    if (!in_array($name, $entityToNotDetach, true)) {
+                        continue;
+                    }
+
+                    foreach ($loadedEntitySet as $loadedEntity) {
+                        $this->em->detach($loadedEntity);
                     }
                 }
             }
@@ -346,7 +350,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
      * @param mixed       $data        Profile data from integration
      * @param bool|true   $persist     Set to false to not persist lead to the database in this method
      * @param array|null  $socialCache
-     * @param mixed||null $identifiers
+     * @param mixed|null  $identifiers
      * @param string|null $object
      *
      * @return Lead

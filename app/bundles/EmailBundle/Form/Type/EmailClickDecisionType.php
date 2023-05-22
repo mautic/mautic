@@ -21,12 +21,4 @@ class EmailClickDecisionType extends AbstractType
             ]
         );
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'email_click_decision';
-    }
 }

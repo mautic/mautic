@@ -3,7 +3,7 @@
 namespace Mautic\ChannelBundle\Event;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class ChannelBroadcastEvent.
@@ -63,6 +63,16 @@ class ChannelBroadcastEvent extends Event
      * @var int
      */
     private $batch = 50;
+
+    /**
+     * @var int|null
+     */
+    private $maxThreads;
+
+    /**
+     * @var int|null
+     */
+    private $threadId;
 
     /**
      * MaintenanceEvent constructor.
@@ -196,5 +206,25 @@ class ChannelBroadcastEvent extends Event
     public function getBatch()
     {
         return $this->batch;
+    }
+
+    public function getMaxThreads(): ?int
+    {
+        return $this->maxThreads;
+    }
+
+    public function setMaxThreads(?int $maxThreads): void
+    {
+        $this->maxThreads = $maxThreads;
+    }
+
+    public function getThreadId(): ?int
+    {
+        return $this->threadId;
+    }
+
+    public function setThreadId(?int $threadId): void
+    {
+        $this->threadId = $threadId;
     }
 }

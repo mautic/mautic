@@ -7,6 +7,7 @@ namespace Mautic\LeadBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
@@ -14,12 +15,11 @@ use Mautic\LeadBundle\Helper\SegmentCountCacheHelper;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\LeadBundle\Segment\ContactSegmentService;
 use Mautic\LeadBundle\Segment\Stat\SegmentChartQueryFactory;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\Translator;
 
 class ListModelTest extends TestCase
 {
@@ -52,7 +52,7 @@ class ListModelTest extends TestCase
     {
         $eventDispatcherInterfaceMock = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcherInterfaceMock->method('dispatch');
-        $loggerMock                   = $this->createMock(Logger::class);
+        $loggerMock                   = $this->createMock(LoggerInterface::class);
         $translatorMock               = $this->createMock(Translator::class);
         $this->leadListRepositoryMock = $this->createMock(LeadListRepository::class);
 

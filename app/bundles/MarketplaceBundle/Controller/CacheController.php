@@ -27,7 +27,7 @@ class CacheController extends CommonController
         $this->allowlist       = $allowlist;
     }
 
-    public function ClearAction(): Response
+    public function clearAction(): Response
     {
         if (!$this->config->marketplaceIsEnabled()) {
             return $this->notFound();

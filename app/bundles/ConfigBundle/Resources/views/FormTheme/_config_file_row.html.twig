@@ -1,0 +1,27 @@
+{%- set hasErrors = form.vars.errors|length %}
+{%- set feedbackClass = hasErrors > 0 ? 'has-error' : '' %}
+{%- set field = form.vars.name %}
+{%- set hide = fieldValue is not defined or (fieldValue is defined and fieldValue is empty) ? 'hide' : '' %}
+{%- set filename = inputAlphanum(form.vars.label|trans, true, '_') %}
+{%- set downloadUrl = path('mautic_config_action', {'objectAction': 'download', 'objectId': field, 'filename': filename}) %}
+{%- set removeUrl = path('mautic_config_action', {'objectAction': 'remove', 'objectId': field}) %}
+<div class="row">
+    <div class="form-group col-xs-12 {{ feedbackClass }}">
+        {{ form_label(form, form.vars.label) }}
+        <span class="small pull-right {{ hide }}">
+            <a
+               data-toggle="confirmation"
+               href="{{ removeUrl }}"
+               data-message="{{ 'mautic.config.remove_file_contents'|trans|e }}"
+               data-confirm-text="{{ 'mautic.core.remove'|trans|e }}"
+               data-confirm-callback="removeConfigValue"
+               data-cancel-text="{{ 'mautic.core.form.cancel'|trans|e }}">
+                {{ 'mautic.core.remove'|trans }}
+            </a>
+            <span> | </span>
+            <a href="{{ downloadUrl }}">{{ 'mautic.core.download'|trans }}</a>
+        </span>
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
+    </div>
+</div>

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Mautic\IntegrationsBundle\Tests\Unit\Sync\SyncDataExchange\Internal\ObjectHelper;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Doctrine\DBAL\Statement;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\FieldDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Sync\Order\ObjectChangeDAO;
 use Mautic\IntegrationsBundle\Sync\DAO\Value\NormalizedValueDAO;
@@ -14,37 +13,39 @@ use Mautic\IntegrationsBundle\Sync\DAO\Value\ReferenceValueDAO;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\Object\Contact;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\Internal\ObjectHelper\ContactObjectHelper;
 use Mautic\IntegrationsBundle\Sync\SyncDataExchange\MauticSyncDataExchange;
+use Mautic\LeadBundle\DataObject\LeadManipulator;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\LeadModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class ContactObjectHelperTest extends TestCase
 {
     /**
-     * @var LeadModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadModel|MockObject
      */
     private $model;
 
     /**
-     * @var LeadRepository|\PHPUnit\Framework\MockObject\MockObject
+     * @var LeadRepository|MockObject
      */
     private $repository;
 
     /**
-     * @var Connection|\PHPUnit\Framework\MockObject\MockObject
+     * @var Connection|MockObject
      */
     private $connection;
 
     /**
-     * @var FieldModel|\PHPUnit\Framework\MockObject\MockObject
+     * @var FieldModel|MockObject
      */
     private $fieldModel;
 
     /**
-     * @var DoNotContact|\PHPUnit\Framework\MockObject\MockObject
+     * @var DoNotContact|MockObject
      */
     private $doNotContactModel;
 
@@ -68,13 +69,18 @@ class ContactObjectHelperTest extends TestCase
     public function testCreate(): void
     {
         $this->model->expects($this->exactly(2))
-            ->method('saveEntity');
+            ->method('saveEntity')
+            ->with($this->callback(function (Lead $lead): bool {
+                $this->assertManipulator($lead, 'create');
+
+                return true;
+            }));
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
         $objects = [
-            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 1, new \DateTime()),
-            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 2, new \DateTime()),
+            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 1, new DateTime()),
+            new ObjectChangeDAO('Test', Contact::NAME, null, 'MappedObject', 2, new DateTime()),
         ];
 
         $objectMappings = $this->getObjectHelper()->create($objects);
@@ -94,8 +100,8 @@ class ContactObjectHelperTest extends TestCase
         $this->repository->expects($this->exactly(2))
             ->method('detachEntity');
 
-        $objectChangeDaoA = new ObjectChangeDAO('Test', Contact::NAME, 0, 'MappedObject', 0, new \DateTime());
-        $objectChangeDaoB = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDaoA = new ObjectChangeDAO('Test', Contact::NAME, 0, 'MappedObject', 0, new DateTime());
+        $objectChangeDaoB = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objects          = [$objectChangeDaoA, $objectChangeDaoB];
         $companyId        = 1234;
         $companyValue     = new ReferenceValueDAO();
@@ -105,16 +111,16 @@ class ContactObjectHelperTest extends TestCase
         $emailField       = new FieldDAO('email', new NormalizedValueDAO('email', 'john@doe.com'));
         $companyField     = new FieldDAO(
             MauticSyncDataExchange::OBJECT_COMPANY,
-            new NormalizedValueDAO('reference', $companyValue, $companyValue)
+            new NormalizedValueDAO('reference', $companyValue, 'Company A')
         );
 
         $objectChangeDaoA->addField($emailField);
         $objectChangeDaoA->addField($companyField);
 
-        $contact1 = $this->createMock(Lead::class);
+        $contact1 = $this->createPartialMock(Lead::class, ['getId', 'addUpdatedField']);
         $contact1->method('getId')
             ->willReturn(0);
-        $contact2 = $this->createMock(Lead::class);
+        $contact2 = $this->createPartialMock(Lead::class, ['getId']);
         $contact2->method('getId')
             ->willReturn(1);
         $this->model->expects($this->once())
@@ -125,25 +131,6 @@ class ContactObjectHelperTest extends TestCase
                     $contact2,
                 ]
             );
-
-        $queryBuilder = new QueryBuilder($this->connection);
-        $statement    = $this->createMock(Statement::class);
-
-        $this->connection->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $this->connection->expects($this->once())
-            ->method('executeQuery')
-            ->with(
-                'SELECT c.companyname FROM '.MAUTIC_TABLE_PREFIX.'companies c WHERE c.id = :id',
-                ['id' => $companyId]
-            )
-            ->willReturn($statement);
-
-        $statement->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn('Company A');
 
         $contact1->expects($this->exactly(2))
             ->method('addUpdatedField')
@@ -160,6 +147,9 @@ class ContactObjectHelperTest extends TestCase
             $this->assertTrue(isset($objects[$objectMapping->getIntegrationObjectId()]));
             $this->assertEquals($objects[$objectMapping->getIntegrationObjectId()]->getMappedObjectId(), $objectMapping->getIntegrationObjectId());
         }
+
+        $this->assertManipulator($contact1, 'update');
+        $this->assertManipulator($contact2, 'update');
     }
 
     public function testDoNotContactIsAdded(): void
@@ -168,7 +158,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('addDncForContact')
             ->with(1, 'email', 1, 'Test', true, true, true);
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 1)));
 
         $objects = [
@@ -191,7 +181,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('removeDncForContact')
             ->with(1, 'email');
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 0)));
 
         $objects = [
@@ -214,7 +204,7 @@ class ContactObjectHelperTest extends TestCase
             ->method('addDncForContact')
             ->with(1, 'email', 3, 'Test', true, true, true);
 
-        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new \DateTime());
+        $objectChangeDAO = new ObjectChangeDAO('Test', Contact::NAME, 1, 'MappedObject', 1, new DateTime());
         $objectChangeDAO->addField(new FieldDAO('mautic_internal_dnc_email', new NormalizedValueDAO(NormalizedValueDAO::INT_TYPE, 4)));
 
         $objects = [
@@ -237,5 +227,13 @@ class ContactObjectHelperTest extends TestCase
     private function getObjectHelper()
     {
         return new ContactObjectHelper($this->model, $this->repository, $this->connection, $this->fieldModel, $this->doNotContactModel);
+    }
+
+    private function assertManipulator(Lead $lead, string $objectName): void
+    {
+        $manipulator = $lead->getManipulator();
+        $this->assertInstanceOf(LeadManipulator::class, $manipulator);
+        $this->assertSame('integrations', $manipulator->getBundleName());
+        $this->assertSame($objectName, $manipulator->getObjectName());
     }
 }

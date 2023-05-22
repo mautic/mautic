@@ -2,23 +2,28 @@
 
 namespace Mautic\CoreBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Lock\Lock;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\FlockStore;
+use Symfony\Component\Lock\Store\RedisStore;
 
-abstract class ModeratedCommand extends ContainerAwareCommand
+abstract class ModeratedCommand extends Command
 {
-    const MODE_PID   = 'pid';
-    const MODE_FLOCK = 'flock';
+    public const MODE_PID   = 'pid';
+    public const MODE_FLOCK = 'flock';
+    public const MODE_REDIS = 'redis';
 
     /**
      * @deprecated Symfony 4 Removed LockHandler and the replacement is the lock from the Lock component so there is no need for something custom
      */
-    const MODE_LOCK = 'file_lock';
+    public const MODE_LOCK = 'file_lock';
 
     protected $checkFile;
     protected $moderationKey;
@@ -27,6 +32,8 @@ abstract class ModeratedCommand extends ContainerAwareCommand
     protected $runDirectory;
     protected $lockExpiration;
     protected $lockFile;
+
+    private CoreParametersHelper $coreParametersHelper;
 
     /**
      * @var Lock
@@ -37,6 +44,16 @@ abstract class ModeratedCommand extends ContainerAwareCommand
      * @var OutputInterface
      */
     protected $output;
+
+    protected PathsHelper $pathsHelper;
+
+    public function __construct(PathsHelper $pathsHelper, CoreParametersHelper $coreParametersHelper)
+    {
+        $this->pathsHelper          = $pathsHelper;
+        $this->coreParametersHelper = $coreParametersHelper;
+
+        parent::__construct();
+    }
 
     /**
      * Set moderation options.
@@ -56,7 +73,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
                 '--lock_mode',
                 '-x',
                 InputOption::VALUE_REQUIRED,
-                'Allowed value are "pid" or "flock". By default, lock will try with pid, if not available will use file system',
+                'Allowed value are "pid", "flock" or redis. By default, lock will try with pid, if not available will use file system',
                 self::MODE_PID
             )
             ->addOption('--force', '-f', InputOption::VALUE_NONE, 'Deprecated; use --bypass-locking instead.');
@@ -81,7 +98,7 @@ abstract class ModeratedCommand extends ContainerAwareCommand
             // File lock is deprecated in favor of Symfony's Lock component's lock
             $this->moderationMode = 'flock';
         }
-        if (!in_array($this->moderationMode, ['pid', 'flock'])) {
+        if (!in_array($this->moderationMode, [self::MODE_PID, self::MODE_FLOCK, self::MODE_REDIS])) {
             $output->writeln('<error>Unknown locking method specified.</error>');
 
             return false;
@@ -89,12 +106,13 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
         // Allow multiple runs of the same command if executing different IDs, etc
         $this->moderationKey = $this->getName().$moderationKey;
-
-        // Setup the run directory for lock/pid files
-        $this->runDirectory = $this->getContainer()->getParameter('kernel.cache_dir').'/../run';
-        if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
-            // This needs to throw an exception in order to not silently fail when there is an issue
-            throw new \RuntimeException($this->runDirectory.' could not be created.');
+        if (in_array($this->moderationMode, [self::MODE_PID, self::MODE_FLOCK])) {
+            // Setup the run directory for lock/pid files
+            $this->runDirectory = $this->pathsHelper->getSystemPath('cache').'/../run';
+            if (!file_exists($this->runDirectory) && !@mkdir($this->runDirectory)) {
+                // This needs to throw an exception in order to not silently fail when there is an issue
+                throw new \RuntimeException($this->runDirectory.' could not be created.');
+            }
         }
 
         // Check if the command is currently running
@@ -171,7 +189,18 @@ abstract class ModeratedCommand extends ContainerAwareCommand
 
     private function checkFlock(): bool
     {
-        $store      = new FlockStore($this->runDirectory);
+        switch ($this->moderationMode) {
+            case self::MODE_REDIS:
+                $cacheAdapterConfig = $this->coreParametersHelper->get('cache_adapter_redis');
+                $redisDsn           = $cacheAdapterConfig['dsn'] ?? null;
+                $redisOptions       = $cacheAdapterConfig['options'] ?? [];
+                $redis              = RedisAdapter::createConnection($redisDsn, $redisOptions);
+                $store              = new RedisStore($redis, $this->lockExpiration ?? 3600);
+                break;
+            default:
+                $store = new FlockStore($this->runDirectory);
+        }
+
         $factory    = new LockFactory($store);
         $this->lock = $factory->createLock($this->moderationKey, $this->lockExpiration);
 

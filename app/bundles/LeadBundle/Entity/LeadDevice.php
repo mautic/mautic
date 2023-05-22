@@ -67,7 +67,7 @@ class LeadDevice
     private $trackingId;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
@@ -346,7 +346,7 @@ class LeadDevice
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getTrackingId()
     {

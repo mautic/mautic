@@ -203,7 +203,7 @@ class TableSchemaHelper
 
         if (!empty($sql)) {
             foreach ($sql as $s) {
-                $this->db->executeUpdate($s);
+                $this->db->executeStatement($s);
             }
         }
 
@@ -241,7 +241,7 @@ class TableSchemaHelper
             return $this->schema;
         }
 
-        if ($this->db instanceof \Doctrine\DBAL\Connections\MasterSlaveConnection) {
+        if ($this->db instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $params       = $this->db->getParams();
             $schemaConfig = new \Doctrine\DBAL\Schema\SchemaConfig();
             $schemaConfig->setName($params['master']['dbname']);

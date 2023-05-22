@@ -13,12 +13,4 @@ class BatchSendType extends AbstractType
             $builder->setAction($options['action']);
         }
     }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'batch_send';
-    }
 }

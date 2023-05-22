@@ -16,7 +16,7 @@ class FormEntity extends CommonEntity
     private $isPublished = true;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateAdded;
 
@@ -31,7 +31,7 @@ class FormEntity extends CommonEntity
     private $createdByUser;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateModified;
 
@@ -46,7 +46,7 @@ class FormEntity extends CommonEntity
     private $modifiedByUser;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $checkedOut;
 
@@ -161,9 +161,10 @@ class FormEntity extends CommonEntity
     public function __clone()
     {
         $this->dateAdded    = null;
-        $this->dateModified = null;
+        $this->dateModified = new \DateTime();
         $this->checkedOut   = null;
         $this->isPublished  = false;
+        $this->createdBy    = null;
         $this->changes      = [];
     }
 
@@ -212,7 +213,7 @@ class FormEntity extends CommonEntity
     /**
      * Get dateAdded.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -237,7 +238,7 @@ class FormEntity extends CommonEntity
     /**
      * Get dateModified.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateModified()
     {
@@ -261,7 +262,7 @@ class FormEntity extends CommonEntity
     /**
      * Get checkedOut.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getCheckedOut()
     {

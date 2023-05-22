@@ -6,7 +6,6 @@ namespace Mautic\MarketplaceBundle\Controller\Package;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Helper\ComposerHelper;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\MarketplaceBundle\Exception\RecordNotFoundException;
 use Mautic\MarketplaceBundle\Model\PackageModel;
 use Mautic\MarketplaceBundle\Security\Permissions\MarketplacePermissions;
@@ -18,20 +17,17 @@ class DetailController extends CommonController
 {
     private PackageModel $packageModel;
     private RouteProvider $routeProvider;
-    private CorePermissions $corePermissions;
     private Config $config;
     private ComposerHelper $composer;
 
     public function __construct(
         PackageModel $packageModel,
         RouteProvider $routeProvider,
-        CorePermissions $corePermissions,
         Config $config,
         ComposerHelper $composer
     ) {
         $this->packageModel    = $packageModel;
         $this->routeProvider   = $routeProvider;
-        $this->corePermissions = $corePermissions;
         $this->config          = $config;
         $this->composer        = $composer;
     }
@@ -42,7 +38,7 @@ class DetailController extends CommonController
             return $this->notFound();
         }
 
-        if (!$this->corePermissions->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
+        if (!$this->security->isGranted(MarketplacePermissions::CAN_VIEW_PACKAGES)) {
             return $this->accessDenied();
         }
 
@@ -54,6 +50,8 @@ class DetailController extends CommonController
             return $this->notFound($e->getMessage());
         }
 
+        $security = $this->security;
+
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
@@ -61,8 +59,9 @@ class DetailController extends CommonController
                     'packageDetail'     => $packageDetail,
                     'isInstalled'       => $isInstalled,
                     'isComposerEnabled' => $this->config->isComposerEnabled(),
+                    'security'          => $security,
                 ],
-                'contentTemplate' => 'MarketplaceBundle:Package:detail.html.php',
+                'contentTemplate' => '@Marketplace/Package/detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'package',
                     'activeLink'    => '#mautic_marketplace',

@@ -21,8 +21,6 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $this->generateCsv();
 
         $assetData = [
@@ -42,10 +40,8 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
         $this->expectedPngContent         = file_get_contents($this->csvPath);
     }
 
-    protected function tearDown(): void
+    protected function beforeTearDown(): void
     {
-        parent::tearDown();
-
         if (file_exists($this->csvPath)) {
             unlink($this->csvPath);
         }
@@ -73,7 +69,7 @@ abstract class AbstractAssetTest extends MauticMysqlTestCase
 
         $this->em->persist($asset);
         $this->em->flush();
-        $this->em->clear();
+        $this->em->detach($asset);
 
         return $asset;
     }

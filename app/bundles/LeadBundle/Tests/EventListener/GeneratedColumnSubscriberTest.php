@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\Tests\EventListener;
 
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Event\GeneratedColumnsEvent;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\EventListener\GeneratedColumnSubscriber;
 use Mautic\LeadBundle\Model\ListModel;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GeneratedColumnSubscriberTest extends TestCase
 {
@@ -33,6 +34,11 @@ class GeneratedColumnSubscriberTest extends TestCase
             {
             }
         };
+        $modelTranslator = $this->createMock(Translator::class);
+        $modelTranslator->expects(self::any())
+            ->method('trans')
+            ->willReturnArgument(0);
+        $segmentModel->setTranslator($modelTranslator);
 
         $this->translator                = $this->createMock(TranslatorInterface::class);
         $this->generatedColumnSubscriber = new GeneratedColumnSubscriber($segmentModel, $this->translator);

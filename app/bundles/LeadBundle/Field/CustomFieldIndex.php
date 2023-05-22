@@ -71,7 +71,7 @@ class CustomFieldIndex
             $modifySchema->executeChanges();
         } catch (DriverException $e) {
             if (1069 === $e->getErrorCode() /* ER_TOO_MANY_KEYS */) {
-                $this->logger->addWarning($e->getMessage());
+                $this->logger->warning($e->getMessage());
             } else {
                 throw $e;
             }

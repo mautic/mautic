@@ -106,7 +106,8 @@ class LegacyEventDispatcher
             $this->contactTracker->setSystemContact($log->getLead());
 
             if (isset($settings['eventName'])) {
-                $result = $this->dispatchEventName($settings['eventName'], $settings, $log);
+                $event  = $this->dispatchEventName($settings['eventName'], $settings, $log);
+                $result = $event->getResult();
             } else {
                 if (!is_callable($settings['callback'])) {
                     // No use to keep trying for the other logs as it won't ever work
@@ -173,7 +174,6 @@ class LegacyEventDispatcher
             $event = $log->getEvent();
 
             $legacyDecisionEvent = $this->dispatcher->dispatch(
-                CampaignEvents::ON_EVENT_DECISION_TRIGGER,
                 new CampaignDecisionEvent(
                     $log->getLead(),
                     $event->getType(),
@@ -182,7 +182,8 @@ class LegacyEventDispatcher
                     $this->getLegacyEventsConfigArray($event, $decisionEvent->getEventConfig()),
                     0 === $event->getOrder(),
                     [$log]
-                )
+                ),
+                CampaignEvents::ON_EVENT_DECISION_TRIGGER
             );
 
             if ($legacyDecisionEvent->wasDecisionTriggered()) {
@@ -194,7 +195,7 @@ class LegacyEventDispatcher
     /**
      * @param $eventName
      *
-     * @return bool
+     * @return CampaignExecutionEvent
      */
     private function dispatchEventName($eventName, array $settings, LeadEventLog $log)
     {
@@ -212,14 +213,14 @@ class LegacyEventDispatcher
             $log
         );
 
-        $this->dispatcher->dispatch($eventName, $campaignEvent);
+        $this->dispatcher->dispatch($campaignEvent, $eventName);
 
         if ($channel = $campaignEvent->getChannel()) {
             $log->setChannel($channel)
                 ->setChannelId($campaignEvent->getChannelId());
         }
 
-        return $campaignEvent->getResult();
+        return $campaignEvent;
     }
 
     /**
@@ -273,7 +274,6 @@ class LegacyEventDispatcher
         $eventArray = $this->getEventArray($log->getEvent());
 
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTION,
             new CampaignExecutionEvent(
                 [
                     'eventSettings'   => $config->getConfig(),
@@ -285,30 +285,31 @@ class LegacyEventDispatcher
                 ],
                 $result,
                 $log
-            )
+            ),
+            CampaignEvents::ON_EVENT_EXECUTION
         );
     }
 
     private function dispatchExecutedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED,
-            new ExecutedEvent($config, $log)
+            new ExecutedEvent($config, $log),
+            CampaignEvents::ON_EVENT_EXECUTED
         );
 
         $collection = new ArrayCollection();
         $collection->set($log->getId(), $log);
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_EXECUTED_BATCH,
-            new ExecutedBatchEvent($config, $log->getEvent(), $collection)
+            new ExecutedBatchEvent($config, $log->getEvent(), $collection),
+            CampaignEvents::ON_EVENT_EXECUTED_BATCH
         );
     }
 
     private function dispatchFailedEvent(AbstractEventAccessor $config, LeadEventLog $log)
     {
         $this->dispatcher->dispatch(
-            CampaignEvents::ON_EVENT_FAILED,
-            new FailedEvent($config, $log)
+            new FailedEvent($config, $log),
+            CampaignEvents::ON_EVENT_FAILED
         );
 
         $this->notificationHelper->notifyOfFailure($log->getLead(), $log->getEvent());

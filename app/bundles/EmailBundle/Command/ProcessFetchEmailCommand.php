@@ -58,10 +58,7 @@ EOT
             );
     }
 
-    /**
-     * @return int
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $limit     = $input->getOption('message-limit');
         $mailboxes = $this->parametersHelper->get('monitored_email');

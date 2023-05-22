@@ -103,7 +103,7 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
                 break;
             case 'regexp':
             case 'notRegexp':
-                $subQueryBuilder->select('NULL')
+                $subQueryBuilder->select($tableAlias.'.lead_id')
                     ->from($filter->getTable(), $tableAlias);
 
                 $this->addLeadAndMinMaxLimiters($subQueryBuilder, $batchLimiters, str_replace(MAUTIC_TABLE_PREFIX, '', $filter->getTable()));
@@ -113,7 +113,10 @@ class ForeignValueFilterQueryBuilder extends BaseFilterQueryBuilder
 
                 $subQueryBuilder->andWhere($expression);
 
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($subQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->in($leadsTableAlias.'.id', $subQueryBuilder->getSQL()),
+                    $filter->getGlue()
+                );
                 break;
             default:
                 $subQueryBuilder->select($tableAlias.'.lead_id')

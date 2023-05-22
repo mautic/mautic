@@ -14,7 +14,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class DynamicContentFilterEntryType extends AbstractType
 {
@@ -104,9 +103,6 @@ class DynamicContentFilterEntryType extends AbstractType
         $view->vars['fields'] = $this->fieldChoices;
     }
 
-    /**
-     * @param OptionsResolverInterface $resolver
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -115,14 +111,6 @@ class DynamicContentFilterEntryType extends AbstractType
                 'error_bubbling' => false,
             ]
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getBlockPrefix()
-    {
-        return 'dynamic_content_filter_entry';
     }
 
     private function filterFieldChoices()

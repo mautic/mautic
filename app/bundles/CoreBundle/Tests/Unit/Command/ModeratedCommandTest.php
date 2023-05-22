@@ -3,21 +3,19 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
 class ModeratedCommandTest extends TestCase
 {
-    /**
-     * @var MockObject|ContainerInterface
-     */
-    private $container;
+    private CoreParametersHelper|MockObject $coreParametersHelper;
 
     /**
      * @var MockObject|InputInterface
@@ -25,27 +23,36 @@ class ModeratedCommandTest extends TestCase
     private $input;
 
     /**
+     * @var MockObject|PathsHelper
+     */
+    private $pathsHelper;
+
+    /**
      * @var NullOutput
      */
     private $output;
 
+    /**
+     * @var FakeModeratedCommand
+     */
+    private $fakeModeratedCommand;
+
     protected function setUp(): void
     {
-        $this->container = $this->createMock(ContainerInterface::class);
-        $this->input     = $this->createMock(InputInterface::class);
-        $this->output    = new NullOutput();
+        $this->input                = $this->createMock(InputInterface::class);
+        $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->output               = new NullOutput();
+        $this->fakeModeratedCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
     }
 
-    public function testUnableToWriteLockFileThrowsAnException()
+    public function testUnableToWriteLockFileThrowsAnException(): void
     {
-        $command   = new FakeModeratedCommand();
-        $command->setContainer($this->container);
-
         $this->expectException(\RuntimeException::class);
 
-        $this->container->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.cache_dir')
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
             ->willReturn('/does/not/exist');
 
         $this->input->method('getOption')
@@ -60,16 +67,13 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $command->run($this->input, $this->output);
+        $this->fakeModeratedCommand->run($this->input, $this->output);
     }
 
-    public function testLockByPassDoesNotAttemptToCreateALock()
+    public function testLockByPassDoesNotAttemptToCreateALock(): void
     {
-        $command   = new FakeModeratedCommand();
-        $command->setContainer($this->container);
-
-        $this->container->expects($this->never())
-            ->method('getParameter');
+        $this->pathsHelper->expects($this->never())
+            ->method('getSystemPath');
 
         $this->input->method('getOption')
             ->willReturnCallback(
@@ -85,16 +89,13 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $command->run($this->input, $this->output);
+        $this->fakeModeratedCommand->run($this->input, $this->output);
     }
 
-    public function testDeprecatedForceOptionIsRecognized()
+    public function testDeprecatedForceOptionIsRecognized(): void
     {
-        $command   = new FakeModeratedCommand();
-        $command->setContainer($this->container);
-
-        $this->container->expects($this->never())
-            ->method('getParameter');
+        $this->pathsHelper->expects($this->never())
+            ->method('getSystemPath');
 
         $this->input->method('getOption')
             ->willReturnCallback(
@@ -112,20 +113,20 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $command->run($this->input, $this->output);
+        $this->fakeModeratedCommand->run($this->input, $this->output);
     }
 
     public function testPidLock(): void
     {
-        $command = new FakeModeratedCommand();
-        if (!$command->isPidSupported()) {
+        if (!$this->fakeModeratedCommand->isPidSupported()) {
             $this->markTestSkipped('getmypid and/or posix_getpgid are not available');
         }
 
         $cacheDir = __DIR__.'/resource/cache/tmp';
-        $this->container->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.cache_dir')
+
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
             ->willReturn($cacheDir);
 
         $this->input->method('getOption')
@@ -142,8 +143,7 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $command->setContainer($this->container);
-        $command->run($this->input, $this->output);
+        $this->fakeModeratedCommand->run($this->input, $this->output);
 
         // Assert that the file lock was created
         $runDir   = $cacheDir.'/../run';
@@ -157,7 +157,7 @@ class ModeratedCommandTest extends TestCase
         $this->assertEquals(1, $finder->count());
 
         // Complete the command
-        $command->forceCompleteRun();
+        $this->fakeModeratedCommand->forceCompleteRun();
 
         // Clean up the files
         $finder = new Finder();
@@ -171,15 +171,13 @@ class ModeratedCommandTest extends TestCase
         rmdir($runDir);
     }
 
-    public function testFileLock()
+    public function testFileLock(): void
     {
-        $command = new FakeModeratedCommand();
-        $command->setContainer($this->container);
-
         $cacheDir = __DIR__.'/resource/cache/tmp';
-        $this->container->expects($this->once())
-            ->method('getParameter')
-            ->with('kernel.cache_dir')
+
+        $this->pathsHelper->expects($this->once())
+            ->method('getSystemPath')
+            ->with('cache')
             ->willReturn($cacheDir);
 
         $this->input->method('getOption')
@@ -196,7 +194,7 @@ class ModeratedCommandTest extends TestCase
                 }
             );
 
-        $command->run($this->input, $this->output);
+        $this->fakeModeratedCommand->run($this->input, $this->output);
 
         $runDir = $cacheDir.'/../run';
         $this->assertFileExists($runDir);
@@ -217,7 +215,7 @@ class ModeratedCommandTest extends TestCase
         fclose($fileHandler);
 
         // Finish the command
-        $command->forceCompleteRun();
+        $this->fakeModeratedCommand->forceCompleteRun();
 
         // Check the file is unlocked
         $fileHandler = fopen($file->getPathname(), 'r');
@@ -230,6 +228,31 @@ class ModeratedCommandTest extends TestCase
         // Cleanup
         unlink($file->getPathname());
         rmdir($runDir);
+    }
+
+    public function testRedisLock(): void
+    {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->willReturn(['dsn' => '']);
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                function (string $name) {
+                    switch ($name) {
+                        case 'lock_mode':
+                            return ModeratedCommand::MODE_REDIS;
+                        case 'bypass-locking':
+                            return false;
+                        default:
+                            return null;
+                    }
+                }
+            );
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->fakeModeratedCommand->run($this->input, $this->output);
     }
 
     private function getFirstFile(Finder $finder): SplFileInfo

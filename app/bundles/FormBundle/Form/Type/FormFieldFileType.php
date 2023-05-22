@@ -11,17 +11,17 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class FormFieldFileType.
  */
 class FormFieldFileType extends AbstractType
 {
-    const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
-    const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
-    const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
+    public const PROPERTY_ALLOWED_FILE_EXTENSIONS = 'allowed_file_extensions';
+    public const PROPERTY_ALLOWED_FILE_SIZE       = 'allowed_file_size';
+    public const PROPERTY_PREFERED_PROFILE_IMAGE  = 'profile_image';
 
     /** @var CoreParametersHelper */
     private $coreParametersHelper;

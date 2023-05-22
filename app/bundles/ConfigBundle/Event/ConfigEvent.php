@@ -72,7 +72,7 @@ class ConfigEvent extends CommonEvent
     /**
      * Sets the config array.
      *
-     * @param null $key
+     * @param string $key
      */
     public function setConfig(array $config, $key = null)
     {

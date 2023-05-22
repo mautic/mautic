@@ -11,7 +11,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
 {
     /** @var string */
-    const DATE = '2019-07-07 15:00:00';
+    public const DATE = '2019-07-07 15:00:00';
 
     /** @var MessageQueueModel */
     protected $messageQueue;
@@ -63,6 +63,7 @@ class MessageQueueModelTest extends \PHPUnit\Framework\TestCase
         $oldScheduleDate = $this->message->getScheduledDate();
         $this->messageQueue->reschedule($this->message, $interval);
         $scheduleDate = $this->message->getScheduledDate();
+        /** @var \DateTime $oldScheduleDate */
         $oldScheduleDate->add($interval);
 
         $this->assertEquals($oldScheduleDate, $scheduleDate);

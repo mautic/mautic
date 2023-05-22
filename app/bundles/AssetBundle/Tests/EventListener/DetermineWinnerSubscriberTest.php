@@ -10,7 +10,7 @@ use Mautic\AssetBundle\EventListener\DetermineWinnerSubscriber;
 use Mautic\CoreBundle\Event\DetermineWinnerEvent;
 use Mautic\PageBundle\Entity\Page;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DetermineWinnerSubscriberTest extends \PHPUnit\Framework\TestCase
 {

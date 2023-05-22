@@ -63,7 +63,16 @@ Mautic.filterTableData = function (name, filterby, filterValue, tmpl, target, ba
         baseUrl = baseUrl + "?tmpl=" + tmpl
     }
 
-    var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + "&value=" + encodeURIComponent(filterValue)
+    var value = '';
+    if (mQuery.isArray(filterValue)) {
+        for (var i = 0; i < filterValue.length; i++) {
+            value += '&value[]=' + encodeURIComponent(filterValue[i]);
+        }
+    } else {
+        value = "&value=" + encodeURIComponent(filterValue)
+    }
+
+    var route = baseUrl + "&name=" + name + "&filterby=" + encodeURIComponent(filterby) + value
     Mautic.loadContent(route, '', 'POST', target);
 };
 

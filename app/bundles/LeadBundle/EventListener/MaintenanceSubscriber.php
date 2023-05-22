@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MaintenanceEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MaintenanceSubscriber implements EventSubscriberInterface
 {
@@ -50,13 +50,13 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
-                  $qb->expr()->andX(
+                  $qb->expr()->and(
                     $qb->expr()->lte('l.date_added', ':date2'),
                     $qb->expr()->isNull('l.last_active')
                   ));
                 $qb->setParameter('date2', $event->getDate()->format('Y-m-d H:i:s'));
             }
-            $rows = $qb->execute()->fetchColumn();
+            $rows = $qb->execute()->fetchOne();
         } else {
             $qb->select('l.id')->from(MAUTIC_TABLE_PREFIX.'leads', 'l')
               ->where($qb->expr()->lte('l.last_active', ':date'));
@@ -65,7 +65,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
                 $qb->andWhere($qb->expr()->isNull('l.date_identified'));
             } else {
                 $qb->orWhere(
-                  $qb->expr()->andX(
+                  $qb->expr()->and(
                     $qb->expr()->lte('l.date_added', ':date2'),
                     $qb->expr()->isNull('l.last_active')
                   ));
@@ -77,7 +77,7 @@ class MaintenanceSubscriber implements EventSubscriberInterface
 
             $qb2 = $this->db->createQueryBuilder();
             while (true) {
-                $leadsIds = array_column($qb->execute()->fetchAll(), 'id');
+                $leadsIds = array_column($qb->execute()->fetchAllAssociative(), 'id');
                 if (0 === sizeof($leadsIds)) {
                     break;
                 }

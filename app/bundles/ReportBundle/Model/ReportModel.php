@@ -2,14 +2,12 @@
 
 namespace Mautic\ReportBundle\Model;
 
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
-use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\LeadBundle\Model\FieldModel;
 use Mautic\ReportBundle\Builder\MauticReportBuilder;
@@ -24,19 +22,20 @@ use Mautic\ReportBundle\Generator\ReportGenerator;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Contracts\EventDispatcher\Event;
+use Twig\Environment;
 
 /**
- * Class ReportModel.
+ * @extends FormModel<Report>
  */
 class ReportModel extends FormModel
 {
-    const CHANNEL_FEATURE = 'reporting';
+    public const CHANNEL_FEATURE = 'reporting';
 
     /**
      * @var array
@@ -49,9 +48,9 @@ class ReportModel extends FormModel
     protected $defaultPageLimit;
 
     /**
-     * @var TemplatingHelper
+     * @var Environment
      */
-    protected $templatingHelper;
+    protected $twig;
 
     /**
      * @var ChannelListHelper
@@ -85,7 +84,7 @@ class ReportModel extends FormModel
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TemplatingHelper $templatingHelper,
+        Environment $twig,
         ChannelListHelper $channelListHelper,
         FieldModel $fieldModel,
         ReportHelper $reportHelper,
@@ -93,7 +92,7 @@ class ReportModel extends FormModel
         ExcelExporter $excelExporter
     ) {
         $this->defaultPageLimit  = $coreParametersHelper->get('default_pagelimit');
-        $this->templatingHelper  = $templatingHelper;
+        $this->twig              = $twig;
         $this->channelListHelper = $channelListHelper;
         $this->fieldModel        = $fieldModel;
         $this->reportHelper      = $reportHelper;
@@ -129,7 +128,7 @@ class ReportModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof Report) {
             throw new MethodNotAllowedHttpException(['Report']);
@@ -140,7 +139,7 @@ class ReportModel extends FormModel
         }
 
         $options = array_merge($options, [
-            'table_list' => $this->getTableData(),
+            'table_list' => $this->getTableData('all', $entity->getSource()),
             'attr'       => [
                 'readonly' => false,
             ],
@@ -201,7 +200,7 @@ class ReportModel extends FormModel
                 $event->setEntityManager($this->em);
             }
 
-            $this->dispatcher->dispatch($name, $event);
+            $this->dispatcher->dispatch($event, $name);
 
             return $event;
         } else {
@@ -216,7 +215,7 @@ class ReportModel extends FormModel
      *
      * @return mixed
      */
-    public function buildAvailableReports($context)
+    public function buildAvailableReports($context, ?string $reportSource = null)
     {
         if (empty($this->reportBuilderData[$context])) {
             // Check to see if all has been obtained
@@ -227,8 +226,8 @@ class ReportModel extends FormModel
                 //build them
                 $eventContext = ('all' == $context) ? '' : $context;
 
-                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper);
-                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_BUILD, $event);
+                $event = new ReportBuilderEvent($this->translator, $this->channelListHelper, $eventContext, $this->fieldModel->getPublishedFieldArrays(), $this->reportHelper, $reportSource);
+                $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_BUILD);
 
                 $tables = $event->getTables();
                 $graphs = $event->getGraphs();
@@ -262,9 +261,9 @@ class ReportModel extends FormModel
      *
      * @return array
      */
-    public function getTableData($context = 'all')
+    public function getTableData($context = 'all', ?string $reportSource = null)
     {
-        $data = $this->buildAvailableReports($context);
+        $data = $this->buildAvailableReports($context, $reportSource);
 
         $data = (!isset($data['tables'])) ? [] : $data['tables'];
 
@@ -448,19 +447,20 @@ class ReportModel extends FormModel
                 return $response;
 
             case 'html':
-                $content = $this->templatingHelper->getTemplating()->renderResponse(
-                    'MauticReportBundle:Report:export.html.php',
+                $content = $this->twig->render(
+                    '@MauticReport/Report/export.html.twig',
                     [
-                        'reportData' => $reportData,
-                        'data'       => $reportData['data'],
-                        'columns'    => $reportData['columns'],
-                        'pageTitle'  => $name,
-                        'graphs'     => $reportData['graphs'],
-                        'report'     => $report,
-                        'dateFrom'   => $reportData['dateFrom'],
-                        'dateTo'     => $reportData['dateTo'],
+                        'reportData'       => $reportData,
+                        'data'             => $reportData['data'],
+                        'columns'          => $reportData['columns'],
+                        'pageTitle'        => $name,
+                        'graphs'           => $reportData['graphs'],
+                        'report'           => $report,
+                        'dateFrom'         => $reportData['dateFrom'],
+                        'dateTo'           => $reportData['dateTo'],
+                        'reportDataResult' => new ReportDataResult($reportData),
                     ]
-                )->getContent();
+                );
 
                 return new Response($content);
 
@@ -598,7 +598,7 @@ class ReportModel extends FormModel
                 }
 
                 $event = new ReportGraphEvent($entity, $eventGraphs, $query);
-                $this->dispatcher->dispatch(ReportEvents::REPORT_ON_GRAPH_GENERATE, $event);
+                $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_GRAPH_GENERATE);
                 $graphs = $event->getGraphs();
 
                 unset($defaultGraphOptions);
@@ -609,7 +609,7 @@ class ReportModel extends FormModel
 
         // Allow plugin to manipulate the query
         $event = new ReportQueryEvent($entity, $query, $totalResults, $dataOptions);
-        $this->dispatcher->dispatch(ReportEvents::REPORT_QUERY_PRE_EXECUTE, $event);
+        $this->dispatcher->dispatch($event, ReportEvents::REPORT_QUERY_PRE_EXECUTE);
         $query = $event->getQuery();
 
         if (empty($options['ignoreTableData']) && !empty($selectedColumns)) {
@@ -638,7 +638,7 @@ class ReportModel extends FormModel
             }
 
             $queryTime = microtime(true);
-            $data      = $query->execute()->fetchAll();
+            $data      = $query->execute()->fetchAllAssociative();
             $queryTime = round((microtime(true) - $queryTime) * 1000);
 
             if ($queryTime >= 1000) {
@@ -655,7 +655,7 @@ class ReportModel extends FormModel
 
             // Allow plugin to manipulate the data
             $event = new ReportDataEvent($entity, $data, $totalResults, $dataOptions);
-            $this->dispatcher->dispatch(ReportEvents::REPORT_ON_DISPLAY, $event);
+            $this->dispatcher->dispatch($event, ReportEvents::REPORT_ON_DISPLAY);
             $data = $event->getData();
         }
 
@@ -747,7 +747,7 @@ class ReportModel extends FormModel
             $debugData['count_query'] = $countQb->getSQL();
         }
 
-        return (int) $countQb->execute()->fetchColumn();
+        return (int) $countQb->execute()->fetchOne();
     }
 
     /**
@@ -786,7 +786,7 @@ class ReportModel extends FormModel
      */
     private function getConnection()
     {
-        if ($this->em->getConnection() instanceof MasterSlaveConnection) {
+        if ($this->em->getConnection() instanceof \Doctrine\DBAL\Connections\PrimaryReadReplicaConnection) {
             $this->em->getConnection()->connect('slave');
         }
 

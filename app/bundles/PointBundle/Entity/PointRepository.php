@@ -4,6 +4,9 @@ namespace Mautic\PointBundle\Entity;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
 
+/**
+ * @extends CommonRepository<Point>
+ */
 class PointRepository extends CommonRepository
 {
     /**
@@ -67,14 +70,14 @@ class PointRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->eq('p.type', ':type'),
                 $q->expr()->eq('x.lead_id', (int) $leadId)
             )
         )
             ->setParameter('type', $type);
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 
@@ -99,12 +102,12 @@ class PointRepository extends CommonRepository
 
         //make sure the published up and down dates are good
         $q->where(
-            $q->expr()->andX(
+            $q->expr()->and(
                 $q->expr()->eq('x.lead_id', (int) $leadId)
             )
         );
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $return = [];
 

@@ -14,7 +14,7 @@ use Mautic\IntegrationsBundle\Sync\VariableExpresser\VariableExpresserHelperInte
 use Mautic\LeadBundle\Model\FieldModel;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldHelperTest extends TestCase
 {
@@ -29,7 +29,7 @@ class FieldHelperTest extends TestCase
     private $variableExpresserHelper;
 
     /**
-     * @var ChannelListHelper|\PHPUnit\Framework\MockObject\MockObject
+     * @var ChannelListHelper
      */
     private $channelListHelper;
 

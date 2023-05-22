@@ -14,12 +14,14 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigType extends AbstractType
 {
+    public const MINIFY_EMAIL_HTML = 'minify_email_html';
+
     /**
      * @var TranslatorInterface
      */
@@ -327,6 +329,21 @@ class ConfigType extends AbstractType
                     'tooltip' => 'mautic.email.config.mailer.disable.trackable.urls.tooltip',
                 ],
                 'data'       => empty($options['data']['disable_trackable_urls']) ? false : true,
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            self::MINIFY_EMAIL_HTML,
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'mautic.email.config.mailer.minify.html',
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'mautic.email.config.mailer.minify.html.tooltip',
+                ],
+                'data'       => $options['data'][self::MINIFY_EMAIL_HTML] ?? false,
                 'required'   => false,
             ]
         );

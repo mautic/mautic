@@ -6,6 +6,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\TimelineTrait;
 
+/**
+ * @extends CommonRepository<CitrixEvent>
+ */
 class CitrixEventRepository extends CommonRepository
 {
     use TimelineTrait;
@@ -78,7 +81,7 @@ class CitrixEventRepository extends CommonRepository
         }
 
         if (isset($options['search']) && $options['search']) {
-            $query->andWhere($query->expr()->orX(
+            $query->andWhere($query->expr()->or(
                 $query->expr()->like('c.event_name', $query->expr()->literal('%'.$options['search'].'%')),
                 $query->expr()->like('c.product', $query->expr()->literal('%'.$options['search'].'%'))
             ));
@@ -153,7 +156,7 @@ class CitrixEventRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * @return array<array<string>>
      */
     protected function getDefaultOrder()
     {

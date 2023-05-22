@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\ApiBundle\Tests\Functional;
 
+use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,10 +18,11 @@ use Symfony\Component\HttpFoundation\Request;
  */
 final class Oauth2Test extends MauticMysqlTestCase
 {
+    use IsolatedTestTrait;
+
     protected function setUp(): void
     {
         $this->useCleanupRollback = false;
-        $this->useMockServices    = false;
 
         parent::setUp();
     }
@@ -76,7 +78,7 @@ final class Oauth2Test extends MauticMysqlTestCase
 
     public function testAuthWorkflow(): void
     {
-        $this->client->enableReboot();
+        $this->client->disableReboot();
 
         // Create OAuth2 credentials.
         $crawler    = $this->client->request(Request::METHOD_GET, 's/credentials/new');

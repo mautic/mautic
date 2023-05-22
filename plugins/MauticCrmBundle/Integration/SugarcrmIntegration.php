@@ -9,7 +9,9 @@ use Mautic\CoreBundle\Helper\EncryptionHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Model\CompanyModel;
 use Mautic\LeadBundle\Model\DoNotContact;
 use Mautic\LeadBundle\Model\FieldModel;
@@ -27,8 +29,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SugarcrmIntegration extends CrmAbstractIntegration
 {
@@ -104,10 +106,6 @@ class SugarcrmIntegration extends CrmAbstractIntegration
      */
     public function getSupportedFeatures()
     {
-        //Version 6.x supports all features
-        if (isset($this->keys['version']) && '6' == $this->keys['version']) {
-            return ['push_lead', 'get_leads', 'push_leads'];
-        }
         //Only push_lead is currently supported for version 7
         return ['push_lead', 'get_leads', 'push_leads'];
     }
@@ -788,6 +786,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
         /** @var IntegrationEntityRepository $integrationEntityRepo */
         $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
         $companyRepo           = $this->em->getRepository('MauticLeadBundle:Company');
+        assert($companyRepo instanceof CompanyRepository);
 
         $sugarRejectedLeads = [];
         if (isset($data['entry_list'])) {
@@ -932,7 +931,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                                 $company   = $companyRepo->find($companyId);
 
                                 $this->companyModel->addLeadToCompany($company, $entity);
-                                $this->em->clear(Company::class);
+                                $companyRepo->detachEntity($company);
                                 $this->em->detach($entity);
                             }
                         }
@@ -974,7 +973,9 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                             $integrationEntities[] = $integrationEntity;
                         }
                         $this->em->detach($entity);
-                        $this->em->clear($detachClass);
+                        $entityRepository = $this->em->getRepository($detachClass);
+                        assert($entityRepository instanceof LeadRepository || $entityRepository instanceof CompanyRepository);
+                        $entityRepository->detachEntity($entity);
                         unset($entity);
                     } else {
                         continue;
@@ -983,7 +984,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                 }
 
                 $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($integrationEntities);
-                $this->em->clear('Mautic\PluginBundle\Entity\IntegrationEntity');
+                $this->integrationEntityModel->getRepository()->detachEntities($integrationEntities);
             }
             unset($data);
             unset($integrationEntities);
@@ -1722,8 +1723,8 @@ class SugarcrmIntegration extends CrmAbstractIntegration
 
             if ($persistEntities) {
                 $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+                $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 unset($persistEntities);
-                $this->em->clear(IntegrationEntity::class);
             }
         }
 
