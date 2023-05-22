@@ -4,49 +4,14 @@ namespace Mautic\ApiBundle\Entity\oAuth2;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\OAuthServerBundle\Model\AuthCode as BaseAuthCode;
-use FOS\OAuthServerBundle\Model\ClientInterface;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Security\Core\User\UserInterface;
+
 
 /**
  * Class AuthCode.
  */
 class AuthCode extends BaseAuthCode
 {
-    /**
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @var \Mautic\UserBundle\Entity\User|null
-     */
-    protected $user;
-
-    /**
-     * @var string
-     */
-    protected $token;
-
-    /**
-     * @var string|null
-     */
-    protected $expiresAt;
-
-    /**
-     * @var string|null
-     */
-    protected $scope;
-
-    /**
-     * @var string
-     */
-    protected $redirectUri;
 
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
@@ -85,59 +50,4 @@ class AuthCode extends BaseAuthCode
             ->build();
     }
 
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * Set client.
-     *
-     * @return RefreshToken
-     */
-    public function setClient(ClientInterface $client)
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    /**
-     * Get client.
-     *
-     * @return ClientInterface
-     */
-    public function getClient()
-    {
-        return $this->client;
-    }
-
-    /**
-     * Set user.
-     *
-     * @param \Mautic\UserBundle\Entity\User|null $user
-     *
-     * @return RefreshToken
-     */
-    public function setUser(UserInterface $user = null)
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
-    /**
-     * Get user.
-     *
-     * @return \Mautic\UserBundle\Entity\User|null
-     */
-    public function getUser()
-    {
-        return $this->user;
-    }
 }

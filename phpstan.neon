@@ -35,5 +35,4 @@ parameters:
 	doctrine:
 		objectManagerLoader: tests/object-manager.php
 		allowNullablePropertyForRequiredField: true
-	stubFiles:
-		- stubs/Token.stub
+		

@@ -73,7 +73,7 @@ class FrequencyRuleRepositoryTest extends MauticMysqlTestCase
         $violations         = $this->frequencyRuleRepository->getAppliedFrequencyRules('email', [$lead->getId()], 1, 'DAY');
         $expectedViolations = [
             [
-                'lead_id'          => $lead->getId(),
+                'lead_id'          => (string)$lead->getId(),
                 'frequency_number' => '1',
                 'frequency_time'   => 'DAY',
             ],

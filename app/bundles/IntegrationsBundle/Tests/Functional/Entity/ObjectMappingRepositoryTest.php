@@ -89,7 +89,7 @@ final class ObjectMappingRepositoryTest extends MauticMysqlTestCase
         Assert::assertSame(self::INTEGRATION_OBJECT_NAME, $objectMapping->getIntegrationObjectName());
         Assert::assertSame(self::INTEGRATION_OBJECT_ID, $objectMapping->getIntegrationObjectId());
         Assert::assertSame(self::INTERNAL_OBJECT_NAME, $objectMapping->getInternalObjectName());
-        Assert::assertSame((string) self::INTERNAL_OBJECT_ID, $objectMapping->getInternalObjectId());
+        Assert::assertSame(self::INTERNAL_OBJECT_ID, $objectMapping->getInternalObjectId());
         Assert::assertSame($now->getTimestamp(), $objectMapping->getDateCreated()->getTimestamp());
         Assert::assertSame($now->getTimestamp(), $objectMapping->getLastSyncDate()->getTimestamp());
         Assert::assertNull($objectMapping->getIntegrationReferenceId());
