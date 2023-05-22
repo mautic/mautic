@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 
 class PublicControllerFunctionalTest extends MauticMysqlTestCase
 {
@@ -90,10 +91,38 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertTrue($this->client->getResponse()->isOk());
     }
 
+    public function testUnsubscribeFormActionWithUsingLandingPageWithoutContactLocal()
+    {
+        $form = $this->getForm('blank');
+        $lead = $this->getLead();
+        $page = $this->getPage();
+
+        $stat = $this->getStat($form, $lead, $page);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('Save preferences', $crawler->html());
+    }
+
+    public function testUnsubscribeFormActionWithUsingLandingPageWithContactLocal()
+    {
+        $form = $this->getForm('blank');
+        $lead = $this->getLead('de');
+        $page = $this->getPage();
+
+        $stat = $this->getStat($form, $lead, $page);
+        $this->em->flush();
+
+        $crawler = $this->client->request('GET', '/email/unsubscribe/'.$stat->getTrackingHash());
+        $this->assertTrue($this->client->getResponse()->isOk());
+        $this->assertStringContainsString('Präferenzen speichern', $crawler->html());
+    }
+
     /**
      * @throws \Doctrine\ORM\ORMException
      */
-    protected function getStat(Form $form = null, Lead $lead = null): Stat
+    protected function getStat(Form $form = null, Lead $lead = null, Page $prefCenterPage = null): Stat
     {
         $trackingHash = 'tracking_hash_unsubscribe_form_email';
         $emailName    = 'Test unsubscribe form email';
@@ -103,6 +132,7 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         $email->setSubject($emailName);
         $email->setEmailType('template');
         $email->setUnsubscribeForm($form);
+        $email->setPreferenceCenter($prefCenterPage);
         $this->em->persist($email);
 
         // Create a test email stat.
@@ -133,13 +163,28 @@ class PublicControllerFunctionalTest extends MauticMysqlTestCase
         return $form;
     }
 
-    protected function createLead(): Lead
+    protected function createLead(?string $local = null): Lead
     {
         $lead = new Lead();
         $lead->setEmail('john@doe.email');
+        $lead->addUpdatedField('preferred_locale', $local);
         $this->em->persist($lead);
 
         return $lead;
+    }
+
+    protected function getPage(): Page
+    {
+        $page = new Page();
+        $page->setTitle('Page:Page:LandingPagePrefCenter');
+        $page->setAlias('page-page-landingPagePrefCenter');
+        $page->setIsPublished(true);
+        $page->setTemplate('blank');
+        $page->setCustomHtml('<h1>Preference center page</h1><br>{saveprefsbutton}');
+        $page->setIsPreferenceCenter(true);
+        $this->em->persist($page);
+
+        return $page;
     }
 
     public function testPreviewDisabledByDefault(): void
