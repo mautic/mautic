@@ -22,7 +22,7 @@ class CampaignRepository extends CommonRepository
         $q = $this->getEntityManager()
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
-            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         if (!empty($args['joinLists'])) {
@@ -74,7 +74,7 @@ class CampaignRepository extends CommonRepository
     public function getPublishedCampaigns($specificId = null, $leadId = null, $forList = false, $viewOther = false)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:Campaign', 'c', 'c.id');
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Campaign', 'c', 'c.id');
 
         if ($forList && $leadId) {
             $q->select('partial c.{id, name}, partial l.{campaign, lead, dateAdded, manuallyAdded, manuallyRemoved}, partial ll.{id}');
@@ -610,7 +610,7 @@ class CampaignRepository extends CommonRepository
         $emails = $this->getEntityManager()
             ->createQueryBuilder()
             ->select('e.channelId')
-            ->from('MauticCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Campaign', $this->getTableAlias(), $this->getTableAlias().'.id')
             ->leftJoin(
                 $this->getTableAlias().'.events',
                 'e',

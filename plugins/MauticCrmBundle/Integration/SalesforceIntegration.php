@@ -789,7 +789,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                         $integrationEntity = (empty($integrationId))
                             ? $this->createIntegrationEntity($object, $personData['Id'], 'lead', $lead->getId(), [], false)
                             :
-                            $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                            $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
 
                         $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                         $integrationEntityRepo->saveEntity($integrationEntity);
@@ -868,8 +868,8 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     $integrationEntity = (empty($integrationId))
                         ? $this->createIntegrationEntity($object, $companyData['Id'], 'lead', $company->getId(), [], false)
-                        :
-                        $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationId[0]['id']);
+                        
+                        $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
 
                     $integrationEntity->setLastSyncDate($this->getLastSyncDate());
                     $integrationEntityRepo->saveEntity($integrationEntity);
@@ -1672,7 +1672,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 } elseif (isset($trackedContacts['Contact'][$key])) {
                     // We already know this is a converted contact so just ignore it
                     $integrationEntity = $this->em->getReference(
-                        'MauticPluginBundle:IntegrationEntity',
+                        \Mautic\PluginBundle\Entity\IntegrationEntity::class,
                         $lead['id']
                     );
                     $this->deleteIntegrationEntities[] = $integrationEntity;
@@ -2218,7 +2218,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 // This is a converted lead so remove the Lead entity leaving the Contact entity
                 if (!empty($trackedContacts['Lead'][$key])) {
                     $this->deleteIntegrationEntities[] = $this->em->getReference(
-                        'MauticPluginBundle:IntegrationEntity',
+                        \Mautic\PluginBundle\Entity\IntegrationEntity::class,
                         $trackedContacts['Lead'][$key]
                     );
                     $deleted = true;
@@ -2229,7 +2229,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                     // This Lead is already a Contact but was not updated for whatever reason
                     if (!$deleted) {
                         $this->deleteIntegrationEntities[] = $this->em->getReference(
-                            'MauticPluginBundle:IntegrationEntity',
+                            \Mautic\PluginBundle\Entity\IntegrationEntity::class,
                             $checkEmailsInSF[$key]['id']
                         );
                     }
@@ -2277,7 +2277,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $this->salesforceIdMapping[$contactId] = (!empty($sfEntityRecord['ConvertedContactId'])) ? $sfEntityRecord['ConvertedContactId']
                     : $sfEntityRecord['Id'];
 
-                $leadEntity = $this->em->getReference('MauticLeadBundle:Lead', $leadData['internal_entity_id']);
+                $leadEntity = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadData['internal_entity_id']);
                 if ($updateLead = $this->buildCompositeBody(
                     $mauticData,
                     $objectFields[$sfObject],
@@ -2984,7 +2984,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
                 $companyData = $processedCompanies[$key] = $checkCompaniesInSF[$key];
             }
 
-            $companyEntity = $this->em->getReference('MauticLeadBundle:Company', $companyData['internal_entity_id']);
+            $companyEntity = $this->em->getReference(\Mautic\LeadBundle\Entity\Company::class, $companyData['internal_entity_id']);
 
             if ($updateCompany = $this->buildCompositeBody(
                 $mauticData,
@@ -3164,7 +3164,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
             foreach ($resultsById['records'] as $sfId => $record) {
                 if (isset($record['IsDeleted']) && 1 == $record['IsDeleted']) {
                     if ($foundKey = array_search($record['Id'], $searchForIds)) {
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $checkIdsInSF[$foundKey]['id']);
+                        $integrationEntity = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $checkIdsInSF[$foundKey]['id']);
                         $integrationEntity->setInternalEntity('company-deleted');
                         $this->persistIntegrationEntities[] = $integrationEntity;
                         unset($checkIdsInSF[$foundKey]);

@@ -468,10 +468,10 @@ class CampaignModel extends CommonFormModel
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->addList($this->em->getReference('MauticLeadBundle:LeadList', $id));
+                        $entity->addList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList:class, $id));
                         break;
                     case 'forms':
-                        $entity->addForm($this->em->getReference('MauticFormBundle:Form', $id));
+                        $entity->addForm($this->em->getReference(\Mautic\FormBundle\Entity\Form:class, $id));
                         break;
                     default:
                         break;
@@ -483,10 +483,10 @@ class CampaignModel extends CommonFormModel
             foreach ($sources as $id => $label) {
                 switch ($type) {
                     case 'lists':
-                        $entity->removeList($this->em->getReference('MauticLeadBundle:LeadList', $id));
+                        $entity->removeList($this->em->getReference(\Mautic\LeadBundle\Entity\LeadList:class, $id));
                         break;
                     case 'forms':
-                        $entity->removeForm($this->em->getReference('MauticFormBundle:Form', $id));
+                        $entity->removeForm($this->em->getReference(\Mautic\FormBundle\Entity\Form:class, $id));
                         break;
                     default:
                         break;

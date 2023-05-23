@@ -1875,7 +1875,7 @@ class MailHelper
         // Note if a lead
         if (null !== $this->lead) {
             try {
-                $stat->setLead($this->factory->getEntityManager()->getReference('MauticLeadBundle:Lead', $this->lead['id']));
+                $stat->setLead($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\Lead::class, $this->lead['id']));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1897,7 +1897,7 @@ class MailHelper
         // Note if sent from a lead list
         if (null !== $listId) {
             try {
-                $stat->setList($this->factory->getEntityManager()->getReference('MauticLeadBundle:LeadList', $listId));
+                $stat->setList($this->factory->getEntityManager()->getReference(\Mautic\LeadBundle\Entity\LeadList:class, $listId));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }
@@ -1938,7 +1938,7 @@ class MailHelper
 
         if (isset($this->copies[$id])) {
             try {
-                $stat->setStoredCopy($this->factory->getEntityManager()->getReference('MauticEmailBundle:Copy', $this->copies[$id]));
+                $stat->setStoredCopy($this->factory->getEntityManager()->getReference(\Mautic\EmailBundle\Entity\Copy::class, $this->copies[$id]));
             } catch (ORMException $exception) {
                 // keep IDE happy
             }

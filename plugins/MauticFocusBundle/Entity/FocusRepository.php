@@ -30,7 +30,7 @@ class FocusRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($alias)
-            ->from('MauticFocusBundle:Focus', $alias, $alias.'.id');
+            ->from(\Mautic\CampaignBundle\Entity\Campaign::classFocusBundle:Focus', $alias, $alias.'.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin($alias.'.category', 'c');

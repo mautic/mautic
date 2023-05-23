@@ -71,8 +71,10 @@ class ChannelEvent extends CommonEvent
 
         // if not defined, try the classic naming convention
         $channel = ucfirst($channel);
+        $class   = "\Mautic\\{$channel}Bundle\Entity\\{$channel}";
+        $repo    = new $class();
 
-        return "Mautic{$channel}Bundle:{$channel}";
+        return get_class($repo);
     }
 
     /**
