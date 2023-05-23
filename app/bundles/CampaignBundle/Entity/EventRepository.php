@@ -109,7 +109,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Event', 'e', 'e.id')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.parent)', (int) $parentId)
             );
@@ -140,7 +140,7 @@ class EventRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->createQueryBuilder();
         $q->select('e, IDENTITY(e.parent)')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Event', 'e', 'e.id')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
             ->where(
                 $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
             )
@@ -254,7 +254,7 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Event', 'e', 'e.id')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e', 'e.id')
             ->where('e.channel = :channel')
             ->setParameter('channel', $channel);
 
@@ -283,7 +283,7 @@ class EventRepository extends CommonRepository
     {
         $q = $this->getEntityManager()->createQueryBuilder()
             ->select('e, c, l')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classCampaignBundle:Event', 'e')
+            ->from(\Mautic\CampaignBundle\Entity\Event::class, 'e')
             ->join('e.campaign', 'c')
             ->join('e.log', 'l');
 

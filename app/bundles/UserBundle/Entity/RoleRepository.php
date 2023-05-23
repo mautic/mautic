@@ -38,7 +38,7 @@ class RoleRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
 
         $q->select('partial r.{id, name}')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classUserBundle:Role', 'r');
+            ->from(\Mautic\UserBundle\Entity\Role::class, 'r');
 
         if (!empty($search)) {
             $q->where('r.name LIKE :search')

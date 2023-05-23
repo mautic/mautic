@@ -20,7 +20,7 @@ class PageRepository extends CommonRepository
             //use a subquery to get a count of submissions otherwise doctrine will not pull all of the results
             $sq = $this->_em->createQueryBuilder()
                 ->select('count(fs.id)')
-                ->from(\Mautic\CampaignBundle\Entity\Campaign::classFormBundle:Submission', 'fs')
+                ->from(\Mautic\FormBundle\Entity\Submission::class, 'fs')
                 ->where('fs.page = p');
 
             $select[] = '('.$sq->getDql().') as submission_count';

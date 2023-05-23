@@ -17,7 +17,7 @@ class TriggerRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias().', cat')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classPointBundle:Trigger', $this->getTableAlias())
+            ->from(\Mautic\PointBundle\Entity\Trigger::class, $this->getTableAlias())
             ->leftJoin($this->getTableAlias().'.category', 'cat');
 
         $args['qb'] = $q;
@@ -34,7 +34,7 @@ class TriggerRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder()
             ->select('partial t.{id, color, points}')
-            ->from(\Mautic\CampaignBundle\Entity\Campaign::classPointBundle:Trigger', 't', 't.id');
+            ->from(\Mautic\PointBundle\Entity\Trigger::class, 't', 't.id');
 
         $q->where($this->getPublishedByDateExpression($q));
 
