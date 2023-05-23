@@ -42,11 +42,19 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     // Define what rule sets will be applied
     $rectorConfig->sets([
         \Rector\Symfony\Set\SymfonyLevelSetList::UP_TO_SYMFONY_44,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
-        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
         \Rector\Doctrine\Set\DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_BEHAVIORS_20,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_CODE_QUALITY,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_COMMON_20,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_210,
         \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_211,
+        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_30, this rule should run after the upgrade to doctrine 3.0
+        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_DBAL_40, this rule should run after the upgrade to doctrine 4.0
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_213,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_214,
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_ORM_29,
+        //\Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_REPOSITORY_AS_SERVICE, will break code in Mautic, needs to be fixed first
+        \Rector\Doctrine\Set\DoctrineSetList::DOCTRINE_25,
 
         // @todo implement the whole set. Start rule by rule below.
         // \Rector\Set\ValueObject\SetList::DEAD_CODE
@@ -63,23 +71,6 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
     $rectorConfig->rule(\Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
-
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\ChangeBigIntEntityPropertyToIntTypeRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromColumnTypeRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\MakeEntityDateTimePropertyDateTimeInterfaceRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\CorrectDefaultTypesOnEntityPropertyRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\ImproveDoctrineCollectionDocTypeInEntityRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromToOneRelationTypeRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromToManyRelationTypeRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromDoctrineCollectionRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\DoctrineTargetEntityStringToClassConstantRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\RemoveRedundantDefaultPropertyAnnotationValuesRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\MethodCall\ChangeSetParametersArrayToArrayCollectionRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\InitializeDefaultEntityCollectionRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\MoveCurrentDateTimeDefaultInEntityToConstructorRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRedundantDefaultClassAnnotationValuesRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRepositoryFromEntityAnnotationRector::class);
-    $rectorConfig->rule(\Rector\Doctrine\Rector\ClassMethod\MakeEntitySetterNullabilityInSyncWithPropertyRector::class);
 
     $rectorConfig->ruleWithConfiguration(\Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::class, [
         \Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
