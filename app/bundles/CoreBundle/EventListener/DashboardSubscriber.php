@@ -97,8 +97,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     if (!empty($log['bundle']) && !empty($log['object']) && !empty($log['objectId'])) {
                         try {
                             $model = $this->modelFactory->getModel($log['bundle'].'.'.$log['object']);
-                            $item  = $model->getEntity($log['objectId']) ?: '';
-                            if (method_exists($item, $model->getNameGetter())) {
+                            $item  = $model->getEntity($log['objectId']);
+                            if ($item && method_exists($item, $model->getNameGetter())) {
                                 $log['objectName'] = $item->{$model->getNameGetter()}();
 
                                 if ('lead' == $log['bundle'] && 'mautic.lead.lead.anonymous' == $log['objectName']) {
