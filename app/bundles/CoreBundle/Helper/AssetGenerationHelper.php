@@ -39,6 +39,7 @@ class AssetGenerationHelper
         'chosen-js/chosen.jquery.js',
         'at.js/dist/js/jquery.atwho.js',
         'jvectormap-next/jquery-jvectormap.js',
+        'jquery.quicksearch/src/jquery.quicksearch.js',
         // TODO: Add the rest of the libraries here.
     ];
 

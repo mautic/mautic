@@ -29,6 +29,7 @@
     "jquery-ui-touch-punch": "^0.2.3",
     "jquery.caret": "^0.3.1",
     "jquery.cookie": "^1.4.1",
+    "jquery.quicksearch": "^2.4.0",
     "js-cookie": "^2.0.2",
     "jsplumb": "^2.12.8",
     "jvectormap-next": "^3.1.1",
