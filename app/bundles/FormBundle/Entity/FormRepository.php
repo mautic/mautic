@@ -122,7 +122,7 @@ class FormRepository extends CommonRepository
                 $sq       = $this->getEntityManager()->createQueryBuilder();
                 $subquery = $sq->select('count(s.id)')
                     ->from(\Mautic\FormBundle\Entity\Submission::class, 's')
-                    ->leftJoin(\Mautic\FormBundle\Entity\Form:class, 'f2',
+                    ->leftJoin(\Mautic\FormBundle\Entity\Form::class, 'f2',
                         Join::WITH,
                         $sq->expr()->eq('s.form', 'f2')
                     )

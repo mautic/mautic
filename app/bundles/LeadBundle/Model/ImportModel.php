@@ -161,7 +161,7 @@ class ImportModel extends FormModel
                     $this->translator->trans('mautic.lead.import.failed'),
                     'fa-download',
                     null,
-                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class $import->getCreatedBy())
+                    $this->em->getReference(\Mautic\UserBundle\Entity\User::class, $import->getCreatedBy())
                 );
             }
         }

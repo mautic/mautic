@@ -868,7 +868,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     $integrationEntity = (empty($integrationId))
                         ? $this->createIntegrationEntity($object, $companyData['Id'], 'lead', $company->getId(), [], false)
-                        
+                        :
                         $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationId[0]['id']);
 
                     $integrationEntity->setLastSyncDate($this->getLastSyncDate());
