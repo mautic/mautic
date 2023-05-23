@@ -81,8 +81,8 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRepositoryFromEntityAnnotationRector::class);
     $rectorConfig->rule(\Rector\Doctrine\Rector\ClassMethod\MakeEntitySetterNullabilityInSyncWithPropertyRector::class);
 
-    $rectorConfig->ruleWithConfiguration(EntityAliasToClassConstantReferenceRector::class, [
-        EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
+    $rectorConfig->ruleWithConfiguration(\Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::class, [
+        \Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
             'MauticApiBundle'                         => 'Mautic\ApiBundle\Entity',
             'MauticAssetBundle'                       => 'Mautic\AssetBundle\Entity',
             'MauticCampaignBundle'                    => 'Mautic\CampaignBundle\Entity',

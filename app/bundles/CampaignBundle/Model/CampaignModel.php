@@ -76,7 +76,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getRepository()
     {
-        $repo = $this->em->getRepository('MauticCampaignBundle:Campaign');
+        $repo = $this->em->getRepository(\Mautic\CampaignBundle\Entity\Campaign::class);
         $repo->setCurrentUser($this->userHelper->getUser());
 
         return $repo;
@@ -87,7 +87,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getEventRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Event');
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Event::class);
     }
 
     /**
@@ -95,7 +95,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:Lead');
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class);
     }
 
     /**
@@ -103,7 +103,7 @@ class CampaignModel extends CommonFormModel
      */
     public function getCampaignLeadEventLogRepository()
     {
-        return $this->em->getRepository('MauticCampaignBundle:LeadEventLog');
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
     }
 
     /**
@@ -642,7 +642,7 @@ class CampaignModel extends CommonFormModel
             $leads = array_keys($leads->toArray());
         }
 
-        return $this->em->getRepository('MauticCampaignBundle:Lead')->getLeadDetails($campaignId, $leads);
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeadDetails($campaignId, $leads);
     }
 
     /**
@@ -658,7 +658,7 @@ class CampaignModel extends CommonFormModel
         $campaignId = ($campaign instanceof Campaign) ? $campaign->getId() : $campaign;
         $eventId    = (is_array($event) && isset($event['id'])) ? $event['id'] : $event;
 
-        return $this->em->getRepository('MauticCampaignBundle:Lead')->getLeads($campaignId, $eventId);
+        return $this->em->getRepository(\Mautic\CampaignBundle\Entity\Lead::class)->getLeads($campaignId, $eventId);
     }
 
     /**

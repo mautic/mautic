@@ -783,7 +783,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (isset($personData['Id'])) {
                         /** @var IntegrationEntityRepository $integrationEntityRepo */
-                        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
                         $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'lead', $lead->getId());
 
                         $integrationEntity = (empty($integrationId))
@@ -863,7 +863,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 if (isset($companyData['Id'])) {
                     /** @var IntegrationEntityRepository $integrationEntityRepo */
-                    $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+                    $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
                     $integrationId         = $integrationEntityRepo->getIntegrationsEntityId('Salesforce', $object, 'company', $company->getId());
 
                     $integrationEntity = (empty($integrationId))
@@ -989,7 +989,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         sort($salesForceObjects);
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $startDate             = new \DateTime($query['start']);
         $endDate               = new \DateTime($query['end']);
         $limit                 = 100;
@@ -1366,7 +1366,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $this->failureFetchingLeads = false;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
         $mixedFields           = $this->getIntegrationSettings()->getFeatureSettings();
 
         // Get the last time the campaign was synced to prevent resyncing the entire SF campaign
@@ -1429,7 +1429,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                     if (20 === $counter) {
                         // Batch to control RAM use
-                        $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+                        $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
                         $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                         $persistEntities = [];
                         $counter         = 0;
@@ -1438,7 +1438,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
 
                 // Catch left overs
                 if ($persistEntities) {
-                    $this->em->getRepository('MauticPluginBundle:IntegrationEntity')->saveEntities($persistEntities);
+                    $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class)->saveEntities($persistEntities);
                     $this->integrationEntityModel->getRepository()->detachEntities($persistEntities);
                 }
 
@@ -1520,7 +1520,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         $objectId   = null;
 
         /** @var IntegrationEntityRepository $integrationEntityRepo */
-        $integrationEntityRepo = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $integrationEntityRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
 
         $body = [
             'Status' => $status,
@@ -2671,7 +2671,7 @@ class SalesforceIntegration extends CrmAbstractIntegration
         }
 
         //get last modified date for donot contact in Mautic
-        $auditLogRepo        = $this->em->getRepository('MauticCoreBundle:AuditLog');
+        $auditLogRepo        = $this->em->getRepository(\Mautic\CoreBundle\Entity\AuditLog::class);
         $filters['search']   = 'dnc_channel_status%'.$channel;
         $lastModifiedDNCDate = $auditLogRepo->getAuditLogsForLeads(array_flip($leadIds), $filters, ['dateAdded', 'DESC'], $params['start']);
         $trackedIds          = [];

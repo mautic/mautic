@@ -73,7 +73,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getRepository()
     {
-        return $this->em->getRepository('MauticSmsBundle:Sms');
+        return $this->em->getRepository(\Mautic\SmsBundle\Entity\Sms::class);
     }
 
     /**
@@ -81,7 +81,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticSmsBundle:Stat');
+        return $this->em->getRepository(\Mautic\SmsBundle\Entity\Stat::class);
     }
 
     /**
@@ -251,7 +251,7 @@ class SmsModel extends FormModel implements AjaxLookupModelInterface
         $contactIds = array_keys($contacts);
 
         /** @var DoNotContactRepository $dncRepo */
-        $dncRepo = $this->em->getRepository('MauticLeadBundle:DoNotContact');
+        $dncRepo = $this->em->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class);
         $dnc     = $dncRepo->getChannelList('sms', $contactIds);
 
         if (!empty($dnc)) {
