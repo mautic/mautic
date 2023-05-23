@@ -2,7 +2,7 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Exception\Exception as DriverException;
 use Mautic\CoreBundle\Doctrine\Helper\ColumnSchemaHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Model\FormModel;

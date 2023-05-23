@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\LeadBundle\Field\Command;
 
-use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Exception\Exception as DriverException;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
