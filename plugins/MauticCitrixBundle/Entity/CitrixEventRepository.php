@@ -111,7 +111,7 @@ class CitrixEventRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($alias)
-            ->from(\Mautic\CitrixBundle\Entity\CitrixEvent::class, $alias, $alias.'.id');
+            ->from(\MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent::class, $alias, $alias.'.id');
 
         $args['qb'] = $q;
 
