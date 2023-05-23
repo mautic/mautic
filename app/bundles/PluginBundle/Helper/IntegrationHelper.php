@@ -105,7 +105,7 @@ class IntegrationHelper
             $plugins = $this->bundleHelper->getPluginBundles();
 
             // Get a list of already installed integrations
-            $integrationRepo = $this->em->getRepository('MauticPluginBundle:Integration');
+            $integrationRepo = $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class);
             //get a list of plugins for filter
             $installedPlugins = $this->pluginModel->getEntities(
                 [
@@ -424,12 +424,12 @@ class IntegrationHelper
      */
     public function getIntegrationSettings()
     {
-        return $this->em->getRepository('MauticPluginBundle:Integration')->getIntegrations();
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getIntegrations();
     }
 
     public function getCoreIntegrationSettings()
     {
-        return $this->em->getRepository('MauticPluginBundle:Integration')->getCoreIntegrations();
+        return $this->em->getRepository(\Mautic\PluginBundle\Entity\Integration::class)->getCoreIntegrations();
     }
 
     /**
@@ -496,7 +496,7 @@ class IntegrationHelper
 
             if ($persistLead && !empty($socialCache)) {
                 $lead->setSocialCache($socialCache);
-                $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+                $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
             }
         } elseif ($returnSettings) {
             $socialIntegrations = $this->getIntegrationObjects($specificIntegration, ['public_profile', 'public_activity']);
@@ -529,7 +529,7 @@ class IntegrationHelper
             $socialCache = [];
         }
         $lead->setSocialCache($socialCache);
-        $this->em->getRepository('MauticLeadBundle:Lead')->saveEntity($lead);
+        $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)->saveEntity($lead);
 
         return $socialCache;
     }

@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\CompanyLeadRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use Mautic\LeadBundle\Entity\StagesChangeLog;
 use Mautic\LeadBundle\Entity\StagesChangeLogRepository;
 use Mautic\LeadBundle\Exception\ImportFailedException;
 use Mautic\LeadBundle\Model\CompanyModel;
@@ -522,7 +523,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerMock->expects($this->exactly(2))
             ->method('getRepository')
             ->withConsecutive(
-                ['MauticLeadBundle:StagesChangeLog'],
+                [StagesChangeLog::class],
                 [Stage::class]
             )
             ->willReturnOnConsecutiveCalls(
@@ -560,7 +561,7 @@ class LeadModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManagerMock->expects($this->exactly(2))
             ->method('getRepository')
             ->withConsecutive(
-                ['MauticLeadBundle:StagesChangeLog'],
+                [StagesChangeLog::class],
                 [Stage::class]
             )
             ->willReturnOnConsecutiveCalls(
