@@ -44,7 +44,6 @@ class CitrixModel extends FormModel
     public function getRepository()
     {
         $result = $this->em->getRepository(CitrixEvent::class);
-        \assert($result instanceof CitrixEventRepository);
 
         return $result;
     }

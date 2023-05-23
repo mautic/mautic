@@ -21,19 +21,19 @@ class CitrixEvent
     protected $lead;
 
     #[ORM\Column(name: 'product', type: \Doctrine\DBAL\Types\Types::STRING, length: 20)]
-    protected ?string $product = null;
+    protected string $product;
 
     #[ORM\Column(name: 'email', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
-    protected ?string $email = null;
+    protected string $email;
 
     #[ORM\Column(name: 'event_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
-    protected ?string $eventName = null;
+    protected string $eventName;
 
     #[ORM\Column(name: 'event_desc', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $eventDesc = null;
 
     #[ORM\Column(name: 'event_type', type: \Doctrine\DBAL\Types\Types::STRING, length: 50)]
-    protected ?string $eventType = null;
+    protected string $eventType;
 
     #[ORM\Column(name: 'event_date', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     protected ?\DateTimeInterface $eventDate = null;

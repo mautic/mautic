@@ -21,7 +21,6 @@ class RoleModel extends FormModel
     public function getRepository(): RoleRepository
     {
         $result = $this->em->getRepository(Role::class);
-        \assert($result instanceof RoleRepository);
 
         return $result;
     }

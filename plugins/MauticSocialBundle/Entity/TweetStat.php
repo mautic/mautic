@@ -20,17 +20,17 @@ class TweetStat
     /**
      * ID of the tweet from Twitter.
      *
-     * @var string
+     * @var string|null
      */
     private $twitterTweetId;
 
     /**
-     * @var Tweet
+     * @var Tweet|null
      */
     private $tweet;
 
     /**
-     * @var TheLead
+     * @var TheLead|null
      */
     private $lead;
 
@@ -45,37 +45,37 @@ class TweetStat
     private $dateSent;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $isFailed = false;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $favoriteCount = 0;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retweetCount = 0;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $responseDetails = [];
 

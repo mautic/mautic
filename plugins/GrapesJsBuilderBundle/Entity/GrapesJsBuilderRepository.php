@@ -12,7 +12,7 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 class GrapesJsBuilderRepository extends CommonRepository
 {
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

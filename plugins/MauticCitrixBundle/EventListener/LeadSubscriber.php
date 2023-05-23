@@ -228,7 +228,7 @@ class LeadSubscriber implements EventSubscriberInterface
         $alias             = $event->getAlias();
         $func              = $event->getFunc();
         $currentFilter     = $details['field'];
-        $citrixEventsTable = $em->getClassMetadata('MauticCitrixBundle:CitrixEvent')->getTableName();
+        $citrixEventsTable = $em->getClassMetadata(\MauticPlugin\MauticCitrixBundle\Entity\CitrixEvent::class)->getTableName();
 
         foreach ($activeProducts as $product) {
             $eventFilters = [$product.'-registration', $product.'-attendance', $product.'-no-attendance'];

@@ -37,12 +37,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
@@ -57,12 +57,12 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $publishDown;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $content;
 
     /**
-     * @var array
+     * @var array|null
      */
     private $utmTags = [];
 
@@ -72,7 +72,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $sentCount = 0;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\DynamicContentBundle\Entity\Stat>
      */
     private $stats;
 
@@ -82,7 +82,7 @@ class DynamicContent extends FormEntity implements VariantEntityInterface, Trans
     private $isCampaignBased = true;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $slotName;
 

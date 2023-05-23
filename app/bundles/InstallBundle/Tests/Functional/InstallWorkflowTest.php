@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Test\IsolatedTestTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\InstallBundle\Configurator\Step\CheckStep;
 use Mautic\LeadBundle\Entity\LeadField;
-use Mautic\LeadBundle\Entity\LeadFieldRepository;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -100,7 +99,6 @@ class InstallWorkflowTest extends MauticMysqlTestCase
 
         // Assert that the fixtures were loaded
         $fieldRepository = $this->em->getRepository(LeadField::class);
-        \assert($fieldRepository instanceof LeadFieldRepository);
 
         $emailField = $fieldRepository->findOneBy(['alias' => 'email']);
         \assert($emailField instanceof LeadField);

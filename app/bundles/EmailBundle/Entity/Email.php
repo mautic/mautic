@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -47,42 +46,42 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $subject;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $useOwnerAsMailer;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $fromName;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $replyToAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $bccAddress;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
@@ -97,17 +96,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $utmTags = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $plainText;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $customHtml;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $emailType = 'template';
 
@@ -122,9 +121,9 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $publishDown;
 
     /**
-     * @var bool
+     * @var bool|null
      */
-    private $publicPreview = 0;
+    private $publicPreview = false;
 
     /**
      * @var int
@@ -142,17 +141,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $revision = 1;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\EmailBundle\Entity\Stat>
      */
     private $stats;
 
@@ -167,17 +166,17 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     private $variantReadCount = 0;
 
     /**
-     * @var \Mautic\FormBundle\Entity\Form
+     * @var \Mautic\FormBundle\Entity\Form|null
      */
     private $unsubscribeForm;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $preferenceCenter;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\AssetBundle\Entity\Asset>
      */
     private $assetAttachments;
 
@@ -889,7 +888,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
     }
 
     /**
-     * @return PersistentCollection
+     * @return ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     public function getLists()
     {
@@ -913,7 +912,7 @@ class Email extends FormEntity implements VariantEntityInterface, TranslationEnt
      */
     public function setLists(array $lists = [])
     {
-        $this->lists = $lists;
+        $this->lists = new ArrayCollection($lists);
 
         return $this;
     }

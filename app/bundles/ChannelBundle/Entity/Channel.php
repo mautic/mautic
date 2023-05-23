@@ -20,7 +20,7 @@ class Channel extends CommonEntity
     private $channel;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $channelId;
 

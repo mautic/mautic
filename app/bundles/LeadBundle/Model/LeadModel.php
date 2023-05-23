@@ -585,6 +585,7 @@ class LeadModel extends FormModel
             $currentLeadStageId   = $stagesChangeLogRepo->getCurrentLeadStage($lead->getId());
             $currentLeadStageName = null;
             if ($currentLeadStageId) {
+                /** @var Stage|null $currentStage */
                 $currentStage = $this->em->getRepository(Stage::class)->findByIdOrName($currentLeadStageId);
                 if ($currentStage) {
                     $currentLeadStageName = $currentStage->getName();
@@ -593,6 +594,7 @@ class LeadModel extends FormModel
 
             $newLeadStageIdOrName = is_object($data['stage']) ? $data['stage']->getId() : $data['stage'];
             if ((int) $newLeadStageIdOrName !== $currentLeadStageId && $newLeadStageIdOrName !== $currentLeadStageName) {
+                /** @var Stage|null $newStage */
                 $newStage = $this->em->getRepository(Stage::class)->findByIdOrName($newLeadStageIdOrName);
                 if ($newStage) {
                     $lead->stageChangeLogEntry(
