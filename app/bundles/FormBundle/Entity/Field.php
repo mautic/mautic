@@ -192,7 +192,7 @@ class Field
         $builder->addNullableField('validation', Types::JSON);
 
         $builder->addNullableField('parent', 'string', 'parent_id');
-        $builder->addNullableField('conditions', 'json_array');
+        $builder->addNullableField('conditions', 'json');
 
         $builder->createManyToOne('form', 'Form')
             ->inversedBy('fields')
