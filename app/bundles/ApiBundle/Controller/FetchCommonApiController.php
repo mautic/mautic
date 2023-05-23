@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\AppVersion;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Model\MauticModelInterface;
 use Mautic\CoreBundle\Security\Exception\PermissionException;
@@ -377,16 +378,25 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         return $this->model->getEntity();
     }
 
+    /**
+     * @required
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @required
+     */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper): void
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
+    /**
+     * @required
+     */
     public function setFactory(MauticFactory $factory): void
     {
         $this->factory = $factory;
@@ -413,22 +423,23 @@ class FetchCommonApiController extends AbstractFOSRestController implements Maut
         return $request;
     }
 
+    /**
+     * @required
+     */
     public function setTranslator(Translator $translator): void
     {
         $this->translator = $translator;
     }
 
-    public function setFlashBag(FlashBag $flashBag): void
+    /**
+     * @required
+     */
+    public function setUserHelper(UserHelper $userHelper)
     {
-        // @see \Mautic\CoreBundle\EventListener\CoreSubscriber::onKernelController()
+        $this->setUser($userHelper->getUser());
     }
 
-    public function setParametersContainer(ContainerBagInterface $parametersContainer): void
-    {
-        $this->parametersContainer = $parametersContainer;
-    }
-
-    public function setUser(User $user): void
+    private function setUser(User $user): void
     {
         $this->user = $user;
     }

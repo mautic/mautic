@@ -17,6 +17,7 @@ interface MauticController
 
     /**
      * @param ModelFactory<object> $modelFactory
+     * @required
      */
     public function setModelFactory(ModelFactory $modelFactory): void;
 }

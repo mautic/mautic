@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\DataExporterHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Helper\InputHelper;
 use Mautic\CoreBundle\Helper\TrailingSlashHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -86,6 +87,9 @@ class CommonController extends AbstractController implements MauticController
         $this->doctrine = $doctrine;
     }
 
+    /**
+     * @required
+     */
     public function setFactory(MauticFactory $factory)
     {
         $this->factory = $factory;
@@ -100,26 +104,46 @@ class CommonController extends AbstractController implements MauticController
         $this->modelFactory = $modelFactory;
     }
 
+    /**
+     * @required
+     */
+    public function setUserHelper(UserHelper $userHelper): void
+    {
+        $this->setUser($userHelper->getUser());
+    }
+
     public function setUser(User $user)
     {
         $this->user = $user;
     }
 
+    /**
+     * @required
+     */
     public function setCoreParametersHelper(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
+    /**
+     * @required
+     */
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @required
+     */
     public function setTranslator(Translator $translator)
     {
         $this->translator = $translator;
     }
 
+    /**
+     * @required
+     */
     public function setFlashBag(FlashBag $flashBag)
     {
         $this->flashBag = $flashBag;

@@ -170,7 +170,7 @@ class CoreSubscriberTest extends TestCase
     {
         $user = $this->createMock(User::class);
 
-        $this->userHelper->expects(self::exactly(2))
+        $this->userHelper->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
 
@@ -184,30 +184,20 @@ class CoreSubscriberTest extends TestCase
 
         $event = new ControllerEvent($kernel, fn () => $controller, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        $controller->expects(self::once())
-            ->method('setFactory')
-            ->with($this->factory);
-        $controller->expects(self::once())
-            ->method('setModelFactory')
-            ->with($this->modelFactory);
-        $controller->expects(self::once())
-            ->method('setUser')
-            ->with($user);
-        $controller->expects(self::once())
-            ->method('setCoreParametersHelper')
-            ->with($this->coreParametersHelper);
-        $controller->expects(self::once())
-            ->method('setCoreParametersHelper')
-            ->with($this->coreParametersHelper);
-        $controller->expects(self::once())
-            ->method('setDispatcher')
-            ->with($this->dispatcher);
-        $controller->expects(self::once())
-            ->method('setTranslator')
-            ->with($this->translator);
-        $controller->expects(self::once())
-            ->method('setFlashBag')
-            ->with($this->flashBag);
+        $controller->expects(self::never())
+            ->method('setFactory');
+        $controller->expects(self::never())
+            ->method('setModelFactory');
+        $controller->expects(self::never())
+            ->method('setUser');
+        $controller->expects(self::never())
+            ->method('setCoreParametersHelper');
+        $controller->expects(self::never())
+            ->method('setDispatcher');
+        $controller->expects(self::never())
+            ->method('setTranslator');
+        $controller->expects(self::never())
+            ->method('setFlashBag');
         $controller->expects(self::once())
             ->method('initialize')
             ->with($event);

@@ -131,12 +131,8 @@ class CoreSubscriber implements EventSubscriberInterface
         $this->userModel            = $userModel;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->dispatcher           = $dispatcher;
-        $this->translator           = $translator;
         $this->requestStack         = $requestStack;
         $this->formRepository       = $formRepository;
-        $this->factory              = $factory;
-        $this->modelFactory         = $modelFactory;
-        $this->flashBag             = $flashBag;
     }
 
     /**
@@ -235,27 +231,6 @@ class CoreSubscriber implements EventSubscriberInterface
 
         //only affect Mautic controllers
         if ($controller[0] instanceof MauticController) {
-            // set the factory for easy use access throughout the controllers
-            // @deprecated To be removed in 3.0
-            $controller[0]->setFactory($this->factory);
-
-            $controller[0]->setModelFactory($this->modelFactory);
-
-            // set the user as well
-            $controller[0]->setUser($this->userHelper->getUser());
-
-            // and the core parameters helper
-            $controller[0]->setCoreParametersHelper($this->coreParametersHelper);
-
-            // and the dispatcher
-            $controller[0]->setDispatcher($this->dispatcher);
-
-            // and the translator
-            $controller[0]->setTranslator($this->translator);
-
-            // and the flash bag
-            $controller[0]->setFlashBag($this->flashBag);
-
             //run any initialize functions
             $controller[0]->initialize($event);
         }
