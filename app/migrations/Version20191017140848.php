@@ -19,7 +19,7 @@ class Version20191017140848 extends AbstractMauticMigration
     public function preUp(Schema $schema): void
     {
         $smsStatsTable = $schema->getTable(MAUTIC_TABLE_PREFIX.'sms_message_stats');
-        if ($smsStatsTable->hasColumn('is_failed') && $smsStatsTable->hasColumn('details')) {
+        if ($smsStatsTable->hasColumn('is_failed') && $smsStatsTable->hasColumn('details') && $smsStatsTable->hasIndex($this->prefix.'stat_sms_failed_search')) {
             throw new SkipMigration('Schema includes this migration');
         }
     }
@@ -33,6 +33,9 @@ class Version20191017140848 extends AbstractMauticMigration
         if (!$smsStatsTable->hasColumn('is_failed')) {
             $this->addSql('ALTER TABLE '.$this->prefix.'sms_message_stats ADD is_failed TINYINT(1) DEFAULT NULL');
             $this->addSql("UPDATE {$this->prefix}sms_message_stats SET is_failed = '0'");
+        }
+
+        if (!$smsStatsTable->hasIndex($this->prefix.'stat_sms_failed_search')) {
             $this->addSql("CREATE INDEX {$this->prefix}stat_sms_failed_search ON {$this->prefix}sms_message_stats (is_failed)");
         }
 

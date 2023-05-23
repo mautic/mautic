@@ -21,11 +21,17 @@ class TranslatorExtension extends AbstractExtension
     {
         return [
             new TwigFunction('translatorGetJsLang', [$this, 'getJsLang']),
+            new TwigFunction('translatorHasId', [$this, 'translatorHasId']),
         ];
     }
 
     public function getJsLang(): string
     {
         return $this->translatorHelper->getJsLang();
+    }
+
+    public function translatorHasId(string $id, ?string $domain = null, ?string $locale = null): bool
+    {
+        return $this->translatorHelper->hasId($id, $domain, $locale);
     }
 }

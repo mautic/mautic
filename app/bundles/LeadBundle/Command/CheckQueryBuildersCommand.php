@@ -40,7 +40,6 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         $listModel = $container->get('mautic.lead.model.list');
 
         $id            = $input->getOption('segment-id');
-        $verbose       = $input->getOption('verbose');
         $this->skipOld = $input->getOption('skip-old');
 
         $failed = $ok = 0;
@@ -53,7 +52,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
 
                 return 1;
             }
-            $response = $this->runSegment($output, $verbose, $list, $listModel);
+            $response = $this->runSegment($output, $list, $listModel);
             if ($response) {
                 ++$ok;
             } else {
@@ -74,7 +73,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
                 if ('+' == substr($id, strlen($id) - 1, 1) and $l->getId() < intval(trim($id, '+'))) {
                     continue;
                 }
-                $response = $this->runSegment($output, $verbose, $l, $listModel);
+                $response = $this->runSegment($output, $l, $listModel);
                 if (!$response) {
                     ++$failed;
                 } else {
@@ -111,7 +110,7 @@ class CheckQueryBuildersCommand extends ModeratedCommand
         return $now->format('H:i:s.u');
     }
 
-    private function runSegment(OutputInterface $output, $verbose, LeadList $l, ListModel $listModel)
+    private function runSegment(OutputInterface $output, LeadList $l, ListModel $listModel)
     {
         if (!$l->isPublished()) {
             $msg = sprintf('Segment #%d is not published', $l->getId());

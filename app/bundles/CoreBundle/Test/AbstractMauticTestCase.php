@@ -99,7 +99,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         return $this->traitLoadFixtureFiles($paths, $append, $omName, $registryName, $purgeMode);
     }
 
-    private function mockServices()
+    private function mockServices(): void
     {
         $cookieHelper = $this->getMockBuilder(CookieHelper::class)
             ->disableOriginalConstructor()
@@ -114,7 +114,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         self::$container->set('session', new Session(new FixedMockFileSessionStorage()));
     }
 
-    protected function applyMigrations()
+    protected function applyMigrations(): void
     {
         $input  = new ArgvInput(['console', 'doctrine:migrations:version', '--add', '--all', '--no-interaction']);
         $output = new BufferedOutput();
@@ -124,7 +124,7 @@ abstract class AbstractMauticTestCase extends WebTestCase
         $application->run($input, $output);
     }
 
-    protected function installDatabaseFixtures(array $classNames = [])
+    protected function installDatabaseFixtures(array $classNames = []): void
     {
         $this->loadFixtures($classNames);
     }

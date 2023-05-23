@@ -342,7 +342,7 @@ class CampaignController extends AbstractStandardFormController
                 $this->afterFormProcessed($valid, $campaign, $form, 'new');
             } else {
                 $viewParameters = ['page' => $page];
-                $returnUrl      = $this->generateUrl('c', $viewParameters);
+                $returnUrl      = $this->generateUrl($this->getIndexRoute(), $viewParameters);
                 $template       = 'MauticCampaignBundle:Campaign:index';
             }
 

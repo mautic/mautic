@@ -1,5 +1,5 @@
 {% set alertType = alertType|default('growl') %}
-<div id="flashes"{{ alertType == 'growl' ? ' class="alert-growl-container"' : '' }}>
+<div id="flashes"{% if alertType == 'growl' %} class="alert-growl-container"{% endif %}>
     {{ include('MauticCoreBundle:Notification:flash_messages.html.twig', {
         dismissable: notDismissable|default(false) == false ? ' alert-dismissable' : '',
         alertType: alertType

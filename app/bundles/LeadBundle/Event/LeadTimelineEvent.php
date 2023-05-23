@@ -46,7 +46,7 @@ class LeadTimelineEvent extends Event
     protected $lead;
 
     /**
-     * @var int
+     * @var array<string, int>
      */
     protected $totalEvents = [];
 

@@ -28,4 +28,11 @@ class ParameterLoaderTest extends TestCase
 
         putenv('MAUTIC_CONFIG_PARAMETERS=');
     }
+
+    public function testDefaultParametersAreLoaded(): void
+    {
+        $loader = new ParameterLoader(__DIR__.'/TestRoot');
+        $this->assertIsArray($loader->getDefaultParameters());
+        $this->assertFalse($loader->getDefaultParameters()['api_enabled']);
+    }
 }

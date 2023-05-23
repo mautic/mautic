@@ -1,14 +1,6 @@
 {% set request = app.request %}
 {% set contentOnly = request.get('contentOnly', false) or (contentOnly is defined and contentOnly is not empty) %}
 {% set modalView = request.get('modal', false) or (modalView is defined and modalView is not empty) %}
-{{- '' -}}
-{# Fallback in case the child template didn't set these blocks #}
-{% block modal %}{% endblock %}
-{% block pageTitle %}{% endblock %}
-{% block publishStatus %}{% endblock %}
-{% block actions %}{% endblock %}
-{% block toolbar %}{% endblock %}
-{{- '' -}}
 {# load base template #}
 {% set template = null %}
 {% if not request.isXmlHttpRequest() and not modalView %}
@@ -20,12 +12,13 @@
 {% if template is not empty %}
     {{- include(template, {
         content: block('content'),
-        modal: block('modal'),
+        modal: block('modal') is defined ? block('modal') : '',
         headerTitle: block('headerTitle'),
-        pageTitle: block('pageTitle'),
-        publishStatus: block('publishStatus'),
-        actions: block('actions'),
-        toolbar: block('toolbar')
+        pageTitle: block('pageTitle') is defined ? block('pageTitle') : '',
+        publishStatus: block('publishStatus') is defined ? block('publishStatus') : '',
+        actions: block('actions') is defined ? block('actions') : '',
+        toolbar: block('toolbar') is defined ? block('toolbar') : '',
+        isXmlHttpRequest: request.isXmlHttpRequest
     }) -}}
 {% else %}
     {{ block('content') }}

@@ -24,6 +24,7 @@ class DateExtension extends AbstractExtension
     {
         return [
             new TwigFunction('dateToText', [$this, 'toText'], ['is_safe' => ['all']]),
+            new TwigFunction('dateToFull', [$this, 'toFull'], ['is_safe' => ['all']]),
         ];
     }
 
@@ -36,5 +37,15 @@ class DateExtension extends AbstractExtension
     public function toText($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s', bool $forceDateForNonText = false): string
     {
         return $this->dateHelper->toText($datetime, $timezone, $fromFormat, $forceDateForNonText);
+    }
+
+    /**
+     * Returns full date. eg. October 8, 2014 21:19.
+     *
+     * @param \DateTime|string $datetime
+     */
+    public function toFull($datetime, string $timezone = 'local', string $fromFormat = 'Y-m-d H:i:s'): string
+    {
+        return $this->dateHelper->toFull($datetime, $timezone, $fromFormat);
     }
 }

@@ -43,14 +43,12 @@ final class MauticReportBuilderTest extends TestCase
 
         $this->dispatcher        = $this->createMock(EventDispatcherInterface::class);
         $this->connection        = $this->createMock(Connection::class);
-        $this->queryBuilder      = new QueryBuilder($this->connection);
         $this->channelListHelper = $this->createMock(ChannelListHelper::class);
+        $this->queryBuilder      = new QueryBuilder($this->connection);
 
-        $this->connection->method('createQueryBuilder')->willReturn(new QueryBuilder($this->connection));
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->connection->method('getExpressionBuilder')->willReturn(new ExpressionBuilder($this->connection));
-        $this->connection->method('quote')->willReturnMap([
-            ['', null, "''"],
-        ]);
+        $this->connection->method('quote')->willReturnMap([['', null, "''"]]);
     }
 
     public function testColumnSanitization(): void

@@ -184,7 +184,7 @@ class ImportController extends FormController
     public function newAction($objectId = 0, $ignorePost = false)
     {
         //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', true);
+        ini_set('auto_detect_line_endings', '1');
 
         $dispatcher = $this->container->get('event_dispatcher');
 

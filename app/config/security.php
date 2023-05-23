@@ -83,7 +83,7 @@ $firewalls = [
         ],
         'remember_me' => [
             'secret'   => '%mautic.rememberme_key%',
-            'lifetime' => (int) $container->getParameter('mautic.rememberme_lifetime'),
+            'lifetime' => '%mautic.rememberme_lifetime%',
             'path'     => '%mautic.rememberme_path%',
             'domain'   => '%mautic.rememberme_domain%',
         ],

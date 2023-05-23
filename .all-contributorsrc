@@ -741,6 +741,52 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "benji07",
+      "name": "Benjamin Lévêque",
+      "avatar_url": "https://avatars.githubusercontent.com/u/166890?v=4",
+      "profile": "http://benjamin.leveque.me",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "uzegonemad",
+      "name": "Benjamin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/430255?v=4",
+      "profile": "https://buzelac.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "IrisAmrein",
+      "name": "Iris Amrein",
+      "avatar_url": "https://avatars.githubusercontent.com/u/70972871?v=4",
+      "profile": "https://github.com/IrisAmrein",
+      "contributions": [
+        "userTesting"
+      ]
+    },
+    {
+      "login": "pety-dc",
+      "name": "peter.osvath",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25766885?v=4",
+      "profile": "https://github.com/pety-dc",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "poweriguana",
+      "name": "poweriguana",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86078621?v=4",
+      "profile": "https://github.com/poweriguana",
+      "contributions": [
+        "userTesting",
+        "projectManagement"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -12,6 +12,7 @@ Mautic.campaignOnLoad = function (container, response) {
     }
 
     if (mQuery('#CampaignEventPanel').length) {
+        var tooltipTimeout = null;
         // setup button clicks
         mQuery('#CampaignEventPanelGroups button').on('click', function() {
             var eventType = mQuery(this).data('type');
@@ -55,7 +56,14 @@ Mautic.campaignOnLoad = function (container, response) {
                 Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, true);
             }).on('keyup.tooltip', function() {
                 // Recreate tooltips for those left
-                Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
+                if (tooltipTimeout) {
+                    clearTimeout(tooltipTimeout);
+                }
+
+                // wrap into setTimeout for fast typing users.
+                tooltipTimeout = setTimeout(function () {
+                    Mautic.campaignBuilderUpdateEventListTooltips(thisSelect, false);
+                }, 200);
             });
         });
 
@@ -137,19 +145,42 @@ Mautic.lazyLoadContactListOnCampaignDetail = function() {
  * Update chosen tooltips
  *
  * @param theSelect
- * @param destroy
+ * @param onlyDestroy
  */
-Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, destroy) {
-    mQuery('#'+theSelect+' option').each(function () {
+Mautic.campaignBuilderUpdateEventListTooltips = function(theSelect, onlyDestroy) {
+    const $select = mQuery('#'+theSelect);
+    const dataAttribute = 'tooltips';
+
+    // create a stack
+    if (undefined === $select.data(dataAttribute)) {
+        $select.data(dataAttribute, []);
+    }
+
+    // remove existing tooltips before we create new ones.
+    const tooltips = $select.data(dataAttribute);
+
+    mQuery.each(tooltips, function (index, $tooltip) {
+        if (undefined === $tooltip) {
+            return;
+        }
+
+        $tooltip.tooltip('hide');
+        $tooltip.tooltip('destroy');
+    });
+    $select.data(dataAttribute, []);
+
+    if (true === onlyDestroy) {
+        return;
+    }
+
+    // create tooltips.
+    $select.find('option').each(function () {
         if (mQuery(this).attr('id')) {
             // Initiate a tooltip on each option since chosen doesn't copy over the data attributes
-            var chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
+            const chosenOption = '#' + theSelect + '_chosen .option_' + mQuery(this).attr('id');
 
-            if (destroy) {
-                mQuery(chosenOption).tooltip('destroy');
-            } else {
-                mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
-            }
+            const $tooltip = mQuery(chosenOption).tooltip({html: true, container: 'body', placement: 'left'});
+            $select.data(dataAttribute).push($tooltip);
         }
     });
 }

@@ -1,0 +1,47 @@
+{% if filters is defined and filters is not empty %}
+    <div class="form-group">
+        {% for filterName, filter in filters %}
+        {% set attr = getFilterAttributes(
+            filterName|trans,
+            filter,
+            target|default('.page-list'),
+            tmpl|default('list')
+        ) %}
+
+        <select {{ attr|join(' ') }}>
+        {% if filter.groups is defined %}
+            {% for groupLabel, groupFilter in filter.groups %}
+                <optgroup label="{{ groupLabel|trans }}"{% if groupFilter.prefix is defined %} data-prefix="{{ groupFilter.prefix }}"{% endif %}>
+                    {% for value, label in groupFilter.options if groupFilter.options is defined %}
+                        {% if label is iterable %}
+                            {% set value = label.value|default(label.id) %}
+                            {% set label = label.label|default(label.title|default(label.name)) %}
+                        {% endif %}
+
+                        {% set selected = (groupFilter.values is defined and value in groupFilter.values) ? ' selected' : '' %}
+
+                        {% if groupFilter.prefix is defined %}
+                            {% set value = groupFilter.prefix ~ ':' ~ value %}
+                        {% endif %}
+                    <option value="{{ value|escape('html_attr') }}"{{ selected }}>{{ label }}</option>
+                    {% endfor %}
+                </optgroup>
+            {% endfor %}
+        {% elseif filter.options is defined %}
+            {% for value, label in filter.options %}
+                {% if label is iterable %}
+                    {% set value = label.value|default(label.id) %}
+                    {% set label = label.label|default(label.title|default(label.name)) %}
+                {% endif %}
+
+                {% set selected = (filter.values is defined and value in filter.values) ? ' selected' : '' %}
+                ?>
+                <option value="{{ value|escape('html_attr') }}"{{ selected }}>
+                    {{ (filter.translateLabels is not defined or filter.translateLabels is empty) ? label : label|trans }}
+                </option>
+            {% endfor %}
+        {% endif %}
+        </select>
+        {% endfor %}
+    </div>
+{% endif %}

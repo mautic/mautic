@@ -2,6 +2,8 @@
 
 namespace Mautic\EmailBundle\EventListener;
 
+use Mautic\LeadBundle\Segment\OperatorOptions;
+
 /**
  * Trait MatchFilterForLeadTrait.
  */
@@ -81,7 +83,6 @@ trait MatchFilterForLeadTrait
                     if (!is_array($leadVal)) {
                         $leadVal = explode('|', $leadVal);
                     }
-
                     if (!is_array($filterVal)) {
                         $filterVal = explode('|', $filterVal);
                     }
@@ -91,6 +92,10 @@ trait MatchFilterForLeadTrait
                     $filterVal = (int) $filterVal;
                     break;
                 case 'select':
+                    if (!is_array($filterVal)) {
+                        $filterVal = explode('|', $filterVal);
+                    }
+                    break;
                 default:
                     if (is_numeric($leadVal)) {
                         $leadVal   = (int) $leadVal;
@@ -141,29 +146,12 @@ trait MatchFilterForLeadTrait
                     $filterVal         = str_replace('%', '.*', $filterVal);
                     $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/', $leadVal);
                     break;
-                case 'in':
-                    $leadValMatched = false;
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValMatched = true;
-                            // Break once we find a match
-                            break;
-                        }
-                    }
-                    $groups[$groupNum] = $leadValMatched;
+
+                case OperatorOptions::IN:
+                    $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
                     break;
-                case '!in':
-                    $leadValNotMatched = true;
-
-                    foreach ($leadVal as $v) {
-                        if (in_array($v, $filterVal)) {
-                            $leadValNotMatched = false;
-                            // Break once we find a match
-                            break;
-                        }
-                    }
-
-                    $groups[$groupNum] = $leadValNotMatched;
+                case OperatorOptions::NOT_IN:
+                    $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                     break;
                 case 'regexp':
                     $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
@@ -185,5 +173,25 @@ trait MatchFilterForLeadTrait
         }
 
         return in_array(true, $groups);
+    }
+
+    /**
+     * @param mixed $leadVal
+     * @param mixed $filterVal
+     */
+    private function checkLeadValueIsInFilter($leadVal, $filterVal, bool $defaultFlag): bool
+    {
+        $leadVal    = !is_array($leadVal) ? [$leadVal] : $leadVal;
+        $filterVal  = !is_array($filterVal) ? [$filterVal] : $filterVal;
+        $retFlag    = $defaultFlag;
+        foreach ($leadVal as $v) {
+            if (in_array($v, $filterVal)) {
+                $retFlag = !$defaultFlag;
+                // Break once we find a match
+                break;
+            }
+        }
+
+        return $retFlag;
     }
 }
