@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Test;
 
 use AppKernel;
-use Doctrine\DBAL\Exception as DBALException;
+use Doctrine\DBAL\DBALException;
 use Exception;
 use LogicException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\MySQLSchemaManager;
+use Doctrine\DBAL\Schema\MySqlSchemaManager;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumn;
 use Mautic\CoreBundle\Doctrine\GeneratedColumn\GeneratedColumns;
 use Mautic\CoreBundle\Doctrine\Provider\GeneratedColumnsProviderInterface;
@@ -45,7 +45,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
     private $command;
 
     /**
-     * @var MockObject|MySQLSchemaManager
+     * @var MockObject|MySqlSchemaManager
      */
     private $schemaManager;
 
@@ -73,7 +73,7 @@ class MigrationCommandSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->connection               = $this->createMock(Connection::class);
         $this->command                  = $this->createMock(Command::class);
         $this->output                   = $this->createMock(OutputInterface::class);
-        $this->schemaManager            = $this->createMock(MySQLSchemaManager::class);
+        $this->schemaManager            = $this->createMock(MySqlSchemaManager::class);
         $this->generatedColumns         = new GeneratedColumns();
         $this->subscriber               = new MigrationCommandSubscriber(
             $this->versionProvider,
