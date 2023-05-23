@@ -607,6 +607,22 @@ return [
                     'setPassword' => ['%mautic.mailer_password%'],
                 ],
             ],
+            'mautic.transport.postal' => [
+                'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostalTransport',
+                'serviceAlias' => 'swiftmailer.mailer.transport.%s',
+                'arguments'    => [
+                    'translator',
+                    'monolog.logger.mautic',
+                    'mautic.email.model.transport_callback',
+                    '%mautic.mailer_host%',
+                    '%mautic.mailer_port%',
+                    '%mautic.mailer_encryption%',
+                ],
+                'methodCalls'  => [
+                    'setUsername' => ['%mautic.mailer_user%'],
+                    'setPassword' => ['%mautic.mailer_password%'],
+                ],
+            ],
             'mautic.transport.postmark' => [
                 'class'        => 'Mautic\EmailBundle\Swiftmailer\Transport\PostmarkTransport',
                 'serviceAlias' => 'swiftmailer.mailer.transport.%s',
