@@ -29,21 +29,21 @@ final class OptionsDTO implements \JsonSerializable
         return $json;
     }
 
-    public function setStartTime(?string $startTime = null): self
+    public function setStartTime(?string $startTime): self
     {
         $this->startTime = $startTime;
 
         return $this;
     }
 
-    public function setOpenTracking(?bool $openTracking = null): self
+    public function setOpenTracking(?bool $openTracking): self
     {
         $this->openTracking = $openTracking;
 
         return $this;
     }
 
-    public function setClickTracking(?bool $clickTracking = null): self
+    public function setClickTracking(?bool $clickTracking): self
     {
         $this->clickTracking = $clickTracking;
 

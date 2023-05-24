@@ -38,7 +38,7 @@ final class ContentDTO implements \JsonSerializable
         return $this;
     }
 
-    public function setInlineCss(?string $inlineCss = null): self
+    public function setInlineCss(?string $inlineCss): self
     {
         $this->inlineCss = $inlineCss;
 
