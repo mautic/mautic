@@ -31,7 +31,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * @extends FormModel<Import>
  */
-final class ImportModel extends FormModel
+class ImportModel extends FormModel
 {
     protected PathsHelper $pathsHelper;
 
