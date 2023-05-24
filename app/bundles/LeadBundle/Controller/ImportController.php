@@ -124,7 +124,7 @@ final class ImportController extends FormController
     }
 
     /** Cancel and unpublish the import during manual import. */
-    public function cancelAction(Request $request): JsonResponse|RedirectResponse
+    public function cancelAction(Request $request): JsonResponse|RedirectResponse|Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -145,7 +145,7 @@ final class ImportController extends FormController
     }
 
     /** Schedules manual import to background queue. */
-    public function queueAction(Request $request): JsonResponse|RedirectResponse
+    public function queueAction(Request $request): JsonResponse|RedirectResponse|Response
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
