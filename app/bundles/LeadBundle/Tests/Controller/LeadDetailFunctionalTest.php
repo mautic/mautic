@@ -108,5 +108,8 @@ class LeadDetailFunctionalTest extends MauticMysqlTestCase
 
         Assert::assertNull($mouseOver);
         Assert::assertSame(sprintf('Campaigns %s is part of', $firstName), $dataHeader);
+        $response = $this->client->getResponse();
+        //Make sure the data-target-url is not an absolute URL
+        Assert::assertStringContainsString(sprintf('data-target-url="/s/contacts/view/%s/stats"', $lead->getId()), $response->getContent());
     }
 }
