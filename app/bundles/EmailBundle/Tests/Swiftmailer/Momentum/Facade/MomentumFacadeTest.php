@@ -267,6 +267,6 @@ final class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
         $fromDTO    = new FromDTO('test@mautic.com');
         $contentDTO = new ContentDTO('subject', $fromDTO);
 
-        return new TransmissionDTO($contentDTO, null, null);
+        return new TransmissionDTO($contentDTO, '/dev/null', null);
     }
 }
