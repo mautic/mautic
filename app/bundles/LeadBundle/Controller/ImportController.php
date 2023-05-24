@@ -39,7 +39,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ImportController extends FormController
+final class ImportController extends FormController
 {
     // Steps of the import
     public const STEP_UPLOAD_CSV      = 1;
