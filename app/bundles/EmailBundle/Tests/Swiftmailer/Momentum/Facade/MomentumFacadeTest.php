@@ -22,7 +22,7 @@ use SparkPost\SparkPostResponse;
 /**
  * @todo this test is slow as it calls methods with sleep(5). Find a better way to speed it up.
  */
-class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
+final class MomentumFacadeTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var MockObject|AdapterInterface
