@@ -47,7 +47,7 @@ class UTCDateTimeType extends DateTimeType
     /**
      * @param mixed $value
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      *
      * @throws ConversionException
      */
