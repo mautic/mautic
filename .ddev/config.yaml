@@ -1,7 +1,7 @@
 name: mautic
 type: php
 docroot: ""
-php_version: "8.0"
+php_version: "8.1"
 webserver_type: apache-fpm
 router_http_port: "80"
 router_https_port: "443"
