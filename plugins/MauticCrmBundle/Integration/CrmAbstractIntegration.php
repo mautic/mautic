@@ -398,7 +398,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         $lead->setNewlyCreated(true);
 
         if (count($uniqueLeadFieldData)) {
-            $existingLeads = $this->em->getRepository('MauticLeadBundle:Lead')
+            $existingLeads = $this->em->getRepository(\Mautic\LeadBundle\Entity\Lead::class)
                 ->getLeadsByUniqueFields($uniqueLeadFieldData);
             if (!empty($existingLeads)) {
                 $lead = array_shift($existingLeads);
@@ -452,7 +452,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         if (isset($data['owner_email']) && isset($config['updateOwner']) && isset($config['updateOwner'][0])
             && 'updateOwner' == $config['updateOwner'][0]
         ) {
-            if ($mauticUser = $this->em->getRepository('MauticUserBundle:User')->findOneBy(['email' => $data['owner_email']])) {
+            if ($mauticUser = $this->em->getRepository(\Mautic\UserBundle\Entity\User::class)->findOneBy(['email' => $data['owner_email']])) {
                 $lead->setOwner($mauticUser);
             }
         }

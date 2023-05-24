@@ -22,7 +22,7 @@ class StagesChangeLog
     private $lead;
 
     /**
-     * @var Stage
+     * @var Stage|null
      */
     private $stage;
 

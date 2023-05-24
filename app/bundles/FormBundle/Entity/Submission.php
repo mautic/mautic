@@ -15,7 +15,7 @@ use Mautic\PageBundle\Entity\Page;
 class Submission
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
@@ -30,12 +30,12 @@ class Submission
     private $ipAddress;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingId;
 
@@ -50,7 +50,7 @@ class Submission
     private $referer;
 
     /**
-     * @var \Mautic\PageBundle\Entity\Page
+     * @var \Mautic\PageBundle\Entity\Page|null
      */
     private $page;
 
@@ -140,7 +140,7 @@ class Submission
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**

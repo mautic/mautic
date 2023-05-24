@@ -385,7 +385,7 @@ class FormSubscriber implements EventSubscriberInterface
         $actions = $form->getActions();
         $fields  = $form->getFields();
 
-        if (null !== $actions && null !== $fields) {
+        if (!$actions->isEmpty() && !$fields->isEmpty()) {
             $actionFields = [
                 'register.webinar'     => ['email', 'firstname', 'lastname'],
                 'register.training'    => ['email', 'firstname', 'lastname'],

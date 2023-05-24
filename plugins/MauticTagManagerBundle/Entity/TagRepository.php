@@ -20,7 +20,7 @@ class TagRepository extends BaseTagRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

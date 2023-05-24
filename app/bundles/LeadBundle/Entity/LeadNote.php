@@ -30,7 +30,7 @@ class LeadNote extends FormEntity
     private $text;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $type = 'general';
 

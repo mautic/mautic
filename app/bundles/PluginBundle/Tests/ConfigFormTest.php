@@ -118,9 +118,9 @@ class ConfigFormTest extends KernelTestCase
                 ->will(
                     $this->returnValueMap(
                             [
-                                ['MauticPluginBundle:Plugin', $pluginRepository],
-                                ['MauticPluginBundle:Integration', $integrationRepository],
-                                ['MauticPluginBundle:IntegrationEntity', $integrationEntityRepository],
+                                [\Mautic\PluginBundle\Entity\Plugin::class, $pluginRepository],
+                                [\Mautic\PluginBundle\Entity\Integration::class, $integrationRepository],
+                                [\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityRepository],
                             ]
                     )
                 );

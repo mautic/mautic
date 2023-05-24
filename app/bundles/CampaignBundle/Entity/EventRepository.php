@@ -227,7 +227,7 @@ class EventRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -254,30 +254,20 @@ class EventRepository extends CommonRepository
         $q = $this->getEntityManager()->createQueryBuilder();
 
         $q->select('e')
-            ->from('MauticCampaignBundle:Event', 'e', 'e.id');
+            ->from('MauticCampaignBundle:Event', 'e', 'e.id')
+            ->where('e.channel = :channel')
+            ->setParameter('channel', $channel);
 
-        $expr = $q->expr()->andX();
         if ($campaignId) {
-            $expr->add(
-                $q->expr()->eq('IDENTITY(e.campaign)', (int) $campaignId)
-            );
-
-            $q->orderBy('e.order');
+            $q->andWhere('IDENTITY(e.campaign) = :campaignId')
+                ->setParameter('campaignId', $campaignId)
+                ->orderBy('e.order');
         }
-
-        $expr->add(
-            $q->expr()->eq('e.channel', ':channel')
-        );
-        $q->setParameter('channel', $channel);
 
         if ($eventType) {
-            $expr->add(
-                $q->expr()->eq('e.eventType', ':eventType')
-            );
-            $q->setParameter('eventType', $eventType);
+            $q->andWhere('e.eventType', ':eventType')
+            ->setParameter('eventType', $eventType);
         }
-
-        $q->where($expr);
 
         return $q->getQuery()->getResult();
     }

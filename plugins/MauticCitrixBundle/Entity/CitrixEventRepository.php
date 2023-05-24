@@ -26,23 +26,16 @@ class CitrixEventRepository extends CommonRepository
      */
     public function getEvents($product, $eventType, \DateTime $fromDate = null)
     {
-        $q = $this->createQueryBuilder('c');
+        $q = $this->createQueryBuilder($this->getTableAlias());
 
-        $expr = $q->expr()->andX(
-            $q->expr()->eq('c.product', ':product'),
-            $q->expr()->eq('c.event_type', ':eventType')
-        );
-
+        $q->where('c.product = :product')
+            ->andWhere('c.event_type = :eventType')
+            ->setParameter('product', $product)
+            ->setParameter('eventType', $eventType);
         if ($fromDate) {
-            $expr->add(
-                $q->expr()->gte('c.event_date', ':fromDate')
-            );
-            $q->setParameter('fromDate', $fromDate);
+            $q->andWhere('c.event_date >= :fromDate')
+                ->setParameter('fromDate', $fromDate);
         }
-
-        $q->where($expr)
-            ->setParameter('eventType', $eventType)
-            ->setParameter('product', $product);
 
         return $q->getQuery()->getArrayResult();
     }
@@ -167,8 +160,6 @@ class CitrixEventRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {

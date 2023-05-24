@@ -4,17 +4,18 @@ namespace Mautic\CoreBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 trait VariantEntityTrait
 {
     /**
-     * @var ArrayCollection
+     * @var mixed
      **/
     private $variantChildren;
 
     /**
-     * @var Page
+     * @var mixed
      **/
     private $variantParent;
 
@@ -81,7 +82,7 @@ trait VariantEntityTrait
     /**
      * Get variantChildren.
      *
-     * @return \Doctrine\Common\Collections\Collection
+     * @return mixed
      */
     public function getVariantChildren()
     {
@@ -109,7 +110,7 @@ trait VariantEntityTrait
     /**
      * Get variantParent.
      *
-     * @return $this
+     * @return mixed
      */
     public function getVariantParent()
     {
@@ -218,9 +219,9 @@ trait VariantEntityTrait
      * Get the variant parent/children.
      **.
      *
-     * @return array[$parent, $children]
+     * @return array<mixed>
      */
-    public function getVariants()
+    public function getVariants(): array
     {
         $parent = $this->getVariantParent();
         if (empty($parent)) {
