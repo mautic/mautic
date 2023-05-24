@@ -12,7 +12,7 @@ final class OptionsDTO implements \JsonSerializable
 
     private ?bool $clickTracking = null;
 
-    /** @return array<string, ?string|?bool> */
+    /** @return array<string, string|bool> */
     public function jsonSerialize(): array
     {
         $json = [];
