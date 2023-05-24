@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\LeadBundle\Controller;
 
 use function assert;
@@ -189,17 +191,8 @@ class ImportController extends FormController
         return $this->indexAction($request);
     }
 
-    /**
-     * @param int  $objectId
-     * @param bool $ignorePost
-     *
-     * @return JsonResponse|Response
-     */
-    public function newAction(Request $request, $objectId = 0, $ignorePost = false)
+     public function newAction(Request $request, int $objectId = 0, bool $ignorePost = false): Response
     {
-        //Auto detect line endings for the file to work around MS DOS vs Unix new line characters
-        ini_set('auto_detect_line_endings', '1');
-
         $dispatcher = $this->dispatcher;
 
         try {
