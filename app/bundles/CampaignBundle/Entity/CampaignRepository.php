@@ -501,7 +501,7 @@ class CampaignRepository extends CommonRepository
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile(600, 'campaign_lead_count_'.md5($q->getSQL()))
+                new QueryCacheProfile()
             )->fetchAllAssociative();
         } else {
             $results = $q->execute()->fetchAllAssociative();
