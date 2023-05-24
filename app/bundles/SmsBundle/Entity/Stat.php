@@ -127,7 +127,7 @@ class Stat
             ->nullable()
             ->build();
 
-        $builder->addField('details', 'json_array');
+        $builder->addField('details', 'json');
     }
 
     /**

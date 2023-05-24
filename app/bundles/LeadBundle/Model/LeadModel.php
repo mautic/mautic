@@ -1006,7 +1006,7 @@ class LeadModel extends FormModel
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
         }
         $lead->setStage($stage);
         $lead->stageChangeLogEntry(
@@ -1407,7 +1407,7 @@ class LeadModel extends FormModel
         unset($fieldData['ownerusername']);
 
         if (null !== $owner) {
-            $lead->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
+            $lead->setOwner($this->em->getReference(\Mautic\UserBundle\Entity\User::class, $owner));
         }
 
         if (null !== $tags) {
@@ -1546,7 +1546,7 @@ class LeadModel extends FormModel
                 if (is_numeric($tag)) {
                     // Existing tag being added to this lead
                     $lead->addTag(
-                        $this->em->getReference('MauticLeadBundle:Tag', $tag)
+                        $this->em->getReference(\Mautic\LeadBundle\Entity\Tag::class, $tag)
                     );
                 } else {
                     $lead->addTag(

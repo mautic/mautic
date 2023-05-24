@@ -184,7 +184,7 @@ class DynamicContentType extends AbstractType
             ]
         );
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticDynamicContentBundle:DynamicContent');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\DynamicContentBundle\Entity\DynamicContent::class);
         $builder->add(
             $builder->create(
                 'translationParent',

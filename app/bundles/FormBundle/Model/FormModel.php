@@ -388,7 +388,7 @@ class FormModel extends CommonFormModel
         $deleteActions   = [];
         foreach ($actions as $actionId) {
             if (isset($existingActions[$actionId])) {
-                $actionEntity = $this->em->getReference('MauticFormBundle:Action', (int) $actionId);
+                $actionEntity = $this->em->getReference(\Mautic\FormBundle\Entity\Action::class, (int) $actionId);
                 $entity->removeAction($actionEntity);
                 $deleteActions[] = $actionId;
             }

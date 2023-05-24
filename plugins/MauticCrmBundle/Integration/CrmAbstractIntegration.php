@@ -210,7 +210,7 @@ abstract class CrmAbstractIntegration extends AbstractIntegration
         foreach ($leadIds as $leadId) {
             $i        = 0;
             $activity = [];
-            $lead     = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead     = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
             $page     = 1;
 
             while (true) {

@@ -321,7 +321,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
         }
 
         if ($companies instanceof Company) {
@@ -443,7 +443,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
     {
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
         }
 
         $companyLeadRemove = [];
@@ -848,7 +848,7 @@ class CompanyModel extends CommonFormModel implements AjaxLookupModelInterface
         unset($fields['modifiedByUser']);
 
         if (null !== $owner) {
-            $company->setOwner($this->em->getReference('MauticUserBundle:User', $owner));
+            $company->setOwner($this->em->getReference(\Mautic\UserBundle\Entity\User::class, $owner));
         }
 
         $fieldData = $this->getFieldData($fields, $data);

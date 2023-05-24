@@ -75,7 +75,7 @@ class UserCreator implements UserCreatorInterface
         }
 
         /** @var Role $defaultRole */
-        $defaultRole = $this->entityManager->getReference('MauticUserBundle:Role', $this->defaultRole);
+        $defaultRole = $this->entityManager->getReference(\Mautic\UserBundle\Entity\Role::class, $this->defaultRole);
 
         $user = $this->userMapper->getUser($response);
         $user->setPassword($this->userModel->checkNewPassword($user, $this->encoder, EncryptionHelper::generateKey()));
