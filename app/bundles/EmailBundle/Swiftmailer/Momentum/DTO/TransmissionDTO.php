@@ -23,7 +23,7 @@ final class TransmissionDTO implements \JsonSerializable
 
     private ContentDTO $content;
 
-    public function __construct(ContentDTO $content, ?string $returnPath, OptionsDTO $options = null)
+    public function __construct(ContentDTO $content, string $returnPath, ?OptionsDTO $options = null)
     {
         $this->content    = $content;
         $this->returnPath = $returnPath;
