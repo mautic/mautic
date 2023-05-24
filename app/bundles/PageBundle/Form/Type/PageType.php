@@ -159,7 +159,7 @@ class PageType extends AbstractType
             $redirectUrlDataOptions .= "|{$page['alias']}";
         }
 
-        $transformer = new IdToEntityModelTransformer($this->em, 'MauticPageBundle:Page');
+        $transformer = new IdToEntityModelTransformer($this->em, \Mautic\PageBundle\Entity\Page::class);
         $builder->add(
             $builder->create(
                 'variantParent',

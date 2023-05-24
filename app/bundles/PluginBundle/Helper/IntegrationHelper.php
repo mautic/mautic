@@ -129,7 +129,7 @@ class IntegrationHelper
 
                     $id                  = $installedPlugins[$plugin['bundle']]['id'];
                     $this->byPlugin[$id] = [];
-                    $pluginReference     = $this->em->getReference('MauticPluginBundle:Plugin', $id);
+                    $pluginReference     = $this->em->getReference(\Mautic\PluginBundle\Entity\Plugin::class, $id);
                     $pluginNamespace     = str_replace('MauticPlugin', '', $plugin['bundle']);
 
                     foreach ($finder as $file) {

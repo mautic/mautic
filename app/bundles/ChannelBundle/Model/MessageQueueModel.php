@@ -157,14 +157,14 @@ class MessageQueueModel extends FormModel
 
             $messageQueue = new MessageQueue();
             if ($campaignEventId) {
-                $messageQueue->setEvent($this->em->getReference('MauticCampaignBundle:Event', $campaignEventId));
+                $messageQueue->setEvent($this->em->getReference(\Mautic\CampaignBundle\Entity\Event::class, $campaignEventId));
             }
             $messageQueue->setChannel($channel);
             $messageQueue->setChannelId($channelId);
             $messageQueue->setDatePublished(new \DateTime());
             $messageQueue->setMaxAttempts($maxAttempts);
             $messageQueue->setLead(
-                ($lead instanceof Lead) ? $lead : $this->em->getReference('MauticLeadBundle:Lead', $leadId)
+                ($lead instanceof Lead) ? $lead : $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId)
             );
             $messageQueue->setPriority($priority);
             $messageQueue->setScheduledDate($scheduledDate);

@@ -408,7 +408,7 @@ trait LeadDetailsTrait
     {
         // Upcoming events from Campaign Bundle
         /** @var \Mautic\CampaignBundle\Entity\LeadEventLogRepository $leadEventLogRepository */
-        $leadEventLogRepository = $this->doctrine->getManager()->getRepository('MauticCampaignBundle:LeadEventLog');
+        $leadEventLogRepository = $this->doctrine->getManager()->getRepository(\Mautic\CampaignBundle\Entity\LeadEventLog::class);
 
         return $leadEventLogRepository->getUpcomingEvents(
             [
