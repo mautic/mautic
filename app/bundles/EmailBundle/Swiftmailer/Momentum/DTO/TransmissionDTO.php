@@ -1,80 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\OptionsDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\RecipientDTO;
 
-/**
- * Class Mail.
- */
-class TransmissionDTO implements \JsonSerializable
+final class TransmissionDTO implements \JsonSerializable
 {
-    /**
-     * @var OptionsDTO|null
-     */
-    private $options;
+    private ?OptionsDTO $options;
 
     /**
      * @var RecipientDTO[]
      */
-    private $recipients = [];
+    private array $recipients = [];
 
-    /**
-     * @var string|null
-     */
-    private $campaignId;
+    private ?string $campaignId = null;
 
-    /**
-     * @var string|null
-     */
-    private $description;
+    private string $returnPath;
 
-    /**
-     * @var string
-     */
-    private $returnPath;
+    private ContentDTO $content;
 
-    /**
-     * @var ContentDTO
-     */
-    private $content;
-
-    /**
-     * TransmissionDTO constructor.
-     *
-     * @param string $returnPath
-     */
-    public function __construct(ContentDTO $content, $returnPath, OptionsDTO $options = null)
+    public function __construct(ContentDTO $content, ?string $returnPath, OptionsDTO $options = null)
     {
         $this->content    = $content;
         $this->returnPath = $returnPath;
         $this->options    = $options;
     }
 
-    /**
-     * @return TransmissionDTO
-     */
-    public function addRecipient(RecipientDTO $recipientDTO)
+    public function addRecipient(RecipientDTO $recipientDTO): self
     {
         $this->recipients[] = $recipientDTO;
 
         return $this;
     }
 
-    /**
-     * @param $campaignId
-     */
-    public function setCampaignId($campaignId)
+    public function setCampaignId(?string $campaignId): self
     {
         $this->campaignId = $campaignId;
+
+        return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function jsonSerialize()
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'return_path' => $this->returnPath,
@@ -86,9 +57,6 @@ class TransmissionDTO implements \JsonSerializable
         }
         if (!empty($this->campaignId)) {
             $json['campaign_id'] = $this->campaignId;
-        }
-        if (!empty($this->description)) {
-            $json['description'] = $this->description;
         }
 
         return $json;

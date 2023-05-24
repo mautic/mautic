@@ -1,129 +1,73 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\AttachementDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\FromDTO;
 
-/**
- * Class ContentDTO.
- */
 final class ContentDTO implements \JsonSerializable
 {
-    /**
-     * @var string
-     */
-    private $subject;
+    private string $subject;
 
-    /**
-     * @var FromDTO
-     */
-    private $from = [];
+    private FromDTO $from;
 
-    /**
-     * @var string|null
-     */
-    private $html;
+    private ?string $html = null;
 
-    /**
-     * @var string|null
-     */
-    private $inlineCss;
+    private ?string $inlineCss = null;
 
-    /**
-     * @var string|null
-     */
-    private $text;
+    private ?string $text = null;
 
-    /**
-     * @var string|null
-     */
-    private $replyTo;
+    /** @var array<string, string> */
+    private array $headers = [];
 
-    /**
-     * @var array
-     */
-    private $headers = [];
+    /** @var AttachementDTO[] */
+    private array $attachments = [];
 
-    /**
-     * @var array
-     */
-    private $attachments = [];
-
-    /**
-     * ContentDTO constructor.
-     *
-     * @param $subject
-     */
-    public function __construct($subject, FromDTO $from)
+    public function __construct(string $subject, FromDTO $from)
     {
         $this->subject = $subject;
         $this->from    = $from;
     }
 
-    /**
-     * @param string|null $html
-     *
-     * @return ContentDTO
-     */
-    public function setHtml($html)
+    public function setHtml(?string $html): self
     {
         $this->html = $html;
 
         return $this;
     }
 
-    /**
-     * @param string|null $inlineCss
-     *
-     * @return ContentDTO
-     */
-    public function setInlineCss($inlineCss = null)
+    public function setInlineCss(?string $inlineCss = null): self
     {
         $this->inlineCss = $inlineCss;
 
         return $this;
     }
 
-    /**
-     * @param string|null $text
-     *
-     * @return ContentDTO
-     */
-    public function setText($text)
+    public function setText(?string $text): self
     {
         $this->text = $text;
 
         return $this;
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     *
-     * @return ContentDTO
-     */
-    public function addHeader($key, $value)
+    public function addHeader(string $key, string $value): self
     {
         $this->headers[$key] = $value;
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function addAttachment(AttachementDTO $attachementDTO)
+    public function addAttachment(AttachementDTO $attachmentDTO): self
     {
-        $this->attachments[] = $attachementDTO;
+        $this->attachments[] = $attachmentDTO;
 
         return $this;
     }
 
-    /**
-     * @return array|mixed
-     */
-    public function jsonSerialize()
+    /** @return array<string, mixed> */
+    public function jsonSerialize(): array
     {
         $json = [
             'subject' => $this->subject,
@@ -134,9 +78,6 @@ final class ContentDTO implements \JsonSerializable
         }
         if (null !== $this->text) {
             $json['text'] = $this->text;
-        }
-        if (null !== $this->replyTo) {
-            $json['reply_to'] = $this->replyTo;
         }
         if (0 !== count($this->headers)) {
             $json['headers'] = $this->headers;
