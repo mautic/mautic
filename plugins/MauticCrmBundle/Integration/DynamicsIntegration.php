@@ -800,7 +800,7 @@ class DynamicsIntegration extends CrmAbstractIntegration
                     $lead                       = $this->getCompoundMauticFields($lead);
                     $lead['integration_entity'] = $object;
                     $leadsToUpdateInD[$key]     = $lead;
-                    $integrationEntity          = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $lead['id']);
+                    $integrationEntity          = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $lead['id']);
                     $integrationEntities[]      = $integrationEntity->setLastSyncDate(new \DateTime());
                 }
             }

@@ -57,7 +57,7 @@ class Channel extends CommonEntity
             ->addId()
             ->addField('channel', 'string')
             ->addNamedField('channelId', 'integer', 'channel_id', true)
-            ->addField('properties', 'json_array')
+            ->addField('properties', 'json')
             ->createField('isEnabled', 'boolean')
                 ->columnName('is_enabled')
                 ->build();

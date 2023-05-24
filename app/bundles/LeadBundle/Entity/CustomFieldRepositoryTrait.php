@@ -111,7 +111,7 @@ trait CustomFieldRepositoryTrait
                     $alias = $this->getTableAlias();
                     $q     = $this->getEntityManager()->createQueryBuilder();
                     $q->select($alias)
-                        ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
+                        ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
                         ->indexBy($alias, $alias.'.id');
                 } else {
                     //ORM

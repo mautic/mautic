@@ -21,7 +21,7 @@ class DynamicContentRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select('e')
-            ->from('MauticDynamicContentBundle:DynamicContent', 'e', 'e.id');
+            ->from(\Mautic\DynamicContentBundle\Entity\DynamicContent::class, 'e', 'e.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin('e.category', 'c');

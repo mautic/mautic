@@ -270,7 +270,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $this->leadRepository],
+                        [\Mautic\LeadBundle\Entity\Lead::class, $this->leadRepository],
                         [Submission::class, $this->submissioRepository],
                     ]
                 )
