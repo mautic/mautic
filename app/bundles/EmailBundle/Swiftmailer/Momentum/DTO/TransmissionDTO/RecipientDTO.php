@@ -20,12 +20,12 @@ final class RecipientDTO implements \JsonSerializable
     /**
      * @var array<string, mixed>
      */
-    private array $metadata = [];
+    private array $metadata;
 
     /**
      * @var array<string, mixed>
      */
-    private array $substitutionData = [];
+    private array $substitutionData;
 
     /**
      * RecipientDTO constructor.
