@@ -231,8 +231,6 @@ class ImportModel extends FormModel
      * Import the CSV file from configuration in the $import entity.
      *
      * @param int $limit Number of records to import before delaying the import
-     *
-     * @return bool
      */
     public function process(Import $import, Progress $progress, int $limit = 0): bool
     {
@@ -424,8 +422,6 @@ class ImportModel extends FormModel
      * Decide whether the CSV row is empty.
      *
      * @param mixed $row
-     *
-     * @return bool
      */
     public function isEmptyCsvRow($row): bool
     {
@@ -499,7 +495,11 @@ class ImportModel extends FormModel
         return $chart->render();
     }
 
-    /** Returns a list of failed rows for the import. */
+    /**
+     * Returns a list of failed rows for the import.
+     *
+     * @return ?Paginator<Import>
+     */
     public function getFailedRows(?int $importId = null, string $object = 'lead'): ?Paginator
     {
         if (!$importId) {
