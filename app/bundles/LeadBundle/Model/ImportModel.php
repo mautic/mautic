@@ -498,7 +498,7 @@ class ImportModel extends FormModel
     /**
      * Returns a list of failed rows for the import.
      *
-     * @return ?Paginator<Import>
+     * @return ?Paginator<LeadEventLog>
      */
     public function getFailedRows(?int $importId = null, string $object = 'lead'): ?Paginator
     {
