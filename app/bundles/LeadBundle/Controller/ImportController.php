@@ -46,20 +46,11 @@ final class ImportController extends FormController
     public const STEP_PROGRESS_BAR    = 3;
     public const STEP_IMPORT_FROM_CSV = 4;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var SessionInterface
-     */
-    private $session;
+    private SessionInterface $session;
 
-    /**
-     * @var ImportModel
-     */
-    private $importModel;
+    private ImportModel $importModel;
 
     public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, LoggerInterface $mauticLogger, ManagerRegistry $doctrine)
     {
@@ -79,12 +70,7 @@ final class ImportController extends FormController
         parent::initialize($event);
     }
 
-    /**
-     * @param int $page
-     *
-     * @return JsonResponse|RedirectResponse
-     */
-    public function indexAction(Request $request, $page = 1)
+    public function indexAction(Request $request, int $page = 1): JsonResponse|RedirectResponse
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
@@ -132,22 +118,13 @@ final class ImportController extends FormController
         return [$count, $items];
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function viewAction(Request $request, $objectId)
+    public function viewAction(Request $request, int $objectId): array|JsonResponse|RedirectResponse|Response
     {
         return $this->viewStandard($request, $objectId, 'import', 'lead');
     }
 
-    /**
-     * Cancel and unpublish the import during manual import.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function cancelAction(Request $request)
+    /** Cancel and unpublish the import during manual import. */
+    public function cancelAction(Request $request): JsonResponse|RedirectResponse
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -167,12 +144,8 @@ final class ImportController extends FormController
         return $this->indexAction($request);
     }
 
-    /**
-     * Schedules manual import to background queue.
-     *
-     * @return array|JsonResponse|RedirectResponse|Response
-     */
-    public function queueAction(Request $request)
+    /** Schedules manual import to background queue. */
+    public function queueAction(Request $request): JsonResponse|RedirectResponse
     {
         $initEvent   = $this->dispatchImportOnInit();
         $object      = $initEvent->objectSingular;
@@ -190,7 +163,7 @@ final class ImportController extends FormController
         return $this->indexAction($request);
     }
 
-     public function newAction(Request $request, int $objectId = 0, bool $ignorePost = false): Response
+    public function newAction(Request $request, int $objectId = 0, bool $ignorePost = false): Response
     {
         $dispatcher = $this->dispatcher;
 
@@ -514,14 +487,8 @@ final class ImportController extends FormController
         }
     }
 
-    /**
-     * Returns line count from the session.
-     *
-     * @param string $object
-     *
-     * @return int
-     */
-    protected function getLineCount($object)
+    /** Returns line count from the session. */
+    protected function getLineCount(string $object): int
     {
         $progress = $this->session->get('mautic.'.$object.'.import.progress', [0, 0]);
 
@@ -536,7 +503,7 @@ final class ImportController extends FormController
      *
      * @return bool
      */
-    protected function importInBrowser(FormInterface $form, $object)
+    protected function importInBrowser(FormInterface $form, string $object): bool
     {
         $browserImportLimit = $this->getLineCountLimit();
 
@@ -549,9 +516,9 @@ final class ImportController extends FormController
         return false;
     }
 
-    protected function getLineCountLimit()
+    protected function getLineCountLimit(): int
     {
-        return $this->coreParametersHelper->get('background_import_if_more_rows_than', 0);
+        return (int) $this->coreParametersHelper->get('background_import_if_more_rows_than', 0);
     }
 
     /**
@@ -562,7 +529,7 @@ final class ImportController extends FormController
      *
      * @return bool
      */
-    protected function importInCli(FormInterface $form, $object)
+    protected function importInCli(FormInterface $form, string $object): bool
     {
         $browserImportLimit = $this->getLineCountLimit();
 
@@ -575,12 +542,8 @@ final class ImportController extends FormController
         return false;
     }
 
-    /**
-     * Generates import directory path.
-     *
-     * @return string
-     */
-    protected function getImportDirName()
+    /** Generates import directory path. */
+    protected function getImportDirName(): string
     {
         return $this->importModel->getImportDir();
     }
@@ -588,12 +551,8 @@ final class ImportController extends FormController
     /**
      * Generates unique import directory name inside the cache dir if not stored in the session.
      * If it exists in the session, returns that one.
-     *
-     * @param string $object
-     *
-     * @return string
      */
-    protected function getImportFileName($object)
+    protected function getImportFileName(string $object): string
     {
         // Return the dir path from session if exists
         if ($fileName = $this->session->get('mautic.'.$object.'.import.file')) {
@@ -610,12 +569,8 @@ final class ImportController extends FormController
 
     /**
      * Return full absolute path to the CSV file.
-     *
-     * @param string $object
-     *
-     * @return string
      */
-    protected function getFullCsvPath($object)
+    protected function getFullCsvPath(string $object): string
     {
         return $this->getImportDirName().'/'.$this->getImportFileName($object);
     }
@@ -642,9 +597,9 @@ final class ImportController extends FormController
     }
 
     /**
-     * @param $action
+     * @param array<string, mixed> $args
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getViewArguments(array $args, $action)
     {
@@ -675,11 +630,7 @@ final class ImportController extends FormController
         return $args;
     }
 
-    /**
-     * Support non-index pages such as modal forms.
-     *
-     * @return bool|string
-     */
+    /** Support non-index pages such as modal forms. */
     protected function generateUrl(string $route, array $parameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): string
     {
         if (!isset($parameters['object'])) {
