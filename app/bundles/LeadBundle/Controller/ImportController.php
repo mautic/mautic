@@ -70,7 +70,7 @@ final class ImportController extends FormController
         parent::initialize($event);
     }
 
-    public function indexAction(Request $request, int $page = 1): JsonResponse|RedirectResponse
+    public function indexAction(Request $request, int $page = 1): JsonResponse|RedirectResponse|Response
     {
         $initEvent = $this->dispatchImportOnInit();
         $this->session->set('mautic.import.object', $initEvent->objectSingular);
