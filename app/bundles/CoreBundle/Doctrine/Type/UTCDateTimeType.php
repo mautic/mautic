@@ -69,9 +69,7 @@ class UTCDateTimeType extends DateTimeType
 
         // Set to local timezone
         date_default_timezone_set($timezone);
-        if ($value instanceof \DateTime) {
-            $value->setTimezone(new \DateTimeZone($timezone));
-        }
+        $value->setTimezone(new \DateTimeZone($timezone));
 
         return $value;
     }
