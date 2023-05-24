@@ -1821,7 +1821,7 @@ class EmailModel extends FormModel implements AjaxLookupModelInterface
         $dnc = [];
         foreach ($leadId as $lead) {
             $dnc[] = $this->doNotContact->addDncForContact(
-                $this->em->getReference('MauticLeadBundle:Lead', $lead),
+                $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead),
                 'email',
                 $reason,
                 $comments,

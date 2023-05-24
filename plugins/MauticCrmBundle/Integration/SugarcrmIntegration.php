@@ -1663,7 +1663,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     $this->logIntegrationError(new \Exception($item['error']));
 
                     if ($integrationEntityId) {
-                        $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                        $integrationEntity = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityId);
                         $integrationEntity->setLastSyncDate(new \DateTime());
 
                         $persistEntities[] = $integrationEntity;
@@ -1697,7 +1697,7 @@ class SugarcrmIntegration extends CrmAbstractIntegration
                     } else {
                         // Record was updated
                         if ($integrationEntityId) {
-                            $integrationEntity = $this->em->getReference('MauticPluginBundle:IntegrationEntity', $integrationEntityId);
+                            $integrationEntity = $this->em->getReference(\Mautic\PluginBundle\Entity\IntegrationEntity::class, $integrationEntityId);
                             $integrationEntity->setLastSyncDate(new \DateTime());
                         } else {
                             // Found in Sugarcrm so create a new record for it

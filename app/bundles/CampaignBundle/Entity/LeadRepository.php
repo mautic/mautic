@@ -27,7 +27,7 @@ class LeadRepository extends CommonRepository
     public function getLeadDetails($campaignId, $leads = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:Lead', 'lc')
+            ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
             ->select('lc')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
@@ -62,7 +62,7 @@ class LeadRepository extends CommonRepository
     public function getLeads($campaignId, $eventId = null)
     {
         $q = $this->getEntityManager()->createQueryBuilder()
-            ->from('MauticCampaignBundle:Lead', 'lc')
+            ->from(\Mautic\CampaignBundle\Entity\Lead::class, 'lc')
             ->select('lc, l')
             ->leftJoin('lc.campaign', 'c')
             ->leftJoin('lc.lead', 'l');
@@ -78,7 +78,7 @@ class LeadRepository extends CommonRepository
         if (null != $eventId) {
             $dq = $this->getEntityManager()->createQueryBuilder();
             $dq->select('el.id')
-                ->from('MauticCampaignBundle:LeadEventLog', 'ell')
+                ->from(\Mautic\CampaignBundle\Entity\LeadEventLog::class, 'ell')
                 ->leftJoin('ell.lead', 'el')
                 ->leftJoin('ell.event', 'ev')
                 ->where(

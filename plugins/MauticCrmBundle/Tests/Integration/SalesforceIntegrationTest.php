@@ -826,7 +826,7 @@ class SalesforceIntegrationTest extends AbstractIntegrationTestCase
             ->willReturnCallback(
                 function () {
                     switch (func_get_arg(0)) {
-                        case 'MauticPluginBundle:IntegrationEntity':
+                        case \Mautic\PluginBundle\Entity\IntegrationEntity::class:
                             return new IntegrationEntity();
                     }
                 }
