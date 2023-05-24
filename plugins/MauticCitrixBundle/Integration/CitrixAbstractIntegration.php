@@ -13,7 +13,7 @@ use Mautic\PluginBundle\Integration\AbstractIntegration;
 abstract class CitrixAbstractIntegration extends AbstractIntegration
 {
     protected $auth;
-    public const DEPRECATION_MESSAGE = 'The Citrix plugin is deprecated and will be removed in Mautic 5. See <a href="https://www.leuchtfeuer.com/en/mautic/know-how/mautic/gotowebinar-plugin-new-features/" target=”_blank”>an alternative</a> for this plugin.';
+    public const DEPRECATION_MESSAGE = 'The Citrix plugin is deprecated and will be removed in Mautic 5. See <a href="https://www.leuchtfeuer.com/en/mautic/downloads/mautic-goto-plugin/" target=”_blank”>an alternative</a> for this plugin.';
 
     /**
      * @return array
