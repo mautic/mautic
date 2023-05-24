@@ -289,7 +289,7 @@ class LeadEventLogRepository extends CommonRepository
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile()
+                new QueryCacheProfile(600)
             )->fetchAllAssociative();
         } else {
             $results = $q->execute()->fetchAllAssociative();
