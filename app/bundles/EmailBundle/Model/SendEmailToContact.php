@@ -109,8 +109,13 @@ class SendEmailToContact
      *
      * @return $this
      */
-    public function setEmail(Email $email, array $channel = [], array $customHeaders = [], array $assetAttachments = [], string $emailType = null)
-    {
+    public function setEmail(
+        Email $email,
+        array $channel = [],
+        array $customHeaders = [],
+        array $assetAttachments = [],
+        string $emailType = null
+    ): SendEmailToContact {
         // Flush anything that's pending from a previous email
         $this->flush();
 

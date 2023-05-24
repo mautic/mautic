@@ -1198,6 +1198,11 @@ class MailHelper
         $this->emailType = $emailType;
     }
 
+    public function isMarketingEmail(): bool
+    {
+        return self::EMAIL_TYPE_TRANSACTIONAL !== $this->getEmailType();
+    }
+
     /**
      * @return Email|null
      */

@@ -18,8 +18,10 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailBuilderEvent;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\Helper\MailHashHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\TokenHelper;
 use Mautic\PageBundle\Entity\Redirect;
 use Mautic\PageBundle\Entity\Trackable;
 use Mautic\PageBundle\Model\RedirectModel;
@@ -35,7 +37,8 @@ class BuilderSubscriber implements EventSubscriberInterface
         private TrackableModel $pageTrackableModel,
         private RedirectModel $pageRedirectModel,
         private TranslatorInterface $translator,
-        private MailHashHelper $mailHash
+        private MailHashHelper $mailHash,
+        private MailHelper $mailer
     ) {
     }
 
@@ -268,16 +271,21 @@ class BuilderSubscriber implements EventSubscriberInterface
             $idHash = uniqid();
         }
 
-        $unsubscribeText = $this->coreParametersHelper->get('unsubscribe_text');
-        if (!$unsubscribeText) {
-            $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
-        }
+        if ($this->mailer->isMarketingEmail()) {
+            $unsubscribeText = $this->coreParametersHelper->get('unsubscribe_text');
+            if (!$unsubscribeText) {
+                $unsubscribeText = $this->translator->trans('mautic.email.unsubscribe.text', ['%link%' => '|URL|']);
+            }
 
-        // We will replace tokens in unsubscribe text too
-        $unsubscribeText = \Mautic\LeadBundle\Helper\TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
-        $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
-        $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
-        $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+            // We will replace tokens in unsubscribe text too
+            $unsubscribeText = TokenHelper::findLeadTokens($unsubscribeText, $lead, true);
+            $unsubscribeText = str_replace('|URL|', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]), $unsubscribeText);
+            $event->addToken('{unsubscribe_text}', EmojiHelper::toHtml($unsubscribeText));
+            $event->addToken('{unsubscribe_url}', $this->emailModel->buildUrl('mautic_email_unsubscribe', ['idHash' => $idHash, 'urlEmail' => $toEmail, 'secretHash' => $unsubscribeHash]));
+        } else {
+            $event->addToken('{unsubscribe_text}', '');
+            $event->addToken('{unsubscribe_url}', '');
+        }
 
         $webviewText = $this->coreParametersHelper->get('webview_text');
         if (!$webviewText) {

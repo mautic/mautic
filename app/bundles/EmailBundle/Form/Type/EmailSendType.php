@@ -53,8 +53,8 @@ class EmailSendType extends AbstractType
                 ButtonGroupType::class,
                 [
                     'choices' => [
-                        'mautic.email.send.emailtype.transactional' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                         'mautic.email.send.emailtype.marketing'     => MailHelper::EMAIL_TYPE_MARKETING,
+                        'mautic.email.send.emailtype.transactional' => MailHelper::EMAIL_TYPE_TRANSACTIONAL,
                     ],
                     'label'      => 'mautic.email.send.emailtype',
                     'label_attr' => ['class' => 'control-label'],
@@ -62,7 +62,7 @@ class EmailSendType extends AbstractType
                         'class'   => 'form-control email-type',
                         'tooltip' => 'mautic.email.send.emailtype.tooltip',
                     ],
-                    'data' => (!isset($options['data']['email_type'])) ? MailHelper::EMAIL_TYPE_TRANSACTIONAL : $options['data']['email_type'],
+                    'data' => (!isset($options['data']['email_type'])) ? MailHelper::EMAIL_TYPE_MARKETING : $options['data']['email_type'],
                 ]
             );
         }
@@ -148,7 +148,7 @@ class EmailSendType extends AbstractType
                         'attr'     => [
                             'class'        => 'form-control',
                             'tooltip'      => 'mautic.channel.message.send.priority.tooltip',
-                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                            'data-show-on' => '{"campaignevent_properties_email_type_0":"checked"}',
                         ],
                         'data'        => $data,
                         'placeholder' => false,
@@ -164,7 +164,7 @@ class EmailSendType extends AbstractType
                         'attr'  => [
                             'class'        => 'form-control',
                             'tooltip'      => 'mautic.channel.message.send.attempts.tooltip',
-                            'data-show-on' => '{"campaignevent_properties_email_type_1":"checked"}',
+                            'data-show-on' => '{"campaignevent_properties_email_type_0":"checked"}',
                         ],
                         'data'       => $data,
                         'empty_data' => 0,
@@ -179,7 +179,7 @@ class EmailSendType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'with_email_types' => false,
+                'with_email_types' => true,
             ]
         );
 

@@ -9,6 +9,7 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\BuilderSubscriber;
 use Mautic\EmailBundle\Helper\MailHashHelper;
+use Mautic\EmailBundle\Helper\MailHelper;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\LeadBundle\Entity\Company;
 use Mautic\LeadBundle\Entity\Lead;
@@ -21,30 +22,36 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class BuilderSubscriberTest extends TestCase
 {
     /**
-     * @var MockObject|CoreParametersHelper
+     * @var MockObject&CoreParametersHelper
      */
-    private $coreParametersHelper;
-    /**
-     * @var BuilderSubscriber
-     */
-    private $builderSubscriber;
-    /**
-     * @var MockObject|EmailModel
-     */
-    private $emailModel;
-    /**
-     * @var MockObject|TrackableModel
-     */
-    private $trackableModel;
-    /**
-     * @var MockObject|RedirectModel
-     */
-    private $redirectModel;
+    private MockObject $coreParametersHelper;
+
+    private BuilderSubscriber $builderSubscriber;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject&EmailModel
      */
-    private $translator;
+    private MockObject $emailModel;
+
+    /**
+     * @var MockObject&TrackableModel
+     */
+    private MockObject $trackableModel;
+
+    /**
+     * @var MockObject&RedirectModel
+     */
+    private MockObject $redirectModel;
+
+    /**
+     * @var MockObject&TranslatorInterface
+     */
+    private MockObject $translator;
+
+    /**
+     * @var MockObject&MailHelper
+     */
+    private MockObject $mailHelperMock;
 
     /**
      * @param array<mixed> $data
@@ -59,6 +66,7 @@ class BuilderSubscriberTest extends TestCase
         $this->trackableModel       = $this->createMock(TrackableModel::class);
         $this->redirectModel        = $this->createMock(RedirectModel::class);
         $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->mailHelperMock       = $this->createMock(MailHelper::class);
         $mailHashHelper             = new MailHashHelper($this->coreParametersHelper);
         $this->builderSubscriber    = new BuilderSubscriber(
             $this->coreParametersHelper,
@@ -66,7 +74,8 @@ class BuilderSubscriberTest extends TestCase
             $this->trackableModel,
             $this->redirectModel,
             $this->translator,
-            $mailHashHelper
+            $mailHashHelper,
+            $this->mailHelperMock
         );
         $this->emailModel->method('buildUrl')->willReturn('https://some.url');
         $this->translator->method('trans')->willReturn('some translation');
@@ -183,9 +192,83 @@ class BuilderSubscriberTest extends TestCase
             ->withConsecutive([$unsubscribeTokenizedText], [])
             ->willReturn($unsubscribeTokenizedText);
 
+        $this->mailHelperMock->expects($this->once())
+            ->method('isMarketingEmail')
+            ->willReturn(true);
+
         $this->builderSubscriber->onEmailGenerate($event);
         $this->assertEquals(
             $company->getName().' '.$lead->getLastname(),
+            $event->getTokens()['{unsubscribe_text}']
+        );
+    }
+
+    public function testUnsubscribeTestTokensAreReplacedWithHashOnEmailGenerate(): void
+    {
+        $lead = new Lead();
+        $lead->setId(7);
+        $lead->setLastname('Sykora');
+        $lead->setEmail('lukas.sykora@acquia.com');
+
+        $company = new Company();
+        $company->setName('Acquia');
+
+        $leadArray                = $lead->convertToArray();
+        $leadArray['companies'][] = ['companyname' => $company->getName(), 'is_primary' => true];
+
+        $email = new Email();
+        $email->setSendToDnc(true);
+
+        $args = [
+            'lead'   => $leadArray,
+            'email'  => $email,
+            'idHash' => 'hash',
+        ];
+        $event = new EmailSendEvent(null, $args);
+
+        $unsubscribeTokenizedText = '<a href="|URL|">Unsubscribe</a> {contactfield=companyname} {contactfield=lastname}';
+
+        $this->coreParametersHelper
+            ->method('get')
+            ->withConsecutive(['secret_key'], ['unsubscribe_text'], ['webview_text'], ['default_signature_text'], ['mailer_from_name'])
+            ->willReturnOnConsecutiveCalls('secret', $unsubscribeTokenizedText, 'Just a text', 'Signature', 'jan.kozak@acquia.com');
+
+        $emailHash = hash_hmac('sha256', 'lukas.sykora@acquia.com', 'secret');
+        $this->emailModel
+            ->method('buildUrl')
+            ->withConsecutive(['mautic_email_unsubscribe', ['idHash' => 'hash', 'urlEmail' => 'lukas.sykora@acquia.com', 'secretHash' => $emailHash]])
+            ->willReturnOnConsecutiveCalls('/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash);
+
+        $this->translator->expects($this->never())
+            ->method('trans')
+            ->withConsecutive([$unsubscribeTokenizedText], [])
+            ->willReturn($unsubscribeTokenizedText);
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('isMarketingEmail')
+            ->willReturn(true);
+
+        $this->builderSubscriber->onEmailGenerate($event);
+        $this->assertEquals(
+            '<a href="'.'/email/unsubscribe/hash/lukas.sykora@acquia.com/'.$emailHash.'">Unsubscribe</a> '.$company->getName().' '.$lead->getLastname(),
+            $event->getTokens()['{unsubscribe_text}']
+        );
+    }
+
+    public function testNoUnsubscribeTextForTransactionalEmail(): void
+    {
+        $args = [
+            'email' => (new Email()),
+        ];
+        $event = new EmailSendEvent(null, $args);
+
+        $this->mailHelperMock->expects($this->once())
+            ->method('isMarketingEmail')
+            ->willReturn(false);
+
+        $this->builderSubscriber->onEmailGenerate($event);
+        $this->assertEquals(
+            '',
             $event->getTokens()['{unsubscribe_text}']
         );
     }
