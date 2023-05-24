@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO;
 
-use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\AttachementDTO;
+use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\AttachmentDTO;
 use Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO\FromDTO;
 
 final class ContentDTO implements \JsonSerializable
@@ -22,7 +22,7 @@ final class ContentDTO implements \JsonSerializable
     /** @var array<string, string> */
     private array $headers = [];
 
-    /** @var AttachementDTO[] */
+    /** @var AttachmentDTO[] */
     private array $attachments = [];
 
     public function __construct(string $subject, FromDTO $from)
@@ -59,7 +59,7 @@ final class ContentDTO implements \JsonSerializable
         return $this;
     }
 
-    public function addAttachment(AttachementDTO $attachmentDTO): self
+    public function addAttachment(AttachmentDTO $attachmentDTO): self
     {
         $this->attachments[] = $attachmentDTO;
 

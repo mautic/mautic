@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Mautic\EmailBundle\Swiftmailer\Momentum\DTO\TransmissionDTO\ContentDTO;
 
-final class AttachementDTO implements \JsonSerializable
+final class AttachmentDTO implements \JsonSerializable
 {
     private string $type;
 
