@@ -41,7 +41,7 @@ class InactiveHelper
     private DecisionHelper $decisionHelper;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $earliestInactiveDate;
 
@@ -139,7 +139,7 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getEarliestInactiveDateTime()
     {
@@ -164,7 +164,7 @@ class InactiveHelper
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      *
      * @throws \Mautic\CampaignBundle\Executioner\Scheduler\Exception\NotSchedulableException
      */

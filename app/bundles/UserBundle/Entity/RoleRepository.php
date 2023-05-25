@@ -38,7 +38,7 @@ class RoleRepository extends CommonRepository
         $q = $this->_em->createQueryBuilder();
 
         $q->select('partial r.{id, name}')
-            ->from('MauticUserBundle:Role', 'r');
+            ->from(\Mautic\UserBundle\Entity\Role::class, 'r');
 
         if (!empty($search)) {
             $q->where('r.name LIKE :search')
@@ -132,7 +132,7 @@ class RoleRepository extends CommonRepository
         )
             ->groupBy('u.role_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

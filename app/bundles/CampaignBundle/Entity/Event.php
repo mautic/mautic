@@ -38,7 +38,7 @@ class Event implements ChannelInterface
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -63,32 +63,32 @@ class Event implements ChannelInterface
     private $properties = [];
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerDate;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $triggerInterval = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $triggerIntervalUnit;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerHour;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerRestrictedStartHour;
 
     /**
-     * @var \DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $triggerRestrictedStopHour;
 
@@ -98,7 +98,7 @@ class Event implements ChannelInterface
     private $triggerRestrictedDaysOfWeek = [];
 
     /**
-     * @var string
+     * @var string|null
      */
     private $triggerMode;
 
@@ -108,27 +108,27 @@ class Event implements ChannelInterface
     private $campaign;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\Event>
      **/
     private $children;
 
     /**
-     * @var Event
+     * @var Event|null
      **/
     private $parent;
 
     /**
-     * @var string
+     * @var string|null
      **/
     private $decisionPath;
 
     /**
-     * @var string
+     * @var string|null
      **/
     private $tempId;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\CampaignBundle\Entity\LeadEventLog>
      */
     private $log;
 
@@ -787,7 +787,7 @@ class Event implements ChannelInterface
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getTriggerHour()
     {
@@ -984,7 +984,7 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedStartHour.
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getTriggerRestrictedStartHour()
     {
@@ -1016,7 +1016,7 @@ class Event implements ChannelInterface
     /**
      * Get the value of triggerRestrictedStopHour.
      *
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getTriggerRestrictedStopHour()
     {

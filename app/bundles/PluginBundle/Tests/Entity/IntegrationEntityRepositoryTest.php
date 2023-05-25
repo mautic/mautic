@@ -27,7 +27,7 @@ class IntegrationEntityRepositoryTest extends MauticMysqlTestCase
     {
         parent::setUp();
         $this->prefix                      = self::$container->getParameter('mautic.db_table_prefix');
-        $this->integrationEntityRepository = $this->em->getRepository('MauticPluginBundle:IntegrationEntity');
+        $this->integrationEntityRepository = $this->em->getRepository(\Mautic\PluginBundle\Entity\IntegrationEntity::class);
     }
 
     public function testThatGetIntegrationsEntityIdReturnsCorrectValues(): void

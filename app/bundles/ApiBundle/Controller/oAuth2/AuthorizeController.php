@@ -21,11 +21,6 @@ use Twig\Environment;
 class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeController
 {
     /**
-     * @var SessionInterface
-     */
-    private $session;
-
-    /**
      * @var Form
      */
     private $authorizeForm;
@@ -70,7 +65,6 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
         Environment $twig,
         SessionInterface $session = null
     ) {
-        $this->session              = $session;
         $this->authorizeForm        = $authorizeForm;
         $this->authorizeFormHandler = $authorizeFormHandler;
         $this->oAuth2Server         = $oAuth2Server;
@@ -106,9 +100,9 @@ class AuthorizeController extends \FOS\OAuthServerBundle\Controller\AuthorizeCon
             throw new AccessDeniedException('This user does not have access to this section.');
         }
 
-        if (true === $this->session->get('_fos_oauth_server.ensure_logout')) {
-            $this->session->invalidate(600);
-            $this->session->set('_fos_oauth_server.ensure_logout', true);
+        if (true === $request->getSession()->get('_fos_oauth_server.ensure_logout')) {
+            $request->getSession()->invalidate(600);
+            $request->getSession()->set('_fos_oauth_server.ensure_logout', true);
         }
 
         $event = $this->eventDispatcher->dispatch(

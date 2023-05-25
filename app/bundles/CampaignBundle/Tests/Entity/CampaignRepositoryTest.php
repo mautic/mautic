@@ -61,7 +61,7 @@ class CampaignRepositoryTest extends TestCase
 
         $this->queryBuilder->expects(self::once())
             ->method('from')
-            ->with('MauticCampaignBundle:Campaign', $this->repository->getTableAlias(), $this->repository->getTableAlias().'.id')
+            ->with(\Mautic\CampaignBundle\Entity\Campaign::class, $this->repository->getTableAlias(), $this->repository->getTableAlias().'.id')
             ->willReturn($this->queryBuilder);
 
         $this->queryBuilder->expects(self::once())

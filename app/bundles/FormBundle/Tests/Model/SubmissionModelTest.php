@@ -8,8 +8,8 @@ use Mautic\CampaignBundle\Model\CampaignModel;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Templating\Helper\DateHelper;
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
 use Mautic\FormBundle\Entity\Field;
 use Mautic\FormBundle\Entity\Form;
 use Mautic\FormBundle\Entity\Submission;
@@ -195,7 +195,14 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->fieldHelper              = $this->createMock(FormFieldHelper::class);
         $this->dispatcher               = $this->createMock(EventDispatcherInterface::class);
         $this->translator               = $this->createMock(Translator::class);
-        $this->dateHelper               = $this->createMock(DateHelper::class);
+        $this->dateHelper               = new DateHelper(
+            'Y-m-d H:i:s',
+            'Y-m-d H:i',
+            'Y-m-d',
+            'H:i',
+            $this->translator,
+            $this->createMock(\Mautic\CoreBundle\Helper\CoreParametersHelper::class)
+        );
         $this->userHelper               = $this->createMock(UserHelper::class);
         $this->entityManager            = $this->createMock(EntityManager::class);
         $this->submissioRepository      = $this->createMock(SubmissionRepository::class);
@@ -273,7 +280,7 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        ['MauticLeadBundle:Lead', $this->leadRepository],
+                        [\Mautic\LeadBundle\Entity\Lead::class, $this->leadRepository],
                         [Submission::class, $this->submissioRepository],
                     ]
                 )

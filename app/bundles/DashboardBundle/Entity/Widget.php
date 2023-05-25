@@ -2,7 +2,7 @@
 
 namespace Mautic\DashboardBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -36,7 +36,7 @@ class Widget extends FormEntity
     private $height;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $ordering;
 
@@ -71,7 +71,7 @@ class Widget extends FormEntity
     private $loadTime = 0;
 
     /**
-     * @var int (minutes)
+     * @var int|null (minutes)
      */
     private $cacheTimeout;
 
@@ -93,12 +93,12 @@ class Widget extends FormEntity
         $builder->setTable('widgets');
         $builder->setCustomRepositoryClass(WidgetRepository::class);
         $builder->addIdColumns('name', false);
-        $builder->addField('type', Type::STRING);
-        $builder->addField('width', Type::INTEGER);
-        $builder->addField('height', Type::INTEGER);
-        $builder->addNullableField('cacheTimeout', Type::INTEGER, 'cache_timeout');
-        $builder->addNullableField('ordering', Type::INTEGER);
-        $builder->addNullableField('params', Type::TARRAY);
+        $builder->addField('type', Types::STRING);
+        $builder->addField('width', Types::INTEGER);
+        $builder->addField('height', Types::INTEGER);
+        $builder->addNullableField('cacheTimeout', Types::INTEGER, 'cache_timeout');
+        $builder->addNullableField('ordering', Types::INTEGER);
+        $builder->addNullableField('params', Types::ARRAY);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)

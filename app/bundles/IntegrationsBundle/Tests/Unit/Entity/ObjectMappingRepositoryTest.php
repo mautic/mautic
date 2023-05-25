@@ -18,7 +18,7 @@ final class ObjectMappingRepositoryTest extends TestCase
     use RepositoryConfiguratorTrait;
 
     /**
-     * @var MockObject&AbstractQuery
+     * @var MockObject&AbstractQuery<mixed>
      */
     private $query;
 

@@ -16,12 +16,12 @@ class WebhookQueue
     private $id;
 
     /**
-     * @var Webhook|null
+     * @var Webhook
      */
     private $webhook;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     private $dateAdded;
 
@@ -36,7 +36,7 @@ class WebhookQueue
     private $payloadCompressed;
 
     /**
-     * @var Event|null
+     * @var Event
      **/
     private $event;
 
@@ -91,7 +91,7 @@ class WebhookQueue
     }
 
     /**
-     * @return DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {

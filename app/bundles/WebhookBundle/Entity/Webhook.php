@@ -29,7 +29,7 @@ class Webhook extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -44,17 +44,17 @@ class Webhook extends FormEntity
     private $secret;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Event>
      */
     private $events;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\WebhookBundle\Entity\Log>
      */
     private $logs;
 
@@ -80,7 +80,7 @@ class Webhook extends FormEntity
      * ASC or DESC order for fetching order of the events when queue mode is on.
      * Null means use the global default.
      *
-     * @var string
+     * @var string|null
      */
     private $eventsOrderbyDir;
 
@@ -438,7 +438,7 @@ class Webhook extends FormEntity
     }
 
     /**
-     * @return Collection<int,self>
+     * @return Collection<int, \Mautic\WebhookBundle\Entity\Log>
      */
     public function getLimitedLogs(): Collection
     {

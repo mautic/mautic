@@ -30,7 +30,6 @@ class RedirectModel extends FormModel
     public function getRepository(): RedirectRepository
     {
         $result = $this->em->getRepository(Redirect::class);
-        \assert($result instanceof RedirectRepository);
 
         return $result;
     }
@@ -125,14 +124,19 @@ class RedirectModel extends FormModel
     /**
      * Get Redirect entities by an array of URLs.
      *
-     * @return array
+     * @return array<Redirect>
      */
     public function getRedirectsByUrls(array $urls)
     {
+        /** @var array<Redirect> $redirects */
         $redirects   = $this->getRepository()->findByUrls(array_values($urls));
         $newEntities = [];
-        $return      = [];
-        $byUrl       = [];
+
+        /** @var array<string, Redirect> $return */
+        $return = [];
+
+        /** @var array<string, Redirect> $byUrl */
+        $byUrl = [];
 
         foreach ($redirects as $redirect) {
             $byUrl[$redirect->getUrl()] = $redirect;

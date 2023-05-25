@@ -2,6 +2,7 @@
 
 namespace Mautic\PageBundle\Entity;
 
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -31,26 +32,22 @@ class HitRepository extends CommonRepository
         $q2->select('null')
             ->from(MAUTIC_TABLE_PREFIX.'page_hits', 'h');
 
-        $expr = $q2->expr()->andX();
+        $expr = null;
 
         // If we know the lead, use that to determine uniqueness
         if (null !== $lead && $lead->getId()) {
-            $expr->add(
-                $q2->expr()->eq('h.lead_id', $lead->getId())
-            );
+            $expr = CompositeExpression::and($q2->expr()->eq('h.lead_id', $lead->getId()));
         } else {
-            $expr->add(
-                $q2->expr()->eq('h.tracking_id', ':id')
-            );
+            $expr = CompositeExpression::and($q2->expr()->eq('h.tracking_id', ':id'));
             $q->setParameter('id', $trackingId);
         }
 
         if ($page instanceof Page) {
-            $expr->add(
+            $expr = $expr->with(
                 $q2->expr()->eq('h.page_id', $page->getId())
             );
         } elseif ($page instanceof Redirect) {
-            $expr->add(
+            $expr = $expr->with(
                 $q2->expr()->eq('h.redirect_id', $page->getId())
             );
         }
@@ -60,7 +57,7 @@ class HitRepository extends CommonRepository
         $q->select('u.is_unique')
             ->from(sprintf('(SELECT (NOT EXISTS (%s)) is_unique)', $q2->getSQL()), 'u');
 
-        return (bool) $q->execute()->fetchColumn();
+        return (bool) $q->execute()->fetchOne();
     }
 
     /**
@@ -157,7 +154,7 @@ class HitRepository extends CommonRepository
 
         $q->andWhere($q->expr()->eq('h.code', (int) $code));
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $hits = [];
         foreach ($results as $r) {
@@ -262,7 +259,7 @@ class HitRepository extends CommonRepository
         } else {
             $sq->orderBy('h.date_hit', 'DESC limit 1');
         }
-        $result = $sq->execute()->fetch();
+        $result = $sq->execute()->fetchAssociative();
 
         return new \DateTime($result['latest_hit'], new \DateTimeZone('UTC'));
     }
@@ -286,7 +283,7 @@ class HitRepository extends CommonRepository
             ->from(MAUTIC_TABLE_PREFIX.'pages', 'p')
             ->where($q->expr()->$inOrEq('p.id', $pageIds))
             ->execute()
-            ->fetchAll();
+            ->fetchAllAssociative();
 
         $return = [];
         foreach ($pages as $p) {
@@ -301,7 +298,7 @@ class HitRepository extends CommonRepository
         // Get the total number of bounces - simplified query for if date_left is null, it'll more than likely be a bounce or
         // else we would have recorded the date_left on a subsequent page hit
         $q    = $this->getEntityManager()->getConnection()->createQueryBuilder();
-        $expr = $q->expr()->andX(
+        $expr = $q->expr()->and(
             $q->expr()->$inOrEq('h.page_id', $pageIds),
             $q->expr()->eq('h.code', 200),
             $q->expr()->isNull('h.date_left')
@@ -309,8 +306,8 @@ class HitRepository extends CommonRepository
 
         if (null !== $fromDate) {
             //make sure the date is UTC
-            $dt = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
-            $expr->add(
+            $dt   = new DateTimeHelper($fromDate, 'Y-m-d H:i:s', 'local');
+            $expr = $expr->with(
                 $q->expr()->gte('h.date_hit', $q->expr()->literal($dt->toUtcString()))
             );
         }
@@ -320,7 +317,7 @@ class HitRepository extends CommonRepository
             ->where($expr)
             ->groupBy('h.page_id');
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $p) {
             $return[$p['page_id']]['bounces'] = (int) $p['bounces'];
@@ -378,7 +375,7 @@ class HitRepository extends CommonRepository
             ->select('ph.page_id, ph.date_hit, ph.date_left, p.title')
             ->orderBy('ph.date_hit', 'ASC')
             ->andWhere(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('ph.page_id', $pageIds)
                 )
             );
@@ -391,7 +388,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         //loop to structure
         $times  = [];
@@ -439,7 +436,7 @@ class HitRepository extends CommonRepository
             );
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $times = [];
 
@@ -506,7 +503,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -535,7 +532,7 @@ class HitRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**

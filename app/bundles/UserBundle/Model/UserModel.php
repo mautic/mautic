@@ -13,9 +13,11 @@ use Mautic\UserBundle\Event\UserEvent;
 use Mautic\UserBundle\Form\Type\UserType;
 use Mautic\UserBundle\Model\UserToken\UserTokenServiceInterface;
 use Mautic\UserBundle\UserEvents;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -44,7 +46,6 @@ class UserModel extends FormModel
     public function getRepository(): UserRepository
     {
         $result = $this->em->getRepository(User::class);
-        \assert($result instanceof UserRepository);
 
         return $result;
     }
@@ -94,7 +95,7 @@ class UserModel extends FormModel
      *
      * @return string
      */
-    public function checkNewPassword(User $entity, UserPasswordEncoder $encoder, $submittedPassword, $validate = false)
+    public function checkNewPassword(User $entity, UserPasswordEncoderInterface $encoder, $submittedPassword, $validate = false)
     {
         if ($validate) {
             if (strlen($submittedPassword) < 6) {
@@ -115,7 +116,7 @@ class UserModel extends FormModel
      *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
      */
-    public function createForm($entity, $formFactory, $action = null, $options = [])
+    public function createForm($entity, FormFactoryInterface $formFactory, $action = null, $options = [])
     {
         if (!$entity instanceof User) {
             throw new MethodNotAllowedHttpException(['User'], 'Entity must be of class User()');
@@ -141,7 +142,7 @@ class UserModel extends FormModel
         if ($entity) {
             //add user's permissions
             $entity->setActivePermissions(
-                $this->em->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($entity->getRole())
+                $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($entity->getRole())
             );
         }
 
@@ -153,7 +154,7 @@ class UserModel extends FormModel
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->em->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
 
         return $this->getRepository()->findOneBy(
             [

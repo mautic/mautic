@@ -36,7 +36,7 @@ class Notification
     protected $message;
 
     /**
-     * @var DateTime|null
+     * @var \DateTimeInterface|null
      */
     protected $dateAdded;
 
@@ -46,7 +46,7 @@ class Notification
     protected $iconClass;
 
     /**
-     * @var bool|null
+     * @var bool
      */
     protected $isRead = false;
 
@@ -155,7 +155,7 @@ class Notification
     }
 
     /**
-     * @return \DateTime|null
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {

@@ -3,7 +3,7 @@
 namespace Mautic\FormBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
@@ -26,12 +26,12 @@ class Form extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formAttributes;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -41,12 +41,12 @@ class Form extends FormEntity
     private $alias;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $cachedHtml;
 
@@ -56,52 +56,51 @@ class Form extends FormEntity
     private $postAction = 'return';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $postActionProperty;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     private $fields;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     private $actions;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $template;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $inKioskMode = false;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $renderStyle = false;
 
     /**
-     * @ORM\OneToMany(targetEntity="Submission", mappedBy="form", fetch="EXTRA_LAZY")
-     * @ORM\OrderBy({"dateSubmitted" = "DESC"})
-     *
-     * @var ArrayCollection
+     * @var Collection<int, Submission>
      */
-    private $submissions;
+    #[ORM\OneToMany(targetEntity: \Mautic\FormBundle\Entity\Submission::class, mappedBy: 'form', fetch: 'EXTRA_LAZY')]
+    #[ORM\OrderBy(['dateSubmitted' => 'DESC'])]
+    private \Doctrine\Common\Collections\Collection $submissions;
 
     /**
      * @var int
@@ -109,17 +108,17 @@ class Form extends FormEntity
     public $submissionCount;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $formType;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     private $noIndex;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $progressiveProfilingLimit;
 
@@ -218,7 +217,7 @@ class Form extends FormEntity
             ->nullable()
             ->build();
 
-        $builder->addNullableField('progressiveProfilingLimit', Type::INTEGER, 'progressive_profiling_limit');
+        $builder->addNullableField('progressiveProfilingLimit', Types::INTEGER, 'progressive_profiling_limit');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata)
@@ -405,7 +404,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return string
+     * @return bool|null
      */
     public function getRenderStyle()
     {
@@ -473,7 +472,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishUp()
     {
@@ -494,7 +493,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getPublishDown()
     {
@@ -528,7 +527,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Field[]
+     * @return ArrayCollection<int, \Mautic\FormBundle\Entity\Field>
      */
     public function getFields()
     {
@@ -645,7 +644,7 @@ class Form extends FormEntity
     }
 
     /**
-     * @return \Doctrine\Common\Collections\Collection|Action[]
+     * @return ArrayCollection<string, \Mautic\FormBundle\Entity\Action>
      */
     public function getActions()
     {
@@ -851,10 +850,6 @@ class Form extends FormEntity
      */
     public function getProgressiveProfilingLimit()
     {
-        if (0 === $this->progressiveProfilingLimit) {
-            $this->progressiveProfilingLimit = '';
-        }
-
         return $this->progressiveProfilingLimit;
     }
 }

@@ -54,7 +54,7 @@ class StatRepository extends CommonRepository
             ->setParameter('leadId', $contactId)
             ->setParameter('emailId', $emailId);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         if ($result) {
             foreach ($result as $row) {
@@ -100,12 +100,12 @@ class StatRepository extends CommonRepository
             ->setParameter('dateFrom', $dateFrom->format('Y-m-d H:i:s'))
             ->setParameter('dateTo', $dateTo->format('Y-m-d H:i:s'));
 
-        $companyJoinOnExpr = $q->expr()->andX(
+        $companyJoinOnExpr = $q->expr()->and(
             $q->expr()->eq('s.lead_id', 'cl.lead_id')
         );
         if (!empty($companyId)) {
             // Must force a one to one relationship
-            $companyJoinOnExpr->add(
+            $companyJoinOnExpr->with(
                 $q->expr()->eq('cl.is_primary', 1)
             );
         }
@@ -139,7 +139,7 @@ class StatRepository extends CommonRepository
             $sb->select('null')
                 ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll')
                 ->where(
-                    $sb->expr()->andX(
+                    $sb->expr()->and(
                         $sb->expr()->eq('lll.leadlist_id', ':segmentId'),
                         $sb->expr()->eq('lll.lead_id', 'ph.lead_id'),
                         $sb->expr()->eq('lll.manually_removed', 0)
@@ -148,9 +148,9 @@ class StatRepository extends CommonRepository
 
             // Filter for both broadcasts and campaign related segments
             $q->andWhere(
-                $q->expr()->orX(
+                $q->expr()->or(
                     $q->expr()->eq('s.list_id', ':segmentId'),
-                    $q->expr()->andX(
+                    $q->expr()->and(
                         $q->expr()->isNull('s.list_id'),
                         sprintf('EXISTS (%s)', $sb->getSQL())
                     )
@@ -163,7 +163,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('s.id');
         $q->orderBy('s.id', 'DESC');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -190,7 +190,7 @@ class StatRepository extends CommonRepository
                 ->setParameter('list', $listId);
         }
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         //index by lead
         $stats = [];
@@ -285,7 +285,7 @@ class StatRepository extends CommonRepository
                 $subQ->select('null')
                     ->from(MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'list')
                     ->andWhere(
-                        $q->expr()->andX(
+                        $q->expr()->and(
                             $q->expr()->in('list.leadlist_id', array_map('intval', $listId)),
                             $q->expr()->eq('list.lead_id', 's.lead_id')
                         )
@@ -307,7 +307,7 @@ class StatRepository extends CommonRepository
             $chartQuery->applyDateFilters($q, 'date_sent', 's');
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if ((true === $listId || is_array($listId)) && !$combined) {
             // Return list group of counts
@@ -335,7 +335,7 @@ class StatRepository extends CommonRepository
         $sq->select('e.email_id, count(e.id) as the_count')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where(
-                $sq->expr()->andX(
+                $sq->expr()->and(
                     $sq->expr()->eq('e.is_failed', ':false'),
                     $sq->expr()->in('e.email_id', $inIds)
                 )
@@ -351,7 +351,7 @@ class StatRepository extends CommonRepository
         $sq->groupBy('e.email_id');
 
         //get a total number of sent emails first
-        $totalCounts = $sq->execute()->fetchAll();
+        $totalCounts = $sq->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($inIds as $id) {
@@ -371,7 +371,7 @@ class StatRepository extends CommonRepository
         //now get a read count
         $sq->andWhere('e.is_read = :true')
             ->setParameter('true', true, 'boolean');
-        $readCounts = $sq->execute()->fetchAll();
+        $readCounts = $sq->execute()->fetchAllAssociative();
 
         foreach ($readCounts as $r) {
             $return[$r['email_id']]['readCount'] = (int) $r['the_count'];
@@ -386,7 +386,7 @@ class StatRepository extends CommonRepository
     /**
      * @param array<int,int|string>|int $emailIds
      *
-     * @return int
+     * @return array<int, array<string, mixed>>
      */
     public function getOpenedStatIds($emailIds = null, $listId = null)
     {
@@ -410,7 +410,7 @@ class StatRepository extends CommonRepository
             $q->andWhere('s.list_id = '.(int) $listId);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -463,7 +463,7 @@ class StatRepository extends CommonRepository
 
         if (isset($options['search']) && $options['search']) {
             $query->andWhere(
-                $query->expr()->orX(
+                $query->expr()->or(
                     $query->expr()->like('ec.subject', $query->expr()->literal('%'.$options['search'].'%')),
                     $query->expr()->like('e.subject', $query->expr()->literal('%'.$options['search'].'%')),
                     $query->expr()->like('e.name', $query->expr()->literal('%'.$options['search'].'%'))
@@ -512,7 +512,7 @@ class StatRepository extends CommonRepository
     {
         $query->select('count(es.id) as sent, count(CASE WHEN es.is_read THEN 1 ELSE null END) as "read", count(CASE WHEN es.is_failed THEN 1 ELSE null END) as failed');
 
-        $results = $query->execute()->fetch();
+        $results = $query->execute()->fetchAssociative();
 
         $results['ignored'] = $results['sent'] - $results['read'] - $results['failed'];
         unset($results['sent']);
@@ -536,7 +536,7 @@ class StatRepository extends CommonRepository
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
-        return $query->execute()->fetchAll();
+        return $query->execute()->fetchAllAssociative();
     }
 
     /**
@@ -552,7 +552,7 @@ class StatRepository extends CommonRepository
         $q->select('e.email_id, count(e.id) as sentcount')
             ->from(MAUTIC_TABLE_PREFIX.'email_stats', 'e')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->in('e.email_id', $emailIds),
                     $q->expr()->eq('e.is_failed', ':false')
                 )
@@ -568,7 +568,7 @@ class StatRepository extends CommonRepository
         $q->groupBy('e.email_id');
 
         //get a total number of sent emails first
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         $counts = [];
 
@@ -616,7 +616,7 @@ class StatRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -632,7 +632,9 @@ class StatRepository extends CommonRepository
     public function findContactEmailStats($leadId, $emailId)
     {
         return $this->createQueryBuilder('s')
-            ->where('IDENTITY(s.lead) = '.(int) $leadId.' AND IDENTITY(s.email) = '.(int) $emailId)
+            ->where('IDENTITY(s.lead) = :leadId AND IDENTITY(s.email) =  :emailId')
+            ->setParameter('leadId', (int) $leadId)
+            ->setParameter('emailId', (int) $emailId)
             ->getQuery()
             ->getResult();
     }
@@ -654,7 +656,7 @@ class StatRepository extends CommonRepository
             ->setParameter(':email', $emailId)
             ->setParameter(':contacts', $contacts);
 
-        return $query->execute()->fetch();
+        return $query->execute()->fetchAssociative();
     }
 
     /**
@@ -674,7 +676,7 @@ class StatRepository extends CommonRepository
             ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy('s.lead_id');
 
-        $results = $query->execute()->fetchAll();
+        $results = $query->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {
@@ -740,7 +742,7 @@ class StatRepository extends CommonRepository
             ->setParameter(':contacts', $contacts, Connection::PARAM_INT_ARRAY)
             ->groupBy("{$leadAlias}.id");
 
-        $results = $queryBuilder->execute()->fetchAll();
+        $results = $queryBuilder->execute()->fetchAllAssociative();
 
         $contacts = [];
         foreach ($results as $result) {

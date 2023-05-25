@@ -14,37 +14,37 @@ use Mautic\LeadBundle\Entity\Lead;
 class Stat
 {
     /**
-     * @var int
+     * @var string
      */
     private $id;
 
     /**
-     * @var Notification
+     * @var Notification|null
      */
     private $notification;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\Lead
+     * @var \Mautic\LeadBundle\Entity\Lead|null
      */
     private $lead;
 
     /**
-     * @var \Mautic\LeadBundle\Entity\LeadList
+     * @var \Mautic\LeadBundle\Entity\LeadList|null
      */
     private $list;
 
     /**
-     * @var \Mautic\CoreBundle\Entity\IpAddress
+     * @var \Mautic\CoreBundle\Entity\IpAddress|null
      */
     private $ipAddress;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateSent;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateRead;
 
@@ -54,27 +54,27 @@ class Stat
     private $isClicked = false;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateClicked;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $trackingHash;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $retryCount = 0;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $source;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $sourceId;
 
@@ -84,7 +84,7 @@ class Stat
     private $tokens = [];
 
     /**
-     * @var int
+     * @var int|null
      */
     private $clickCount;
 
@@ -94,7 +94,7 @@ class Stat
     private $clickDetails = [];
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $lastClicked;
 
@@ -249,11 +249,11 @@ class Stat
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -487,7 +487,7 @@ class Stat
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateRead()
     {
