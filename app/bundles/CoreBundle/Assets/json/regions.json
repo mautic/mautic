@@ -380,8 +380,8 @@
 	"Austria": [
 		"Burgenland",
 		"K\u00e4rnten",
-		"Niederosterreich",
-		"Oberosterreich",
+		"Nieder\u00f6sterreich",
+		"Ober\u00f6sterreich",
 		"Salzburg",
 		"Steiermark",
 		"Tirol",
@@ -892,14 +892,14 @@
 		"Basel-Landschaft",
 		"Basel-Stadt",
 		"Fribourg",
-		"Geneva",
+		"Gen\u00e8ve",
 		"Glarus",
-		"Graubunden",
+		"Graub\u00fcnden",
 		"Luzern",
-		"Neuchatel",
+		"Neuch\u00e2tel",
 		"Nidwalden",
 		"Obwalden",
-		"Sankt Gallen",
+		"St. Gallen",
 		"Schaffhausen",
 		"Solothurn",
 		"Schwyz",
@@ -909,7 +909,7 @@
 		"Vaud",
 		"Valais",
 		"Zug",
-		"Zurich"
+		"Z\u00fcrich"
 	],
 	"France": [
 		"Auvergne-Rhône-Alpes",
@@ -1218,7 +1218,7 @@
 		"Zl\u00ednsk\u00fd kraj"
 	],
 	"Germany": [
-		"Baden-Wuerttemberg",
+		"Baden-W\u00fcrttemberg",
 		"Bayern",
 		"Bremen",
 		"Hamburg",
@@ -1233,7 +1233,7 @@
 		"Mecklenburg-Vorpommern",
 		"Sachsen",
 		"Sachsen-Anhalt",
-		"Thueringen"
+		"Th\u00fcringen"
 	],
 	"Djibouti": [
 		"Ali Sabiah",
@@ -2492,6 +2492,19 @@
 		"Tarh\u016bnah-Masall\u0101tah",
 		"W\u0101d\u012b al hay\u0101t",
 		"Yafran-J\u0101d\u016b"
+	],
+	"Liechtenstein": [
+		"Balzers",
+		"Eschen",
+		"Gamprin",
+		"Mauren",
+		"Planken",
+		"Ruggell",
+		"Schaan",
+		"Schellenberg",
+		"Triesen",
+		"Triesenberg",
+		"Vaduz"
 	],
 	"Morocco": [
 		"Agadir",
