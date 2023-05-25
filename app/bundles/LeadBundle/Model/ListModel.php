@@ -1342,4 +1342,19 @@ class ListModel extends FormModel
 
         return $leadCounts;
     }
+
+    public function getSegmentsBuildTime($limit = 10, string $order = 'DESC', array $segmentsFilter = [], $canViewOthers = true)
+    {
+        $criteria = ['isPublished' => true];
+
+        if (!$canViewOthers) {
+            $criteria['userId'] = $this->userHelper->getUser()->getId();
+        }
+
+        if (!empty($segmentsFilter)) {
+            $criteria['id'] = $segmentsFilter;
+        }
+
+        return $this->getRepository()->findBy($criteria, ['lastBuiltTime' => $order], $limit);
+    }
 }

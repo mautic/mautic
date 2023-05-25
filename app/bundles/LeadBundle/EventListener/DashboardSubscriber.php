@@ -6,6 +6,7 @@ use Mautic\DashboardBundle\Event\WidgetDetailEvent;
 use Mautic\DashboardBundle\EventListener\DashboardSubscriber as MainDashboardSubscriber;
 use Mautic\LeadBundle\Form\Type\DashboardLeadsInTimeWidgetType;
 use Mautic\LeadBundle\Form\Type\DashboardLeadsLifetimeWidgetType;
+use Mautic\LeadBundle\Form\Type\DashboardSegmentsBuildTime;
 use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
 use Symfony\Component\Routing\RouterInterface;
@@ -33,8 +34,11 @@ class DashboardSubscriber extends MainDashboardSubscriber
         'lead.lifetime'                 => [
             'formAlias' => DashboardLeadsLifetimeWidgetType::class,
         ],
-        'map.of.leads'  => [],
-        'top.lists'     => [],
+        'map.of.leads'            => [],
+        'top.lists'               => [],
+        'segments.build.time'     => [
+            'formAlias' => DashboardSegmentsBuildTime::class,
+        ],
         'top.creators'  => [],
         'top.owners'    => [],
         'created.leads' => [],
@@ -451,6 +455,71 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     ],
                     'bodyItems' => $items,
                     'raw'       => $leads,
+                ]);
+            }
+
+            $event->setTemplate('@MauticCore/Helper/table.html.twig');
+            $event->stopPropagation();
+
+            return;
+        }
+
+        if ('segments.build.time' == $event->getType()) {
+            if (!$event->isCached()) {
+                $params = $event->getWidget()->getParams();
+
+                if (empty($params['limit'])) {
+                    // Count the list limit from the widget height
+                    $limit = round((($event->getWidget()->getHeight() - 80) / 35) - 1);
+                } else {
+                    $limit = $params['limit'];
+                }
+
+                $segments = $this->leadListModel->getSegmentsBuildTime($limit, $params['order'] ?? 'desc', $params['segments'] ?? [], $canViewOthers);
+                $items    = [];
+
+                // Build table rows with links
+                if ($segments) {
+                    foreach ($segments as $segment) {
+                        $listUrl    = $this->router->generate('mautic_segment_action', ['objectAction' => 'view', 'objectId' => $segment->getId()]);
+
+                        $time = $segment->getLastBuiltTime();
+                        if ($time >= 60) {
+                            $timeString = $this->translator->trans('mautic.core.date.minute', ['%count%' => floor($time / 60)]);
+                            if ($time % 60 > 0) {
+                                $timeString .= ' '.$this->translator->trans('mautic.core.date.second', ['%count%' => round($time % 60)]);
+                            }
+                        } elseif ($time >= 1) {
+                            $timeString =  $this->translator->trans('mautic.core.date.second', ['%count%' => round($time)]);
+                        } else {
+                            $timeString =  $this->translator->trans('mautic.core.date.less.than.second');
+                        }
+
+                        $row        = [
+                            [
+                                'value' => $segment->getName(),
+                                'type'  => 'link',
+                                'link'  => $listUrl,
+                            ],
+                            [
+                                'value' => $segment->getCreatedByUser(),
+                            ],
+                            [
+                                'value' => $timeString,
+                            ],
+                        ];
+                        $items[] = $row;
+                    }
+                }
+
+                $event->setTemplateData([
+                    'headItems' => [
+                        'mautic.dashboard.label.title',
+                        'mautic.core.createdby',
+                        'mautic.lead.list.last_built_time',
+                    ],
+                    'bodyItems' => $items,
+                    'raw'       => $segments,
                 ]);
             }
 
