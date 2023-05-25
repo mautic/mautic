@@ -32,7 +32,6 @@
     "mautic/core-project-message": "4.x-dev",
     "mautic/core-lib": "*",
     "mautic/grapes-js-builder-bundle": "*",
-    "mautic/plugin-citrix": "*",
     "mautic/plugin-clearbit": "*",
     "mautic/plugin-cloudstorage": "*",
     "mautic/plugin-crm": "*",
