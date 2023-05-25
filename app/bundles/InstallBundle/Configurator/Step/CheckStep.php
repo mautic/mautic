@@ -257,6 +257,10 @@ class CheckStep implements StepInterface
             }
         }
 
+        if (-1 !== (int) ini_get('zend.assertions')) {
+            $messages[] = 'mautic.install.zend_assertions';
+        }
+
         return $messages;
     }
 
