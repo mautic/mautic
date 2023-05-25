@@ -24,27 +24,27 @@ class LeadList extends FormEntity
     private $id;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $name;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $publicName;
 
     /**
-     * @var Category
+     * @var Category|null
      **/
     private $category;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
     /**
-     * @var string|null
+     * @var string
      */
     private $alias;
 
@@ -64,7 +64,7 @@ class LeadList extends FormEntity
     private $isPreferenceCenter = false;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<\Mautic\LeadBundle\Entity\ListLead>
      */
     private $leads;
 

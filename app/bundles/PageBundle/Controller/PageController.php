@@ -874,7 +874,7 @@ class PageController extends FormController
      *
      * @return JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function abtestAction($objectId)
+    public function abtestAction(Request $request, AssetsHelper $assetsHelper, Translator $translator, $objectId)
     {
         /** @var \Mautic\PageBundle\Model\PageModel $model */
         $model  = $this->getModel('page.page');
@@ -905,7 +905,7 @@ class PageController extends FormController
         $clone->setIsPublished(false);
         $clone->setVariantParent($entity);
 
-        return $this->newAction($clone);
+        return $this->newAction($request, $assetsHelper, $translator, $clone);
     }
 
     /**

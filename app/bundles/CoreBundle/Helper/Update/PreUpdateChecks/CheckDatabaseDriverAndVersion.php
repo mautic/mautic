@@ -28,7 +28,7 @@ class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
         $platform = strtolower(get_class($connection->getDatabasePlatform()));
 
         /**
-         * The second case is for MariaDB < 10.2, where Doctrine reports it as MySQLPlatform. Here we can use a little
+         * The second case is for MariaDB < 10.2, where Doctrine reports it as MySqlPlatform. Here we can use a little
          * help from the version string, which contains "MariaDB" in that case: 10.1.48-MariaDB-1~bionic.
          */
         if (false !== strpos($platform, 'mariadb') || false !== strpos(strtolower($version), 'mariadb')) {

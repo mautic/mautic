@@ -46,7 +46,7 @@ class Notification
     protected $iconClass;
 
     /**
-     * @var bool|null
+     * @var bool
      */
     protected $isRead = false;
 
