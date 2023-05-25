@@ -560,10 +560,11 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
     public function testGetExportRow(): void
     {
         $viewOnlyFields = ['button'];
+        $dateSubmitted  = '28-03-2023 12:00';
         $fixture        = [
             'id'            => 1,
             'leadId'        => 123,
-            'dateSubmitted' => '28-03-2023 12:00',
+            'dateSubmitted' => $dateSubmitted,
             'ipAddress'     => '127.0.0.1',
             'referer'       => 'https://test.com',
             'results'       => [
@@ -588,17 +589,18 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         }
 
         $this->assertIsArray($result);
-        $this->assertSame([1, 123, '2023-03-28 12:00:00', '127.0.0.1', 'https://test.com', 'a@b.c'], $result);
+        $this->assertSame([1, 123, $this->dateHelper->toFull($dateSubmitted, 'UTC'), '127.0.0.1', 'https://test.com', 'a@b.c'], $result);
     }
 
     public function testGetExportRowForPage(): void
     {
-        $email   = 'a@b.c';
-        $formId  = 432;
-        $fixture = [
+        $email         = 'a@b.c';
+        $formId        = 432;
+        $dateSubmitted = '28-03-2023 12:00';
+        $fixture       = [
             'id'            => 1,
             'leadId'        => 123,
-            'dateSubmitted' => '28-03-2023 12:00',
+            'dateSubmitted' => $dateSubmitted,
             'ipAddress'     => '127.0.0.1',
             'referer'       => 'https://test.com',
             'formId'        => $formId,
@@ -623,8 +625,8 @@ class SubmissionModelTest extends \PHPUnit\Framework\TestCase
         $this->assertIsArray($row2);
         $this->assertCount(6, $row1);
         $this->assertCount(5, $row2);
-        $this->assertSame([1, 123, $formId, '2023-03-28 12:00:00', '127.0.0.1', 'https://test.com'], $row1);
-        $this->assertSame([1, 123, '2023-03-28 12:00:00', '127.0.0.1', 'https://test.com'], $row2);
+        $this->assertSame([1, 123, $formId, $this->dateHelper->toFull($dateSubmitted, 'UTC'), '127.0.0.1', 'https://test.com'], $row1);
+        $this->assertSame([1, 123, $this->dateHelper->toFull($dateSubmitted, 'UTC'), '127.0.0.1', 'https://test.com'], $row2);
         $this->assertNotContains($formId, $row2);
         $this->assertNotContains($email, $row1);
     }
