@@ -3,6 +3,7 @@
 namespace Mautic\CoreBundle\Tests\Unit\Command;
 
 use Mautic\CoreBundle\Command\ModeratedCommand;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\PathsHelper;
 use Mautic\CoreBundle\Tests\Unit\Command\src\FakeModeratedCommand;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -14,6 +15,8 @@ use Symfony\Component\Finder\SplFileInfo;
 
 class ModeratedCommandTest extends TestCase
 {
+    private CoreParametersHelper|MockObject $coreParametersHelper;
+
     /**
      * @var MockObject|InputInterface
      */
@@ -38,8 +41,9 @@ class ModeratedCommandTest extends TestCase
     {
         $this->input                = $this->createMock(InputInterface::class);
         $this->pathsHelper          = $this->createMock(PathsHelper::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $this->output               = new NullOutput();
-        $this->fakeModeratedCommand = new FakeModeratedCommand($this->pathsHelper);
+        $this->fakeModeratedCommand = new FakeModeratedCommand($this->pathsHelper, $this->coreParametersHelper);
     }
 
     public function testUnableToWriteLockFileThrowsAnException(): void
@@ -224,6 +228,31 @@ class ModeratedCommandTest extends TestCase
         // Cleanup
         unlink($file->getPathname());
         rmdir($runDir);
+    }
+
+    public function testRedisLock(): void
+    {
+        $this->coreParametersHelper->expects($this->once())
+            ->method('get')
+            ->willReturn(['dsn' => '']);
+
+        $this->input->method('getOption')
+            ->willReturnCallback(
+                function (string $name) {
+                    switch ($name) {
+                        case 'lock_mode':
+                            return ModeratedCommand::MODE_REDIS;
+                        case 'bypass-locking':
+                            return false;
+                        default:
+                            return null;
+                    }
+                }
+            );
+
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->fakeModeratedCommand->run($this->input, $this->output);
     }
 
     private function getFirstFile(Finder $finder): SplFileInfo

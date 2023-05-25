@@ -30,7 +30,7 @@ class Sms extends FormEntity
     private $name;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $description;
 
@@ -45,12 +45,12 @@ class Sms extends FormEntity
     private $message;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishUp;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $publishDown;
 
@@ -60,22 +60,22 @@ class Sms extends FormEntity
     private $sentCount = 0;
 
     /**
-     * @var \Mautic\CategoryBundle\Entity\Category
+     * @var \Mautic\CategoryBundle\Entity\Category|null
      **/
     private $category;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\LeadBundle\Entity\LeadList>
      */
     private $lists;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection<int, \Mautic\SmsBundle\Entity\Stat>
      */
     private $stats;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $smsType = 'template';
 

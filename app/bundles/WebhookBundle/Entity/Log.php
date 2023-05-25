@@ -2,7 +2,7 @@
 
 namespace Mautic\WebhookBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -27,17 +27,17 @@ class Log
     private $statusCode;
 
     /**
-     * @var \DateTime
+     * @var \DateTimeInterface
      */
     private $dateAdded;
 
     /**
-     * @var float
+     * @var float|null
      */
     private $runtime;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $note;
 
@@ -54,14 +54,14 @@ class Log
             ->addJoinColumn('webhook_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->createField('statusCode', Type::STRING)
+        $builder->createField('statusCode', Types::STRING)
             ->columnName('status_code')
             ->length(50)
             ->build();
 
-        $builder->addNullableField('dateAdded', Type::DATETIME, 'date_added');
-        $builder->addNullableField('note', Type::STRING);
-        $builder->addNullableField('runtime', Type::FLOAT);
+        $builder->addNullableField('dateAdded', Types::DATETIME_MUTABLE, 'date_added');
+        $builder->addNullableField('note', Types::STRING);
+        $builder->addNullableField('runtime', Types::FLOAT);
     }
 
     /**
@@ -111,7 +111,7 @@ class Log
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

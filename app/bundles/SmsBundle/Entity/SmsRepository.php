@@ -21,7 +21,7 @@ class SmsRepository extends CommonRepository
         $q = $this->_em
             ->createQueryBuilder()
             ->select($this->getTableAlias())
-            ->from('MauticSmsBundle:Sms', $this->getTableAlias(), $this->getTableAlias().'.id');
+            ->from(\Mautic\SmsBundle\Entity\Sms::class, $this->getTableAlias(), $this->getTableAlias().'.id');
 
         if (empty($args['iterator_mode'])) {
             $q->leftJoin($this->getTableAlias().'.category', 'c');
@@ -68,7 +68,7 @@ class SmsRepository extends CommonRepository
             ->join('ll', MAUTIC_TABLE_PREFIX.'lead_lists_leads', 'lll', 'lll.leadlist_id = sml.leadlist_id and lll.manually_removed = 0')
             ->join('lll', MAUTIC_TABLE_PREFIX.'leads', 'l', 'lll.lead_id = l.id')
             ->where(
-                $q->expr()->andX(
+                $q->expr()->and(
                     $q->expr()->eq('sml.sms_id', ':smsId')
                 )
             )
@@ -88,7 +88,7 @@ class SmsRepository extends CommonRepository
     {
         $q = $this->_em->createQueryBuilder();
         $q->select('SUM(e.sentCount) as sent_count')
-            ->from('MauticSmsBundle:Sms', 'e');
+            ->from(\Mautic\SmsBundle\Entity\Sms::class, 'e');
         $results = $q->getQuery()->getSingleResult(Query::HYDRATE_ARRAY);
 
         if (!isset($results['sent_count'])) {
@@ -173,7 +173,7 @@ class SmsRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {

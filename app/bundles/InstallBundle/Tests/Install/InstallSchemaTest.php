@@ -88,7 +88,7 @@ class InstallSchemaTest extends \PHPUnit\Framework\TestCase
         if (!empty($sql)) {
             foreach ($sql as $q) {
                 try {
-                    $this->connection->query($q);
+                    $this->connection->executeQuery($q);
                 } catch (\Exception $exception) {
                     $exceptions[] = $exception->getMessage();
                 }

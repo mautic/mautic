@@ -2,6 +2,7 @@
 
 namespace Mautic\UserBundle\Controller\Api;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\ApiBundle\Controller\CommonApiController;
 use Mautic\ApiBundle\Helper\EntityResultHelper;
 use Mautic\CoreBundle\Helper\AppVersion;
@@ -38,10 +39,11 @@ class UserApiController extends CommonApiController
         FormFactoryInterface $formFactory,
         AppVersion $appVersion,
         UserPasswordEncoderInterface $encoder,
-        RequestStack $requestStack
+        RequestStack $requestStack,
+        ManagerRegistry $doctrine
     ) {
         $this->encoder = $encoder;
-        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack);
+        parent::__construct($security, $translator, $entityResultHelper, $router, $formFactory, $appVersion, $requestStack, $doctrine);
     }
 
     public function initialize(ControllerEvent $event)
@@ -183,7 +185,7 @@ class UserApiController extends CommonApiController
             return $this->notFound();
         }
 
-        $permissions = $request->request->get('permissions');
+        $permissions = $request->request->all()['permissions'] ?? [];
 
         if (empty($permissions)) {
             return $this->badRequest('mautic.api.call.permissionempty');

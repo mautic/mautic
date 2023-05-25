@@ -2,6 +2,7 @@
 
 namespace Mautic\CategoryBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CategoryBundle\Model\ContactActionModel;
 use Mautic\CoreBundle\Controller\AbstractFormController;
@@ -23,12 +24,12 @@ class BatchContactController extends AbstractFormController
      */
     private $categoryModel;
 
-    public function __construct(CorePermissions $security, UserHelper $userHelper, ContactActionModel $actionModel, CategoryModel $categoryModel)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, ContactActionModel $actionModel, CategoryModel $categoryModel, ManagerRegistry $doctrine)
     {
         $this->actionModel   = $actionModel;
         $this->categoryModel = $categoryModel;
 
-        parent::__construct($security, $userHelper);
+        parent::__construct($security, $userHelper, $doctrine);
     }
 
     /**

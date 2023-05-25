@@ -20,7 +20,7 @@ class TagRepository extends BaseTagRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -36,7 +36,7 @@ class TagRepository extends BaseTagRepository
             ->where('lt.tag = :tag')
             ->setParameter('tag', $tag);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         return count($result);
     }
@@ -66,7 +66,7 @@ class TagRepository extends BaseTagRepository
         )
             ->groupBy('ltx.tag_id');
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         $return = [];
         foreach ($result as $r) {

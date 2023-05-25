@@ -46,7 +46,6 @@ class UserModel extends FormModel
     public function getRepository(): UserRepository
     {
         $result = $this->em->getRepository(User::class);
-        \assert($result instanceof UserRepository);
 
         return $result;
     }
@@ -143,7 +142,7 @@ class UserModel extends FormModel
         if ($entity) {
             //add user's permissions
             $entity->setActivePermissions(
-                $this->em->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($entity->getRole())
+                $this->em->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($entity->getRole())
             );
         }
 
@@ -155,7 +154,7 @@ class UserModel extends FormModel
      */
     public function getSystemAdministrator()
     {
-        $adminRole = $this->em->getRepository('MauticUserBundle:Role')->findOneBy(['isAdmin' => true]);
+        $adminRole = $this->em->getRepository(\Mautic\UserBundle\Entity\Role::class)->findOneBy(['isAdmin' => true]);
 
         return $this->getRepository()->findOneBy(
             [

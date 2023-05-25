@@ -153,8 +153,6 @@ class AssetRepository extends CommonRepository
 
     /**
      * {@inheritdoc}
-     *
-     * @return string
      */
     public function getTableAlias()
     {
@@ -174,7 +172,7 @@ class AssetRepository extends CommonRepository
             ->where('a.id IN (:assetIds)')
             ->setParameter('assetIds', $assets, \Doctrine\DBAL\Connection::PARAM_INT_ARRAY);
 
-        $result = $q->execute()->fetchAll();
+        $result = $q->execute()->fetchAllAssociative();
 
         return (int) $result[0]['total_size'];
     }
@@ -213,7 +211,7 @@ class AssetRepository extends CommonRepository
         $q->where($this->getTableAlias().'.category = :categoryId');
         $q->andWhere($this->getTableAlias().'.isPublished = TRUE');
         $q->setParameter('categoryId', $categoryId);
-        $q->orderBy($this->getTableAlias().'.dateAdded', 'DESC');
+        $q->orderBy($this->getTableAlias().'.dateAdded', \Doctrine\Common\Collections\Criteria::DESC);
         $q->setMaxResults(1);
 
         return $q->getQuery()->getSingleResult();

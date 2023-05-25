@@ -73,6 +73,8 @@ class FieldAliasKeywordValidatorTest extends \PHPUnit\Framework\TestCase
             []
         );
 
+        $this->translatorMock->method('trans')->willReturn('');
+
         $this->validator = new FieldAliasKeywordValidator(
             $this->listModelMock,
             $this->fieldAliasHelperlMock,

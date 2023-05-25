@@ -2,6 +2,7 @@
 
 namespace Mautic\WebhookBundle\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\FormController;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -14,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class WebhookController extends FormController
 {
-    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper)
+    public function __construct(CorePermissions $security, UserHelper $userHelper, FormFactoryInterface $formFactory, FormFieldHelper $fieldHelper, ManagerRegistry $doctrine)
     {
         $this->setStandardParameters(
             'webhook.webhook', // model name
@@ -27,7 +28,7 @@ class WebhookController extends FormController
             'mauticWebhook' // mauticContent
         );
 
-        parent::__construct($security, $userHelper, $formFactory, $fieldHelper);
+        parent::__construct($security, $userHelper, $formFactory, $fieldHelper, $doctrine);
     }
 
     /**

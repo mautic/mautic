@@ -124,11 +124,6 @@ final class AssetsHelper
             $url = $this->getBaseUrl().'/'.$path;
         }
 
-        // Remove the dev index so the assets work in the dev mode
-        if (strpos($url, '/index_dev.php/')) {
-            $url = str_replace('index_dev.php/', '', $url);
-        }
-
         return $url;
     }
 
@@ -507,11 +502,12 @@ final class AssetsHelper
      */
     private function getCKEditorScripts(): array
     {
-        $base    = 'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/';
+        $base = 'node_modules/ckeditor4/';
 
         return [
             $base.'ckeditor.js?v'.$this->version,
             $base.'adapters/jquery.js?v'.$this->version,
+            'app/bundles/CoreBundle/Assets/js/libraries/ckeditor/mautic-token.js?v'.$this->version,
         ];
     }
 

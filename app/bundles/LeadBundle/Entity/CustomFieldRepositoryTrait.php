@@ -111,7 +111,7 @@ trait CustomFieldRepositoryTrait
                     $alias = $this->getTableAlias();
                     $q     = $this->getEntityManager()->createQueryBuilder();
                     $q->select($alias)
-                        ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
+                        ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
                         ->indexBy($alias, $alias.'.id');
                 } else {
                     //ORM
@@ -136,7 +136,7 @@ trait CustomFieldRepositoryTrait
                     $q = $this->getEntitiesOrmQueryBuilder($order, $args);
                     $this->buildSelectClause($dq, $args);
 
-                    $q->orderBy('ORD', 'ASC');
+                    $q->orderBy('ORD', \Doctrine\Common\Collections\Criteria::ASC);
                 }
 
                 //only pull the leads as filtered via DBAL
@@ -190,7 +190,7 @@ trait CustomFieldRepositoryTrait
         }
 
         $q->where($this->getTableAlias().'.id = '.(int) $id);
-        $values = $q->execute()->fetch();
+        $values = $q->execute()->fetchAssociative();
 
         return $this->formatFieldValues($values, $byGroup, $object);
     }
@@ -233,7 +233,7 @@ trait CustomFieldRepositoryTrait
                 ->setMaxResults($limit);
         }
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -379,7 +379,8 @@ trait CustomFieldRepositoryTrait
                 ->setParameter('published', true, 'boolean')
                 ->setParameter('object', $object)
                 ->addOrderBy('f.field_order', 'asc');
-            $results = $fq->execute()->fetchAll();
+
+            $results = $fq->execute()->fetchAllAssociative();
 
             $fields      = [];
             $fixedFields = [];

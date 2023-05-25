@@ -2,7 +2,6 @@
 
 namespace Mautic\LeadBundle\Model;
 
-use Doctrine\DBAL\DBALException;
 use Exception;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\CoreBundle\Helper\Chart\BarChart;
@@ -148,7 +147,7 @@ class ListModel extends FormModel
      *
      * @return mixed|void
      *
-     * @throws DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function saveEntity($entity, $unlock = true)
     {
@@ -452,7 +451,7 @@ class ListModel extends FormModel
                 // Dispatch batch event
                 if ($this->dispatcher->hasListeners(LeadEvents::LEAD_LIST_BATCH_CHANGE)) {
                     $this->dispatcher->dispatch(
-                        new ListChangeEvent($segmentId, $leadList, true),
+                        new ListChangeEvent($newLeadList[$segmentId], $leadList, true),
                         LeadEvents::LEAD_LIST_BATCH_CHANGE
                     );
                 }
@@ -585,7 +584,7 @@ class ListModel extends FormModel
 
         if (!$lead instanceof Lead) {
             $leadId = (is_array($lead) && isset($lead['id'])) ? $lead['id'] : $lead;
-            $lead   = $this->em->getReference('MauticLeadBundle:Lead', $leadId);
+            $lead   = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $leadId);
         } else {
             $leadId = $lead->getId();
         }
@@ -688,7 +687,7 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getRepository()->detachEntities($persistLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -814,7 +813,8 @@ class ListModel extends FormModel
         }
 
         // Clear ListLead entities from Doctrine memory
-        $this->em->clear(ListLead::class);
+        $this->getListLeadRepository()->detachEntities($persistLists);
+        $this->getListLeadRepository()->detachEntities($deleteLists);
 
         if ($batchProcess) {
             // Detach for batch processing to preserve memory
@@ -882,7 +882,7 @@ class ListModel extends FormModel
         $chartQuery = new ChartQuery($this->em->getConnection(), $dateFrom, $dateTo);
         $chartQuery->applyDateFilters($q, 'date_added');
 
-        return $q->execute()->fetchAll();
+        return $q->execute()->fetchAllAssociative();
     }
 
     /**
@@ -926,7 +926,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         if (in_array(0, $segments)) {
             $qAll = $this->em->getConnection()->createQueryBuilder();
@@ -943,7 +943,7 @@ class ListModel extends FormModel
             if (!empty($dateTo)) {
                 $qAll->andWhere("t.date_added <= '".$dateTo->format('Y-m-d')." 23:59:59'");
             }
-            $resultsAll = $qAll->execute()->fetchAll();
+            $resultsAll = $qAll->execute()->fetchAllAssociative();
             $results    = array_merge($results, $resultsAll);
         }
 
@@ -1028,7 +1028,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr($result['stage'], 0, 12);
@@ -1094,7 +1094,7 @@ class ListModel extends FormModel
                 ->setParameter('userId', $this->userHelper->getUser()->getId());
         }
 
-        $results = $q->execute()->fetchAll();
+        $results = $q->execute()->fetchAllAssociative();
 
         foreach ($results as $result) {
             $data['labels'][] = substr(empty($result['device']) ? $this->translator->trans('mautic.core.no.info') : $result['device'], 0, 12);

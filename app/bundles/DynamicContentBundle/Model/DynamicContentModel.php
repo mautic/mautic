@@ -47,7 +47,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
     public function getRepository()
     {
         /** @var DynamicContentRepository $repo */
-        $repo = $this->em->getRepository('MauticDynamicContentBundle:DynamicContent');
+        $repo = $this->em->getRepository(\Mautic\DynamicContentBundle\Entity\DynamicContent::class);
 
         $repo->setTranslator($this->translator);
 
@@ -59,7 +59,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      */
     public function getStatRepository()
     {
-        return $this->em->getRepository('MauticDynamicContentBundle:Stat');
+        return $this->em->getRepository(\Mautic\DynamicContentBundle\Entity\Stat::class);
     }
 
     /**
@@ -137,7 +137,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
      * @param string     $slot
      * @param Lead|array $lead
      *
-     * @return DynamicContent
+     * @return array<string, mixed>|false
      */
     public function getSlotContentForLead($slot, $lead)
     {
@@ -160,7 +160,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
             ->orderBy('dcld.date_added', 'DESC')
             ->addOrderBy('dcld.id', 'DESC');
 
-        return $qb->execute()->fetch();
+        return $qb->execute()->fetchAssociative();
     }
 
     /**
@@ -182,7 +182,7 @@ class DynamicContentModel extends FormModel implements AjaxLookupModelInterface
                 return;
             }
 
-            $lead = $this->em->getReference('MauticLeadBundle:Lead', $lead['id']);
+            $lead = $this->em->getReference(\Mautic\LeadBundle\Entity\Lead::class, $lead['id']);
         }
 
         $stat = new Stat();

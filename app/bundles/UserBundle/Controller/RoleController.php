@@ -132,7 +132,7 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
@@ -243,7 +243,7 @@ class RoleController extends FormController
             if (!$cancelled = $this->isFormCancelled($form)) {
                 if ($valid = $this->isFormValid($form)) {
                     //set the permissions
-                    $role        = $request->request->get('role', []);
+                    $role        = $request->request->get('role') ?? [];
                     $permissions = $role['permissions'] ?? null;
                     $model->setRolePermissions($entity, $permissions);
 
@@ -300,7 +300,7 @@ class RoleController extends FormController
         $translator        = $this->translator;
 
         $permissionsArray = ($role->getId()) ?
-            $this->get('doctrine')->getRepository('MauticUserBundle:Permission')->getPermissionsByRole($role, true) :
+            $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\Permission::class)->getPermissionsByRole($role, true) :
             [];
 
         $permissions     = [];
@@ -445,7 +445,7 @@ class RoleController extends FormController
             // Loop over the IDs to perform access checks pre-delete
             foreach ($ids as $objectId) {
                 $entity = $model->getEntity($objectId);
-                $users  = $this->get('doctrine')->getRepository('MauticUserBundle:User')->findByRole($entity);
+                $users  = $this->get('doctrine')->getRepository(\Mautic\UserBundle\Entity\User::class)->findByRole($entity);
 
                 if (null === $entity) {
                     $flashes[] = [

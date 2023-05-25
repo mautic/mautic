@@ -17,7 +17,6 @@ use Mautic\LeadBundle\Deduplicate\Exception\SameContactException;
 use Mautic\LeadBundle\Entity\DoNotContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadDevice;
-use Mautic\LeadBundle\Entity\LeadDeviceRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Event\ContactExportSchedulerEvent;
 use Mautic\LeadBundle\Form\Type\BatchType;
@@ -36,7 +35,6 @@ use Mautic\LeadBundle\Model\NoteModel;
 use Mautic\LeadBundle\Services\ContactColumnsDictionary;
 use Mautic\LeadBundle\Twig\Helper\AvatarHelper;
 use Mautic\PluginBundle\Entity\IntegrationEntity;
-use Mautic\PluginBundle\Entity\IntegrationEntityRepository;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -305,12 +303,9 @@ class LeadController extends FormController
         /** @var \Mautic\LeadBundle\Model\LeadModel $model */
         $model = $this->getModel('lead.lead');
 
-        // When we change company data these changes get cached
-        // so we need to clear the entity manager
-        $model->getRepository()->clear();
-
         /** @var \Mautic\LeadBundle\Entity\Lead $lead */
         $lead = $model->getEntity($objectId);
+        $model->getRepository()->refetchEntity($lead);
 
         //set some permissions
         $permissions = $this->security->isGranted(
@@ -387,12 +382,11 @@ class LeadController extends FormController
         }
 
         // We need the DoNotContact repository to check if a lead is flagged as do not contact
-        $dnc = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
 
-        $dncSms = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'sms');
+        $dncSms = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'sms');
 
-        $integrationRepo = $this->getDoctrine()->getRepository(IntegrationEntity::class);
-        assert($integrationRepo instanceof IntegrationEntityRepository);
+        $integrationRepo = $this->doctrine->getRepository(IntegrationEntity::class);
 
         $model = $this->getModel('lead.list');
         assert($model instanceof ListModel);
@@ -400,8 +394,7 @@ class LeadController extends FormController
         $leadNoteModel = $this->getModel('lead.note');
         assert($leadNoteModel instanceof NoteModel);
 
-        $leadDeviceRepository = $this->getDoctrine()->getRepository(LeadDevice::class);
-        assert($leadDeviceRepository instanceof LeadDeviceRepository);
+        $leadDeviceRepository = $this->doctrine->getRepository(LeadDevice::class);
 
         return $this->delegateView(
             [
@@ -503,7 +496,7 @@ class LeadController extends FormController
                     ));
 
                     /** @var LeadRepository $contactRepository */
-                    $contactRepository = $this->getDoctrine()->getManager()->getRepository(Lead::class);
+                    $contactRepository = $this->doctrine->getManager()->getRepository(Lead::class);
 
                     // Save here as we need the entity with an ID for the company code bellow.
                     $contactRepository->saveEntity($lead);
@@ -1395,8 +1388,7 @@ class LeadController extends FormController
             ? $request->get('list', 0)
             : $request->request->get(
                 'lead_quickemail[list]',
-                0,
-                true
+                0
             );
         $email = ['list' => $inList];
 
@@ -1414,7 +1406,8 @@ class LeadController extends FormController
         }
 
         // Check if lead has a bounce status
-        $dnc    = $this->getDoctrine()->getManager()->getRepository('MauticLeadBundle:DoNotContact')->getEntriesByLeadAndChannel($lead, 'email');
+        $dnc    = $this->doctrine->getManager()->getRepository(\Mautic\LeadBundle\Entity\DoNotContact::class)->getEntriesByLeadAndChannel($lead, 'email');
+
         $action = $this->generateUrl('mautic_contact_action', ['objectAction' => 'email', 'objectId' => $objectId]);
         $form   = $this->formFactory->create(EmailType::class, $email, ['action' => $action]);
 
@@ -1555,7 +1548,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch', [], true);
+            $data  = $request->request->all()['lead_batch'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1678,7 +1671,7 @@ class LeadController extends FormController
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
 
-            $data = $request->request->get('lead_batch_dnc', [], true);
+            $data = $request->request->all()['lead_batch_dnc'] ?? [];
             $ids  = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1768,7 +1761,7 @@ class LeadController extends FormController
         if ('POST' === $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_stage', [], true);
+            $data  = $request->request->all()['lead_batch_stage'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];
@@ -1874,7 +1867,7 @@ class LeadController extends FormController
         if ('POST' == $request->getMethod()) {
             /** @var \Mautic\LeadBundle\Model\LeadModel $model */
             $model = $this->getModel('lead');
-            $data  = $request->request->get('lead_batch_owner', [], true);
+            $data  = $request->request->all()['lead_batch_owner'] ?? [];
             $ids   = json_decode($data['ids'], true);
 
             $entities = [];

@@ -3,7 +3,17 @@
     *   Minimal PHP version was increased from 7.4 to 8.0 and 8.1.
 *   Configuration
     * Replace all occurances of `%kernel.root_dir%` to `%kernel.project_dir%/app` as the "root_dir" was deprecated in Symfony 4 and removed in Symfony 5. The "project_dir" variable is path to the Mautic root directory. The "root_dir" variable was path to the app directory.
-*   Commands
+    * The index_dev.php was removed. Use env variables to set the environment.
+    * We are following symfony env naming convention. [synfomy 4.4](https://symfony.com/doc/4.4/configuration.html#selecting-the-active-environment)
+      * `.env`                contains default values for the environment variables needed by the app
+      * `.env.local`          uncommitted file with local overrides
+      * `.env.$APP_ENV`       committed environment-specific defaults
+      * `.env.$APP_ENV.local` uncommitted environment-specific overrides
+    * The system run similar index_dev.php if you use `APP_ENV=dev` and `APP_DEBUG=1` in your .env.local file.
+* Installation
+    * The email step was removed from both GUI and CLI installers.
+    * The installation is considered completed once `db_driver` and `site_url` parameters are set. It used to be `db_driver` and `mailer_from_name`.  
+* Commands
     * The command `bin/console mautic:segments:update` will no longer update the campaign members but only the segment members. Use also command `bin/console mautic:campaigns:update` to update the campaign members if you haven't already. Both commands are recommended from Mautic 1.
     * Command `Mautic\LeadBundle\Command\CheckQueryBuildersCommand` and the methods it use:
         * `Mautic\LeadBundle\Model\ListModel::getVersionNew()`
@@ -11,6 +21,12 @@
 *   Services
     * Repository service `mautic.user.token.repository` for `Mautic\UserBundle\Entity\UserTokenRepository` was removed as it was duplicated. Use `mautic.user.repository.user_token` instead.
     * In tests replace `self::$container->get('mautic.http.client.mock_handler')` with `self::$container->get(\GuzzleHttp\Handler\MockHandler::class)` to get HTTP client mock handler.
+* JS Dependencies
+    * Most of the JS libraries were moved from hard-coded location in the CoreBundle to package.json so we can manage them with NPM
+    * This means that when you run `composer install` then it will also run `npm install` to download JS dependencies and `bin/console mautic:assets:generate` to build the production assets.
+    * Libraries `jquery-color`, `jquery-play-sound` and `html5notifications` were removed as unused. Details in https://github.com/mautic/mautic/pull/12265.
+    * Library `jvectormap` was replaced with its accessor `jvectormap-next` as it was unmaintaned. Details in https://github.com/mautic/mautic/pull/12359.
+    * Library `quicksearch` was updated from unmaintained vendor to latest version of its successor. Details in https://github.com/mautic/mautic/pull/12372.
 *   Other
     * `Mautic\UserBundle\Security\Firewall\AuthenticationListener::class` no longer implements the deprecated `Symfony\Component\Security\Http\Firewall\ListenerInterface` and was made final. The `public function handle(GetResponseEvent $event)` method was changed to `public function __invoke(RequestEvent $event): void` to support Symfony 5.
     * `Mautic\IntegrationsBundle\Configuration\PluginConfiguration` removed - we don't use it
@@ -32,6 +48,7 @@
     * Transactional emails in campaigns ignore the DNC setting.
     * There are no unsubscribe headers in transactional emails.
     * The SortablePanels templates, JS and CSS was removed as unused.
+    * Country name of Swaziland was update to Eswatini based on Standard: ISO 3166.
     * `Mautic\CoreBundle\Controller\CommonController::addFlash()` was renamed to `CommonController::addFlashMessage()`to prevent naming collision with `Symfony\Bundle\FrameworkBundle\Controller\AbstractController::addFlash()`. Controllers adding flash messages should use `$this->addFlashMessage()`.
 
 # Dependency injection improvements

@@ -44,7 +44,6 @@ class CitrixModel extends FormModel
     public function getRepository()
     {
         $result = $this->em->getRepository(CitrixEvent::class);
-        \assert($result instanceof CitrixEventRepository);
 
         return $result;
     }
@@ -368,6 +367,7 @@ class CitrixModel extends FormModel
         }
 
         // Delete events
+        $citrixEvents = [];
         if (0 !== count($emailsToRemove)) {
             $citrixEvents = $this->getRepository()->findBy(
                 [
@@ -404,8 +404,15 @@ class CitrixModel extends FormModel
             }
         }
 
-        $this->em->clear(Lead::class);
-        $this->em->clear(CitrixEvent::class);
+        foreach ($newEntities as $newEntity) {
+            $this->em->detach($newEntity);
+            $this->em->detach($newEntity->getLead());
+        }
+
+        foreach ($citrixEvents as $citrixEvent) {
+            $this->em->detach($citrixEvent);
+            $this->em->detach($citrixEvent->getLead());
+        }
 
         return $count;
     }
