@@ -3,7 +3,7 @@
 namespace Mautic\CoreBundle\Test;
 
 use AppKernel;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Exception;
 use LogicException;
 use Mautic\InstallBundle\InstallFixtures\ORM\LeadFieldData;
@@ -179,11 +179,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connection = $this->connection;
         $command    = 'mysql -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" < "${:db_backup_file}"';
         $envVars    = [
-            'MYSQL_PWD'      => $connection->getPassword(),
-            'db_host'        => $connection->getHost(),
-            'db_port'        => $connection->getPort(),
-            'db_user'        => $connection->getUsername(),
-            'db_name'        => $connection->getDatabase(),
+            'MYSQL_PWD'      => $this->connection->getParams()['password'],
+            'db_host'        => $this->connection->getParams()['host'],
+            'db_port'        => $this->connection->getParams()['port'],
+            'db_user'        => $this->connection->getParams()['user'],
+            'db_name'        => $this->connection->getParams()['dbname'],
             'db_backup_file' => $file,
         ];
 
@@ -254,15 +254,15 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $content .= 'SET unique_checks=0;'.PHP_EOL;
         $content .= 'SET FOREIGN_KEY_CHECKS=0;'.PHP_EOL;
 
-        $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getDatabase()])
+        $tables = $this->connection->executeQuery('SELECT TABLE_NAME FROM information_schema.tables WHERE table_type = "BASE TABLE" AND table_schema = ?', [$this->connection->getParams()['dbname']])
             ->fetchFirstColumn();
 
         foreach ($tables as $table) {
             $content .= sprintf('DELETE FROM %s;'.PHP_EOL, $table);
         }
 
-        $password = ($this->connection->getPassword()) ? " -p{$this->connection->getPassword()}" : '';
-        $command  = "mysqldump --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getHost()} -P{$this->connection->getPort()} -u{$this->connection->getUsername()}$password {$this->connection->getDatabase()} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
+        $password = ($this->connection->getParams()['password']) ? " -p{$this->connection->getParams()['password']}" : '';
+        $command  = "mysqldump --skip-triggers --compact --no-create-info --skip-opt --single-transaction --opt -h{$this->connection->getParams()['host']} -P{$this->connection->getParams()['port']} -u{$this->connection->getParams()['user']}$password {$this->connection->getParams()['dbname']} | grep -v \"LOCK TABLE\" | grep -v \"ALTER TABLE\"";
 
         $content .= shell_exec($command);
         $content .= 'COMMIT;'.PHP_EOL;
@@ -280,11 +280,11 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
         $connection = $this->connection;
         $command    = 'mysqldump --opt -h"${:db_host}" -P"${:db_port}" -u"${:db_user}" "${:db_name}" > "${:db_backup_file}"';
         $envVars    = [
-            'MYSQL_PWD'      => $connection->getPassword(),
-            'db_host'        => $connection->getHost(),
-            'db_port'        => $connection->getPort(),
-            'db_user'        => $connection->getUsername(),
-            'db_name'        => $connection->getDatabase(),
+            'MYSQL_PWD'      => $this->connection->getParams()['password'],
+            'db_host'        => $this->connection->getParams()['host'],
+            'db_port'        => $this->connection->getParams()['port'],
+            'db_user'        => $this->connection->getParams()['user'],
+            'db_name'        => $this->connection->getParams()['dbname'],
             'db_backup_file' => $sqlDumpFile,
         ];
 
@@ -315,7 +315,7 @@ abstract class MauticMysqlTestCase extends AbstractMauticTestCase
 
     private function getSqlFilePath(string $name): string
     {
-        return sprintf('%s/%s-%s.sql', self::$container->getParameter('kernel.cache_dir'), $name, $this->connection->getDatabase());
+        return sprintf('%s/%s-%s.sql', self::$container->getParameter('kernel.cache_dir'), $name, $this->connection->getParams()['dbname']);
     }
 
     private function resetCustomFields(): bool
