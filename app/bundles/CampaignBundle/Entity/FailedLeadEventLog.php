@@ -22,7 +22,7 @@ class FailedLeadEventLog
     private $dateAdded;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $reason;
 

@@ -48,7 +48,7 @@ class LeadEventLogRepository extends CommonRepository
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
@@ -289,7 +289,7 @@ class LeadEventLogRepository extends CommonRepository
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile(600, __METHOD__)
+                new QueryCacheProfile(600)
             )->fetchAllAssociative();
         } else {
             $results = $q->execute()->fetchAllAssociative();

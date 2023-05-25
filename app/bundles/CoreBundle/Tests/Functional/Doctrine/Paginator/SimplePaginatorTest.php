@@ -8,7 +8,6 @@ use function assert;
 use Doctrine\DBAL\Logging\DebugStack;
 use Mautic\CoreBundle\Doctrine\Paginator\SimplePaginator;
 use Mautic\CoreBundle\Entity\IpAddress;
-use Mautic\CoreBundle\Entity\IpAddressRepository;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class SimplePaginatorTest extends MauticMysqlTestCase
@@ -45,7 +44,6 @@ class SimplePaginatorTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $repository = $this->em->getRepository(IpAddress::class);
-        assert($repository instanceof IpAddressRepository);
 
         $paginator  = $repository->getEntities([
             'use_simple_paginator' => true,

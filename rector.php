@@ -63,4 +63,54 @@ return static function (Rector\Config\RectorConfig $rectorConfig): void {
     $rectorConfig->rule(\Rector\DeadCode\Rector\For_\RemoveDeadIfForeachForRector::class);
     $rectorConfig->rule(\Rector\DeadCode\Rector\If_\RemoveDeadInstanceOfRector::class);
     $rectorConfig->rule(\Rector\Symfony\Rector\MethodCall\ContainerGetToConstructorInjectionRector::class);
+
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\ChangeBigIntEntityPropertyToIntTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromColumnTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\MakeEntityDateTimePropertyDateTimeInterfaceRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\CorrectDefaultTypesOnEntityPropertyRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\ImproveDoctrineCollectionDocTypeInEntityRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromToOneRelationTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromToManyRelationTypeRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\TypedPropertyFromDoctrineCollectionRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\DoctrineTargetEntityStringToClassConstantRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Property\RemoveRedundantDefaultPropertyAnnotationValuesRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\MethodCall\ChangeSetParametersArrayToArrayCollectionRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\InitializeDefaultEntityCollectionRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\MoveCurrentDateTimeDefaultInEntityToConstructorRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRedundantDefaultClassAnnotationValuesRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\Class_\RemoveRepositoryFromEntityAnnotationRector::class);
+    $rectorConfig->rule(\Rector\Doctrine\Rector\ClassMethod\MakeEntitySetterNullabilityInSyncWithPropertyRector::class);
+
+    $rectorConfig->ruleWithConfiguration(\Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::class, [
+        \Rector\Doctrine\Rector\MethodCall\EntityAliasToClassConstantReferenceRector::ALIASES_TO_NAMESPACES         => [
+            'MauticApiBundle'                         => 'Mautic\ApiBundle\Entity',
+            'MauticAssetBundle'                       => 'Mautic\AssetBundle\Entity',
+            'MauticCampaignBundle'                    => 'Mautic\CampaignBundle\Entity',
+            'MauticCategoryBundle'                    => 'Mautic\CategoryBundle\Entity',
+            'MauticChannelBundle'                     => 'Mautic\ChannelBundle\Entity',
+            'MauticCoreBundle'                        => 'Mautic\CoreBundle\Entity',
+            'MauticDashboardBundle'                   => 'Mautic\DashboardBundle\Entity',
+            'MauticDynamicContentBundle'              => 'Mautic\DynamicContentBundle\Entity',
+            'MauticEmailBundle'                       => 'Mautic\EmailBundle\Entity',
+            'MauticFormBundle'                        => 'Mautic\FormBundle\Entity',
+            'MauticIntegrationBundle'                 => 'Mautic\IntegrationBundle\Entity',
+            'MauticLeadBundle'                        => 'Mautic\LeadBundle\Entity',
+            'MauticNotificationBundle'                => 'Mautic\NotificationBundle\Entity',
+            'MauticPageBundle'                        => 'Mautic\PageBundle\Entity',
+            'MauticPluginBundle'                      => 'Mautic\PluginBundle\Entity',
+            'MauticPointBundle'                       => 'Mautic\PointBundle\Entity',
+            'MauticReportBundle'                      => 'Mautic\ReportBundle\Entity',
+            'MauticSmsBundle'                         => 'Mautic\SmsBundle\Entity',
+            'MauticStageBundle'                       => 'Mautic\StageBundle\Entity',
+            'MauticUserBundle'                        => 'Mautic\UserBundle\Entity',
+            'MauticWebhookBundle'                     => 'Mautic\WebhookBundle\Entity',
+            'MauticPluginMauticSocialBundle'          => 'MauticPlugin\MauticSocialBundle\Entity',
+            'MauticPluginMauticCitrixBundle'          => 'MauticPlugin\MauticCitrixBundle\Entity',
+            'MauticPluginMauticCrmBundle'             => 'MauticPlugin\MauticCrmBundle\Entity',
+            'MauticPluginMauticTagManagerBundle'      => 'MauticPlugin\MauticTagManagerBundle\Entity',
+            'MauticPluginMauticFocusBundle'           => 'MauticPlugin\MauticFocusBundle\Entity',
+            'MauticPluginMauticGrapesJsBuilderBundle' => 'MauticPlugin\MauticGrapesJsBuilderBundle\Entity',
+            'FOSOAuthServerBundle'                    => 'FOS\OAuthServerBundle\Entity',
+        ],
+    ]);
 };

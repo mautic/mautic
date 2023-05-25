@@ -16,7 +16,7 @@ class WebhookQueue
     private $id;
 
     /**
-     * @var Webhook|null
+     * @var Webhook
      */
     private $webhook;
 
@@ -36,7 +36,7 @@ class WebhookQueue
     private $payloadCompressed;
 
     /**
-     * @var Event|null
+     * @var Event
      **/
     private $event;
 

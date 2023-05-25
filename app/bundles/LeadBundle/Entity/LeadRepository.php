@@ -578,7 +578,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
         }
 
         $q->select($select)
-            ->from('MauticLeadBundle:Lead', $alias, $alias.'.id')
+            ->from(\Mautic\LeadBundle\Entity\Lead::class, $alias, $alias.'.id')
             ->leftJoin($alias.'.owner', 'u')
             ->indexBy($alias, $alias.'.id');
 
@@ -1214,7 +1214,7 @@ class LeadRepository extends CommonRepository implements CustomFieldRepositoryIn
     }
 
     /**
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableAlias()
     {
