@@ -501,7 +501,7 @@ class CampaignRepository extends CommonRepository
                 $q->getSQL(),
                 $q->getParameters(),
                 $q->getParameterTypes(),
-                new QueryCacheProfile(600, __METHOD__)
+                new QueryCacheProfile(600)
             )->fetchAllAssociative();
         } else {
             $results = $q->execute()->fetchAllAssociative();
